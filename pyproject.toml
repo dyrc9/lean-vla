@@ -1,0 +1,70 @@
+[project]
+name = "proofalign"
+version = "0.1.0"
+description = "Research prototype for a Lean-backed dual alignment safety wrapper for VLA robots."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+]
+vla = [
+    "torch==2.2.0",
+    "torchvision==0.17.0",
+    "torchaudio==2.2.0",
+    "accelerate>=0.25.0",
+    "draccus==0.8.0",
+    "einops",
+    "huggingface-hub",
+    "json-numpy",
+    "jsonlines",
+    "matplotlib",
+    "peft==0.11.1",
+    "protobuf==3.20.3",
+    "rich",
+    "sentencepiece==0.1.99",
+    "tensorflow==2.15.0",
+    "tensorflow-datasets==4.9.3",
+    "tensorflow-graphics==2021.12.3",
+    "tensorflow-metadata==1.14.0",
+    "timm==0.9.10",
+    "tokenizers==0.19.1",
+    "wandb==0.16.6",
+    "diffusers==0.30.3",
+    "imageio",
+    "uvicorn",
+    "fastapi",
+    "dlimp @ git+https://gh-proxy.com/https://github.com/moojink/dlimp_openvla@040105d256bd28866cc6620621a3d5f7b6b91b46",
+    "transformers @ git+https://gh-proxy.com/https://github.com/moojink/transformers-openvla-oft.git@bc339d9ad707454c0c115970db43c260067c61ab",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/proofalign"]
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src", "."]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+]
+
+[[tool.uv.index]]
+name = "pytorch-cu121"
+url = "https://download.pytorch.org/whl/cu121"
+explicit = true
+
+[tool.uv.sources]
+torch = { index = "pytorch-cu121" }
+torchvision = { index = "pytorch-cu121" }
+torchaudio = { index = "pytorch-cu121" }
