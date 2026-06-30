@@ -256,6 +256,12 @@ class ExecutionStep:
     after: WorldState | None = None
     pre_certificates: list[Any] = field(default_factory=list)
     post_certificates: list[Any] = field(default_factory=list)
+    raw_action: Any | None = None
+    proofalign_action: dict[str, Any] | None = None
+    env_info: dict[str, Any] = field(default_factory=dict)
+    reward: float | None = None
+    done: bool | None = None
+    runtime_seconds: dict[str, float] = field(default_factory=dict)
 
 
 @dataclass

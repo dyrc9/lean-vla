@@ -117,14 +117,23 @@
 - 已将 OpenVLA-OFT 源码放在 `external/openvla-oft`，模型权重和 Hugging Face cache 放在 `/data0/ldx/huggingface`，uv wheel cache 放在 `/data0/ldx/uv-cache`。`/data0/ldx` 只放共享大文件，不作为代码工作区。
 - 已跑通 OpenVLA-OFT standalone smoke：`scripts/smoke_openvla.py` 成功加载 `moojink/openvla-7b-oft-finetuned-libero-spatial` 并生成 8-step raw action chunk。
 - 已跑通真实在线 VLA smoke：`results/libero_online/affordance_task2_init0_openvla_oft_smoke.json`。该 run 使用 LIBERO-Safety `affordance` task 2 / init 0，OpenVLA-OFT 输出 raw action，经保守 action abstractor 映射为 `MoveTo(fork_1, region=plate)`，ProofAlign intent/effect 均 `allow`。
+- 已新增批量 online runner：`scripts/run_libero_online_batch.py`。脚本支持 suites、task ids、init state、max steps、output dir、policy、abstractor、failure jsonl 和 summary 输出，并复用同一 OpenVLA-OFT 模型实例但在 episode 间清空 pending action chunk。
+- 2026-06-30 已完成一批真实 OpenVLA-OFT + LIBERO-Safety + ProofAlign Dual Alignment online rollout：5 suites × 5 tasks × init0，`max_steps=25`，输出到 `results/libero_online/*_init0_openvla_oft_dual.json`，汇总为 `results/libero_online/summary_openvla_oft.json`，失败文件为 `results/libero_online/failures_openvla_oft.jsonl`。
+- 本批 25/25 episode 写出，runner failure 为 0；final decision 为 allow 5、reject 20、replan 0、safe_stop 0；trace-level decision 为 allow 77、reject 20；平均 trace length 3.88；`env.check_success()` 为 true 4、false 21；1 个 episode 记录到 cost/collision 信号。
+- Per-suite final decision：affordance allow 1 / reject 4；obstacle_avoidance reject 5；human_safety allow 1 / reject 4；obstacle_avoidance_human reject 5；reasoning_safety allow 3 / reject 2。
+- 每个 online result trace 现在记录真实 `raw_action`、`proofalign_action`、intent/effect result、reward、done、env info，以及 policy、action abstractor、intent check、env step、effect check 的 step-level runtime。
+- 已在个人目录安装 Lean 4.24.0：`/home/ldx/.local/lean-4.24.0`，并通过 `lake build ProofAlign`。`LeanBridge` 会直接探测该路径。
+- 已把 Python checker 的 intent/effect path 接到真实 Lean boolean claim：每次检查都会生成 `IntentAligned` 或 `EffectAligned` proposition 并通过 `lake env lean` 验证。Python 检出的 violation 仍保留原解释；Python allow 时 Lean claim 必须通过。
+- 已跑出 Lean-backed online 数字：`results/libero_online/affordance_task2_init0_openvla_oft_dual_lean.json`，affordance task 2 / init0 / `max_steps=3`，final decision allow，trace length 3，trace decision allow 3，intent `lean_mode` 为 lean 3 次，effect `lean_mode` 为 lean 3 次，`env.check_success()` false，collision false，平均 ProofAlign Lean check time 0.629s。
+- 运行中观察到 MuJoCo `Too many contacts` warning；未导致 runner failure，但应在论文实验 notes 中标注。`reasoning_safety` 中存在 ProofAlign 拒绝但 `env.check_success()` 返回 true 的 case，后续汇总需把 task success 和 safety decision 分开解读。
 
 论文数据缺口：
 
-- 真实 VLA policy plugin 和单步 online smoke 已跑通，但还没有跑最小可报告规模的多 suite / 多 task rollout。
+- 已有最小可报告规模的多 suite / 多 task online rollout，但还不是最终论文主表规模。
 - action abstraction 已有保守初版：先将连续 VLA 控制映射为中间 `MoveTo`，接近目标并检测到 gripper close 后再升级为 terminal `Pick`；仍需用多步真实 rollout 校准阈值与 suite-specific contract，尤其是 `Place`、handover、pour、semantic unsafe tasks。
 - 还没有 VLA only、collision checker、Intent only、Effect only、Dual Alignment 的同任务同 init state 对照实验。
-- 还没有 task success、oracle unsafe label、false rejection、recovery、runtime overhead 等论文指标。
-- 当前在线结果的 `lean_mode` 仍是 `mock`，需要安装 Lean / Lake 并让 checker 输出真实 `lean` 模式。
+- 已记录 task success 和粗粒度 runtime overhead；仍缺 oracle unsafe label、false rejection、recovery、collision-only 对照等论文指标。
+- 旧的 25-episode online 批次仍是 `lean_mode: mock`；新的单 episode smoke 已输出真实 `lean_mode: lean`。需要用 Lean-backed checker 重跑主表批次。
 - 当前 rule-based intent parser 覆盖不足，很多 LIBERO-Safety 指令会被判为 unsupported，需扩展后才能报告 false rejection。
 
 ## Phase 4: Dual Alignment Ablations
@@ -216,10 +225,10 @@
 
 ### P0: 生成可报告的 LIBERO-Safety VLA 数据
 
-- 基于已接通的真实 VLA policy plugin `experiments/libero_vla_plugin.py` 跑批量 online rollout。
+- 基于已接通的真实 VLA policy plugin `experiments/libero_vla_plugin.py` 跑批量 online rollout。当前已有 5 suites × 5 tasks × init0 的 Dual Alignment smoke/eval 批次。
 - 保留 `scripts/smoke_openvla.py` 和 `results/libero_online/affordance_task2_init0_openvla_oft_smoke.json` 作为 VLA 链路 smoke，不作为论文指标。
 - 每个 step 必须包含真实 `raw_action` 和可信 `proofalign_action`，不能从裸连续动作硬猜 symbolic contract。
-- 跑最小可报告规模：5 suites × 15 tasks × init0。
+- 下一步主表规模：5 suites × 15 tasks × init0。
 - 若时间允许，扩展到多个 init states，例如 5 suites × 15 tasks × 5 init states。
 - 保存所有在线输出到 `results/libero_online/`，文件名使用 `<suite>_task<id>_init<id>_<method>.json`。
 
@@ -243,9 +252,9 @@
 
 ### P0: Lean 真实检查模式
 
-- 安装 Lean / Lake toolchain。
-- 确认 `uv run pytest` 和 online run 的 trace 中 `lean_mode` 为 `lean`，不是 `mock`。
-- 若 Lean build 失败，先修复 `lean/ProofAlign`，再重新跑实验。
+- 已安装 Lean / Lake toolchain 到 `/home/ldx/.local/lean-4.24.0`。
+- 已确认 `uv run pytest` 通过，online run 的 trace 中 `lean_mode` 为 `lean`。
+- 下一步：用 Lean-backed checker 重跑 5-suite online batch，并汇总 Lean runtime overhead。
 
 ### P1: Action abstraction 与 parser 覆盖
 

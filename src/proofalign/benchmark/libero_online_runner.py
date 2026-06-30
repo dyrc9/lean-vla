@@ -5,6 +5,7 @@ import importlib
 import json
 import os
 import sys
+from time import perf_counter
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -14,6 +15,7 @@ from proofalign.benchmark.libero_online_wrapper import (
     LiberoActionAbstractor,
     LiberoOnlineIntegrationError,
     ProofAlignLiberoWrapper,
+    action_to_dict,
     make_libero_offscreen_env,
 )
 from proofalign.benchmark.libero_safety_adapter import LiberoSafetyAdapter, LiberoSafetyUnavailable
@@ -182,6 +184,16 @@ def create_initialized_env(runtime: LiberoTaskRuntime, args: argparse.Namespace)
 
 
 def run_online_episode(args: argparse.Namespace) -> ExecutionDecision:
+    return run_online_episode_with_plugins(args)[0]
+
+
+def run_online_episode_with_plugins(
+    args: argparse.Namespace,
+    *,
+    policy: Callable[[str, Any, list[ExecutionStep]], Any] | None = None,
+    action_abstractor: LiberoActionAbstractor | None = None,
+) -> tuple[ExecutionDecision, dict[str, Any]]:
+    episode_start = perf_counter()
     runtime = load_libero_task_runtime(
         benchmark_name=args.benchmark,
         task_id=args.task_id,
@@ -189,9 +201,16 @@ def run_online_episode(args: argparse.Namespace) -> ExecutionDecision:
         bddl_file=args.bddl_file,
     )
     env = create_initialized_env(runtime, args)
+    task_success: bool | None = None
     try:
-        policy = build_policy(args)
-        action_abstractor = build_action_abstractor(args)
+        if policy is None:
+            policy = build_policy(args)
+        else:
+            reset_episode = getattr(policy, "reset_episode", None)
+            if callable(reset_episode):
+                reset_episode()
+        if action_abstractor is None:
+            action_abstractor = build_action_abstractor(args)
         spec = build_safety_spec(args)
         wrapper_kwargs: dict[str, Any] = {}
         if action_abstractor is not None:
@@ -206,8 +225,13 @@ def run_online_episode(args: argparse.Namespace) -> ExecutionDecision:
         else:
             wrapper.current_state = wrapper.state_observer.observe(env, wrapper.current_observation)
         decision = wrapper.run_episode(policy, max_steps=args.max_steps)
-        _write_result(args.output, runtime, decision)
-        return decision
+        task_success = _check_task_success(env)
+        episode_metadata = {
+            "task_success": task_success,
+            "episode_wall_time_seconds": perf_counter() - episode_start,
+        }
+        _write_result(args.output, runtime, decision, episode_metadata)
+        return decision, episode_metadata
     finally:
         if hasattr(env, "close"):
             env.close()
@@ -275,13 +299,32 @@ def _load_action_file(path: Path) -> list[Any]:
     raise LiberoOnlineIntegrationError(f"Unsupported action file shape: {path}")
 
 
-def _write_result(path: str | None, runtime: LiberoTaskRuntime, decision: ExecutionDecision) -> None:
+def _check_task_success(env: Any) -> bool | None:
+    check = getattr(env, "check_success", None)
+    if not callable(check):
+        return None
+    try:
+        return bool(check())
+    except Exception:
+        return None
+
+
+def _write_result(
+    path: str | None,
+    runtime: LiberoTaskRuntime,
+    decision: ExecutionDecision,
+    episode_metadata: dict[str, Any] | None = None,
+) -> None:
     if not path:
         return
     output = Path(path)
     output.parent.mkdir(parents=True, exist_ok=True)
     payload = {
         "metadata": runtime.metadata,
+        "task_success": (episode_metadata or {}).get("task_success"),
+        "runtime": {
+            "episode_wall_time_seconds": (episode_metadata or {}).get("episode_wall_time_seconds"),
+        },
         "decision": decision.decision.value,
         "explanation": decision.explanation,
         "final_state": decision.final_state.to_dict(),
@@ -291,9 +334,15 @@ def _write_result(path: str | None, runtime: LiberoTaskRuntime, decision: Execut
                 "object": step.action.object_id,
                 "part": step.action.part,
                 "region": step.action.region,
+                "raw_action": step.raw_action,
+                "proofalign_action": step.proofalign_action or action_to_dict(step.action),
                 "decision": step.decision.value,
                 "intent": step.intent_result.__dict__,
                 "effect": step.effect_result.__dict__ if step.effect_result else None,
+                "reward": step.reward,
+                "done": step.done,
+                "env_info": step.env_info,
+                "runtime_seconds": step.runtime_seconds,
             }
             for step in decision.trace
         ],

@@ -86,6 +86,9 @@ class OpenVLAPolicy:
     _proprio_projector: Any = None
     _oft_cfg: Any = None
 
+    def reset_episode(self) -> None:
+        self._pending_actions.clear()
+
     def __call__(self, instruction: str, observation: Any, history: list[ExecutionStep]) -> dict[str, Any]:
         if self._pending_actions:
             raw_action = self._pending_actions.popleft()

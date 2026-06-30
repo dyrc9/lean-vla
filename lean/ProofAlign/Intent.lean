@@ -21,7 +21,7 @@ def IntentAligned (intent : TaskIntent) (action : Action) (spec : SafetySpec) : 
         && !(spec.forbiddenObjects.contains obj)
         && !(intent.avoidObjects.contains obj)
     | Action.moveTo obj region =>
-        intent.verb == "move"
+        (intent.verb == "move" || intent.verb == "pick" || intent.verb == "place")
         && intent.targetObject == some obj
         && (intent.targetRegion == none || intent.targetRegion == some region)
         && !(spec.forbiddenObjects.contains obj)

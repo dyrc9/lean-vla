@@ -24,15 +24,22 @@ class LeanBridge:
     fallback mode.
     """
 
-    def __init__(self, lean_root: Path | None = None, command: str = "lean") -> None:
+    def __init__(self, lean_root: Path | None = None, command: str | None = None) -> None:
         self.lean_root = lean_root or Path(__file__).resolve().parents[2] / "lean"
-        self.command = command
+        bundled = Path("/home/ldx/.local/lean-4.24.0/bin/lean")
+        self.command = command or (str(bundled) if bundled.exists() else "lean")
         self.lake_command = "lake"
         self._cached_project_check: LeanCheck | None = None
 
     @property
     def available(self) -> bool:
-        return shutil.which(self.command) is not None
+        return Path(self.command).exists() or shutil.which(self.command) is not None
+
+    def _lake_command(self) -> str | None:
+        bundled = Path(self.command).with_name("lake")
+        if bundled.exists():
+            return str(bundled)
+        return shutil.which(self.lake_command)
 
     def check_project(self) -> LeanCheck:
         if self._cached_project_check is not None:
@@ -42,9 +49,10 @@ class LeanBridge:
                 False, True, "mock", stderr="Lean executable not found; using prototype mock mode."
             )
             return self._cached_project_check
-        if shutil.which(self.lake_command):
+        lake = self._lake_command()
+        if lake:
             proc = subprocess.run(
-                [self.lake_command, "build", "ProofAlign"],
+                [lake, "build", "ProofAlign"],
                 cwd=str(self.lean_root),
                 text=True,
                 capture_output=True,
@@ -73,8 +81,9 @@ class LeanBridge:
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / f"{name}.lean"
             path.write_text(snippet, encoding="utf-8")
-            if shutil.which(self.lake_command):
-                cmd = [self.lake_command, "env", self.command, str(path)]
+            lake = self._lake_command()
+            if lake:
+                cmd = [lake, "env", self.command, str(path)]
             else:
                 cmd = [self.command, str(path)]
             proc = subprocess.run(cmd, cwd=str(self.lean_root), text=True, capture_output=True, check=False)

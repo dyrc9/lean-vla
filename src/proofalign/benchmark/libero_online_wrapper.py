@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from time import perf_counter
 from typing import Any, Protocol
 
 from proofalign.action_abstraction import action_from_dict
@@ -275,9 +276,11 @@ class ProofAlignLiberoWrapper:
         return observation
 
     def step(self, raw_action: Any) -> LiberoStepResult:
+        total_start = perf_counter()
         if self.current_state is None:
             self.current_state = self.state_observer.observe(self.env, self.current_observation)
         before = self.current_state.clone()
+        abstract_start = perf_counter()
         symbolic_action = self.action_abstractor.abstract(
             raw_action,
             instruction=self.instruction,
@@ -286,7 +289,9 @@ class ProofAlignLiberoWrapper:
             spec=self.spec,
             history=self.trace,
         )
+        abstract_time = perf_counter() - abstract_start
         pre_certs = CertificateBundle.from_dicts(symbolic_action.params.get("pre_certificates"))
+        intent_start = perf_counter()
         intent_result = self.checker.check_intent_alignment(
             self.intent,
             before,
@@ -295,6 +300,7 @@ class ProofAlignLiberoWrapper:
             pre_certs,
             len(self.trace),
         )
+        intent_time = perf_counter() - intent_start
         if not intent_result.passed:
             step = ExecutionStep(
                 symbolic_action,
@@ -303,6 +309,18 @@ class ProofAlignLiberoWrapper:
                 intent_result.suggested_decision,
                 before,
                 pre_certificates=pre_certs.to_dicts(),
+                raw_action=env_action_from_raw(raw_action),
+                proofalign_action=action_to_dict(symbolic_action),
+                env_info={},
+                reward=0.0,
+                done=True,
+                runtime_seconds={
+                    "action_abstractor": abstract_time,
+                    "intent_check": intent_time,
+                    "effect_check": 0.0,
+                    "env_step": 0.0,
+                    "wrapper_step_wall": perf_counter() - total_start,
+                },
             )
             self.trace.append(step)
             return LiberoStepResult(
@@ -314,11 +332,15 @@ class ProofAlignLiberoWrapper:
                 step,
             )
 
-        observation, reward, done, info = normalize_env_step(self.env.step(env_action_from_raw(raw_action)))
+        env_action = env_action_from_raw(raw_action)
+        env_start = perf_counter()
+        observation, reward, done, info = normalize_env_step(self.env.step(env_action))
+        env_time = perf_counter() - env_start
         self.current_observation = observation
         info = dict(info)
         after = self.state_observer.observe(self.env, observation, info)
         post_certs = CertificateBundle.from_dicts(symbolic_action.params.get("post_certificates"))
+        effect_start = perf_counter()
         effect_result = self.checker.check_effect_alignment(
             before,
             symbolic_action,
@@ -327,6 +349,7 @@ class ProofAlignLiberoWrapper:
             post_certs,
             len(self.trace),
         )
+        effect_time = perf_counter() - effect_start
         decision = effect_result.suggested_decision
         done = bool(done or decision in {Decision.REJECT, Decision.SAFE_STOP})
         info.update(self._info(decision, effect_result))
@@ -339,6 +362,18 @@ class ProofAlignLiberoWrapper:
             after,
             pre_certificates=pre_certs.to_dicts(),
             post_certificates=post_certs.to_dicts(),
+            raw_action=env_action,
+            proofalign_action=action_to_dict(symbolic_action),
+            env_info=dict(info),
+            reward=float(reward),
+            done=done,
+            runtime_seconds={
+                "action_abstractor": abstract_time,
+                "intent_check": intent_time,
+                "effect_check": effect_time,
+                "env_step": env_time,
+                "wrapper_step_wall": perf_counter() - total_start,
+            },
         )
         self.trace.append(step)
         self.current_state = after
@@ -350,8 +385,11 @@ class ProofAlignLiberoWrapper:
         final_decision = Decision.ALLOW
         explanation = "episode completed without ProofAlign violations"
         for _ in range(max_steps):
+            policy_start = perf_counter()
             raw_action = policy(self.instruction, self.current_observation, self.trace)
+            policy_time = perf_counter() - policy_start
             result = self.step(raw_action)
+            result.step.runtime_seconds["policy"] = policy_time
             final_decision = result.decision
             if result.decision != Decision.ALLOW:
                 explanation = result.step.effect_result.explanation if result.step.effect_result else result.step.intent_result.explanation
@@ -399,6 +437,22 @@ def env_action_from_raw(raw_action: Any) -> Any:
     if isinstance(raw_action, dict) and "raw_action" in raw_action:
         return raw_action["raw_action"]
     return raw_action
+
+
+def action_to_dict(action: Action) -> dict[str, Any]:
+    payload: dict[str, Any] = {"type": action.kind.value}
+    if action.object_id is not None:
+        payload["object"] = action.object_id
+    if action.part is not None:
+        payload["part"] = action.part
+    if action.region is not None:
+        payload["region"] = action.region
+    if action.pose is not None:
+        payload["pose"] = action.pose.to_dict()
+    if action.avoid_object is not None:
+        payload["avoid_object"] = action.avoid_object
+    payload.update(action.params)
+    return payload
 
 
 def unwrap_libero_env(env: Any) -> Any:
