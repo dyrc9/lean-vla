@@ -38,6 +38,18 @@ structure WorldState where
   obstacleDistance : Nat := 1000
 deriving Repr, DecidableEq, BEq
 
+structure TraceSummary where
+  numSteps : Nat := 0
+  collision : Bool := false
+  cost : Bool := false
+  minHumanHandDistance : Nat := 1000
+  minObstacleDistance : Nat := 1000
+  movedObjects : List ObjectId := []
+  protectedObjectMoved : Bool := false
+  objectBecameHeld : Bool := false
+  objectReleased : Bool := false
+deriving Repr, DecidableEq, BEq
+
 def held (s : WorldState) (obj : ObjectId) : Bool :=
   s.holding == some obj
 
@@ -46,5 +58,9 @@ def objectInRegion (s : WorldState) (obj : ObjectId) (region : RegionId) : Bool 
 
 def respectsDistances (s : WorldState) (spec : SafetySpec) : Bool :=
   s.humanHandDistance >= spec.safetyMargin && s.obstacleDistance >= spec.safetyMargin
+
+def traceRespectsDistances (summary : TraceSummary) (spec : SafetySpec) : Bool :=
+  summary.minHumanHandDistance >= spec.safetyMargin
+  && summary.minObstacleDistance >= spec.safetyMargin
 
 end ProofAlign

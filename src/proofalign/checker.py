@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 import re
 
-from proofalign.certificates import CertificateBundle, CertificateKind, certificates_from_action_params
+from proofalign.certificates import Certificate, CertificateBundle, CertificateKind, certificates_from_action_params
 from proofalign.lean_bridge import LeanBridge
 from proofalign.models import (
     Action,
@@ -12,6 +12,7 @@ from proofalign.models import (
     Decision,
     SafetySpec,
     TaskIntent,
+    TraceSummary,
     WorldState,
 )
 from proofalign.violations import ViolationReport, ViolationType
@@ -223,6 +224,114 @@ class DualAlignmentChecker:
             _lean_effect_expression(before, action, after, spec),
         )
 
+    def check_chunk_effect_alignment(
+        self,
+        before: WorldState,
+        action: Action,
+        after: WorldState,
+        summary: TraceSummary,
+        spec: SafetySpec,
+        post_certificates: CertificateBundle | None = None,
+        step: int | None = None,
+    ) -> CheckResult:
+        violations: list[str] = []
+        reports: list[ViolationReport] = []
+        certs = post_certificates or certificates_from_action_params(action.params, "effect")
+
+        if summary.num_raw_steps <= 0:
+            self._add_violation(violations, reports, ViolationType.POSTCONDITION, "chunk_effect", "chunk executed no raw env steps", Decision.REPLAN)
+        if summary.collision or summary.cost_observed:
+            reason = "collision was observed during chunk execution" if summary.collision else "LIBERO safety cost was observed during chunk execution"
+            self._add_violation(violations, reports, ViolationType.COLLISION, "chunk_effect", reason, Decision.SAFE_STOP)
+        if summary.min_human_hand_distance < spec.safety_margin:
+            self._add_violation(
+                violations,
+                reports,
+                ViolationType.CLEARANCE,
+                "chunk_effect",
+                f"chunk human hand distance {summary.min_human_hand_distance:.3f} below margin {spec.safety_margin:.3f}",
+                Decision.REPLAN,
+            )
+        if summary.min_obstacle_distance < spec.safety_margin:
+            self._add_violation(
+                violations,
+                reports,
+                ViolationType.CLEARANCE,
+                "chunk_effect",
+                f"chunk obstacle distance {summary.min_obstacle_distance:.3f} below margin {spec.safety_margin:.3f}",
+                Decision.REPLAN,
+            )
+        if summary.protected_object_moved:
+            self._add_violation(
+                violations,
+                reports,
+                ViolationType.FRAME_CONDITION,
+                "chunk_effect",
+                "protected object moved during chunk execution",
+                Decision.SAFE_STOP,
+            )
+
+        action_target = action.object_id
+        for moved in summary.moved_objects:
+            if moved != action_target and _matches_any(moved, spec.forbidden_objects + spec.protected_objects):
+                self._add_violation(
+                    violations,
+                    reports,
+                    ViolationType.FRAME_CONDITION,
+                    "chunk_effect",
+                    f"frame condition failed: protected/forbidden object {moved} moved",
+                    Decision.SAFE_STOP,
+                    [moved],
+                )
+
+        if action.kind == ActionKind.PICK and action.object_id:
+            obj = after.objects.get(action.object_id)
+            if (
+                not after.last_action_success
+                or after.gripper_holding != action.object_id
+                or not obj
+                or obj.held_by != "gripper"
+                or not summary.object_became_held
+            ):
+                self._add_violation(
+                    violations,
+                    reports,
+                    ViolationType.POSTCONDITION,
+                    "chunk_effect",
+                    f"pick chunk postcondition failed: {action.object_id} did not become held by gripper",
+                    Decision.REPLAN,
+                    [action.object_id],
+                )
+
+        if action.kind == ActionKind.PLACE and action.object_id and action.region:
+            obj = after.objects.get(action.object_id)
+            region = after.regions.get(action.region)
+            if not after.last_action_success or after.gripper_holding is not None or not summary.object_released:
+                self._add_violation(violations, reports, ViolationType.POSTCONDITION, "chunk_effect", "place chunk postcondition failed: gripper did not release object", Decision.REPLAN, [action.object_id])
+            if not obj or not region or not region.contains(obj.pose):
+                self._add_violation(violations, reports, ViolationType.POSTCONDITION, "chunk_effect", f"place chunk postcondition failed: {action.object_id} is not in {action.region}", Decision.REPLAN, [action.object_id])
+
+        if action.kind == ActionKind.MOVE_TO and action.region and spec.require_progress_to_region:
+            obj_id = action.object_id
+            region = after.regions.get(action.region)
+            if obj_id and region and obj_id in before.objects and obj_id in after.objects:
+                before_dist = before.objects[obj_id].pose.distance_to(region.center)
+                after_dist = after.objects[obj_id].pose.distance_to(region.center)
+                if after_dist >= before_dist:
+                    self._add_violation(violations, reports, ViolationType.POSTCONDITION, "chunk_effect", f"move chunk postcondition failed: {obj_id} did not progress toward {action.region}", Decision.REPLAN, [obj_id])
+
+        self._check_post_certificates(certs, action, spec, step, violations, reports)
+
+        decision = Decision.SAFE_STOP if _summary_hazard(summary) or any(report.recoverability == Decision.SAFE_STOP for report in reports) else Decision.REPLAN
+        return self._result(
+            "chunk_effect",
+            violations,
+            "observed chunk effect matches symbolic action contract",
+            decision,
+            reports,
+            _lean_chunk_effect_expression(before, action, after, summary, spec),
+        )
+
     def check_dual_alignment(
         self,
         intent: TaskIntent,
@@ -254,6 +363,60 @@ class DualAlignmentChecker:
                 violation_reports=effect_result.violation_reports,
             )
         return CheckResult(True, "dual", [], "Both alignment layers passed.", Decision.ALLOW, effect_result.lean_mode)
+
+    def check_certified_dual_chunk_alignment(
+        self,
+        intent: TaskIntent,
+        before: WorldState,
+        action: Action,
+        after: WorldState,
+        summary: TraceSummary,
+        spec: SafetySpec,
+        pre_certificates: CertificateBundle | None = None,
+        post_certificates: CertificateBundle | None = None,
+        step: int | None = None,
+    ) -> CheckResult:
+        pre_certs = pre_certificates or CertificateBundle.from_dicts(action.params.get("pre_certificates"))
+        post_certs = post_certificates or CertificateBundle.from_dicts(action.params.get("post_certificates"))
+        intent_result = self.check_intent_alignment(intent, before, action, spec, pre_certs, step)
+        if not intent_result.passed:
+            return CheckResult(
+                passed=False,
+                layer="dual_chunk",
+                violations=intent_result.violations,
+                explanation="Intent-action alignment failed before chunk execution.",
+                suggested_decision=intent_result.suggested_decision,
+                lean_mode=intent_result.lean_mode,
+                violation_reports=intent_result.violation_reports,
+            )
+        effect_result = self.check_chunk_effect_alignment(before, action, after, summary, spec, post_certs, step)
+        if not effect_result.passed:
+            return CheckResult(
+                passed=False,
+                layer="dual_chunk",
+                violations=effect_result.violations,
+                explanation="Chunk action-effect alignment failed after execution.",
+                suggested_decision=effect_result.suggested_decision,
+                lean_mode=effect_result.lean_mode,
+                violation_reports=effect_result.violation_reports,
+            )
+        return self._result(
+            "dual_chunk",
+            [],
+            "Both certified chunk alignment layers passed.",
+            Decision.REPLAN,
+            [],
+            _lean_certified_dual_chunk_expression(
+                intent,
+                before,
+                action,
+                after,
+                summary,
+                spec,
+                pre_certs,
+                post_certs,
+            ),
+        )
 
     def _result(
         self,
@@ -385,6 +548,47 @@ def _lean_effect_expression(before: WorldState, action: Action, after: WorldStat
     return f"ProofAlign.EffectAligned ({_lean_world(before)}) ({_lean_action(action)}) ({_lean_world(after)}) ({_lean_spec(spec)})"
 
 
+def _lean_chunk_effect_expression(
+    before: WorldState,
+    action: Action,
+    after: WorldState,
+    summary: TraceSummary,
+    spec: SafetySpec,
+) -> str:
+    return (
+        "ProofAlign.ChunkEffectAligned "
+        f"({_lean_world(before)}) "
+        f"({_lean_action(action)}) "
+        f"({_lean_world(after)}) "
+        f"({_lean_trace_summary(summary)}) "
+        f"({_lean_spec(spec)})"
+    )
+
+
+def _lean_certified_dual_chunk_expression(
+    intent: TaskIntent,
+    before: WorldState,
+    action: Action,
+    after: WorldState,
+    summary: TraceSummary,
+    spec: SafetySpec,
+    pre_certs: CertificateBundle,
+    post_certs: CertificateBundle,
+) -> str:
+    return (
+        "ProofAlign.CertifiedDualChunkAligned "
+        f"({_lean_intent(intent)}) "
+        f"({_lean_world(before)}) "
+        f"({_lean_intent_action(intent, action)}) "
+        f"({_lean_world(after)}) "
+        f"({_lean_trace_summary(summary)}) "
+        f"({_lean_spec(spec)}) "
+        f"({_lean_certificate_list(pre_certs.certificates)}) "
+        f"({_lean_certificate_list(post_certs.certificates)}) "
+        f"{_lean_nat(spec.certificate_min_confidence)}"
+    )
+
+
 def _lean_intent(intent: TaskIntent) -> str:
     return (
         "{ "
@@ -456,6 +660,68 @@ def _lean_world(state: WorldState) -> str:
     )
 
 
+def _lean_trace_summary(summary: TraceSummary) -> str:
+    return (
+        "{ "
+        f"numSteps := {max(0, int(summary.num_raw_steps))}, "
+        f"collision := {_lean_bool(summary.collision)}, "
+        f"cost := {_lean_bool(summary.cost_observed)}, "
+        f"minHumanHandDistance := {_lean_nat(summary.min_human_hand_distance)}, "
+        f"minObstacleDistance := {_lean_nat(summary.min_obstacle_distance)}, "
+        f"movedObjects := {_lean_string_list(summary.moved_objects)}, "
+        f"protectedObjectMoved := {_lean_bool(summary.protected_object_moved)}, "
+        f"objectBecameHeld := {_lean_bool(summary.object_became_held)}, "
+        f"objectReleased := {_lean_bool(summary.object_released)} "
+        "}"
+    )
+
+
+def _lean_certificate_list(certs: list[Certificate]) -> str:
+    return "[" + ", ".join(_lean_certificate(cert) for cert in certs) + "]"
+
+
+def _lean_certificate(cert: Certificate) -> str:
+    value = cert.value if isinstance(cert.value, (int, float)) else 1.0
+    threshold = cert.threshold if cert.threshold is not None else 0.0
+    return (
+        "{ "
+        f"kind := {_lean_cert_kind(cert.kind)}, "
+        f"status := {_lean_cert_status(cert.status.value)}, "
+        f"subject := {_lean_option_string(cert.subject)}, "
+        f"target := {_lean_option_string(cert.target)}, "
+        f"value := {_lean_nat(float(value))}, "
+        f"threshold := {_lean_nat(float(threshold))}, "
+        f"confidence := {_lean_nat(cert.confidence)} "
+        "}"
+    )
+
+
+def _lean_cert_kind(kind: CertificateKind) -> str:
+    mapping = {
+        CertificateKind.OBJECT_IDENTITY: "ProofAlign.CertKind.objectIdentity",
+        CertificateKind.AFFORDANCE: "ProofAlign.CertKind.affordance",
+        CertificateKind.COLLISION_FREE: "ProofAlign.CertKind.collisionFree",
+        CertificateKind.HUMAN_CLEARANCE: "ProofAlign.CertKind.humanClearance",
+        CertificateKind.OBSTACLE_CLEARANCE: "ProofAlign.CertKind.obstacleClearance",
+        CertificateKind.REGION_OCCUPANCY: "ProofAlign.CertKind.regionOccupancy",
+        CertificateKind.STATE_TRANSITION: "ProofAlign.CertKind.stateTransition",
+        CertificateKind.FRAME_CONDITION: "ProofAlign.CertKind.frameCondition",
+    }
+    return mapping[kind]
+
+
+def _lean_cert_status(status: str) -> str:
+    mapping = {
+        "valid": "ProofAlign.CertStatus.valid",
+        "invalid": "ProofAlign.CertStatus.invalid",
+        "missing": "ProofAlign.CertStatus.missing",
+        "expired": "ProofAlign.CertStatus.expired",
+        "low_confidence": "ProofAlign.CertStatus.lowConfidence",
+        "unknown": "ProofAlign.CertStatus.unknown",
+    }
+    return mapping.get(status, "ProofAlign.CertStatus.unknown")
+
+
 def _lean_string(value: str) -> str:
     return json.dumps(value)
 
@@ -480,3 +746,7 @@ def _lean_nat(value: float) -> str:
     if value >= 999:
         return "100000"
     return str(max(0, int(round(value * 100))))
+
+
+def _summary_hazard(summary: TraceSummary) -> bool:
+    return summary.collision or summary.cost_observed or summary.protected_object_moved

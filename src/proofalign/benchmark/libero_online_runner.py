@@ -215,6 +215,7 @@ def run_online_episode_with_plugins(
         wrapper_kwargs: dict[str, Any] = {}
         if action_abstractor is not None:
             wrapper_kwargs["action_abstractor"] = action_abstractor
+        wrapper_kwargs["max_chunk_steps"] = getattr(args, "max_chunk_steps", 8)
         wrapper = ProofAlignLiberoWrapper(env, runtime.instruction, spec, **wrapper_kwargs)
         try:
             wrapper.current_observation = getattr(env, "_get_observations", lambda: None)()
@@ -335,7 +336,11 @@ def _write_result(
                 "part": step.action.part,
                 "region": step.action.region,
                 "raw_action": step.raw_action,
+                "raw_actions": step.raw_actions,
                 "proofalign_action": step.proofalign_action or action_to_dict(step.action),
+                "chunk_id": step.chunk_id,
+                "contract": step.contract,
+                "summary": step.trace_summary.to_dict() if step.trace_summary else None,
                 "decision": step.decision.value,
                 "intent": step.intent_result.__dict__,
                 "effect": step.effect_result.__dict__ if step.effect_result else None,
@@ -383,6 +388,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--safety-spec", help="JSON file with ProofAlign SafetySpec overrides.")
     parser.add_argument("--output", default="results/libero_online/episode.json")
     parser.add_argument("--max-steps", type=int, default=300)
+    parser.add_argument("--max-chunk-steps", type=int, default=8)
     parser.add_argument("--warmup-steps", type=int, default=5)
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--camera-height", type=int, default=128)

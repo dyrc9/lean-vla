@@ -20,6 +20,7 @@ from proofalign.models import (
     Region,
     SafetySpec,
     TaskIntent,
+    TraceSummary,
     WorldState,
 )
 
@@ -261,6 +262,12 @@ class ProofAlignLiberoWrapper:
     checker: DualAlignmentChecker = field(default_factory=DualAlignmentChecker)
     state_observer: LiberoStateObserver = field(default_factory=LiberoStateObserver)
     action_abstractor: LiberoActionAbstractor = field(default_factory=DefaultLiberoActionAbstractor)
+    max_chunk_steps: int = 8
+    object_move_epsilon: float = 0.01
+    progress_epsilon: float = 1e-4
+    no_progress_patience: int = 3
+    gripper_close_threshold: float = -0.2
+    gripper_open_threshold: float = 0.2
 
     def __post_init__(self) -> None:
         self.intent: TaskIntent = parse_intent(self.instruction)
@@ -379,6 +386,177 @@ class ProofAlignLiberoWrapper:
         self.current_state = after
         return LiberoStepResult(observation, float(reward), done, info, decision, step)
 
+    def step_chunk(
+        self,
+        raw_action: Any,
+        *,
+        max_chunk_steps: int | None = None,
+        chunk_id: str | None = None,
+    ) -> LiberoStepResult:
+        total_start = perf_counter()
+        max_steps = max_chunk_steps or self.max_chunk_steps
+        if self.current_state is None:
+            self.current_state = self.state_observer.observe(self.env, self.current_observation)
+        before = self.current_state.clone()
+
+        abstract_start = perf_counter()
+        symbolic_action = self.action_abstractor.abstract(
+            raw_action,
+            instruction=self.instruction,
+            observation=self.current_observation,
+            state=before,
+            spec=self.spec,
+            history=self.trace,
+        )
+        abstract_time = perf_counter() - abstract_start
+
+        env_actions = raw_actions_from_raw(raw_action, max_steps)
+        pre_certs = CertificateBundle.from_dicts(symbolic_action.params.get("pre_certificates"))
+        intent_start = perf_counter()
+        intent_result = self.checker.check_intent_alignment(
+            self.intent,
+            before,
+            symbolic_action,
+            self.spec,
+            pre_certs,
+            len(self.trace),
+        )
+        intent_time = perf_counter() - intent_start
+        if not intent_result.passed:
+            step = ExecutionStep(
+                symbolic_action,
+                intent_result,
+                None,
+                intent_result.suggested_decision,
+                before,
+                pre_certificates=pre_certs.to_dicts(),
+                raw_action=env_actions,
+                proofalign_action=action_to_dict(symbolic_action),
+                env_info={},
+                reward=0.0,
+                done=True,
+                runtime_seconds={
+                    "action_abstractor": abstract_time,
+                    "intent_check": intent_time,
+                    "effect_check": 0.0,
+                    "env_step": 0.0,
+                    "wrapper_step_wall": perf_counter() - total_start,
+                },
+                chunk_id=chunk_id or f"chunk_{len(self.trace)}",
+                contract=action_to_dict(symbolic_action),
+                raw_actions=[],
+                trace_summary=TraceSummary(num_raw_steps=0, boundary_reason="intent_reject"),
+            )
+            self.trace.append(step)
+            return LiberoStepResult(
+                self.current_observation,
+                0.0,
+                True,
+                self._info(intent_result.suggested_decision, intent_result),
+                intent_result.suggested_decision,
+                step,
+            )
+
+        summary = TraceSummary(
+            min_human_hand_distance=before.min_distance_to_human_hand,
+            min_obstacle_distance=before.min_distance_to_obstacle,
+        )
+        reward_total = 0.0
+        done = False
+        info: dict[str, Any] = {}
+        observation = self.current_observation
+        after = before
+        env_time = 0.0
+        executed_actions: list[Any] = []
+        previous = before
+        no_progress_count = 0
+        last_progress_distance = self._progress_distance(symbolic_action, before)
+
+        for index, env_action in enumerate(env_actions[:max_steps]):
+            env_start = perf_counter()
+            observation, reward, done_step, step_info = normalize_env_step(self.env.step(env_action))
+            env_time += perf_counter() - env_start
+            executed_actions.append(env_action)
+            reward_total += float(reward)
+            info = dict(step_info)
+            after = self.state_observer.observe(self.env, observation, info)
+            self._update_trace_summary(summary, before, previous, after, info, symbolic_action)
+            summary.num_raw_steps = index + 1
+            done = bool(done or done_step)
+
+            distance = self._progress_distance(symbolic_action, after)
+            if distance is not None and last_progress_distance is not None:
+                if distance >= last_progress_distance - self.progress_epsilon:
+                    no_progress_count += 1
+                else:
+                    no_progress_count = 0
+                last_progress_distance = distance
+
+            boundary = self._chunk_boundary_reason(
+                before,
+                previous,
+                after,
+                symbolic_action,
+                info,
+                env_action,
+                done,
+                no_progress_count,
+            )
+            if boundary:
+                summary.boundary_reason = boundary
+                break
+            previous = after
+        else:
+            summary.boundary_reason = "max_chunk_steps"
+
+        self.current_observation = observation
+        post_certs = CertificateBundle.from_dicts(symbolic_action.params.get("post_certificates"))
+        effect_start = perf_counter()
+        effect_result = self.checker.check_chunk_effect_alignment(
+            before,
+            symbolic_action,
+            after,
+            summary,
+            self.spec,
+            post_certs,
+            len(self.trace),
+        )
+        effect_time = perf_counter() - effect_start
+        decision = effect_result.suggested_decision
+        done = bool(done or decision in {Decision.REJECT, Decision.SAFE_STOP})
+        info.update(self._info(decision, effect_result))
+        info["proofalign_chunk_summary"] = summary.to_dict()
+        info["proofalign_chunk_boundary"] = summary.boundary_reason
+        step = ExecutionStep(
+            symbolic_action,
+            intent_result,
+            effect_result,
+            decision,
+            before,
+            after,
+            pre_certificates=pre_certs.to_dicts(),
+            post_certificates=post_certs.to_dicts(),
+            raw_action=executed_actions,
+            proofalign_action=action_to_dict(symbolic_action),
+            env_info=dict(info),
+            reward=float(reward_total),
+            done=done,
+            runtime_seconds={
+                "action_abstractor": abstract_time,
+                "intent_check": intent_time,
+                "effect_check": effect_time,
+                "env_step": env_time,
+                "wrapper_step_wall": perf_counter() - total_start,
+            },
+            chunk_id=chunk_id or f"chunk_{len(self.trace)}",
+            contract=action_to_dict(symbolic_action),
+            raw_actions=list(executed_actions),
+            trace_summary=summary,
+        )
+        self.trace.append(step)
+        self.current_state = after
+        return LiberoStepResult(observation, float(reward_total), done, info, decision, step)
+
     def run_episode(self, policy: VLAActionProvider, *, max_steps: int) -> ExecutionDecision:
         if self.current_observation is None:
             self.reset()
@@ -388,7 +566,7 @@ class ProofAlignLiberoWrapper:
             policy_start = perf_counter()
             raw_action = policy(self.instruction, self.current_observation, self.trace)
             policy_time = perf_counter() - policy_start
-            result = self.step(raw_action)
+            result = self.step_chunk(raw_action, max_chunk_steps=self.max_chunk_steps)
             result.step.runtime_seconds["policy"] = policy_time
             final_decision = result.decision
             if result.decision != Decision.ALLOW:
@@ -398,6 +576,77 @@ class ProofAlignLiberoWrapper:
                 break
         final_state = self.current_state or self.state_observer.observe(self.env, self.current_observation)
         return ExecutionDecision(final_decision, final_state, list(self.trace), explanation)
+
+    def _update_trace_summary(
+        self,
+        summary: TraceSummary,
+        before: WorldState,
+        previous: WorldState,
+        after: WorldState,
+        info: dict[str, Any],
+        action: Action,
+    ) -> None:
+        cost = _cost_dict(info)
+        summary.cost.update(cost)
+        summary.cost_observed = summary.cost_observed or _cost_observed(cost)
+        summary.collision = summary.collision or after.collision or _collision_from_info(info)
+        summary.min_human_hand_distance = min(summary.min_human_hand_distance, after.min_distance_to_human_hand)
+        summary.min_obstacle_distance = min(summary.min_obstacle_distance, after.min_distance_to_obstacle)
+        if previous.gripper_holding is None and after.gripper_holding is not None:
+            summary.object_became_held = True
+        if previous.gripper_holding is not None and after.gripper_holding is None:
+            summary.object_released = True
+
+        moved = _moved_objects(before, after, self.object_move_epsilon)
+        if before.gripper_holding != after.gripper_holding:
+            for obj_id in (before.gripper_holding, after.gripper_holding):
+                if obj_id and obj_id not in moved:
+                    moved.append(obj_id)
+        for obj_id in moved:
+            if obj_id not in summary.moved_objects:
+                summary.moved_objects.append(obj_id)
+            if obj_id != action.object_id and _matches_any_symbol(obj_id, self.spec.protected_objects):
+                summary.protected_object_moved = True
+
+    def _chunk_boundary_reason(
+        self,
+        before: WorldState,
+        previous: WorldState,
+        after: WorldState,
+        action: Action,
+        info: dict[str, Any],
+        env_action: Any,
+        done: bool,
+        no_progress_count: int,
+    ) -> str | None:
+        if done:
+            return "env_done"
+        if _collision_from_info(info) or after.collision:
+            return "collision"
+        if _cost_observed(_cost_dict(info)):
+            return "cost"
+        gripper = _last_scalar(env_action)
+        if gripper is not None:
+            if previous.gripper_holding is None and gripper <= self.gripper_close_threshold:
+                return "gripper_close"
+            if previous.gripper_holding is not None and gripper >= self.gripper_open_threshold:
+                return "gripper_open"
+        if previous.gripper_holding is None and after.gripper_holding is not None:
+            return "object_became_held"
+        if previous.gripper_holding is not None and after.gripper_holding is None:
+            return "object_released"
+        if action.object_id and action.region and _object_in_region(after, action.object_id, action.region):
+            before_in_region = _object_in_region(before, action.object_id, action.region)
+            if not before_in_region:
+                return "target_region_reached"
+        if no_progress_count >= self.no_progress_patience:
+            return "no_progress"
+        return None
+
+    def _progress_distance(self, action: Action, state: WorldState) -> float | None:
+        if action.object_id and action.region and action.object_id in state.objects and action.region in state.regions:
+            return state.objects[action.object_id].pose.distance_to(state.regions[action.region].center)
+        return None
 
     def _info(self, decision: Decision, result: CheckResult) -> dict[str, Any]:
         return {
@@ -437,6 +686,16 @@ def env_action_from_raw(raw_action: Any) -> Any:
     if isinstance(raw_action, dict) and "raw_action" in raw_action:
         return raw_action["raw_action"]
     return raw_action
+
+
+def raw_actions_from_raw(raw_action: Any, max_chunk_steps: int) -> list[Any]:
+    env_action = env_action_from_raw(raw_action)
+    if _looks_like_action_chunk(env_action):
+        try:
+            return [env_action[index] for index in range(min(len(env_action), max_chunk_steps))]
+        except Exception:
+            return list(env_action)[:max_chunk_steps]
+    return [env_action]
 
 
 def action_to_dict(action: Action) -> dict[str, Any]:
@@ -480,3 +739,96 @@ def _part_from_dict(data: dict[str, Any]) -> Any:
 def _looks_like_human_hand(object_id: str, kind: str) -> bool:
     text = f"{object_id} {kind}".lower()
     return "human_hand" in text or "hand" in text
+
+
+def _looks_like_action_chunk(value: Any) -> bool:
+    shape = getattr(value, "shape", None)
+    if shape is not None:
+        try:
+            return len(shape) >= 2
+        except TypeError:
+            pass
+    if not isinstance(value, (list, tuple)) or not value:
+        return False
+    return not _is_scalar(value[0])
+
+
+def _is_scalar(value: Any) -> bool:
+    if isinstance(value, (int, float, bool)):
+        return True
+    try:
+        import numpy as np
+
+        return isinstance(value, np.generic)
+    except Exception:
+        return False
+
+
+def _last_scalar(value: Any) -> float | None:
+    numbers = _flatten_numbers(value)
+    return numbers[-1] if numbers else None
+
+
+def _flatten_numbers(value: Any) -> list[float]:
+    if _is_scalar(value):
+        return [float(value)]
+    if hasattr(value, "tolist"):
+        try:
+            return _flatten_numbers(value.tolist())
+        except Exception:
+            return []
+    if isinstance(value, dict):
+        numbers: list[float] = []
+        for key in sorted(value):
+            numbers.extend(_flatten_numbers(value[key]))
+        return numbers
+    if isinstance(value, (list, tuple)):
+        numbers = []
+        for item in value:
+            numbers.extend(_flatten_numbers(item))
+        return numbers
+    return []
+
+
+def _cost_dict(info: dict[str, Any]) -> dict[str, Any]:
+    cost = info.get("cost", {})
+    if isinstance(cost, dict):
+        return dict(cost)
+    return {"cost": cost}
+
+
+def _cost_observed(cost: dict[str, Any]) -> bool:
+    return any(bool(value) for value in cost.values())
+
+
+def _collision_from_info(info: dict[str, Any]) -> bool:
+    if "collision" in info:
+        return bool(info["collision"])
+    return _cost_observed(_cost_dict(info))
+
+
+def _moved_objects(before: WorldState, after: WorldState, epsilon: float) -> list[str]:
+    moved: list[str] = []
+    for obj_id, before_obj in before.objects.items():
+        after_obj = after.objects.get(obj_id)
+        if not after_obj:
+            continue
+        if before_obj.pose.distance_to(after_obj.pose) > epsilon or before_obj.held_by != after_obj.held_by:
+            moved.append(obj_id)
+    return moved
+
+
+def _object_in_region(state: WorldState, object_id: str, region_id: str) -> bool:
+    obj = state.objects.get(object_id)
+    region = state.regions.get(region_id)
+    return bool(obj and region and region.contains(obj.pose))
+
+
+def _matches_any_symbol(value: str | None, candidates: list[str]) -> bool:
+    return any(_symbol_key(value) == _symbol_key(candidate) for candidate in candidates if value)
+
+
+def _symbol_key(value: str | None) -> str:
+    if value is None:
+        return ""
+    return "".join(ch for ch in value.lower().replace("_", "") if ch.isalnum())

@@ -172,6 +172,59 @@ class WorldState:
 
 
 @dataclass
+class TraceSummary:
+    num_raw_steps: int = 0
+    collision: bool = False
+    cost: dict[str, Any] = field(default_factory=dict)
+    cost_observed: bool = False
+    min_human_hand_distance: float = 999.0
+    min_obstacle_distance: float = 999.0
+    moved_objects: list[str] = field(default_factory=list)
+    protected_object_moved: bool = False
+    object_became_held: bool = False
+    object_released: bool = False
+    boundary_reason: str | None = None
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any] | None) -> "TraceSummary":
+        data = data or {}
+        cost_value = data.get("cost", {})
+        cost = cost_value if isinstance(cost_value, dict) else {"cost": cost_value}
+        return cls(
+            num_raw_steps=int(data.get("num_raw_steps", data.get("num_steps", 0))),
+            collision=bool(data.get("collision", False)),
+            cost=dict(cost),
+            cost_observed=bool(data.get("cost_observed", _cost_observed(cost))),
+            min_human_hand_distance=float(data.get("min_human_hand_distance", 999.0)),
+            min_obstacle_distance=float(data.get("min_obstacle_distance", 999.0)),
+            moved_objects=list(data.get("moved_objects", [])),
+            protected_object_moved=bool(data.get("protected_object_moved", False)),
+            object_became_held=bool(data.get("object_became_held", False)),
+            object_released=bool(data.get("object_released", False)),
+            boundary_reason=data.get("boundary_reason"),
+        )
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "num_raw_steps": self.num_raw_steps,
+            "collision": self.collision,
+            "cost": dict(self.cost),
+            "cost_observed": self.cost_observed,
+            "min_human_hand_distance": self.min_human_hand_distance,
+            "min_obstacle_distance": self.min_obstacle_distance,
+            "moved_objects": list(self.moved_objects),
+            "protected_object_moved": self.protected_object_moved,
+            "object_became_held": self.object_became_held,
+            "object_released": self.object_released,
+            "boundary_reason": self.boundary_reason,
+        }
+
+
+def _cost_observed(cost: dict[str, Any]) -> bool:
+    return any(bool(value) for value in cost.values())
+
+
+@dataclass
 class TaskIntent:
     raw_instruction: str
     verb: str
@@ -262,6 +315,10 @@ class ExecutionStep:
     reward: float | None = None
     done: bool | None = None
     runtime_seconds: dict[str, float] = field(default_factory=dict)
+    chunk_id: str | None = None
+    contract: dict[str, Any] | None = None
+    raw_actions: list[Any] = field(default_factory=list)
+    trace_summary: TraceSummary | None = None
 
 
 @dataclass
