@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import traceback
 from collections import Counter, defaultdict
 from pathlib import Path
@@ -46,7 +47,10 @@ def build_episode_args(args: argparse.Namespace, suite: str, task_id: int, outpu
     episode_args.init_state_id = args.init_state_id
     episode_args.output = str(output)
     episode_args.max_steps = args.max_steps
+    episode_args.max_chunk_steps = args.max_chunk_steps
+    episode_args.continue_on_replan = args.continue_on_replan
     episode_args.warmup_steps = args.warmup_steps
+    episode_args.warmup_gripper = args.warmup_gripper
     episode_args.seed = args.seed
     episode_args.camera_height = args.camera_height
     episode_args.camera_width = args.camera_width
@@ -75,8 +79,10 @@ def has_cost_or_collision(episode: dict[str, Any]) -> bool:
         if info.get("collision"):
             return True
         cost = info.get("cost")
-        if isinstance(cost, dict) and any(bool(value) for value in cost.values()):
-            return True
+        if isinstance(cost, dict):
+            if any(bool(value) for value in cost.values()):
+                return True
+            continue
         if cost not in (None, {}, [], 0, 0.0, False):
             return True
     return False
@@ -102,6 +108,17 @@ def summarize(
             "task_success": Counter(),
         }
     )
+    init_breakdown: dict[str, dict[str, Any]] = defaultdict(
+        lambda: {
+            "total_episodes": 0,
+            "completed_episodes": 0,
+            "failed_episodes": 0,
+            "final_decisions": Counter(),
+            "trace_decisions": Counter(),
+            "trace_lengths": [],
+            "task_success": Counter(),
+        }
+    )
     trace_lengths: list[int] = []
     policy_times: list[float] = []
     env_step_times: list[float] = []
@@ -109,15 +126,19 @@ def summarize(
     episode_wall_times: list[float] = []
 
     for episode in episodes:
-        suite = episode.get("metadata", {}).get("benchmark_name", "unknown")
+        metadata = episode.get("metadata", {})
+        suite = metadata.get("benchmark_name", "unknown")
+        init_state_id = str(metadata.get("init_state_id", "unknown"))
         trace = episode.get("trace", [])
         trace_lengths.append(len(trace))
-        suite_breakdown[suite]["total_episodes"] += 1
-        suite_breakdown[suite]["completed_episodes"] += 1
-        suite_breakdown[suite]["final_decisions"][episode.get("decision", "unknown")] += 1
-        suite_breakdown[suite]["trace_lengths"].append(len(trace))
+        for breakdown in (suite_breakdown[suite], init_breakdown[init_state_id]):
+            breakdown["total_episodes"] += 1
+            breakdown["completed_episodes"] += 1
+            breakdown["final_decisions"][episode.get("decision", "unknown")] += 1
+            breakdown["trace_lengths"].append(len(trace))
         task_success = episode.get("task_success")
         suite_breakdown[suite]["task_success"][str(task_success)] += 1
+        init_breakdown[init_state_id]["task_success"][str(task_success)] += 1
         wall_time = (episode.get("runtime") or {}).get("episode_wall_time_seconds")
         if isinstance(wall_time, (int, float)):
             episode_wall_times.append(float(wall_time))
@@ -125,6 +146,7 @@ def summarize(
             decision = step.get("decision", "unknown")
             trace_decisions[decision] += 1
             suite_breakdown[suite]["trace_decisions"][decision] += 1
+            init_breakdown[init_state_id]["trace_decisions"][decision] += 1
             runtime = step.get("runtime_seconds") or {}
             if isinstance(runtime.get("policy"), (int, float)):
                 policy_times.append(float(runtime["policy"]))
@@ -138,21 +160,29 @@ def summarize(
 
     for failure in failures:
         suite = failure.get("suite", "unknown")
+        init_state_id = str(failure.get("init_state_id", "unknown"))
         suite_breakdown[suite]["total_episodes"] += 1
         suite_breakdown[suite]["failed_episodes"] += 1
+        init_breakdown[init_state_id]["total_episodes"] += 1
+        init_breakdown[init_state_id]["failed_episodes"] += 1
 
-    suites: dict[str, Any] = {}
-    for suite, data in sorted(suite_breakdown.items()):
-        lengths = data["trace_lengths"]
-        suites[suite] = {
-            "total_episodes": data["total_episodes"],
-            "completed_episodes": data["completed_episodes"],
-            "failed_episodes": data["failed_episodes"],
-            "final_decisions": dict(data["final_decisions"]),
-            "trace_decisions": dict(data["trace_decisions"]),
-            "average_trace_length": sum(lengths) / len(lengths) if lengths else None,
-            "task_success": dict(data["task_success"]),
-        }
+    def finalize_breakdown(breakdown: dict[str, dict[str, Any]]) -> dict[str, Any]:
+        finalized: dict[str, Any] = {}
+        for key, data in sorted(breakdown.items()):
+            lengths = data["trace_lengths"]
+            finalized[key] = {
+                "total_episodes": data["total_episodes"],
+                "completed_episodes": data["completed_episodes"],
+                "failed_episodes": data["failed_episodes"],
+                "final_decisions": dict(data["final_decisions"]),
+                "trace_decisions": dict(data["trace_decisions"]),
+                "average_trace_length": sum(lengths) / len(lengths) if lengths else None,
+                "task_success": dict(data["task_success"]),
+            }
+        return finalized
+
+    suites = finalize_breakdown(suite_breakdown)
+    init_states = finalize_breakdown(init_breakdown)
 
     def average(values: list[float]) -> float | None:
         return sum(values) / len(values) if values else None
@@ -169,6 +199,7 @@ def summarize(
         "trace_decision_counts": {decision: trace_decisions.get(decision, 0) for decision in DECISIONS},
         "average_trace_length": average([float(length) for length in trace_lengths]),
         "per_suite_breakdown": suites,
+        "per_init_state_breakdown": init_states,
         "failure_list": failures,
         "output_files": output_files,
         "task_success_counts": dict(Counter(str(ep.get("task_success")) for ep in episodes)),
@@ -188,7 +219,10 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--suites", nargs="+", default=["affordance"], help="Suite names, comma or space separated.")
     parser.add_argument("--task-ids", default="0-4", help="Task ids, e.g. 0-4 or 0,1,2.")
     parser.add_argument("--init-state-id", type=int, default=0)
+    parser.add_argument("--init-state-ids", help="Init state ids, e.g. 0-4 or 0,1,2. Overrides --init-state-id.")
     parser.add_argument("--max-steps", type=int, default=25)
+    parser.add_argument("--max-chunk-steps", type=int, default=8)
+    parser.add_argument("--continue-on-replan", action="store_true")
     parser.add_argument("--output-dir", default="results/libero_online")
     parser.add_argument("--method-name", default="openvla_oft_dual")
     parser.add_argument("--summary", default="results/libero_online/summary_openvla_oft.json")
@@ -201,6 +235,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--action-file")
     parser.add_argument("--safety-spec")
     parser.add_argument("--warmup-steps", type=int, default=2)
+    parser.add_argument("--warmup-gripper", type=float, default=0.0)
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--camera-height", type=int, default=224)
     parser.add_argument("--camera-width", type=int, default=224)
@@ -212,12 +247,41 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     return parser.parse_args(argv)
 
 
+def write_run_config(
+    output_dir: Path,
+    args: argparse.Namespace,
+    suites: list[str],
+    task_ids: list[int],
+    init_state_ids: list[int],
+) -> None:
+    payload = {
+        "args": vars(args),
+        "tasks": [
+            {"suite": suite, "task_id": task_id, "init_state_id": init_state_id}
+            for suite in suites
+            for task_id in task_ids
+            for init_state_id in init_state_ids
+        ],
+        "environment": {
+            "LIBERO_SAFETY_ROOT": os.environ.get("LIBERO_SAFETY_ROOT"),
+            "HF_ENDPOINT": os.environ.get("HF_ENDPOINT"),
+            "HF_HOME": os.environ.get("HF_HOME"),
+            "CUDA_VISIBLE_DEVICES": os.environ.get("CUDA_VISIBLE_DEVICES"),
+            "MUJOCO_EGL_DEVICE_ID": os.environ.get("MUJOCO_EGL_DEVICE_ID"),
+            "PYTHONPATH": os.environ.get("PYTHONPATH"),
+        },
+    }
+    (output_dir / "run_config.json").write_text(json.dumps(payload, indent=2), encoding="utf-8")
+
+
 def main(argv: list[str] | None = None) -> None:
     args = parse_args(argv)
     suites = parse_list(args.suites)
     task_ids = parse_task_ids(args.task_ids)
+    init_state_ids = parse_task_ids(args.init_state_ids) if args.init_state_ids else [args.init_state_id]
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
+    write_run_config(output_dir, args, suites, task_ids, init_state_ids)
     failure_path = Path(args.failure_jsonl)
     failure_path.parent.mkdir(parents=True, exist_ok=True)
     failure_path.write_text("", encoding="utf-8")
@@ -229,45 +293,54 @@ def main(argv: list[str] | None = None) -> None:
     episodes: list[dict[str, Any]] = []
     failures: list[dict[str, Any]] = []
     output_files: list[str] = []
-    expected_total = len(suites) * len(task_ids)
+    expected_total = len(suites) * len(task_ids) * len(init_state_ids)
 
     for suite in suites:
         for task_id in task_ids:
-            output = output_dir / f"{suite}_task{task_id}_init{args.init_state_id}_{args.method_name}.json"
-            output_files.append(str(output))
-            if args.skip_existing and output.exists():
-                episodes.append(load_episode(output))
-                continue
-            episode_args = build_episode_args(args, suite, task_id, output)
-            try:
-                run_online_episode_with_plugins(
-                    episode_args,
-                    policy=shared_policy,
-                    action_abstractor=shared_abstractor,
+            for init_state_id in init_state_ids:
+                args.init_state_id = init_state_id
+                output = output_dir / f"{suite}_task{task_id}_init{init_state_id}_{args.method_name}.json"
+                output_files.append(str(output))
+                if args.skip_existing and output.exists():
+                    episodes.append(load_episode(output))
+                    continue
+                episode_args = build_episode_args(args, suite, task_id, output)
+                try:
+                    run_online_episode_with_plugins(
+                        episode_args,
+                        policy=shared_policy,
+                        action_abstractor=shared_abstractor,
+                    )
+                    episodes.append(load_episode(output))
+                except Exception as exc:
+                    failure = {
+                        "suite": suite,
+                        "task_id": task_id,
+                        "init_state_id": init_state_id,
+                        "output": str(output),
+                        "error_type": type(exc).__name__,
+                        "error": str(exc),
+                        "traceback": traceback.format_exc(),
+                    }
+                    failures.append(failure)
+                    with failure_path.open("a", encoding="utf-8") as handle:
+                        handle.write(json.dumps(failure) + "\n")
+
+                summary = summarize(
+                    expected_total=expected_total,
+                    episodes=episodes,
+                    failures=failures,
+                    output_files=output_files,
                 )
-                episodes.append(load_episode(output))
-            except Exception as exc:
-                failure = {
-                    "suite": suite,
-                    "task_id": task_id,
-                    "init_state_id": args.init_state_id,
-                    "output": str(output),
-                    "error_type": type(exc).__name__,
-                    "error": str(exc),
-                    "traceback": traceback.format_exc(),
-                }
-                failures.append(failure)
-                with failure_path.open("a", encoding="utf-8") as handle:
-                    handle.write(json.dumps(failure) + "\n")
+                Path(args.summary).write_text(json.dumps(summary, indent=2), encoding="utf-8")
 
-            summary = summarize(
-                expected_total=expected_total,
-                episodes=episodes,
-                failures=failures,
-                output_files=output_files,
-            )
-            Path(args.summary).write_text(json.dumps(summary, indent=2), encoding="utf-8")
-
+    summary = summarize(
+        expected_total=expected_total,
+        episodes=episodes,
+        failures=failures,
+        output_files=output_files,
+    )
+    Path(args.summary).write_text(json.dumps(summary, indent=2), encoding="utf-8")
     print(json.dumps(summary, indent=2))
 
 

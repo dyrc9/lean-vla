@@ -157,10 +157,31 @@ def _resolve_task_bddl_path(bddl_root: str, task: Any) -> Path:
         return direct
     level = getattr(task, "level", None)
     if level is not None:
-        leveled = root / problem_folder / f"L{int(level)}" / bddl_file
+        level_dir = root / problem_folder / f"L{int(level)}"
+        leveled = level_dir / bddl_file
         if leveled.exists():
             return leveled
+        matched = _match_bddl_stem(level_dir, bddl_file)
+        if matched is not None:
+            return matched
+    matched = _match_bddl_stem(root / problem_folder, bddl_file)
+    if matched is not None:
+        return matched
     return direct
+
+
+def _match_bddl_stem(directory: Path, bddl_file: str) -> Path | None:
+    """Handle LIBERO-Safety metadata/file-name drift within one task folder."""
+
+    if not directory.exists():
+        return None
+    requested = Path(bddl_file).stem
+    matches = [
+        candidate
+        for candidate in sorted(directory.glob("*.bddl"))
+        if requested.startswith(candidate.stem) or candidate.stem.startswith(requested)
+    ]
+    return matches[0] if len(matches) == 1 else None
 
 
 def create_initialized_env(runtime: LiberoTaskRuntime, args: argparse.Namespace) -> Any:
@@ -178,8 +199,11 @@ def create_initialized_env(runtime: LiberoTaskRuntime, args: argparse.Namespace)
     env.reset()
     if runtime.init_state is not None and hasattr(env, "set_init_state"):
         env.set_init_state(runtime.init_state)
+    warmup_action = [0.0] * args.action_dim
+    if args.action_dim:
+        warmup_action[-1] = args.warmup_gripper
     for _ in range(args.warmup_steps):
-        env.step([0.0] * args.action_dim)
+        env.step(warmup_action)
     return env
 
 
@@ -216,6 +240,7 @@ def run_online_episode_with_plugins(
         if action_abstractor is not None:
             wrapper_kwargs["action_abstractor"] = action_abstractor
         wrapper_kwargs["max_chunk_steps"] = getattr(args, "max_chunk_steps", 8)
+        wrapper_kwargs["stop_on_replan"] = not getattr(args, "continue_on_replan", False)
         wrapper = ProofAlignLiberoWrapper(env, runtime.instruction, spec, **wrapper_kwargs)
         try:
             wrapper.current_observation = getattr(env, "_get_observations", lambda: None)()
@@ -389,7 +414,9 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--output", default="results/libero_online/episode.json")
     parser.add_argument("--max-steps", type=int, default=300)
     parser.add_argument("--max-chunk-steps", type=int, default=8)
+    parser.add_argument("--continue-on-replan", action="store_true")
     parser.add_argument("--warmup-steps", type=int, default=5)
+    parser.add_argument("--warmup-gripper", type=float, default=0.0)
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--camera-height", type=int, default=128)
     parser.add_argument("--camera-width", type=int, default=128)

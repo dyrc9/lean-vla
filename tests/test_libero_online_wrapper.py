@@ -61,6 +61,19 @@ class FakeLiberoEnv:
         return {"robot0_eef_pos": [0.2, 0.1, 0.0]}, 1.0, False, {"cost": dict(self.cost), "collision": self.collision}
 
 
+class StaticChunkPolicy:
+    def __init__(self) -> None:
+        self.calls = 0
+
+    def __call__(self, instruction, observation, history):
+        del instruction, observation, history
+        self.calls += 1
+        return {
+            "raw_action": [[0.1, 0.0, 0.0, 0.0], [0.1, 0.0, 0.0, 0.0]],
+            "proofalign_action": {"type": "Pick", "object": "mug", "part": "handle"},
+        }
+
+
 def test_online_wrapper_blocks_intent_failure_before_env_step():
     env = FakeLiberoEnv()
     wrapper = ProofAlignLiberoWrapper(
@@ -183,6 +196,25 @@ def test_chunk_pick_postcondition_miss_triggers_replan():
     assert env.step_count == 2
     assert result.step.effect_result
     assert "pick chunk postcondition failed" in result.step.effect_result.explanation
+
+
+def test_run_episode_max_steps_counts_raw_env_steps():
+    env = FakeLiberoEnv(hold_on_step=False)
+    wrapper = ProofAlignLiberoWrapper(
+        env,
+        "pick up the mug by the handle",
+        SafetySpec.from_dict({}),
+        max_chunk_steps=2,
+        stop_on_replan=False,
+    )
+    wrapper.reset()
+    policy = StaticChunkPolicy()
+
+    wrapper.run_episode(policy, max_steps=5)
+
+    assert env.step_count == 5
+    assert policy.calls == 3
+    assert [step.trace_summary.num_raw_steps for step in wrapper.trace if step.trace_summary] == [2, 2, 1]
 
 
 def test_lean_expression_builds_for_trace_summary():

@@ -268,6 +268,7 @@ class ProofAlignLiberoWrapper:
     no_progress_patience: int = 3
     gripper_close_threshold: float = -0.2
     gripper_open_threshold: float = 0.2
+    stop_on_replan: bool = True
 
     def __post_init__(self) -> None:
         self.intent: TaskIntent = parse_intent(self.instruction)
@@ -562,15 +563,22 @@ class ProofAlignLiberoWrapper:
             self.reset()
         final_decision = Decision.ALLOW
         explanation = "episode completed without ProofAlign violations"
-        for _ in range(max_steps):
+        raw_steps_executed = 0
+        while raw_steps_executed < max_steps:
             policy_start = perf_counter()
             raw_action = policy(self.instruction, self.current_observation, self.trace)
             policy_time = perf_counter() - policy_start
-            result = self.step_chunk(raw_action, max_chunk_steps=self.max_chunk_steps)
+            remaining_steps = max_steps - raw_steps_executed
+            result = self.step_chunk(raw_action, max_chunk_steps=min(self.max_chunk_steps, remaining_steps))
             result.step.runtime_seconds["policy"] = policy_time
+            summary = result.step.trace_summary
+            raw_steps_executed += summary.num_raw_steps if summary else 1
             final_decision = result.decision
             if result.decision != Decision.ALLOW:
                 explanation = result.step.effect_result.explanation if result.step.effect_result else result.step.intent_result.explanation
+            if result.decision in {Decision.REJECT, Decision.SAFE_STOP}:
+                break
+            if result.decision == Decision.REPLAN and self.stop_on_replan:
                 break
             if result.done:
                 break

@@ -30,6 +30,7 @@ class LeanBridge:
         self.command = command or (str(bundled) if bundled.exists() else "lean")
         self.lake_command = "lake"
         self._cached_project_check: LeanCheck | None = None
+        self._cached_boolean_checks: dict[str, LeanCheck] = {}
 
     @property
     def available(self) -> bool:
@@ -74,6 +75,9 @@ class LeanBridge:
     def check_boolean_claim(self, name: str, expression: str) -> LeanCheck:
         """Ask Lean to check a generated proposition of shape `example : expr = true`."""
 
+        cached = self._cached_boolean_checks.get(expression)
+        if cached is not None:
+            return cached
         if not self.available:
             return LeanCheck(False, True, "mock", stderr="Lean executable not found; using prototype mock mode.")
         self.check_project()
@@ -87,4 +91,6 @@ class LeanBridge:
             else:
                 cmd = [self.command, str(path)]
             proc = subprocess.run(cmd, cwd=str(self.lean_root), text=True, capture_output=True, check=False)
-        return LeanCheck(True, proc.returncode == 0, "lean", proc.stdout, proc.stderr)
+        check = LeanCheck(True, proc.returncode == 0, "lean", proc.stdout, proc.stderr)
+        self._cached_boolean_checks[expression] = check
+        return check
