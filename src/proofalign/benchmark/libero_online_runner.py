@@ -11,6 +11,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
+from proofalign.benchmark.attack_records import apply_attack_record, get_attack_record, load_attack_record_index
 from proofalign.benchmark.libero_online_wrapper import (
     LiberoActionAbstractor,
     LiberoOnlineIntegrationError,
@@ -224,6 +225,16 @@ def run_online_episode_with_plugins(
         init_state_id=args.init_state_id,
         bddl_file=args.bddl_file,
     )
+    attack_records = load_attack_record_index(getattr(args, "attack_record", None))
+    runtime = apply_attack_record(
+        runtime,
+        get_attack_record(
+            attack_records,
+            suite=args.benchmark,
+            task_id=args.task_id,
+            init_state_id=args.init_state_id,
+        ),
+    )
     env = create_initialized_env(runtime, args)
     task_success: bool | None = None
     try:
@@ -410,6 +421,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--abstractor", help="Action abstractor factory plugin as module:callable.")
     parser.add_argument("--abstractor-config", help="JSON config passed to the abstractor factory.")
     parser.add_argument("--action-file", help="Replay a JSON/JSONL action file instead of loading a policy plugin.")
+    parser.add_argument("--attack-record", help="JSON/JSONL file with SABER-style instruction overrides.")
     parser.add_argument("--safety-spec", help="JSON file with ProofAlign SafetySpec overrides.")
     parser.add_argument("--output", default="results/libero_online/episode.json")
     parser.add_argument("--max-steps", type=int, default=300)

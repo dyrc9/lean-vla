@@ -65,6 +65,7 @@ def build_episode_args(args: argparse.Namespace, suite: str, task_id: int, outpu
     episode_args.abstractor_config = args.abstractor_config
     episode_args.safety_spec = args.safety_spec
     episode_args.action_file = args.action_file
+    episode_args.attack_record = args.attack_record
     episode_args.bddl_file = None
     return episode_args
 
@@ -233,6 +234,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--abstractor", default="experiments.libero_vla_plugin:create_abstractor")
     parser.add_argument("--abstractor-config")
     parser.add_argument("--action-file")
+    parser.add_argument("--attack-record")
     parser.add_argument("--safety-spec")
     parser.add_argument("--warmup-steps", type=int, default=2)
     parser.add_argument("--warmup-gripper", type=float, default=0.0)

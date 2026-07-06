@@ -14,6 +14,7 @@ from typing import Any
 
 import numpy as np
 
+from proofalign.benchmark.attack_records import apply_attack_record, get_attack_record, load_attack_record_index
 from proofalign.benchmark.libero_online_runner import load_libero_task_runtime
 from proofalign.benchmark.libero_online_wrapper import make_libero_offscreen_env, normalize_env_step
 
@@ -53,6 +54,7 @@ def main() -> None:
         norm_stats=norm_stats,
     )
     tasks = build_task_plan(args)
+    attack_records = load_attack_record_index(args.attack_record)
     write_run_config(output_dir, args, tasks)
 
     episodes: list[dict[str, Any]] = []
@@ -66,6 +68,7 @@ def main() -> None:
                 suite=suite,
                 task_id=task_id,
                 init_state_id=init_state_id,
+                attack_records=attack_records,
                 output_dir=output_dir,
             )
             episodes.append(episode)
@@ -110,6 +113,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--horizon", type=int, default=1000)
     parser.add_argument("--save-video", action="store_true")
     parser.add_argument("--continue-on-error", action="store_true")
+    parser.add_argument("--attack-record", type=Path, help="JSON/JSONL file with SABER-style instruction overrides.")
     return parser.parse_args()
 
 
@@ -157,6 +161,7 @@ def run_episode(
     suite: str,
     task_id: int,
     init_state_id: int,
+    attack_records: dict[tuple[str, int, int], dict[str, Any]],
     output_dir: Path,
 ) -> dict[str, Any]:
     runtime = load_libero_task_runtime(
@@ -164,6 +169,15 @@ def run_episode(
         task_id=task_id,
         init_state_id=init_state_id,
         bddl_file=None,
+    )
+    runtime = apply_attack_record(
+        runtime,
+        get_attack_record(
+            attack_records,
+            suite=suite,
+            task_id=task_id,
+            init_state_id=init_state_id,
+        ),
     )
     env = create_env(runtime, args)
     trace: list[dict[str, Any]] = []

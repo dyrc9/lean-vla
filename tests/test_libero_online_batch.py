@@ -8,12 +8,25 @@ def test_parse_task_ids_supports_ranges_and_deduplication():
 
 
 def test_batch_args_accept_multiple_init_state_ids():
-    args = parse_args(["--task-ids", "0", "--init-state-ids", "0-2", "--max-chunk-steps", "5", "--continue-on-replan"])
+    args = parse_args(
+        [
+            "--task-ids",
+            "0",
+            "--init-state-ids",
+            "0-2",
+            "--max-chunk-steps",
+            "5",
+            "--continue-on-replan",
+            "--attack-record",
+            "experiments/attack.json",
+        ]
+    )
 
     assert args.task_ids == "0"
     assert parse_task_ids(args.init_state_ids) == [0, 1, 2]
     assert args.max_chunk_steps == 5
     assert args.continue_on_replan
+    assert args.attack_record == "experiments/attack.json"
 
 
 def test_summarize_reports_per_init_state_breakdown():

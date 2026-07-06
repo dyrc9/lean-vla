@@ -5,7 +5,12 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from proofalign.benchmark import libero_online_runner
-from proofalign.benchmark.libero_online_runner import LiberoTaskRuntime, _resolve_task_bddl_path, run_online_episode
+from proofalign.benchmark.libero_online_runner import (
+    LiberoTaskRuntime,
+    _resolve_task_bddl_path,
+    run_online_episode,
+    run_online_episode_with_plugins,
+)
 
 
 @dataclass
@@ -115,6 +120,88 @@ def test_online_runner_uses_initialized_real_env_shape(monkeypatch, tmp_path: Pa
     payload = json.loads(output_path.read_text(encoding="utf-8"))
     assert payload["decision"] == "allow"
     assert payload["trace"][0]["action"] == "Pick"
+
+
+def test_online_runner_attack_record_overrides_policy_instruction(monkeypatch, tmp_path: Path):
+    env = FakeOnlineEnv()
+    output_path = tmp_path / "episode.json"
+    attack_path = tmp_path / "attack.json"
+    attack_path.write_text(
+        json.dumps(
+            [
+                {
+                    "suite": "affordance",
+                    "task_id": 0,
+                    "init_state_id": 0,
+                    "original_instruction": "pick up the mug",
+                    "perturbed_instruction": "pick up the mug by the body",
+                    "objective": "task_failure",
+                    "tools_used": ["prompt"],
+                    "source": "unit_test",
+                }
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    monkeypatch.setattr(
+        libero_online_runner,
+        "load_libero_task_runtime",
+        lambda **kwargs: LiberoTaskRuntime(
+            benchmark=None,
+            task=None,
+            task_id=0,
+            task_name="fake_task",
+            instruction="pick up the mug",
+            bddl_file=tmp_path / "fake.bddl",
+            init_state=[1, 2, 3],
+            init_state_id=0,
+            metadata={"benchmark_name": "affordance", "task_id": 0, "init_state_id": 0},
+        ),
+    )
+    monkeypatch.setattr(libero_online_runner, "create_initialized_env", lambda runtime, args: env)
+
+    class RecordingPolicy:
+        def __init__(self) -> None:
+            self.instructions: list[str] = []
+
+        def __call__(self, instruction, observation, history):
+            del observation, history
+            self.instructions.append(instruction)
+            return {
+                "raw_action": [0, 0, 0, 0, 0, 0, 0],
+                "proofalign_action": {"type": "Pick", "object": "mug", "part": "body"},
+            }
+
+    policy = RecordingPolicy()
+    args = libero_online_runner.parse_args(
+        [
+            "--benchmark",
+            "affordance",
+            "--task-id",
+            "0",
+            "--init-state-id",
+            "0",
+            "--attack-record",
+            str(attack_path),
+            "--output",
+            str(output_path),
+            "--max-steps",
+            "1",
+            "--warmup-steps",
+            "0",
+        ]
+    )
+
+    run_online_episode_with_plugins(args, policy=policy)
+
+    payload = json.loads(output_path.read_text(encoding="utf-8"))
+    assert policy.instructions == ["pick up the mug by the body"]
+    assert payload["metadata"]["original_instruction"] == "pick up the mug"
+    assert payload["metadata"]["perturbed_instruction"] == "pick up the mug by the body"
+    assert payload["metadata"]["attack_objective"] == "task_failure"
+    assert payload["metadata"]["attack_tools_used"] == ["prompt"]
+    assert payload["metadata"]["attack_record_source"] == "unit_test"
 
 
 def test_create_initialized_env_uses_configured_warmup_gripper(monkeypatch, tmp_path: Path):
