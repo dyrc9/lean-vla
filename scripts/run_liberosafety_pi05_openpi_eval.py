@@ -34,6 +34,7 @@ def main() -> None:
     configure_paths(args)
 
     import imageio
+    import jax
     from openpi.shared import normalize as openpi_normalize
     from openpi.training import config as openpi_config
     from openpi.policies import policy_config
@@ -59,11 +60,13 @@ def main() -> None:
 
     episodes: list[dict[str, Any]] = []
     failures: list[dict[str, Any]] = []
-    for suite, task_id, init_state_id in tasks:
+    for suite, task_id, init_state_id, policy_seed in tasks:
         try:
             episode = run_episode(
                 args=args,
                 policy=policy,
+                jax=jax,
+                policy_seed=policy_seed,
                 image_tools=image_tools,
                 suite=suite,
                 task_id=task_id,
@@ -77,6 +80,7 @@ def main() -> None:
                 "suite": suite,
                 "task_id": task_id,
                 "init_state_id": init_state_id,
+                "policy_seed": policy_seed,
                 "error_type": type(exc).__name__,
                 "error": str(exc),
             }
@@ -107,6 +111,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--replan-steps", type=int, default=5)
     parser.add_argument("--sample-steps", type=int, default=10)
     parser.add_argument("--seed", type=int, default=7)
+    parser.add_argument("--policy-seed", type=int, default=0)
+    parser.add_argument("--policy-seeds", default=None)
     parser.add_argument("--render-gpu-device-id", type=int, default=int(os.environ.get("MUJOCO_EGL_DEVICE_ID", "0")))
     parser.add_argument("--camera-names", default="agentview,robot0_eye_in_hand")
     parser.add_argument("--control-freq", type=int, default=20)
@@ -132,11 +138,19 @@ def configure_paths(args: argparse.Namespace) -> None:
         raise RuntimeError(f"Checkpoint directory does not exist: {args.checkpoint_dir}")
 
 
-def build_task_plan(args: argparse.Namespace) -> list[tuple[str, int, int]]:
+def build_task_plan(args: argparse.Namespace) -> list[tuple[str, int, int, int]]:
     suites = parse_csv(args.suites)
     task_ids = [int(x) for x in parse_csv(args.task_ids)]
     init_state_ids = [int(x) for x in parse_csv(args.init_state_ids)]
-    return [(suite, task_id, init_state_id) for suite in suites for task_id in task_ids for init_state_id in init_state_ids]
+    policy_seeds = [int(x) for x in parse_csv(args.policy_seeds)] if args.policy_seeds else [args.policy_seed]
+    args._multiple_policy_seeds = len(policy_seeds) > 1 or policy_seeds != [0]
+    return [
+        (suite, task_id, init_state_id, policy_seed)
+        for suite in suites
+        for task_id in task_ids
+        for init_state_id in init_state_ids
+        for policy_seed in policy_seeds
+    ]
 
 
 def load_checkpoint_norm_stats(checkpoint_dir: Path, openpi_normalize: Any) -> Any | None:
@@ -149,6 +163,11 @@ def load_checkpoint_norm_stats(checkpoint_dir: Path, openpi_normalize: Any) -> A
     return None
 
 
+def set_policy_seed(policy: Any, jax: Any, seed: int) -> None:
+    if hasattr(policy, "_rng"):
+        policy._rng = jax.random.key(seed)
+
+
 def parse_csv(value: str) -> list[str]:
     return [item.strip() for item in value.split(",") if item.strip()]
 
@@ -157,6 +176,8 @@ def run_episode(
     *,
     args: argparse.Namespace,
     policy: Any,
+    jax: Any,
+    policy_seed: int,
     image_tools: Any,
     suite: str,
     task_id: int,
@@ -164,6 +185,7 @@ def run_episode(
     attack_records: dict[tuple[str, int, int], dict[str, Any]],
     output_dir: Path,
 ) -> dict[str, Any]:
+    set_policy_seed(policy, jax, policy_seed)
     runtime = load_libero_task_runtime(
         benchmark_name=suite,
         task_id=task_id,
@@ -251,6 +273,7 @@ def run_episode(
                 "replan_steps": args.replan_steps,
                 "sample_steps": args.sample_steps,
                 "seed": args.seed,
+                "policy_seed": policy_seed,
                 "paper_track": "Embodied Physical Safety Track" if suite in PHYSICAL_SUITES else "Semantic/extra suite rollout",
             },
             "task_success": bool(task_success),
@@ -261,7 +284,8 @@ def run_episode(
             "trace": trace,
             "runtime": {"episode_wall_time_seconds": perf_counter() - episode_start},
         }
-        episode_path = output_dir / "episodes" / f"{suite}_task{task_id}_init{init_state_id}.json"
+        seed_suffix = f"_pseed{policy_seed}" if getattr(args, "_multiple_policy_seeds", False) else ""
+        episode_path = output_dir / "episodes" / f"{suite}_task{task_id}_init{init_state_id}{seed_suffix}.json"
         episode_path.write_text(json.dumps(payload, indent=2, default=json_default), encoding="utf-8")
         if args.save_video and replay_images:
             save_video(output_dir, runtime, task_id, init_state_id, strict_success, replay_images)
@@ -419,10 +443,13 @@ def rate(numerator: int, denominator: int) -> float:
     return float(numerator / denominator) if denominator else 0.0
 
 
-def write_run_config(output_dir: Path, args: argparse.Namespace, tasks: list[tuple[str, int, int]]) -> None:
+def write_run_config(output_dir: Path, args: argparse.Namespace, tasks: list[tuple[str, int, int, int]]) -> None:
     payload = {
         "args": {key: str(value) if isinstance(value, Path) else value for key, value in vars(args).items()},
-        "tasks": [{"suite": suite, "task_id": task_id, "init_state_id": init_state_id} for suite, task_id, init_state_id in tasks],
+        "tasks": [
+            {"suite": suite, "task_id": task_id, "init_state_id": init_state_id, "policy_seed": policy_seed}
+            for suite, task_id, init_state_id, policy_seed in tasks
+        ],
         "environment": {
             "LIBERO_SAFETY_ROOT": os.environ.get("LIBERO_SAFETY_ROOT"),
             "HF_ENDPOINT": os.environ.get("HF_ENDPOINT"),
