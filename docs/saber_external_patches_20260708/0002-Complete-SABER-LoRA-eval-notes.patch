@@ -1,0 +1,164 @@
+From 22ad50642a2aec11d00d43b9c0f36d2788bd487f Mon Sep 17 00:00:00 2001
+From: Codex <codex@local>
+Date: Wed, 8 Jul 2026 14:13:03 +0800
+Subject: [PATCH 2/2] Complete SABER LoRA eval notes
+
+---
+ SABER_LORA_EVAL_NOTES.md | 53 ++++++++++++++++++++++++++++++++++++++++
+ eval_attack_vla.py       | 41 +++++++++++++++++--------------
+ 2 files changed, 76 insertions(+), 18 deletions(-)
+
+diff --git a/SABER_LORA_EVAL_NOTES.md b/SABER_LORA_EVAL_NOTES.md
+index 9fb8634..b8fc3ff 100644
+--- a/SABER_LORA_EVAL_NOTES.md
++++ b/SABER_LORA_EVAL_NOTES.md
+@@ -185,6 +185,59 @@ Expected output path when run:
+ outputs/agent_output_records_constraint_violation_hf/constraint_violation_openpi_pi05.json
+ ```
+ 
++## Full Official Eval Completed 2026-07-08
++
++All three released LoRA attack agents were evaluated with `eval_attack_vla.py` against `openpi_pi05` on the full 60-scenario subset:
++
++```text
++victim: openpi_pi05
++suites: libero_spatial,libero_object,libero_goal,libero_10
++task_ids: 7-9
++episodes_per_task: 5
++seed: 42
++vla_gpu: 4
++attack_gpus: 2
++gpu_memory_utilization: 0.45
++```
++
++The run used the merged LoRA model directories under `/data0/ldx/saber/outputs/hf_merged_attack_agents/` and saved records under this repo's `outputs/` directory.
++
++Validated outputs:
++
++```text
++outputs/agent_output_records_task_failure_hf/task_failure_openpi_pi05.json
++  episodes: 60
++  missing required fields: 0
++  changed with tools: 60
++  baseline_success_rate: 0.95
++  task_execution_rate: 0.95
++  attack_success_rate: 0.017543859649122806
++  avg_reward: 0.011700296286174406
++  avg_constraint_violations: 0.0
++
++outputs/agent_output_records_action_inflation_hf/action_inflation_openpi_pi05.json
++  episodes: 60
++  missing required fields: 0
++  changed with tools: 60
++  baseline_success_rate: 0.9333333333333333
++  task_execution_rate: 0.9
++  attack_success_rate: 0.08928571428571429
++  avg_reward: 0.22235690012921838
++  avg_constraint_violations: 0.0
++
++outputs/agent_output_records_constraint_violation_hf/constraint_violation_openpi_pi05.json
++  episodes: 60
++  missing required fields: 0
++  changed with tools: 60
++  baseline_success_rate: 0.9333333333333333
++  task_execution_rate: 0.5
++  attack_success_rate: 0.5
++  avg_reward: 0.5262126243734195
++  avg_constraint_violations: 665.4666666666667
++```
++
++The ART shutdown `asyncio.exceptions.CancelledError` appeared after each report was saved, but each command exited with code 0 and each JSON validated.
++
+ ## 10-Record Smoke Commands
+ 
+ Use GPU4 for Pi0.5 and GPUs 2,3 for the attack agent/vLLM on this machine, because GPU0 had significant existing usage during this session.
+diff --git a/eval_attack_vla.py b/eval_attack_vla.py
+index 67678f1..a59b1e8 100644
+--- a/eval_attack_vla.py
++++ b/eval_attack_vla.py
+@@ -38,12 +38,6 @@ _pre_parser.add_argument("--vla_gpu", type=str, default="0")
+ _pre_parser.add_argument("--attack_gpus", type=str, default="2,3")
+ _pre_args, _ = _pre_parser.parse_known_args()
+ 
+-# ALL GPUs (VLA + attack) must be visible from the start because the CUDA
+-# driver is initialised once per process — JAX does it first, and changing
+-# CUDA_VISIBLE_DEVICES afterwards has no effect on the already-init driver.
+-# JAX model placement is controlled via jax.default_device().
+-# XLA_PYTHON_CLIENT_PREALLOCATE=false ensures JAX only allocates memory on
+-# the device it actually uses (the VLA GPU).
+ _IS_JAX_VICTIM = _pre_args.victim.lower().replace("-", "_") == "openpi_pi05"
+ _VLA_GPU = str(_pre_args.vla_gpu)
+ _ATTACK_GPUS_PHYSICAL = _pre_args.attack_gpus
+@@ -51,14 +45,25 @@ _ALL_GPU_SORTED = sorted(set(
+     [_VLA_GPU] + _ATTACK_GPUS_PHYSICAL.split(",")
+ ))
+ _ALL_GPUS = ",".join(_ALL_GPU_SORTED)
+-os.environ["CUDA_VISIBLE_DEVICES"] = _ALL_GPUS
++
++# For the JAX/OpenPI victim, OpenPI restores parameters with a mesh over
++# jax.devices(). If attack GPUs are visible at that point, JAX replicates onto
++# them and later collides with vLLM. Keep only the VLA GPU visible until the
++# JAX model is loaded; ART/vLLM subprocesses inherit attack GPUs later.
++if _IS_JAX_VICTIM:
++    _INITIAL_GPU_SORTED = [_VLA_GPU]
++    _INITIAL_GPUS = _VLA_GPU
++else:
++    _INITIAL_GPU_SORTED = _ALL_GPU_SORTED
++    _INITIAL_GPUS = _ALL_GPUS
++os.environ["CUDA_VISIBLE_DEVICES"] = _INITIAL_GPUS
+ 
+ if _IS_JAX_VICTIM:
+     os.environ.setdefault("XLA_PYTHON_CLIENT_MEM_FRACTION", "0.45")
+     os.environ.setdefault("XLA_PYTHON_CLIENT_PREALLOCATE", "false")
+ 
+ # Device index for VLA model within the visible GPU list
+-_VLA_DEVICE_IDX = _ALL_GPU_SORTED.index(_VLA_GPU)
++_VLA_DEVICE_IDX = _INITIAL_GPU_SORTED.index(_VLA_GPU)
+ _VLA_TORCH_DEVICE = f"cuda:{_VLA_DEVICE_IDX}"
+ 
+ # Headless rendering
+@@ -483,7 +488,7 @@ async def evaluate(args):
+         jax_devices = jax.devices("gpu")
+         vla_jax_device = jax_devices[_VLA_DEVICE_IDX]
+         logger.info("Loading JAX VLA model on device %s (idx %d in %s) ...",
+-                     vla_jax_device, _VLA_DEVICE_IDX, _ALL_GPUS)
++                     vla_jax_device, _VLA_DEVICE_IDX, _INITIAL_GPUS)
+         with jax.default_device(vla_jax_device):
+             vla_model = load_vla_model(
+                 victim_id,
+@@ -499,16 +504,7 @@ async def evaluate(args):
+     else:
+         vla_model = None  # Loaded per-suite if needed
+ 
+-    # Force torch CUDA init while ALL GPUs are visible, so that PyTorch
+-    # device mappings are established before we narrow CUDA_VISIBLE_DEVICES
+-    # for the vLLM subprocess.
+-    import torch
+-    _ = torch.cuda.device_count()
+-    logger.info("PyTorch sees %d GPUs (CUDA_VISIBLE_DEVICES=%s).",
+-                 torch.cuda.device_count(), os.environ.get("CUDA_VISIBLE_DEVICES", ""))
+-
+     # --- Switch CUDA_VISIBLE_DEVICES for attack agent subprocess (vLLM) ---
+-    # JAX model is already loaded; changing env var doesn't affect its CUDA ctx.
+     # IMPORTANT: Must use 2 attack GPUs (e.g. --attack_gpus 2,3) so Unsloth
+     # model loading (cuda:1) and vLLM inference (cuda:0) don't share a GPU.
+     # With only 1 attack GPU, ART's register() loads model via Unsloth AND
+@@ -516,6 +512,15 @@ async def evaluate(args):
+     os.environ["CUDA_VISIBLE_DEVICES"] = _ATTACK_GPUS_PHYSICAL
+     logger.info("CUDA_VISIBLE_DEVICES=%s for attack agent subprocess (vLLM).", _ATTACK_GPUS_PHYSICAL)
+ 
++    # For non-JAX victims, initialize torch only after the final CUDA visibility
++    # is set. For JAX victims, ART/vLLM runs in subprocesses that inherit the
++    # attack-GPU env above; the parent process does not need a torch CUDA ctx.
++    if not vla_is_jax:
++        import torch
++        _ = torch.cuda.device_count()
++        logger.info("PyTorch sees %d GPUs (CUDA_VISIBLE_DEVICES=%s).",
++                    torch.cuda.device_count(), os.environ.get("CUDA_VISIBLE_DEVICES", ""))
++
+     import art
+     from art.langgraph import wrap_rollout, init_chat_model
+     from langchain_core.messages import SystemMessage, HumanMessage
+-- 
+2.43.0
+
