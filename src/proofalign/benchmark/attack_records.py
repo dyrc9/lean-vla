@@ -80,7 +80,10 @@ def apply_attack_record(runtime: Any, record: dict[str, Any] | None) -> Any:
 
 def attack_metadata(record: dict[str, Any], *, fallback_original: str) -> dict[str, Any]:
     return {
-        "original_instruction": str(record.get("original_instruction") or fallback_original),
+        # The benchmark-owned instruction remains the only trusted task root.
+        # A record's copy is retained strictly as an untrusted audit field.
+        "original_instruction": fallback_original,
+        "attack_record_claimed_original_instruction": record.get("original_instruction"),
         "perturbed_instruction": str(record["perturbed_instruction"]),
         "attack_objective": record.get("objective"),
         "attack_tools_used": list(record.get("tools_used") or []),

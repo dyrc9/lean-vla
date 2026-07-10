@@ -1,5 +1,10 @@
 # Lean 规格设计
 
+> 状态说明（2026-07-10）：本文主要记录最初的 typed symbolic/legacy dual-checker
+> 设计草图。当前可执行方法已经升级为 CTDA；权威定义见
+> [`method.md`](method.md)，当前 Lean 实现见 `lean/ProofAlign/CTDA.lean`。本文中的
+> “应当/草图”不能用来描述当前在线保证。
+
 ## 设计目标
 
 Lean 在本项目中是 trusted proof checker。它的职责是检查符号状态、任务意图、安全规范和外部 certificate 之间的逻辑关系，而不是生成动作、识别物体、规划轨迹或仿真连续动力学。
@@ -13,7 +18,8 @@ Lean 层应满足四个目标：
 
 ## 核心数据结构
 
-以下是规格设计草图，不是当前项目中的可运行 Lean 实现。
+以下是早期规格设计草图；其中一部分已在 legacy Lean specification 中实现，另一部分被
+CTDA 的 mission、contract、trace 和 evidence 类型替代。
 
 ### Object
 
@@ -351,4 +357,3 @@ Lean checker 应返回可分类的失败原因：
 - `StateUncertain`：状态估计不足以安全决策。
 
 这些失败类型直接驱动 reject / repair / replan 策略。
-

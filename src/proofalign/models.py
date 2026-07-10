@@ -295,7 +295,7 @@ class CheckResult:
     violations: list[str] = field(default_factory=list)
     explanation: str = ""
     suggested_decision: Decision = Decision.ALLOW
-    lean_mode: str = "mock"
+    lean_mode: str = "unavailable"
     violation_reports: list[Any] = field(default_factory=list)
 
 
@@ -319,6 +319,7 @@ class ExecutionStep:
     contract: dict[str, Any] | None = None
     raw_actions: list[Any] = field(default_factory=list)
     trace_summary: TraceSummary | None = None
+    ctda: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass

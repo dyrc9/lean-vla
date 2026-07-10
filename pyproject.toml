@@ -8,6 +8,8 @@ dependencies = []
 
 [project.optional-dependencies]
 dev = [
+    "numpy>=1.26,<2",
+    "pillow>=10",
     "pytest>=8.0",
 ]
 vla = [
@@ -56,6 +58,8 @@ pythonpath = ["src", "."]
 
 [dependency-groups]
 dev = [
+    "numpy>=1.26,<2",
+    "pillow>=10",
     "pytest>=8.0",
 ]
 

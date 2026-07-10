@@ -1,6 +1,10 @@
 # ProofAlign
 
-ProofAlign is a small research prototype for a Lean-based dual alignment safety wrapper for Vision-Language-Action (VLA) robots.
+ProofAlign is a research prototype for a Lean-backed runtime assurance wrapper
+for Vision-Language-Action (VLA) robots. Its current method is **Contract-Carrying
+Temporal Dual Alignment (CTDA)**: semantic macro-contracts must refine a frozen
+task mission, and every authorized/executed action prefix must remain bound to
+that contract and its evidence.
 
 The prototype accepts:
 
@@ -9,19 +13,46 @@ The prototype accepts:
 - a candidate VLA action or action chunk,
 - an observed post-action state from a tiny simulator.
 
-Python orchestrates parsing, symbolic abstraction, simulation, and runtime decisions. Lean is the trusted checker for the discrete action-contract specification. Lean does not do perception, motion planning, trajectory optimization, or VLA inference.
+Python orchestrates parsing, symbolic abstraction, simulation and runtime
+decisions. Lean is the trusted checker for discrete action-contract
+specifications. Lean does not do perception, motion planning, trajectory
+optimization or VLA inference.
+
+## Current Status
+
+Two paths currently coexist:
+
+- The legacy dual checker sends concrete `IntentAligned`, `EffectAligned` and
+  chunk-level Boolean claims to real Lean and fails closed if Lean is unavailable.
+- The CTDA path implements frozen missions, semantic refinement, bounded prefix
+  authorization, execution/trace provenance, a persistent temporal monitor and
+  fallback dispatch. The online LIBERO evaluator is currently the fail-closed
+  Python reference implementation (`ctda-python-reference`). The equivalent Lean
+  CTDA checkers and soundness/reflection theorems build successfully, but are not
+  yet wired into each online prefix authorization.
+
+Consequently, the repository does **not** claim that Lean currently proves raw
+perception, continuous robot dynamics, hardware actuation or every online LIBERO
+CTDA prefix. See [the documentation index](docs/README.md) and
+[the normative method definition](docs/method.md) for the exact claim boundary.
 
 ## Dual Alignment
 
 ProofAlign checks two layers:
 
-1. **Intent-Action Alignment**
-   Checks whether the candidate action is a legal refinement of the original task intent. For example, `pick up the mug by the handle` cannot be refined into picking a knife or grasping an unsafe blade.
+1. **Semantic-Temporal Alignment**
+   Checks whether a semantic skill contract is a legal, non-blocking refinement
+   of the frozen mission, active task phase and residual obligations.
 
-2. **Action-Effect Alignment**
-   Checks whether the observed post-state satisfies the symbolic contract promised by the action. For example, after `Pick(mug, handle)`, the mug should be held by the gripper; after `Place(mug, plate)`, the mug should be inside the plate region; collisions trigger `safe_stop`.
+2. **Physical-Effect Alignment**
+   Binds policy proposal, filtered/authorized command, execution receipt and
+   realized trace to the contract. It is staged as pre-execution authorization,
+   per-prefix conformance monitoring and post-execution completion audit.
 
-The output is an execution decision: `allow`, `reject`, `replan`, or `safe_stop`.
+The legacy API returns `allow`, `reject`, `replan` or `safe_stop`. CTDA static
+checks return `proven`, `refuted`, `unknown` or `inconsistent`; its temporal
+monitor returns `complete`, `safe_pending`, `violated`, `unknown` or
+`inconsistent`.
 
 ## Install
 
@@ -31,7 +62,10 @@ This project uses `uv` for Python environment management.
 uv sync --dev
 ```
 
-Lean is optional for the Python pipeline, but recommended. If Lean is unavailable, `LeanBridge` enters explicit mock fallback mode so the research pipeline remains runnable. To install Lean 4, use `elan`:
+Lean is optional for non-authorizing diagnostics, but required on a Lean-backed
+safety path. If Lean is unavailable or the project does not build, `LeanBridge`
+fails closed. An explicit `allow_mock=True` mode exists only for tests and demos;
+its result must not authorize execution. To install Lean 4, use `elan`:
 
 ```bash
 curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh
@@ -94,12 +128,14 @@ The `examples/tasks/` directory contains five JSON scenarios inspired by LIBERO-
 - `action_abstraction.py`: converts VLA-like action dictionaries into symbolic actions.
 - `checker.py`: implements the dual alignment checker and runtime decisions.
 - `simulator.py`: discrete post-state simulator for prototype tests.
-- `lean_bridge.py`: calls Lean/Lake when available; otherwise uses explicit mock fallback.
+- `lean_bridge.py`: calls Lean/Lake and fails closed when the checker is unavailable.
+- `ctda.py`: immutable CTDA mission/contract/evidence objects and the fail-closed reference checker.
+- `ctda_runtime.py`: staged prefix authorization and observed-trace integration for LIBERO.
 - `certificates.py`: schema for untrusted perception/planner/simulator certificates.
 - `baselines.py` and `experiments.py`: local ablation runner and metrics export.
 - `benchmark/libero_safety_adapter.py`: handoff point for GPU-machine LIBERO-Safety integration.
 - `benchmark/libero_online_wrapper.py`: online wrapper for the native LIBERO-Safety robosuite/MuJoCo backend.
-- `lean/ProofAlign/*.lean`: Lean 4 datatypes and predicates for symbolic contracts.
+- `lean/ProofAlign/*.lean`: Lean 4 datatypes, CTDA checkers, reflection theorems, and examples.
 
 ## GPU Benchmark Handoff
 
@@ -114,6 +150,21 @@ The executable entrypoint is:
 ```bash
 uv run python scripts/run_libero_online.py --benchmark affordance --task-id 0 --policy my_vla_eval:create_policy
 ```
+
+CTDA mode is deliberately fail closed. It additionally requires `--ctda`,
+`--warmup-steps 0`, a v2 structured fallback manifest, its pinned SHA-256
+digest, and the explicit `local-simulator-exact-allowlist` evidence mode. The
+manifest is labeled `operator-pinned-simulator-test-only`; it is not accepted as
+a formally verified proof. The built-in `hold` controller must be the canonical
+all-zero command within the environment-provided action bounds. Monitor failures
+dispatch it, check the immediate observed hard invariants and actual switch
+latency, terminate the old authorization chain, and record a typed switch trace.
+The local issuer and actuator receipt remain simulator/test TCB only, not a
+production hardware-attestation mechanism. Batch runs reject `--skip-existing`;
+live task roots, initial state, action bounds, environment version, and safety
+observations are revalidated instead of trusting cached episode metadata. The
+read-only BDDL snapshot assumes an operator-controlled process and does not claim
+protection against a malicious process running as the same OS user.
 
 An OpenVLA/OpenVLA-OFT plugin is provided at
 `experiments/libero_vla_plugin.py`. The default model is the published

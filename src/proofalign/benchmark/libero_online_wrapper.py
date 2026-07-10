@@ -1,13 +1,22 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, field
-from time import perf_counter
-from typing import Any, Protocol
+from dataclasses import asdict, dataclass, field
+from math import isfinite
+from time import monotonic_ns, perf_counter
+from typing import Any, Iterable, Protocol
 
 from proofalign.action_abstraction import action_from_dict
 from proofalign.benchmark.libero_safety_adapter import _parts_for_kind
 from proofalign.certificates import CertificateBundle
 from proofalign.checker import DualAlignmentChecker
+from proofalign.ctda import (
+    MonitorCheckResult,
+    MonitorVerdict,
+    StaticCheckResult,
+    StaticVerdict,
+    digest_payload,
+)
+from proofalign.ctda_runtime import CTDARuntimeSession, PreparedPrefix
 from proofalign.intent_parser import parse_intent
 from proofalign.models import (
     Action,
@@ -23,10 +32,14 @@ from proofalign.models import (
     TraceSummary,
     WorldState,
 )
+from proofalign.violations import ViolationType
 
 
 class LiberoOnlineIntegrationError(RuntimeError):
     """Raised when a real LIBERO/VLA value cannot be safely abstracted."""
+
+
+_CTDA_UNKNOWN_OBSERVATION_PREFIX = "ctda_unknown_observation:"
 
 
 class LiberoActionAbstractor(Protocol):
@@ -111,16 +124,36 @@ class LiberoStateObserver:
         regions = self._regions(raw_env, sim)
         gripper_holding = next((obj.object_id for obj in objects.values() if obj.held_by == "gripper"), None)
         robot_pose = self._robot_pose(raw_env, sim, observation)
+        human_distance, human_observed = self._distance(
+            info, raw_env, "human_hand", robot_pose, objects
+        )
+        obstacle_distance, obstacle_observed = self._distance(
+            info, raw_env, "obstacle", robot_pose, objects
+        )
+        collision, collision_observed = self._collision(info, raw_env)
+        cost_observed = self._cost_observed(info, raw_env)
+        notes = ["state observed from LIBERO-Safety robosuite/MuJoCo backend"]
+        for name, observed in (
+            ("min_distance_to_human_hand", human_observed),
+            ("min_distance_to_obstacle", obstacle_observed),
+            ("collision", collision_observed),
+            ("cost", cost_observed),
+        ):
+            if not observed:
+                notes.append(f"{_CTDA_UNKNOWN_OBSERVATION_PREFIX}{name}")
         return WorldState(
             objects=objects,
             regions=regions,
             gripper_holding=gripper_holding,
             robot_pose=robot_pose,
-            min_distance_to_human_hand=self._distance(info, "human_hand", robot_pose, objects),
-            min_distance_to_obstacle=self._distance(info, "obstacle", robot_pose, objects),
-            collision=self._collision(info),
+            # Keep the legacy numeric defaults for non-CTDA callers. CTDA checks
+            # the provenance notes above and fails closed instead of treating a
+            # default value as an observation.
+            min_distance_to_human_hand=human_distance,
+            min_distance_to_obstacle=obstacle_distance,
+            collision=collision,
             last_action_success=bool(info.get("last_action_success", True)),
-            notes=["state observed from LIBERO-Safety robosuite/MuJoCo backend"],
+            notes=notes,
         )
 
     def _objects(self, raw_env: Any, sim: Any) -> dict[str, Object]:
@@ -227,7 +260,14 @@ class LiberoStateObserver:
                 continue
         return False
 
-    def _distance(self, info: dict[str, Any], target: str, robot_pose: Pose, objects: dict[str, Object]) -> float:
+    def _distance(
+        self,
+        info: dict[str, Any],
+        raw_env: Any,
+        target: str,
+        robot_pose: Pose,
+        objects: dict[str, Object],
+    ) -> tuple[float, bool]:
         keys = (
             f"min_distance_to_{target}",
             f"{target}_distance",
@@ -235,21 +275,49 @@ class LiberoStateObserver:
         )
         for key in keys:
             if key in info:
-                return float(info[key])
+                try:
+                    value = float(info[key])
+                except (TypeError, ValueError):
+                    continue
+                if isfinite(value):
+                    return value, True
+        for key in keys:
+            if not hasattr(raw_env, key):
+                continue
+            try:
+                value = float(getattr(raw_env, key))
+            except (TypeError, ValueError):
+                continue
+            if isfinite(value):
+                return value, True
         candidates = [
             obj.pose.distance_to(robot_pose)
             for obj in objects.values()
             if target in obj.object_id.lower() or target in obj.kind.lower()
         ]
-        return min(candidates) if candidates else self.default_safety_distance
+        return (min(candidates), True) if candidates else (self.default_safety_distance, False)
 
-    def _collision(self, info: dict[str, Any]) -> bool:
+    def _collision(self, info: dict[str, Any], raw_env: Any) -> tuple[bool, bool]:
         if "collision" in info:
-            return bool(info["collision"])
+            return bool(info["collision"]), True
         cost = info.get("cost")
         if isinstance(cost, dict):
-            return any(bool(value) for value in cost.values())
-        return False
+            return any(bool(value) for value in cost.values()), True
+        if cost is not None:
+            return bool(cost), True
+        if hasattr(raw_env, "collision"):
+            return bool(getattr(raw_env, "collision")), True
+        raw_cost = getattr(raw_env, "cost", None)
+        if isinstance(raw_cost, dict):
+            return any(bool(value) for value in raw_cost.values()), True
+        if raw_cost is not None:
+            return bool(raw_cost), True
+        return False, False
+
+    def _cost_observed(self, info: dict[str, Any], raw_env: Any) -> bool:
+        if "cost" in info and info["cost"] is not None:
+            return True
+        return hasattr(raw_env, "cost") and getattr(raw_env, "cost") is not None
 
 
 @dataclass
@@ -269,6 +337,7 @@ class ProofAlignLiberoWrapper:
     gripper_close_threshold: float = -0.2
     gripper_open_threshold: float = 0.2
     stop_on_replan: bool = True
+    ctda_session: CTDARuntimeSession | None = None
 
     def __post_init__(self) -> None:
         self.intent: TaskIntent = parse_intent(self.instruction)
@@ -281,9 +350,13 @@ class ProofAlignLiberoWrapper:
         self.current_observation = observation
         self.current_state = self.state_observer.observe(self.env, observation)
         self.trace = []
+        if self.ctda_session is not None:
+            self.ctda_session.reset()
         return observation
 
     def step(self, raw_action: Any) -> LiberoStepResult:
+        if self.ctda_session is not None:
+            return self.step_chunk(raw_action, max_chunk_steps=1)
         total_start = perf_counter()
         if self.current_state is None:
             self.current_state = self.state_observer.observe(self.env, self.current_observation)
@@ -384,6 +457,7 @@ class ProofAlignLiberoWrapper:
             },
         )
         self.trace.append(step)
+        self.current_observation = observation
         self.current_state = after
         return LiberoStepResult(observation, float(reward), done, info, decision, step)
 
@@ -395,7 +469,11 @@ class ProofAlignLiberoWrapper:
         chunk_id: str | None = None,
     ) -> LiberoStepResult:
         total_start = perf_counter()
-        max_steps = max_chunk_steps or self.max_chunk_steps
+        requested_max_steps = max_chunk_steps or self.max_chunk_steps
+        # Until incremental observation/authorization is available, one CTDA
+        # authorization covers exactly one raw command. This prevents a failed
+        # first observation from being followed by more commands in the chunk.
+        max_steps = 1 if self.ctda_session is not None else requested_max_steps
         if self.current_state is None:
             self.current_state = self.state_observer.observe(self.env, self.current_observation)
         before = self.current_state.clone()
@@ -458,6 +536,78 @@ class ProofAlignLiberoWrapper:
                 step,
             )
 
+        ctda_prepared: PreparedPrefix | None = None
+        ctda_pre_time = 0.0
+        ctda_dispatch_ns: int | None = None
+        if self.ctda_session is not None:
+            ctda_start = perf_counter()
+            observation_issues = _ctda_observation_issues(before)
+            if observation_issues:
+                static_result = StaticCheckResult.unknown(*observation_issues)
+                prepared = None
+            else:
+                prepared_result = self.ctda_session.prepare_prefix(
+                    symbolic_action,
+                    before,
+                    tuple(env_actions[:1]),
+                    self.spec,
+                    now_ns=monotonic_ns(),
+                )
+                static_result = prepared_result.check
+                prepared = prepared_result.prepared
+            if prepared is not None and static_result.proven:
+                ctda_dispatch_ns = monotonic_ns()
+                static_result = _ctda_dispatch_check(prepared, ctda_dispatch_ns)
+            ctda_pre_time = perf_counter() - ctda_start
+            ctda_precheck = _ctda_static_check(static_result)
+            if prepared is None or not ctda_precheck.passed:
+                ctda_metadata = _ctda_metadata(
+                    self.ctda_session,
+                    static_verdict=static_result.verdict.value,
+                    witness_ref=static_result.witness_ref,
+                    issues=static_result.issues,
+                    dispatch_ns=ctda_dispatch_ns,
+                )
+                step = ExecutionStep(
+                    symbolic_action,
+                    intent_result,
+                    ctda_precheck,
+                    ctda_precheck.suggested_decision,
+                    before,
+                    pre_certificates=pre_certs.to_dicts(),
+                    raw_action=env_actions,
+                    proofalign_action=action_to_dict(symbolic_action),
+                    env_info={},
+                    reward=0.0,
+                    done=True,
+                    runtime_seconds={
+                        "action_abstractor": abstract_time,
+                        "intent_check": intent_time,
+                        "ctda_prefix_pre": ctda_pre_time,
+                        "ctda_monitor": 0.0,
+                        "effect_check": 0.0,
+                        "env_step": 0.0,
+                        "wrapper_step_wall": perf_counter() - total_start,
+                    },
+                    chunk_id=chunk_id or f"chunk_{len(self.trace)}",
+                    contract=action_to_dict(symbolic_action),
+                    raw_actions=[],
+                    trace_summary=TraceSummary(num_raw_steps=0, boundary_reason="ctda_precheck"),
+                    ctda=ctda_metadata,
+                )
+                self.trace.append(step)
+                info = self._info(ctda_precheck.suggested_decision, ctda_precheck)
+                info["proofalign_ctda"] = ctda_metadata
+                return LiberoStepResult(
+                    self.current_observation,
+                    0.0,
+                    True,
+                    info,
+                    ctda_precheck.suggested_decision,
+                    step,
+                )
+            ctda_prepared = prepared
+
         summary = TraceSummary(
             min_human_hand_distance=before.min_distance_to_human_hand,
             min_obstacle_distance=before.min_distance_to_obstacle,
@@ -469,11 +619,17 @@ class ProofAlignLiberoWrapper:
         after = before
         env_time = 0.0
         executed_actions: list[Any] = []
+        ctda_states_after: list[WorldState] = []
         previous = before
         no_progress_count = 0
         last_progress_distance = self._progress_distance(symbolic_action, before)
 
-        for index, env_action in enumerate(env_actions[:max_steps]):
+        dispatch_actions = (
+            tuple(_frozen_action_copy(action) for action in ctda_prepared.authorized_actions)
+            if ctda_prepared is not None
+            else tuple(env_actions[:max_steps])
+        )
+        for index, env_action in enumerate(dispatch_actions):
             env_start = perf_counter()
             observation, reward, done_step, step_info = normalize_env_step(self.env.step(env_action))
             env_time += perf_counter() - env_start
@@ -481,6 +637,7 @@ class ProofAlignLiberoWrapper:
             reward_total += float(reward)
             info = dict(step_info)
             after = self.state_observer.observe(self.env, observation, info)
+            ctda_states_after.append(after.clone())
             self._update_trace_summary(summary, before, previous, after, info, symbolic_action)
             summary.num_raw_steps = index + 1
             done = bool(done or done_step)
@@ -512,8 +669,161 @@ class ProofAlignLiberoWrapper:
 
         self.current_observation = observation
         post_certs = CertificateBundle.from_dicts(symbolic_action.params.get("post_certificates"))
+        ctda_effect_result: CheckResult | None = None
+        ctda_metadata: dict[str, Any] = {}
+        ctda_monitor_time = 0.0
+        ctda_monitor_verdict: MonitorVerdict | None = None
+        ctda_observe_ns: int | None = None
+        ctda_violation_at_ns: int | None = None
+        if self.ctda_session is not None and ctda_prepared is not None:
+            ctda_start = perf_counter()
+            ctda_observe_ns = monotonic_ns()
+            observation_issues = tuple(
+                issue
+                for state in ctda_states_after
+                for issue in _ctda_observation_issues(state)
+            )
+            if observation_issues:
+                ctda_monitor_verdict = MonitorVerdict.UNKNOWN
+                ctda_effect_result = CheckResult(
+                    passed=False,
+                    layer="ctda_monitor",
+                    violations=list(dict.fromkeys(observation_issues)),
+                    explanation="; ".join(dict.fromkeys(observation_issues)),
+                    suggested_decision=Decision.REPLAN,
+                    lean_mode="ctda-python-reference",
+                )
+                ctda_violation_at_ns = monotonic_ns()
+                ctda_metadata = _ctda_metadata(
+                    self.ctda_session,
+                    static_verdict=StaticVerdict.PROVEN.value,
+                    monitor_verdict=MonitorVerdict.UNKNOWN.value,
+                    issues=tuple(ctda_effect_result.violations),
+                    candidate_digest=ctda_prepared.candidate.candidate_digest,
+                    contract_id=ctda_prepared.candidate.proposal.contract_id,
+                    dispatch_ns=ctda_dispatch_ns,
+                    observe_ns=ctda_observe_ns,
+                )
+            else:
+                try:
+                    monitored, record = self.ctda_session.observe_prefix(
+                        ctda_prepared,
+                        tuple(ctda_states_after),
+                        tuple(executed_actions),
+                        self.spec,
+                        dispatch_ns=ctda_dispatch_ns,
+                        observation_times_ns=(ctda_observe_ns,),
+                        now_ns=ctda_observe_ns,
+                    )
+                    ctda_monitor_verdict = monitored.verdict
+                    ctda_effect_result = _ctda_monitor_check(monitored)
+                    if not ctda_effect_result.passed:
+                        ctda_violation_at_ns = monotonic_ns()
+                    ctda_metadata = _ctda_metadata(
+                        self.ctda_session,
+                        static_verdict=StaticVerdict.PROVEN.value,
+                        monitor_verdict=monitored.verdict.value,
+                        witness_ref=monitored.witness_ref,
+                        issues=monitored.issues,
+                        record_digest=record.record_digest,
+                        candidate_digest=record.candidate.candidate_digest,
+                        contract_id=record.candidate.proposal.contract_id,
+                        plant_trace_digest=record.plant_trace.plant_trace_digest,
+                        event_trace_digest=record.event_trace.symbolic_event_trace_digest,
+                        record_payload=asdict(record),
+                        dispatch_ns=ctda_dispatch_ns,
+                        observe_ns=ctda_observe_ns,
+                    )
+                except Exception as exc:
+                    ctda_violation_at_ns = monotonic_ns()
+                    ctda_effect_result = CheckResult(
+                        passed=False,
+                        layer="ctda_monitor",
+                        violations=[f"CTDA runtime evidence construction failed: {exc}"],
+                        explanation=f"CTDA runtime evidence construction failed: {exc}",
+                        suggested_decision=Decision.SAFE_STOP,
+                        lean_mode="ctda-python-reference",
+                    )
+                    ctda_metadata = _ctda_metadata(
+                        self.ctda_session,
+                        static_verdict=StaticVerdict.PROVEN.value,
+                        monitor_verdict=MonitorVerdict.INCONSISTENT.value,
+                        issues=tuple(ctda_effect_result.violations),
+                        candidate_digest=ctda_prepared.candidate.candidate_digest,
+                        contract_id=ctda_prepared.candidate.proposal.contract_id,
+                        dispatch_ns=ctda_dispatch_ns,
+                        observe_ns=ctda_observe_ns,
+                    )
+            if ctda_effect_result is not None and not ctda_effect_result.passed:
+                try:
+                    fallback_state_before = after
+                    (
+                        fallback_observation,
+                        fallback_reward,
+                        fallback_done,
+                        fallback_info,
+                        fallback_state,
+                        fallback_receipt,
+                        fallback_trace,
+                        fallback_env_time,
+                    ) = self._execute_ctda_fallback(
+                        trigger=ctda_effect_result.explanation,
+                        triggered_at_ns=ctda_violation_at_ns or monotonic_ns(),
+                        state_before=fallback_state_before,
+                    )
+                    observation = fallback_observation
+                    after = fallback_state
+                    reward_total += fallback_reward
+                    done = bool(done or fallback_done)
+                    env_time += fallback_env_time
+                    executed_actions.append(self.ctda_session.fallback_command())
+                    info["proofalign_fallback_env_info"] = fallback_info
+                    self._update_trace_summary(
+                        summary,
+                        before,
+                        fallback_state_before,
+                        fallback_state,
+                        fallback_info,
+                        symbolic_action,
+                    )
+                    summary.num_raw_steps += 1
+                    summary.boundary_reason = (
+                        f"{summary.boundary_reason}+ctda_fallback"
+                        if summary.boundary_reason
+                        else "ctda_fallback"
+                    )
+                    ctda_metadata["fallback_switch"] = {
+                        **asdict(fallback_receipt),
+                        "command": list(self.ctda_session.fallback_command()),
+                    }
+                    ctda_metadata["fallback_trace"] = fallback_trace
+                    if not fallback_receipt.succeeded:
+                        issue = "configured simulator fallback did not establish its immediate postcondition"
+                        ctda_effect_result = CheckResult(
+                            passed=False,
+                            layer="ctda_fallback",
+                            violations=list(ctda_effect_result.violations) + [issue],
+                            explanation=f"{ctda_effect_result.explanation}; {issue}",
+                            suggested_decision=Decision.SAFE_STOP,
+                            lean_mode="ctda-python-reference",
+                        )
+                except Exception as exc:
+                    ctda_effect_result = CheckResult(
+                        passed=False,
+                        layer="ctda_fallback",
+                        violations=list(ctda_effect_result.violations)
+                        + [f"configured fallback dispatch failed: {exc}"],
+                        explanation=(
+                            f"{ctda_effect_result.explanation}; "
+                            f"configured fallback dispatch failed: {exc}"
+                        ),
+                        suggested_decision=Decision.SAFE_STOP,
+                        lean_mode="ctda-python-reference",
+                    )
+                    ctda_metadata["fallback_error"] = str(exc)
+            ctda_monitor_time = perf_counter() - ctda_start
         effect_start = perf_counter()
-        effect_result = self.checker.check_chunk_effect_alignment(
+        legacy_effect_result = self.checker.check_chunk_effect_alignment(
             before,
             symbolic_action,
             after,
@@ -523,11 +833,18 @@ class ProofAlignLiberoWrapper:
             len(self.trace),
         )
         effect_time = perf_counter() - effect_start
+        effect_result = _merge_effect_results(
+            legacy_effect_result,
+            ctda_effect_result,
+            ctda_monitor_verdict,
+        )
         decision = effect_result.suggested_decision
         done = bool(done or decision in {Decision.REJECT, Decision.SAFE_STOP})
         info.update(self._info(decision, effect_result))
         info["proofalign_chunk_summary"] = summary.to_dict()
         info["proofalign_chunk_boundary"] = summary.boundary_reason
+        if ctda_metadata:
+            info["proofalign_ctda"] = ctda_metadata
         step = ExecutionStep(
             symbolic_action,
             intent_result,
@@ -545,6 +862,8 @@ class ProofAlignLiberoWrapper:
             runtime_seconds={
                 "action_abstractor": abstract_time,
                 "intent_check": intent_time,
+                "ctda_prefix_pre": ctda_pre_time,
+                "ctda_monitor": ctda_monitor_time,
                 "effect_check": effect_time,
                 "env_step": env_time,
                 "wrapper_step_wall": perf_counter() - total_start,
@@ -553,8 +872,10 @@ class ProofAlignLiberoWrapper:
             contract=action_to_dict(symbolic_action),
             raw_actions=list(executed_actions),
             trace_summary=summary,
+            ctda=ctda_metadata,
         )
         self.trace.append(step)
+        self.current_observation = observation
         self.current_state = after
         return LiberoStepResult(observation, float(reward_total), done, info, decision, step)
 
@@ -582,8 +903,202 @@ class ProofAlignLiberoWrapper:
                 break
             if result.done:
                 break
+        if (
+            self.ctda_session is not None
+            and self.ctda_session.supervisor.active_contract is not None
+            and final_decision is Decision.ALLOW
+        ):
+            final_decision = Decision.REPLAN
+            explanation = "episode ended with a pending CTDA contract obligation"
+            try:
+                fallback_state_before = (
+                    self.current_state
+                    or self.state_observer.observe(self.env, self.current_observation)
+                )
+                fallback_triggered_at_ns = monotonic_ns()
+                (
+                    observation,
+                    fallback_reward,
+                    fallback_done,
+                    fallback_info,
+                    fallback_state,
+                    fallback_receipt,
+                    fallback_trace,
+                    fallback_env_time,
+                ) = self._execute_ctda_fallback(
+                    trigger=explanation,
+                    triggered_at_ns=fallback_triggered_at_ns,
+                    state_before=fallback_state_before,
+                )
+                self.current_observation = observation
+                self.current_state = fallback_state
+                if not fallback_receipt.succeeded:
+                    final_decision = Decision.SAFE_STOP
+                    explanation += "; configured simulator fallback did not establish its immediate postcondition"
+                if self.trace:
+                    last_step = self.trace[-1]
+                    last_step.ctda["fallback_switch"] = {
+                        **asdict(fallback_receipt),
+                        "command": list(self.ctda_session.fallback_command()),
+                    }
+                    last_step.ctda["fallback_trace"] = fallback_trace
+                    last_step.env_info["proofalign_fallback_env_info"] = fallback_info
+                    last_step.after = fallback_state
+                    last_step.reward = float(last_step.reward or 0.0) + float(
+                        fallback_reward
+                    )
+                    last_step.done = bool(
+                        last_step.done
+                        or fallback_done
+                        or final_decision in {Decision.REJECT, Decision.SAFE_STOP}
+                    )
+                    last_step.runtime_seconds["env_step"] = float(
+                        last_step.runtime_seconds.get("env_step", 0.0)
+                    ) + fallback_env_time
+                    fallback_command = self.ctda_session.fallback_command()
+                    last_step.raw_actions.append(fallback_command)
+                    if isinstance(last_step.raw_action, list):
+                        last_step.raw_action.append(fallback_command)
+                    fallback_result = CheckResult(
+                        passed=False,
+                        layer="ctda_fallback",
+                        violations=[explanation],
+                        explanation=explanation,
+                        suggested_decision=final_decision,
+                        lean_mode="ctda-python-reference",
+                    )
+                    last_step.effect_result = fallback_result
+                    last_step.decision = final_decision
+                    last_step.env_info.update(self._info(final_decision, fallback_result))
+                    if last_step.trace_summary is not None:
+                        last_summary = last_step.trace_summary
+                        self._update_trace_summary(
+                            last_summary,
+                            last_step.before,
+                            fallback_state_before,
+                            fallback_state,
+                            fallback_info,
+                            last_step.action,
+                        )
+                        last_summary.num_raw_steps += 1
+                        last_summary.boundary_reason = (
+                            f"{last_summary.boundary_reason}+ctda_fallback"
+                            if last_summary.boundary_reason
+                            else "ctda_fallback"
+                        )
+                        last_step.env_info[
+                            "proofalign_chunk_summary"
+                        ] = last_summary.to_dict()
+                        last_step.env_info[
+                            "proofalign_chunk_boundary"
+                        ] = last_summary.boundary_reason
+            except Exception as exc:
+                final_decision = Decision.SAFE_STOP
+                explanation += f"; configured fallback dispatch failed: {exc}"
+                if self.trace:
+                    self.trace[-1].ctda["fallback_error"] = str(exc)
         final_state = self.current_state or self.state_observer.observe(self.env, self.current_observation)
         return ExecutionDecision(final_decision, final_state, list(self.trace), explanation)
+
+    def _execute_ctda_fallback(
+        self,
+        *,
+        trigger: str,
+        triggered_at_ns: int,
+        state_before: WorldState,
+    ) -> tuple[Any, float, bool, dict[str, Any], WorldState, Any, dict[str, Any], float]:
+        if self.ctda_session is None:
+            raise RuntimeError("no CTDA session is configured")
+        command = self.ctda_session.fallback_command()
+        requested_at = monotonic_ns()
+        dispatched_at = monotonic_ns()
+        env_start = perf_counter()
+        actuator_attestation = None
+        state_after_observed: WorldState | None = None
+        observation_error: str | None = None
+        try:
+            observation, reward, done, env_info = normalize_env_step(self.env.step(command))
+            applied_at = monotonic_ns()
+            try:
+                actuator_attestation = self.ctda_session.attest_fallback_actuation(
+                    command,
+                    dispatched_at_ns=dispatched_at,
+                    applied_at_ns=applied_at,
+                )
+            except Exception as exc:
+                env_info = dict(env_info)
+                env_info["fallback_actuator_evidence_error"] = str(exc)
+            try:
+                state_after_observed = self.state_observer.observe(
+                    self.env, observation, env_info
+                )
+            except Exception as exc:
+                observation_error = str(exc)
+                env_info = dict(env_info)
+                env_info["fallback_observation_exception"] = observation_error
+                done = True
+        except Exception as exc:
+            observation_error = str(exc)
+            observation = self.current_observation
+            reward = 0.0
+            done = True
+            env_info = {"fallback_exception": str(exc)}
+        observed_at = monotonic_ns()
+        fallback_env_time = perf_counter() - env_start
+        receipt = self.ctda_session.record_fallback_switch(
+            trigger=trigger,
+            state_before=state_before,
+            state_after=state_after_observed,
+            command=command,
+            triggered_at_ns=triggered_at_ns,
+            requested_at_ns=requested_at,
+            dispatched_at_ns=dispatched_at,
+            observed_at_ns=observed_at,
+            safety_spec=self.spec,
+            environment_info=env_info,
+            observation_error=observation_error,
+            actuator_attestation=actuator_attestation,
+        )
+        if state_after_observed is None:
+            state_after = state_before.clone()
+            state_after.notes.append(
+                f"{_CTDA_UNKNOWN_OBSERVATION_PREFIX}fallback_post_state"
+            )
+        else:
+            state_after = state_after_observed
+        fallback_trace = {
+            "kind": "ctda_fallback",
+            "trigger": trigger,
+            "requested_command": list(command),
+            "command_application": receipt.command_application,
+            "applied_command_digest": receipt.applied_command_digest,
+            "triggered_at_ns": triggered_at_ns,
+            "requested_at_ns": requested_at,
+            "dispatched_at_ns": dispatched_at,
+            "observed_at_ns": observed_at,
+            "reward": float(reward),
+            "done": bool(done),
+            "env_info": dict(env_info),
+            "state_before_digest": receipt.state_before_digest,
+            "state_after_digest": receipt.state_after_digest,
+            "state_after": (
+                state_after_observed.to_dict()
+                if state_after_observed is not None
+                else None
+            ),
+            "observation_error": observation_error,
+            "receipt": asdict(receipt),
+        }
+        return (
+            observation,
+            float(reward),
+            bool(done),
+            dict(env_info),
+            state_after,
+            receipt,
+            fallback_trace,
+            fallback_env_time,
+        )
 
     def _update_trace_summary(
         self,
@@ -663,6 +1178,171 @@ class ProofAlignLiberoWrapper:
             "proofalign_explanation": result.explanation,
             "proofalign_violations": list(result.violations),
         }
+
+
+def _ctda_static_check(result: StaticCheckResult) -> CheckResult:
+    passed = result.verdict is StaticVerdict.PROVEN
+    if result.verdict is StaticVerdict.INCONSISTENT:
+        decision = Decision.SAFE_STOP
+    elif passed:
+        decision = Decision.ALLOW
+    else:
+        decision = Decision.REPLAN
+    issues = list(result.issues)
+    explanation = (
+        "CTDA prefix authorization proven"
+        if passed
+        else "; ".join(issues) or f"CTDA prefix authorization returned {result.verdict.value}"
+    )
+    return CheckResult(
+        passed=passed,
+        layer="ctda_prefix_pre",
+        violations=[] if passed else issues,
+        explanation=explanation,
+        suggested_decision=decision,
+        lean_mode="ctda-python-reference",
+    )
+
+
+def _ctda_monitor_check(result: MonitorCheckResult) -> CheckResult:
+    passed = result.verdict in {MonitorVerdict.COMPLETE, MonitorVerdict.SAFE_PENDING}
+    if result.verdict in {MonitorVerdict.VIOLATED, MonitorVerdict.INCONSISTENT}:
+        decision = Decision.SAFE_STOP
+    elif result.verdict is MonitorVerdict.UNKNOWN:
+        decision = Decision.REPLAN
+    else:
+        decision = Decision.ALLOW
+    issues = list(result.issues)
+    explanation = (
+        f"CTDA monitor {result.verdict.value}"
+        if passed
+        else "; ".join(issues) or f"CTDA monitor returned {result.verdict.value}"
+    )
+    return CheckResult(
+        passed=passed,
+        layer="ctda_monitor",
+        violations=[] if passed else issues,
+        explanation=explanation,
+        suggested_decision=decision,
+        lean_mode="ctda-python-reference",
+    )
+
+
+def _merge_effect_results(
+    legacy: CheckResult,
+    ctda: CheckResult | None,
+    monitor_verdict: MonitorVerdict | None,
+) -> CheckResult:
+    if ctda is None:
+        return legacy
+    if not ctda.passed:
+        return ctda
+    if legacy.passed:
+        return ctda
+    if monitor_verdict is MonitorVerdict.SAFE_PENDING and _only_postcondition_failures(legacy):
+        return ctda
+    return legacy
+
+
+def _only_postcondition_failures(result: CheckResult) -> bool:
+    return bool(result.violation_reports) and all(
+        report.violation_type is ViolationType.POSTCONDITION
+        for report in result.violation_reports
+    )
+
+
+def _ctda_observation_issues(state: WorldState) -> tuple[str, ...]:
+    missing = [
+        note.removeprefix(_CTDA_UNKNOWN_OBSERVATION_PREFIX)
+        for note in state.notes
+        if note.startswith(_CTDA_UNKNOWN_OBSERVATION_PREFIX)
+    ]
+    return tuple(
+        f"missing trusted CTDA observation: {name}"
+        for name in dict.fromkeys(missing)
+    )
+
+
+def _frozen_action_copy(value: Any) -> Any:
+    if hasattr(value, "tolist"):
+        return _frozen_action_copy(value.tolist())
+    if isinstance(value, (list, tuple)):
+        return tuple(_frozen_action_copy(item) for item in value)
+    if isinstance(value, (str, int, float, bool)) or value is None:
+        return value
+    raise LiberoOnlineIntegrationError(
+        f"authorized action contains unsupported value: {type(value).__name__}"
+    )
+
+
+def _ctda_dispatch_check(prepared: PreparedPrefix, dispatch_ns: int) -> StaticCheckResult:
+    candidate = prepared.candidate
+    if not candidate.verify_integrity():
+        return StaticCheckResult.inconsistent("CTDA candidate integrity failed before dispatch")
+    if len(prepared.authorized_actions) != 1:
+        return StaticCheckResult.refuted("CTDA runtime authorizations must contain exactly one raw step")
+    try:
+        frozen_actions = tuple(
+            _frozen_action_copy(action) for action in prepared.authorized_actions
+        )
+        command_digest = digest_payload(frozen_actions)
+    except (TypeError, ValueError, LiberoOnlineIntegrationError) as exc:
+        return StaticCheckResult.inconsistent(f"cannot bind authorized dispatch command: {exc}")
+    authorization = candidate.authorization
+    if command_digest != authorization.authorized_command_digest:
+        return StaticCheckResult.inconsistent(
+            "frozen dispatch command digest differs from its CTDA authorization"
+        )
+    if not authorization.is_fresh(dispatch_ns):
+        return StaticCheckResult.refuted("CTDA authorization expired before command dispatch")
+    if dispatch_ns + authorization.max_authorized_duration_ns > authorization.valid_until_ns:
+        return StaticCheckResult.refuted(
+            "remaining CTDA authorization window cannot cover the dispatched prefix"
+        )
+    return StaticCheckResult.success(authorization.authorization_digest)
+
+
+def _ctda_metadata(
+    session: CTDARuntimeSession,
+    *,
+    static_verdict: str | None = None,
+    monitor_verdict: str | None = None,
+    witness_ref: str | None = None,
+    issues: Iterable[str] = (),
+    contract_id: str | None = None,
+    record_digest: str | None = None,
+    candidate_digest: str | None = None,
+    plant_trace_digest: str | None = None,
+    event_trace_digest: str | None = None,
+    record_payload: dict[str, Any] | None = None,
+    dispatch_ns: int | None = None,
+    observe_ns: int | None = None,
+) -> dict[str, Any]:
+    active_contract = session.supervisor.active_contract
+    monitor = session.supervisor.monitor_state
+    return {
+        "spec_digest": session.supervisor.mission.spec_digest,
+        "contract_id": contract_id or (active_contract.contract_id if active_contract else None),
+        "active_phase": session.supervisor.active_phase,
+        "monitor_state_digest": monitor.monitor_state_digest if monitor else None,
+        "static_verdict": static_verdict,
+        "monitor_verdict": monitor_verdict,
+        "witness_ref": witness_ref,
+        "issues": list(issues),
+        "candidate_digest": candidate_digest,
+        "record_digest": record_digest,
+        "plant_trace_digest": plant_trace_digest,
+        "symbolic_event_trace_digest": event_trace_digest,
+        "record": record_payload,
+        "dispatch_monotonic_ns": dispatch_ns,
+        "observe_monotonic_ns": observe_ns,
+        "assurance_scope": getattr(
+            session,
+            "assurance_scope",
+            "conditional-simulator-kinematic-test-only",
+        ),
+        "proof_verified": False,
+    }
 
 
 def make_libero_offscreen_env(bddl_file_name: str, **kwargs: Any) -> Any:

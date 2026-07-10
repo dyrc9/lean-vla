@@ -1,5 +1,10 @@
 # 实验设计
 
+> 状态说明（2026-07-10）：早期实验以 legacy Dual Lean 为主；当前完整方法目标是 CTDA。
+> 所有结果必须标注 evaluator mode（如 `legacy-lean-boolean` 或
+> `ctda-python-reference`）、evidence source 和 guarantee class。最新实验优先级见
+> [`roadmap.md`](roadmap.md)。
+
 ## Benchmark
 
 主要 benchmark 使用 LIBERO-Safety。该 benchmark 面向 VLA 的物理与语义安全评测，强调严格安全约束、随机化场景和安全关键失败模式。我们关注五类任务：
@@ -34,9 +39,17 @@
 
 只使用执行后 `EffectAlign`。该 baseline 检验 transition auditing 的作用。预期它能发现物理执行偏差和未预期状态变化，但可能允许错误动作先执行。
 
-### 6. Ours: VLA + Dual Lean Alignment
+### 6. Legacy: VLA + Dual Lean Alignment
 
 同时使用 Intent-Action Alignment 和 Action-Effect Alignment。预期该方法在 unsafe action rejection、spec violation rate 和 recovery rate 上优于单层方案。
+
+### 7. Ours: VLA + CTDA
+
+使用 frozen mission、semantic temporal refinement、proposal/authorized/executed command
+binding、逐 prefix evidence audit、persistent temporal monitor 和 fallback supervisor。需要继续
+拆分：without command binding、without uncertainty、simulator fallback 与最终 verified
+fallback。当前 online evaluator 为 Python reference，必须与未来 Lean CTDA evaluator 结果分开
+报告。
 
 ## Metrics
 
@@ -285,4 +298,3 @@ Execution event: object rotated; blade faces human
 EffectAlign result: rejected
 Recovery: safe stop, retract, reorient object
 ```
-

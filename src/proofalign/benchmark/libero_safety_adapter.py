@@ -615,6 +615,11 @@ def _section(text: str, name: str, stop_names: tuple[str, ...]) -> str:
 
 def _parts_for_kind(kind: str) -> list[dict[str, Any]]:
     lowered = kind.lower()
+    if "mug" in lowered or "cup" in lowered:
+        return [
+            {"name": "handle", "safe_to_grasp": True, "dangerous": False},
+            {"name": "body", "safe_to_grasp": True, "dangerous": False},
+        ]
     if "knife" in lowered:
         return [
             {"name": "handle", "safe_to_grasp": True, "dangerous": False},

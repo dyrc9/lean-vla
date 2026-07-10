@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import re
+from decimal import Decimal, InvalidOperation, ROUND_CEILING, ROUND_FLOOR
 
 from proofalign.certificates import Certificate, CertificateBundle, CertificateKind, certificates_from_action_params
 from proofalign.lean_bridge import LeanBridge
@@ -585,7 +586,7 @@ def _lean_certified_dual_chunk_expression(
         f"({_lean_spec(spec)}) "
         f"({_lean_certificate_list(pre_certs.certificates)}) "
         f"({_lean_certificate_list(post_certs.certificates)}) "
-        f"{_lean_nat(spec.certificate_min_confidence)}"
+        f"{_lean_nat_upper(spec.certificate_min_confidence)}"
     )
 
 
@@ -634,7 +635,7 @@ def _lean_action_with_object(action: Action, obj: str, region: str | None = None
 def _lean_spec(spec: SafetySpec) -> str:
     return (
         "{ "
-        f"safetyMargin := {_lean_nat(spec.safety_margin)}, "
+        f"safetyMargin := {_lean_nat_upper(spec.safety_margin)}, "
         f"forbiddenObjects := {_lean_string_list(spec.forbidden_objects)}, "
         f"forbiddenParts := {_lean_string_list(spec.forbidden_parts)}, "
         f"protectedObjects := {_lean_string_list(spec.protected_objects)}, "
@@ -654,8 +655,8 @@ def _lean_world(state: WorldState) -> str:
         f"holding := {_lean_option_string(state.gripper_holding)}, "
         f"inRegion := {_lean_pair_list(in_region)}, "
         f"collision := {_lean_bool(state.collision)}, "
-        f"humanHandDistance := {_lean_nat(state.min_distance_to_human_hand)}, "
-        f"obstacleDistance := {_lean_nat(state.min_distance_to_obstacle)} "
+        f"humanHandDistance := {_lean_nat_lower(state.min_distance_to_human_hand)}, "
+        f"obstacleDistance := {_lean_nat_lower(state.min_distance_to_obstacle)} "
         "}"
     )
 
@@ -666,8 +667,8 @@ def _lean_trace_summary(summary: TraceSummary) -> str:
         f"numSteps := {max(0, int(summary.num_raw_steps))}, "
         f"collision := {_lean_bool(summary.collision)}, "
         f"cost := {_lean_bool(summary.cost_observed)}, "
-        f"minHumanHandDistance := {_lean_nat(summary.min_human_hand_distance)}, "
-        f"minObstacleDistance := {_lean_nat(summary.min_obstacle_distance)}, "
+        f"minHumanHandDistance := {_lean_nat_lower(summary.min_human_hand_distance)}, "
+        f"minObstacleDistance := {_lean_nat_lower(summary.min_obstacle_distance)}, "
         f"movedObjects := {_lean_string_list(summary.moved_objects)}, "
         f"protectedObjectMoved := {_lean_bool(summary.protected_object_moved)}, "
         f"objectBecameHeld := {_lean_bool(summary.object_became_held)}, "
@@ -689,9 +690,9 @@ def _lean_certificate(cert: Certificate) -> str:
         f"status := {_lean_cert_status(cert.status.value)}, "
         f"subject := {_lean_option_string(cert.subject)}, "
         f"target := {_lean_option_string(cert.target)}, "
-        f"value := {_lean_nat(float(value))}, "
-        f"threshold := {_lean_nat(float(threshold))}, "
-        f"confidence := {_lean_nat(cert.confidence)} "
+        f"value := {_lean_nat_lower(float(value))}, "
+        f"threshold := {_lean_nat_upper(float(threshold))}, "
+        f"confidence := {_lean_nat_lower(cert.confidence)} "
         "}"
     )
 
@@ -742,10 +743,45 @@ def _lean_bool(value: bool) -> str:
     return "true" if value else "false"
 
 
+_LEAN_SCALE = Decimal(100)
+_LEAN_UNKNOWN_UPPER = 100_000_000
+
+
+def _lean_nat_lower(value: float) -> str:
+    """Encode a measured lower bound without rounding toward safety.
+
+    Lean compares measured values against required minima. Flooring the
+    measurement and ceiling the requirement ensures quantisation cannot turn an
+    unsafe boundary value into an accepted one. Non-finite observations encode
+    as zero so missing/invalid evidence fails closed.
+    """
+
+    return str(_scaled_nat(value, ROUND_FLOOR, nonfinite=0))
+
+
+def _lean_nat_upper(value: float) -> str:
+    """Encode a required minimum conservatively using an outward ceiling."""
+
+    return str(_scaled_nat(value, ROUND_CEILING, nonfinite=_LEAN_UNKNOWN_UPPER))
+
+
 def _lean_nat(value: float) -> str:
-    if value >= 999:
-        return "100000"
-    return str(max(0, int(round(value * 100))))
+    """Backward-compatible alias for measured/lower-bound values."""
+
+    return _lean_nat_lower(value)
+
+
+def _scaled_nat(value: float, rounding: str, *, nonfinite: int) -> int:
+    try:
+        decimal = Decimal(str(value))
+    except (InvalidOperation, ValueError):
+        return nonfinite
+    if not decimal.is_finite():
+        return nonfinite
+    if decimal <= 0:
+        return 0
+    scaled = (decimal * _LEAN_SCALE).to_integral_value(rounding=rounding)
+    return max(0, int(scaled))
 
 
 def _summary_hazard(summary: TraceSummary) -> bool:

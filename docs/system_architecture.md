@@ -1,299 +1,297 @@
-# 系统架构
+# ProofAlign 2.0 系统架构
 
-## 总览
+更新日期：2026-07-10
 
-系统由 VLA policy、感知与状态抽象、动作抽象、Lean checker、执行监控和恢复机制组成。核心思想是把 VLA 的候选动作放在两个 formal gates 之间：
+## 1. 总览
 
-1. 执行前经过 Intent-Action checker。
-2. 执行后经过 Action-Effect checker。
+ProofAlign 是 VLA 外部的 runtime assurance wrapper。系统不修改 VLA 权重，而是在每次低层
+命令 dispatch 前后维护一个合同、授权和证据链。
 
 ```text
-Natural Language Instruction
-        |
-        v
-Task Spec Compiler --------------+
-        |                         |
-        v                         |
-   SafetySpec Σ                   |
-        |                         |
-        v                         |
-Observation o_t ---> State Observer ---> WorldState s_t
-        |                         |
-        v                         |
-      VLA Policy ---> Action Chunk a_t
+Authenticated task / BDDL / safety templates
+                       |
+                       v
+              Frozen MissionSpec + SpecDigest
+                       |
+Observation ----------+---------------------------+
+     |                                             |
+     v                                             v
+State/Fact Adapter                         Task Automaton State
+     |                                             |
+     +-----------> Semantic Contract Compiler <---+
                             |
                             v
-              Symbolic Action Abstractor
+                 SemanticTemporalRefines
+                            |
+VLA proposal --------------+
+     |                      v
+     +----> Safety Filter / Prefix Evidence
                             |
                             v
-              Intent-Action Lean Checker
+                    PrefixPreCertified
                             |
-              accept / reject / repair
-                            |
-                            v
-              Monitored Execution
+                 proven only / fail closed
                             |
                             v
-Observation o_{t+1} -> State Observer -> WorldState s_{t+1}
+                  Bounded Command Dispatch
                             |
                             v
-              Action-Effect Lean Checker
+       ExecutionReceipt + PlantTrace + EventTrace
                             |
-       accept / recover / safe stop / replan
+                            v
+              ObservedPrefixEvidenceValid
+                            |
+                            v
+                 Persistent Temporal Monitor
+                            |
+       +--------------------+--------------------+
+       |                    |                    |
+    complete           safe_pending        other verdict
+       |                    |                    |
+ advance phase      authorize next prefix   latch + fallback
 ```
 
-## 从自然语言指令到 Lean task spec
+概念上只有两个 alignment layer：
 
-输入 `I` 是自然语言，例如：
+- `SemanticTemporalRefines`：mission/phase 到 semantic contract；
+- `PhysicalEffectConforms`：proposal、授权命令、执行回执和 realized trace 到 contract。
+
+工程上第二层分为 prefix-pre、observed-prefix 和 completion monitor 三段。
+
+## 2. 模块与职责
+
+### 2.1 Task root adapter
+
+输入是 benchmark task、BDDL bytes、认证用户指令或调度器任务。adapter 负责冻结原始 artifact、
+计算 digest，并构造：
+
+- authority envelope；
+- object/region registry；
+- task automaton；
+- goal atoms、goal phases 和 phase obligations；
+- hard invariants 和 evidence requirements；
+- time base 与 episode nonce。
+
+当前 LIBERO 路径会冻结 instruction 和 BDDL snapshot，并在环境创建后重新验证 digest。但 BDDL
+goal 到 typed mission 的编译器尚未被形式化验证，仍属于 TCB。
+
+### 2.2 VLA policy
+
+VLA 接收 policy prompt、视觉观测和历史，输出连续 action proposal。它可以输出固定 chunk，
+但 proposal 不自动拥有 `Pick`、`Place` 等完整语义，也不具有执行权限。
+
+policy rationale、learned critic 和 confidence 可以触发降级、replan 或 stop，不能单独把
+`unknown/refuted` 升级为 `proven`。
+
+### 2.3 State and fact adapter
+
+该模块把 simulator 或传感器输出转换为：
+
+- symbolic world state；
+- exact/bounded interval；
+- plant sample；
+- symbolic event frame；
+- state、sample 和 trace digest；
+- observer/abstraction attestation。
+
+Lean 检查引用、范围和 provenance，不证明 detector、pose estimator 或 contact classifier 本身
+正确。缺失、过期或互相冲突的观测必须生成 `unknown` 或 `inconsistent`。
+
+### 2.4 Semantic contract compiler
+
+compiler 将当前 task phase 和 action abstraction 组合成 `SemanticSkillContract`。合同声明：
+
+- skill、target、part、region；
+- guards、temporal guarantees 和 terminal event；
+- 要推进的 residual obligations；
+- `may_modify` / `must_preserve` frame sets；
+- deadline、evidence requirements 和 fallback。
+
+compiler 不允许生成任意 Lean 源码；它只能实例化 typed schema。合同必须重新通过 semantic
+checker，compiler 本身不能批准执行。
+
+### 2.5 Semantic checker
+
+semantic checker 校验 frozen mission binding、authority、phase transition、对象与 affordance、
+guard、frame set、deadline、任务进展和 evidence coverage。输出：
 
 ```text
-"Pick up the mug by its handle and place it on the coaster without touching the knife."
+proven(witness)
+refuted(counterexamples)
+unknown(missing evidence)
+inconsistent(conflicts)
 ```
 
-Task Spec Compiler 负责生成：
+只有 `proven` 可进入 prefix authorization。
 
-- 目标对象：`mug`
-- 目标部件：`mug.handle`
-- 目标区域：`coaster.region`
-- 禁止对象：`knife`
-- 禁止接触关系：`Contacting(robot, knife)`
-- 动作偏好：`Pick(mug, mug.handle)` before `Place(mug, coaster.region)`
-- 完成条件：`InRegion(mug, coaster.region) ∧ Stable(mug)`
+### 2.6 Prefix authorizer and safety filter
 
-该 compiler 可以由 LLM、规则系统或人工标注辅助，但输出必须变成 Lean 可检查的 `TaskIntent` 和 `SafetySpec`。在 prototype 中，可以先使用模板化 parser 或 benchmark annotation，避免把自然语言解析本身作为主要贡献。
-
-## 从 VLA action chunk 到 symbolic action abstraction
-
-VLA 可能输出：
-
-- end-effector delta actions
-- waypoint sequence
-- gripper command
-- language-like skill command
-- low-level primitive chunk
-
-Symbolic Action Abstractor 将其映射到 `Action`：
+该模块把 VLA proposal 与最终准备 dispatch 的命令区分开：
 
 ```text
-raw chunk:
-  move gripper toward cup handle, close gripper
-
-symbolic abstraction:
-  Pick(object=cup, part=cup_handle)
-
-predicted effect:
-  Holding(robot, cup)
+policy proposal
+  -> optional CBF / predictive / kinematic filter
+  -> authorized command
+  -> PrefixAuthorization
 ```
 
-抽象器需要引用 perception 结果、planner metadata 和 VLA action intent。若无法可靠抽象，系统应返回 `unknown`，触发 re-observe 或 ask-for-clarification，而不是直接执行。
+授权必须绑定当前 state、monitor state、proposal index、proposal digest、filter policy、dynamics
+model、reachable tube、time window 和 fallback witness。授权不可跨 state、monitor、episode 或
+proposal 重放。
 
-## Intent-Action Checker
+### 2.7 Dispatcher and execution adapter
 
-Intent-Action checker 调用 Lean 检查：
+dispatcher 只下发 `PrefixPreCertified = proven` 对应的 exact command，并生成
+`ExecutionReceipt`。receipt 记录授权命令、实际命令、允许误差、时间戳和 actuator evidence。
+
+当前 LIBERO CTDA 路径把一次授权限制为一个 raw `env.step`，即使 policy 一次产生多个动作，
+也需要逐步重新授权。这是当前的安全实现选择，不代表 semantic contract 只能持续一个 step。
+
+### 2.8 Trace builder
+
+执行 adapter 产生两条相互绑定的 trace：
+
+- `PlantTrace`：每个实际 sample 的 command、state、interval、tube membership、model assumption
+  和 invariant verdict；
+- `SymbolicEventTrace`：`holding`、`released`、`inRegion`、`stable`、`goalReached` 等事实。
+
+每个 symbolic fact 都应通过 abstraction link 指向 source plant sample。没有 provenance 的事实
+不能完成合同。
+
+### 2.9 Persistent temporal monitor
+
+monitor state 跨 prefix 保留：当前 phase、已完成 guarantee、pending obligation、proposal index、
+last event time 和 digest。monitor 不能在每次 policy call 后清零。
+
+运行时策略：
+
+| Verdict | 行为 |
+|---|---|
+| `complete` | 接受合同完成并推进 task automaton |
+| `safe_pending` | 保持同一合同，申请下一条新授权 |
+| `violated` | 锁存旧链并触发 fallback/safe stop |
+| `unknown` | 不继续执行，re-observe 或 fallback |
+| `inconsistent` | 视为证据链故障，锁存并 fallback |
+
+### 2.10 Fallback supervisor
+
+fallback 不是一个字符串 decision。supervisor 必须：
+
+1. 冻结 fallback command 和 manifest；
+2. 在 non-continuable verdict 后终止旧 authorization chain；
+3. 实际 dispatch fallback；
+4. 记录 requested/applied command、触发原因、切换前后状态和单调时间戳；
+5. 检查即时 hard invariant 和实测切换 latency；
+6. 生成 typed switch receipt。
+
+当前实现只接受 action bounds 内的 canonical all-zero hold，且 manifest 必须明确标记为
+`operator-pinned-simulator-test-only`。它不构成真实机器人 verified fallback proof。
+
+## 3. Lean 端结构
+
+### Legacy specification
+
+- `Core.lean`：`Action`、`TaskIntent`、`SafetySpec`、`WorldState`、`TraceSummary`；
+- `Intent.lean`：`SafetyAdmissible`、`MissionRefines`、`IntentAligned`；
+- `Effect.lean`：runtime invariant、frame condition、`EffectAligned` 和
+  `ChunkEffectAligned`；
+- `Safety.lean`：dual/certified composition；
+- `Certificate.lean`：旧版 certificate schema。
+
+Python legacy bridge 为具体输入生成 `Bool = true` proposition，通过 `by decide` 交给 Lean。
+
+### CTDA specification
+
+`ProofAlign/CTDA.lean` 定义：
+
+- frozen mission、task automaton 和 phase obligation；
+- semantic skill contract；
+- proposal、authorization、reachable tube 和 typed evidence；
+- execution receipt、plant/event trace 和 abstraction provenance；
+- `SemanticTemporalRefines`、`PrefixPreCertified`、`ObservedPrefixEvidenceValid`；
+- finite-prefix temporal monitor；
+- checker soundness/reflection theorem。
+
+`ProofAlign/CTDAExamples.lean` 提供正例和 binding、deadline、tube、command、trace、post evidence
+等负例。
+
+## 4. Python 端结构
+
+- `ctda.py`：不可变 CTDA 数据模型、digest/attestation 逻辑、reference checker 和 stateful
+  supervisor；
+- `ctda_runtime.py`：从 legacy/LIBERO state 生成 mission、contract、prefix candidate、receipt 和
+  trace，并处理 fallback switch；
+- `benchmark/libero_online_wrapper.py`：legacy macro-chunk 与 CTDA 单 prefix online loop；
+- `benchmark/libero_online_runner.py`：冻结 task root、验证 fallback manifest、创建环境并落盘
+  audit metadata；
+- `lean_bridge.py`：当前只执行 legacy generated Boolean claim；尚未提供 CTDA request
+  serialization/evaluator 调用。
+
+## 5. 当前在线路径
+
+### Legacy mode
 
 ```text
-IntentAlign(I, s_t, a_t, Σ)
+raw VLA chunk -> symbolic Action
+  -> Python intent diagnostics + Lean IntentAligned Bool claim
+  -> execute macro/small chunk
+  -> TraceSummary
+  -> Python effect diagnostics + Lean ChunkEffectAligned Bool claim
 ```
 
-输入：
-
-- `TaskIntent`
-- `WorldState s_t`
-- `Action a_t`
-- pre-execution certificates
-- `SafetySpec Σ`
-
-输出：
-
-- `accepted(theorem_ref)`
-- `rejected(violation_report)`
-- `unknown(missing_certificate)`
-
-典型检查：
-
-- 动作目标是否为 intent 中允许对象。
-- 动作是否使用安全 affordance。
-- 动作 precondition 是否满足。
-- 禁止对象是否保持 untouched。
-- 外部 motion planner 是否提供了足够 clearance certificate。
-- 人手、禁区、障碍物约束是否覆盖 action chunk。
-
-## Execution Monitor
-
-Execution Monitor 在动作执行期间运行。它不替代 Lean，而是负责实时收集和触发：
-
-- action chunk start / stop
-- force threshold events
-- emergency stop events
-- human hand intrusion
-- object slip
-- unexpected contact
-- tracking loss
-- timeout
-
-对于短 action chunk，可以在 chunk 结束后统一检查 EffectAlign。对于长动作或高风险任务，应在中间 checkpoint 执行 partial EffectAlign 或 invariant check。
-
-## State Observer
-
-State Observer 从 `o_t` 生成 `s_t`，从 `o_{t+1}` 生成 `s_{t+1}`。它整合：
-
-- object detection / segmentation
-- pose estimation
-- part detection
-- human hand tracking
-- region occupancy
-- contact event detection
-- robot proprioception
-- planner and controller logs
-
-State Observer 还生成 certificate：
-
-- object identity certificate
-- pose-to-region certificate
-- hand clearance certificate
-- object displacement certificate
-- contact event certificate
-- state confidence certificate
-
-Lean 只接受满足 schema 的 certificate；低置信度、过期或引用错误的 certificate 会导致 `unknown` 或 `rejected`。
-
-## Action-Effect Checker
-
-Action-Effect checker 调用 Lean 检查：
+### CTDA mode
 
 ```text
-EffectAlign(s_t, a_t, s_{t+1}, Σ)
+frozen task root
+  -> Python CTDAChecker / CTDASupervisor
+  -> one-step prefix authorization
+  -> env.step
+  -> receipt + plant/event trace
+  -> Python observed-prefix + temporal monitor
+  -> next authorization or fallback
 ```
 
-输入：
+CTDA mode当前输出标记为 `ctda-python-reference`。Lean CTDA specification 会随工程构建并由
+单元/Lean examples 验证，但不是当前 online dispatch 的 evaluator。
 
-- 执行前状态 `s_t`
-- 已执行动作 `a_t`
-- 执行后状态 `s_{t+1}`
-- post-execution certificates
-- `SafetySpec Σ`
+## 6. Fail-closed 规则
 
-典型检查：
+以下情况不得 dispatch：
 
-- `Pick(obj)` 后是否 `Holding(robot, obj)`。
-- `Place(obj, region)` 后是否 `InRegion(obj, region)` 且 `Stable(obj)`。
-- 非目标对象是否保持 frame condition。
-- 是否发生不允许接触。
-- 人手是否始终远离危险区域。
-- forbidden object 是否被移动。
-- 若 action 声称避开障碍，执行日志中是否出现越界或碰撞事件。
+- Lean-backed legacy 路径中 Lean 不可用或工程构建失败；
+- mission authority 或 typed attestation 未通过配置 verifier；
+- semantic/prefix checker 返回非 `proven`；
+- authorization 过期、state/monitor/episode digest 不匹配；
+- tube 有覆盖空洞或 fallback witness 不一致；
+- 另一个 authorization 尚在 flight；
+- receipt/trace 缺失、命令不一致或 observation 为 unknown；
+- monitor 已锁存 terminal non-continuable verdict。
 
-## Reject / Repair / Safe Stop / Replan
+mock mode 只允许诊断和测试，不能连接执行授权路径。
 
-### Reject
+## 7. 信任边界
 
-当 IntentAlign 明确失败时，系统拒绝动作。示例：
+| 组件 | 当前角色 | 当前信任/保证 |
+|---|---|---|
+| Lean kernel + CTDA definition | 离散逻辑 checker | 对 Lean 内 proposition 和 checker theorem 负责 |
+| Python CTDA checker | 当前 online reference evaluator | 经过单测，但不是 Lean kernel 执行结果 |
+| Task/BDDL compiler | 规格生成 | 未验证 TCB；digest 只保护冻结后的完整性 |
+| State/action abstractor | 连续到符号映射 | 未验证 TCB；需要 provenance/evidence |
+| Simulator evidence issuer | 本地 attestation | exact allowlist 测试信任，不是硬件证明 |
+| Kinematic tube | prefix 运动界 | 条件化近似，不是完整接触动力学 reachability |
+| Hold fallback | simulator safe-stop action | 有真实 dispatch/receipt，无长期恢复域定理 |
+| VLA | 非可信 proposal producer | 永不直接获得执行权限 |
 
-- 抓取了错误对象。
-- 试图接触禁止对象。
-- 使用危险部件。
-- 缺少必需 precondition。
+## 8. 不应声称的能力
 
-Reject 应产生可读原因，供 VLA 或上层 planner 修正。
+当前系统不能声称：
 
-### Repair
+- Lean 验证了原始 RGB、object identity 或自然语言语义；
+- Lean 验证了真实连续动力学、接触、摩擦或控制器稳定性；
+- 每个 LIBERO CTDA online prefix 已经由 Lean evaluator 授权；
+- simulator software receipt 等同于硬件 actuator attestation；
+- `safe_pending` 证明未来所有 prefix 安全；
+- task success 等同于 safe success。
 
-当动作接近合法但存在可修复错误时，系统尝试局部修正：
-
-- 将 `Pick(knife, blade)` 修正为 `Pick(knife, handle)`。
-- 将目标区域从 unsafe region 改为允许区域。
-- 要求 planner 重新生成避障路径。
-- 要求 VLA 重选对象 referent。
-
-Repair 后必须重新通过 IntentAlign，不能直接绕过 Lean checker。
-
-### Safe Stop
-
-当执行中出现不确定或危险状态时，系统进入 safe stop：
-
-- 人手突然进入 guarded region。
-- 物体 tracking loss。
-- force/torque 超过阈值。
-- 发生未知接触。
-- EffectAlign 返回严重 violation。
-
-Safe stop 的目标是降低风险，而不是完成任务。它可以包括停止运动、释放或保持物体、撤退到安全 pose、等待人类确认。
-
-### Replan
-
-当动作失败但任务仍可安全继续时，系统 replan：
-
-- 重新观察状态。
-- 更新 `s_t`。
-- 保持原始 `TaskIntent`。
-- 要求 VLA 或 planner 生成新的 action chunk。
-- 再次执行 IntentAlign。
-
-Replan 不允许改变原始安全约束，除非有新的明确人类指令。
-
-## 模块接口
-
-### VLA Policy Interface
-
-```text
-Input:
-  instruction I
-  observation o_t
-  execution history H_t
-  optional rejection report R_{t-1}
-
-Output:
-  action chunk a_t
-  optional natural-language rationale
-  optional predicted effect e_t
-```
-
-VLA rationale 不能作为安全证明，只能辅助 action abstraction 或 debugging。
-
-### Lean Checker Interface
-
-```text
-Input:
-  check_type: IntentAlign | EffectAlign
-  world_state_before
-  action
-  world_state_after optional
-  safety_spec
-  certificates
-
-Output:
-  ProofResult
-```
-
-### Runtime Policy
-
-```text
-if IntentAlign = accepted:
-    execute under monitor
-else if repairable:
-    repair and re-check
-else:
-    reject / replan
-
-if EffectAlign = accepted:
-    continue
-else if recoverable:
-    recover and re-check
-else:
-    safe stop
-```
-
-## 安全边界
-
-本架构把安全责任分层：
-
-- VLA：提出任务相关动作。
-- Perception：提供对象、部件、区域和状态估计。
-- Planner / simulator：提供连续几何和动力学 certificate。
-- Lean：检查 symbolic contract。
-- Controller：执行低层动作并维护硬件约束。
-- Monitor：检测运行时异常。
-- Human / supervisor：处理无法自动恢复的不确定场景。
-
-这种设计不会把所有安全责任压到 Lean 上。Lean 的价值是让每个 action chunk 的关键安全假设显式化、可检查、可复现。
-
+方法的完整定义见 [`method.md`](method.md)，详细迁移与边界审计见
+[`lean_method_upgrade_20260710.md`](lean_method_upgrade_20260710.md)。

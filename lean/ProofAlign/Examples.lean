@@ -18,6 +18,9 @@ def rejectKnifeBladeIntent : TaskIntent :=
 def avoidHandIntent : TaskIntent :=
   { verb := "place", targetObject := some "mug", targetRegion := some "plate", avoidObjects := ["human_hand"] }
 
+def placeMugIntent : TaskIntent :=
+  { verb := "place", targetObject := some "mug", targetRegion := some "plate" }
+
 def before : WorldState := {}
 
 def afterSafePick : WorldState :=
@@ -48,6 +51,18 @@ example : IntentAligned safeGraspIntent (Action.pick "mug" "handle") safeSpec = 
   decide
 
 example : IntentAligned safeGraspIntent (Action.pick "knife" "blade") safeSpec = false := by
+  decide
+
+example : IntentAligned placeMugIntent (Action.pick "mug" "handle") safeSpec = true := by
+  decide
+
+example : IntentAligned placeMugIntent (Action.moveTo "mug" "pregrasp") safeSpec = true := by
+  decide
+
+example : SafetyAdmissible placeMugIntent Action.stop safeSpec = true := by
+  decide
+
+example : MissionRefines placeMugIntent Action.stop = false := by
   decide
 
 example : EffectAligned before (Action.pick "mug" "handle") afterSafePick safeSpec = true := by

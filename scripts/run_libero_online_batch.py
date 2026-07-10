@@ -49,6 +49,12 @@ def build_episode_args(args: argparse.Namespace, suite: str, task_id: int, outpu
     episode_args.max_steps = args.max_steps
     episode_args.max_chunk_steps = args.max_chunk_steps
     episode_args.continue_on_replan = args.continue_on_replan
+    episode_args.ctda = args.ctda
+    episode_args.ctda_fallback_witness = args.ctda_fallback_witness
+    episode_args.ctda_fallback_witness_sha256 = args.ctda_fallback_witness_sha256
+    episode_args.ctda_evidence_mode = args.ctda_evidence_mode
+    episode_args.ctda_episode_nonce = args.ctda_episode_nonce
+    episode_args.method_name = args.method_name
     episode_args.warmup_steps = args.warmup_steps
     episode_args.warmup_gripper = args.warmup_gripper
     episode_args.seed = args.seed
@@ -71,20 +77,38 @@ def build_episode_args(args: argparse.Namespace, suite: str, task_id: int, outpu
 
 
 def load_episode(path: Path) -> dict[str, Any]:
-    return json.loads(path.read_text(encoding="utf-8")) | {"_path": str(path)}
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(payload, dict):
+        raise ValueError(f"episode result must be a JSON object: {path}")
+    return payload | {"_path": str(path)}
+
+
+def _info_has_cost_or_collision(info: Any) -> bool:
+    if not isinstance(info, dict):
+        return False
+    if info.get("collision") is True:
+        return True
+    cost = info.get("cost")
+    if isinstance(cost, dict):
+        if any(bool(value) for value in cost.values()):
+            return True
+    elif cost not in (None, {}, [], 0, 0.0, False):
+        return True
+    nested_fallback = info.get("proofalign_fallback_env_info")
+    return nested_fallback is not info and _info_has_cost_or_collision(nested_fallback)
 
 
 def has_cost_or_collision(episode: dict[str, Any]) -> bool:
     for step in episode.get("trace", []):
-        info = step.get("env_info") or {}
-        if info.get("collision"):
+        if _info_has_cost_or_collision(step.get("env_info")):
             return True
-        cost = info.get("cost")
-        if isinstance(cost, dict):
-            if any(bool(value) for value in cost.values()):
-                return True
-            continue
-        if cost not in (None, {}, [], 0, 0.0, False):
+        ctda = step.get("ctda") or {}
+        fallback_trace = ctda.get("fallback_trace") or {}
+        if _info_has_cost_or_collision(fallback_trace.get("env_info")):
+            return True
+        receipt = fallback_trace.get("receipt") or ctda.get("fallback_switch") or {}
+        postcondition = receipt.get("postcondition") or {}
+        if postcondition.get("no_collision") is False or postcondition.get("no_cost") is False:
             return True
     return False
 
@@ -125,6 +149,13 @@ def summarize(
     env_step_times: list[float] = []
     proofalign_times: list[float] = []
     episode_wall_times: list[float] = []
+    ctda_static_verdicts: Counter[str] = Counter()
+    ctda_monitor_verdicts: Counter[str] = Counter()
+    ctda_records = 0
+    ctda_fallback_attempts = 0
+    ctda_fallback_successes = 0
+    ctda_fallback_failures = 0
+    ctda_fallback_errors = 0
 
     for episode in episodes:
         metadata = episode.get("metadata", {})
@@ -154,10 +185,36 @@ def summarize(
             if isinstance(runtime.get("env_step"), (int, float)):
                 env_step_times.append(float(runtime["env_step"]))
             proofalign_time = 0.0
-            for key in ("intent_check", "effect_check"):
+            for key in ("intent_check", "ctda_prefix_pre", "ctda_monitor", "effect_check"):
                 if isinstance(runtime.get(key), (int, float)):
                     proofalign_time += float(runtime[key])
             proofalign_times.append(proofalign_time)
+            ctda = step.get("ctda") or {}
+            if ctda.get("static_verdict"):
+                ctda_static_verdicts[str(ctda["static_verdict"])] += 1
+            if ctda.get("monitor_verdict"):
+                ctda_monitor_verdicts[str(ctda["monitor_verdict"])] += 1
+            if ctda.get("record_digest"):
+                ctda_records += 1
+            fallback_switch = ctda.get("fallback_switch") or {}
+            fallback_trace = ctda.get("fallback_trace") or {}
+            fallback_error = ctda.get("fallback_error")
+            if fallback_switch or fallback_trace or fallback_error:
+                ctda_fallback_attempts += 1
+                receipt = fallback_switch or fallback_trace.get("receipt") or {}
+                if receipt.get("succeeded") is True:
+                    ctda_fallback_successes += 1
+                else:
+                    ctda_fallback_failures += 1
+                fallback_info = fallback_trace.get("env_info") or {}
+                trace_has_error = bool(
+                    fallback_trace.get("observation_error")
+                    or fallback_info.get("fallback_exception")
+                    or fallback_info.get("fallback_observation_exception")
+                    or fallback_info.get("fallback_actuator_evidence_error")
+                )
+                if fallback_error or trace_has_error:
+                    ctda_fallback_errors += 1
 
     for failure in failures:
         suite = failure.get("suite", "unknown")
@@ -205,6 +262,15 @@ def summarize(
         "output_files": output_files,
         "task_success_counts": dict(Counter(str(ep.get("task_success")) for ep in episodes)),
         "episodes_with_cost_or_collision": sum(1 for episode in episodes if has_cost_or_collision(episode)),
+        "ctda": {
+            "static_verdict_counts": dict(ctda_static_verdicts),
+            "monitor_verdict_counts": dict(ctda_monitor_verdicts),
+            "record_count": ctda_records,
+            "fallback_attempt_count": ctda_fallback_attempts,
+            "fallback_success_count": ctda_fallback_successes,
+            "fallback_failure_count": ctda_fallback_failures,
+            "fallback_error_count": ctda_fallback_errors,
+        },
         "runtime_seconds": {
             "average_episode_wall": average(episode_wall_times),
             "average_policy_step": average(policy_times),
@@ -224,6 +290,14 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--max-steps", type=int, default=25)
     parser.add_argument("--max-chunk-steps", type=int, default=8)
     parser.add_argument("--continue-on-replan", action="store_true")
+    parser.add_argument("--ctda", action="store_true")
+    parser.add_argument("--ctda-fallback-witness")
+    parser.add_argument("--ctda-fallback-witness-sha256")
+    parser.add_argument(
+        "--ctda-evidence-mode",
+        choices=("local-simulator-exact-allowlist",),
+    )
+    parser.add_argument("--ctda-episode-nonce")
     parser.add_argument("--output-dir", default="results/libero_online")
     parser.add_argument("--method-name", default="openvla_oft_dual")
     parser.add_argument("--summary", default="results/libero_online/summary_openvla_oft.json")
@@ -278,6 +352,12 @@ def write_run_config(
 
 def main(argv: list[str] | None = None) -> None:
     args = parse_args(argv)
+    if args.skip_existing:
+        raise ValueError(
+            "--skip-existing is disabled because benchmark task roots, initial "
+            "state, effective safety spec, environment version, and action bounds "
+            "must be revalidated in the live environment"
+        )
     suites = parse_list(args.suites)
     task_ids = parse_task_ids(args.task_ids)
     init_state_ids = parse_task_ids(args.init_state_ids) if args.init_state_ids else [args.init_state_id]
@@ -303,9 +383,6 @@ def main(argv: list[str] | None = None) -> None:
                 args.init_state_id = init_state_id
                 output = output_dir / f"{suite}_task{task_id}_init{init_state_id}_{args.method_name}.json"
                 output_files.append(str(output))
-                if args.skip_existing and output.exists():
-                    episodes.append(load_episode(output))
-                    continue
                 episode_args = build_episode_args(args, suite, task_id, output)
                 try:
                     run_online_episode_with_plugins(

@@ -1,13 +1,18 @@
 from __future__ import annotations
 
 import argparse
+from hashlib import sha256
 import importlib
 import json
+from math import isfinite
 import os
+import secrets
+import shutil
 import sys
-from time import perf_counter
+import tempfile
+from time import monotonic_ns, perf_counter
 from collections.abc import Callable
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass, field, replace
 from pathlib import Path
 from typing import Any
 
@@ -20,6 +25,13 @@ from proofalign.benchmark.libero_online_wrapper import (
     make_libero_offscreen_env,
 )
 from proofalign.benchmark.libero_safety_adapter import LiberoSafetyAdapter, LiberoSafetyUnavailable
+from proofalign.ctda import AuthorityEnvelope, TimeBase, digest_legacy_state, digest_payload
+from proofalign.ctda_runtime import (
+    ConditionalKinematicConfig,
+    CTDARuntimeSession,
+    ExactAllowlistEvidenceIssuer,
+)
+from proofalign.intent_parser import parse_intent
 from proofalign.models import Decision, ExecutionDecision, ExecutionStep, SafetySpec
 
 
@@ -36,6 +48,7 @@ class LiberoTaskRuntime:
     bddl_file: Path
     init_state: Any | None
     init_state_id: int
+    frozen_bddl_bytes: bytes | None = None
     metadata: dict[str, Any] = field(default_factory=dict)
 
 
@@ -125,10 +138,11 @@ def load_libero_task_runtime(
     task = benchmark.get_task(task_id)
     task_name = str(getattr(task, "name", f"{benchmark_name}_{task_id}"))
     instruction = str(getattr(task, "language", "") or task_name.replace("_", " "))
+    canonical_bddl_path = _resolve_task_bddl_path(get_libero_path("bddl_files"), task).resolve()
     if bddl_file:
         bddl_path = Path(bddl_file).expanduser().resolve()
     else:
-        bddl_path = _resolve_task_bddl_path(get_libero_path("bddl_files"), task)
+        bddl_path = canonical_bddl_path
     init_state = _load_init_state(benchmark, task, task_id, init_state_id)
     return LiberoTaskRuntime(
         benchmark=benchmark,
@@ -145,6 +159,7 @@ def load_libero_task_runtime(
             "task_name": task_name,
             "init_state_id": init_state_id,
             "bddl_file": str(bddl_path),
+            "canonical_bddl_file": str(canonical_bddl_path),
         },
     )
 
@@ -186,25 +201,51 @@ def _match_bddl_stem(directory: Path, bddl_file: str) -> Path | None:
 
 
 def create_initialized_env(runtime: LiberoTaskRuntime, args: argparse.Namespace) -> Any:
-    env = make_libero_offscreen_env(
-        bddl_file_name=str(runtime.bddl_file),
-        camera_heights=args.camera_height,
-        camera_widths=args.camera_width,
-        camera_names=args.camera_names.split(","),
-        render_gpu_device_id=args.render_gpu_device_id,
-        control_freq=args.control_freq,
-        horizon=args.horizon,
-    )
-    if hasattr(env, "seed"):
-        env.seed(args.seed)
-    env.reset()
-    if runtime.init_state is not None and hasattr(env, "set_init_state"):
-        env.set_init_state(runtime.init_state)
-    warmup_action = [0.0] * args.action_dim
-    if args.action_dim:
-        warmup_action[-1] = args.warmup_gripper
-    for _ in range(args.warmup_steps):
-        env.step(warmup_action)
+    snapshot_dir: Path | None = None
+    bddl_path = runtime.bddl_file
+    if getattr(args, "ctda", False):
+        if runtime.frozen_bddl_bytes is None:
+            raise LiberoOnlineIntegrationError("CTDA task root has no frozen BDDL bytes")
+        snapshot_dir = Path(tempfile.mkdtemp(prefix="proofalign-ctda-bddl-"))
+        bddl_path = snapshot_dir / runtime.bddl_file.name
+        bddl_path.write_bytes(runtime.frozen_bddl_bytes)
+        bddl_path.chmod(0o400)
+    try:
+        env = make_libero_offscreen_env(
+            bddl_file_name=str(bddl_path),
+            camera_heights=args.camera_height,
+            camera_widths=args.camera_width,
+            camera_names=args.camera_names.split(","),
+            render_gpu_device_id=args.render_gpu_device_id,
+            control_freq=args.control_freq,
+            horizon=args.horizon,
+        )
+    except Exception:
+        if snapshot_dir is not None:
+            shutil.rmtree(snapshot_dir, ignore_errors=True)
+        raise
+    if snapshot_dir is not None:
+        setattr(env, "_proofalign_bddl_snapshot_path", str(bddl_path))
+        setattr(env, "_proofalign_bddl_snapshot_dir", str(snapshot_dir))
+    try:
+        if hasattr(env, "seed"):
+            env.seed(args.seed)
+        env.reset()
+        if runtime.init_state is not None and hasattr(env, "set_init_state"):
+            env.set_init_state(runtime.init_state)
+        warmup_action = [0.0] * args.action_dim
+        if args.action_dim:
+            warmup_action[-1] = args.warmup_gripper
+        for _ in range(args.warmup_steps):
+            env.step(warmup_action)
+    except Exception:
+        try:
+            if hasattr(env, "close"):
+                env.close()
+        finally:
+            if snapshot_dir is not None:
+                shutil.rmtree(snapshot_dir, ignore_errors=True)
+        raise
     return env
 
 
@@ -225,15 +266,28 @@ def run_online_episode_with_plugins(
         init_state_id=args.init_state_id,
         bddl_file=args.bddl_file,
     )
+    runtime = _prepare_ctda_trust_root(runtime, args)
     attack_records = load_attack_record_index(getattr(args, "attack_record", None))
-    runtime = apply_attack_record(
+    attack_record = get_attack_record(
+        attack_records,
+        suite=args.benchmark,
+        task_id=args.task_id,
+        init_state_id=args.init_state_id,
+    )
+    if getattr(args, "ctda", False) and attack_record is not None:
+        claimed_original = attack_record.get("original_instruction")
+        if claimed_original != runtime.instruction:
+            raise LiberoOnlineIntegrationError(
+                "CTDA attack record original_instruction must exactly match the benchmark task"
+            )
+    runtime = apply_attack_record(runtime, attack_record)
+    runtime = replace(
         runtime,
-        get_attack_record(
-            attack_records,
-            suite=args.benchmark,
-            task_id=args.task_id,
-            init_state_id=args.init_state_id,
-        ),
+        metadata={
+            **runtime.metadata,
+            "method_name": getattr(args, "method_name", None),
+            "execution_config_digest": _execution_config_digest(args),
+        },
     )
     env = create_initialized_env(runtime, args)
     task_success: bool | None = None
@@ -261,6 +315,8 @@ def run_online_episode_with_plugins(
             wrapper.reset()
         else:
             wrapper.current_state = wrapper.state_observer.observe(env, wrapper.current_observation)
+        if getattr(args, "ctda", False):
+            _configure_ctda(wrapper, runtime, spec, args)
         decision = wrapper.run_episode(policy, max_steps=args.max_steps)
         task_success = _check_task_success(env)
         episode_metadata = {
@@ -270,8 +326,13 @@ def run_online_episode_with_plugins(
         _write_result(args.output, runtime, decision, episode_metadata)
         return decision, episode_metadata
     finally:
-        if hasattr(env, "close"):
-            env.close()
+        try:
+            if hasattr(env, "close"):
+                env.close()
+        finally:
+            snapshot_dir = getattr(env, "_proofalign_bddl_snapshot_dir", None)
+            if snapshot_dir:
+                shutil.rmtree(str(snapshot_dir), ignore_errors=True)
 
 
 def build_safety_spec(args: argparse.Namespace) -> SafetySpec:
@@ -284,6 +345,395 @@ def build_safety_spec(args: argparse.Namespace) -> SafetySpec:
         except LiberoSafetyUnavailable:
             pass
     return SafetySpec.from_dict({})
+
+
+def _prepare_ctda_trust_root(
+    runtime: LiberoTaskRuntime,
+    args: argparse.Namespace,
+) -> LiberoTaskRuntime:
+    """Freeze benchmark-owned task inputs before any attack or environment action."""
+
+    if not getattr(args, "ctda", False):
+        return runtime
+    if int(getattr(args, "warmup_steps", 0)) != 0:
+        raise LiberoOnlineIntegrationError(
+            "--ctda requires --warmup-steps 0; unmonitored warmup actions are outside CTDA"
+        )
+    selected = runtime.bddl_file.expanduser().resolve()
+    if not selected.is_file():
+        raise LiberoOnlineIntegrationError(f"CTDA requires a readable BDDL task root: {selected}")
+    selected_bytes = selected.read_bytes()
+    selected_digest = sha256(selected_bytes).hexdigest()
+    canonical_value = runtime.metadata.get("canonical_bddl_file")
+    if canonical_value:
+        canonical = Path(str(canonical_value)).expanduser().resolve()
+        if not canonical.is_file():
+            raise LiberoOnlineIntegrationError(
+                f"CTDA benchmark-owned canonical BDDL file is unreadable: {canonical}"
+            )
+        canonical_digest = sha256(canonical.read_bytes()).hexdigest()
+        if not secrets.compare_digest(selected_digest, canonical_digest):
+            raise LiberoOnlineIntegrationError(
+                "--bddl-file content does not match the selected benchmark task"
+            )
+    metadata = dict(runtime.metadata)
+    metadata.update(
+        {
+            "benchmark_instruction": runtime.instruction,
+            "bddl_digest": selected_digest,
+            "ctda_task_root_frozen_before_env": True,
+        }
+    )
+    return replace(
+        runtime,
+        bddl_file=selected,
+        frozen_bddl_bytes=selected_bytes,
+        metadata=metadata,
+    )
+
+
+def _execution_config_digest(args: argparse.Namespace) -> str:
+    """Bind result reuse to behavior-affecting CLI inputs and artifact contents."""
+
+    artifact_args = (
+        "bddl_file",
+        "policy_config",
+        "abstractor_config",
+        "action_file",
+        "attack_record",
+        "safety_spec",
+        "ctda_fallback_witness",
+    )
+    artifacts: dict[str, str | None] = {}
+    for name in artifact_args:
+        value = getattr(args, name, None)
+        if not value:
+            artifacts[name] = None
+            continue
+        path = Path(str(value)).expanduser()
+        artifacts[name] = (
+            sha256(path.read_bytes()).hexdigest() if path.is_file() else "missing"
+        )
+    return digest_payload(
+        {
+            "benchmark": getattr(args, "benchmark", None),
+            "task_id": getattr(args, "task_id", None),
+            "init_state_id": getattr(args, "init_state_id", None),
+            "method_name": getattr(args, "method_name", None),
+            "max_steps": getattr(args, "max_steps", None),
+            "max_chunk_steps": getattr(args, "max_chunk_steps", None),
+            "continue_on_replan": getattr(args, "continue_on_replan", False),
+            "policy": getattr(args, "policy", None),
+            "abstractor": getattr(args, "abstractor", None),
+            "seed": getattr(args, "seed", None),
+            "warmup_steps": getattr(args, "warmup_steps", None),
+            "warmup_gripper": getattr(args, "warmup_gripper", None),
+            "camera_height": getattr(args, "camera_height", None),
+            "camera_width": getattr(args, "camera_width", None),
+            "camera_names": getattr(args, "camera_names", None),
+            "control_freq": getattr(args, "control_freq", None),
+            "horizon": getattr(args, "horizon", None),
+            "action_dim": getattr(args, "action_dim", None),
+            "render_gpu_device_id": getattr(args, "render_gpu_device_id", None),
+            "ctda": getattr(args, "ctda", False),
+            "ctda_evidence_mode": getattr(args, "ctda_evidence_mode", None),
+            "ctda_episode_nonce": getattr(args, "ctda_episode_nonce", None),
+            "ctda_fallback_witness_sha256": getattr(
+                args, "ctda_fallback_witness_sha256", None
+            ),
+            "artifacts": artifacts,
+            "implementation": _implementation_digests(),
+            "policy_source": _plugin_source_digest(getattr(args, "policy", None)),
+            "abstractor_source": _plugin_source_digest(
+                getattr(args, "abstractor", None)
+            ),
+        }
+    )
+
+
+def _implementation_digests() -> dict[str, str]:
+    package_root = Path(__file__).resolve().parents[1]
+    paths = (
+        Path(__file__).resolve(),
+        package_root / "ctda.py",
+        package_root / "ctda_runtime.py",
+        package_root / "checker.py",
+        package_root / "lean_bridge.py",
+        Path(__file__).with_name("libero_online_wrapper.py").resolve(),
+    )
+    return {
+        str(path): sha256(path.read_bytes()).hexdigest()
+        for path in paths
+        if path.is_file()
+    }
+
+
+def _plugin_source_digest(spec: Any) -> str | None:
+    if not isinstance(spec, str) or not spec:
+        return None
+    module_name = spec.split(":", 1)[0]
+    try:
+        module_spec = importlib.util.find_spec(module_name)
+        origin = Path(str(module_spec.origin)).resolve() if module_spec and module_spec.origin else None
+    except (ImportError, AttributeError, ValueError):
+        origin = None
+    if origin is None or not origin.is_file():
+        return "unresolved"
+    return sha256(origin.read_bytes()).hexdigest()
+
+
+def _configure_ctda(
+    wrapper: ProofAlignLiberoWrapper,
+    runtime: LiberoTaskRuntime,
+    spec: SafetySpec,
+    args: argparse.Namespace,
+) -> None:
+    if wrapper.current_state is None:
+        raise LiberoOnlineIntegrationError("CTDA requires an observed initial state")
+    fallback_path_value = getattr(args, "ctda_fallback_witness", None)
+    if not fallback_path_value:
+        raise LiberoOnlineIntegrationError(
+            "--ctda requires --ctda-fallback-witness; fallback safety is never assumed"
+        )
+    fallback_path = Path(fallback_path_value).expanduser().resolve()
+    if not fallback_path.is_file():
+        raise LiberoOnlineIntegrationError(f"CTDA fallback witness does not exist: {fallback_path}")
+    if not runtime.bddl_file.is_file():
+        raise LiberoOnlineIntegrationError(
+            f"CTDA authenticated task root requires a readable BDDL file: {runtime.bddl_file}"
+        )
+    bddl_digest = sha256(runtime.bddl_file.read_bytes()).hexdigest()
+    frozen_bddl_digest = runtime.metadata.get("bddl_digest")
+    if not isinstance(frozen_bddl_digest, str) or not secrets.compare_digest(
+        bddl_digest, frozen_bddl_digest
+    ):
+        raise LiberoOnlineIntegrationError(
+            "CTDA BDDL task root changed after environment creation"
+        )
+    snapshot_value = getattr(wrapper.env, "_proofalign_bddl_snapshot_path", None)
+    if not snapshot_value:
+        raise LiberoOnlineIntegrationError(
+            "CTDA environment did not expose its immutable BDDL snapshot"
+        )
+    snapshot_path = Path(str(snapshot_value))
+    if not snapshot_path.is_file() or not secrets.compare_digest(
+        sha256(snapshot_path.read_bytes()).hexdigest(), frozen_bddl_digest
+    ):
+        raise LiberoOnlineIntegrationError(
+            "CTDA environment BDDL snapshot differs from the frozen task root"
+        )
+    fallback_bytes = fallback_path.read_bytes()
+    fallback_digest = sha256(fallback_bytes).hexdigest()
+    expected_fallback_digest = str(
+        getattr(args, "ctda_fallback_witness_sha256", "") or ""
+    ).lower()
+    if not expected_fallback_digest:
+        raise LiberoOnlineIntegrationError(
+            "--ctda requires --ctda-fallback-witness-sha256 as an explicit artifact trust anchor"
+        )
+    if not secrets.compare_digest(fallback_digest, expected_fallback_digest):
+        raise LiberoOnlineIntegrationError(
+            "CTDA fallback witness digest does not match --ctda-fallback-witness-sha256"
+        )
+    evidence_mode = getattr(args, "ctda_evidence_mode", None)
+    if evidence_mode != "local-simulator-exact-allowlist":
+        raise LiberoOnlineIntegrationError(
+            "--ctda currently requires --ctda-evidence-mode local-simulator-exact-allowlist; "
+            "this explicitly places the deterministic simulator adapter in the TCB"
+        )
+    control_period_ns = max(1, round(1_000_000_000 / max(1, int(args.control_freq))))
+    spec_id = f"{args.benchmark}:{runtime.task_id}:{runtime.init_state_id}"
+    action_low, action_high = _environment_action_bounds(wrapper.env)
+    safety_spec_digest = digest_payload(asdict(spec))
+    fallback_manifest = _validate_ctda_fallback_manifest(
+        fallback_bytes,
+        spec_id=spec_id,
+        bddl_digest=bddl_digest,
+        safety_spec_digest=safety_spec_digest,
+        action_low=action_low,
+        action_high=action_high,
+        max_switch_latency_ns=control_period_ns * 2,
+    )
+    trusted_instruction = str(
+        runtime.metadata.get("benchmark_instruction", runtime.instruction)
+    )
+    authority = AuthorityEnvelope(
+        authority_id=f"libero:{args.benchmark}",
+        source=f"{runtime.bddl_file}#sha256={bddl_digest}",
+        version=f"task-{runtime.task_id}",
+        attestation_digest=sha256(
+            json.dumps(
+                {
+                    "bddl_digest": bddl_digest,
+                    "instruction": trusted_instruction,
+                    "task_id": runtime.task_id,
+                    "init_state_id": runtime.init_state_id,
+                },
+                sort_keys=True,
+                separators=(",", ":"),
+            ).encode("utf-8")
+        ).hexdigest(),
+        authenticated=False,
+    )
+    time_base = TimeBase(
+        clock_id="python-monotonic-ns",
+        control_period_ns=control_period_ns,
+        max_jitter_ns=control_period_ns // 10,
+        monitor_latency_ns=control_period_ns,
+        switch_latency_ns=int(fallback_manifest["worst_case_switch_latency_ns"]),
+    )
+    evidence = ("legacy_certificate",) if spec.require_certificates else ()
+    issuer = ExactAllowlistEvidenceIssuer(
+        producer_id=f"proofalign-libero-simulator:{args.benchmark}",
+        producer_version="1",
+    )
+    created_at = monotonic_ns()
+    wrapper.ctda_session = CTDARuntimeSession.from_legacy(
+        parse_intent(trusted_instruction),
+        wrapper.current_state,
+        spec,
+        authority,
+        time_base,
+        spec_id=spec_id,
+        episode_nonce=(getattr(args, "ctda_episode_nonce", None) or secrets.token_hex(16)),
+        evidence_issuer=issuer,
+        now_ns=created_at,
+        config=ConditionalKinematicConfig(
+            control_period_ns=control_period_ns,
+            fallback_id="hold",
+            fallback_witness_digest=fallback_digest,
+            fallback_verified=True,
+            fallback_action=tuple(float(value) for value in fallback_manifest["fallback_action"]),
+            semantic_evidence=evidence,
+        ),
+    )
+    # Keep the validated artifact fields available for audit output without
+    # treating the JSON declaration itself as a proof.
+    setattr(wrapper.ctda_session, "fallback_manifest", fallback_manifest)
+    setattr(
+        wrapper.ctda_session,
+        "assurance_scope",
+        fallback_manifest["assurance_scope"],
+    )
+    runtime.metadata["ctda"] = {
+        "enabled": True,
+        "assurance_scope": fallback_manifest["assurance_scope"],
+        "evidence_mode": evidence_mode,
+        "bddl_digest": bddl_digest,
+        "fallback_manifest_digest": fallback_digest,
+        "safe_set_digest": fallback_manifest["safe_set_digest"],
+        "assurance_artifact_digest": fallback_manifest["assurance_artifact_digest"],
+        "safety_spec_digest": safety_spec_digest,
+        "spec_digest": wrapper.ctda_session.supervisor.mission.spec_digest,
+        "mission_claim_digest": wrapper.ctda_session.supervisor.mission.mission_claim_digest,
+        "episode_nonce": wrapper.ctda_session.supervisor.mission.episode_nonce,
+        "switch_latency_bound_ns": int(fallback_manifest["worst_case_switch_latency_ns"]),
+        "environment_action_bounds": {
+            "lower": list(action_low),
+            "upper": list(action_high),
+        },
+        "fallback_action_digest": digest_payload(
+            tuple(float(value) for value in fallback_manifest["fallback_action"])
+        ),
+        "initial_state_digest": digest_legacy_state(wrapper.current_state),
+        "proof_verified": False,
+    }
+
+
+def _validate_ctda_fallback_manifest(
+    raw: bytes,
+    *,
+    spec_id: str,
+    bddl_digest: str,
+    safety_spec_digest: str,
+    action_low: tuple[float, ...],
+    action_high: tuple[float, ...],
+    max_switch_latency_ns: int,
+) -> dict[str, Any]:
+    try:
+        payload = json.loads(raw.decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise LiberoOnlineIntegrationError("CTDA fallback witness must be valid UTF-8 JSON") from exc
+    if not isinstance(payload, dict):
+        raise LiberoOnlineIntegrationError("CTDA fallback witness must be a JSON object")
+    expected = {
+        "schema": "proofalign.ctda.fallback.v2",
+        "spec_id": spec_id,
+        "bddl_digest": bddl_digest,
+        "safety_spec_digest": safety_spec_digest,
+        "controller_id": "hold",
+        "model_id": "libero-delta-kinematic-v1",
+        "assurance_scope": "operator-pinned-simulator-test-only",
+    }
+    for key, value in expected.items():
+        if payload.get(key) != value:
+            raise LiberoOnlineIntegrationError(
+                f"CTDA fallback witness {key!r} is not bound to the active runtime"
+            )
+    if "verified" in payload:
+        raise LiberoOnlineIntegrationError(
+            "CTDA fallback manifest must not self-assert proof verification"
+        )
+    if payload.get("operator_trusted") is not True:
+        raise LiberoOnlineIntegrationError(
+            "CTDA simulator fallback manifest requires explicit operator_trusted=true"
+        )
+    for key in ("safe_set_digest", "assurance_artifact_digest"):
+        value = payload.get(key)
+        if not isinstance(value, str) or not value.strip():
+            raise LiberoOnlineIntegrationError(f"CTDA fallback witness is missing {key}")
+    latency = payload.get("worst_case_switch_latency_ns")
+    if type(latency) is not int or latency <= 0 or latency > max_switch_latency_ns:
+        raise LiberoOnlineIntegrationError(
+            "CTDA fallback witness exceeds the configured switch-latency bound"
+        )
+    action = payload.get("fallback_action")
+    if not isinstance(action, list) or len(action) != len(action_low):
+        raise LiberoOnlineIntegrationError("CTDA fallback action has the wrong dimension")
+    if any(type(value) not in (int, float) or not isfinite(float(value)) for value in action):
+        raise LiberoOnlineIntegrationError("CTDA fallback action contains a non-finite value")
+    if any(
+        float(value) < lower or float(value) > upper
+        for value, lower, upper in zip(action, action_low, action_high)
+    ):
+        raise LiberoOnlineIntegrationError(
+            "CTDA fallback action is outside the environment action bounds"
+        )
+    if any(abs(float(value)) > 1e-12 for value in action):
+        raise LiberoOnlineIntegrationError(
+            "the built-in hold controller requires the canonical all-zero action"
+        )
+    return dict(payload)
+
+
+def _environment_action_bounds(env: Any) -> tuple[tuple[float, ...], tuple[float, ...]]:
+    spec = getattr(env, "action_spec", None)
+    if callable(spec):
+        spec = spec()
+    if not isinstance(spec, (tuple, list)) or len(spec) != 2:
+        raise LiberoOnlineIntegrationError(
+            "CTDA requires environment-provided action_spec bounds"
+        )
+    low = _finite_numeric_tuple(spec[0], "lower")
+    high = _finite_numeric_tuple(spec[1], "upper")
+    if not low or len(low) != len(high) or any(a > b for a, b in zip(low, high)):
+        raise LiberoOnlineIntegrationError("environment action_spec bounds are malformed")
+    return low, high
+
+
+def _finite_numeric_tuple(value: Any, label: str) -> tuple[float, ...]:
+    if hasattr(value, "tolist"):
+        value = value.tolist()
+    if not isinstance(value, (tuple, list)):
+        raise LiberoOnlineIntegrationError(f"environment action_spec {label} bound is not a vector")
+    result: list[float] = []
+    for item in value:
+        if type(item) not in (int, float) or not isfinite(float(item)):
+            raise LiberoOnlineIntegrationError(
+                f"environment action_spec {label} bound contains a non-finite value"
+            )
+        result.append(float(item))
+    return tuple(result)
 
 
 def _load_init_state(benchmark: Any, task: Any, task_id: int, init_state_id: int) -> Any | None:
@@ -376,6 +826,7 @@ def _write_result(
                 "proofalign_action": step.proofalign_action or action_to_dict(step.action),
                 "chunk_id": step.chunk_id,
                 "contract": step.contract,
+                "ctda": step.ctda,
                 "summary": step.trace_summary.to_dict() if step.trace_summary else None,
                 "decision": step.decision.value,
                 "intent": step.intent_result.__dict__,
@@ -427,6 +878,25 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--max-steps", type=int, default=300)
     parser.add_argument("--max-chunk-steps", type=int, default=8)
     parser.add_argument("--continue-on-replan", action="store_true")
+    parser.add_argument(
+        "--ctda",
+        action="store_true",
+        help="Enable fail-closed CTDA prefix authorization and persistent trace monitoring.",
+    )
+    parser.add_argument(
+        "--ctda-fallback-witness",
+        help="Required with --ctda: structured, runtime-bound fallback witness JSON.",
+    )
+    parser.add_argument(
+        "--ctda-fallback-witness-sha256",
+        help="Required with --ctda: pinned SHA-256 trust anchor for the fallback witness.",
+    )
+    parser.add_argument(
+        "--ctda-evidence-mode",
+        choices=("local-simulator-exact-allowlist",),
+        help="Explicit CTDA evidence TCB. The built-in mode is simulator/test only.",
+    )
+    parser.add_argument("--ctda-episode-nonce", help="Optional fixed nonce for reproducible audit replay.")
     parser.add_argument("--warmup-steps", type=int, default=5)
     parser.add_argument("--warmup-gripper", type=float, default=0.0)
     parser.add_argument("--seed", type=int, default=0)
