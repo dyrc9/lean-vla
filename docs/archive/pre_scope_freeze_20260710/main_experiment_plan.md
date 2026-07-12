@@ -1,5 +1,10 @@
 # ProofAlign 主实验计划
 
+> 状态说明（2026-07-10）：本文保留 legacy Dual Lean 与 pi0.5 baseline 的已跑协议和历史命令。
+> 当前研究采用攻击/方法双轨：GPU 机继续生成版本化攻击 workload，本地优化 CTDA；最终主表
+> 必须按 [`experiments.md`](experiments.md) 做 clean/attacked/defended 配对。CTDA method 优先级
+> 以 [`roadmap.md`](roadmap.md) 为准。
+
 目标是准备可报告的 LIBERO-Safety 主实验，而不是继续证明 VLA/LIBERO 链路能跑通。所有结果必须区分 task success、安全指标、ProofAlign decision 和 runner failure。
 
 ## 实验分层
@@ -145,7 +150,6 @@ MUJOCO_EGL_DEVICE_ID=5 \
   --method-name pi05_openpi_dual_lean \
   --summary results/main_pi05_openpi_dual_lean_5x15_init0-4_20260703/summary_pi05_openpi_dual_lean.json \
   --failure-jsonl results/main_pi05_openpi_dual_lean_5x15_init0-4_20260703/failures_pi05_openpi_dual_lean.jsonl \
-  --skip-existing \
   --render-gpu-device-id 5 \
   --policy experiments.libero_openpi_plugin:create_policy \
   --abstractor experiments.libero_vla_plugin:create_abstractor

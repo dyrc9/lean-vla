@@ -479,27 +479,43 @@ class ProofAlignLiberoWrapper:
         before = self.current_state.clone()
 
         abstract_start = perf_counter()
-        symbolic_action = self.action_abstractor.abstract(
-            raw_action,
-            instruction=self.instruction,
-            observation=self.current_observation,
-            state=before,
-            spec=self.spec,
-            history=self.trace,
-        )
+        if self.ctda_session is not None:
+            # Paper CTDA never lets policy symbolic metadata select the contract.
+            # This action is a compatibility/logging view of the frozen mission.
+            symbolic_action = _ctda_mission_action(self.ctda_session)
+        else:
+            symbolic_action = self.action_abstractor.abstract(
+                raw_action,
+                instruction=self.instruction,
+                observation=self.current_observation,
+                state=before,
+                spec=self.spec,
+                history=self.trace,
+            )
         abstract_time = perf_counter() - abstract_start
 
         env_actions = raw_actions_from_raw(raw_action, max_steps)
         pre_certs = CertificateBundle.from_dicts(symbolic_action.params.get("pre_certificates"))
         intent_start = perf_counter()
-        intent_result = self.checker.check_intent_alignment(
-            self.intent,
-            before,
-            symbolic_action,
-            self.spec,
-            pre_certs,
-            len(self.trace),
-        )
+        if self.ctda_session is not None:
+            intent_result = CheckResult(
+                passed=True,
+                layer="ctda_mission_root",
+                explanation=(
+                    "legacy policy-facing intent and proofalign_action are diagnostic only; "
+                    "authorization is rooted in the frozen mission"
+                ),
+                lean_mode="ctda-python-reference",
+            )
+        else:
+            intent_result = self.checker.check_intent_alignment(
+                self.intent,
+                before,
+                symbolic_action,
+                self.spec,
+                pre_certs,
+                len(self.trace),
+            )
         intent_time = perf_counter() - intent_start
         if not intent_result.passed:
             step = ExecutionStep(
@@ -559,7 +575,10 @@ class ProofAlignLiberoWrapper:
                 ctda_dispatch_ns = monotonic_ns()
                 static_result = _ctda_dispatch_check(prepared, ctda_dispatch_ns)
             ctda_pre_time = perf_counter() - ctda_start
-            ctda_precheck = _ctda_static_check(static_result)
+            ctda_precheck = _ctda_static_check(
+                static_result,
+                self.ctda_session.evaluator_mode,
+            )
             if prepared is None or not ctda_precheck.passed:
                 ctda_metadata = _ctda_metadata(
                     self.ctda_session,
@@ -716,7 +735,10 @@ class ProofAlignLiberoWrapper:
                         now_ns=ctda_observe_ns,
                     )
                     ctda_monitor_verdict = monitored.verdict
-                    ctda_effect_result = _ctda_monitor_check(monitored)
+                    ctda_effect_result = _ctda_monitor_check(
+                        monitored,
+                        self.ctda_session.evaluator_mode,
+                    )
                     if not ctda_effect_result.passed:
                         ctda_violation_at_ns = monotonic_ns()
                     ctda_metadata = _ctda_metadata(
@@ -1180,7 +1202,10 @@ class ProofAlignLiberoWrapper:
         }
 
 
-def _ctda_static_check(result: StaticCheckResult) -> CheckResult:
+def _ctda_static_check(
+    result: StaticCheckResult,
+    evaluator_mode: str = "ctda-python-reference",
+) -> CheckResult:
     passed = result.verdict is StaticVerdict.PROVEN
     if result.verdict is StaticVerdict.INCONSISTENT:
         decision = Decision.SAFE_STOP
@@ -1200,11 +1225,14 @@ def _ctda_static_check(result: StaticCheckResult) -> CheckResult:
         violations=[] if passed else issues,
         explanation=explanation,
         suggested_decision=decision,
-        lean_mode="ctda-python-reference",
+        lean_mode=evaluator_mode,
     )
 
 
-def _ctda_monitor_check(result: MonitorCheckResult) -> CheckResult:
+def _ctda_monitor_check(
+    result: MonitorCheckResult,
+    evaluator_mode: str = "ctda-python-reference",
+) -> CheckResult:
     passed = result.verdict in {MonitorVerdict.COMPLETE, MonitorVerdict.SAFE_PENDING}
     if result.verdict in {MonitorVerdict.VIOLATED, MonitorVerdict.INCONSISTENT}:
         decision = Decision.SAFE_STOP
@@ -1224,7 +1252,7 @@ def _ctda_monitor_check(result: MonitorCheckResult) -> CheckResult:
         violations=[] if passed else issues,
         explanation=explanation,
         suggested_decision=decision,
-        lean_mode="ctda-python-reference",
+        lean_mode=evaluator_mode,
     )
 
 
@@ -1320,6 +1348,25 @@ def _ctda_metadata(
 ) -> dict[str, Any]:
     active_contract = session.supervisor.active_contract
     monitor = session.supervisor.monitor_state
+    wire_artifacts = [
+        {
+            "mode": item.mode.value,
+            "stage": item.stage.value,
+            "request_id": item.request_id,
+            "verdict": item.verdict,
+            "proof_verified": item.proof_verified,
+            "elapsed_ns": item.elapsed_ns,
+            "checker_source_digest": item.checker_source_digest,
+            "checker_build_digest": item.checker_build_digest,
+            "cache_key": item.cache_key,
+            "artifact_dir": item.artifact_dir,
+            "cache_hit": item.cache_hit,
+            "parity_match": item.parity_match,
+            "stdout": item.stdout,
+            "stderr": item.stderr,
+        }
+        for item in session.evaluation_artifacts
+    ]
     return {
         "spec_digest": session.supervisor.mission.spec_digest,
         "contract_id": contract_id or (active_contract.contract_id if active_contract else None),
@@ -1336,12 +1383,14 @@ def _ctda_metadata(
         "record": record_payload,
         "dispatch_monotonic_ns": dispatch_ns,
         "observe_monotonic_ns": observe_ns,
+        "evaluator_mode": session.evaluator_mode,
+        "wire_artifacts": wire_artifacts,
         "assurance_scope": getattr(
             session,
             "assurance_scope",
             "conditional-simulator-kinematic-test-only",
         ),
-        "proof_verified": False,
+        "proof_verified": session.kernel_proof_verified,
     }
 
 
@@ -1384,6 +1433,35 @@ def raw_actions_from_raw(raw_action: Any, max_chunk_steps: int) -> list[Any]:
         except Exception:
             return list(env_action)[:max_chunk_steps]
     return [env_action]
+
+
+def _ctda_mission_action(session: CTDARuntimeSession) -> Action:
+    """Create a logging-only symbolic view from the frozen residual obligation."""
+
+    contract = session.supervisor.active_contract
+    if contract is not None:
+        payload = {
+            "type": contract.skill,
+            "object": contract.target,
+            "part": contract.part,
+            "region": contract.region,
+        }
+    else:
+        obligations = tuple(
+            item
+            for item in session.supervisor.mission.phase_obligations
+            if item.source_phase == session.supervisor.active_phase
+        )
+        bindings = {
+            (item.skill, item.target, item.part, item.region) for item in obligations
+        }
+        if len(bindings) != 1:
+            raise LiberoOnlineIntegrationError(
+                "frozen mission phase has no unique Pick/Place logging view"
+            )
+        skill, target, part, region = next(iter(bindings))
+        payload = {"type": skill, "object": target, "part": part, "region": region}
+    return action_from_dict({key: value for key, value in payload.items() if value is not None})
 
 
 def action_to_dict(action: Action) -> dict[str, Any]:

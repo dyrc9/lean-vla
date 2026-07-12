@@ -221,6 +221,7 @@ deriving Repr, DecidableEq, BEq
 structure MissionSpec where
   specId : SpecId
   specDigest : Digest
+  episodeNonce : String
   authority : AuthorityEnvelope
   instructionDigest : Digest
   goal : TraceFormula
@@ -282,6 +283,7 @@ structure PrefixAuthorization where
   contractDigest : Digest
   semanticWitnessRef : WitnessRef
   specDigest : Digest
+  episodeNonce : String
   stateDigest : Digest
   monitorStateDigest : Digest
   proposalIndex : Nat
@@ -364,12 +366,17 @@ structure MonitorState where
   monitorStateDigest : Digest
   contractId : ContractId
   specDigest : Digest
+  episodeNonce : String
   phase : PhaseId
   stateDigest : Digest
   nextProposalIndex : Nat
   pending : List TraceFormula
   hasPending : Bool
   lastEventTimestamp : Timestamp
+  /-- The complete accepted symbolic history for the active contract.  This is
+  intentionally explicit in the reference specification: a later prefix must
+  extend this trace instead of restarting temporal evaluation at index zero. -/
+  acceptedTrace : SymbolicEventTrace := []
 deriving Repr, DecidableEq, BEq
 
 inductive MonitorVerdict where
@@ -458,6 +465,7 @@ deriving Repr, DecidableEq, BEq
 structure ContractExecution where
   contractId : ContractId
   specDigest : Digest
+  episodeNonce : String
   prefixes : List PrefixExecutionRecord
 deriving Repr, DecidableEq, BEq
 
@@ -553,6 +561,7 @@ def SemanticTemporalRefines (request : SemanticCheckRequest) : Prop :=
   ∧ request.mission.authority.sourceDigest ≠ ""
   ∧ request.mission.specId ≠ ""
   ∧ request.mission.specDigest ≠ ""
+  ∧ request.mission.episodeNonce ≠ ""
   ∧ request.contract.contractId ≠ ""
   ∧ request.contract.contractDigest ≠ ""
   ∧ request.contract.specId = request.mission.specId
@@ -717,6 +726,8 @@ def PrefixPreCertified (request : PrefixPreCheckRequest) : Prop :=
   ∧ request.candidate.authorization.semanticWitnessRef = request.semanticWitness
   ∧ request.candidate.authorization.authorizationDigest ≠ ""
   ∧ request.candidate.authorization.specDigest = request.mission.specDigest
+  ∧ request.candidate.authorization.episodeNonce = request.mission.episodeNonce
+  ∧ request.monitorState.episodeNonce = request.mission.episodeNonce
   ∧ request.candidate.authorization.stateDigest = request.stateDigest
   ∧ request.candidate.authorization.monitorStateDigest = request.monitorState.monitorStateDigest
   ∧ request.candidate.authorization.proposalIndex = request.candidate.proposal.proposalIndex
@@ -832,7 +843,7 @@ theorem PrefixPreCertified.guarantee_nonempty
     checkSemantic_sound request.semanticRequest request.semanticWitness semanticChecked
   have semanticGuarantee : request.semanticRequest.contract.guarantee ≠ [] := by
     rcases semanticValid with
-      ⟨_, _, _, _, _, _, _, _, _, _, _, _, _, _, guaranteeNonempty, _⟩
+      ⟨_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, guaranteeNonempty, _⟩
     exact guaranteeNonempty
   rw [contractBinding] at semanticGuarantee
   exact semanticGuarantee
@@ -1287,6 +1298,20 @@ structure MonitorCheckRequest where
   postEvidence : PostEvidenceBundle
 deriving Repr, DecidableEq, BEq
 
+def traceContinuationValid
+    (accepted current : SymbolicEventTrace) : Bool :=
+  match accepted.getLast?, current.head? with
+  | some previous, some first => previous.timestamp.tick < first.timestamp.tick
+  | _, _ => true
+
+def monitorHistoryTimestampValid (state : MonitorState) : Bool :=
+  match state.acceptedTrace.getLast? with
+  | none => state.lastEventTimestamp.tick == 0
+  | some last => last.timestamp == state.lastEventTimestamp
+
+def accumulatedTrace (request : MonitorCheckRequest) : SymbolicEventTrace :=
+  request.priorState.acceptedTrace ++ request.observed.record.eventTrace
+
 def monitorBindingsValid (request : MonitorCheckRequest) : Bool :=
   let precheck := request.observed.prefixRequest
   let record := request.observed.record
@@ -1295,8 +1320,11 @@ def monitorBindingsValid (request : MonitorCheckRequest) : Bool :=
     && request.priorState.contractId == precheck.contract.contractId
     && request.priorState.specDigest == precheck.mission.specDigest
     && request.priorState.phase == precheck.contract.phaseBefore
+    && request.priorState.stateDigest == precheck.stateDigest
     && request.priorState.nextProposalIndex == record.candidate.proposal.proposalIndex
     && request.nextProposalIndex == record.candidate.proposal.proposalIndex + 1
+    && monitorHistoryTimestampValid request.priorState
+    && traceContinuationValid request.priorState.acceptedTrace record.eventTrace
     && record.monitorAfterDigest != ""
     && finalPlantStateDigest record.plantTrace == some request.currentStateDigest
     && match record.plantTrace.getLast? with
@@ -1306,18 +1334,21 @@ def monitorBindingsValid (request : MonitorCheckRequest) : Bool :=
 def pendingMonitorState (request : MonitorCheckRequest) : MonitorState :=
   let precheck := request.observed.prefixRequest
   let record := request.observed.record
+  let history := accumulatedTrace request
   { monitorStateDigest := record.monitorAfterDigest
     contractId := precheck.contract.contractId
     specDigest := precheck.mission.specDigest
+    episodeNonce := precheck.mission.episodeNonce
     phase := precheck.contract.phaseBefore
     stateDigest := request.currentStateDigest
     nextProposalIndex := request.nextProposalIndex
     pending := precheck.contract.guarantee
     hasPending := true
     lastEventTimestamp :=
-      match record.eventTrace.getLast? with
+      match history.getLast? with
       | none => request.priorState.lastEventTimestamp
-      | some frame => frame.timestamp }
+      | some frame => frame.timestamp
+    acceptedTrace := history }
 
 def completeWitnessFor (request : MonitorCheckRequest) : WitnessRef :=
   let precheck := request.observed.prefixRequest
@@ -1342,11 +1373,12 @@ def monitorStep (request : MonitorCheckRequest) : MonitorVerdict :=
       else if precheck.contract.deadline.expiresAt.tick < request.currentTime.tick then
         .violated ["contract deadline expired before completion was accepted"]
       else
-        let terminalSeen := terminalEventAtEnd record.eventTrace precheck.contract
+        let trace := accumulatedTrace request
+        let terminalSeen := terminalEventAtEnd trace precheck.contract
         let invariantVerdict :=
-          hardInvariantVerdict precheck.mission precheck.contract record.eventTrace
+          hardInvariantVerdict precheck.mission precheck.contract trace
         let guaranteeVerdict :=
-          contractGuaranteeVerdict precheck.mission precheck.contract record.eventTrace
+          contractGuaranteeVerdict precheck.mission precheck.contract trace
         if invariantVerdict = .violated then
           .violated ["a frozen mission invariant is violated on the checked prefix"]
         else if guaranteeVerdict = .violated then
@@ -1372,11 +1404,11 @@ def CurrentPrefixSafeUnderCheckedEvidence (request : MonitorCheckRequest) : Prop
   ∧ hardInvariantVerdict
       request.observed.prefixRequest.mission
       request.observed.prefixRequest.contract
-      request.observed.record.eventTrace ≠ .violated
+      (accumulatedTrace request) ≠ .violated
   ∧ contractGuaranteeVerdict
       request.observed.prefixRequest.mission
       request.observed.prefixRequest.contract
-      request.observed.record.eventTrace ≠ .violated
+      (accumulatedTrace request) ≠ .violated
 
 def PendingObligations (state : MonitorState) : Prop :=
   state.hasPending = true ∧ state.pending ≠ []
@@ -1387,16 +1419,16 @@ def CompletedTraceConforms (request : MonitorCheckRequest) : Prop :=
   ∧ request.currentTime.tick <=
       request.observed.prefixRequest.contract.deadline.expiresAt.tick
   ∧ terminalEventAtEnd
-      request.observed.record.eventTrace
+      (accumulatedTrace request)
       request.observed.prefixRequest.contract = true
   ∧ hardInvariantVerdict
       request.observed.prefixRequest.mission
       request.observed.prefixRequest.contract
-      request.observed.record.eventTrace = .satisfied
+      (accumulatedTrace request) = .satisfied
   ∧ contractGuaranteeVerdict
       request.observed.prefixRequest.mission
       request.observed.prefixRequest.contract
-      request.observed.record.eventTrace = .satisfied
+      (accumulatedTrace request) = .satisfied
   ∧ postEvidenceBundleValid
       request.observed.prefixRequest.contract
       request.observed.record
@@ -1445,5 +1477,17 @@ theorem monitor_complete_sound
   split at result <;> try simp_all [CompletedTraceConforms]
   split at result <;> try simp_all [CompletedTraceConforms]
   split at result <;> simp_all [CompletedTraceConforms]
+
+theorem pending_monitor_history_extends (request : MonitorCheckRequest) :
+    (pendingMonitorState request).acceptedTrace =
+      request.priorState.acceptedTrace ++ request.observed.record.eventTrace := by
+  rfl
+
+theorem pending_monitor_last_timestamp_tracks_history
+    (request : MonitorCheckRequest)
+    (frame : SymbolicEventFrame)
+    (historyLast : (accumulatedTrace request).getLast? = some frame) :
+    (pendingMonitorState request).lastEventTimestamp = frame.timestamp := by
+  simp [pendingMonitorState, historyLast]
 
 end ProofAlign

@@ -2,12 +2,23 @@ from __future__ import annotations
 
 import json
 import warnings
+from hashlib import sha256
 from dataclasses import replace
 from pathlib import Path
 from typing import Any
 
 
 AttackRecordIndex = dict[tuple[str, int, int], dict[str, Any]]
+
+
+def attack_record_digest(record: dict[str, Any]) -> str:
+    payload = json.dumps(
+        record,
+        sort_keys=True,
+        separators=(",", ":"),
+        ensure_ascii=False,
+    ).encode("utf-8")
+    return sha256(payload).hexdigest()
 
 
 def load_attack_record_index(path: str | Path | None) -> AttackRecordIndex:
@@ -88,4 +99,6 @@ def attack_metadata(record: dict[str, Any], *, fallback_original: str) -> dict[s
         "attack_objective": record.get("objective"),
         "attack_tools_used": list(record.get("tools_used") or []),
         "attack_record_source": record.get("source"),
+        "attack_record_schema": record.get("schema_version", "legacy-v0"),
+        "attack_record_digest": attack_record_digest(record),
     }

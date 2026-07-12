@@ -48,9 +48,14 @@ class OpenPIPolicy:
     _loaded: bool = False
     _policy: Any = None
     _image_tools: Any = None
+    _initial_rng: Any = None
 
     def reset_episode(self) -> None:
-        return None
+        # Batch evaluation reuses the loaded policy.  Restore the checkpoint
+        # policy's initial RNG so task order does not silently change proposals.
+        # The pure pi0.5 runner likewise resets the OpenPI RNG for every episode.
+        if self._loaded and self._initial_rng is not None and hasattr(self._policy, "_rng"):
+            self._policy._rng = self._initial_rng
 
     def __call__(self, instruction: str, observation: Any, history: list[ExecutionStep]) -> dict[str, Any]:
         del history
@@ -69,6 +74,7 @@ class OpenPIPolicy:
                 "openpi_config": self.config.openpi_config,
                 "sample_steps": self.config.sample_steps,
                 "max_actions_per_call": self.config.max_actions_per_call,
+                "rng_reset_mode": "checkpoint-initial-per-episode",
             },
         }
 
@@ -91,6 +97,7 @@ class OpenPIPolicy:
             sample_kwargs={"num_steps": self.config.sample_steps},
             norm_stats=norm_stats,
         )
+        self._initial_rng = getattr(self._policy, "_rng", None)
         self._image_tools = image_tools
         self._loaded = True
 

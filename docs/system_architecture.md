@@ -1,297 +1,177 @@
-# ProofAlign 2.0 系统架构
+# ProofAlign 当前与目标架构
 
 更新日期：2026-07-10
 
-## 1. 总览
+本文描述代码中已经存在的路径，以及 first sprint 需要闭合的目标路径。方法语义以
+[`method.md`](method.md) 为准。
 
-ProofAlign 是 VLA 外部的 runtime assurance wrapper。系统不修改 VLA 权重，而是在每次低层
-命令 dispatch 前后维护一个合同、授权和证据链。
-
-```text
-Authenticated task / BDDL / safety templates
-                       |
-                       v
-              Frozen MissionSpec + SpecDigest
-                       |
-Observation ----------+---------------------------+
-     |                                             |
-     v                                             v
-State/Fact Adapter                         Task Automaton State
-     |                                             |
-     +-----------> Semantic Contract Compiler <---+
-                            |
-                            v
-                 SemanticTemporalRefines
-                            |
-VLA proposal --------------+
-     |                      v
-     +----> Safety Filter / Prefix Evidence
-                            |
-                            v
-                    PrefixPreCertified
-                            |
-                 proven only / fail closed
-                            |
-                            v
-                  Bounded Command Dispatch
-                            |
-                            v
-       ExecutionReceipt + PlantTrace + EventTrace
-                            |
-                            v
-              ObservedPrefixEvidenceValid
-                            |
-                            v
-                 Persistent Temporal Monitor
-                            |
-       +--------------------+--------------------+
-       |                    |                    |
-    complete           safe_pending        other verdict
-       |                    |                    |
- advance phase      authorize next prefix   latch + fallback
-```
-
-概念上只有两个 alignment layer：
-
-- `SemanticTemporalRefines`：mission/phase 到 semantic contract；
-- `PhysicalEffectConforms`：proposal、授权命令、执行回执和 realized trace 到 contract。
-
-工程上第二层分为 prefix-pre、observed-prefix 和 completion monitor 三段。
-
-## 2. 模块与职责
-
-### 2.1 Task root adapter
-
-输入是 benchmark task、BDDL bytes、认证用户指令或调度器任务。adapter 负责冻结原始 artifact、
-计算 digest，并构造：
-
-- authority envelope；
-- object/region registry；
-- task automaton；
-- goal atoms、goal phases 和 phase obligations；
-- hard invariants 和 evidence requirements；
-- time base 与 episode nonce。
-
-当前 LIBERO 路径会冻结 instruction 和 BDDL snapshot，并在环境创建后重新验证 digest。但 BDDL
-goal 到 typed mission 的编译器尚未被形式化验证，仍属于 TCB。
-
-### 2.2 VLA policy
-
-VLA 接收 policy prompt、视觉观测和历史，输出连续 action proposal。它可以输出固定 chunk，
-但 proposal 不自动拥有 `Pick`、`Place` 等完整语义，也不具有执行权限。
-
-policy rationale、learned critic 和 confidence 可以触发降级、replan 或 stop，不能单独把
-`unknown/refuted` 升级为 `proven`。
-
-### 2.3 State and fact adapter
-
-该模块把 simulator 或传感器输出转换为：
-
-- symbolic world state；
-- exact/bounded interval；
-- plant sample；
-- symbolic event frame；
-- state、sample 和 trace digest；
-- observer/abstraction attestation。
-
-Lean 检查引用、范围和 provenance，不证明 detector、pose estimator 或 contact classifier 本身
-正确。缺失、过期或互相冲突的观测必须生成 `unknown` 或 `inconsistent`。
-
-### 2.4 Semantic contract compiler
-
-compiler 将当前 task phase 和 action abstraction 组合成 `SemanticSkillContract`。合同声明：
-
-- skill、target、part、region；
-- guards、temporal guarantees 和 terminal event；
-- 要推进的 residual obligations；
-- `may_modify` / `must_preserve` frame sets；
-- deadline、evidence requirements 和 fallback。
-
-compiler 不允许生成任意 Lean 源码；它只能实例化 typed schema。合同必须重新通过 semantic
-checker，compiler 本身不能批准执行。
-
-### 2.5 Semantic checker
-
-semantic checker 校验 frozen mission binding、authority、phase transition、对象与 affordance、
-guard、frame set、deadline、任务进展和 evidence coverage。输出：
+## 1. 目标数据流
 
 ```text
-proven(witness)
-refuted(counterexamples)
-unknown(missing evidence)
-inconsistent(conflicts)
+trusted benchmark task / BDDL / registry
+  -> locally frozen MissionSpec
+  -> mission-rooted active contract
+
+policy-facing prompt + RGB
+  -> untrusted VLA
+  -> raw action proposal
+
+MissionSpec + active contract + trusted state + raw proposal
+  -> independent proposal binder
+  -> ctda-wire-v1 semantic/prefix request
+  -> Lean CTDA evaluator
+  -> exact dispatch or fail-closed
+
+dispatch + simulator receipt + trusted observed state
+  -> plant/event prefix
+  -> ctda-wire-v1 observed/monitor request
+  -> persistent monitor
+  -> safe_pending / complete / fail-closed
 ```
 
-只有 `proven` 可进入 prefix authorization。
+只有两层 alignment：
 
-### 2.6 Prefix authorizer and safety filter
+- mission refinement；
+- proposal/effect trace conformance。
 
-该模块把 VLA proposal 与最终准备 dispatch 的命令区分开：
+serialization、digest、provenance、uncertainty 和 fallback 是共享机制，不是额外的 alignment
+layer。
 
-```text
-policy proposal
-  -> optional CBF / predictive / kinematic filter
-  -> authorized command
-  -> PrefixAuthorization
-```
+## 2. 当前代码模块
 
-授权必须绑定当前 state、monitor state、proposal index、proposal digest、filter policy、dynamics
-model、reachable tube、time window 和 fallback witness。授权不可跨 state、monitor、episode 或
-proposal 重放。
-
-### 2.7 Dispatcher and execution adapter
-
-dispatcher 只下发 `PrefixPreCertified = proven` 对应的 exact command，并生成
-`ExecutionReceipt`。receipt 记录授权命令、实际命令、允许误差、时间戳和 actuator evidence。
-
-当前 LIBERO CTDA 路径把一次授权限制为一个 raw `env.step`，即使 policy 一次产生多个动作，
-也需要逐步重新授权。这是当前的安全实现选择，不代表 semantic contract 只能持续一个 step。
-
-### 2.8 Trace builder
-
-执行 adapter 产生两条相互绑定的 trace：
-
-- `PlantTrace`：每个实际 sample 的 command、state、interval、tube membership、model assumption
-  和 invariant verdict；
-- `SymbolicEventTrace`：`holding`、`released`、`inRegion`、`stable`、`goalReached` 等事实。
-
-每个 symbolic fact 都应通过 abstraction link 指向 source plant sample。没有 provenance 的事实
-不能完成合同。
-
-### 2.9 Persistent temporal monitor
-
-monitor state 跨 prefix 保留：当前 phase、已完成 guarantee、pending obligation、proposal index、
-last event time 和 digest。monitor 不能在每次 policy call 后清零。
-
-运行时策略：
-
-| Verdict | 行为 |
-|---|---|
-| `complete` | 接受合同完成并推进 task automaton |
-| `safe_pending` | 保持同一合同，申请下一条新授权 |
-| `violated` | 锁存旧链并触发 fallback/safe stop |
-| `unknown` | 不继续执行，re-observe 或 fallback |
-| `inconsistent` | 视为证据链故障，锁存并 fallback |
-
-### 2.10 Fallback supervisor
-
-fallback 不是一个字符串 decision。supervisor 必须：
-
-1. 冻结 fallback command 和 manifest；
-2. 在 non-continuable verdict 后终止旧 authorization chain；
-3. 实际 dispatch fallback；
-4. 记录 requested/applied command、触发原因、切换前后状态和单调时间戳；
-5. 检查即时 hard invariant 和实测切换 latency；
-6. 生成 typed switch receipt。
-
-当前实现只接受 action bounds 内的 canonical all-zero hold，且 manifest 必须明确标记为
-`operator-pinned-simulator-test-only`。它不构成真实机器人 verified fallback proof。
-
-## 3. Lean 端结构
-
-### Legacy specification
-
-- `Core.lean`：`Action`、`TaskIntent`、`SafetySpec`、`WorldState`、`TraceSummary`；
-- `Intent.lean`：`SafetyAdmissible`、`MissionRefines`、`IntentAligned`；
-- `Effect.lean`：runtime invariant、frame condition、`EffectAligned` 和
-  `ChunkEffectAligned`；
-- `Safety.lean`：dual/certified composition；
-- `Certificate.lean`：旧版 certificate schema。
-
-Python legacy bridge 为具体输入生成 `Bool = true` proposition，通过 `by decide` 交给 Lean。
-
-### CTDA specification
-
-`ProofAlign/CTDA.lean` 定义：
-
-- frozen mission、task automaton 和 phase obligation；
-- semantic skill contract；
-- proposal、authorization、reachable tube 和 typed evidence；
-- execution receipt、plant/event trace 和 abstraction provenance；
-- `SemanticTemporalRefines`、`PrefixPreCertified`、`ObservedPrefixEvidenceValid`；
-- finite-prefix temporal monitor；
-- checker soundness/reflection theorem。
-
-`ProofAlign/CTDAExamples.lean` 提供正例和 binding、deadline、tube、command、trace、post evidence
-等负例。
-
-## 4. Python 端结构
-
-- `ctda.py`：不可变 CTDA 数据模型、digest/attestation 逻辑、reference checker 和 stateful
-  supervisor；
-- `ctda_runtime.py`：从 legacy/LIBERO state 生成 mission、contract、prefix candidate、receipt 和
-  trace，并处理 fallback switch；
-- `benchmark/libero_online_wrapper.py`：legacy macro-chunk 与 CTDA 单 prefix online loop；
-- `benchmark/libero_online_runner.py`：冻结 task root、验证 fallback manifest、创建环境并落盘
-  audit metadata；
-- `lean_bridge.py`：当前只执行 legacy generated Boolean claim；尚未提供 CTDA request
-  serialization/evaluator 调用。
-
-## 5. 当前在线路径
-
-### Legacy mode
-
-```text
-raw VLA chunk -> symbolic Action
-  -> Python intent diagnostics + Lean IntentAligned Bool claim
-  -> execute macro/small chunk
-  -> TraceSummary
-  -> Python effect diagnostics + Lean ChunkEffectAligned Bool claim
-```
-
-### CTDA mode
-
-```text
-frozen task root
-  -> Python CTDAChecker / CTDASupervisor
-  -> one-step prefix authorization
-  -> env.step
-  -> receipt + plant/event trace
-  -> Python observed-prefix + temporal monitor
-  -> next authorization or fallback
-```
-
-CTDA mode当前输出标记为 `ctda-python-reference`。Lean CTDA specification 会随工程构建并由
-单元/Lean examples 验证，但不是当前 online dispatch 的 evaluator。
-
-## 6. Fail-closed 规则
-
-以下情况不得 dispatch：
-
-- Lean-backed legacy 路径中 Lean 不可用或工程构建失败；
-- mission authority 或 typed attestation 未通过配置 verifier；
-- semantic/prefix checker 返回非 `proven`；
-- authorization 过期、state/monitor/episode digest 不匹配；
-- tube 有覆盖空洞或 fallback witness 不一致；
-- 另一个 authorization 尚在 flight；
-- receipt/trace 缺失、命令不一致或 observation 为 unknown；
-- monitor 已锁存 terminal non-continuable verdict。
-
-mock mode 只允许诊断和测试，不能连接执行授权路径。
-
-## 7. 信任边界
-
-| 组件 | 当前角色 | 当前信任/保证 |
+| 模块 | 当前职责 | 当前边界 |
 |---|---|---|
-| Lean kernel + CTDA definition | 离散逻辑 checker | 对 Lean 内 proposition 和 checker theorem 负责 |
-| Python CTDA checker | 当前 online reference evaluator | 经过单测，但不是 Lean kernel 执行结果 |
-| Task/BDDL compiler | 规格生成 | 未验证 TCB；digest 只保护冻结后的完整性 |
-| State/action abstractor | 连续到符号映射 | 未验证 TCB；需要 provenance/evidence |
-| Simulator evidence issuer | 本地 attestation | exact allowlist 测试信任，不是硬件证明 |
-| Kinematic tube | prefix 运动界 | 条件化近似，不是完整接触动力学 reachability |
-| Hold fallback | simulator safe-stop action | 有真实 dispatch/receipt，无长期恢复域定理 |
-| VLA | 非可信 proposal producer | 永不直接获得执行权限 |
+| `src/proofalign/ctda.py` | typed mission/contract/evidence、digest 与 Python reference checks | 不是 online Lean evaluator |
+| `src/proofalign/ctda_runtime.py` | mission-rooted contract、raw binder、四阶段 evaluator transaction、persistent monitor | 当前只支持有限 Pick/Place slice |
+| `src/proofalign/ctda_wire.py` | strict `ctda-wire-v1`、canonical digest 与 Python reference semantics | 不替换 episode/attack schema |
+| `src/proofalign/ctda_evaluator.py` | Python/Lean/shadow evaluator、cache 与 replay artifact | 当前逐 request 编译，非 real-time |
+| `src/proofalign/ctda_shadow.py` | JSON/JSONL/episode/fixture CPU replay、parity、latency、provenance | synthetic corpus 不提供 ground truth |
+| `src/proofalign/benchmark/libero_online_wrapper.py` | LIBERO reset、policy call、raw-step dispatch、trace 和 fallback | simulator adapter 属于声明 TCB |
+| `src/proofalign/benchmark/libero_online_runner.py` | task root、SafetySpec、fallback manifest、evaluator mode 和 CLI | simulator adapter 属于 TCB |
+| `experiments/libero_openpi_plugin.py` | pi0.5/OpenPI inference 与 action chunk | 当前 `proofalign_action` 来自 instruction heuristic，只能作兼容 metadata |
+| `experiments/libero_vla_plugin.py` | legacy action abstraction 与 OpenVLA diagnostic | 不是 paper CTDA contract authority |
+| `src/proofalign/lean_bridge.py` | legacy Lean claim bridge | 不用于 paper CTDA wire path |
+| `lean/ProofAlign/CTDA.lean` | CTDA datatypes、staged checks、monitor、theorem | 核心 typed specification |
+| `lean/ProofAlign/CTDAWire.lean` | 共同支持的四阶段 wire checker | 有限离散 semantics，不证明 adapter 真值 |
+| `scripts/run_liberosafety_pi05_openpi_eval.py` | 纯 pi0.5 clean/attack rollout | 不导入 defense checker |
+| `scripts/run_libero_online_batch.py` | defense/ablation online batch | evaluator mode 必须进入每个 artifact |
 
-## 8. 不应声称的能力
+## 3. 当前运行模式
 
-当前系统不能声称：
+### `legacy-lean-boolean`
 
-- Lean 验证了原始 RGB、object identity 或自然语言语义；
-- Lean 验证了真实连续动力学、接触、摩擦或控制器稳定性；
-- 每个 LIBERO CTDA online prefix 已经由 Lean evaluator 授权；
-- simulator software receipt 等同于硬件 actuator attestation；
-- `safe_pending` 证明未来所有 prefix 安全；
-- task success 等同于 safe success。
+Python 构造 concrete Boolean claim，Lean 以 `by decide` 检查。该路径证明 Lean 能进入真实
+rollout，但其结果不能当作 CTDA theorem/evaluator 的在线证据。
 
-方法的完整定义见 [`method.md`](method.md)，详细迁移与边界审计见
-[`lean_method_upgrade_20260710.md`](lean_method_upgrade_20260710.md)。
+### `ctda-python-reference`
+
+当前完整 CTDA simulator loop。它实现 typed bindings、persistent state 和 fail-closed behavior，
+但 authoritative judgment 仍来自 Python reference code。
+
+### `ctda-lean-kernel`
+
+每个共同支持的 `semantic`、`prefix_pre`、`observed_prefix` 和 `monitor_step` request 经
+`ctda-wire-v1` 送入 Lean；只有 kernel 检查通过才允许 dispatch/phase advance。
+
+### `ctda-shadow`
+
+Python 与 Lean 同时评估但不改变 action，用于 parity、latency 和 clean false-block calibration。
+shadow 结果不能授权实际执行。
+
+当前本地 golden corpus 为零 mismatch，但逐 request Lean replay p99 约 0.65--1.95 秒，因此该
+mode 目前是 slow interlock/offline audit，不是 20 Hz real-time evaluator。
+
+## 4. First sprint 已闭合的四个 P0 接口
+
+### 4.1 Trusted task adapter
+
+输入 benchmark-owned task artifact，输出有限域 `MissionSpec`。必须明确 supported task slice；
+unsupported task fail closed。当前不是通用 verified BDDL compiler。
+
+### 4.2 Mission-rooted contract provider
+
+从 `MissionSpec + active phase + residual obligation` 提供 active contract。policy prompt 和
+policy `proofalign_action` 只能记录在 untrusted metadata 中，不能改变 active contract。
+
+### 4.3 Independent raw proposal binder
+
+从 trusted state 和 raw commands 判断 prefix 是否与 active contract 一致。binder verdict 必须由
+consumer 计算，不能接受 policy 自报 Boolean。最小支持 `Pick`/`Place` slice。
+
+### 4.4 CTDA evaluator transaction
+
+统一 evaluator interface：
+
+```text
+evaluate(canonical wire request) -> verdict + proof/audit artifact
+```
+
+状态提交顺序：
+
+```text
+construct request
+  -> evaluate
+  -> if proven: atomically commit authorization/monitor state
+  -> else: no dispatch and no partial state mutation
+```
+
+## 5. `ctda-wire-v1` 最小 envelope
+
+```json
+{
+  "schema_version": "ctda-wire-v1",
+  "request_id": "content-addressed id",
+  "stage": "semantic | prefix_pre | observed_prefix | monitor_step",
+  "time_unit": "ns",
+  "checker_version_digest": "...",
+  "payload": {}
+}
+```
+
+要求：
+
+- canonical UTF-8 JSON、稳定 key 顺序、拒绝 NaN/Infinity；
+- 时间只用非负 integer nanoseconds；
+- temporal formula 使用 tagged union，不执行任意字符串；
+- critical digest 由 consumer 重算；
+- 未知字段/enum、缺字段和类型错误默认拒绝；
+- 保存 request、generated Lean artifact、checker digest、stdout/stderr 和 verdict，支持 kernel
+  replay。
+
+该 wire schema 是内部协议，不替换 episode JSON 或 attack-record schema。
+
+## 6. 信任边界
+
+当前方法允许 simulator state adapter 属于 TCB。因此 camera attack 可以攻击 policy RGB，但
+不能同时被描述为攻陷 CTDA observer。若未来让 policy 与 monitor 共用同一被攻击 camera，必须
+重新定义保证或加入独立 sensing。
+
+以下不是当前 TCB 能力：
+
+- 密码学 task authentication；
+- authenticated IPC/process isolation；
+- hardware actuator receipt；
+- sensor attestation；
+- verified dynamics/fallback。
+
+## 7. Fail-closed 规则
+
+以下任一条件发生时不得 dispatch 或 phase advance：
+
+- unsupported/ambiguous mission or contract；
+- missing/stale/replayed/cross-episode binding；
+- raw proposal binder `refuted/unknown`；
+- serialization/Lean build/evaluator/cache/parity error；
+- receipt/command/trace mismatch；
+- timestamp rollback 或 monitor history mismatch；
+- missing completion/post evidence；
+- evaluator timeout。
+
+Fail-closed 本身不是安全收益。实验必须单独报告 false block、deadlock 和 availability cost。
+
+## 8. 当前环境分工
+
+- 本地无 GPU：contract source、binder、wire、Lean evaluator、golden corpus 和 shadow harness
+  已完成；下一本地工作只允许 latency 优化与 fixture calibration。
+- 远程 GPU：在本地 readiness gate 通过后运行 pi0.5/OpenPI、LIBERO-Safety 和发布攻击
+  workload。详见 [`remote_execution.md`](remote_execution.md)。

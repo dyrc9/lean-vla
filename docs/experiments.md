@@ -1,300 +1,183 @@
-# 实验设计
+# ProofAlign 最小实验协议
 
-> 状态说明（2026-07-10）：早期实验以 legacy Dual Lean 为主；当前完整方法目标是 CTDA。
-> 所有结果必须标注 evaluator mode（如 `legacy-lean-boolean` 或
-> `ctda-python-reference`）、evidence source 和 guarantee class。最新实验优先级见
-> [`roadmap.md`](roadmap.md)。
+更新日期：2026-07-10
 
-## Benchmark
+本文定义进入论文主表的唯一实验协议。当前环境没有 GPU；本地只开发 shadow/parity harness，
+远程 rollout 在 [`roadmap.md`](roadmap.md) 的 readiness gate 通过后开始。
 
-主要 benchmark 使用 LIBERO-Safety。该 benchmark 面向 VLA 的物理与语义安全评测，强调严格安全约束、随机化场景和安全关键失败模式。我们关注五类任务：
+## 1. 实验回答的问题
 
-1. Affordance-Aware Grasping (AAG)
-2. Human-Robot Interaction (HRI)
-3. Tabletop Spatial Avoidance (TSA)
-4. Free-Space Hand-Object Avoidance (FSHOA)
-5. Semantic Safety Reasoning (SSR)
+- **RQ1 Duality**：mission layer 和 trace/effect layer 是否捕获互补失败？
+- **RQ2 Security effect**：full CTDA 是否减少 unauthorized/unsafe dispatch、constraint violation
+  和 success-but-unsafe？
+- **RQ3 Utility**：防护收益对应多少 clean-success loss、false block、unknown 和 deadlock？
+- **RQ4 Formal/runtime cost**：Python/Lean 是否 parity，p50/p95/p99 verifier tax 是否满足在线
+  deadline？
 
-本文实验目标不是证明真实机器人完全安全，而是检验：在相同 VLA 和相同 perception/planning 条件下，Dual Lean Alignment 是否能更早拒绝危险动作、更准确定位 violation，并在保持合理成功率的同时降低 unsafe execution。
+攻击强度本身不是本文贡献。发布攻击只提供独立 workload。
 
-## Baselines
+## 2. 公平性原则
 
-### 1. VLA only
+所有主比较固定：
 
-直接执行 VLA action chunk，不加额外 safety gate。该 baseline 衡量原始 policy 的 task success 与 safety failure。
+- victim checkpoint；
+- task/suite/init；
+- env seed 和 policy seed；
+- camera、resize、action chunk、replan 和 horizon；
+- clean/attack artifact version；
+- contract/binder/evaluator config；
+- threshold，且只能在 clean calibration 上冻结。
 
-### 2. VLA + collision checker
+方法自己的 verdict 不能作为 ground truth。unsafe/safe label 必须来自 benchmark annotation、
+independent simulator oracle、attack annotation 或明确人工审核，并记录 provenance。
 
-在执行前加入几何碰撞检查或路径 clearance check。该 baseline 测试纯几何安全过滤能解决多少问题。它应能降低 TSA / FSHOA 中部分碰撞，但对语义误解、affordance 错误、抓错对象帮助有限。
+## 3. 最小方法矩阵
 
-### 3. VLA + LLM verifier
+| 方法 | Mission gate | Trace/effect gate | 用途 |
+|---|---:|---:|---|
+| VLA only | — | — | 原始 task/safety baseline |
+| Collision/safety checker | — | local geometry only | 强物理局部 baseline |
+| Mission layer only | ✓ | — | 测任务授权与 phase refinement |
+| Trace/effect layer only | — | ✓ | 测 raw prefix、receipt、trace 和 completion |
+| Full CTDA | ✓ | ✓ | 测双层互补与 utility trade-off |
 
-使用 LLM / VLM verifier 对动作进行自然语言或视觉语义审查。该 baseline 代表神经 verifier 路线。预期它能发现部分明显语义错误，但稳定性、可复现性和 edge-case strictness 不如 machine-checkable spec。
+legacy Dual Lean 只作为工程历史或 appendix compatibility result，不进入 CTDA 主表。
 
-### 4. VLA + Intent Alignment only
+## 4. 最小 workload
 
-只使用执行前 `IntentAlign`。该 baseline 检验意图对齐对抓错对象、错误 affordance、危险指令执行、语义漂移的作用。预期它能减少 pre-execution unsafe action，但无法发现执行后偏差。
+1. **Clean**：相同 pi0.5/OpenPI + LIBERO-Safety split。
+2. **Published instruction attack**：优先能映射同一 LIBERO-Safety task 的 Phantom Voice；SABER
+   standard-LIBERO record 不能直接与 LIBERO-Safety 结果混表。
+3. **Published camera attack**：优先 Phantom Menace fixed sensor attacks；UPA-RFAS released patch
+   只作为后续 cross-model transfer。
 
-### 5. VLA + Effect Alignment only
+不自己训练/优化攻击，不接训练时后门，不为不同攻击单独调方法阈值。
 
-只使用执行后 `EffectAlign`。该 baseline 检验 transition auditing 的作用。预期它能发现物理执行偏差和未预期状态变化，但可能允许错误动作先执行。
+## 5. 两种互补协议
 
-### 6. Legacy: VLA + Dual Lean Alignment
+### 5.1 Fixed-trace shadow protocol
 
-同时使用 Intent-Action Alignment 和 Action-Effect Alignment。预期该方法在 unsafe action rejection、spec violation rate 和 recovery rate 上优于单层方案。
+所有方法读取同一个保存的 proposal/trace artifact，不调用 `env.step`。用途：
 
-### 7. Ours: VLA + CTDA
+- detector coverage 与 unique catch；
+- clean false block；
+- unsupported/unknown/deadlock；
+- Python/Lean parity；
+- stage latency；
+- protocol tamper/replay negative cases。
 
-使用 frozen mission、semantic temporal refinement、proposal/authorized/executed command
-binding、逐 prefix evidence audit、persistent temporal monitor 和 fallback supervisor。需要继续
-拆分：without command binding、without uncertainty、simulator fallback 与最终 verified
-fallback。当前 online evaluator 为 Python reference，必须与未来 Lean CTDA evaluator 结果分开
-报告。
+该协议测 detection/monitor behavior，不证明闭环防御能恢复任务。
 
-## Metrics
+### 5.2 Paired closed-loop protocol
 
-### Success Rate
-
-任务最终完成比例。应与安全指标同时报告，避免 unsafe success 被误判为好结果。
-
-```text
-Success Rate = successful episodes / total episodes
-```
-
-### Collision Rate
-
-执行过程中发生机器人-物体、物体-物体、机器人-人手或对象-人手碰撞的比例。
-
-```text
-Collision Rate = episodes with collision / total episodes
-```
-
-### Rejection Rate
-
-系统拒绝候选动作的比例。高 rejection 不一定好，需要结合 unsafe action rejection 和 false rejection 分析。
-
-```text
-Rejection Rate = rejected candidate actions / total candidate actions
-```
-
-### Spec Violation Rate
-
-episode 或 action step 中违反 `Σ` 的比例。包括目标错配、禁止对象移动、人手距离不足、错误 affordance、postcondition failure 等。
+每个 condition 用相同 task/init/seed/config 重新运行 policy 和环境：
 
 ```text
-Spec Violation Rate = checked steps with violation / total checked steps
+clean
+attacked
+attacked + method
 ```
 
-### Unsafe Action Rejection Rate
+不同方法介入后状态可能分叉，这是闭环实验的一部分。配对单位是最初的
+task/init/env-seed/policy-seed/workload，而不是强行 replay 已不适用的后续 action。
 
-危险候选动作被成功拒绝的比例。需要通过 benchmark annotations、oracle replay 或离线 safety labels 确定候选动作是否 unsafe。
+## 6. 核心指标
 
-```text
-Unsafe Action Rejection Rate =
-  rejected unsafe actions / total unsafe candidate actions
-```
+### Task/utility
 
-### False Rejection Rate
+- task success；
+- safe success；
+- success-but-unsafe；
+- clean relative success retention；
+- refusal/deadlock/timeout。
 
-安全且任务相关的候选动作被错误拒绝的比例。该指标衡量 formal spec 是否过度保守。
+### Security/safety
 
-```text
-False Rejection Rate =
-  rejected safe actions / total safe candidate actions
-```
+- unauthorized dispatch；
+- unsafe dispatch；
+- constraint/cost/collision episode rate；
+- violation severity；
+- first-violation time；
+- unsafe action blocked；
+- Layer 1 unique catch、Layer 2 unique catch；
+- intervention lead time 与 risk exposure time。
 
-### Recovery Rate
+### Availability
 
-EffectAlign 失败或 monitor 触发后，系统成功恢复并继续安全执行的比例。
+- false block；
+- unknown/inconsistent；
+- `safe_pending` timeout；
+- fallback trigger 与即时 postcondition。当前 zero-hold 不计 verified recovery。
 
-```text
-Recovery Rate =
-  recovered unsafe/deviated transitions / total detected unsafe/deviated transitions
-```
+### Formal/runtime
 
-### Runtime Overhead
+- Python/Lean parity mismatch；
+- semantic/prefix_pre/observed_prefix/monitor_step p50/p95/p99；
+- deadline miss；
+- generated Lean artifact/kernel replay success；
+- total verifier tax。
 
-Lean checking、certificate generation、state abstraction 和 replan 带来的额外时间。
+没有独立 label 时，false block、unsafe blocked 等指标必须输出 `not_evaluated`，不能用 CTDA
+自己的判断生成百分比。
 
-```text
-Runtime Overhead =
-  average runtime with checker - average runtime baseline
-```
+## 7. 分阶段规模
 
-应分别报告：
+### CPU fixture gate
 
-- Lean proof checking time
-- certificate generation time
-- action abstraction time
-- total step latency
+- 小型 typed clean/negative fixture；
+- parity mismatch = 0；
+- shadow summary 可重建；
+- 无 label 指标正确显示 `not_evaluated`。
 
-## Per-Category Expected Effects
+### Remote 60-episode workload gate
 
-### Affordance-Aware Grasping (AAG)
+- physical suites：`affordance,obstacle_avoidance,human_safety,obstacle_avoidance_human`；
+- task ids：`0-14`；
+- init：`0`；
+- clean、instruction、camera 分开保存。
 
-AAG 关注物体部件与抓取 affordance。例如杯子应抓 handle，刀应抓 handle 而不是 blade，脆弱物应使用安全接触区域。
+仅用于确认 clean baseline 和 attack safety signal。未通过 gate 不扩主表。
 
-预期：
+### Main paired experiment
 
-- VLA only 可能抓错部件或忽略危险部件。
-- Collision checker 对此帮助有限，因为抓刀刃不一定产生几何碰撞。
-- LLM verifier 可发现部分明显错误，但可能不稳定。
-- IntentAlign 应显著降低 unsafe affordance action。
-- EffectAlign 可发现抓取后未持有目标、滑移、误碰邻近物体。
-- Dual Alignment 在 unsafe grasp rejection 与 post-grasp auditing 上最好。
+先做 5 methods × 3 workloads 的最小矩阵。通过 utility/security gate 后，才扩 init `0-4`、第二
+victim 或 UPA-RFAS。
 
-重点指标：
+建议报告 paired bootstrap confidence interval；具体显著性检验在看到事件分布后冻结，并写入
+analysis config。
 
-- Unsafe Action Rejection Rate
-- Spec Violation Rate
-- False Rejection Rate
-- Success Rate under safe affordance constraints
+## 8. Artifact 规则
 
-### Human-Robot Interaction (HRI)
+每个 episode 至少保存：
 
-HRI 关注人与机器人共享空间中的安全，例如人手靠近、handover、避免向人递交危险姿态物体。
+- git commit 与 dirty diff digest；
+- schema/checker/evaluator mode 与 build digest；
+- victim/checkpoint/config digest；
+- suite/task/init/env seed/policy seed；
+- trusted instruction、policy-facing instruction 和 attack-record digest；
+- camera/preprocessing/chunk/replan/horizon；
+- active mission/contract/config digest；
+- per-prefix request/verdict/latency；
+- raw proposal、authorized/applied command、receipt 和 trace digest；
+- independent label 与 provenance；
+- task success、cost/collision、runner warnings/failure；
+- output file checksum。
 
-预期：
+`external/`、`results/` 和 `/data0/ldx` 不随 Git 迁移。远程结束后必须复制 raw artifact、生成
+manifest/checksum，并在当前仓库保存可重建 summary 或受控 artifact 索引。
 
-- Collision checker 可处理部分距离约束，但难以表达语义姿态，如尖锐部件朝向人。
-- IntentAlign 检查 handover 是否被允许、对象是否适合递交、部件方向是否安全。
-- EffectAlign 检查执行后人手距离、对象姿态、是否发生未知接触。
-- Dual Alignment 应降低人手相关碰撞和危险 handover。
+## 9. 进入论文表格的 gate
 
-重点指标：
+以下是目标条件，不是当前结果：
 
-- Collision Rate with human hand
-- Spec Violation Rate
-- Recovery Rate
-- Runtime Overhead
+- clean relative success retention ≥90%；
+- clean false block 目标 ≤5%，>10% 停止扩实验；
+- unknown/deadlock 目标 ≤5%；
+- Python/Lean parity mismatch = 0；
+- p99 不超过声明 control deadline；
+- instruction/camera workload 至少产生一类 authorization/safety signal；
+- full dual 对两层各有独立 contribution；
+- 没有逐攻击调参。
 
-### Tabletop Spatial Avoidance (TSA)
-
-TSA 关注桌面区域、障碍物、禁区和对象间空间关系。
-
-预期：
-
-- Collision checker 在 TSA 中是强 baseline，可显著减少几何碰撞。
-- 但若任务要求“不移动红色碗”或“把杯子放在安全区域而非禁区”，还需要意图和关系约束。
-- IntentAlign 检查目标区域是否允许、路径 certificate 是否覆盖 protected regions。
-- EffectAlign 检查非目标对象是否被推动、最终放置是否稳定。
-- Dual Alignment 相比 collision checker 的增益主要体现在 semantic spatial constraints 和 frame conditions。
-
-重点指标：
-
-- Collision Rate
-- Frame Condition Violation Rate
-- Spec Violation Rate
-- Success Rate
-
-### Free-Space Hand-Object Avoidance (FSHOA)
-
-FSHOA 关注自由空间运动中机器人、手、物体之间的动态避让。
-
-预期：
-
-- Collision checker 能处理静态路径，但对动态人手进入和状态更新延迟不足。
-- Execution Monitor 与 EffectAlign 更重要。
-- IntentAlign 要求动作带有 hand clearance certificate。
-- EffectAlign 检查实际执行日志和后继状态是否满足 clearance / no-contact。
-- Dual Alignment 应显著提高动态干扰下的 safe stop 与 recovery。
-
-重点指标：
-
-- Collision Rate
-- Recovery Rate
-- Unsafe Action Rejection Rate
-- Runtime Overhead
-
-### Semantic Safety Reasoning (SSR)
-
-SSR 关注语义层面的危险，如不要把清洁剂放到食物旁，不要把热物递给人，不要移动禁止对象。
-
-预期：
-
-- Collision checker 几乎无法解决 SSR。
-- LLM verifier 有一定能力，但可能产生不一致判断。
-- IntentAlign 是核心，检查动作是否违反 TaskIntent 和 SafetySpec。
-- EffectAlign 检查动作后是否引入语义危险，例如危险物体进入 protected region。
-- Dual Alignment 在 SSR 中应相对 baseline 显示最大安全增益。
-
-重点指标：
-
-- Spec Violation Rate
-- Unsafe Action Rejection Rate
-- False Rejection Rate
-- Success Rate
-
-## Ablations
-
-### Certificate Quality
-
-比较不同 certificate 来源：
-
-- oracle certificate
-- simulator-generated certificate
-- perception-generated certificate
-- noisy certificate
-
-目标是理解 Lean checker 对上游感知质量的敏感性。
-
-### Spec Strictness
-
-比较不同 `Σ` 强度：
-
-- minimal spec：只包含目标和基本碰撞约束。
-- moderate spec：加入 affordance、禁止对象和 region constraints。
-- strict spec：加入 frame condition、动态 hand clearance、semantic hazards。
-
-目标是分析 safety gain 与 false rejection trade-off。
-
-### Action Chunk Granularity
-
-比较不同检查频率：
-
-- primitive-level checking
-- short chunk checking
-- long chunk checking
-- event-triggered checking
-
-预期更细粒度检查更安全但 overhead 更高。
-
-## 预期结果模式
-
-我们期望看到以下趋势，而不是声称所有指标无条件最优：
-
-- Dual Alignment 的 Spec Violation Rate 和 Collision Rate 低于 VLA only 与 LLM verifier。
-- 在 AAG 和 SSR 上，IntentAlign 贡献最大。
-- 在 HRI 和 FSHOA 上，EffectAlign 与 execution monitor 贡献最大。
-- 在 TSA 上，collision checker 是强 baseline，但 Dual Alignment 在 frame condition 和 semantic region constraints 上更好。
-- Dual Alignment 可能带来更高 Rejection Rate 和一定 Runtime Overhead。
-- 若 SafetySpec 过严或 perception certificate 噪声大，False Rejection Rate 会升高。
-
-## 报告格式
-
-每个任务类别应报告：
-
-- aggregate metrics table
-- per-failure-mode breakdown
-- confusion matrix for unsafe/safe action rejection
-- runtime overhead distribution
-- qualitative case studies
-
-示例 case study：
-
-```text
-Instruction: place the mug on the coaster without touching the knife.
-VLA action: Pick(knife, blade)
-IntentAlign result: rejected
-Reason: IntentTargetMismatch + UnsafeAffordance + ForbiddenObjectTouched
-Recovery: replan to Pick(mug, handle)
-```
-
-```text
-Instruction: hand the scissors to the human safely.
-VLA action: HandOver(scissors, human)
-IntentAlign result: accepted with handle-facing-human constraint
-Execution event: object rotated; blade faces human
-EffectAlign result: rejected
-Recovery: safe stop, retract, reorient object
-```
+未达到条件时，按 [`roadmap.md`](roadmap.md) 的 kill criteria 降级 claim，而不是筛选有利任务或
+继续堆实验数量。

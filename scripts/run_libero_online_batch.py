@@ -54,6 +54,9 @@ def build_episode_args(args: argparse.Namespace, suite: str, task_id: int, outpu
     episode_args.ctda_fallback_witness_sha256 = args.ctda_fallback_witness_sha256
     episode_args.ctda_evidence_mode = args.ctda_evidence_mode
     episode_args.ctda_episode_nonce = args.ctda_episode_nonce
+    episode_args.ctda_evaluator = args.ctda_evaluator
+    episode_args.ctda_artifact_dir = args.ctda_artifact_dir
+    episode_args.ctda_lean_timeout_seconds = args.ctda_lean_timeout_seconds
     episode_args.method_name = args.method_name
     episode_args.warmup_steps = args.warmup_steps
     episode_args.warmup_gripper = args.warmup_gripper
@@ -298,6 +301,13 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         choices=("local-simulator-exact-allowlist",),
     )
     parser.add_argument("--ctda-episode-nonce")
+    parser.add_argument(
+        "--ctda-evaluator",
+        choices=("ctda-python-reference", "ctda-lean-kernel", "ctda-shadow"),
+        default="ctda-python-reference",
+    )
+    parser.add_argument("--ctda-artifact-dir")
+    parser.add_argument("--ctda-lean-timeout-seconds", type=float, default=10.0)
     parser.add_argument("--output-dir", default="results/libero_online")
     parser.add_argument("--method-name", default="openvla_oft_dual")
     parser.add_argument("--summary", default="results/libero_online/summary_openvla_oft.json")
@@ -321,6 +331,15 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--horizon", type=int, default=1000)
     parser.add_argument("--action-dim", type=int, default=7)
     return parser.parse_args(argv)
+
+
+def validate_batch_args(args: argparse.Namespace) -> None:
+    if args.skip_existing and args.ctda:
+        raise ValueError(
+            "--skip-existing is disabled in CTDA mode because benchmark task roots, "
+            "initial state, effective safety spec, environment version, and action "
+            "bounds must be revalidated in the live environment"
+        )
 
 
 def write_run_config(
@@ -352,12 +371,7 @@ def write_run_config(
 
 def main(argv: list[str] | None = None) -> None:
     args = parse_args(argv)
-    if args.skip_existing:
-        raise ValueError(
-            "--skip-existing is disabled because benchmark task roots, initial "
-            "state, effective safety spec, environment version, and action bounds "
-            "must be revalidated in the live environment"
-        )
+    validate_batch_args(args)
     suites = parse_list(args.suites)
     task_ids = parse_task_ids(args.task_ids)
     init_state_ids = parse_task_ids(args.init_state_ids) if args.init_state_ids else [args.init_state_id]
@@ -385,11 +399,12 @@ def main(argv: list[str] | None = None) -> None:
                 output_files.append(str(output))
                 episode_args = build_episode_args(args, suite, task_id, output)
                 try:
-                    run_online_episode_with_plugins(
-                        episode_args,
-                        policy=shared_policy,
-                        action_abstractor=shared_abstractor,
-                    )
+                    if not (args.skip_existing and output.exists()):
+                        run_online_episode_with_plugins(
+                            episode_args,
+                            policy=shared_policy,
+                            action_abstractor=shared_abstractor,
+                        )
                     episodes.append(load_episode(output))
                 except Exception as exc:
                     failure = {

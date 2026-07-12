@@ -993,27 +993,54 @@ class ContractMonitorState:
     contract_id: str
     spec_digest: str
     phase: str
+    episode_nonce: str
     completed_guarantees: tuple[str, ...] = ()
     observed_atoms: tuple[str, ...] = ()
+    accepted_events: tuple[SymbolicEvent, ...] = ()
     last_proposal_index: int = -1
     last_event_timestamp_ns: int = -1
     monitor_state_digest: str = field(init=False)
 
     def __post_init__(self) -> None:
-        for name in ("contract_id", "spec_digest", "phase"):
+        for name in ("contract_id", "spec_digest", "phase", "episode_nonce"):
             _require_text(name, getattr(self, name))
         object.__setattr__(self, "completed_guarantees", _freeze_evidence(self.completed_guarantees))
         object.__setattr__(self, "observed_atoms", _freeze_evidence(self.observed_atoms))
+        object.__setattr__(self, "accepted_events", tuple(self.accepted_events))
         if self.last_proposal_index < -1 or self.last_event_timestamp_ns < -1:
             raise ValueError("invalid monitor sequence counters")
         object.__setattr__(self, "monitor_state_digest", _computed_digest(self))
 
     @classmethod
     def initial(cls, mission: MissionSpec, contract: SemanticSkillContract) -> "ContractMonitorState":
-        return cls(contract.contract_id, mission.spec_digest, contract.phase_before)
+        return cls(
+            contract.contract_id,
+            mission.spec_digest,
+            contract.phase_before,
+            mission.episode_nonce,
+        )
 
     def verify_integrity(self) -> bool:
         return self.monitor_state_digest == _computed_digest(self)
+
+    def history_is_well_formed(self) -> bool:
+        return (
+            all(
+                left.timestamp_ns <= right.timestamp_ns
+                for left, right in zip(self.accepted_events, self.accepted_events[1:])
+            )
+            and (
+                (
+                    not self.accepted_events
+                    and self.last_event_timestamp_ns == -1
+                )
+                or (
+                    bool(self.accepted_events)
+                    and self.accepted_events[-1].timestamp_ns
+                    == self.last_event_timestamp_ns
+                )
+            )
+        )
 
 
 def advance_monitor_state(
@@ -1026,6 +1053,7 @@ def advance_monitor_state(
 
     atoms = set(state.observed_atoms)
     completed = set(state.completed_guarantees)
+    accepted_events = list(state.accepted_events)
     phase = state.phase
     last_timestamp = state.last_event_timestamp_ns
     for event in event_trace.events:
@@ -1044,12 +1072,15 @@ def advance_monitor_state(
             ):
                 phase = contract.phase_before
         last_timestamp = max(last_timestamp, event.timestamp_ns)
+        accepted_events.append(event)
     return ContractMonitorState(
         contract_id=state.contract_id,
         spec_digest=state.spec_digest,
         phase=phase,
+        episode_nonce=state.episode_nonce,
         completed_guarantees=tuple(completed),
         observed_atoms=tuple(atoms),
+        accepted_events=tuple(accepted_events),
         last_proposal_index=proposal_index,
         last_event_timestamp_ns=last_timestamp,
     )
@@ -1351,6 +1382,8 @@ class CTDAChecker:
         evidence_items = tuple(evidence)
         if not candidate.verify_integrity() or not monitor_state.verify_integrity():
             return StaticCheckResult.inconsistent("candidate or monitor digest integrity failure")
+        if not monitor_state.history_is_well_formed():
+            return StaticCheckResult.inconsistent("persistent monitor history is not time ordered")
         mission_result = self.check_mission_spec(mission, now)
         if not mission_result.proven:
             return mission_result
@@ -1390,6 +1423,8 @@ class CTDAChecker:
             refutations.append("authorization was issued for a different monitor state")
         if monitor_state.contract_id != contract.contract_id or monitor_state.spec_digest != mission.spec_digest:
             refutations.append("monitor state is not bound to this contract and mission")
+        if monitor_state.episode_nonce != mission.episode_nonce:
+            refutations.append("monitor state belongs to another episode")
         if monitor_state.phase != contract.phase_before:
             refutations.append("monitor is no longer in the contract source phase")
         if proposal.proposal_index != authorization.proposal_index:
@@ -1818,6 +1853,16 @@ class CTDAChecker:
                 state,
                 issues=("runtime proposal index does not advance the monitor",),
             )
+        if (
+            state.last_event_timestamp_ns >= 0
+            and record.event_trace.events
+            and record.event_trace.events[0].timestamp_ns <= state.last_event_timestamp_ns
+        ):
+            return MonitorCheckResult(
+                MonitorVerdict.INCONSISTENT,
+                state,
+                issues=("runtime event trace does not strictly extend monitor history",),
+            )
         new_state = advance_monitor_state(
             contract, state, record.event_trace, record.candidate.proposal.proposal_index
         )
@@ -2113,50 +2158,56 @@ def mission_from_legacy(
     spec_id: str,
     episode_nonce: str,
 ) -> MissionSpec:
-    """Build a frozen compatibility mission from the current prototype models.
+    """Compile the frozen Pick/Place task-template slice used by paper CTDA.
 
-    This adapter intentionally uses a small deterministic automaton.  Production
-    missions should come from the authenticated task manifest/BDDL compiler rather
-    than from natural language alone.
+    ``intent`` must already have been produced from the benchmark-owned trusted
+    instruction.  Policy-facing prompts and policy symbolic metadata must never be
+    passed to this compiler.  The function is deliberately *not* a general natural
+    language or BDDL compiler: unsupported verbs, ambiguous grasp parts, and missing
+    registry entries fail closed.
     """
 
     verb = str(getattr(intent, "verb", "")).lower()
     target = getattr(intent, "target_object", None)
-    if verb == "pick":
-        phases = ("approach", "holding")
-        transitions = (
-            TaskTransition("approach", "MoveTo", "approach"),
-            TaskTransition("approach", "Pick", "holding"),
-        )
-        initial_phase = "holding" if getattr(state, "gripper_holding", None) == target else "approach"
-    elif verb == "place":
-        phases = ("approach", "holding", "transport", "released")
-        transitions = (
-            TaskTransition("approach", "MoveTo", "approach"),
-            TaskTransition("approach", "Pick", "holding"),
-            TaskTransition("holding", "MoveTo", "transport"),
-            TaskTransition("holding", "Place", "released"),
-            TaskTransition("transport", "MoveTo", "transport"),
-            TaskTransition("transport", "Place", "released"),
-        )
-        initial_phase = "holding" if getattr(state, "gripper_holding", None) == target else "approach"
-    elif verb in {"move", "move_to"}:
-        phases = ("transport", "at_target")
-        transitions = (
-            TaskTransition("transport", "MoveTo", "at_target"),
-            TaskTransition("transport", "Place", "at_target"),
-        )
-        initial_phase = "transport"
-    else:
-        phases = ("active", "complete")
-        transitions = tuple(
-            TaskTransition("active", skill, "complete")
-            for skill in ("Pick", "Place", "MoveTo", "Avoid", "Stop", "Reject")
-        )
-        initial_phase = "active"
-
     objects = getattr(state, "objects", {})
     regions = getattr(state, "regions", {})
+    if target is None or target not in objects:
+        raise ValueError("trusted Pick/Place template target is absent from the frozen registry")
+
+    requested_part = getattr(intent, "target_part", None)
+    target_parts = getattr(objects[target], "parts", {})
+    safe_target_parts = tuple(
+        sorted(
+            str(part_name)
+            for part_name, part in target_parts.items()
+            if getattr(part, "safe_to_grasp", False)
+            and not getattr(part, "dangerous", False)
+        )
+    )
+    if requested_part is None:
+        if len(safe_target_parts) != 1:
+            raise ValueError("trusted Pick/Place template has an ambiguous safe grasp part")
+        requested_part = safe_target_parts[0]
+    elif requested_part not in safe_target_parts:
+        raise ValueError("trusted Pick/Place template names a non-safe grasp part")
+
+    region = getattr(intent, "target_region", None)
+    if verb == "pick":
+        phases = ("approach", "holding")
+        transitions = (TaskTransition("approach", "Pick", "holding"),)
+        initial_phase = "holding" if getattr(state, "gripper_holding", None) == target else "approach"
+    elif verb == "place":
+        if region is None or region not in regions:
+            raise ValueError("trusted Place template region is absent from the frozen registry")
+        phases = ("approach", "holding", "released")
+        transitions = (
+            TaskTransition("approach", "Pick", "holding"),
+            TaskTransition("holding", "Place", "released"),
+        )
+        initial_phase = "holding" if getattr(state, "gripper_holding", None) == target else "approach"
+    else:
+        raise ValueError(f"unsupported trusted task template verb: {verb or '<missing>'}")
+
     safe_parts: list[tuple[str, str]] = []
     for object_id, obj in objects.items():
         for part_name, part in getattr(obj, "parts", {}).items():
@@ -2179,22 +2230,15 @@ def mission_from_legacy(
     goal_payload = {
         "verb": verb,
         "target_object": target,
-        "target_part": getattr(intent, "target_part", None),
-        "target_region": getattr(intent, "target_region", None),
+        "target_part": requested_part,
+        "target_region": region,
     }
-    region = getattr(intent, "target_region", None)
     if verb == "pick":
         goal_atoms = (f"holding:{target}",)
         goal_phases = ("holding",)
     elif verb == "place":
         goal_atoms = (f"released:{target}", f"in_region:{target}:{region}")
         goal_phases = ("released",)
-    elif verb in {"move", "move_to"}:
-        goal_atoms = (f"progress:{target}:{region}",)
-        goal_phases = ("at_target",)
-    else:
-        goal_atoms = ("rejected",)
-        goal_phases = ("complete",)
 
     phase_obligations: list[PhaseObligation] = []
     for index, transition in enumerate(transitions):
@@ -2215,12 +2259,8 @@ def mission_from_legacy(
                 destination_phase=transition.destination_phase,
                 guarantees=guarantees,
                 target=(target if transition.skill in {"Pick", "Place", "MoveTo"} else None),
-                part=(
-                    getattr(intent, "target_part", None)
-                    if transition.skill == "Pick"
-                    else None
-                ),
-                region=(region if transition.skill in {"Place", "MoveTo"} else None),
+                part=(requested_part if transition.skill == "Pick" else None),
+                region=(region if transition.skill == "Place" else None),
                 completes_goal=set(goal_atoms).issubset(guarantees),
             )
         )
@@ -2264,7 +2304,7 @@ def contract_from_legacy_action(
     deadline_ns: int,
     fallback_id: str = "hold",
 ) -> SemanticSkillContract:
-    """Bind an existing symbolic ``Action`` to one mission-automaton transition."""
+    """Legacy compatibility adapter; paper CTDA uses ``contract_from_mission_phase``."""
 
     kind = getattr(action, "kind", None)
     skill = str(getattr(kind, "value", kind))
@@ -2307,6 +2347,73 @@ def contract_from_legacy_action(
         must_preserve=mission.default_must_preserve,
         fallback_id=fallback_id,
         advances_obligations=tuple(item.obligation_id for item in obligations),
+    )
+
+
+def contract_from_mission_phase(
+    mission: MissionSpec,
+    *,
+    current_phase: str,
+    issued_at_ns: int,
+    deadline_ns: int,
+    fallback_id: str = "hold",
+) -> SemanticSkillContract:
+    """Provide the unique active contract from frozen residual obligations.
+
+    No policy prompt, symbolic proposal, producer-supplied contract id, or expected
+    effect is an input.  Approach and transport remain raw prefixes inside the
+    persistent Pick/Place macro-contract.
+    """
+
+    obligations = tuple(
+        item for item in mission.phase_obligations if item.source_phase == current_phase
+    )
+    if not obligations:
+        raise ValueError(f"mission phase {current_phase} has no residual obligation")
+    transitions = {
+        (item.skill, item.destination_phase) for item in obligations
+    }
+    if len(transitions) != 1:
+        raise ValueError(f"mission phase {current_phase} has ambiguous residual obligations")
+    skill, destination_phase = next(iter(transitions))
+    targets = {item.target for item in obligations}
+    parts = {item.part for item in obligations}
+    regions = {item.region for item in obligations}
+    if len(targets) != 1 or len(parts) != 1 or len(regions) != 1:
+        raise ValueError(f"mission phase {current_phase} has ambiguous contract bindings")
+    target = next(iter(targets))
+    part = next(iter(parts))
+    region = next(iter(regions))
+    obligation_ids = tuple(sorted(item.obligation_id for item in obligations))
+    contract_id = digest_payload(
+        {
+            "provider": "mission-rooted-pick-place-v1",
+            "spec_digest": mission.spec_digest,
+            "episode_nonce": mission.episode_nonce,
+            "phase": current_phase,
+            "obligations": obligation_ids,
+        }
+    )
+    guarantees = tuple(
+        sorted({atom for obligation in obligations for atom in obligation.guarantees})
+    )
+    return SemanticSkillContract(
+        contract_id=contract_id,
+        spec_id=mission.spec_id,
+        spec_digest=mission.spec_digest,
+        phase_before=current_phase,
+        expected_next_phase=destination_phase,
+        skill=skill,
+        issued_at_ns=issued_at_ns,
+        deadline_ns=deadline_ns,
+        target=target,
+        part=part,
+        region=region,
+        guarantees=guarantees,
+        may_modify=(target,) if target is not None else (),
+        must_preserve=mission.default_must_preserve,
+        fallback_id=fallback_id,
+        advances_obligations=obligation_ids,
     )
 
 
@@ -2389,6 +2496,7 @@ __all__ = [
     "bind_mission_authority",
     "canonical_json",
     "contract_from_legacy_action",
+    "contract_from_mission_phase",
     "digest_legacy_action",
     "digest_legacy_state",
     "digest_payload",

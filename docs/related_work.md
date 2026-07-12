@@ -1,158 +1,157 @@
-# Related Work
+# Related Work：双层执行完整性的定位
 
-## 位置概述
+> 本文只用于研究定位，不是实现状态、CLI 或执行计划的事实来源。当前方法和 claim 以
+> [`method.md`](method.md) 为准。
 
-本项目位于 VLA 安全执行、LLM/VLM 机器人规划、形式化方法、proof-carrying planning 与运行时监控的交叉处。我们的 novelty 不是“第一个把 formal methods 用到机器人安全”，也不是“第一个检查机器人计划安全”。更准确地说，我们提出：
+## 定位原则
 
-> 将 safe VLA execution 表述为双层 machine-checkable alignment：动作执行前必须对齐初始人类意图，动作执行后必须对齐其承诺的实际效果。
+ProofAlign 不以“首次将形式化方法用于机器人”“首次做运行时监控”或“首次用 Lean 检查
+VLA”为新意。已有工作分别覆盖了安全任务 gate、时序 monitor、proof-carrying planning、
+runtime assurance、连续 safety filter、软件/轨迹 attestation 和 VLA attack。
 
-这一定位使我们与计划级验证、collision checking、LLM verifier、training-time safety alignment 和 proof-carrying plans 区分开。
+CTDA 的候选新意是把这些问题收束成 VLA 控制链上的两个不可互相推出的完整性关系：
 
-## SENTINEL: multi-level formal safety evaluation
+```text
+Mission Authorization Integrity:
+  trusted, locally frozen mission + active phase
+    -> persistent semantic macro-contract
 
-SENTINEL 提出面向 LLM-based embodied agents 的多层形式化安全评测框架，覆盖 semantic、plan 和 trajectory levels，并用 temporal logic 表达安全需求。它的重要启发是：机器人安全不应只靠启发式规则或 LLM 自我判断，而应将自然语言安全需求落到形式语义和可验证结构上。
+Execution / Effect Realization Integrity:
+  contract -> proposal -> authorized command -> executed command -> observed trace
+```
 
-与 SENTINEL 的区别：
+它关注的是从自然语言授权根到连续动作前缀的端到端绑定、complete mediation 和跨 action
+chunk 的时序连续性。Lean 是实现离散 checker 的手段，不单独构成 novelty。
 
-- SENTINEL 更偏 evaluation framework，关注多层安全评估。
-- 我们关注 VLA runtime execution，每个 action chunk 都经过执行前和执行后 checking。
-- SENTINEL 的多层结构是 semantic / plan / trajectory；我们的核心结构是 intent-action / action-effect 两种 alignment relation。
-- 我们使用 Lean 作为 proof checker，强调 proof-carrying contract 和 trusted checking boundary。
+## 1. VLA safety benchmark 与攻击
 
-## SafeGate / Task Safety Contracts
+LIBERO-Safety、HazardArena、ForesightSafety-VLA 等工作说明 task success 无法覆盖碰撞、危险
+affordance、语义约束和过程级风险。SABER 进一步把 instruction channel 作为攻击面，目标包括
+task failure、action inflation 和 constraint violation。
 
-SafeGate 与 Task Safety Contracts 关注 LLM-controlled robot systems 的 pre-execution safety gate 和运行时 contract。它们将自然语言任务转化为 invariants、guards 和 abort conditions，并可使用 SMT solver 执行约束检查。
+这些工作为 CTDA 提供 threat workload，但不自动给出 runtime authorization mechanism。
+ProofAlign 的攻击线独立生成并保存 attack artifact；防御线使用同一 task/init/seed/proposal
+做 paired replay 和 online evaluation。攻击成功率是威胁证据，不等于防御效果。
 
-与 SafeGate 的区别：
+CTDA 与 training-time safety alignment 的区别是：它不要求重新训练或验证 VLA，而把 VLA
+视为非可信 proposal producer。即使攻击后的 prompt 和 proposal 内部一致，它们仍必须对齐
+冻结的 mission root。
 
-- SafeGate 重点是阻止 unsafe / defective commands 进入执行，并通过 task safety contracts 约束状态转移。
-- 我们的入口不是只有 task command，而是 VLA 在闭环中不断生成的 action chunk。
-- 我们显式区分 `IntentAlign` 和 `EffectAlign`：前者防止语义漂移和错误 affordance，后者审计实际执行效果。
-- 我们选择 Lean proof checking，而不是把约束主要表达为 SMT 问题；Lean 更适合表达 rich typed symbolic domains、证明结构和可组合规格。
+## 2. Semantic gate、task contract 与 temporal monitor
 
-## SafePlan
+[SafeGate / Task Safety Contracts](https://arxiv.org/abs/2604.05427) 在 LLM-controlled robot
+systems 中结合 pre-execution gate、invariants、guards、abort conditions 和运行时 contract。
+RoboGuard、SafePlan、Plug in the Safety Chip、Code-as-Monitor、VASO 和 SafeManip 等方向分别
+探索了神经/符号 guard、formal task planning、LTL/时序约束、generated monitor 和 skill
+contract。
 
-SafePlan 将 formal logic 与 chain-of-thought reasoners 结合，用于提高 LLM-based robotic task planning 的安全性，检查 task prompts、plans 和 allocations 中的安全问题。
+这些工作使以下主张不再成立：
 
-与 SafePlan 的区别：
+- “首次在机器人任务执行前做语义安全检查”；
+- “首次在执行中和完成时使用 temporal monitor”；
+- “首次把任务表示成 formal contract”。
 
-- SafePlan 的核心对象是 LLM task planning 与 reasoning pipeline。
-- 我们面向 VLA execution，其中动作直接来自视觉-语言-动作策略，可能是 action chunk 而非离散自然语言计划。
-- SafePlan 使用 reasoner 辅助安全判断；我们把最终安全边界放在 Lean checker 上。
-- 我们强调执行后效果检查，因为 VLA 的物理执行可能偏离计划。
+CTDA 必须通过更窄的区别成立：
 
-## Plug in the Safety Chip
+1. policy-facing prompt 与 trusted mission root 分离；
+2. semantic contract 跨多个 VLA action chunks 持续存在；
+3. 第一层只决定合同是否被任务授权，不把物理可行性偷渡成语义结论；
+4. 第二层绑定 proposal、filter 后命令、actuator receipt 和 trace；
+5. 未取得 completion witness 时不得推进 task phase。
 
-Plug in the Safety Chip 提出为 LLM-driven robot agents 加入基于 temporal constraints 的安全模块，能够编码 prohibited actions、解释 violation，并进行 unsafe action pruning。
+因此 SafeGate/semantic monitor 是第一层和共享 monitor substrate 的强 baseline，而不是应被
+弱化的 strawman。
 
-与该工作的区别：
+## 3. Runtime assurance 与连续控制安全
 
-- Safety Chip 强调 LTL 约束和 action pruning。
-- 我们将 pruning 扩展成双层 contract：动作能否执行，以及执行后状态转移是否可接受。
-- 我们更关注 VLA 的语义-物理错配，例如抓错物体、错误 affordance、postcondition failure。
-- 我们把 collision / planner / perception 的输出作为 certificate，由 Lean 检查其与任务规范的一致性。
+[SOTER](https://doi.org/10.1109/DSN.2019.00027) 将 uncertified advanced controller、
+certified baseline controller 和 safety specification 组成 runtime-assurance module，并研究
+安全切换与模块组合。Simplex/RTA、ModelPlex、VeriPhy、CBF、predictive safety filter 和
+reachability 方法进一步覆盖 dynamics model、reachable set、barrier condition、sampling 与
+fallback。
 
-## FEARL
+这些工作比当前 CTDA prototype 的 simulator zero-hold 和 Boolean tube 声明提供更强的连续
+安全基础。CTDA 不应声称替代它们；第二层应把它们的 consumer-checkable witness 作为
+`PrefixPreCertified` 和 observed-prefix conformance 的证据。
 
-FEARL (Foundation-Enabled Assured Robot Learning) 通过模块化架构把大模型 controller 与小型 safety module 分离，使形式化验证集中在低维 safety module 上，而不是验证完整 foundation model。
+CTDA 的区别是把 continuous/RTA evidence 绑定到 VLA 的 semantic macro-contract 和任务阶段。
+即使一条 trajectory 对局部 dynamics 是安全的，如果它没有被 frozen mission 授权，第一层
+仍应拒绝；即使合同语义合法，如果 tube、command 或 trace 不一致，第二层仍应拒绝。
 
-与 FEARL 的区别：
+## 4. Proof-carrying plan 与 machine-checkable contract
 
-- FEARL 的重点是将可验证性放到小型 safety module，保留 foundation model 的表达能力。
-- 我们不验证一个 learned safety policy，而是验证每个 VLA action chunk 的 symbolic contract。
-- FEARL 更接近 policy architecture decomposition；我们更接近 runtime proof-carrying execution architecture。
-- 二者互补：FEARL 的 safety module 可以作为 certificate 生成者之一，Lean checker 则检查其输出是否满足任务级 contract。
+Proof-Carrying Plans、formal planning、resource logic 和 proof-producing solver 已经说明 plan
+可以携带 pre/post-condition proof，而不是只携带动作序列。CTDA 将对象从离散完整 plan 扩展
+为闭环 VLA proposal 与短 action prefix，并增加实际执行回执和 observed-trace audit。
 
-## Proof-Carrying Plans
+这里必须区分三种 evidence：
 
-Proof-Carrying Plans 将 AI plans 与证明结合，使用资源逻辑、Curry-Howard 风格和 proof-carrying structure 来验证计划的 pre/post conditions。它说明计划可以携带可检查证明，而不是只携带动作序列。
+- `binding metadata`：digest、id、version、timestamp，只证明对象身份和关联；
+- `trusted attestation`：由声明 TCB/密钥/隔离边界保证 producer 身份与软件状态；
+- `consumer-checkable witness`：checker 可以独立复核的 proof、tube、barrier 或 trace artifact。
 
-与 Proof-Carrying Plans 的区别：
+当前不少 CTDA evidence 仍属于前两类，不能统一写成 physical proof。更准确的当前表述是
+contract/evidence-carrying runtime；只有可复核 witness 覆盖相应 claim 后，才使用更强的
+proof-carrying 表述。
 
-- Proof-Carrying Plans 主要面向 classical planning / AI plans。
-- 我们面向 VLA 的闭环 action chunks，动作可能来自神经策略且执行环境动态变化。
-- 我们不仅要求 plan/action 携带 proof，还要求 execution result 被检查。
-- 我们的 EffectAlign 是对 proof-carrying planning 的运行时扩展：证明不只在执行前成立，还要与观察到的状态转移一致。
+## 5. Autonomous-system execution integrity 与 attestation
 
-## SayCan
+安全领域已有与 CTDA 非常接近的执行完整性工作：
 
-SayCan 将语言模型的 high-level knowledge 与机器人 affordance value functions 结合，强调“do as I can, not as I say”。它通过可执行技能的 affordance 分数 grounding LLM 计划。
+- [ARI, USENIX Security 2023](https://www.usenix.org/conference/usenixsecurity23/presentation/wang-jinwen)
+  定义 Real-time Mission Execution Integrity，关注自主 CPS 任务的正确、及时执行及其 attestation；
+- [DIAT, NDSS 2019](https://www.ndss-symposium.org/ndss-paper/diat-data-integrity-attestation-for-resilient-collaboration-of-autonomous-systems/)
+  关注自主系统中数据生成、处理和传输链的完整性证明；
+- [TAT, USENIX Security 2026](https://www.usenix.org/conference/usenixsecurity26/presentation/yao)
+  定义工业机械臂 trajectory integrity，并对实际运动轨迹做 attestation。
 
-与 SayCan 的区别：
+这些工作要求 ProofAlign 不能只把 digest equality 写成 security mechanism。若 threat model
+包含恶意 host、IPC、observer 或 actuator，必须引入签名/密钥、可信计数器、隔离 reference
+monitor 和 sensor/actuator attestation。
 
-- SayCan 解决语言计划与机器人能力之间的 grounding。
-- 我们解决 VLA 动作与安全规范、初始意图、实际效果之间的 formal alignment。
-- SayCan 的 affordance score 是选择动作的依据；我们的 affordance condition 是可检查的 safety obligation。
-- SayCan 不提供 machine-checked proof boundary；我们的 Lean checker 是 trusted runtime component。
+CTDA 相对这一方向最有潜力的区别是：现有 mission/trajectory attestation 主要从程序或预定
+轨迹出发，而 VLA 的授权根来自自然语言任务，proposal 在闭环中不断变化。CTDA 试图连接：
 
-## Inner Monologue
+```text
+authenticated natural-language/BDDL mission semantics
+  -> semantic phase authorization
+  -> exact low-level prefix authorization
+  -> executed command and observed effect integrity
+```
 
-Inner Monologue 研究 LLM 在 embodied planning 中如何利用环境反馈、成功检测、场景描述和人类交互形成闭环语言推理。
+要使这一差异成为安全贡献，论文必须明确定义攻击者、认证机制、TCB 和端到端安全属性，不能
+只依赖 `authenticated = true` 或可由攻击者重算的普通 hash。
 
-与 Inner Monologue 的区别：
+## 6. 最接近工作的差异矩阵
 
-- Inner Monologue 强调语言反馈提升闭环规划。
-- 我们强调形式化反馈约束执行安全。
-- Inner Monologue 的反馈可帮助重新规划；我们的 EffectAlign 会把执行后偏差转化为 formal violation report。
-- 两者可结合：violation report 可以成为 VLA / LLM planner 的 structured feedback。
+| 方向 | 已有能力 | CTDA 需要证明的增量 |
+|---|---|---|
+| SafeGate / semantic guard | unsafe command gate、task contracts、runtime constraints | prompt 与 frozen authority 分离；VLA prefix 与任务 phase 的持续绑定 |
+| Code-as-Monitor / SafeManip | execution/completion temporal monitoring | monitor artifact 不直接成为信任根；跨 proposal 的 persistent residual state |
+| VASO / formal skill contract | formal/planner-facing skill abstraction | proposal、authorized、executed、observed 四对象绑定 |
+| SOTER / Simplex RTA | uncertified/verified controller 切换与安全保证 | RTA witness 与 semantic contract、任务 phase 组合 |
+| CBF / predictive filter / reachability | 连续 prefix safety 或 recoverability | 局部物理安全不能替代 mission authorization |
+| ARI / DIAT / TAT | mission、data 或 trajectory integrity attestation | 从认证自然语言语义到动态 VLA proposal/effect 的端到端连接 |
+| Proof-carrying planning | plan 的 machine-checkable pre/post proof | 闭环 prefix、实际 receipt、observed trace 和 partial completion |
 
-## Code as Policies
+## 7. Novelty 与 claim 边界
 
-Code as Policies 使用 LLM 生成机器人 policy code，通过程序结构组合 perception APIs、控制 primitives 和空间几何计算。
+当前最稳健的 novelty statement 是：
 
-与 Code as Policies 的区别：
+> CTDA formulates VLA execution as two coupled integrity relations: every
+> persistent semantic contract must refine a trusted, locally frozen mission, and
+> every proposed, authorized, executed, and observed action prefix must remain
+> bound to that contract until a checked completion witness advances the task.
 
-- Code as Policies 把语言转化为可执行代码。
-- 我们把 VLA 动作转化为可检查 contract。
-- 生成的代码或 policy 可以成为动作生成器，但仍需要 IntentAlign 与 EffectAlign 检查其安全性。
-- 我们不依赖代码生成模型本身作为安全证明来源。
+论文不能把以下单独列为新意：双 checker、使用 Lean、执行前 gate、执行后 monitor、temporal
+logic 或 fallback。新意必须来自双层安全属性、端到端对象绑定、跨 chunk complete mediation，
+以及它们在攻击 workload 下的可验证增益。
 
-## ProgPrompt
+最终保证分三层报告：
 
-ProgPrompt 用程序化 prompt 结构生成 situated robot task plans，使 LLM 输出更受 available actions、objects 和 executable programs 约束。
+1. **协议保证**：没有两层授权不 dispatch，没有 completion witness 不推进 phase；
+2. **离散形式保证**：checker 的 `proven` 推出 typed proposition；
+3. **条件物理保证**：仅在 observer、dynamics、timing、actuator、abstraction 和 fallback
+   assumptions 成立时推出 prefix invariant preservation。
 
-与 ProgPrompt 的区别：
-
-- ProgPrompt 通过 prompt 结构改善计划生成。
-- 我们通过 Lean proof checking 验证 action chunk 是否满足 task intent 和 safety specification。
-- ProgPrompt 的约束主要影响生成分布；我们的约束是运行时 gate。
-- 对于 VLA，动作往往不是显式程序文本，因此我们需要 symbolic action abstraction。
-
-## 其他相关方向
-
-### Collision checking and motion planning
-
-运动规划与 collision checking 是机器人安全的基础。它们可以保证特定轨迹在给定几何模型下避开障碍物。然而它们通常不表达高层任务意图、语义危险、对象部件 affordance、禁止对象和 postcondition frame conditions。因此我们将其作为 certificate generator，而不是完整 verifier。
-
-### Runtime monitoring
-
-运行时监控可以检测人手进入、接触异常、力阈值、tracking loss 等事件。我们的 Execution Monitor 与 Lean checker 互补：monitor 提供事件和证据，Lean 检查这些事件是否导致 contract violation。
-
-### Safety benchmarks for VLA
-
-LIBERO-Safety、HazardArena 和 ForesightSafety-VLA 等 benchmark 说明 VLA 安全不能用单一 task success 捕捉。它们推动了对 physical safety、semantic safety、process-level risk 和 failure taxonomy 的关注。本项目使用 LIBERO-Safety 作为主要评测，并把 benchmark 中的安全约束转化为 Lean-checkable specification。
-
-## Novelty Summary
-
-已有工作已经探索了形式化评测、SMT/LTL safety gate、proof-carrying planning、LLM-based robot planning、affordance grounding 和 runtime monitoring。我们的新意在于组合方式和问题表述：
-
-1. **Dual alignment formulation**：safe VLA execution 被定义为 `IntentAlign ∧ EffectAlign`，分别约束动作生成前的语义忠实性和动作执行后的物理/语义效果。
-2. **Machine-checkable runtime contracts**：每个 action chunk 需要携带或引用 Lean 可检查的 contract，而不是只在 episode 结束后评测。
-3. **Persistent human intent**：初始指令被编译成持续约束，不允许 VLA 在闭环中语义漂移。
-4. **Effect auditing**：执行后的状态转移必须与动作承诺匹配，防止物理偏差和动态干扰被忽略。
-5. **Lean as trusted proof checker**：神经模型、planner、simulator 和 perception 可以生成候选与 certificate，但最终 contract checking 由 Lean 完成。
-
-## References
-
-- SENTINEL: A Multi-Level Formal Framework for Safety Evaluation of LLM-based Embodied Agents. https://arxiv.org/abs/2510.12985
-- LIBERO-Safety: A Comprehensive Benchmark for Physical and Semantic Safety in Vision-Language-Action Models. https://arxiv.org/abs/2606.23686
-- Pre-Execution Safety Gate & Task Safety Contracts for LLM-Controlled Robot Systems. https://arxiv.org/abs/2604.05427
-- SafePlan: Leveraging Formal Logic and Chain-of-Thought Reasoning for Enhanced Safety in LLM-based Robotic Task Planning. https://arxiv.org/abs/2503.06892
-- Plug in the Safety Chip: Enforcing Constraints for LLM-driven Robot Agents. https://arxiv.org/abs/2309.09919
-- FEARL / Verifiable Foundation Models for Robot Safety. https://arxiv.org/abs/2606.23754
-- Proof-Carrying Plans: a Resource Logic for AI Planning. https://arxiv.org/abs/2008.04165
-- SayCan / Do As I Can, Not As I Say: Grounding Language in Robotic Affordances. https://arxiv.org/abs/2204.01691
-- Inner Monologue: Embodied Reasoning through Planning with Language Models. https://arxiv.org/abs/2207.05608
-- Code as Policies: Language Model Programs for Embodied Control. https://arxiv.org/abs/2209.07753
-- ProgPrompt: Generating Situated Robot Task Plans using Large Language Models. https://arxiv.org/abs/2209.11302
-
+三者不能在摘要或实验表中合并成无条件“robot safety proof”。

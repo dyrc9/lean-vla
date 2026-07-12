@@ -552,6 +552,116 @@ def test_complete_record_checks_both_trace_domains_and_advances_phase() -> None:
     assert audited.verdict is MonitorVerdict.COMPLETE
 
 
+def test_monitor_completes_guarantees_split_across_prefixes() -> None:
+    mission = _mission()
+    contract = _contract(mission)
+    initial = ContractMonitorState.initial(mission, contract)
+    first_candidate, _ = _candidate(mission, contract, initial, proposal_index=0)
+    first_record = _record(
+        mission,
+        contract,
+        initial,
+        first_candidate,
+        events=(SymbolicEvent(20, "holding:mug", True, object_id="mug"),),
+        sample_timestamps=(15, 20),
+    )
+    first_checker = _checker(mission, first_candidate, first_record)
+
+    first = first_checker.monitor_step(
+        mission, contract, initial, first_record, now_ns=20
+    )
+
+    assert first.verdict is MonitorVerdict.SAFE_PENDING
+    assert tuple(event.atom for event in first.monitor_state.accepted_events) == (
+        "holding:mug",
+    )
+
+    second_candidate, _ = _candidate(
+        mission, contract, first.monitor_state, proposal_index=1
+    )
+    second_record = _record(
+        mission,
+        contract,
+        first.monitor_state,
+        second_candidate,
+        events=(SymbolicEvent(35, "phase:holding", True),),
+        sample_timestamps=(30, 35),
+    )
+    post_evidence = _post_evidence(second_record)
+    second_checker = _checker(
+        mission, second_candidate, second_record, post_evidence
+    )
+
+    second = second_checker.monitor_step(
+        mission,
+        contract,
+        first.monitor_state,
+        second_record,
+        evidence=post_evidence,
+        now_ns=35,
+    )
+
+    assert second.verdict is MonitorVerdict.COMPLETE
+    assert tuple(event.atom for event in second.monitor_state.accepted_events) == (
+        "holding:mug",
+        "phase:holding",
+    )
+    assert second.monitor_state.episode_nonce == mission.episode_nonce
+
+
+def test_monitor_rejects_cross_prefix_timestamp_rollback() -> None:
+    mission = _mission()
+    contract = _contract(mission)
+    initial = ContractMonitorState.initial(mission, contract)
+    first_candidate, _ = _candidate(mission, contract, initial, proposal_index=0)
+    first_record = _record(
+        mission,
+        contract,
+        initial,
+        first_candidate,
+        events=(SymbolicEvent(20, "holding:mug", True, object_id="mug"),),
+        sample_timestamps=(15, 20),
+    )
+    first = _checker(mission, first_candidate, first_record).monitor_step(
+        mission, contract, initial, first_record, now_ns=20
+    )
+    assert first.verdict is MonitorVerdict.SAFE_PENDING
+
+    second_candidate, _ = _candidate(
+        mission, contract, first.monitor_state, proposal_index=1
+    )
+    rollback_record = _record(
+        mission,
+        contract,
+        first.monitor_state,
+        second_candidate,
+        events=(SymbolicEvent(15, "phase:holding", True),),
+        sample_timestamps=(10, 15),
+    )
+    result = _checker(mission, second_candidate, rollback_record).monitor_step(
+        mission, contract, first.monitor_state, rollback_record, now_ns=15
+    )
+
+    assert result.verdict is MonitorVerdict.INCONSISTENT
+    assert any("strictly extend" in issue for issue in result.issues)
+
+
+def test_monitor_history_is_digest_bound() -> None:
+    mission = _mission()
+    contract = _contract(mission)
+    initial = ContractMonitorState.initial(mission, contract)
+    with_history = replace(
+        initial,
+        accepted_events=(SymbolicEvent(10, "holding:mug", True),),
+        last_event_timestamp_ns=10,
+    )
+
+    assert with_history.verify_integrity()
+    assert with_history.monitor_state_digest != initial.monitor_state_digest
+    erased_history = replace(with_history, accepted_events=())
+    assert not erased_history.history_is_well_formed()
+
+
 def test_trace_abstraction_tampering_is_refuted() -> None:
     mission = _mission()
     contract = _contract(mission)

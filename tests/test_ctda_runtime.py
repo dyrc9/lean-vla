@@ -175,6 +175,172 @@ def test_runtime_persists_pending_contract_across_policy_proposals(safe_state, s
     assert second.prepared.candidate.proposal.proposal_index == 1
 
 
+def test_paper_contract_and_verdict_ignore_policy_symbolic_metadata(
+    safe_state, safe_spec
+) -> None:
+    trusted = _session(safe_state, safe_spec, fallback_verified=True)
+    tampered = _session(safe_state, safe_spec, fallback_verified=True)
+    raw = ([0.1, 0.0, 0.0, -1.0],)
+    trusted_metadata = action_from_dict(
+        {"type": "Pick", "object": "mug", "part": "handle"}
+    )
+    adversarial_metadata = action_from_dict(
+        {"type": "Place", "object": "knife", "region": "attacker_region"}
+    )
+
+    first = trusted.prepare_prefix(
+        trusted_metadata, safe_state, raw, safe_spec, now_ns=1_000_000
+    )
+    second = tampered.prepare_prefix(
+        adversarial_metadata, safe_state, raw, safe_spec, now_ns=1_000_000
+    )
+
+    assert first.check.verdict is second.check.verdict is StaticVerdict.PROVEN
+    assert trusted.supervisor.mission.spec_digest == tampered.supervisor.mission.spec_digest
+    assert trusted.supervisor.active_contract is not None
+    assert tampered.supervisor.active_contract is not None
+    assert (
+        trusted.supervisor.active_contract.contract_digest
+        == tampered.supervisor.active_contract.contract_digest
+    )
+    assert first.prepared is not None and second.prepared is not None
+    assert (
+        first.prepared.candidate.proposal_contract_witness_digest
+        == second.prepared.candidate.proposal_contract_witness_digest
+    )
+
+
+def test_trusted_instruction_or_registry_change_invalidates_old_contract(
+    safe_state, safe_spec
+) -> None:
+    original = _session(safe_state, safe_spec, fallback_verified=True)
+    raw = ([0.1, 0.0, 0.0, -1.0],)
+    action = action_from_dict({"type": "Pick", "object": "mug", "part": "handle"})
+    prepared = original.prepare_prefix(
+        action, safe_state, raw, safe_spec, now_ns=1_000_000
+    )
+    assert prepared.prepared is not None
+    old_contract = original.supervisor.active_contract
+    assert old_contract is not None
+
+    changed_intent = replace(
+        parse_intent("pick up the mug by the handle"),
+        raw_instruction="trusted benchmark instruction revision",
+    )
+    revised = CTDARuntimeSession.from_legacy(
+        changed_intent,
+        safe_state,
+        safe_spec,
+        _authority(),
+        _time_base(),
+        spec_id="runtime-pick",
+        episode_nonce="runtime-pick-episode",
+        config=original.config,
+        evidence_issuer=ExactAllowlistEvidenceIssuer(),
+        now_ns=0,
+    )
+    changed_registry = safe_state.clone()
+    changed_registry.objects.pop("knife")
+    registry_revision = CTDARuntimeSession.from_legacy(
+        parse_intent("pick up the mug by the handle"),
+        changed_registry,
+        safe_spec,
+        _authority(),
+        _time_base(),
+        spec_id="runtime-pick",
+        episode_nonce="runtime-pick-episode",
+        config=original.config,
+        evidence_issuer=ExactAllowlistEvidenceIssuer(),
+        now_ns=0,
+    )
+
+    assert revised.supervisor.mission.spec_digest != original.supervisor.mission.spec_digest
+    assert (
+        registry_revision.supervisor.mission.spec_digest
+        != original.supervisor.mission.spec_digest
+    )
+    stale = revised.supervisor.checker.check_semantic_refinement(
+        revised.supervisor.mission,
+        revised.supervisor.active_phase,
+        old_contract,
+        now_ns=1_000_000,
+    )
+    assert stale.verdict is StaticVerdict.REFUTED
+
+
+@pytest.mark.parametrize(
+    ("mutate_state", "raw", "issue"),
+    [
+        (lambda state: state, ([-0.1, -0.1, 0.0, 0.0],), "moves away"),
+        (lambda state: state, ([0.1, 0.0, 0.0, 1.0],), "opens the gripper"),
+        (
+            lambda state: _state_holding(state, "knife"),
+            ([0.1, 0.0, 0.0, -1.0],),
+            "wrong held object",
+        ),
+    ],
+)
+def test_raw_binder_fails_closed_on_wrong_target_gripper_or_held_object(
+    safe_state, safe_spec, mutate_state, raw, issue
+) -> None:
+    state = mutate_state(safe_state.clone())
+    session = _session(safe_state, safe_spec, fallback_verified=True)
+    untrusted_metadata = action_from_dict(
+        {"type": "Pick", "object": "knife", "part": "blade"}
+    )
+
+    result = session.prepare_prefix(
+        untrusted_metadata, state, raw, safe_spec, now_ns=1_000_000
+    )
+
+    assert result.check.verdict is StaticVerdict.REFUTED
+    assert result.prepared is None
+    assert any(issue in item for item in result.check.issues)
+    assert session.proposal_index == 0
+    assert session.supervisor.active_phase == "approach"
+
+
+def test_raw_binder_rejects_release_outside_mission_region(
+    safe_state, safe_spec
+) -> None:
+    held = _state_holding(safe_state.clone(), "mug")
+    session = CTDARuntimeSession.from_legacy(
+        parse_intent("place the mug on the plate"),
+        held,
+        safe_spec,
+        _authority(),
+        _time_base(),
+        spec_id="runtime-place",
+        episode_nonce="runtime-place-episode",
+        config=ConditionalKinematicConfig(
+            fallback_verified=True,
+            fallback_witness_digest=digest_text("verified-hold"),
+            fallback_action=(0.0, 0.0, 0.0, 0.0),
+        ),
+        evidence_issuer=ExactAllowlistEvidenceIssuer(),
+        now_ns=0,
+    )
+
+    result = session.prepare_prefix(
+        action_from_dict({"type": "Place", "object": "knife", "region": "attacker"}),
+        held,
+        ([0.0, 0.0, 0.0, 1.0],),
+        safe_spec,
+        now_ns=1_000_000,
+    )
+
+    assert result.check.verdict is StaticVerdict.REFUTED
+    assert any("releases outside" in issue for issue in result.check.issues)
+    assert session.proposal_index == 0
+    assert session.supervisor.active_phase == "holding"
+
+
+def _state_holding(state, object_id: str):
+    state.gripper_holding = object_id
+    state.objects[object_id].held_by = "gripper"
+    return state
+
+
 def test_runtime_from_legacy_fails_closed_without_evidence_issuer(safe_state, safe_spec) -> None:
     intent = parse_intent("pick up the mug by the handle")
 

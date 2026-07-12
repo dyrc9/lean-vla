@@ -8,6 +8,7 @@ from scripts.run_libero_online_batch import (
     parse_args,
     parse_task_ids,
     summarize,
+    validate_batch_args,
 )
 
 
@@ -143,9 +144,11 @@ def test_summarize_counts_fallback_error_even_without_a_receipt():
     assert summary["ctda"]["fallback_error_count"] == 1
 
 
-def test_batch_disables_skip_existing() -> None:
-    with pytest.raises(ValueError, match="skip-existing is disabled"):
-        main(["--skip-existing"])
+def test_batch_disables_skip_existing_only_for_ctda() -> None:
+    with pytest.raises(ValueError, match="disabled in CTDA mode"):
+        validate_batch_args(parse_args(["--skip-existing", "--ctda"]))
+
+    validate_batch_args(parse_args(["--skip-existing"]))
 
 
 def test_load_episode_rejects_non_object_json(tmp_path) -> None:
