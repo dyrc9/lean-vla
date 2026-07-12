@@ -13,10 +13,11 @@ archive 中的内容。
 3. [`system_architecture.md`](system_architecture.md)：当前实现与目标闭环的模块对应。
 4. [`roadmap.md`](roadmap.md)：唯一执行优先级、阶段 gate 和停止条件。
 5. [`experiments.md`](experiments.md)：最小配对实验、指标和 artifact 规则。
-6. [`implementation_notes.md`](implementation_notes.md)：本地 CPU/Lean 开发与验证约定。
-7. [`remote_execution.md`](remote_execution.md)：迁移到远程 GPU 后的环境、路径和运行协议。
-8. [`paper_story.md`](paper_story.md)：收缩后的论文叙事和可写贡献。
-9. [`related_work.md`](related_work.md)：研究定位；不作为实现状态或 CLI 来源。
+6. [`reproduction_plan.md`](reproduction_plan.md)：发布攻击、现有防御与 CTDA 的复现证据链。
+7. [`implementation_notes.md`](implementation_notes.md)：本地 CPU/Lean 开发与验证约定。
+8. [`remote_execution.md`](remote_execution.md)：迁移到远程 GPU 后的环境、路径和运行协议。
+9. [`paper_story.md`](paper_story.md)：收缩后的论文叙事和可写贡献。
+10. [`related_work.md`](related_work.md)：研究定位；不作为实现状态或 CLI 来源。
 
 ## 当前方法口径
 

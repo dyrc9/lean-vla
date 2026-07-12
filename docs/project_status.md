@@ -33,26 +33,29 @@ clean/Lean slow-interlock 单 episode smoke 入口已在本地完成；内网 GP
 
 ## 尚未闭合
 
-1. 当前 Lean evaluator 为每个 request 生成并编译 replay source。一次本地 shadow 的 Lean p99
+1. SABER、Phantom Menace、SAFE 和 FIPER 的官方 pipeline 尚未在远程 GPU 环境复现；当前
+   `reproduction_targets.json` 均为 `planned`，不能写成已有攻击/防御结果。
+2. 当前 Lean evaluator 为每个 request 生成并编译 replay source。一次本地 shadow 的 Lean p99
    为 semantic 1.954 s、prefix 0.657 s、observed 0.646 s、monitor 0.666 s，明显超过 20 Hz
    control period；当前只能主张 slow online interlock/offline audit，不能主张 real-time。
-2. 远程 GPU 上尚未用 pi0.5/OpenPI + LIBERO-Safety 验证 clean retention、unknown/deadlock 和
+3. 远程 GPU 上尚未用 pi0.5/OpenPI + LIBERO-Safety 验证 clean retention、unknown/deadlock 和
    evaluator tax。
-3. 旧 notes 中的 60-episode baseline、12-episode Dual Lean、SABER 和 EDPA 结果没有完整 raw
+4. 旧 notes 中的 60-episode baseline、12-episode Dual Lean、SABER 和 EDPA 结果没有完整 raw
    artifact 保存在当前 checkout，不能仅凭叙述重建主表。
-4. 当前本地旧 heuristic artifact 出现极高 false rejection，且 synthetic golden corpus 没有独立
+5. 当前本地旧 heuristic artifact 出现极高 false rejection，且 synthetic golden corpus 没有独立
    ground truth，说明 clean abstraction/calibration gate 尚未通过。
-5. 当前 simulator receipt、运动学界和 zero-hold 只能支持带假设的 simulator trace 结论，不能
+6. 当前 simulator receipt、运动学界和 zero-hold 只能支持带假设的 simulator trace 结论，不能
    支持硬件、连续动力学或 verified recovery claim。
 
 ## 当前唯一优先级
 
-1. 把本地代码、fixture 和 replay protocol 迁移到远程环境，先复跑 CPU/Lean preflight；
-2. 只运行 clean single-episode shadow/slow-interlock smoke，记录真实 OpenPI/LIBERO latency 与
+1. 按 [`reproduction_plan.md`](reproduction_plan.md) 先复现 SABER、Phantom Menace、SAFE 和
+   FIPER 的官方 pipeline，冻结 upstream commit/command/artifact；
+2. 补 observation-attack、OpenPI feature/multi-sample、SAFE/FIPER alarm adapter；
+3. 把本地代码、fixture 和 replay protocol 迁移到远程环境，复跑 CPU/Lean preflight；
+4. 只运行 clean single-episode shadow/slow-interlock smoke，记录真实 OpenPI/LIBERO latency 与
    false-block 信号；
-3. 若 p99 仍超过 control deadline，将 Lean path 固定为 offline audit，不能用放宽授权窗口冒充
-   real-time enforcement；
-4. calibration gate 通过后才启动最小 paired GPU pilot。
+5. calibration 与 published-workload gate 通过后才启动最小 paired GPU pilot。
 
 ## 当前可写与不可写
 

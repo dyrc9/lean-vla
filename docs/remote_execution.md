@@ -24,6 +24,11 @@ gate。
 /home/ldx/lean-vla/external/LIBERO-Safety # benchmark checkout
 /home/ldx/lean-vla/external/openpi        # OpenPI checkout
 /home/ldx/lean-vla/external/SABER         # attack checkout
+/home/ldx/lean-vla/external/Phantom-Menace
+/home/ldx/lean-vla/external/EDPA_attack_defense
+/home/ldx/lean-vla/external/SAFE
+/home/ldx/lean-vla/external/fiper
+/home/ldx/lean-vla/external/RoboGuard
 
 /data0/ldx/libero_safety_models/pi05_libero_safety
 /data0/ldx/libero_safety_assets/assets
@@ -45,6 +50,11 @@ checkout/assets。
 - `external/openpi`
 - `external/LIBERO-Safety`
 - `external/SABER`
+- `external/Phantom-Menace`
+- `external/EDPA_attack_defense`
+- `external/SAFE`
+- `external/fiper`
+- `external/RoboGuard`
 - `results/`
 - attack-record JSON/JSONL
 - `/data0/ldx/libero_safety_models/pi05_libero_safety`
@@ -59,6 +69,11 @@ git status --short
 git -C external/openpi rev-parse HEAD
 git -C external/LIBERO-Safety rev-parse HEAD
 git -C external/SABER rev-parse HEAD
+git -C external/Phantom-Menace rev-parse HEAD
+git -C external/EDPA_attack_defense rev-parse HEAD
+git -C external/SAFE rev-parse HEAD
+git -C external/fiper rev-parse HEAD
+git -C external/RoboGuard rev-parse HEAD
 ```
 
 还应记录但目前旧文档没有完整保存：
@@ -430,10 +445,30 @@ pgrep -af 'eval_attack_vla.py|VLLM::EngineCore|model-service'
 
 不要杀其他用户进程。
 
+## 10.1 其他发布工作准备顺序
+
+外部仓库 clone、commit freeze 和官方 R0 reproduction 按
+[`reproduction_plan.md`](reproduction_plan.md) 执行：
+
+1. Phantom Menace：先在其 standard-LIBERO/OpenPI runner 复现 clean 与一个 camera attack，再将
+   `sensor_attacks/` 封装成 ProofAlign observation-transform plugin；
+2. SAFE：先用官方 rollout schema 跑通 π0 detector，再确认当前 π0.5 OpenPI 的 feature hook；
+3. FIPER：先用官方数据复现 RND/ACE + conformal pipeline，再接 π0.5 multi-sample audit output；
+4. EDPA：先在官方 π0/standard-LIBERO 生成 patch；OpenVLA-only adversarial training 单独记账；
+5. RoboGuard：只做 semantic graph/plan adapter spike，不阻塞 P0 主表。
+
+每个 checkout 使用独立环境；不要把它们的 torch/JAX/Spot/LLM 依赖强装进 ProofAlign root env。
+机器可读 target 清单为 `experiments/reproduction_targets.json`。clone 后立刻把 exact commit、license、
+checkpoint 和 patch digest 写入 run manifest；在完成官方 reproduction 前不要改 upstream attack 或
+defense 算法。
+
 ## 11. EDPA 状态
 
-当前仓库没有 EDPA checkout、checkpoint、安装命令或可重放 artifact。不要根据旧 related-work
-引用臆造远程配置。EDPA 已从当前执行路线暂缓。
+当前仓库仍没有 EDPA checkout、checkpoint 或可重放 artifact，因此尚未复现。EDPA 现在是 P1：
+先按官方仓库在 π0/standard-LIBERO 上完成最小 patch reproduction，再考虑固定 patch 对 π0.5 的
+cross-model transfer。官方 adversarial fine-tuning 当前只支持 OpenVLA，必须放在 secondary
+training-defense table，不能与 primary π0.5 主表混排。P0 SABER/Phantom/SAFE/FIPER 未闭合前，
+不启动 EDPA paper-scale matrix。
 
 ## 12. 远程结果回传
 

@@ -187,12 +187,20 @@ Lean slow-interlock 单 episode smoke 已脚本化；仍需在能访问内网 GP
 远程先做 clean single-episode shadow/slow-interlock smoke；不得直接启动主表。
 环境见 [`remote_execution.md`](remote_execution.md)。
 
+在 60-episode pilot 前增加 upstream reproduction gate，详见
+[`reproduction_plan.md`](reproduction_plan.md)：
+
+1. standard LIBERO 上复现 SABER π0.5 clean + record/replay；
+2. standard LIBERO 上复现 Phantom Menace OpenPI clean + camera transform；
+3. 复现 SAFE/FIPER 官方 detector pipeline，冻结需要的 rollout/feature schema；
+4. 上游通过后才开发 LIBERO-Safety exact-task workload 与 π0.5 defense adapter。
+
 ### Workload
 
 - clean pi0.5/OpenPI + LIBERO-Safety；
-- 一个发布 instruction attack family：优先 Phantom Voice；SABER 只在能映射相同
-  LIBERO-Safety task 时进入主配对；
-- 一个发布 camera attack family：Phantom Menace；UPA-RFAS 只作后续 transfer baseline。
+- 一个发布 instruction attack family：SABER `constraint_violation` 优先；
+- 一个发布 camera attack family：Phantom Menace deterministic transform；
+- EDPA 只作后续 patch transfer 和训练型 secondary track。
 
 不在本项目中优化攻击，不按攻击调整 CTDA 阈值。
 
@@ -213,10 +221,13 @@ Lean slow-interlock 单 episode smoke 已脚本化；仍需在能访问内网 GP
 固定方法：
 
 1. VLA only；
-2. collision/safety checker；
-3. Mission layer only；
-4. Trace/effect layer only；
+2. privileged collision/cost checker；
+3. SAFE；
+4. FIPER；
 5. Full CTDA。
+
+Mission-only 与 trace-only 放在独立 CTDA ablation 表。RoboGuard 通过 plan-interface gate 后加入
+semantic comparison；EDPA/Phantom training defense 在其官方 victim 上单独成表。
 
 固定 workload：clean、一个 instruction family、一个 camera family。
 

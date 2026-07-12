@@ -42,6 +42,7 @@ Start at [docs/README.md](docs/README.md). The canonical documents are:
 - [Current and target architecture](docs/system_architecture.md)
 - [Execution roadmap](docs/roadmap.md)
 - [Experiment protocol](docs/experiments.md)
+- [Attack/defense reproduction plan](docs/reproduction_plan.md)
 - [Implementation notes](docs/implementation_notes.md)
 - [Remote/GPU execution runbook](docs/remote_execution.md)
 - [Paper story](docs/paper_story.md)
