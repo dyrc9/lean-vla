@@ -1,0 +1,58 @@
+{
+  "args": {
+    "suites": [
+      "affordance"
+    ],
+    "task_ids": "2",
+    "init_state_id": 0,
+    "init_state_ids": "0",
+    "max_steps": 5,
+    "max_chunk_steps": 5,
+    "continue_on_replan": true,
+    "ctda": true,
+    "ctda_fallback_witness": "/home/ldx/lean-vla/results/runtime_config/ctda_fallback_affordance_task2_init0.json",
+    "ctda_fallback_witness_sha256": "e6fcb1ed7233a5ad9ad24fe384b10f414ba256452c5dbec7f190ebe8a12ac14e",
+    "ctda_evidence_mode": "local-simulator-exact-allowlist",
+    "ctda_episode_nonce": null,
+    "ctda_evaluator": "ctda-lean-kernel",
+    "ctda_artifact_dir": "/home/ldx/lean-vla/results/remote_gpu_smoke_20260713/ctda_kernel_artifacts",
+    "ctda_lean_timeout_seconds": 10.0,
+    "output_dir": "/home/ldx/lean-vla/results/remote_gpu_smoke_20260713/ctda_lean",
+    "method_name": "openvla_oft_dual",
+    "summary": "/home/ldx/lean-vla/results/remote_gpu_smoke_20260713/ctda_lean_summary.json",
+    "failure_jsonl": "/home/ldx/lean-vla/results/remote_gpu_smoke_20260713/ctda_lean_failures.jsonl",
+    "skip_existing": false,
+    "policy": "experiments.libero_openpi_plugin:create_policy",
+    "policy_config": "{\"checkpoint_dir\":\"/data0/ldx/libero_safety_models/pi05_libero_safety\",\"openpi_root\":\"/home/ldx/lean-vla/external/openpi\",\"max_actions_per_call\":5}",
+    "abstractor": "experiments.libero_vla_plugin:create_abstractor",
+    "abstractor_config": null,
+    "action_file": null,
+    "attack_record": null,
+    "safety_spec": null,
+    "warmup_steps": 0,
+    "warmup_gripper": 0.0,
+    "seed": 7,
+    "camera_height": 256,
+    "camera_width": 256,
+    "camera_names": "agentview,robot0_eye_in_hand",
+    "render_gpu_device_id": 5,
+    "control_freq": 20,
+    "horizon": 1000,
+    "action_dim": 7
+  },
+  "tasks": [
+    {
+      "suite": "affordance",
+      "task_id": 2,
+      "init_state_id": 0
+    }
+  ],
+  "environment": {
+    "LIBERO_SAFETY_ROOT": "/home/ldx/lean-vla/external/LIBERO-Safety",
+    "HF_ENDPOINT": "https://hf-mirror.com",
+    "HF_HOME": "/data0/ldx/huggingface",
+    "CUDA_VISIBLE_DEVICES": "4,5",
+    "MUJOCO_EGL_DEVICE_ID": "5",
+    "PYTHONPATH": "/home/ldx/lean-vla:/home/ldx/lean-vla/src:/home/ldx/lean-vla/external/LIBERO-Safety:/home/ldx/lean-vla/external/openpi/src:/home/ldx/lean-vla/external/openpi/packages/openpi-client/src"
+  }
+}

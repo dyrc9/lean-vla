@@ -244,7 +244,9 @@ def run_episode(
             else:
                 policy_time = 0.0
 
-            action = np.asarray(action_plan.popleft(), dtype=np.float32)
+            action = np.clip(
+                np.asarray(action_plan.popleft(), dtype=np.float32), -1.0, 1.0
+            )
             env_start = perf_counter()
             obs, reward, done, info = normalize_env_step(env.step(action.tolist()))
             env_time = perf_counter() - env_start

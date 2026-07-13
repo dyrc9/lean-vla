@@ -312,12 +312,27 @@ class LiberoStateObserver:
             return any(bool(value) for value in raw_cost.values()), True
         if raw_cost is not None:
             return bool(raw_cost), True
+        constraint_cost = self._constraint_cost(raw_env)
+        if constraint_cost is not None:
+            return any(bool(value) for value in constraint_cost.values()), True
         return False, False
 
     def _cost_observed(self, info: dict[str, Any], raw_env: Any) -> bool:
         if "cost" in info and info["cost"] is not None:
             return True
-        return hasattr(raw_env, "cost") and getattr(raw_env, "cost") is not None
+        if hasattr(raw_env, "cost") and getattr(raw_env, "cost") is not None:
+            return True
+        return self._constraint_cost(raw_env) is not None
+
+    def _constraint_cost(self, raw_env: Any) -> dict[str, Any] | None:
+        checker = getattr(raw_env, "_check_constraint", None)
+        if not callable(checker):
+            return None
+        try:
+            value = checker(False)
+        except Exception:
+            return None
+        return dict(value) if isinstance(value, dict) else None
 
 
 @dataclass
@@ -334,8 +349,8 @@ class ProofAlignLiberoWrapper:
     object_move_epsilon: float = 0.01
     progress_epsilon: float = 1e-4
     no_progress_patience: int = 3
-    gripper_close_threshold: float = -0.2
-    gripper_open_threshold: float = 0.2
+    gripper_close_threshold: float = 0.2
+    gripper_open_threshold: float = -0.2
     stop_on_replan: bool = True
     ctda_session: CTDARuntimeSession | None = None
 
@@ -557,14 +572,15 @@ class ProofAlignLiberoWrapper:
         ctda_dispatch_ns: int | None = None
         if self.ctda_session is not None:
             ctda_start = perf_counter()
-            observation_issues = _ctda_observation_issues(before)
+            observation_issues = _ctda_observation_issues(before, self.spec)
             if observation_issues:
                 static_result = StaticCheckResult.unknown(*observation_issues)
                 prepared = None
             else:
+                ctda_before = _ctda_state_for_spec(before, self.spec)
                 prepared_result = self.ctda_session.prepare_prefix(
                     symbolic_action,
-                    before,
+                    ctda_before,
                     tuple(env_actions[:1]),
                     self.spec,
                     now_ns=monotonic_ns(),
@@ -656,7 +672,7 @@ class ProofAlignLiberoWrapper:
             reward_total += float(reward)
             info = dict(step_info)
             after = self.state_observer.observe(self.env, observation, info)
-            ctda_states_after.append(after.clone())
+            ctda_states_after.append(_ctda_state_for_spec(after, self.spec))
             self._update_trace_summary(summary, before, previous, after, info, symbolic_action)
             summary.num_raw_steps = index + 1
             done = bool(done or done_step)
@@ -700,7 +716,7 @@ class ProofAlignLiberoWrapper:
             observation_issues = tuple(
                 issue
                 for state in ctda_states_after
-                for issue in _ctda_observation_issues(state)
+                for issue in _ctda_observation_issues(state, self.spec)
             )
             if observation_issues:
                 ctda_monitor_verdict = MonitorVerdict.UNKNOWN
@@ -1172,9 +1188,9 @@ class ProofAlignLiberoWrapper:
             return "cost"
         gripper = _last_scalar(env_action)
         if gripper is not None:
-            if previous.gripper_holding is None and gripper <= self.gripper_close_threshold:
+            if previous.gripper_holding is None and gripper >= self.gripper_close_threshold:
                 return "gripper_close"
-            if previous.gripper_holding is not None and gripper >= self.gripper_open_threshold:
+            if previous.gripper_holding is not None and gripper <= self.gripper_open_threshold:
                 return "gripper_open"
         if previous.gripper_holding is None and after.gripper_holding is not None:
             return "object_became_held"
@@ -1279,16 +1295,39 @@ def _only_postcondition_failures(result: CheckResult) -> bool:
     )
 
 
-def _ctda_observation_issues(state: WorldState) -> tuple[str, ...]:
-    missing = [
+def _ctda_observation_issues(state: WorldState, spec: SafetySpec) -> tuple[str, ...]:
+    missing = {
         note.removeprefix(_CTDA_UNKNOWN_OBSERVATION_PREFIX)
         for note in state.notes
         if note.startswith(_CTDA_UNKNOWN_OBSERVATION_PREFIX)
-    ]
+    }
+    required: set[str] = set()
+    protected = {str(item).lower() for item in spec.protected_objects}
+    if any("hand" in item for item in protected):
+        required.add("min_distance_to_human_hand")
+    if any("obstacle" in item for item in protected):
+        required.add("min_distance_to_obstacle")
+    if spec.require_no_collision:
+        required.update(("collision", "cost"))
     return tuple(
         f"missing trusted CTDA observation: {name}"
-        for name in dict.fromkeys(missing)
+        for name in sorted(missing & required)
     )
+
+
+def _ctda_state_for_spec(state: WorldState, spec: SafetySpec) -> WorldState:
+    relevant_missing = {
+        issue.removeprefix("missing trusted CTDA observation: ")
+        for issue in _ctda_observation_issues(state, spec)
+    }
+    result = state.clone()
+    result.notes = [
+        note
+        for note in result.notes
+        if not note.startswith(_CTDA_UNKNOWN_OBSERVATION_PREFIX)
+        or note.removeprefix(_CTDA_UNKNOWN_OBSERVATION_PREFIX) in relevant_missing
+    ]
+    return result
 
 
 def _frozen_action_copy(value: Any) -> Any:

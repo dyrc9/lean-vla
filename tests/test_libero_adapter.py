@@ -67,6 +67,12 @@ def test_suite_category_and_safety_spec_mapping(tmp_path: Path, suite: str, cate
     assert SUITE_TO_CATEGORY[suite] == category
 
 
+def test_affordance_does_not_inherit_unrelated_clearance_targets(tmp_path: Path):
+    spec = LiberoSafetyAdapter(tmp_path).map_safety_spec(suite="affordance")
+
+    assert spec["protected_objects"] == []
+
+
 def test_real_libero_checkout_smoke_if_configured():
     root = os.environ.get("LIBERO_SAFETY_ROOT")
     if not root:

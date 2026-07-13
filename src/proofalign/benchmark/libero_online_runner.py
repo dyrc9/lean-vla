@@ -30,6 +30,7 @@ from proofalign.ctda_runtime import (
     ConditionalKinematicConfig,
     CTDARuntimeSession,
     ExactAllowlistEvidenceIssuer,
+    RawProposalBinderConfig,
 )
 from proofalign.ctda_evaluator import (
     LeanKernelEvaluator,
@@ -108,7 +109,12 @@ def build_policy(args: argparse.Namespace) -> Callable[[str, Any, list[Execution
     if args.policy:
         factory = load_plugin(args.policy)
         if args.policy_config:
-            config = json.loads(Path(args.policy_config).read_text(encoding="utf-8"))
+            config_path = Path(args.policy_config)
+            config = (
+                json.loads(config_path.read_text(encoding="utf-8"))
+                if config_path.is_file()
+                else json.loads(args.policy_config)
+            )
             return factory(**config)
         return factory()
     return ZeroActionPolicy(action_dim=args.action_dim, symbolic_action=json.loads(args.zero_symbolic_action))
@@ -613,6 +619,18 @@ def _configure_ctda(
         )
     else:
         raise LiberoOnlineIntegrationError(f"unknown CTDA evaluator mode: {evaluator_mode}")
+    lean_timeout_seconds = float(getattr(args, "ctda_lean_timeout_seconds", 10.0))
+    slow_interlock = evaluator_mode == "ctda-lean-kernel"
+    authorization_slack_ns = (
+        max(control_period_ns, round(lean_timeout_seconds * 1_000_000_000))
+        if slow_interlock
+        else control_period_ns
+    )
+    contract_budget_ns = (
+        max(2_000_000_000, round(lean_timeout_seconds * 4 * 1_000_000_000))
+        if slow_interlock
+        else 2_000_000_000
+    )
     wrapper.ctda_session = CTDARuntimeSession.from_legacy(
         parse_intent(trusted_instruction),
         wrapper.current_state,
@@ -625,17 +643,28 @@ def _configure_ctda(
         now_ns=created_at,
         config=ConditionalKinematicConfig(
             control_period_ns=control_period_ns,
+            contract_budget_ns=contract_budget_ns,
+            authorization_slack_ns=authorization_slack_ns,
+            model_error_m=0.0001,
             fallback_id="hold",
             fallback_witness_digest=fallback_digest,
             fallback_verified=True,
             fallback_action=tuple(float(value) for value in fallback_manifest["fallback_action"]),
             semantic_evidence=evidence,
+            raw_binder=RawProposalBinderConfig(
+                version="mission-raw-binder-libero-panda-v2",
+                gripper_close_threshold=0.2,
+                gripper_open_threshold=-0.2,
+                close_direction=1,
+            ),
         ),
         evaluator=evaluator,
     )
     # Keep the validated artifact fields available for audit output without
     # treating the JSON declaration itself as a proof.
     setattr(wrapper.ctda_session, "fallback_manifest", fallback_manifest)
+    wrapper.gripper_close_threshold = 0.2
+    wrapper.gripper_open_threshold = -0.2
     setattr(
         wrapper.ctda_session,
         "assurance_scope",
@@ -664,6 +693,9 @@ def _configure_ctda(
         "initial_state_digest": digest_legacy_state(wrapper.current_state),
         "proof_verified": False,
         "evaluator_mode": evaluator_mode,
+        "slow_interlock": slow_interlock,
+        "contract_budget_ns": contract_budget_ns,
+        "authorization_slack_ns": authorization_slack_ns,
         "wire_artifact_dir": str(artifact_root),
         "checker_version_digest": evaluator.checker_version_digest,
     }
@@ -736,7 +768,15 @@ def _validate_ctda_fallback_manifest(
 
 
 def _environment_action_bounds(env: Any) -> tuple[tuple[float, ...], tuple[float, ...]]:
-    spec = getattr(env, "action_spec", None)
+    spec = None
+    current = env
+    visited: set[int] = set()
+    while current is not None and id(current) not in visited:
+        visited.add(id(current))
+        spec = getattr(current, "action_spec", None)
+        if spec is not None:
+            break
+        current = getattr(current, "env", None)
     if callable(spec):
         spec = spec()
     if not isinstance(spec, (tuple, list)) or len(spec) != 2:

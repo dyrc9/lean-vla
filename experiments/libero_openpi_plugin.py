@@ -75,6 +75,7 @@ class OpenPIPolicy:
                 "sample_steps": self.config.sample_steps,
                 "max_actions_per_call": self.config.max_actions_per_call,
                 "rng_reset_mode": "checkpoint-initial-per-episode",
+                "action_clip": [-1.0, 1.0],
             },
         }
 
@@ -166,8 +167,11 @@ def _normalize_action_chunk(actions: Any) -> list[list[float]]:
     if not actions:
         return []
     if all(isinstance(value, (int, float)) for value in actions):
-        return [[float(value) for value in actions]]
-    return [[float(value) for value in _flatten_numbers(action)] for action in actions]
+        return [[float(np.clip(value, -1.0, 1.0)) for value in actions]]
+    return [
+        [float(np.clip(value, -1.0, 1.0)) for value in _flatten_numbers(action)]
+        for action in actions
+    ]
 
 
 def _flatten_numbers(value: Any) -> list[float]:

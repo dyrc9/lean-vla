@@ -45,6 +45,7 @@ from proofalign.ctda import (
     semantic_witness_digest,
 )
 from proofalign.intent_parser import parse_intent
+from proofalign.models import Object, ObjectPart, Pose, Region, WorldState
 
 
 _VALID_UNTIL = 10**18
@@ -1224,3 +1225,41 @@ def test_legacy_models_compile_into_frozen_mission_and_contract(safe_state, safe
     assert contract.target == "mug"
     assert contract.guarantees == ("holding:mug",)
     assert contract.advances_obligations
+
+
+def test_legacy_mission_resolves_unique_libero_instance_and_directional_region(safe_spec) -> None:
+    state = WorldState(
+        objects={
+            "fork_1": Object(
+                "fork_1",
+                "fork",
+                Pose(0.1, 0.0, 0.0),
+                {
+                    "handle": ObjectPart("handle", safe_to_grasp=True),
+                    "tines": ObjectPart("tines", safe_to_grasp=False, dangerous=True),
+                },
+            ),
+            "plate_1": Object("plate_1", "plate", Pose(0.2, 0.0, 0.0), {"body": ObjectPart("body")}),
+        },
+        regions={
+            "main_table_plate_region": Region("main_table_plate_region", Pose(0.2, 0.0, 0.0)),
+            "main_table_plate_right_region": Region("main_table_plate_right_region", Pose(0.3, 0.0, 0.0)),
+        },
+    )
+
+    mission = mission_from_legacy(
+        parse_intent("pick up the fork and place it on the right of the plate"),
+        state,
+        safe_spec,
+        AuthorityEnvelope("test-authority", "fixture", "1", "unsigned"),
+        TimeBase("test-clock", 10, 1, 1, 1),
+        spec_id="libero-affordance",
+        episode_nonce="episode-1",
+    )
+
+    assert set(mission.goal_atoms) == {
+        "released:fork_1",
+        "in_region:fork_1:main_table_plate_right_region",
+    }
+    assert mission.phase_obligations[0].target == "fork_1"
+    assert mission.phase_obligations[1].region == "main_table_plate_right_region"

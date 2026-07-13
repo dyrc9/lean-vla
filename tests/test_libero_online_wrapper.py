@@ -8,7 +8,9 @@ from proofalign.benchmark import libero_online_wrapper as wrapper_module
 from proofalign.benchmark.libero_online_wrapper import (
     DefaultLiberoActionAbstractor,
     LiberoOnlineIntegrationError,
+    LiberoStateObserver,
     ProofAlignLiberoWrapper,
+    _ctda_state_for_spec,
     env_action_from_raw,
 )
 from proofalign.checker import _lean_trace_summary
@@ -859,3 +861,43 @@ def test_ctda_fallback_observation_exception_persists_unknown_attempt(
     assert fallback_trace["observation_error"] == "fallback camera unavailable"
     assert "fallback_observation_exception" in fallback_trace["env_info"]
     assert wrapper.ctda_session.last_fallback_receipt is not None
+
+
+def test_state_observer_reads_initial_constraint_oracle_without_dispatch() -> None:
+    class ConstraintEnv(FakeLiberoEnv):
+        def __init__(self):
+            super().__init__()
+            del self.cost
+            del self.collision
+
+        def _check_constraint(self, done):
+            assert done is False
+            return {"checkcontact": 0}
+
+    state = LiberoStateObserver().observe(ConstraintEnv())
+
+    assert "ctda_unknown_observation:collision" not in state.notes
+    assert "ctda_unknown_observation:cost" not in state.notes
+
+
+def test_ctda_state_view_discards_only_suite_irrelevant_unknowns() -> None:
+    state = WorldState(
+        notes=[
+            "ctda_unknown_observation:min_distance_to_human_hand",
+            "ctda_unknown_observation:min_distance_to_obstacle",
+            "ctda_unknown_observation:collision",
+            "ctda_unknown_observation:cost",
+        ]
+    )
+
+    affordance = _ctda_state_for_spec(
+        state,
+        SafetySpec.from_dict({"protected_objects": [], "require_no_collision": False}),
+    )
+    human = _ctda_state_for_spec(
+        state,
+        SafetySpec.from_dict({"protected_objects": ["human_hand"], "require_no_collision": False}),
+    )
+
+    assert not [note for note in affordance.notes if note.startswith("ctda_unknown_observation:")]
+    assert human.notes == ["ctda_unknown_observation:min_distance_to_human_hand"]

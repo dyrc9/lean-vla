@@ -171,6 +171,7 @@ class RawProposalBinderConfig:
     version: str = "mission-raw-binder-pick-place-v1"
     gripper_close_threshold: float = -0.2
     gripper_open_threshold: float = 0.2
+    close_direction: int = -1
     grasp_neighborhood_m: float = 0.25
     translation_scale_m: float = 0.05
     direction_epsilon: float = 1e-9
@@ -188,7 +189,11 @@ class RawProposalBinderConfig:
         ):
             if not isfinite(float(getattr(self, name))):
                 raise ValueError(f"{name} must be finite")
-        if self.gripper_close_threshold >= self.gripper_open_threshold:
+        if self.close_direction not in (-1, 1):
+            raise ValueError("raw binder close_direction must be -1 or 1")
+        if self.close_direction < 0 and self.gripper_close_threshold >= self.gripper_open_threshold:
+            raise ValueError("raw binder gripper thresholds overlap")
+        if self.close_direction > 0 and self.gripper_close_threshold <= self.gripper_open_threshold:
             raise ValueError("raw binder gripper thresholds overlap")
         if (
             self.grasp_neighborhood_m <= 0
@@ -204,6 +209,7 @@ class RawProposalBinderConfig:
                     "version": self.version,
                     "gripper_close_threshold": self.gripper_close_threshold,
                     "gripper_open_threshold": self.gripper_open_threshold,
+                    "close_direction": self.close_direction,
                     "grasp_neighborhood_m": self.grasp_neighborhood_m,
                     "translation_scale_m": self.translation_scale_m,
                     "direction_epsilon": self.direction_epsilon,
@@ -255,6 +261,7 @@ class ConditionalKinematicConfig:
     authorization_slack_ns: int = 20_000_000
     max_command_abs: float = 1.0
     translation_scale_m: float = 0.05
+    model_error_m: float = 0.0
     dynamics_model_id: str = "libero-delta-kinematic-v1"
     filter_policy_id: str = "identity-filter-v1"
     fallback_id: str = "hold"
@@ -279,6 +286,8 @@ class ConditionalKinematicConfig:
             raise ValueError("max_command_abs must be finite and positive")
         if not isfinite(self.translation_scale_m) or self.translation_scale_m < 0:
             raise ValueError("translation_scale_m must be finite and non-negative")
+        if not isfinite(self.model_error_m) or self.model_error_m < 0:
+            raise ValueError("model_error_m must be finite and non-negative")
         if self.fallback_verified and not self.fallback_witness_digest:
             raise ValueError("an enabled fallback requires a witness digest")
         object.__setattr__(self, "fallback_action", tuple(self.fallback_action))
@@ -1765,12 +1774,20 @@ def bind_raw_proposal(
 
     translation = tuple(sum(command[index] for command in flattened) for index in range(3))
     translation_norm = sqrt(sum(value * value for value in translation))
-    close_requested = any(
-        command[-1] <= config.gripper_close_threshold for command in flattened
-    )
-    open_requested = any(
-        command[-1] >= config.gripper_open_threshold for command in flattened
-    )
+    if config.close_direction < 0:
+        close_requested = any(
+            command[-1] <= config.gripper_close_threshold for command in flattened
+        )
+        open_requested = any(
+            command[-1] >= config.gripper_open_threshold for command in flattened
+        )
+    else:
+        close_requested = any(
+            command[-1] >= config.gripper_close_threshold for command in flattened
+        )
+        open_requested = any(
+            command[-1] <= config.gripper_open_threshold for command in flattened
+        )
     if close_requested and open_requested:
         return result(StaticVerdict.REFUTED, "raw binder proposal has conflicting gripper commands")
 
@@ -1783,8 +1800,6 @@ def bind_raw_proposal(
             return result(StaticVerdict.REFUTED, "raw binder Pick contract target is already held")
         if contract.part is None or (contract.target, contract.part) not in mission.safe_parts:
             return result(StaticVerdict.REFUTED, "raw binder Pick contract has no unique safe grasp part")
-        if open_requested:
-            return result(StaticVerdict.REFUTED, "raw binder Pick prefix opens the gripper")
         target_delta = tuple(target - robot for target, robot in zip(target_xyz, robot_xyz))
         target_distance = sqrt(sum(value * value for value in target_delta))
         if close_requested and target_distance > config.grasp_neighborhood_m:
@@ -2222,7 +2237,7 @@ def _prefix_clearance_safe(
     if not invariants:
         return False
     margin = float(getattr(safety_spec, "safety_margin", 0.0))
-    required = margin + _translation_bound(commands, config)
+    required = margin + _translation_bound(commands, config) + config.model_error_m
     human = float(getattr(state, "min_distance_to_human_hand", float("nan")))
     obstacle = float(getattr(state, "min_distance_to_obstacle", float("nan")))
     return human >= required and obstacle >= required
@@ -2261,7 +2276,8 @@ def _observed_tube_membership(
     return bool(
         initial_safe
         and observed_safe
-        and displacement <= _translation_bound(cumulative_commands, config) + 1e-9
+        and displacement
+        <= _translation_bound(cumulative_commands, config) + config.model_error_m + 1e-9
     )
 
 
@@ -2278,7 +2294,7 @@ def _model_assumptions_hold(
     displacement = _pose_distance(previous_state, observed_state)
     if displacement is None:
         return None
-    return displacement <= _translation_bound((command,), config) + 1e-9
+    return displacement <= _translation_bound((command,), config) + config.model_error_m + 1e-9
 
 
 def _kinematic_assumptions(
@@ -2287,6 +2303,7 @@ def _kinematic_assumptions(
 ) -> tuple[str, ...]:
     return (
         f"delta_translation_scale_m={config.translation_scale_m}",
+        f"model_error_m={config.model_error_m}",
         f"command_abs_bound={config.max_command_abs}",
         f"clearance_margin_m={float(getattr(safety_spec, 'safety_margin', 0.0))}",
         "world_state_clearance_observation_sound",

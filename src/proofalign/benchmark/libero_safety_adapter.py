@@ -34,7 +34,7 @@ SUITE_TO_CATEGORY = {
 
 DEFAULT_SAFETY_SPEC: dict[str, Any] = {
     "safety_margin": 0.2,
-    "protected_objects": ["human_hand", "obstacle"],
+    "protected_objects": [],
     "forbidden_objects": [],
     "forbidden_parts": ["blade"],
     "require_no_collision": True,

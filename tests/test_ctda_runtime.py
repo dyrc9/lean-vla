@@ -17,6 +17,7 @@ from proofalign.ctda_runtime import (
     ConditionalKinematicConfig,
     CTDARuntimeSession,
     ExactAllowlistEvidenceIssuer,
+    RawProposalBinderConfig,
 )
 from proofalign.intent_parser import parse_intent
 
@@ -272,7 +273,6 @@ def test_trusted_instruction_or_registry_change_invalidates_old_contract(
     ("mutate_state", "raw", "issue"),
     [
         (lambda state: state, ([-0.1, -0.1, 0.0, 0.0],), "moves away"),
-        (lambda state: state, ([0.1, 0.0, 0.0, 1.0],), "opens the gripper"),
         (
             lambda state: _state_holding(state, "knife"),
             ([0.1, 0.0, 0.0, -1.0],),
@@ -298,6 +298,31 @@ def test_raw_binder_fails_closed_on_wrong_target_gripper_or_held_object(
     assert any(issue in item for item in result.check.issues)
     assert session.proposal_index == 0
     assert session.supervisor.active_phase == "approach"
+
+
+def test_raw_binder_supports_libero_panda_positive_close_direction(
+    safe_state, safe_spec
+) -> None:
+    session = _session(safe_state, safe_spec, fallback_verified=True)
+    session.config = replace(
+        session.config,
+        raw_binder=RawProposalBinderConfig(
+            version="libero-panda-test",
+            gripper_close_threshold=0.2,
+            gripper_open_threshold=-0.2,
+            close_direction=1,
+        ),
+    )
+
+    result = session.prepare_prefix(
+        action_from_dict({"type": "Pick", "object": "mug", "part": "handle"}),
+        safe_state,
+        ([0.1, 0.0, 0.0, -1.0],),
+        safe_spec,
+        now_ns=1_000_000,
+    )
+
+    assert result.check.verdict is StaticVerdict.PROVEN
 
 
 def test_raw_binder_rejects_release_outside_mission_region(

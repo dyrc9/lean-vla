@@ -19,6 +19,7 @@ from enum import Enum
 from hashlib import sha256
 import json
 from math import isfinite
+import re
 import time
 from typing import Any, Iterable, Mapping, Protocol, Sequence
 
@@ -2171,7 +2172,8 @@ def mission_from_legacy(
     target = getattr(intent, "target_object", None)
     objects = getattr(state, "objects", {})
     regions = getattr(state, "regions", {})
-    if target is None or target not in objects:
+    target = _resolve_frozen_object_id(target, objects)
+    if target is None:
         raise ValueError("trusted Pick/Place template target is absent from the frozen registry")
 
     requested_part = getattr(intent, "target_part", None)
@@ -2191,7 +2193,11 @@ def mission_from_legacy(
     elif requested_part not in safe_target_parts:
         raise ValueError("trusted Pick/Place template names a non-safe grasp part")
 
-    region = getattr(intent, "target_region", None)
+    region = _resolve_frozen_region_id(
+        getattr(intent, "target_region", None),
+        regions,
+        str(getattr(intent, "raw_instruction", "")),
+    )
     if verb == "pick":
         phases = ("approach", "holding")
         transitions = (TaskTransition("approach", "Pick", "holding"),)
@@ -2224,8 +2230,11 @@ def mission_from_legacy(
     if getattr(safety_spec, "require_no_collision", True):
         hard_invariants.append("no_collision")
     margin = getattr(safety_spec, "safety_margin", None)
-    if margin is not None:
-        hard_invariants.extend((f"human_clearance>={margin}", f"obstacle_clearance>={margin}"))
+    protected_keys = {_registry_symbol_key(item) for item in must_preserve}
+    if margin is not None and any("humanhand" in item for item in protected_keys):
+        hard_invariants.append(f"human_clearance>={margin}")
+    if margin is not None and any("obstacle" in item for item in protected_keys):
+        hard_invariants.append(f"obstacle_clearance>={margin}")
     required_evidence = ("legacy_certificate",) if getattr(safety_spec, "require_certificates", False) else ()
     goal_payload = {
         "verb": verb,
@@ -2292,6 +2301,62 @@ def mission_from_legacy(
         goal_phases=goal_phases,
         phase_obligations=tuple(phase_obligations),
     )
+
+
+def _registry_symbol_key(value: Any) -> str:
+    text = re.sub(r"__?\d+$", "", str(value).lower())
+    return re.sub(r"[^a-z0-9]", "", text)
+
+
+def _resolve_frozen_object_id(target: Any, objects: Mapping[str, Any]) -> str | None:
+    if target is None:
+        return None
+    target_text = str(target)
+    if target_text in objects:
+        return target_text
+    key = _registry_symbol_key(target_text)
+    matches = {
+        str(object_id)
+        for object_id, obj in objects.items()
+        if key
+        and key
+        in {
+            _registry_symbol_key(object_id),
+            _registry_symbol_key(getattr(obj, "kind", "")),
+        }
+    }
+    return next(iter(matches)) if len(matches) == 1 else None
+
+
+def _resolve_frozen_region_id(
+    region: Any,
+    regions: Mapping[str, Any],
+    trusted_instruction: str,
+) -> str | None:
+    if region is None:
+        return None
+    region_text = str(region)
+    if region_text in regions:
+        return region_text
+    key = _registry_symbol_key(region_text)
+    candidates = {
+        str(region_id)
+        for region_id in regions
+        if key and key in _registry_symbol_key(region_id)
+    }
+    if len(candidates) == 1:
+        return next(iter(candidates))
+    instruction_words = set(re.findall(r"[a-z0-9]+", trusted_instruction.lower()))
+    directional = instruction_words & {"left", "right", "front", "back", "behind"}
+    if directional:
+        narrowed = {
+            region_id
+            for region_id in candidates
+            if directional <= set(re.findall(r"[a-z0-9]+", region_id.lower().replace("_", " ")))
+        }
+        if len(narrowed) == 1:
+            return next(iter(narrowed))
+    return None
 
 
 def contract_from_legacy_action(

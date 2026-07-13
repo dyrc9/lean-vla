@@ -1,0 +1,1 @@
+{"suite": "affordance", "task_id": 2, "init_state_id": 0, "policy_seed": 0, "error_type": "AssertionError", "error": "[error] /home/ldx/lean-vla/external/LIBERO/libero/libero/bddl_files/affordance/pick_up_the_fork_and_place_it_on_the_right_of_the_plate.bddl does not exist!"}

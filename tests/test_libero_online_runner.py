@@ -11,6 +11,7 @@ from proofalign.benchmark import libero_online_runner
 from proofalign.benchmark.libero_online_runner import (
     LiberoOnlineIntegrationError,
     LiberoTaskRuntime,
+    _environment_action_bounds,
     _prepare_ctda_trust_root,
     _validate_ctda_fallback_manifest,
     _resolve_task_bddl_path,
@@ -76,6 +77,17 @@ class FakeOnlineEnv:
 
     def close(self):
         self.closed = True
+
+
+def test_ctda_action_bounds_unwrap_libero_control_env() -> None:
+    class ControlEnvWrapper:
+        def __init__(self) -> None:
+            self.env = FakeOnlineEnv()
+
+    low, high = _environment_action_bounds(ControlEnvWrapper())
+
+    assert low == (-1.0,) * 7
+    assert high == (1.0,) * 7
 
 
 def test_online_runner_uses_initialized_real_env_shape(monkeypatch, tmp_path: Path):
@@ -497,3 +509,25 @@ def test_resolve_task_bddl_path_tolerates_unique_level_stem_prefix(tmp_path: Pat
         level = 2
 
     assert _resolve_task_bddl_path(str(tmp_path), Task()) == bddl_path
+
+
+def test_policy_config_accepts_inline_json(monkeypatch) -> None:
+    captured = {}
+
+    def factory(**kwargs):
+        captured.update(kwargs)
+        return object()
+
+    monkeypatch.setattr(libero_online_runner, "load_plugin", lambda spec: factory)
+    args = libero_online_runner.parse_args(
+        [
+            "--policy",
+            "fixture:create_policy",
+            "--policy-config",
+            '{"max_actions_per_call": 5}',
+        ]
+    )
+
+    libero_online_runner.build_policy(args)
+
+    assert captured == {"max_actions_per_call": 5}

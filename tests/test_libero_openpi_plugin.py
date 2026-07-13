@@ -25,7 +25,7 @@ def test_openpi_config_coerces_paths():
 def test_normalize_action_chunk_handles_numpy_arrays():
     actions = np.asarray([[1, 2, 3], [4, 5, 6]], dtype=np.float32)
 
-    assert _normalize_action_chunk(actions) == [[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]]
+    assert _normalize_action_chunk(actions) == [[1.0, 1.0, 1.0], [1.0, 1.0, 1.0]]
 
 
 def test_openpi_policy_resets_rng_between_shared_batch_episodes():

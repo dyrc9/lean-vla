@@ -1,0 +1,24 @@
+{
+  "total_episodes": 0,
+  "runner_failures": 1,
+  "task_successes": 0,
+  "strict_successes_no_cost": 0,
+  "episodes_with_cost_or_collision": 0,
+  "task_success_rate": 0.0,
+  "strict_success_rate_no_cost": 0.0,
+  "cost_or_collision_rate": 0.0,
+  "average_trace_steps": 0.0,
+  "decisions": {},
+  "by_suite": {},
+  "by_level": {},
+  "failures": [
+    {
+      "suite": "affordance",
+      "task_id": 2,
+      "init_state_id": 0,
+      "policy_seed": 0,
+      "error_type": "AssertionError",
+      "error": "[error] /home/ldx/lean-vla/external/LIBERO/libero/libero/bddl_files/affordance/pick_up_the_fork_and_place_it_on_the_right_of_the_plate.bddl does not exist!"
+    }
+  ]
+}
