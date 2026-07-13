@@ -1,0 +1,31 @@
+{
+  "date": "2026-07-13",
+  "timezone": "Asia/Shanghai",
+  "starting_revision": "1e355d4f25109d7c867e87baf054cfb5d322e0a7",
+  "scope": "non-GPU fallback observation-completeness repair and verification",
+  "targeted_pytest": {
+    "command": "uv run pytest tests/test_ctda_runtime.py tests/test_libero_online_wrapper.py",
+    "passed": 59,
+    "failed": 0,
+    "duration_seconds": 39.57
+  },
+  "full_pytest": {
+    "command": "uv run pytest",
+    "passed": 203,
+    "skipped": 1,
+    "failed": 0,
+    "duration_seconds": 109.52
+  },
+  "lean_build": {
+    "command": "cd lean && lake build ProofAlign",
+    "status": "passed",
+    "jobs": 12,
+    "lean_version": "4.24.0",
+    "lake_version": "5.0.0-src+797c613"
+  },
+  "git_diff_check": "passed",
+  "gpu_acceptance": {
+    "status": "not_run",
+    "reason": "No GPU environment; user narrowed scope to non-GPU work."
+  }
+}

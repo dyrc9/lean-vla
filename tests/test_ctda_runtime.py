@@ -513,6 +513,91 @@ def test_fallback_success_is_computed_and_rejects_clearance_below_margin(
     assert receipt.postcondition.mission_invariants_hold is False
 
 
+def test_fallback_ignores_irrelevant_unknown_clearance_observations(
+    safe_state, safe_spec
+) -> None:
+    affordance_spec = replace(safe_spec, protected_objects=[])
+    session = _session(safe_state, affordance_spec, fallback_verified=True)
+    command = session.fallback_command()
+    actuator = session.attest_fallback_actuation(
+        command, dispatched_at_ns=2, applied_at_ns=2
+    )
+    after = safe_state.clone()
+    after.notes.extend(
+        (
+            "ctda_unknown_observation:min_distance_to_human_hand",
+            "ctda_unknown_observation:min_distance_to_obstacle",
+        )
+    )
+
+    receipt = session.record_fallback_switch(
+        trigger="pending contract",
+        state_before=safe_state,
+        state_after=after,
+        command=command,
+        triggered_at_ns=0,
+        requested_at_ns=1,
+        dispatched_at_ns=2,
+        observed_at_ns=3,
+        safety_spec=affordance_spec,
+        environment_info={"cost": {}},
+        actuator_attestation=actuator,
+    )
+
+    assert receipt.succeeded is True
+    assert receipt.verify_integrity()
+    assert receipt.postcondition.observation_complete is True
+    assert receipt.postcondition.distance_thresholds_hold is True
+    assert receipt.postcondition.human_clearance_m is None
+    assert receipt.postcondition.obstacle_clearance_m is None
+    assert receipt.postcondition.required_observations == ("collision", "cost")
+    assert receipt.postcondition.issues == ()
+
+
+@pytest.mark.parametrize(
+    ("protected_object", "missing_observation"),
+    (
+        ("human_hand", "min_distance_to_human_hand"),
+        ("obstacle", "min_distance_to_obstacle"),
+    ),
+)
+def test_fallback_missing_suite_required_clearance_fails_closed(
+    safe_state, safe_spec, protected_object, missing_observation
+) -> None:
+    suite_spec = replace(safe_spec, protected_objects=[protected_object])
+    session = _session(safe_state, suite_spec, fallback_verified=True)
+    command = session.fallback_command()
+    actuator = session.attest_fallback_actuation(
+        command, dispatched_at_ns=2, applied_at_ns=2
+    )
+    after = safe_state.clone()
+    after.notes.append(f"ctda_unknown_observation:{missing_observation}")
+
+    receipt = session.record_fallback_switch(
+        trigger="monitor violation",
+        state_before=safe_state,
+        state_after=after,
+        command=command,
+        triggered_at_ns=0,
+        requested_at_ns=1,
+        dispatched_at_ns=2,
+        observed_at_ns=3,
+        safety_spec=suite_spec,
+        environment_info={"cost": {}},
+        actuator_attestation=actuator,
+    )
+
+    assert receipt.succeeded is False
+    assert receipt.verify_integrity()
+    assert receipt.postcondition.observation_complete is False
+    assert receipt.postcondition.distance_thresholds_hold is False
+    assert receipt.postcondition.mission_invariants_hold is False
+    assert missing_observation in receipt.postcondition.required_observations
+    assert any(
+        missing_observation in issue for issue in receipt.postcondition.issues
+    )
+
+
 def test_fallback_without_actuator_evidence_is_requested_only(safe_state, safe_spec) -> None:
     session = _session(safe_state, safe_spec, fallback_verified=True)
 

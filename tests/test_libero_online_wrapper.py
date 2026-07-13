@@ -710,6 +710,40 @@ def test_ctda_episode_with_pending_contract_does_not_finish_allow() -> None:
     assert "pending CTDA contract" in decision.explanation
 
 
+def test_ctda_affordance_fallback_ignores_unknown_clearance_signals() -> None:
+    class AffordanceEnv(FakeLiberoEnv):
+        def __init__(self) -> None:
+            super().__init__(hold_on_step=False)
+            del self.min_distance_to_human_hand
+            del self.min_distance_to_obstacle
+
+    env = AffordanceEnv()
+    wrapper = ProofAlignLiberoWrapper(
+        env,
+        "pick up the mug by the handle",
+        SafetySpec.from_dict({"protected_objects": []}),
+        max_chunk_steps=8,
+    )
+    wrapper.reset()
+    _enable_ctda(wrapper, fallback_verified=True)
+
+    decision = wrapper.run_episode(StaticChunkPolicy(), max_steps=1)
+
+    fallback = wrapper.trace[-1].ctda["fallback_switch"]
+    fallback_state = wrapper.trace[-1].ctda["fallback_trace"]["state_after"]
+    assert decision.decision is Decision.REPLAN
+    assert fallback["succeeded"] is True
+    assert fallback["postcondition"]["observation_complete"] is True
+    assert fallback["postcondition"]["required_observations"] == (
+        "collision",
+        "cost",
+    )
+    assert {
+        "ctda_unknown_observation:min_distance_to_human_hand",
+        "ctda_unknown_observation:min_distance_to_obstacle",
+    }.issubset(fallback_state["notes"])
+
+
 def test_ctda_failed_fallback_establishment_escalates_to_safe_stop() -> None:
     class CollisionAfterDispatchEnv(FakeLiberoEnv):
         def step(self, action):
@@ -802,7 +836,9 @@ def test_ctda_fallback_below_distance_threshold_cannot_succeed() -> None:
     wrapper = ProofAlignLiberoWrapper(
         env,
         "pick up the mug by the handle",
-        SafetySpec.from_dict({"safety_margin": 0.2}),
+        SafetySpec.from_dict(
+            {"safety_margin": 0.2, "protected_objects": ["obstacle"]}
+        ),
     )
     wrapper.reset()
     _enable_ctda(wrapper, fallback_verified=True)

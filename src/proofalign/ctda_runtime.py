@@ -337,6 +337,7 @@ class FallbackPostconditionEvaluation:
     obstacle_clearance_m: float | None
     required_margin_m: float
     checked_invariants: tuple[str, ...]
+    required_observations: tuple[str, ...]
     issues: tuple[str, ...] = ()
     evaluation_digest: str = field(init=False)
 
@@ -359,6 +360,18 @@ class FallbackPostconditionEvaluation:
         if not isfinite(self.required_margin_m) or self.required_margin_m < 0:
             raise ValueError("required fallback margin must be finite and non-negative")
         object.__setattr__(self, "checked_invariants", tuple(self.checked_invariants))
+        object.__setattr__(self, "required_observations", tuple(self.required_observations))
+        supported_observations = {
+            "collision",
+            "cost",
+            "min_distance_to_human_hand",
+            "min_distance_to_obstacle",
+        }
+        if (
+            len(set(self.required_observations)) != len(self.required_observations)
+            or not set(self.required_observations).issubset(supported_observations)
+        ):
+            raise ValueError("fallback required observations must be unique and supported")
         object.__setattr__(self, "issues", tuple(self.issues))
         object.__setattr__(
             self,
@@ -374,6 +387,7 @@ class FallbackPostconditionEvaluation:
                     "obstacle_clearance_m": self.obstacle_clearance_m,
                     "required_margin_m": self.required_margin_m,
                     "checked_invariants": self.checked_invariants,
+                    "required_observations": self.required_observations,
                     "issues": self.issues,
                 }
             ),
@@ -381,12 +395,13 @@ class FallbackPostconditionEvaluation:
 
     @property
     def proven(self) -> bool:
+        required = set(self.required_observations)
         return (
             self.observation_complete
             and self.mission_invariants_hold
             and self.distance_thresholds_hold
-            and self.no_collision is True
-            and self.no_cost is True
+            and ("collision" not in required or self.no_collision is True)
+            and ("cost" not in required or self.no_cost is True)
             and not self.issues
         )
 
@@ -586,6 +601,7 @@ class FallbackSwitchReceipt:
                     "obstacle_clearance_m": self.postcondition.obstacle_clearance_m,
                     "required_margin_m": self.postcondition.required_margin_m,
                     "checked_invariants": self.postcondition.checked_invariants,
+                    "required_observations": self.postcondition.required_observations,
                     "issues": self.postcondition.issues,
                 }
             )
@@ -2050,11 +2066,21 @@ def _monitor_result_from_static(
 
 
 def _has_unknown_observation(state: Any) -> bool:
+    return bool(_unknown_observations(state))
+
+
+def _unknown_observations(state: Any) -> frozenset[str]:
     notes = getattr(state, "notes", ()) or ()
-    return any(
-        str(note).startswith("ctda_unknown_observation:")
-        or str(note).startswith("missing trusted CTDA observation:")
+    prefixes = (
+        "ctda_unknown_observation:",
+        "missing trusted CTDA observation:",
+    )
+    return frozenset(
+        text.removeprefix(prefix).strip()
         for note in notes
+        for text in (str(note),)
+        for prefix in prefixes
+        if text.startswith(prefix) and text.removeprefix(prefix).strip()
     )
 
 
@@ -2093,8 +2119,13 @@ def _evaluate_fallback_postcondition(
 
     invariant_thresholds: list[float] = []
     checked_invariants = tuple(str(value) for value in mission.hard_invariants)
+    required_observations: set[str] = set()
+    if getattr(safety_spec, "require_no_collision", True):
+        required_observations.update(("collision", "cost"))
     for invariant in checked_invariants:
-        if invariant.startswith("human_clearance>=") or invariant.startswith(
+        if invariant == "no_collision":
+            required_observations.update(("collision", "cost"))
+        elif invariant.startswith("human_clearance>=") or invariant.startswith(
             "obstacle_clearance>="
         ):
             try:
@@ -2106,28 +2137,52 @@ def _evaluate_fallback_postcondition(
                 issues.append(f"invalid fallback invariant threshold: {invariant}")
                 continue
             invariant_thresholds.append(threshold)
-        elif invariant != "no_collision":
+            required_observations.add(
+                "min_distance_to_human_hand"
+                if invariant.startswith("human_clearance>=")
+                else "min_distance_to_obstacle"
+            )
+        else:
             issues.append(f"unsupported fallback invariant: {invariant}")
     required_margin = max((configured_margin, *invariant_thresholds))
+    ordered_required_observations = tuple(
+        name
+        for name in (
+            "collision",
+            "cost",
+            "min_distance_to_human_hand",
+            "min_distance_to_obstacle",
+        )
+        if name in required_observations
+    )
 
     human: float | None = None
     obstacle: float | None = None
     no_collision: bool | None = None
+    unknown_observations: frozenset[str] = frozenset()
     if state_after is None:
         issues.append("fallback post-state is unavailable")
     else:
-        if _has_unknown_observation(state_after):
-            issues.append("fallback post-state contains unknown safety observations")
-        collision = getattr(state_after, "collision", None)
-        no_collision = not collision if type(collision) is bool else None
-        if no_collision is None:
-            issues.append("fallback collision observation is unavailable")
-        elif not no_collision:
-            issues.append("fallback post-state reports a collision")
+        unknown_observations = _unknown_observations(state_after)
+        unknown_required = unknown_observations & required_observations
+        if unknown_required:
+            issues.append(
+                "fallback post-state contains unknown required safety observations: "
+                + ", ".join(sorted(unknown_required))
+            )
+        if "collision" in required_observations and "collision" not in unknown_observations:
+            collision = getattr(state_after, "collision", None)
+            no_collision = not collision if type(collision) is bool else None
+            if no_collision is None:
+                issues.append("fallback collision observation is unavailable")
+            elif not no_collision:
+                issues.append("fallback post-state reports a collision")
         for attribute, label in (
             ("min_distance_to_human_hand", "human"),
             ("min_distance_to_obstacle", "obstacle"),
         ):
+            if attribute not in required_observations or attribute in unknown_observations:
+                continue
             try:
                 value = float(getattr(state_after, attribute))
             except (AttributeError, TypeError, ValueError):
@@ -2139,19 +2194,25 @@ def _evaluate_fallback_postcondition(
             else:
                 obstacle = value
 
-    no_cost = _environment_no_cost(environment_info)
-    if no_cost is None:
-        issues.append("fallback cost observation is unavailable")
-    elif not no_cost:
-        issues.append("fallback action incurred an environment cost")
+    no_cost: bool | None = None
+    if "cost" in required_observations and "cost" not in unknown_observations:
+        no_cost = _environment_no_cost(environment_info)
+        if no_cost is None:
+            issues.append("fallback cost observation is unavailable")
+        elif not no_cost:
+            issues.append("fallback action incurred an environment cost")
     if observation_error:
         issues.append(f"fallback observation failed: {observation_error}")
 
     distance_thresholds_hold = bool(
-        human is not None
-        and obstacle is not None
-        and human >= required_margin
-        and obstacle >= required_margin
+        (
+            "min_distance_to_human_hand" not in required_observations
+            or (human is not None and human >= required_margin)
+        )
+        and (
+            "min_distance_to_obstacle" not in required_observations
+            or (obstacle is not None and obstacle >= required_margin)
+        )
     )
     if human is not None and human < required_margin:
         issues.append("fallback human clearance is below the required margin")
@@ -2181,14 +2242,20 @@ def _evaluate_fallback_postcondition(
             issues.append(f"fallback mission invariant not established: {invariant}")
 
     issues = list(dict.fromkeys(issues))
+    observation_availability = {
+        "collision": no_collision is not None,
+        "cost": no_cost is not None,
+        "min_distance_to_human_hand": human is not None,
+        "min_distance_to_obstacle": obstacle is not None,
+    }
     observation_complete = bool(
         state_after is not None
         and not observation_error
-        and not _has_unknown_observation(state_after)
-        and no_collision is not None
-        and no_cost is not None
-        and human is not None
-        and obstacle is not None
+        and not (unknown_observations & required_observations)
+        and all(
+            observation_availability[name]
+            for name in ordered_required_observations
+        )
     )
     return FallbackPostconditionEvaluation(
         observation_complete=observation_complete,
@@ -2200,6 +2267,7 @@ def _evaluate_fallback_postcondition(
         obstacle_clearance_m=obstacle,
         required_margin_m=required_margin,
         checked_invariants=checked_invariants,
+        required_observations=ordered_required_observations,
         issues=tuple(issues),
     )
 
