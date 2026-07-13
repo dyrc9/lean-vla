@@ -27,6 +27,7 @@ def placeAutomaton : TaskAutomaton :=
 def placeMission : MissionSpec :=
   { specId := "mission-place-mug"
     specDigest := "spec-digest-v2"
+    episodeNonce := "episode-place-mug-001"
     authority :=
       { authorityId := "libero-manifest"
         sourceDigest := "manifest-digest"
@@ -144,6 +145,7 @@ def safeCandidate : PrefixCandidate :=
         contractDigest := pickContract.contractDigest
         semanticWitnessRef := "semantic:contract-digest-pick"
         specDigest := placeMission.specDigest
+        episodeNonce := placeMission.episodeNonce
         stateDigest := "state-0"
         monitorStateDigest := "monitor-0"
         proposalIndex := 1
@@ -196,6 +198,7 @@ def monitorBeforePick : MonitorState :=
   { monitorStateDigest := "monitor-0"
     contractId := pickContract.contractId
     specDigest := placeMission.specDigest
+    episodeNonce := placeMission.episodeNonce
     phase := "approach"
     stateDigest := "state-0"
     nextProposalIndex := 1
@@ -385,6 +388,19 @@ def latePrefixRequest : PrefixPreCheckRequest :=
 
 example :
     checkPrefixPre latePrefixRequest =
+      .refuted ["semantic witness, prefix authorization, or reachable-tube evidence failed"] := by
+  decide
+
+def wrongEpisodeCandidate : PrefixCandidate :=
+  { safeCandidate with
+    authorization :=
+      { safeCandidate.authorization with episodeNonce := "another-episode" } }
+
+def wrongEpisodePrefix : PrefixPreCheckRequest :=
+  { prefixExampleRequest with candidate := wrongEpisodeCandidate }
+
+example :
+    checkPrefixPre wrongEpisodePrefix =
       .refuted ["semantic witness, prefix authorization, or reachable-tube evidence failed"] := by
   decide
 
@@ -633,6 +649,38 @@ def wrongPostBindingMonitorRequest : MonitorCheckRequest :=
 example :
     monitorStep wrongPostBindingMonitorRequest =
       .unknown ["required post-condition evidence is missing"] := by
+  decide
+
+/-! ## Cross-prefix temporal-history regression examples -/
+
+def firstAcceptedPrefix : SymbolicEventTrace :=
+  [ { timestamp := ⟨1⟩
+      facts := [.noBadContact, .holding "mug"]
+      sourcePlantSampleDigest := "history-sample-1" } ]
+
+def secondAcceptedPrefix : SymbolicEventTrace :=
+  [ { timestamp := ⟨2⟩
+      facts := [.noBadContact, .released "mug"]
+      sourcePlantSampleDigest := "history-sample-2" } ]
+
+def splitPickRelease : TraceFormula :=
+  .sequence [.holding "mug", .released "mug"]
+
+example :
+    evalTraceFormulaPartial ⟨2⟩
+      (firstAcceptedPrefix ++ secondAcceptedPrefix) 0 true splitPickRelease =
+      .satisfied := by
+  native_decide
+
+example :
+    evalTraceFormulaPartial ⟨2⟩ secondAcceptedPrefix 0 true splitPickRelease =
+      .violated := by
+  native_decide
+
+example : traceContinuationValid firstAcceptedPrefix secondAcceptedPrefix = true := by
+  decide
+
+example : traceContinuationValid secondAcceptedPrefix firstAcceptedPrefix = false := by
   decide
 
 end ProofAlign

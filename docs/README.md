@@ -1,52 +1,53 @@
-# ProofAlign 文档导航
+# ProofAlign 文档入口
 
-更新日期：2026-07-10
+本目录只把少量文档定义为当前事实来源。历史实验记录、旧设计、旧命令和阶段性 handoff
+已经移到 [`archive/`](archive/README.md)。除非任务明确要求历史追溯，agent 不应读取或引用
+archive 中的内容。
 
-本页是仓库文档入口。当前主方法是 **ProofAlign 2.0: Contract-Carrying
-Temporal Dual Alignment（CTDA）**。旧的 `IntentAligned / EffectAligned`
-Boolean checker 仍作为兼容路径和实验基线保留，不代表完整 CTDA 在线授权路径。
+## Canonical 文档
 
-## 建议阅读顺序
+建议按以下顺序阅读：
 
-1. [`method.md`](method.md)：当前方法定义、形式判断、运行时协议和保证边界。
-2. [`system_architecture.md`](system_architecture.md)：模块职责、数据流、信任边界和
-   LIBERO 在线接入状态。
-3. [`lean_spec_design.md`](lean_spec_design.md)：Lean 类型和旧版双层 specification 的
-   设计背景。
-4. [`lean_method_upgrade_20260710.md`](lean_method_upgrade_20260710.md)：CTDA 的相关工作、
-   设计推导、迁移方案和截至 2026-07-10 的详细实现审计。
-5. [`implementation_notes.md`](implementation_notes.md)：本地/GPU 环境、验证命令和
-   工程约束。
-6. [`experiments.md`](experiments.md) 与
-   [`main_experiment_plan.md`](main_experiment_plan.md)：实验协议、baseline 和指标。
-7. [`roadmap.md`](roadmap.md)：已完成能力、当前阻塞和下一阶段优先级。
+1. [`project_status.md`](project_status.md)：当前真实进展、已验证资产和 P0 阻塞。
+2. [`method.md`](method.md)：唯一 normative 方法定义、威胁模型和 claim boundary。
+3. [`system_architecture.md`](system_architecture.md)：当前实现与目标闭环的模块对应。
+4. [`roadmap.md`](roadmap.md)：唯一执行优先级、阶段 gate 和停止条件。
+5. [`experiments.md`](experiments.md)：最小配对实验、指标和 artifact 规则。
+6. [`reproduction_plan.md`](reproduction_plan.md)：发布攻击、现有防御与 CTDA 的复现证据链。
+7. [`implementation_notes.md`](implementation_notes.md)：本地 CPU/Lean 开发与验证约定。
+8. [`remote_execution.md`](remote_execution.md)：迁移到远程 GPU 后的环境、路径和运行协议。
+9. [`paper_story.md`](paper_story.md)：收缩后的论文叙事和可写贡献。
+10. [`related_work.md`](related_work.md)：研究定位；不作为实现状态或 CLI 来源。
 
-## 当前实现口径
+## 当前方法口径
 
-| 能力 | 当前状态 | 可以声称什么 |
-|---|---|---|
-| Legacy 双层 checker | 已实现并接入真实 Lean | 对具体离散 Boolean claim 进行 Lean kernel 检查 |
-| Typed CTDA 数据模型 | 已实现 | mission、contract、proposal、authorization、receipt 和 trace 有不可变结构与 digest 绑定 |
-| Python CTDA reference checker | 已实现并接入 LIBERO | fail-closed 地执行 semantic、prefix-pre、observed-prefix 和 monitor 检查 |
-| Lean CTDA checker 与定理 | 已实现、可编译 | checker 对 Lean 中定义的离散 proposition 具有 soundness/reflection 定理 |
-| Lean CTDA 在线 evaluator | 未接入 | 不能声称每个 LIBERO prefix 当前由 Lean CTDA 判定 |
-| 连续动力学安全证明 | 未实现 | 当前仅有带显式假设的 simulator/运动学证据，不能声称真实机器人连续安全 |
-| Verified fallback / 硬件 attestation | 未实现 | 当前 hold fallback、软件 receipt 和 simulator 证据只适用于测试 TCB |
+当前核心是一个有限范围的 **mission-rooted persistent dual monitor**：
 
-## 文档口径规则
+- `MissionRefinementGate`：合同必须来自 trusted, locally frozen benchmark mission、当前
+  phase 和 residual obligation；policy-facing prompt 无权重写任务根。
+- `TraceConformanceGate`：raw proposal、实际 dispatch 和累计 observed trace 必须绑定同一
+  合同；没有 completion witness 不得推进 phase。
 
-- “双层”指两类 alignment：`SemanticTemporalRefines` 与
-  `PhysicalEffectConforms`。第二层在运行时分为执行前授权、执行中逐 prefix 监控和
-  执行后完成审计。
-- “Lean-backed legacy”不等于“Lean CTDA online”。前者通过临时 Lean 文件检查
-  `Bool = true`；后者需要在线调用 `ProofAlign/CTDA.lean` 中的分阶段 evaluator，当前
-  尚未完成接线。
-- `safe_pending` 只表示已检查前缀尚未发现 violation 且合同仍有未决义务，不是整个未来
-  trajectory 的安全证明。
-- digest 只提供完整性和对象绑定；producer、感知、动力学或 fallback 的可信性必须由独立
-  verifier/witness 支撑。
-- Lean 不处理像素、点云、VLA inference、轨迹优化或真实硬件动力学。
+当前 runner 可选择 `ctda-python-reference`、`ctda-lean-kernel` 和 `ctda-shadow`。有限 Pick/Place
+paper path 已改为 mission-rooted contract 与 independent raw binder；`ctda-lean-kernel` 的四个
+stage 确实生成并检查 replay artifact，golden parity 为零 mismatch。当前 Lean p99 仍远超 control
+period，因此只能表述为 slow interlock/offline audit，仍不能把系统表述为完整 proof-carrying VLA、
+real-time safety monitor 或 physical safety proof。
 
-若文档之间出现冲突，以 [`method.md`](method.md) 的方法定义和
-[`lean_method_upgrade_20260710.md`](lean_method_upgrade_20260710.md) 最后的“实现状态与
-剩余边界”为准；命令行行为以代码和 `--help` 为准。
+## 冲突处理
+
+当文档、代码和历史记录不一致时：
+
+1. 方法与 claim 以 [`method.md`](method.md) 为准；
+2. 当前优先级以 [`roadmap.md`](roadmap.md) 为准；
+3. CLI、schema 和默认值以当前代码、测试和 `--help` 为准；
+4. 远程机器路径与迁移清单以 [`remote_execution.md`](remote_execution.md) 为准；
+5. `archive/` 永远不是当前事实来源。
+
+## 文档维护规则
+
+- 不再新增日期型状态文档；状态统一更新 `project_status.md`。
+- 不再新增并行 roadmap；任务统一进入 `roadmap.md`。
+- 远程环境和成功命令只更新 `remote_execution.md`。
+- 实验完成后保存原始 artifact 和机器可重建 summary；不要只写一份结果叙述。
+- 方法字段、Lean semantics、Python evaluator 和实验标签必须同步更新。

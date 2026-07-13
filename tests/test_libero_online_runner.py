@@ -250,7 +250,7 @@ def test_online_runner_ctda_flag_persists_proof_chain(monkeypatch, tmp_path: Pat
         json.dumps(
             [
                 {
-                    "raw_action": [0, 0, 0, 0, 0, 0, 0],
+                    "raw_action": [0.1, 0.05, 0, 0, 0, 0, -1],
                     "proofalign_action": {"type": "Pick", "object": "mug", "part": "body"},
                 }
             ]

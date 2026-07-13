@@ -1,225 +1,265 @@
-# ProofAlign Roadmap
+# ProofAlign Execution Roadmap
 
-更新日期：2026-07-10
+更新日期：2026-07-12
 
-## 1. 当前阶段
+本文是唯一执行计划。历史 roadmap、实验 handoff 和 design memo 已归档。
 
-项目已经从“最小双层 Boolean prototype”进入“CTDA reference runtime 已落地、准备把 Lean
-CTDA evaluator 接入在线授权”的阶段。
+## 0. 总目标
 
-当前事实基线：
-
-- legacy intent/effect/chunk checker 已接真实 Lean，Lean 不可用时 fail closed；
-- Python typed CTDA 已覆盖 frozen mission、semantic refinement、prefix authorization、
-  execution/trace provenance、persistent monitor、replay/stale rejection 和 fallback switch
-  receipt；
-- Lean 已有 CTDA staged checker、finite-prefix monitor 和 soundness/reflection theorem；
-- LIBERO CTDA 已实现逐 raw-step 授权与执行后审计，但 evaluator 仍是
-  `ctda-python-reference`；
-- simulator task root、fallback manifest、action bounds 和运行配置已经冻结并持久化；
-- 尚无 dynamics-aware reachable-tube theorem、verified fallback、可信 BDDL compiler 或硬件
-  attestation chain。
-
-详细状态审计见
-[`lean_method_upgrade_20260710.md`](lean_method_upgrade_20260710.md)；方法口径见
-[`method.md`](method.md)。
-
-## 2. 已完成里程碑
-
-### M0：Legacy dual alignment
-
-- typed `Action / TaskIntent / WorldState / SafetySpec`；
-- intent-action 与 action-effect 双层检查；
-- chunk trace summary、frame condition 和 certificate schema；
-- toy tasks、LIBERO wrapper 和 OpenVLA-OFT plugin；
-- generated Boolean claim 的真实 Lean 检查；
-- conservative float-to-Nat 编码和默认 fail-closed bridge。
-
-### M1：Typed CTDA reference protocol
-
-- immutable mission、phase obligation 和 semantic skill contract；
-- proposal、filtered/authorized command、receipt 和 realized trace binding；
-- typed attestation、digest integrity、freshness 和 exact allowlist verifier；
-- semantic、prefix-pre、trace abstraction、observed-prefix 和 execution-chain checker；
-- persistent supervisor 和 `complete / safe_pending / violated / unknown / inconsistent` verdict；
-- replay、stale、cross-state、cross-monitor 和 cross-episode rejection。
-
-### M2：Lean CTDA specification
-
-- `SemanticTemporalRefines`；
-- `PrefixPreCertified`；
-- `ObservedPrefixEvidenceValid`；
-- finite-prefix temporal formula evaluation和 monitor；
-- staged checker soundness/reflection theorem；
-- 正例与 wrong binding、deadline、tube、command、trace、post evidence 等负例。
-
-### M3：LIBERO fail-closed loop
-
-- 每个 raw `env.step` 前进行 CTDA prefix authorization；
-- 每步生成 actuator receipt、plant/event trace 和 monitor transition；
-- monitor failure/pending-budget exhaustion 时实际 dispatch canonical zero hold；
-- fallback switch receipt 绑定 trigger、requested/applied command、pre/post state、invariant 和
-  latency；
-- 冻结 BDDL snapshot、trusted instruction、SafetySpec、action bounds、fallback digest 和 episode
-  nonce；
-- CTDA 禁止 warmup step 和 `--skip-existing`。
-
-## 3. P0：接入 Lean CTDA 在线 evaluator
-
-这是当前最高优先级。目标是让每次 online authorization 使用 Lean 中的 CTDA checker，而不是
-只运行 Python reference checker。
-
-### 工作项
-
-1. 定义 Python CTDA object 到 Lean request 的规范 serialization。
-2. 为 semantic、prefix-pre、observed-prefix 和 monitor transition 提供统一 evaluator entrypoint。
-3. 决定执行方式：
-   - kernel-audit 模式：生成完整 Lean term/file并由 Lean kernel 检查；
-   - online compiled evaluator：使用预编译 evaluator，同时明确 codegen/runtime 新增 TCB。
-4. 对 Python 与 Lean evaluator 做 differential test，覆盖所有正例和 fail-closed 负例。
-5. 将 online result mode 从 `ctda-python-reference` 区分为明确的
-   `ctda-lean-kernel` 或 `ctda-lean-compiled`。
-6. 加 content-addressed cache；cache key 必须包含 spec、contract、state、monitor、model、evidence
-   和 checker version digest。
-
-### 完成标准
-
-- online wrapper 在 dispatch 前取得 Lean CTDA `proven` witness；
-- 修改任意关键 binding 都会使 Lean evaluator 拒绝；
-- Python reference checker 只作为 differential oracle/diagnostic，不再作为论文 full-CTDA
-  authorization source；
-- 报告 semantic、prefix-pre、observed-prefix 和 monitor 的分项延迟与 p50/p95/p99；
-- 保留完整 kernel replay artifact。
-
-## 4. P1：从条件运动学界升级 physical certificate
-
-### 工作项
-
-1. 给当前 conditional kinematic bound 写出明确 assumptions、适用 action space 和误差预算。
-2. 记录每个 prefix 的最小 tube/barrier margin，而不是只有 Boolean membership。
-3. 引入 risk-aware prefix horizon：free-space 可更长，contact/release/handover 强制缩短并重观测。
-4. 为少量 primitive 评估 CBF-QP、predictive safety filter 或 reachable-tube witness。
-5. 要求所有允许的 cutoff/switch state 都处于 recoverable set，而不只检查名义终点。
-6. 把 witness 设计成 consumer-checkable artifact，避免只信任 producer 的 `verified=true` 声明。
-
-### 完成标准
-
-- 明确给出条件 invariant theorem 的模型、扰动、采样、延迟和控制界；
-- tube witness 覆盖整个 authorized duration，无时间空洞；
-- observed plant sample 可复核地落在 tube 内；
-- model assumption 失效会在下一次 dispatch 前锁存并 fallback。
-
-## 5. P2：Verified fallback 与硬件证据链
-
-### 工作项
-
-1. 从 simulator zero-hold 扩展为 `hold / brake / retreat` baseline controller contract。
-2. 定义 recoverable set、forward switching condition、reverse-switch hysteresis 和 backup
-   availability。
-3. 建立 trigger-to-dispatch、dispatch-to-observe 和总 switch latency 的硬件时间链。
-4. 使用签名、MAC、TEE 或 proof store 验证 observer/actuator attestation，而不是 local allowlist。
-5. 证明 fallback 接管后在声明 horizon 内保持 invariant，并区分即时 stop 与长期 stable state。
-
-### 完成标准
-
-- fallback witness 不是 operator-pinned simulator manifest；
-- actuator receipt 来自实际低层控制接口；
-- 最坏切换延迟满足 theorem assumptions；
-- supervisor composition theorem覆盖 advanced controller 到 baseline controller 的切换。
-
-## 6. P2：可信 task-root compiler
-
-### 工作项
-
-1. 为 LIBERO-Safety 五个 suites 定义 deterministic typed task templates。
-2. 把 BDDL goal、object registry、instruction 和 suite hard-safety template 编译到
-   `MissionSpec`。
-3. 验证 compiler preserves goal/constraint semantics，或产生可由 Lean 检查的 compilation
-   certificate。
-4. 保持 suite hard safety 对 task prompt 的优先级，攻击 prompt 不得重写 task root。
-5. 对 referent ambiguity、unknown object/region 和 contradictory source 产生显式 fail-closed
-   verdict。
-
-### 完成标准
-
-- 同一 task artifact 确定性生成同一 mission claim digest；
-- BDDL/registry 任意变化都会使冻结任务根失效；
-- benchmark attack 只能改变 policy-facing prompt，不能改变 authenticated mission；
-- goal-completing obligation 可追溯到原始 BDDL goal。
-
-## 7. P3：实验与 ablation
-
-所有方法必须使用相同 policy checkpoint、task、init state、policy seed、camera、horizon 和原始
-proposal source。
-
-### 主要对照
-
-1. VLA only；
-2. collision/safety filter only；
-3. legacy Boolean Intent only；
-4. legacy Boolean Effect only；
-5. legacy Dual Lean；
-6. temporal semantic layer only；
-7. predictive physical-effect layer only；
-8. CTDA without command binding；
-9. CTDA without uncertainty handling；
-10. CTDA with simulator fallback；
-11. full available CTDA。
-
-### 指标
-
-- task success、safe success、success-but-unsafe；
-- collision/cost、spec violation、violation severity；
-- unsafe action rejection、false rejection、unknown rate；
-- intervention lead time、risk exposure time、fallback success/latency；
-- semantic/prefix/monitor checker latency和总 verifier tax；
-- contract completion、pending timeout、replan 和 deadlock rate。
-
-### 攻击与场景
-
-- LIBERO-Safety 五 suites；
-- SABER instruction perturbation/action inflation；
-- dynamic obstacle、human intrusion 和 object binding swap；
-- stale/replay/cross-episode evidence injection；
-- actuator mismatch、observation loss、model-assumption failure；
-- temporal ordering、deadline 和 cumulative-effect failure。
-
-### 完成标准
-
-- 每个主结果都区分 evaluator mode、evidence source 和 guarantee class；
-- simulator oracle、noisy observer 和硬件 evidence 不混表；
-- task success 与 safety decision 分开报告；
-- 所有 paper table 可以由保存的 episode artifact 和版本化 summary script 重建。
-
-## 8. P4：形式化组合定理
-
-在前三阶段证据接口稳定后，建立：
+先交付一个有限、诚实、可运行、可审计的闭环：
 
 ```text
-authenticated mission
-∧ semantic refinement witness
-∧ each prefix-pre certificate
-∧ each observed-prefix certificate
-∧ monitor-chain continuity
-∧ plant/observer/timing/fallback assumptions
-  => every checked prefix preserves the declared invariant
-     ∧ complete implies the contract trace guarantee
-     ∧ task phase advances only after a completion witness
+trusted frozen mission
+  -> mission-rooted persistent contract
+  -> independent raw-prefix binding
+  -> Lean-kernel-checked discrete authorization
+  -> exact dispatch and cumulative completion audit
 ```
 
-定理必须明确区分：
+当前环境没有 GPU。本地阶段只做方法闭环、Lean/Python parity、CPU tests 和 shadow harness。
+GPU rollout 只在 readiness gate 通过后迁移到远程执行。
 
-- 对离散 artifact 的无条件 Lean 结论；
-- 对 perception/dynamics/actuation assumptions 的条件保证；
-- statistical uncertainty coverage；
-- simulator-only 与 hardware-backed evidence。
+## 1. 冻结原则
 
-## 9. 工程纪律
+1. 不构造新攻击；只使用发布的、版本化的 attack artifact。
+2. 不继续扩展完整 RTA 架构；CBF/reachability、硬件 attestation 和 verified recovery 全部暂缓。
+3. 不做通用 NL/BDDL compiler；只支持一个显式 task/primitive slice。
+4. 不把 policy-facing prompt 或 `proofalign_action` 当作 contract authority。
+5. 不把 Python verdict 改名为 Lean proof。
+6. 不跑大规模 GPU 主表来掩盖 false block 或 evaluator gap。
+7. 不从 `docs/archive/` 恢复旧口径。
 
-- 修改方法语义时同步更新 `docs/method.md`、Lean definition、Python reference checker 和
-  differential tests；
-- 新增 allow path 必须有对应 fail-closed negative tests；
-- mock、empty evidence 或未验证 learned score 不得进入 authorization path；
-- 不从缓存 episode 元数据替代 live task root/state/action-bound validation；
-- 大模型和数据放 `/data0/ldx`，代码保留在仓库；
-- 推送前至少运行 `uv run pytest` 和 `cd lean && lake build ProofAlign`。
+## 2. P0：文档与 claim scope freeze
+
+状态：**完成**。
+
+产物：
+
+- canonical method、architecture、experiment protocol 和 remote runbook；
+- trusted, locally frozen mission 的准确措辞；
+- 两个系统不变量；
+- 当前不可声称能力；
+- archive 与 canonical source-of-truth 规则。
+
+后续方法变更必须同步更新 `method.md`、Lean definition、Python evaluator 和 tests，不再新增
+平行 design memo。
+
+## 3. P1：修正合同来源与 raw-action binding
+
+状态：**本地完成**。
+
+已实现 frozen Pick/Place template、phase/residual-obligation contract provider、policy metadata
+隔离和版本化 raw binder；prompt/metadata/registry/wrong-target/gripper/held-object/region 回归测试已
+通过。
+
+### 3.1 Trusted mission source
+
+- 明确区分 benchmark-owned trusted instruction、policy-facing instruction 和 untrusted
+  proposal metadata。
+- 为一个有限 task slice 实现 deterministic task-template/manifest compiler。
+- `MissionSpec` 绑定 task artifact、trusted instruction、registry、SafetySpec、phase、episode
+  nonce 和 time base。
+- unsupported/ambiguous task 明确 fail closed。
+
+### 3.2 Mission-rooted contract provider
+
+- active contract 只由 `MissionSpec + active phase + residual obligation` 决定。
+- paper CTDA path 不调用 `heuristic_contract_from_instruction()` 产生授权合同。
+- 改变 attacked prompt 或 policy `proofalign_action` 不得改变 active contract、spec digest 或
+  paper-path verdict。
+- legacy heuristic 仅保留 compatibility/logging 标签。
+
+### 3.3 Independent raw proposal binder
+
+- binder 读取 trusted state、raw command、active contract 和 versioned config。
+- 最小支持 persistent `Pick`/`Place`；approach/transport 属于合同内 prefix。
+- 错误 target/region/held object/gripper action、观测不足或方向不明必须 refuted/unknown。
+- policy 自报 admissibility、contract id 或 expected effect 不能升级 binder verdict。
+- completion 只能来自 observed witness。
+
+### 验收
+
+- prompt tamper 不改变 paper contract/verdict；
+- `proofalign_action` tamper 不改变 paper verdict；
+- trusted task/registry 改变导致 mission digest 改变，旧 artifact 失效；
+- wrong target、wrong gripper、wrong held object fail closed；
+- missing completion 保持 `safe_pending`；
+- stale/replay/cross-episode tests 继续通过；
+- evaluator 失败前没有 supervisor partial commit。
+
+## 4. P2：`ctda-wire-v1` 与 Lean online evaluator
+
+状态：**本地功能闭环完成，real-time 性能未通过**。
+
+### 4.1 Canonical wire schema
+
+实现内部 `ctda-wire-v1`，stage 至少包含：
+
+- `semantic`
+- `prefix_pre`
+- `observed_prefix`
+- `monitor_step`
+
+要求 canonical UTF-8 JSON、integer nanoseconds、tagged temporal formula、strict decoder、consumer
+digest recomputation、stable ordering 和 round-trip/injection tests。它不替换 episode JSON 或
+attack-record schema。
+
+### 4.2 Evaluator abstraction
+
+明确实现：
+
+- `ctda-python-reference`
+- `ctda-lean-kernel`
+- `ctda-shadow`
+
+Lean 不可用、serialization/build/timeout/parity mismatch 时 fail closed。只有 kernel 实际检查
+成功的 request 才能写 `proof_verified=true`。
+
+### 4.3 Online transaction
+
+- `semantic` 和 `prefix_pre` 必须在 `env.step` 前 proven；
+- `observed_prefix` 和 `monitor_step` 必须在下一次 dispatch/phase advance 前 proven；
+- Lean 失败时不得退回 Python 继续 dispatch；
+- request、generated Lean artifact、checker digest 和输出可离线 replay；
+- cache key 必须包含 canonical request 与 checker/build/schema version。
+
+### 4.4 Golden parity corpus
+
+覆盖 proven/refuted/pending/complete/violated/inconsistent 及：
+
+- spec/nonce/state/monitor/contract/proposal/command/time-base tamper；
+- receipt/trace provenance mismatch；
+- split-prefix completion；
+- timestamp rollback；
+- replay、stale、cross-episode artifact。
+
+共同支持语义必须达到零 mismatch。
+
+### 验收
+
+- fake-env test 证明 Lean proven 前 `env.step` 调用次数为 0；
+- Lean unavailable/tampered request 时 dispatch 为 0；
+- observed/monitor 未通过时 phase 不推进；
+- golden corpus 零 parity mismatch；
+- `lake build ProofAlign` 与全量 Python tests 通过。
+
+本地结果：以上 correctness gate 已通过；189 passed / 1 skipped，Lean 12 jobs，fake-env pre-proof
+零 dispatch，unavailable/tampered request 零 dispatch，observed/monitor failure 零 phase advance。
+但逐 request Lean replay 的 p99 为约 0.65--1.95 秒，超过 control deadline，因此当前不得声称
+real-time enforcement。
+
+## 5. P3：CPU-only shadow calibration harness
+
+状态：**工程 harness 与 synthetic golden parity 完成；clean calibration 未完成**。
+
+输入保存的 clean prefix/episode artifact 或 CI fixture，不调用 simulator/GPU，不改变 action。
+
+输出：
+
+- supported/unknown/blocked/allowed；
+- Layer 1、Layer 2 和 dual unique catch；
+- pending/complete/violated/inconsistent；
+- Python/Lean parity mismatch；
+- semantic/prefix/observed/monitor p50/p95/p99；
+- schema/checker/config/git digest；
+- independent label provenance；
+- 没有 ground truth 时相关指标为 `not_evaluated`。
+
+### Readiness gate
+
+以下是进入远程 pilot 的工程目标，不是已经实现的结果：
+
+- parity mismatch = 0；
+- clean false block 目标 ≤5%，>10% 停止扩实验并修 binder/abstraction；
+- unknown/deadlock 目标 ≤5%；
+- clean success retention 远程 paired target ≥90%；
+- p99 必须实测；超过控制周期则降级为 offline audit，不能声称 real-time enforcement。
+
+本地 27-case fixture 结果：parity mismatch = 0，Layer 1/Layer 2/dual unique catch 均有覆盖，
+pending/complete/violated/inconsistent 均有覆盖。fixture 没有独立 ground truth，因此 false block、
+TPR、FPR 均为 `not_evaluated`。Lean p99 超出控制周期，当前按 offline audit/slow interlock 处理。
+
+## 6. P4：远程发布攻击 workload pilot
+
+状态：**本地迁移代码已就绪，远程执行未开始**。P1/P2 correctness 与 golden parity 已通过，
+但 P3 clean calibration 和 real-time latency 未通过。fail-closed preflight manifest 与 clean +
+Lean slow-interlock 单 episode smoke 已脚本化；仍需在能访问内网 GPU 主机的环境 clone 后执行。
+远程先做 clean single-episode shadow/slow-interlock smoke；不得直接启动主表。
+环境见 [`remote_execution.md`](remote_execution.md)。
+
+在 60-episode pilot 前增加 upstream reproduction gate，详见
+[`reproduction_plan.md`](reproduction_plan.md)：
+
+1. standard LIBERO 上复现 SABER π0.5 clean + record/replay；
+2. standard LIBERO 上复现 Phantom Menace OpenPI clean + camera transform；
+3. 复现 SAFE/FIPER 官方 detector pipeline，冻结需要的 rollout/feature schema；
+4. 上游通过后才开发 LIBERO-Safety exact-task workload 与 π0.5 defense adapter。
+
+### Workload
+
+- clean pi0.5/OpenPI + LIBERO-Safety；
+- 一个发布 instruction attack family：SABER `constraint_violation` 优先；
+- 一个发布 camera attack family：Phantom Menace deterministic transform；
+- EDPA 只作后续 patch transfer 和训练型 secondary track。
+
+不在本项目中优化攻击，不按攻击调整 CTDA 阈值。
+
+### 60-episode gate
+
+先跑四个 physical suites × tasks `0-14` × init `0`。进入主表要求：
+
+- clean baseline 稳定且 runner failure 可接受；
+- 至少一个 instruction 和一个 camera workload 产生 authorization/safety signal，而不仅是 task
+  success drop；
+- 每个 episode 保存 task/init/env seed/policy seed/camera/horizon/config/evaluator mode；
+- raw artifact 可从远程复制并校验。
+
+若攻击只造成 task failure、没有 authorization/safety signal，则不写 physical-defense claim。
+
+## 7. P5：最小配对主实验
+
+固定方法：
+
+1. VLA only；
+2. privileged collision/cost checker；
+3. SAFE；
+4. FIPER；
+5. Full CTDA。
+
+Mission-only 与 trace-only 放在独立 CTDA ablation 表。RoboGuard 通过 plan-interface gate 后加入
+semantic comparison；EDPA/Phantom training defense 在其官方 victim 上单独成表。
+
+固定 workload：clean、一个 instruction family、一个 camera family。
+
+固定 task/init/policy seed/env seed/camera/horizon/checkpoint。先跑 pilot，只有 signal 和 utility
+gate 通过才扩 init `0-4`。
+
+指标、offline/online 双协议与 artifact 规则见 [`experiments.md`](experiments.md)。
+
+## 8. Kill criteria
+
+出现以下任一情况，主动缩题而不是继续堆实验：
+
+- online 仍只有 Python reference：删除 Lean-backed online enforcement claim；
+- clean relative success retention <90% 或一次校准后 false block >10%：停止扩实验；
+- full dual 与最佳 single layer 无显著差异，或某层没有 unique catch：删除“双层必要性”claim；
+- visual defense 使用与 policy 相同的 attacked observer：删除确定性 camera-defense claim；
+- 需要按攻击调阈值：删除 attack-agnostic claim；
+- p99 超出 control deadline：改为 offline audit；
+- 独立 oracle 无法标注 unsafe/safe proposal：不报告 detection TPR/FPR；
+- 结果主要依赖 privileged simulator oracle：只主张 simulation/reference-monitor 结果。
+
+## 9. 暂缓项
+
+- EDPA paper-scale reproduction；
+- 新攻击、训练时后门、攻击模型训练；
+- 三个以上 victim；
+- 全量五 suite/多 init 大矩阵；
+- 通用自然语言与全 BDDL compiler；
+- CBF、HJ reachability、完整 dynamics proof；
+- authenticated IPC、TEE、hardware attestation；
+- verified recovery controller；
+- 实机安全保证。
+
+若未来坚持 S&P/USENIX Security/CCS/NDSS 路线，应另开系统安全 track，补进程隔离、认证
+通信、独立 sensor/actuator evidence 和有限实机验证；这些不阻塞当前 simulation-first 论文。

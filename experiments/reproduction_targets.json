@@ -1,0 +1,77 @@
+{
+  "schema": "proofalign.reproduction-targets.v1",
+  "updated": "2026-07-12",
+  "primary_platform": {
+    "benchmark": "LIBERO-Safety",
+    "victim": "pi0.5/OpenPI pi05_libero",
+    "checkpoint": "LIBERO-Safety released pi0.5 checkpoint"
+  },
+  "targets": [
+    {
+      "id": "saber",
+      "role": "attack",
+      "priority": "P0",
+      "paper": "https://arxiv.org/abs/2603.24935",
+      "repository": "https://github.com/wuxiyang1996/SABER",
+      "upstream_platform": "standard LIBERO + pi0.5/OpenPI",
+      "main_adapter": "versioned instruction attack records",
+      "status": "planned",
+      "upstream_commit": null
+    },
+    {
+      "id": "phantom-menace",
+      "role": "attack",
+      "priority": "P0",
+      "paper": "https://arxiv.org/abs/2511.10008",
+      "repository": "https://github.com/ZJUshine/Phantom-Menace",
+      "upstream_platform": "standard LIBERO + OpenPI/OpenVLA",
+      "main_adapter": "versioned observation transform plugin",
+      "status": "planned",
+      "upstream_commit": null
+    },
+    {
+      "id": "edpa",
+      "role": "attack_and_training_defense",
+      "priority": "P1",
+      "paper": "https://arxiv.org/abs/2510.13237",
+      "repository": "https://github.com/trustmlyoungscientist/EDPA_attack_defense",
+      "upstream_platform": "standard LIBERO + pi0/OpenVLA/OpenVLA-OFT",
+      "main_adapter": "fixed adversarial patch transfer",
+      "status": "planned",
+      "upstream_commit": null
+    },
+    {
+      "id": "safe-failure-detector",
+      "role": "runtime_defense",
+      "priority": "P0",
+      "paper": "https://arxiv.org/abs/2506.09937",
+      "repository": "https://github.com/vla-safe/SAFE",
+      "upstream_platform": "LIBERO + OpenVLA/pi0/pi0-FAST",
+      "main_adapter": "pi0.5 latent feature and alarm plugin",
+      "status": "planned",
+      "upstream_commit": null
+    },
+    {
+      "id": "fiper",
+      "role": "runtime_defense",
+      "priority": "P0",
+      "paper": "https://arxiv.org/abs/2510.09459",
+      "repository": "https://github.com/learnsyslab/fiper",
+      "upstream_platform": "generative robot policies",
+      "main_adapter": "pi0.5 observation embedding plus seeded action samples",
+      "status": "planned",
+      "upstream_commit": null
+    },
+    {
+      "id": "roboguard",
+      "role": "semantic_plan_defense",
+      "priority": "P1",
+      "paper": "https://arxiv.org/abs/2503.07885",
+      "repository": "https://github.com/KumarRobotics/RoboGuard",
+      "upstream_platform": "LLM plans + semantic graph + temporal synthesis",
+      "main_adapter": "BDDL semantic graph and independent plan adapter",
+      "status": "planned",
+      "upstream_commit": null
+    }
+  ]
+}

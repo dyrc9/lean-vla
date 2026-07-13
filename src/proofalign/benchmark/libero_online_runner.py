@@ -31,6 +31,11 @@ from proofalign.ctda_runtime import (
     CTDARuntimeSession,
     ExactAllowlistEvidenceIssuer,
 )
+from proofalign.ctda_evaluator import (
+    LeanKernelEvaluator,
+    PythonReferenceEvaluator,
+    ShadowEvaluator,
+)
 from proofalign.intent_parser import parse_intent
 from proofalign.models import Decision, ExecutionDecision, ExecutionStep, SafetySpec
 
@@ -588,6 +593,26 @@ def _configure_ctda(
         producer_version="1",
     )
     created_at = monotonic_ns()
+    artifact_root = Path(
+        getattr(args, "ctda_artifact_dir", None)
+        or (Path(args.output).parent / "ctda_kernel_artifacts" / Path(args.output).stem)
+    )
+    kernel_evaluator = LeanKernelEvaluator(
+        artifact_root=artifact_root,
+        timeout_seconds=float(getattr(args, "ctda_lean_timeout_seconds", 10.0)),
+    )
+    evaluator_mode = getattr(args, "ctda_evaluator", "ctda-python-reference")
+    if evaluator_mode == "ctda-python-reference":
+        evaluator = PythonReferenceEvaluator(kernel_evaluator.checker_version_digest)
+    elif evaluator_mode == "ctda-lean-kernel":
+        evaluator = kernel_evaluator
+    elif evaluator_mode == "ctda-shadow":
+        evaluator = ShadowEvaluator(
+            PythonReferenceEvaluator(kernel_evaluator.checker_version_digest),
+            kernel_evaluator,
+        )
+    else:
+        raise LiberoOnlineIntegrationError(f"unknown CTDA evaluator mode: {evaluator_mode}")
     wrapper.ctda_session = CTDARuntimeSession.from_legacy(
         parse_intent(trusted_instruction),
         wrapper.current_state,
@@ -606,6 +631,7 @@ def _configure_ctda(
             fallback_action=tuple(float(value) for value in fallback_manifest["fallback_action"]),
             semantic_evidence=evidence,
         ),
+        evaluator=evaluator,
     )
     # Keep the validated artifact fields available for audit output without
     # treating the JSON declaration itself as a proof.
@@ -637,6 +663,9 @@ def _configure_ctda(
         ),
         "initial_state_digest": digest_legacy_state(wrapper.current_state),
         "proof_verified": False,
+        "evaluator_mode": evaluator_mode,
+        "wire_artifact_dir": str(artifact_root),
+        "checker_version_digest": evaluator.checker_version_digest,
     }
 
 
@@ -897,6 +926,21 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         help="Explicit CTDA evidence TCB. The built-in mode is simulator/test only.",
     )
     parser.add_argument("--ctda-episode-nonce", help="Optional fixed nonce for reproducible audit replay.")
+    parser.add_argument(
+        "--ctda-evaluator",
+        choices=("ctda-python-reference", "ctda-lean-kernel", "ctda-shadow"),
+        default="ctda-python-reference",
+        help="Authoritative CTDA evaluator mode; shadow is diagnostic and cannot dispatch.",
+    )
+    parser.add_argument(
+        "--ctda-artifact-dir",
+        help="Directory for canonical wire requests and replayable Lean artifacts.",
+    )
+    parser.add_argument(
+        "--ctda-lean-timeout-seconds",
+        type=float,
+        default=10.0,
+    )
     parser.add_argument("--warmup-steps", type=int, default=5)
     parser.add_argument("--warmup-gripper", type=float, default=0.0)
     parser.add_argument("--seed", type=int, default=0)

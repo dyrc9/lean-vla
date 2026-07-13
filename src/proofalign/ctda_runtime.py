@@ -34,13 +34,13 @@ from proofalign.ctda import (
     ReachableTube,
     SemanticSkillContract,
     StaticCheckResult,
+    StaticVerdict,
     SymbolicEvent,
     SymbolicEventTrace,
     TraceAbstractionEvidence,
     advance_monitor_state,
     bind_mission_authority,
-    contract_from_legacy_action,
-    digest_legacy_action,
+    contract_from_mission_phase,
     digest_legacy_state,
     digest_payload,
     digest_text,
@@ -48,6 +48,18 @@ from proofalign.ctda import (
     guard_subject_digest,
     mission_from_legacy,
     proposal_contract_subject_digest,
+)
+from proofalign.ctda_evaluator import (
+    CTDAEvaluationArtifact,
+    CTDAEvaluationResult,
+    CTDAEvaluator,
+    CTDAEvaluatorMode,
+)
+from proofalign.ctda_wire import (
+    WireMonitorVerdict,
+    WireStage,
+    WireStaticVerdict,
+    make_wire_request,
 )
 
 
@@ -153,6 +165,90 @@ LocalEvidenceIssuer = ExactAllowlistEvidenceIssuer
 
 
 @dataclass(frozen=True)
+class RawProposalBinderConfig:
+    """Versioned, finite-domain interpretation of LIBERO delta commands."""
+
+    version: str = "mission-raw-binder-pick-place-v1"
+    gripper_close_threshold: float = -0.2
+    gripper_open_threshold: float = 0.2
+    grasp_neighborhood_m: float = 0.25
+    translation_scale_m: float = 0.05
+    direction_epsilon: float = 1e-9
+    config_digest: str = field(init=False)
+
+    def __post_init__(self) -> None:
+        if not self.version.strip():
+            raise ValueError("raw binder version must be non-empty")
+        for name in (
+            "gripper_close_threshold",
+            "gripper_open_threshold",
+            "grasp_neighborhood_m",
+            "translation_scale_m",
+            "direction_epsilon",
+        ):
+            if not isfinite(float(getattr(self, name))):
+                raise ValueError(f"{name} must be finite")
+        if self.gripper_close_threshold >= self.gripper_open_threshold:
+            raise ValueError("raw binder gripper thresholds overlap")
+        if (
+            self.grasp_neighborhood_m <= 0
+            or self.translation_scale_m <= 0
+            or self.direction_epsilon < 0
+        ):
+            raise ValueError("raw binder geometry thresholds are invalid")
+        object.__setattr__(
+            self,
+            "config_digest",
+            digest_payload(
+                {
+                    "version": self.version,
+                    "gripper_close_threshold": self.gripper_close_threshold,
+                    "gripper_open_threshold": self.gripper_open_threshold,
+                    "grasp_neighborhood_m": self.grasp_neighborhood_m,
+                    "translation_scale_m": self.translation_scale_m,
+                    "direction_epsilon": self.direction_epsilon,
+                }
+            ),
+        )
+
+
+@dataclass(frozen=True)
+class RawProposalBinderResult:
+    """Consumer-computed raw-command binding; producer metadata is absent."""
+
+    verdict: StaticVerdict
+    mission_digest: str
+    contract_digest: str
+    state_digest: str
+    command_digest: str
+    config_digest: str
+    issues: tuple[str, ...] = ()
+    witness_digest: str = field(init=False)
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "issues", tuple(str(item) for item in self.issues))
+        object.__setattr__(
+            self,
+            "witness_digest",
+            digest_payload(
+                {
+                    "verdict": self.verdict.value,
+                    "mission_digest": self.mission_digest,
+                    "contract_digest": self.contract_digest,
+                    "state_digest": self.state_digest,
+                    "command_digest": self.command_digest,
+                    "config_digest": self.config_digest,
+                    "issues": self.issues,
+                }
+            ),
+        )
+
+    @property
+    def proven(self) -> bool:
+        return self.verdict is StaticVerdict.PROVEN
+
+
+@dataclass(frozen=True)
 class ConditionalKinematicConfig:
     control_period_ns: int = 20_000_000
     contract_budget_ns: int = 2_000_000_000
@@ -170,6 +266,7 @@ class ConditionalKinematicConfig:
     physical_evidence: tuple[str, ...] = ("physical_requirement",)
     runtime_evidence: tuple[str, ...] = ("runtime_requirement",)
     post_evidence: tuple[str, ...] = ("post_requirement",)
+    raw_binder: RawProposalBinderConfig = field(default_factory=RawProposalBinderConfig)
 
     def __post_init__(self) -> None:
         if self.control_period_ns <= 0 or self.contract_budget_ns <= 0:
@@ -501,9 +598,12 @@ class CTDARuntimeSession:
     supervisor: CTDASupervisor
     config: ConditionalKinematicConfig = field(default_factory=ConditionalKinematicConfig)
     evidence_issuer: CTDAEvidenceIssuer | None = None
+    evaluator: CTDAEvaluator | None = None
     proposal_index: int = 0
     active_execution: ContractExecution | None = None
     last_fallback_receipt: FallbackSwitchReceipt | None = None
+    evaluation_artifacts: list[CTDAEvaluationArtifact] = field(default_factory=list)
+    stage_request_ids: dict[WireStage, str] = field(default_factory=dict)
 
     @classmethod
     def from_legacy(
@@ -519,6 +619,7 @@ class CTDARuntimeSession:
         evidence_issuer: CTDAEvidenceIssuer | None = None,
         now_ns: int | None = None,
         episode_nonce: str | None = None,
+        evaluator: CTDAEvaluator | None = None,
     ) -> "CTDARuntimeSession":
         if evidence_issuer is None:
             raise ValueError("CTDA fails closed without an explicit typed evidence issuer")
@@ -559,6 +660,7 @@ class CTDARuntimeSession:
             CTDASupervisor(mission, checker, now_ns=now),
             runtime_config,
             evidence_issuer,
+            evaluator,
         )
 
     def reset(self) -> None:
@@ -573,6 +675,25 @@ class CTDARuntimeSession:
         self.proposal_index = 0
         self.active_execution = None
         self.last_fallback_receipt = None
+        self.evaluation_artifacts.clear()
+        self.stage_request_ids.clear()
+
+    @property
+    def evaluator_mode(self) -> str:
+        return (
+            self.evaluator.mode.value
+            if self.evaluator is not None
+            else CTDAEvaluatorMode.PYTHON_REFERENCE.value
+        )
+
+    @property
+    def kernel_proof_verified(self) -> bool:
+        return bool(
+            self.evaluator is not None
+            and self.evaluator.mode is CTDAEvaluatorMode.LEAN_KERNEL
+            and self.evaluation_artifacts
+            and all(item.proof_verified for item in self.evaluation_artifacts)
+        )
 
     def fallback_command(self) -> tuple[float, ...]:
         if not self.config.fallback_verified or not self.config.fallback_action:
@@ -821,6 +942,93 @@ class CTDARuntimeSession:
             for evidence_type in _unique_strings(evidence_types)
         )
 
+    def _evaluate_stage(
+        self,
+        stage: WireStage,
+        payload: dict[str, Any],
+    ) -> CTDAEvaluationResult | None:
+        if self.evaluator is None:
+            return None
+        try:
+            request = make_wire_request(
+                stage,
+                self.evaluator.checker_version_digest,
+                payload,
+            )
+            result = self.evaluator.evaluate(request)
+        except Exception as exc:
+            raise RuntimeError(f"{stage.value} evaluator failed closed: {exc}") from exc
+        self.evaluation_artifacts.append(result.artifact)
+        self.stage_request_ids[stage] = request.request_id
+        return result
+
+    def _static_evaluation_check(
+        self,
+        result: CTDAEvaluationResult | None,
+        stage: WireStage,
+    ) -> StaticCheckResult:
+        if result is None:
+            return StaticCheckResult.success(f"python-reference:{stage.value}")
+        if self.evaluator is not None and self.evaluator.mode is CTDAEvaluatorMode.SHADOW:
+            return StaticCheckResult.inconsistent(
+                "ctda-shadow is diagnostic and cannot authorize dispatch"
+            )
+        if result.verdict is WireStaticVerdict.PROVEN:
+            if (
+                self.evaluator is not None
+                and self.evaluator.mode is CTDAEvaluatorMode.LEAN_KERNEL
+                and not result.artifact.proof_verified
+            ):
+                return StaticCheckResult.inconsistent(
+                    f"{stage.value} was not checked by the Lean kernel"
+                )
+            return StaticCheckResult.success(result.artifact.request_id)
+        if result.verdict is WireStaticVerdict.UNKNOWN:
+            return StaticCheckResult.unknown(
+                f"{stage.value} evaluator returned unknown"
+            )
+        if result.verdict is WireStaticVerdict.REFUTED:
+            return StaticCheckResult.refuted(
+                f"{stage.value} evaluator refuted the wire request"
+            )
+        return StaticCheckResult.inconsistent(
+            f"{stage.value} evaluator failed: {result.artifact.stderr or result.verdict.value}"
+        )
+
+    def _monitor_evaluation_check(
+        self,
+        result: CTDAEvaluationResult | None,
+        reference: MonitorCheckResult,
+        monitor_state: Any,
+    ) -> MonitorCheckResult | None:
+        if result is None:
+            return None
+        if self.evaluator is not None and self.evaluator.mode is CTDAEvaluatorMode.SHADOW:
+            return MonitorCheckResult(
+                MonitorVerdict.INCONSISTENT,
+                monitor_state,
+                issues=("ctda-shadow is diagnostic and cannot advance the online monitor",),
+            )
+        if (
+            self.evaluator is not None
+            and self.evaluator.mode is CTDAEvaluatorMode.LEAN_KERNEL
+            and not result.artifact.proof_verified
+        ):
+            return MonitorCheckResult(
+                MonitorVerdict.INCONSISTENT,
+                monitor_state,
+                issues=("monitor_step was not checked by the Lean kernel",),
+            )
+        if result.verdict.value != reference.verdict.value:
+            return MonitorCheckResult(
+                MonitorVerdict.INCONSISTENT,
+                monitor_state,
+                issues=(
+                    "Python/Lean monitor parity mismatch; phase advance failed closed",
+                ),
+            )
+        return None
+
     def prepare_prefix(
         self,
         symbolic_action: Any,
@@ -846,17 +1054,8 @@ class CTDARuntimeSession:
 
         if self.supervisor.active_contract is None:
             try:
-                contract = contract_from_legacy_action(
+                contract = contract_from_mission_phase(
                     self.supervisor.mission,
-                    symbolic_action,
-                    contract_id=digest_payload(
-                        {
-                            "spec": self.supervisor.mission.spec_digest,
-                            "phase": self.supervisor.active_phase,
-                            "action": digest_legacy_action(symbolic_action),
-                            "created": now,
-                        }
-                    ),
                     current_phase=self.supervisor.active_phase,
                     issued_at_ns=now,
                     deadline_ns=now + self.config.contract_budget_ns,
@@ -892,12 +1091,27 @@ class CTDARuntimeSession:
                     },
                     issued_at_ns=now,
                 )
+                semantic_evaluation = self._evaluate_stage(
+                    WireStage.SEMANTIC,
+                    _semantic_wire_payload(
+                        self.supervisor.mission,
+                        self.supervisor.active_phase,
+                        contract,
+                        now,
+                    ),
+                )
             except (TypeError, ValueError) as exc:
                 return PrepareResult(StaticCheckResult.refuted(f"cannot activate semantic contract: {exc}"))
             except Exception as exc:
                 return PrepareResult(
                     StaticCheckResult.inconsistent(f"cannot issue semantic evidence: {exc}")
                 )
+            semantic_gate = self._static_evaluation_check(
+                semantic_evaluation,
+                WireStage.SEMANTIC,
+            )
+            if not semantic_gate.proven:
+                return PrepareResult(semantic_gate)
             activated = self.supervisor.activate_contract(
                 contract,
                 semantic_attestations,
@@ -912,10 +1126,23 @@ class CTDARuntimeSession:
             return PrepareResult(StaticCheckResult.inconsistent("supervisor lost its active contract state"))
 
         try:
-            proposal_admissible = _action_matches_contract(symbolic_action, contract)
             state_digest = digest_legacy_state(current_state)
             proposal_digest = digest_payload(commands)
             authorised_digest = digest_payload(commands)
+            binder_result = bind_raw_proposal(
+                self.supervisor.mission,
+                contract,
+                current_state,
+                commands,
+                self.config.raw_binder,
+            )
+            if not binder_result.proven:
+                if binder_result.verdict is StaticVerdict.UNKNOWN:
+                    return PrepareResult(StaticCheckResult.unknown(*binder_result.issues))
+                if binder_result.verdict is StaticVerdict.INCONSISTENT:
+                    return PrepareResult(StaticCheckResult.inconsistent(*binder_result.issues))
+                return PrepareResult(StaticCheckResult.refuted(*binder_result.issues))
+            proposal_admissible = True
             duration_ns = len(commands) * self.config.control_period_ns
             model_digest = digest_text(self.config.dynamics_model_id)
             assumptions = _kinematic_assumptions(self.config, safety_spec)
@@ -999,9 +1226,10 @@ class CTDARuntimeSession:
             proposal_witness = digest_payload(
                 {
                     "contract_digest": contract.contract_digest,
-                    "legacy_action_digest": digest_legacy_action(symbolic_action),
                     "proposal_binding_digest": proposal.binding_digest,
-                    "proposal_admissible": proposal_admissible,
+                    "raw_binder_witness_digest": binder_result.witness_digest,
+                    "raw_binder_config_digest": binder_result.config_digest,
+                    "proposal_admissible": True,
                 }
             )
             proposal_attestation = self._issue(
@@ -1015,8 +1243,9 @@ class CTDARuntimeSession:
                 payload={
                     "contract_digest": contract.contract_digest,
                     "proposal_digest": proposal.binding_digest,
-                    "legacy_action_digest": digest_legacy_action(symbolic_action),
-                    "admissible": proposal_admissible,
+                    "raw_binder_witness_digest": binder_result.witness_digest,
+                    "raw_binder_config_digest": binder_result.config_digest,
+                    "admissible": True,
                 },
                 issued_at_ns=now,
             )
@@ -1083,10 +1312,31 @@ class CTDARuntimeSession:
                 filter_envelope_attestation=filter_attestation,
                 pre_attestations=physical_attestations,
             )
+            prefix_evaluation = self._evaluate_stage(
+                WireStage.PREFIX_PRE,
+                _prefix_wire_payload(
+                    self.supervisor.mission,
+                    contract,
+                    monitor,
+                    candidate,
+                    binder_result,
+                    now,
+                    self.stage_request_ids.get(
+                        WireStage.SEMANTIC,
+                        f"python-reference:{WireStage.SEMANTIC.value}",
+                    ),
+                ),
+            )
         except Exception as exc:
             return PrepareResult(
                 StaticCheckResult.inconsistent(f"cannot construct typed prefix evidence: {exc}")
             )
+        prefix_gate = self._static_evaluation_check(
+            prefix_evaluation,
+            WireStage.PREFIX_PRE,
+        )
+        if not prefix_gate.proven:
+            return PrepareResult(prefix_gate)
         check = self.supervisor.authorize_prefix(
             state_digest,
             candidate,
@@ -1197,7 +1447,11 @@ class CTDARuntimeSession:
             ),
         )
         events_with_samples = _derive_events(
-            contract, prepared.before_state, states_after, samples
+            contract,
+            prepared.before_state,
+            states_after,
+            samples,
+            prior_observed_atoms=monitor.observed_atoms,
         )
         events = tuple(item[0] for item in events_with_samples)
         links = tuple(
@@ -1309,6 +1563,88 @@ class CTDARuntimeSession:
             evidence_time,
             evidence_time if now_ns is None else now_ns,
         )
+        observed_reference = self.supervisor.checker.check_observed_prefix(
+            self.supervisor.mission,
+            contract,
+            record,
+            (),
+            evaluation_time,
+        )
+        try:
+            observed_evaluation = self._evaluate_stage(
+                WireStage.OBSERVED_PREFIX,
+                _observed_wire_payload(
+                    self.supervisor.mission,
+                    record,
+                    observed_reference,
+                    self.stage_request_ids.get(
+                        WireStage.PREFIX_PRE,
+                        f"python-reference:{WireStage.PREFIX_PRE.value}",
+                    ),
+                    observation_times[-1],
+                ),
+            )
+        except Exception as exc:
+            return (
+                MonitorCheckResult(
+                    MonitorVerdict.INCONSISTENT,
+                    monitor,
+                    issues=(f"observed_prefix evaluator failed closed: {exc}",),
+                ),
+                record,
+            )
+        observed_gate = self._static_evaluation_check(
+            observed_evaluation,
+            WireStage.OBSERVED_PREFIX,
+        )
+        if self.evaluator is not None and not observed_gate.proven:
+            failed_check = (
+                observed_reference
+                if not observed_reference.proven
+                else observed_gate
+            )
+            return _monitor_result_from_static(failed_check, monitor), record
+
+        monitor_reference = self.supervisor.checker.monitor_step(
+            self.supervisor.mission,
+            contract,
+            monitor,
+            record,
+            post_attestations,
+            evaluation_time,
+        )
+        try:
+            monitor_evaluation = self._evaluate_stage(
+                WireStage.MONITOR_STEP,
+                _monitor_wire_payload(
+                    self.supervisor.mission,
+                    contract,
+                    monitor,
+                    record,
+                    post_attestations,
+                    evaluation_time,
+                    self.stage_request_ids.get(
+                        WireStage.OBSERVED_PREFIX,
+                        f"python-reference:{WireStage.OBSERVED_PREFIX.value}",
+                    ),
+                ),
+            )
+        except Exception as exc:
+            return (
+                MonitorCheckResult(
+                    MonitorVerdict.INCONSISTENT,
+                    monitor,
+                    issues=(f"monitor_step evaluator failed closed: {exc}",),
+                ),
+                record,
+            )
+        monitor_gate = self._monitor_evaluation_check(
+            monitor_evaluation,
+            monitor_reference,
+            monitor,
+        )
+        if monitor_gate is not None:
+            return monitor_gate, record
         result = self.supervisor.observe_prefix(
             record,
             post_attestations,
@@ -1366,6 +1702,336 @@ def _translation_bound(commands: Sequence[Any], config: ConditionalKinematicConf
         xyz = (numbers + [0.0, 0.0, 0.0])[:3]
         bound += sqrt(sum(value * value for value in xyz)) * config.translation_scale_m
     return bound
+
+
+def bind_raw_proposal(
+    mission: Any,
+    contract: SemanticSkillContract,
+    state: Any,
+    commands: Sequence[Any],
+    config: RawProposalBinderConfig,
+) -> RawProposalBinderResult:
+    """Conservatively bind a raw Pick/Place prefix to the active mission contract.
+
+    This consumer-side function intentionally has no policy metadata argument.  A
+    producer cannot upgrade its verdict by supplying ``admissible``, a contract id,
+    an expected effect, or a symbolic action.
+    """
+
+    state_digest = digest_legacy_state(state)
+    command_digest = digest_payload(commands)
+
+    def result(verdict: StaticVerdict, *issues: str) -> RawProposalBinderResult:
+        return RawProposalBinderResult(
+            verdict=verdict,
+            mission_digest=mission.spec_digest,
+            contract_digest=contract.contract_digest,
+            state_digest=state_digest,
+            command_digest=command_digest,
+            config_digest=config.config_digest,
+            issues=tuple(issues),
+        )
+
+    if not mission.verify_integrity() or not contract.verify_integrity():
+        return result(StaticVerdict.INCONSISTENT, "raw binder received a tampered mission or contract")
+    if contract.spec_digest != mission.spec_digest or contract.spec_id != mission.spec_id:
+        return result(StaticVerdict.REFUTED, "raw binder contract is not rooted in the frozen mission")
+    if _has_unknown_observation(state):
+        return result(
+            StaticVerdict.UNKNOWN,
+            "raw binder trusted observation is incomplete; prefix safety witness is missing",
+        )
+    if contract.skill not in {"Pick", "Place"}:
+        return result(StaticVerdict.UNKNOWN, "raw binder does not support this mission primitive")
+    if contract.target is None or contract.target not in mission.object_ids:
+        return result(StaticVerdict.REFUTED, "raw binder contract target is outside the frozen registry")
+    objects = getattr(state, "objects", None)
+    if not hasattr(objects, "get"):
+        return result(StaticVerdict.UNKNOWN, "raw binder object observation is unavailable")
+    target_object = objects.get(contract.target)
+    if target_object is None:
+        return result(StaticVerdict.UNKNOWN, "raw binder target observation is unavailable")
+    robot_xyz = _binder_pose_xyz(getattr(state, "robot_pose", None))
+    target_xyz = _binder_pose_xyz(getattr(target_object, "pose", None))
+    if robot_xyz is None or target_xyz is None:
+        return result(StaticVerdict.UNKNOWN, "raw binder target or robot pose is unavailable")
+    if not commands:
+        return result(StaticVerdict.REFUTED, "raw binder received an empty proposal")
+    flattened = tuple(tuple(_flatten_command(command)) for command in commands)
+    if any(len(command) < 4 for command in flattened):
+        return result(StaticVerdict.UNKNOWN, "raw binder command lacks translation or gripper channels")
+    if any(not all(isfinite(value) for value in command) for command in flattened):
+        return result(StaticVerdict.REFUTED, "raw binder command contains a non-finite value")
+
+    translation = tuple(sum(command[index] for command in flattened) for index in range(3))
+    translation_norm = sqrt(sum(value * value for value in translation))
+    close_requested = any(
+        command[-1] <= config.gripper_close_threshold for command in flattened
+    )
+    open_requested = any(
+        command[-1] >= config.gripper_open_threshold for command in flattened
+    )
+    if close_requested and open_requested:
+        return result(StaticVerdict.REFUTED, "raw binder proposal has conflicting gripper commands")
+
+    held = getattr(state, "gripper_holding", None)
+    if held not in (None, contract.target):
+        return result(StaticVerdict.REFUTED, "raw binder observed the wrong held object")
+
+    if contract.skill == "Pick":
+        if held == contract.target:
+            return result(StaticVerdict.REFUTED, "raw binder Pick contract target is already held")
+        if contract.part is None or (contract.target, contract.part) not in mission.safe_parts:
+            return result(StaticVerdict.REFUTED, "raw binder Pick contract has no unique safe grasp part")
+        if open_requested:
+            return result(StaticVerdict.REFUTED, "raw binder Pick prefix opens the gripper")
+        target_delta = tuple(target - robot for target, robot in zip(target_xyz, robot_xyz))
+        target_distance = sqrt(sum(value * value for value in target_delta))
+        if close_requested and target_distance > config.grasp_neighborhood_m:
+            return result(StaticVerdict.REFUTED, "raw binder closes outside the target neighborhood")
+        if translation_norm > config.direction_epsilon:
+            direction_dot = sum(
+                command * target for command, target in zip(translation, target_delta)
+            )
+            if direction_dot <= config.direction_epsilon:
+                return result(StaticVerdict.REFUTED, "raw binder Pick prefix moves away from the mission target")
+        elif not close_requested:
+            return result(StaticVerdict.UNKNOWN, "raw binder Pick prefix establishes neither approach nor grasp")
+        return result(StaticVerdict.PROVEN)
+
+    if held != contract.target:
+        return result(StaticVerdict.REFUTED, "raw binder Place prefix is not carrying the mission target")
+    if contract.region is None or contract.region not in mission.region_ids:
+        return result(StaticVerdict.REFUTED, "raw binder Place region is outside the frozen registry")
+    regions = getattr(state, "regions", None)
+    region = regions.get(contract.region) if hasattr(regions, "get") else None
+    region_xyz = _binder_pose_xyz(getattr(region, "center", None)) if region is not None else None
+    if region is None or region_xyz is None:
+        return result(StaticVerdict.UNKNOWN, "raw binder Place region observation is unavailable")
+    region_delta = tuple(region_value - object_value for region_value, object_value in zip(region_xyz, target_xyz))
+    if translation_norm > config.direction_epsilon:
+        direction_dot = sum(
+            command * target for command, target in zip(translation, region_delta)
+        )
+        if direction_dot <= config.direction_epsilon:
+            return result(StaticVerdict.REFUTED, "raw binder Place prefix moves away from the mission region")
+    if open_requested:
+        predicted = tuple(
+            value + delta * config.translation_scale_m
+            for value, delta in zip(target_xyz, translation)
+        )
+        radius = getattr(region, "radius", None)
+        if type(radius) not in (int, float) or not isfinite(float(radius)) or float(radius) < 0:
+            return result(StaticVerdict.UNKNOWN, "raw binder Place region radius is unavailable")
+        predicted_distance = sqrt(
+            sum((value - center) ** 2 for value, center in zip(predicted, region_xyz))
+        )
+        if predicted_distance > float(radius):
+            return result(StaticVerdict.REFUTED, "raw binder releases outside the mission region")
+    return result(StaticVerdict.PROVEN)
+
+
+def _binder_pose_xyz(value: Any) -> tuple[float, float, float] | None:
+    try:
+        result = (float(value.x), float(value.y), float(value.z))
+    except (AttributeError, TypeError, ValueError):
+        return None
+    return result if all(isfinite(item) for item in result) else None
+
+
+def _guarantee_formula(
+    guarantees: Sequence[str],
+    deadline_ns: int,
+) -> dict[str, Any]:
+    atoms = [
+        {"tag": "atom", "name": str(atom), "expected": True}
+        for atom in sorted(set(guarantees))
+    ]
+    if not atoms:
+        raise ValueError("wire contract guarantee is empty")
+    item: dict[str, Any] = atoms[0] if len(atoms) == 1 else {"tag": "all", "items": atoms}
+    return {"tag": "eventually", "item": item, "deadline_ns": deadline_ns}
+
+
+def _semantic_wire_payload(
+    mission: Any,
+    active_phase: str,
+    contract: SemanticSkillContract,
+    now_ns: int,
+) -> dict[str, Any]:
+    obligations = tuple(
+        item for item in mission.phase_obligations if item.source_phase == active_phase
+    )
+    binding_set = {
+        (item.target, item.part, item.region) for item in obligations
+    }
+    obligation_target: str | None = None
+    obligation_part: str | None = None
+    obligation_region: str | None = None
+    if len(binding_set) == 1:
+        obligation_target, obligation_part, obligation_region = next(iter(binding_set))
+    return {
+        "mission_digest": mission.spec_digest,
+        "contract_spec_digest": contract.spec_digest,
+        "contract_digest": contract.contract_digest,
+        "active_phase": active_phase,
+        "contract_phase": contract.phase_before,
+        "enabled_obligation_ids": [item.obligation_id for item in obligations],
+        "contract_obligation_ids": list(contract.advances_obligations),
+        "contract_target": contract.target,
+        "obligation_target": obligation_target,
+        "contract_part": contract.part,
+        "obligation_part": obligation_part,
+        "contract_region": contract.region,
+        "obligation_region": obligation_region,
+        "mission_integrity": mission.verify_integrity(),
+        "contract_integrity": contract.verify_integrity(),
+        "issued_at_ns": contract.issued_at_ns,
+        "deadline_ns": contract.deadline_ns,
+        "now_ns": now_ns,
+        "guarantee": _guarantee_formula(contract.guarantees, contract.deadline_ns),
+    }
+
+
+def _prefix_wire_payload(
+    mission: Any,
+    contract: SemanticSkillContract,
+    monitor: Any,
+    candidate: PrefixCandidate,
+    binder: RawProposalBinderResult,
+    now_ns: int,
+    semantic_request_id: str,
+) -> dict[str, Any]:
+    proposal = candidate.proposal
+    authorization = candidate.authorization
+    return {
+        "semantic_request_id": semantic_request_id,
+        "semantic_verdict": WireStaticVerdict.PROVEN.value,
+        "mission_digest": mission.spec_digest,
+        "contract_spec_digest": contract.spec_digest,
+        "contract_digest": contract.contract_digest,
+        "binder_verdict": binder.verdict.value,
+        "state_digest": binder.state_digest,
+        "authorization_state_digest": authorization.state_digest,
+        "monitor_digest": monitor.monitor_state_digest,
+        "authorization_monitor_digest": authorization.monitor_state_digest,
+        "episode_nonce": mission.episode_nonce,
+        "authorization_nonce": authorization.episode_nonce,
+        "proposal_index": proposal.proposal_index,
+        "authorization_proposal_index": authorization.proposal_index,
+        "monitor_last_proposal_index": monitor.last_proposal_index,
+        "proposal_digest": proposal.proposal_digest,
+        "authorization_proposal_digest": authorization.proposal_digest,
+        "command_digest": binder.command_digest,
+        "authorization_command_digest": authorization.authorized_command_digest,
+        "time_base_digest": mission.time_base.time_base_digest,
+        "authorization_time_base_digest": authorization.time_base_digest,
+        "now_ns": now_ns,
+        "issued_at_ns": authorization.issued_at_ns,
+        "valid_until_ns": authorization.valid_until_ns,
+        "duration_ns": authorization.max_authorized_duration_ns,
+    }
+
+
+def _observed_wire_payload(
+    mission: Any,
+    record: PrefixExecutionRecord,
+    plant_check: StaticCheckResult,
+    prefix_request_id: str,
+    observed_ns: int,
+) -> dict[str, Any]:
+    authorization = record.candidate.authorization
+    receipt = record.receipt
+    return {
+        "prefix_request_id": prefix_request_id,
+        "prefix_verdict": WireStaticVerdict.PROVEN.value,
+        "plant_verdict": plant_check.verdict.value,
+        "authorization_digest": authorization.authorization_digest,
+        "receipt_authorization_digest": receipt.authorization_digest,
+        "episode_nonce": mission.episode_nonce,
+        "receipt_episode_nonce": authorization.episode_nonce,
+        "authorized_command_digest": authorization.authorized_command_digest,
+        "dispatched_command_digest": receipt.executed_command_digest,
+        "receipt_command_digest": receipt.executed_command_digest,
+        "mission_time_base_digest": mission.time_base.time_base_digest,
+        "plant_time_base_digest": record.plant_trace.time_base_digest,
+        "dispatch_ns": receipt.executed_at_ns,
+        "observed_ns": observed_ns,
+        "receipt_digest": receipt.receipt_digest,
+        "plant_trace_digest": record.plant_trace.plant_trace_digest,
+        "event_trace_digest": record.event_trace.symbolic_event_trace_digest,
+    }
+
+
+def _monitor_wire_payload(
+    mission: Any,
+    contract: SemanticSkillContract,
+    monitor: Any,
+    record: PrefixExecutionRecord,
+    post_attestations: Sequence[EvidenceAttestation],
+    now_ns: int,
+    observed_request_id: str,
+) -> dict[str, Any]:
+    current_atoms = tuple(event.atom for event in record.event_trace.events)
+    accumulated_atoms = set(monitor.observed_atoms) | set(current_atoms)
+    terminal_atom = f"phase:{contract.expected_next_phase}"
+    terminal_seen = terminal_atom in current_atoms
+    completion_witness = bool(
+        terminal_seen and set(contract.guarantees).issubset(accumulated_atoms)
+    )
+    post_types = {item.evidence_type for item in post_attestations}
+    post_evidence = set(contract.post_requirements).issubset(post_types)
+    return {
+        "observed_request_id": observed_request_id,
+        "observed_verdict": WireStaticVerdict.PROVEN.value,
+        "mission_digest": mission.spec_digest,
+        "contract_spec_digest": contract.spec_digest,
+        "episode_nonce": mission.episode_nonce,
+        "monitor_episode_nonce": monitor.episode_nonce,
+        "contract_digest": contract.contract_digest,
+        "monitor_contract_digest": (
+            contract.contract_digest
+            if monitor.contract_id == contract.contract_id
+            else monitor.contract_id
+        ),
+        "active_phase": contract.phase_before,
+        "monitor_phase": monitor.phase,
+        "previous_monitor_digest": monitor.monitor_state_digest,
+        "record_monitor_before_digest": record.monitor_before_digest,
+        "previous_last_timestamp_ns": monitor.last_event_timestamp_ns,
+        "event_timestamps_ns": sorted(
+            {event.timestamp_ns for event in record.event_trace.events}
+        ),
+        "previous_observed_atoms": list(monitor.observed_atoms),
+        "current_observed_atoms": list(current_atoms),
+        "guarantee": _guarantee_formula(contract.guarantees, contract.deadline_ns),
+        "invariant": {
+            "tag": "atom",
+            "name": "collision",
+            "expected": False,
+        },
+        "expected_phase": contract.expected_next_phase,
+        "terminal_phase_event": terminal_seen,
+        "completion_witness": completion_witness,
+        "post_evidence": post_evidence,
+        "now_ns": now_ns,
+        "deadline_ns": contract.deadline_ns,
+        "next_proposal_index": record.candidate.proposal.proposal_index + 1,
+        "record_proposal_index": record.candidate.proposal.proposal_index,
+    }
+
+
+def _monitor_result_from_static(
+    result: StaticCheckResult,
+    monitor_state: Any,
+) -> MonitorCheckResult:
+    if result.verdict is StaticVerdict.UNKNOWN:
+        verdict = MonitorVerdict.UNKNOWN
+    elif result.verdict is StaticVerdict.INCONSISTENT:
+        verdict = MonitorVerdict.INCONSISTENT
+    else:
+        verdict = MonitorVerdict.VIOLATED
+    return MonitorCheckResult(verdict, monitor_state, issues=result.issues)
 
 
 def _has_unknown_observation(state: Any) -> bool:
@@ -1646,6 +2312,8 @@ def _derive_events(
     before_state: Any,
     states: Sequence[Any],
     samples: Sequence[PlantSample],
+    *,
+    prior_observed_atoms: Sequence[str] = (),
 ) -> list[tuple[SymbolicEvent, int]]:
     events: list[tuple[SymbolicEvent, int]] = []
     for index, (state, sample) in enumerate(zip(states, samples)):
@@ -1684,7 +2352,7 @@ def _derive_events(
                 for guarantee in contract.guarantees:
                     if guarantee.startswith("progress:"):
                         events.append((SymbolicEvent(timestamp, guarantee, True), index))
-        guarantees_seen = {event.atom for event, _ in events}
+        guarantees_seen = set(prior_observed_atoms) | {event.atom for event, _ in events}
         if set(contract.guarantees).issubset(guarantees_seen):
             events.append(
                 (SymbolicEvent(timestamp, f"phase:{contract.expected_next_phase}", True), index)
@@ -1719,4 +2387,7 @@ __all__ = [
     "LocalEvidenceIssuer",
     "PreparedPrefix",
     "PrepareResult",
+    "RawProposalBinderConfig",
+    "RawProposalBinderResult",
+    "bind_raw_proposal",
 ]
