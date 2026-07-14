@@ -147,6 +147,119 @@ def test_online_runner_uses_initialized_real_env_shape(monkeypatch, tmp_path: Pa
     assert payload["trace"][0]["action"] == "Pick"
 
 
+def test_online_runner_preserves_selected_init_observation_without_reset(
+    monkeypatch, tmp_path: Path
+) -> None:
+    env = FakeOnlineEnv()
+    initialized_observation = {"robot0_eef_pos": [0.25, -0.1, 0.4]}
+    env._proofalign_initialized_observation = initialized_observation
+    env._proofalign_selected_init_state_applied = True
+    env._proofalign_initialized_observation_source = "set_init_state"
+    env._get_observations = None
+
+    def unexpected_reset():
+        raise AssertionError("online wrapper replaced the selected init state")
+
+    env.reset = unexpected_reset
+    output_path = tmp_path / "episode.json"
+    monkeypatch.setattr(
+        libero_online_runner,
+        "load_libero_task_runtime",
+        lambda **kwargs: LiberoTaskRuntime(
+            benchmark=None,
+            task=None,
+            task_id=0,
+            task_name="fake_task",
+            instruction="pick up the mug by the body",
+            bddl_file=tmp_path / "fake.bddl",
+            init_state=[1, 2, 3],
+            init_state_id=0,
+            metadata={"benchmark_name": "affordance"},
+        ),
+    )
+    monkeypatch.setattr(
+        libero_online_runner, "create_initialized_env", lambda runtime, args: env
+    )
+
+    seen_observations = []
+
+    def policy(instruction, observation, history):
+        del instruction, history
+        seen_observations.append(observation)
+        return {
+            "raw_action": [0, 0, 0, 0, 0, 0, 0],
+            "proofalign_action": {
+                "type": "Pick",
+                "object": "mug",
+                "part": "body",
+            },
+        }
+
+    args = libero_online_runner.parse_args(
+        [
+            "--output",
+            str(output_path),
+            "--max-steps",
+            "1",
+            "--warmup-steps",
+            "0",
+        ]
+    )
+
+    run_online_episode_with_plugins(args, policy=policy)
+
+    assert seen_observations == [initialized_observation]
+    payload = json.loads(output_path.read_text(encoding="utf-8"))
+    initialization = payload["metadata"]["environment_initialization"]
+    assert initialization["selected_init_state_present"] is True
+    assert initialization["selected_init_state_applied"] is True
+    assert initialization["initialized_observation_source"] == "set_init_state"
+    assert initialization["online_reset_performed"] is False
+    assert initialization["benchmark_init_observed_state_digest"]
+
+
+def test_ctda_runner_rejects_missing_selected_init_provenance(
+    monkeypatch, tmp_path: Path
+) -> None:
+    env = FakeOnlineEnv()
+    bddl_path = tmp_path / "fake.bddl"
+    bddl_path.write_text("(define (problem fake))", encoding="utf-8")
+    monkeypatch.setattr(
+        libero_online_runner,
+        "load_libero_task_runtime",
+        lambda **kwargs: LiberoTaskRuntime(
+            benchmark=None,
+            task=None,
+            task_id=0,
+            task_name="fake_task",
+            instruction="pick up the mug by the body",
+            bddl_file=bddl_path,
+            init_state=[1, 2, 3],
+            init_state_id=0,
+            metadata={"benchmark_name": "affordance"},
+        ),
+    )
+    monkeypatch.setattr(
+        libero_online_runner, "create_initialized_env", lambda runtime, args: env
+    )
+    args = libero_online_runner.parse_args(
+        [
+            "--ctda",
+            "--output",
+            str(tmp_path / "episode.json"),
+            "--max-steps",
+            "1",
+            "--warmup-steps",
+            "0",
+        ]
+    )
+
+    with pytest.raises(LiberoOnlineIntegrationError, match="selected init-state gate"):
+        run_online_episode_with_plugins(
+            args, policy=libero_online_runner.ZeroActionPolicy()
+        )
+
+
 def test_online_runner_attack_record_overrides_policy_instruction(monkeypatch, tmp_path: Path):
     env = FakeOnlineEnv()
     output_path = tmp_path / "episode.json"
@@ -257,6 +370,9 @@ def test_online_runner_ctda_flag_persists_proof_chain(monkeypatch, tmp_path: Pat
     )
     fallback_digest = sha256(fallback_path.read_bytes()).hexdigest()
     env._proofalign_bddl_snapshot_path = str(bddl_path)
+    env._proofalign_initialized_observation = env._get_observations()
+    env._proofalign_selected_init_state_applied = True
+    env._proofalign_initialized_observation_source = "set_init_state"
     action_path = tmp_path / "actions.json"
     action_path.write_text(
         json.dumps(
@@ -319,6 +435,18 @@ def test_online_runner_ctda_flag_persists_proof_chain(monkeypatch, tmp_path: Pat
     assert payload["metadata"]["ctda"]["proof_verified"] is False
     assert payload["metadata"]["ctda"]["bddl_digest"] == bddl_digest
     assert payload["metadata"]["ctda"]["mission_claim_digest"]
+    initialization = payload["metadata"]["environment_initialization"]
+    assert initialization["valid_for_registered_init"] is True
+    assert (
+        initialization["benchmark_init_observed_state_digest"]
+        == payload["metadata"]["ctda"]["initial_state_digest"]
+    )
+    diagnostics = payload["trace"][0]["ctda"]["record"]["plant_trace"]["samples"][0][
+        "kinematic_diagnostics"
+    ]
+    assert diagnostics["cumulative_observed_displacement_m"] == 0.0
+    assert diagnostics["cumulative_translation_bound_m"] > 0.0
+    assert diagnostics["model_error_allowance_m"] == 0.0001
     assert payload["metadata"]["ctda"]["environment_action_bounds"] == {
         "lower": [-1.0] * 7,
         "upper": [1.0] * 7,
@@ -483,6 +611,11 @@ def test_create_initialized_env_uses_configured_warmup_gripper(monkeypatch, tmp_
 
     assert initialized is env
     assert env.actions == [[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0]]
+    assert env._proofalign_initialized_observation == {
+        "robot0_eef_pos": [0.0, 0.0, 0.0]
+    }
+    assert env._proofalign_selected_init_state_applied is True
+    assert env._proofalign_initialized_observation_source == "warmup_step"
 
 
 def test_resolve_task_bddl_path_uses_level_subdirectory(tmp_path: Path):

@@ -337,12 +337,22 @@ SHA-256。该 manifest 仍是 `operator-pinned-simulator-test-only`，不是 ver
 - observed/monitor 未通过时没有下一 dispatch/phase advance；
 - prompt/`proofalign_action` tamper 不改变 mission-rooted contract；
 - request 与 kernel replay artifact 已落盘。
+- 每个 plant sample 已保存累计/单步 observed displacement、translation bound、model-error
+  allowance、limit 和 margin；不得仅凭无法匹配 state digest 的事后 replay 调模型阈值。
+- `metadata.environment_initialization` 证明 selected benchmark init 已应用、初始化观测来自
+  `set_init_state`、online runner 未再次 reset、`valid_for_registered_init=true`，且其
+  `benchmark_init_observed_state_digest` 与
+  `metadata.ctda.initial_state_digest` 一致；否则停止并把 episode 标为无效。
 
 本地 CPU shadow 与远程真实 GPU probe 都确认 Lean stages 远超 control period；固定 50 ms
 fallback switch gate 也只通过 2/3。当前已固定为 fail-closed slow interlock/offline audit，不再以
 deadline 通过作为非实时实验的前置条件。下一步只运行 3--5 prefix clean calibration 并记录完整
 latency/miss；不得通过放宽授权窗口、改变 control frequency、移动时间戳或筛选 prefix 声称
 real-time。
+
+2026-07-14 的首次 5-prefix 尝试在 strict preflight 后运行，但随后发现 online runner 二次 reset
+替换了 benchmark init 0。该 episode 只保留为 init-handoff diagnostic，不能算 clean calibration；
+修复后必须重新形成 clean checkout、重跑 strict preflight，并按完全相同的冻结参数重跑。
 
 具体 command 在迁移时从当前 `--help` 生成，不从 archive 复制。保留以下固定实验参数：
 

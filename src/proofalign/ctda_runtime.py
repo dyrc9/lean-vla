@@ -24,6 +24,7 @@ from proofalign.ctda import (
     EvidenceAttestation,
     EvidenceVerifier,
     ExecutionReceipt,
+    KinematicSampleDiagnostics,
     MonitorCheckResult,
     MonitorVerdict,
     PlantSample,
@@ -1424,6 +1425,17 @@ class CTDARuntimeSession:
         samples: list[PlantSample] = []
         for index, (state, timestamp) in enumerate(zip(states_after, observation_times)):
             previous_state = prepared.before_state if index == 0 else states_after[index - 1]
+            cumulative_commands = commands[: index + 1]
+            cumulative_displacement = _pose_distance(prepared.before_state, state)
+            cumulative_translation_bound = _translation_bound(
+                cumulative_commands, self.config
+            )
+            cumulative_limit = cumulative_translation_bound + self.config.model_error_m
+            step_displacement = _pose_distance(previous_state, state)
+            step_translation_bound = _translation_bound(
+                (commands[index],), self.config
+            )
+            step_limit = step_translation_bound + self.config.model_error_m
             samples.append(
                 PlantSample(
                     timestamp_ns=timestamp,
@@ -1433,7 +1445,7 @@ class CTDARuntimeSession:
                     within_reachable_tube=_observed_tube_membership(
                         prepared.before_state,
                         state,
-                        commands[: index + 1],
+                        cumulative_commands,
                         safety_spec,
                         self.config,
                     ),
@@ -1442,6 +1454,25 @@ class CTDARuntimeSession:
                         state,
                         commands[index],
                         self.config,
+                    ),
+                    kinematic_diagnostics=KinematicSampleDiagnostics(
+                        cumulative_observed_displacement_m=cumulative_displacement,
+                        cumulative_translation_bound_m=cumulative_translation_bound,
+                        model_error_allowance_m=self.config.model_error_m,
+                        cumulative_displacement_limit_m=cumulative_limit,
+                        cumulative_displacement_margin_m=(
+                            None
+                            if cumulative_displacement is None
+                            else cumulative_limit - cumulative_displacement
+                        ),
+                        step_observed_displacement_m=step_displacement,
+                        step_translation_bound_m=step_translation_bound,
+                        step_displacement_limit_m=step_limit,
+                        step_displacement_margin_m=(
+                            None
+                            if step_displacement is None
+                            else step_limit - step_displacement
+                        ),
                     ),
                 )
             )

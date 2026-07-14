@@ -2,12 +2,13 @@
 
 起始版本：`230e32937a194530054616f9232adb7f9973586c`
 
-最新更新：2026-07-14，当前 ProofAlign HEAD
-`b0f3d14b5560c4b839a1daed46be566839aa142f`。
+最新更新：2026-07-14，当前 ProofAlign committed HEAD
+`7bab2d99493f2d3a43c563489ea9959c03184e51`；init-state handoff 修复仍在本地工作树，尚未提交。
 
 ## 当前状态
 
-- 全量测试：206 passed / 1 skipped；Lean build 12 jobs 成功。
+- 当前工作树全量测试：208 passed / 1 skipped；Lean build 12 jobs 成功。init-state provenance 与
+  kinematic diagnostic 的定向测试为 81 passed。
 - OpenPI checkout：`15a9616a00943ada6c20a0f158e3adb39df2ccac`，clean。
 - LIBERO-Safety checkout：`ef0f79b70fc50c5fb612a1bbc1cf8b6c033a702a`，clean standalone
   Git top-level，tracked runtime files 与官方 checkout 差异为 0。
@@ -21,22 +22,32 @@
 - 当前决策：不放宽 witness、不改变 control frequency、不移动 `observed_at`。保留超时
   fail-closed，但不再让 latency gate 阻塞 slow-interlock/offline 实验；删除 real-time
   enforcement claim。
+- `7bab2d9` clean checkout 的 strict preflight 已通过（206 passed / 1 skipped、Lean 12 jobs、
+  `ready=true`）。随后 5-prefix 尝试发现 selected benchmark init 0 被 online runner 二次 reset
+  替换；episode 初始 digest 为
+  `4da02fda6246ba22cd7b39d22bc71cfa61935ca5af20b8222c6ec2aebcf00ad0`，而 intended init digest 为
+  `f866ea35d3243f4dc9400fe169f63acd8ec735b1e1ebce248e9bae29078eb9b8`。因此该 run
+  无效，不进入 calibration 或阈值调整。修复会保留 `set_init_state` 返回的观测并写出可核验的
+  initialization provenance。
 
 关键 artifact：
 
 - `results/remote_gpu_probe_20260714_b0f3d14_v2/`
 - `results/remote_gpu_probe_20260714_b0f3d14_repeat3/`
 - `results/gate_audit_20260714_b0f3d14/`
+- `results/remote_gpu_clean_prefix5_20260714_7bab2d9/`（无效 init-handoff diagnostic）
 
 ## 下一步只做什么
 
-1. 保留并提交当前三个 preflight/smoke hardening 文件；未经用户明确授权仍不得 commit。
-2. clean checkout 后运行严格 preflight，不使用 `--allow-dirty`，并在启动前重新确认 GPU 4/5
-   空闲。
-3. 运行固定 `affordance/task 2/init 0`、env seed 7、policy seed 0、10 Hz、
+1. 审查并提交当前 init-state handoff 修复、回归测试和规范文档；需再次取得用户明确授权，仍不得
+   push 或创建 PR。
+2. clean checkout 后重跑严格 preflight，不使用 `--allow-dirty`，并在启动前重新用
+   `nvidia-smi` 选择空闲 policy/EGL GPU，不沿用上一次分配。
+3. 按完全相同参数重跑固定 `affordance/task 2/init 0`、env seed 7、policy seed 0、10 Hz、
    `max_chunk_steps=1`、同一 witness 的
    3--5 prefix clean slow-interlock calibration。
-4. 保存 raw episode、run config、四阶段 Lean request/result/replay、每次 fallback latency 分解、
+4. 首先核对 initialization provenance 与两个 initial-state digest；不一致时立即标为无效且不继续
+   扩实验。保存 raw episode、run config、四阶段 Lean request/result/replay、fallback latency 分解、
    run notes 和 `SHA256SUMS`；保留全部 timeout/failure prefix。
 5. 检查 parity、unknown/deadlock、false-block signal 和 runner failure。只有 clean calibration
    无新 blocker 后才进入下一 readiness gate。

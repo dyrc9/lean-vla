@@ -818,7 +818,7 @@ def test_runtime_detects_observed_motion_outside_kinematic_model(safe_state, saf
     after = _held_state(safe_state)
     after.robot_pose = after.objects["mug"].pose
 
-    monitored, _ = session.observe_prefix(
+    monitored, record = session.observe_prefix(
         prepared.prepared,
         (after,),
         (raw,),
@@ -832,3 +832,11 @@ def test_runtime_detects_observed_motion_outside_kinematic_model(safe_state, saf
         "left the certified tube" in issue or "model assumption" in issue
         for issue in monitored.issues
     )
+    diagnostics = record.plant_trace.samples[0].kinematic_diagnostics
+    assert diagnostics is not None
+    assert diagnostics.cumulative_translation_bound_m == pytest.approx(0.005)
+    assert diagnostics.model_error_allowance_m == 0.0
+    assert diagnostics.cumulative_displacement_limit_m == pytest.approx(0.005)
+    assert diagnostics.cumulative_observed_displacement_m is not None
+    assert diagnostics.cumulative_displacement_margin_m is not None
+    assert diagnostics.cumulative_displacement_margin_m < 0.0

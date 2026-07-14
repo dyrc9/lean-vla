@@ -163,7 +163,13 @@ task/init/env-seed/policy-seed/workload，而不是强行 replay 已不适用的
 - 先固定 `affordance/task 2/init 0`、env seed 7、policy seed 0/checkpoint RNG reset、10 Hz、
   `max_chunk_steps=1` 和同一 50 ms fallback witness；
 - 只运行 3--5 个 clean prefixes，保存每个 prefix 的 raw proposal、四阶段 Lean artifact、receipt、
-  fallback latency 分解和 checksum；
+  fallback latency 分解、`PlantSample.kinematic_diagnostics`（observed displacement、translation
+  bound、model-error allowance、limit 和 margin）及 checksum；
+- episode 必须记录 `selected_init_state_applied=true`、初始化观测来源和
+  `online_reset_performed=false`，并通过 `valid_for_registered_init` gate；
+  `benchmark_init_observed_state_digest` 必须与
+  `metadata.ctda.initial_state_digest` 一致。任一条件不满足时整条 episode 标为无效，不进入
+  calibration、阈值调整或论文统计；
 - 该阶段明确是 fail-closed slow-interlock diagnostic，不要求 Lean 或 fallback 满足 real-time
   deadline；所有 deadline miss 必须保留并报告；
 - 不得通过改变 control frequency、witness、timestamp boundary 或删除失败 prefix 改善结果；

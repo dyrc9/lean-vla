@@ -763,6 +763,48 @@ class ExecutionReceipt:
 
 
 @dataclass(frozen=True)
+class KinematicSampleDiagnostics:
+    cumulative_observed_displacement_m: float | None
+    cumulative_translation_bound_m: float
+    model_error_allowance_m: float
+    cumulative_displacement_limit_m: float
+    cumulative_displacement_margin_m: float | None
+    step_observed_displacement_m: float | None
+    step_translation_bound_m: float
+    step_displacement_limit_m: float
+    step_displacement_margin_m: float | None
+
+    def __post_init__(self) -> None:
+        for name in (
+            "cumulative_observed_displacement_m",
+            "cumulative_translation_bound_m",
+            "model_error_allowance_m",
+            "cumulative_displacement_limit_m",
+            "cumulative_displacement_margin_m",
+            "step_observed_displacement_m",
+            "step_translation_bound_m",
+            "step_displacement_limit_m",
+            "step_displacement_margin_m",
+        ):
+            value = getattr(self, name)
+            if value is not None and (
+                isinstance(value, bool)
+                or not isinstance(value, (int, float))
+                or not isfinite(value)
+            ):
+                raise ValueError(f"{name} must be finite or None")
+        for name in (
+            "cumulative_translation_bound_m",
+            "model_error_allowance_m",
+            "cumulative_displacement_limit_m",
+            "step_translation_bound_m",
+            "step_displacement_limit_m",
+        ):
+            if getattr(self, name) < 0:
+                raise ValueError(f"{name} must be non-negative")
+
+
+@dataclass(frozen=True)
 class PlantSample:
     timestamp_ns: int
     state_digest: str
@@ -770,6 +812,7 @@ class PlantSample:
     hard_invariants_hold: bool | None
     within_reachable_tube: bool | None
     model_assumptions_hold: bool | None
+    kinematic_diagnostics: KinematicSampleDiagnostics | None = None
 
     def __post_init__(self) -> None:
         if self.timestamp_ns < 0:
@@ -2538,6 +2581,7 @@ __all__ = [
     "EvidenceAttestation",
     "EvidenceVerifier",
     "ExecutionReceipt",
+    "KinematicSampleDiagnostics",
     "MissionSpec",
     "MonitorCheckResult",
     "MonitorVerdict",

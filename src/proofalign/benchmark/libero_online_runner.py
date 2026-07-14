@@ -23,6 +23,7 @@ from proofalign.benchmark.libero_online_wrapper import (
     ProofAlignLiberoWrapper,
     action_to_dict,
     make_libero_offscreen_env,
+    normalize_env_step,
 )
 from proofalign.benchmark.libero_safety_adapter import LiberoSafetyAdapter, LiberoSafetyUnavailable
 from proofalign.ctda import AuthorityEnvelope, TimeBase, digest_legacy_state, digest_payload
@@ -241,14 +242,41 @@ def create_initialized_env(runtime: LiberoTaskRuntime, args: argparse.Namespace)
     try:
         if hasattr(env, "seed"):
             env.seed(args.seed)
-        env.reset()
-        if runtime.init_state is not None and hasattr(env, "set_init_state"):
-            env.set_init_state(runtime.init_state)
+        initial_observation = env.reset()
+        init_state_applied = False
+        observation_source = "reset"
+        if runtime.init_state is not None:
+            set_init_state = getattr(env, "set_init_state", None)
+            if not callable(set_init_state):
+                raise LiberoOnlineIntegrationError(
+                    "selected benchmark init state cannot be applied: environment has no set_init_state()"
+                )
+            initialized = set_init_state(runtime.init_state)
+            if initialized is None:
+                get_observations = getattr(env, "_get_observations", None)
+                if callable(get_observations):
+                    initialized = get_observations()
+            if initialized is None:
+                raise LiberoOnlineIntegrationError(
+                    "selected benchmark init state produced no observation"
+                )
+            initial_observation = initialized
+            init_state_applied = True
+            observation_source = "set_init_state"
         warmup_action = [0.0] * args.action_dim
         if args.action_dim:
             warmup_action[-1] = args.warmup_gripper
         for _ in range(args.warmup_steps):
-            env.step(warmup_action)
+            initial_observation, _, _, _ = normalize_env_step(
+                env.step(warmup_action)
+            )
+            observation_source = "warmup_step"
+        # ControlEnv does not expose _get_observations(). Preserve the exact
+        # observation returned after applying the selected benchmark init state
+        # so the online wrapper does not reset and silently replace that state.
+        setattr(env, "_proofalign_initialized_observation", initial_observation)
+        setattr(env, "_proofalign_selected_init_state_applied", init_state_applied)
+        setattr(env, "_proofalign_initialized_observation_source", observation_source)
     except Exception:
         try:
             if hasattr(env, "close"):
@@ -318,16 +346,63 @@ def run_online_episode_with_plugins(
         wrapper_kwargs["max_chunk_steps"] = getattr(args, "max_chunk_steps", 8)
         wrapper_kwargs["stop_on_replan"] = not getattr(args, "continue_on_replan", False)
         wrapper = ProofAlignLiberoWrapper(env, runtime.instruction, spec, **wrapper_kwargs)
-        try:
-            wrapper.current_observation = getattr(env, "_get_observations", lambda: None)()
-        except Exception:
-            wrapper.current_observation = None
+        selected_init_state_applied = bool(
+            getattr(env, "_proofalign_selected_init_state_applied", False)
+        )
+        initialized_observation_source = getattr(
+            env, "_proofalign_initialized_observation_source", "unknown"
+        )
+        wrapper.current_observation = getattr(
+            env, "_proofalign_initialized_observation", None
+        )
         if wrapper.current_observation is None:
+            try:
+                wrapper.current_observation = getattr(
+                    env, "_get_observations", lambda: None
+                )()
+            except Exception:
+                wrapper.current_observation = None
+        online_reset_performed = wrapper.current_observation is None
+        if online_reset_performed:
             wrapper.reset()
         else:
             wrapper.current_state = wrapper.state_observer.observe(env, wrapper.current_observation)
+        valid_for_registered_init = bool(
+            runtime.init_state is None
+            or (
+                selected_init_state_applied
+                and initialized_observation_source == "set_init_state"
+                and not online_reset_performed
+            )
+        )
+        if getattr(args, "ctda", False) and not valid_for_registered_init:
+            raise LiberoOnlineIntegrationError(
+                "CTDA selected init-state gate failed: require applied set_init_state observation "
+                "with no online reset"
+            )
+        benchmark_init_observed_state_digest = (
+            digest_legacy_state(wrapper.current_state)
+            if selected_init_state_applied and not online_reset_performed
+            else None
+        )
+        runtime.metadata["environment_initialization"] = {
+            "selected_init_state_present": runtime.init_state is not None,
+            "selected_init_state_applied": selected_init_state_applied,
+            "initialized_observation_source": initialized_observation_source,
+            "online_reset_performed": online_reset_performed,
+            "valid_for_registered_init": valid_for_registered_init,
+            "benchmark_init_observed_state_digest": benchmark_init_observed_state_digest,
+        }
         if getattr(args, "ctda", False):
             _configure_ctda(wrapper, runtime, spec, args)
+            if (
+                benchmark_init_observed_state_digest is not None
+                and runtime.metadata["ctda"]["initial_state_digest"]
+                != benchmark_init_observed_state_digest
+            ):
+                raise LiberoOnlineIntegrationError(
+                    "CTDA initial-state digest differs from the selected benchmark init state"
+                )
         decision = wrapper.run_episode(policy, max_steps=args.max_steps)
         task_success = _check_task_success(env)
         episode_metadata = {
