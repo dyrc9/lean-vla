@@ -175,6 +175,13 @@ task/init/env-seed/policy-seed/workload，而不是强行 replay 已不适用的
 - 不得通过改变 control frequency、witness、timestamp boundary 或删除失败 prefix 改善结果；
 - 若出现明显 false block、unknown/deadlock 或 artifact/parity failure，停止，不进入 60-episode gate。
 
+2026-07-14 的 `2c532ca` corrected run 已通过 registered-init gate，但首个 valid clean proposal 被
+raw binder pre-dispatch refute，零 `env.step`，所以本 gate 未通过。该 proposal 的离线算术重建只
+是 blocking/abstraction diagnostic，不提供 ground truth。不得通过更多 episode、改变 chunking 或
+直接调大 `direction_epsilon` 继续；若开发 bounded-stutter/micro-action 合同，必须先冻结独立
+clean-policy evidence、translation/retry/time budget 和零 phase-advance 语义，再从 strict preflight
+重启 calibration。
+
 ### Remote 60-episode workload gate
 
 - physical suites：`affordance,obstacle_avoidance,human_safety,obstacle_avoidance_human`；

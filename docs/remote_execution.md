@@ -352,7 +352,13 @@ real-time。
 
 2026-07-14 的首次 5-prefix 尝试在 strict preflight 后运行，但随后发现 online runner 二次 reset
 替换了 benchmark init 0。该 episode 只保留为 init-handoff diagnostic，不能算 clean calibration；
-修复后必须重新形成 clean checkout、重跑 strict preflight，并按完全相同的冻结参数重跑。
+修复已在 `2c532ca` clean checkout 完成，并重跑 strict preflight。corrected run 的 registered-init
+gate 通过，但首个 OpenPI proposal 被 raw binder pre-dispatch refute，零 `env.step`，所以 calibration
+仍未通过。不要继续增加 episode；下一方法步骤必须先独立定义 bounded-stutter/micro-action 合同。
+
+OpenPI rollout 必须使用 `uv --project external/openpi run python`。ProofAlign 根项目的 `.venv` 不含
+OpenPI 声明的完整依赖；2026-07-14 的一次错误启动因此在首个 policy action 前报
+`ModuleNotFoundError: numpydantic`，该失败已单独保存且不计为 episode。
 
 具体 command 在迁移时从当前 `--help` 生成，不从 archive 复制。保留以下固定实验参数：
 

@@ -12,7 +12,9 @@ affordance fallback 的 observation-completeness blocker；但固定 50 ms switc
 fail-closed slow interlock/offline audit。该 latency 负结果继续完整报告，但不再阻塞非实时的 3--5
 prefix clean calibration；它仍然禁止把 receipt 或系统描述成满足 50 ms worst-case bound。首次
 5-prefix 尝试又发现 runner 在应用 benchmark init state 后发生二次 reset，因此该 episode 已标为
-无效诊断样本，不进入 calibration 或论文统计。
+无效诊断样本，不进入 calibration 或论文统计。`2c532ca` 修复后的 valid-init clean run 已证明
+handoff gate 生效，但首个 OpenPI proposal 被 raw binder 在 dispatch 前 refute；因此 3--5 prefix
+calibration 仍未通过，后续大实验继续关闭。
 
 ## 已验证资产
 
@@ -43,9 +45,10 @@ prefix clean calibration；它仍然禁止把 receipt 或系统描述成满足 5
 2. 当前 Lean evaluator 为每个 request 生成并编译 replay source；远程单-prefix四阶段也约为
    0.9--1.3 s/stage。Lean verification 与 fallback switch 都不满足 real-time claim，后续只按
    slow interlock/offline audit 报告并保留完整 latency distribution。
-3. 远程 GPU 上首次 5-prefix 尝试只到 prefix 2，但事后证明 selected init state 被 runner 二次
-   reset 替换，因此该 episode 无效。initialized-observation handoff 已修复并有回归测试；仍需在
-   clean commit + strict preflight 后按相同冻结配置重跑，才能评估 clean retention、unknown/
+3. `2c532ca` corrected run 的 selected init provenance 与两个 digest 已通过，但首个 clean OpenPI
+   proposal 被 raw binder 以 `moves away from the mission target` pre-dispatch refute，只产生 semantic
+   Lean `proven` artifact，零 `env.step`。其预测平移约 2.835 微米、目标距离增加约 2.735 微米，
+   暴露 bounded-stutter/micro-action abstraction blocker；尚不能评估 clean retention、unknown/
    deadlock 和 evaluator tax。
 4. 旧 notes 中的 60-episode baseline、12-episode Dual Lean、SABER 和 EDPA 结果没有完整 raw
    artifact 保存在当前 checkout，不能仅凭叙述重建主表。
@@ -56,12 +59,11 @@ prefix clean calibration；它仍然禁止把 receipt 或系统描述成满足 5
 
 ## 当前唯一优先级
 
-1. 将 initialized-observation handoff 修复形成 clean checkout，严格重跑 GPU + CPU/Lean
-   preflight；
-2. 在固定 witness、不移动时间戳的条件下重跑 3--5 prefix clean slow-interlock calibration；只有
-   artifact 明确记录 selected init 已应用、runner 未二次 reset，且 benchmark-init observed-state
-   digest 与 CTDA initial-state digest 一致时样本才有效。继续保存 raw episode、四阶段 Lean
-   replay、fallback latency 分解和 checksum；
+1. 保留 `2c532ca` valid-init clean blocker artifact；不得靠增加 episode、改变 chunking 或调大
+   `direction_epsilon` 稀释 1/1 pre-dispatch rejection；
+2. 若扩展方法范围，先用独立 clean-policy evidence 冻结 bounded-stutter/micro-action 合同，并证明
+   stutter 不推进 phase、受 retry/time/translation budget 约束；不能把 CTDA 自己的 verdict 当
+   ground truth。修复后重新走 clean commit、strict preflight 和 3--5 prefix calibration；
 3. 仅在 clean false-block/unknown/deadlock 信号可接受后，按
    [`reproduction_plan.md`](reproduction_plan.md) 复现 SABER、Phantom Menace、SAFE 和 FIPER 的
    官方 pipeline；
@@ -81,6 +83,8 @@ prefix clean calibration；它仍然禁止把 receipt 或系统描述成满足 5
   fallback latency 仅通过 2/3；系统因此按 slow interlock/offline audit 继续评估。
 - 首次 5-prefix 尝试暴露了 init-state handoff 缺陷并已被判为无效样本；它不能支持 clean
   calibration、阈值调整或 utility/security 结论。
+- corrected run 已验证 selected init 被保留且 digest 一致；首个 clean proposal 在 semantic Lean
+  proven 后由 raw binder pre-dispatch refute，零 simulator action。
 
 不可写：
 

@@ -3,7 +3,7 @@
 起始版本：`230e32937a194530054616f9232adb7f9973586c`
 
 最新更新：2026-07-14，当前 ProofAlign committed HEAD
-`7bab2d99493f2d3a43c563489ea9959c03184e51`；init-state handoff 修复仍在本地工作树，尚未提交。
+`2c532ca9c456b161ef4d21265b26ea5a380021ff`；当前仅规范文档有未提交更新，代码 clean。
 
 ## 当前状态
 
@@ -27,8 +27,15 @@
   替换；episode 初始 digest 为
   `4da02fda6246ba22cd7b39d22bc71cfa61935ca5af20b8222c6ec2aebcf00ad0`，而 intended init digest 为
   `f866ea35d3243f4dc9400fe169f63acd8ec735b1e1ebce248e9bae29078eb9b8`。因此该 run
-  无效，不进入 calibration 或阈值调整。修复会保留 `set_init_state` 返回的观测并写出可核验的
+  无效，不进入 calibration 或阈值调整。修复已保留 `set_init_state` 返回的观测并写出可核验的
   initialization provenance。
+- `2c532ca` strict preflight 再次通过：`ready=true`、零 blocker/warning、208 passed / 1 skipped、
+  Lean 12 jobs。corrected run 的 selected init provenance 与 digest gate 全部通过，两个 digest 均为
+  `f866ea35d3243f4dc9400fe169f63acd8ec735b1e1ebce248e9bae29078eb9b8`。
+- corrected run 的首个 clean proposal 在 semantic Lean `proven` 后被 raw binder pre-dispatch
+  refute（`moves away from the mission target`），零 `env.step`、零 fallback。预测平移约 2.835
+  微米、目标距离增加约 2.735 微米；这是 blocking/abstraction signal，不是独立 ground-truth
+  false positive。3--5 prefix gate 未通过。
 
 关键 artifact：
 
@@ -36,21 +43,19 @@
 - `results/remote_gpu_probe_20260714_b0f3d14_repeat3/`
 - `results/gate_audit_20260714_b0f3d14/`
 - `results/remote_gpu_clean_prefix5_20260714_7bab2d9/`（无效 init-handoff diagnostic）
+- `results/remote_gpu_clean_prefix5_20260714_2c532ca/`（错误 uv project，零 prefix，保留为启动失败）
+- `results/remote_gpu_clean_prefix5_20260714_2c532ca_v2/`（valid-init clean binder blocker）
 
 ## 下一步只做什么
 
-1. 审查并提交当前 init-state handoff 修复、回归测试和规范文档；需再次取得用户明确授权，仍不得
-   push 或创建 PR。
-2. clean checkout 后重跑严格 preflight，不使用 `--allow-dirty`，并在启动前重新用
-   `nvidia-smi` 选择空闲 policy/EGL GPU，不沿用上一次分配。
-3. 按完全相同参数重跑固定 `affordance/task 2/init 0`、env seed 7、policy seed 0、10 Hz、
-   `max_chunk_steps=1`、同一 witness 的
-   3--5 prefix clean slow-interlock calibration。
-4. 首先核对 initialization provenance 与两个 initial-state digest；不一致时立即标为无效且不继续
-   扩实验。保存 raw episode、run config、四阶段 Lean request/result/replay、fallback latency 分解、
-   run notes 和 `SHA256SUMS`；保留全部 timeout/failure prefix。
-5. 检查 parity、unknown/deadlock、false-block signal 和 runner failure。只有 clean calibration
-   无新 blocker 后才进入下一 readiness gate。
+1. 两个 `2c532ca` result 目录的 `run_notes.md` 与 `SHA256SUMS` 已生成并校验；保留错误启动和
+   valid blocker，不覆盖、不筛样本。当前五份规范文档更新尚未提交，commit 仍需用户明确授权。
+2. 不再运行更多 episode 或 60-episode/攻击主实验。当前 1/1 clean proposal rejection 已触发
+   binder/abstraction kill criterion。
+3. 若用户授权扩展方法，先设计 bounded-stutter/micro-action contract：独立 clean-policy evidence、
+   translation/retry/time budget、零 phase advance，并为 producer-independent binding 加回归测试。
+4. 方法修复后重新 commit、strict preflight，再从同一冻结 task/init/seed/witness 的 3--5 prefix
+   calibration 开始。
 
 本次下一步仍不是 60-episode、SABER 或 Phantom 主实验。不要把 slow-interlock 结果描述成实时
 执行，也不要用 CTDA verdict 自己生成 ground-truth TPR/FPR。

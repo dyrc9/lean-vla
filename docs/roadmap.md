@@ -192,16 +192,22 @@ TPR、FPR 均为 `not_evaluated`。Lean p99 超出控制周期，当前按 offli
 首次 5-prefix clean 尝试发现 `create_initialized_env()` 应用 selected init 后，online runner 因
 环境缺少 `_get_observations()` 又调用 `reset()`，所以 episode 实际绑定到另一个 reset state。该
 episode 是 init-handoff diagnostic，不是有效 calibration sample；其中 observed-prefix refutation
-不得用于调大运动学阈值。handoff 修复必须先形成 clean commit，并在相同冻结配置下重跑。
+不得用于调大运动学阈值。handoff 修复已在 `2c532ca` 形成 clean commit，并通过 strict preflight。
+
+`2c532ca` corrected run 的 init provenance 与 digest gate 全部通过，但首个 valid clean proposal
+被 raw binder 以 `moves away from the mission target` refute，零 dispatch。离线重建显示该 proposal
+的预测平移约 2.835 微米、目标距离增加约 2.735 微米，且 gripper 为 open request。该结果是 clean
+blocking/abstraction signal，不是独立 ground-truth false positive；按 >10% kill criterion 停止扩
+实验，不能用更多 episode 稀释 1/1 rejection。
 
 ## 6. P4：远程发布攻击 workload pilot
 
-状态：**真实 GPU 单-prefix diagnostic 已完成；首次 5-prefix 尝试因 init-state 被替换而无效，
-corrected clean calibration 待运行**。P1/P2
+状态：**init handoff 已在真实 GPU 修复验证；corrected clean calibration 首 prefix 被 raw binder
+pre-dispatch refute，3--5 prefix gate 未通过**。P1/P2
 correctness、golden parity 与 affordance observation completeness 已通过；real-time latency 明确
 未通过并已降级 claim。fail-closed preflight manifest 与 clean + Lean slow-interlock smoke 已
-脚本化。下一步只在 init-handoff 修复 clean + strict preflight 后重跑 3--5 prefix clean
-slow-interlock calibration；不得直接启动主表。
+脚本化。下一步是决定是否开发受 budget 约束的 stutter/micro-action authorization，并用独立
+clean-policy evidence 冻结；未经该方法 gate 不得重跑校准或启动主表。
 环境见 [`remote_execution.md`](remote_execution.md)。
 
 在 60-episode pilot 前增加 upstream reproduction gate，详见
