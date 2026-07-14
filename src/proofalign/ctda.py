@@ -1742,6 +1742,8 @@ class CTDAChecker:
         record: PrefixExecutionRecord,
         evidence: Iterable[EvidenceAttestation] = (),
         now_ns: int | None = None,
+        *,
+        enforce_dispatch_observation_sla: bool = True,
     ) -> StaticCheckResult:
         if not record.verify_integrity():
             return StaticCheckResult.inconsistent("prefix execution record digest integrity failure")
@@ -1792,6 +1794,13 @@ class CTDAChecker:
             refutations.append("command was dispatched outside the authorization window")
         if record.monitor_before_digest != authorization.monitor_state_digest:
             refutations.append("record starts from a different monitor state")
+        if not enforce_dispatch_observation_sla and not {
+            "timing_policy_id=slow-interlock-diagnostic-v1",
+            "dispatch_to_observation_sla_enforced=false",
+        }.issubset(set(candidate.tube.assumptions)):
+            refutations.append(
+                "diagnostic timing policy is not bound into the reachable-tube assumptions"
+            )
         if not trace.samples:
             refutations.append("plant trace is empty")
         else:
@@ -1802,8 +1811,14 @@ class CTDAChecker:
             if trace.duration_ns > authorization.max_authorized_duration_ns:
                 refutations.append("observed plant trace exceeds the authorized duration")
             final_timestamp = trace.samples[-1].timestamp_ns
-            if final_timestamp > receipt.executed_at_ns + authorization.max_authorized_duration_ns:
-                refutations.append("plant trace ends beyond dispatch plus authorized duration")
+            if (
+                enforce_dispatch_observation_sla
+                and final_timestamp
+                > receipt.executed_at_ns + authorization.max_authorized_duration_ns
+            ):
+                refutations.append(
+                    "real-time dispatch-to-observation SLA exceeds the authorized prefix duration"
+                )
             if final_timestamp > authorization.valid_until_ns:
                 refutations.append("plant trace continues after authorization expiry")
             if final_timestamp > contract.deadline_ns:
@@ -1921,6 +1936,8 @@ class CTDAChecker:
         record: PrefixExecutionRecord,
         evidence: Iterable[EvidenceAttestation] = (),
         now_ns: int | None = None,
+        *,
+        enforce_dispatch_observation_sla: bool = True,
     ) -> MonitorCheckResult:
         evidence_items = tuple(evidence)
         pre = self.check_prefix_pre(
@@ -1939,7 +1956,14 @@ class CTDAChecker:
             return MonitorCheckResult(MonitorVerdict.VIOLATED, state, issues=pre.issues)
         if pre.verdict is StaticVerdict.UNKNOWN:
             return MonitorCheckResult(MonitorVerdict.UNKNOWN, state, issues=pre.issues)
-        observed = self.check_observed_prefix(mission, contract, record, (), now_ns)
+        observed = self.check_observed_prefix(
+            mission,
+            contract,
+            record,
+            (),
+            now_ns,
+            enforce_dispatch_observation_sla=enforce_dispatch_observation_sla,
+        )
         if observed.verdict is StaticVerdict.INCONSISTENT:
             return MonitorCheckResult(MonitorVerdict.INCONSISTENT, state, issues=observed.issues)
         if observed.verdict is StaticVerdict.REFUTED:
@@ -2032,6 +2056,8 @@ class CTDAChecker:
         initial_monitor_state: ContractMonitorState,
         evidence: Iterable[EvidenceAttestation] = (),
         now_ns: int | None = None,
+        *,
+        enforce_dispatch_observation_sla: bool = True,
     ) -> MonitorCheckResult:
         chain = self.check_execution_chain(execution, contract)
         if chain.verdict is StaticVerdict.INCONSISTENT:
@@ -2083,6 +2109,9 @@ class CTDAChecker:
                 record,
                 evidence_items,
                 now_ns,
+                enforce_dispatch_observation_sla=(
+                    enforce_dispatch_observation_sla
+                ),
             )
             if result.verdict is MonitorVerdict.COMPLETE and index != len(execution.prefixes) - 1:
                 return MonitorCheckResult(
@@ -2196,6 +2225,8 @@ class CTDASupervisor:
         record: PrefixExecutionRecord,
         evidence: Iterable[EvidenceAttestation] = (),
         now_ns: int | None = None,
+        *,
+        enforce_dispatch_observation_sla: bool = True,
     ) -> MonitorCheckResult:
         if self.active_contract is None or self.monitor_state is None:
             raise RuntimeError("no semantic contract is active")
@@ -2227,6 +2258,9 @@ class CTDASupervisor:
             record,
             evidence,
             now_ns,
+            enforce_dispatch_observation_sla=(
+                enforce_dispatch_observation_sla
+            ),
         )
         self.monitor_state = result.monitor_state
         if result.verdict is MonitorVerdict.COMPLETE:

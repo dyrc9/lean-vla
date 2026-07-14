@@ -22,7 +22,11 @@ prefix。本轮已在 `74152a9` 实现合同级累计预算与完整 chunk audit
 重跑在第一个 prefix 失败：pre-dispatch proven，累计 path 与观测运动学均有正 margin，但 observation
 比 100 ms authorized prefix duration 晚 4.926 ms，observed-prefix 被 Lean/Python 一致 refute；
 zero-hold postcondition 成立但 56.910 ms switch latency 超过 50 ms，最终 `safe_stop`。只执行 1 个
-policy prefix，未追加 episode；calibration 和后续大实验仍关闭。
+policy prefix，未追加 episode。用户随后授权优先验证 method validity：runtime 现显式区分严格实时
+与 slow-interlock 时序策略。慢速策略仍记录上述两个 miss 和严格 receipt 失败，但不让纯性能 SLA
+单独否决方法；authorization/contract deadline、trace horizon、运动学/不变量、累计预算、
+completion/progress、actuation/postcondition 与 proof/parity 仍 fail closed。新的固定配置 calibration
+须在全量验证和 clean preflight 后执行，后续大实验仍关闭。
 
 ## 已验证资产
 
@@ -64,13 +68,13 @@ policy prefix，未追加 episode；calibration 和后续大实验仍关闭。
 2. 当前 Lean evaluator 为每个 request 生成并编译 replay source；远程单-prefix四阶段也约为
    0.9--1.3 s/stage。Lean verification 与 fallback switch 都不满足 real-time claim，后续只按
    slow interlock/offline audit 报告并保留完整 latency distribution。
-3. `74152a9` 累计合同真实 GPU gate 在第一 prefix 的时序边界失败：dispatch-to-observation
+3. `74152a9` 累计合同历史 GPU gate 在第一 prefix 的时序边界失败：dispatch-to-observation
    `104.926095 ms > 100 ms` authorized duration，虽 observed displacement margin 为正，仍正确
    fail closed；fallback postcondition 完整但 `56.909518 ms > 50 ms`，receipt 失败。该结果只验证
    第一次累计扣减和完整 chunk 日志，没有验证 repeated prefix；不能通过移动 timestamp、增加
-   duration、改变 control frequency 或重跑样本绕过。是否把已声明的 `max_jitter_ns` 纳入
-   observed-duration contract 属于下一项协议/形式化决策，尚未授权。raw stutter 分类仍是 Python
-   binder 语义，不是 Lean raw-action proof。
+   duration、改变 control frequency 或重跑样本绕过。后续获授权的 slow-interlock 策略不改这些
+   原始值，只将 control-period/fallback latency miss 与方法安全判据分列。raw stutter 分类和墙钟
+   timing policy 仍是 Python adapter 语义，不是 Lean raw-action/timing proof。
 4. 旧 notes 中的 60-episode baseline、12-episode Dual Lean、SABER 和 EDPA 结果没有完整 raw
    artifact 保存在当前 checkout，不能仅凭叙述重建主表。
 5. 当前本地旧 heuristic artifact 出现极高 false rejection，且 synthetic golden corpus 没有独立
@@ -80,10 +84,9 @@ policy prefix，未追加 episode；calibration 和后续大实验仍关闭。
 
 ## 当前唯一优先级
 
-1. 冻结 `74152a9` preflight、raw episode、三个唯一 Lean request、fallback receipt、gate validation、
-   run notes 与 checksums；当前 gate 明确为失败，不追加 episode；
-2. 在继续 GPU 前先决定是否单独修改 observed-duration/jitter 合同；任何修改必须同步 Python/Lean
-   semantics、wire fixture 和 fail-closed tests，不能只放宽 100 ms 或移动 observation timestamp；
+1. 完成 strict/slow timing-policy 的全量 pytest、Lean、strict preflight 与 clean commit；
+2. 只重跑一次相同 task/init/seed/witness 的 3--5 prefix calibration，保留所有 timing miss、严格
+   receipt、method verdict 和 checksum；
 3. 仅在新的 clean 3--5 prefix gate 真正通过后，按
    [`reproduction_plan.md`](reproduction_plan.md) 复现 SABER、Phantom Menace、SAFE 和 FIPER 的
    官方 pipeline；
@@ -112,6 +115,8 @@ policy prefix，未追加 episode；calibration 和后续大实验仍关闭。
   到第一次授权与 observation timing gate。
 - `74152a9` 真实 run 已证明完整 chunk audit 与第一次累计扣减落盘；它在 observed-duration 和 fallback
   latency 两个冻结时序界 fail closed，未形成 repeated-prefix 证据。
+- slow-interlock 的 observation/fallback SLA miss 可以作为性能负结果单独报告；这不代表满足实时
+  bound，也不覆盖 authorization expiry、contract deadline 或任何安全/完整性失败。
 
 不可写：
 

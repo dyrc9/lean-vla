@@ -724,6 +724,11 @@ def _configure_ctda(
             authorization_slack_ns=authorization_slack_ns,
             translation_scale_m=translation_scale_m,
             model_error_m=model_error_m,
+            timing_policy_id=(
+                "slow-interlock-diagnostic-v1"
+                if slow_interlock
+                else "strict-real-time-v1"
+            ),
             fallback_id="hold",
             fallback_witness_digest=fallback_digest,
             fallback_verified=True,
@@ -778,6 +783,10 @@ def _configure_ctda(
         "proof_verified": False,
         "evaluator_mode": evaluator_mode,
         "slow_interlock": slow_interlock,
+        "timing_policy_id": wrapper.ctda_session.config.timing_policy_id,
+        "realtime_timing_enforced": (
+            wrapper.ctda_session.config.realtime_timing_enforced
+        ),
         "contract_budget_ns": contract_budget_ns,
         "authorization_slack_ns": authorization_slack_ns,
         "wire_artifact_dir": str(artifact_root),

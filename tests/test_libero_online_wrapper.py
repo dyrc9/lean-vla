@@ -564,6 +564,11 @@ def test_ctda_wrapper_persists_bound_trace_evidence_on_allow() -> None:
     assert result.info["proofalign_ctda"]["monitor_verdict"] == "complete"
     assert result.info["proofalign_ctda"]["dispatch_monotonic_ns"] is not None
     assert result.info["proofalign_ctda"]["observe_monotonic_ns"] is not None
+    timing = result.info["proofalign_ctda"]["performance_timing"]
+    assert timing["timing_policy_id"] == "strict-real-time-v1"
+    assert timing["realtime_timing_enforced"] is True
+    assert timing["dispatch_to_observation_ns"] >= 0
+    assert timing["dispatch_to_observation_sla_ns"] == 20_000_000
     assert result.step.ctda["candidate_digest"]
     assert result.step.ctda["record_digest"]
     assert result.step.ctda["plant_trace_digest"]
@@ -704,6 +709,9 @@ def test_ctda_episode_with_pending_contract_does_not_finish_allow() -> None:
     fallback_switch = wrapper.trace[-1].ctda["fallback_switch"]
     assert fallback_switch["fallback_id"] == "hold"
     assert fallback_switch["succeeded"] is True
+    assert fallback_switch["actuation_and_postcondition_established"] is True
+    assert fallback_switch["established_for_timing_policy"] is True
+    assert fallback_switch["performance_timing"]["realtime_timing_enforced"] is True
     assert fallback_switch["command"] == [0.0, 0.0, 0.0, 0.0]
     assert fallback_switch["state_before_digest"]
     assert fallback_switch["state_after_digest"]

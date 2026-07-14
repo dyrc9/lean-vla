@@ -318,6 +318,7 @@ class ConditionalKinematicConfig:
     model_error_m: float = 0.0
     dynamics_model_id: str = "libero-delta-kinematic-v1"
     filter_policy_id: str = "identity-filter-v1"
+    timing_policy_id: str = "strict-real-time-v1"
     fallback_id: str = "hold"
     fallback_witness_digest: str = ""
     fallback_verified: bool = False
@@ -334,6 +335,11 @@ class ConditionalKinematicConfig:
             raise ValueError("runtime periods and budgets must be positive")
         if self.authorization_slack_ns < 0:
             raise ValueError("authorization slack must be non-negative")
+        if self.timing_policy_id not in {
+            "strict-real-time-v1",
+            "slow-interlock-diagnostic-v1",
+        }:
+            raise ValueError("unsupported CTDA timing policy")
         if self.evidence_validity_ns <= 0:
             raise ValueError("evidence validity must be positive")
         if not isfinite(self.max_command_abs) or self.max_command_abs <= 0:
@@ -369,6 +375,10 @@ class ConditionalKinematicConfig:
             raise ValueError(
                 "enabled hold fallback may only command the bounded gripper channel"
             )
+
+    @property
+    def realtime_timing_enforced(self) -> bool:
+        return self.timing_policy_id == "strict-real-time-v1"
 
 
 @dataclass(frozen=True)
@@ -495,6 +505,7 @@ def _fallback_actuation_subject_digest(
 class FallbackSwitchReceipt:
     episode_nonce: str
     fallback_id: str
+    timing_policy_id: str
     trigger: str
     state_before_digest: str
     state_after_digest: str
@@ -521,6 +532,7 @@ class FallbackSwitchReceipt:
         for name in (
             "episode_nonce",
             "fallback_id",
+            "timing_policy_id",
             "trigger",
             "state_before_digest",
             "state_after_digest",
@@ -540,6 +552,11 @@ class FallbackSwitchReceipt:
             raise ValueError("fallback switch timestamps are not monotonic")
         if self.switch_latency_bound_ns < 0:
             raise ValueError("fallback switch latency bound must be non-negative")
+        if self.timing_policy_id not in {
+            "strict-real-time-v1",
+            "slow-interlock-diagnostic-v1",
+        }:
+            raise ValueError("unsupported fallback timing policy")
         if not isinstance(self.postcondition, FallbackPostconditionEvaluation):
             raise TypeError("fallback postcondition must be a typed evaluation")
         if self.command_application not in {"requested_only", "typed_simulator_applied"}:
@@ -579,6 +596,7 @@ class FallbackSwitchReceipt:
         claim = {
             "episode_nonce": self.episode_nonce,
             "fallback_id": self.fallback_id,
+            "timing_policy_id": self.timing_policy_id,
             "trigger": self.trigger,
             "state_before_digest": self.state_before_digest,
             "state_after_digest": self.state_after_digest,
@@ -609,6 +627,7 @@ class FallbackSwitchReceipt:
         claim = {
             "episode_nonce": self.episode_nonce,
             "fallback_id": self.fallback_id,
+            "timing_policy_id": self.timing_policy_id,
             "trigger": self.trigger,
             "state_before_digest": self.state_before_digest,
             "state_after_digest": self.state_after_digest,
@@ -682,6 +701,45 @@ class FallbackSwitchReceipt:
                     and self.attestation.subject_digest == self.claim_digest
                 )
             )
+        )
+
+    @property
+    def switch_latency_ns(self) -> int:
+        return self.observed_at_ns - self.triggered_at_ns
+
+    @property
+    def within_switch_latency_bound(self) -> bool:
+        return self.switch_latency_ns <= self.switch_latency_bound_ns
+
+    @property
+    def actuation_and_postcondition_established(self) -> bool:
+        """Whether the requested fallback was applied and its safe set observed.
+
+        This intentionally excludes the switch-latency SLA.  The original
+        ``succeeded`` field remains the strict conjunction including latency.
+        """
+
+        return bool(
+            self.command_application == "typed_simulator_applied"
+            and self.applied_command_digest == self.requested_command_digest
+            and self.actuator_attestation is not None
+            and self.actuator_attestation.verify_integrity()
+            and self.actuator_attestation.evidence_type
+            == "fallback_actuator_applied"
+            and self.dispatched_at_ns
+            <= self.actuator_attestation.issued_at_ns
+            <= self.observed_at_ns
+            and self.actuator_attestation.valid_until_ns >= self.observed_at_ns
+            and "simulator_env_step_applies_requested_command"
+            in self.actuator_attestation.assumptions
+            and self.actuator_attestation.subject_digest
+            == _fallback_actuation_subject_digest(
+                self.episode_nonce,
+                self.fallback_id,
+                self.requested_command_digest,
+                self.dispatched_at_ns,
+            )
+            and self.postcondition.proven
         )
 
 
@@ -800,6 +858,24 @@ class CTDARuntimeSession:
         if not self.config.fallback_verified or not self.config.fallback_action:
             raise RuntimeError("no trusted executable fallback is configured")
         return tuple(float(value) for value in self.config.fallback_action)
+
+    def fallback_established_for_timing_policy(
+        self, receipt: FallbackSwitchReceipt
+    ) -> bool:
+        """Apply the configured timing policy without weakening fallback safety."""
+
+        if not receipt.verify_integrity():
+            return False
+        if receipt.timing_policy_id != self.config.timing_policy_id:
+            return False
+        if self.config.realtime_timing_enforced:
+            return receipt.succeeded
+        return bool(
+            receipt.actuation_and_postcondition_established
+            and receipt.attestation is not None
+            and self.evidence_issuer is not None
+            and self.evidence_issuer.verifier.verify(receipt.attestation)
+        )
 
     def attest_fallback_actuation(
         self,
@@ -924,6 +1000,7 @@ class CTDARuntimeSession:
         receipt = FallbackSwitchReceipt(
             episode_nonce=self.supervisor.mission.episode_nonce,
             fallback_id=self.config.fallback_id,
+            timing_policy_id=self.config.timing_policy_id,
             trigger=trigger,
             state_before_digest=digest_legacy_state(state_before),
             state_after_digest=state_after_digest,
@@ -1892,6 +1969,9 @@ class CTDARuntimeSession:
             record,
             (),
             evaluation_time,
+            enforce_dispatch_observation_sla=(
+                self.config.realtime_timing_enforced
+            ),
         )
         try:
             observed_evaluation = self._evaluate_stage(
@@ -1935,6 +2015,9 @@ class CTDARuntimeSession:
             record,
             post_attestations,
             evaluation_time,
+            enforce_dispatch_observation_sla=(
+                self.config.realtime_timing_enforced
+            ),
         )
         try:
             monitor_evaluation = self._evaluate_stage(
@@ -1972,6 +2055,9 @@ class CTDARuntimeSession:
             record,
             post_attestations,
             now_ns=evaluation_time,
+            enforce_dispatch_observation_sla=(
+                self.config.realtime_timing_enforced
+            ),
         )
         if self.active_execution is None:
             raise RuntimeError("CTDA execution chain was not initialised")
@@ -2714,6 +2800,9 @@ def _kinematic_assumptions(
         f"model_error_m={config.model_error_m}",
         f"command_abs_bound={config.max_command_abs}",
         f"clearance_margin_m={float(getattr(safety_spec, 'safety_margin', 0.0))}",
+        f"timing_policy_id={config.timing_policy_id}",
+        "dispatch_to_observation_sla_enforced="
+        f"{str(config.realtime_timing_enforced).lower()}",
         "world_state_clearance_observation_sound",
         "kinematic_delta_bound_covers_plant_motion",
     )

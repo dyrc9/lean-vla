@@ -36,12 +36,19 @@ def _time_base() -> TimeBase:
     return TimeBase("test-clock", 20_000_000, 1_000_000, 1_000_000, 2_000_000)
 
 
-def _session(safe_state, safe_spec, *, fallback_verified: bool) -> CTDARuntimeSession:
+def _session(
+    safe_state,
+    safe_spec,
+    *,
+    fallback_verified: bool,
+    timing_policy_id: str = "strict-real-time-v1",
+) -> CTDARuntimeSession:
     intent = parse_intent("pick up the mug by the handle")
     config = ConditionalKinematicConfig(
         fallback_verified=fallback_verified,
         fallback_witness_digest=(digest_text("verified-hold") if fallback_verified else ""),
         fallback_action=((0.0, 0.0, 0.0, 0.0) if fallback_verified else ()),
+        timing_policy_id=timing_policy_id,
     )
     return CTDARuntimeSession.from_legacy(
         intent,
@@ -107,6 +114,79 @@ def test_runtime_authorizes_then_completes_pick_contract(safe_state, safe_spec) 
     assert monitored.verdict is MonitorVerdict.COMPLETE
     assert session.supervisor.active_contract is None
     assert session.supervisor.active_phase == "holding"
+
+
+def test_strict_timing_policy_rejects_late_but_unexpired_observation(
+    safe_state, safe_spec
+) -> None:
+    session = _session(safe_state, safe_spec, fallback_verified=True)
+    action = action_from_dict({"type": "Pick", "object": "mug", "part": "handle"})
+    raw = [0.1, 0.0, 0.0, -1.0]
+    prepared = session.prepare_prefix(
+        action, safe_state, (raw,), safe_spec, now_ns=1_000_000
+    )
+    assert prepared.prepared is not None
+
+    monitored, record = session.observe_prefix(
+        prepared.prepared,
+        (safe_state.clone(),),
+        (raw,),
+        safe_spec,
+        dispatch_ns=2_000_000,
+        observation_times_ns=(23_000_000,),
+    )
+
+    assert record.plant_trace.samples[-1].timestamp_ns < record.candidate.authorization.valid_until_ns
+    assert monitored.verdict is MonitorVerdict.VIOLATED
+    assert any("dispatch-to-observation SLA" in issue for issue in monitored.issues)
+
+
+def test_slow_interlock_records_late_observation_without_weakening_contract_deadlines(
+    safe_state, safe_spec
+) -> None:
+    session = _session(
+        safe_state,
+        safe_spec,
+        fallback_verified=True,
+        timing_policy_id="slow-interlock-diagnostic-v1",
+    )
+    action = action_from_dict({"type": "Pick", "object": "mug", "part": "handle"})
+    raw = [0.1, 0.0, 0.0, -1.0]
+    prepared = session.prepare_prefix(
+        action, safe_state, (raw,), safe_spec, now_ns=1_000_000
+    )
+    assert prepared.prepared is not None
+    assumptions = prepared.prepared.candidate.tube.assumptions
+    assert "timing_policy_id=slow-interlock-diagnostic-v1" in assumptions
+    assert "dispatch_to_observation_sla_enforced=false" in assumptions
+
+    monitored, record = session.observe_prefix(
+        prepared.prepared,
+        (safe_state.clone(),),
+        (raw,),
+        safe_spec,
+        dispatch_ns=2_000_000,
+        observation_times_ns=(23_000_000,),
+    )
+
+    assert record.plant_trace.samples[-1].timestamp_ns < record.candidate.authorization.valid_until_ns
+    assert monitored.verdict is MonitorVerdict.SAFE_PENDING
+    assert not any("dispatch-to-observation SLA" in issue for issue in monitored.issues)
+
+    next_prepared = session.prepare_prefix(
+        action, safe_state, (raw,), safe_spec, now_ns=24_000_000
+    )
+    assert next_prepared.prepared is not None
+    expired, _ = session.observe_prefix(
+        next_prepared.prepared,
+        (safe_state.clone(),),
+        (raw,),
+        safe_spec,
+        dispatch_ns=25_000_000,
+        observation_times_ns=(65_000_001,),
+    )
+    assert expired.verdict is MonitorVerdict.VIOLATED
+    assert any("authorization expiry" in issue for issue in expired.issues)
 
 
 def test_runtime_rejects_command_outside_kinematic_model(safe_state, safe_spec) -> None:
@@ -907,6 +987,41 @@ def test_fallback_switch_latency_uses_violation_trigger_and_fails_closed(
     assert receipt.postcondition.proven is True
     assert receipt.succeeded is False
     assert receipt.observed_at_ns - receipt.triggered_at_ns > receipt.switch_latency_bound_ns
+    assert session.fallback_established_for_timing_policy(receipt) is False
+
+
+def test_slow_interlock_keeps_late_fallback_as_performance_miss(
+    safe_state, safe_spec
+) -> None:
+    session = _session(
+        safe_state,
+        safe_spec,
+        fallback_verified=True,
+        timing_policy_id="slow-interlock-diagnostic-v1",
+    )
+    command = session.fallback_command()
+    actuator = session.attest_fallback_actuation(
+        command, dispatched_at_ns=2, applied_at_ns=2
+    )
+
+    receipt = session.record_fallback_switch(
+        trigger="monitor violation",
+        state_before=safe_state,
+        state_after=safe_state,
+        command=command,
+        triggered_at_ns=0,
+        requested_at_ns=1,
+        dispatched_at_ns=2,
+        observed_at_ns=_time_base().switch_latency_ns + 1,
+        safety_spec=safe_spec,
+        environment_info={"cost": {}},
+        actuator_attestation=actuator,
+    )
+
+    assert receipt.succeeded is False
+    assert receipt.within_switch_latency_bound is False
+    assert receipt.actuation_and_postcondition_established is True
+    assert session.fallback_established_for_timing_policy(receipt) is True
 
 
 def test_fallback_observation_failure_is_unknown_and_attempt_is_persisted(
@@ -1000,6 +1115,8 @@ def test_verified_hold_fallback_must_stay_inside_command_envelope() -> None:
             fallback_witness_digest=digest_text("hold"),
             fallback_action=(0.1, 0.0, 0.0, 0.0),
         )
+    with pytest.raises(ValueError, match="timing policy"):
+        ConditionalKinematicConfig(timing_policy_id="unbound-latency-bypass")
 
 
 def test_runtime_rejects_authorization_replay(safe_state, safe_spec) -> None:

@@ -21,8 +21,9 @@
   46.949、51.205、46.704 ms。25 次 zero-hold 诊断 median 41.769 ms、p95 45.776 ms、
   max 59.435 ms。
 - 当前决策：不放宽 witness、不改变 control frequency、不移动 `observed_at`。保留超时
-  fail-closed，但不再让 latency gate 阻塞 slow-interlock/offline 实验；删除 real-time
-  enforcement claim。
+  strict receipt 和完整 miss；在显式 `slow-interlock-diagnostic-v1` 下不再让纯 latency SLA 阻塞
+  method-validity 实验；删除 real-time enforcement claim。authorization/contract deadline、
+  trace horizon 与所有安全/完整性条件仍 fail closed。
 - `7bab2d9` clean checkout 的 strict preflight 已通过（206 passed / 1 skipped、Lean 12 jobs、
   `ready=true`）。随后 5-prefix 尝试发现 selected benchmark init 0 被 online runner 二次 reset
   替换；episode 初始 digest 为
@@ -78,11 +79,12 @@
 
 ## 下一步只做什么
 
-1. 保留 `74152a9` preflight、raw episode、三个唯一 Lean request、fallback receipt、gate
-   validation、run notes 和 SHA256SUMS；结论固定为 gate failed。
-2. 不追加 episode，不改 control frequency、duration、timestamp 或 witness。若继续，先单独授权并
-   定义 observed-duration 与 `TimeBase.max_jitter_ns` 的 Python/Lean/wire 语义和 tests。
-3. 新 3--5 prefix gate 通过前仍不运行 SABER/Phantom 官方复现、60 episodes 或 paired pilot。
+1. 保留 `74152a9` 历史失败 artifact；完成 strict/slow timing policy 的 CPU/Lean、clean commit 与
+   strict preflight。
+2. 不改 control frequency、duration、timestamp 或 witness；仅按显式 slow-interlock policy 将纯
+   performance miss 与 method judgment 分列，并保留严格 receipt。
+3. 只重跑一次相同 task/init/seed/witness 的 3--5 prefix calibration。
+4. 新 3--5 prefix gate 通过前仍不运行 SABER/Phantom 官方复现、60 episodes 或 paired pilot。
    whole-chunk authorization 仍不在范围内。
 
 本次下一步仍不是 60-episode、SABER 或 Phantom 主实验。不要把 slow-interlock 结果描述成实时

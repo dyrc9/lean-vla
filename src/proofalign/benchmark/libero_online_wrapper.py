@@ -913,12 +913,13 @@ class ProofAlignLiberoWrapper:
                         if summary.boundary_reason
                         else "ctda_fallback"
                     )
-                    ctda_metadata["fallback_switch"] = {
-                        **asdict(fallback_receipt),
-                        "command": list(self.ctda_session.fallback_command()),
-                    }
+                    ctda_metadata["fallback_switch"] = _fallback_switch_metadata(
+                        self.ctda_session, fallback_receipt
+                    )
                     ctda_metadata["fallback_trace"] = fallback_trace
-                    if not fallback_receipt.succeeded:
+                    if not self.ctda_session.fallback_established_for_timing_policy(
+                        fallback_receipt
+                    ):
                         issue = "configured simulator fallback did not establish its immediate postcondition"
                         ctda_effect_result = CheckResult(
                             passed=False,
@@ -1059,15 +1060,16 @@ class ProofAlignLiberoWrapper:
                 )
                 self.current_observation = observation
                 self.current_state = fallback_state
-                if not fallback_receipt.succeeded:
+                if not self.ctda_session.fallback_established_for_timing_policy(
+                    fallback_receipt
+                ):
                     final_decision = Decision.SAFE_STOP
                     explanation += "; configured simulator fallback did not establish its immediate postcondition"
                 if self.trace:
                     last_step = self.trace[-1]
-                    last_step.ctda["fallback_switch"] = {
-                        **asdict(fallback_receipt),
-                        "command": list(self.ctda_session.fallback_command()),
-                    }
+                    last_step.ctda["fallback_switch"] = _fallback_switch_metadata(
+                        self.ctda_session, fallback_receipt
+                    )
                     last_step.ctda["fallback_trace"] = fallback_trace
                     last_step.env_info["proofalign_fallback_env_info"] = fallback_info
                     last_step.after = fallback_state
@@ -1518,6 +1520,11 @@ def _ctda_metadata(
         "record": record_payload,
         "dispatch_monotonic_ns": dispatch_ns,
         "observe_monotonic_ns": observe_ns,
+        "performance_timing": _observation_timing_metadata(
+            session,
+            dispatch_ns=dispatch_ns,
+            observe_ns=observe_ns,
+        ),
         "bounded_stutter": (
             {
                 "enabled": bounded_stutter,
@@ -1566,6 +1573,60 @@ def _ctda_metadata(
             "conditional-simulator-kinematic-test-only",
         ),
         "proof_verified": session.kernel_proof_verified,
+    }
+
+
+def _observation_timing_metadata(
+    session: CTDARuntimeSession,
+    *,
+    dispatch_ns: int | None,
+    observe_ns: int | None,
+) -> dict[str, Any]:
+    latency_ns = (
+        None
+        if dispatch_ns is None or observe_ns is None
+        else observe_ns - dispatch_ns
+    )
+    sla_ns = session.config.control_period_ns
+    missed = None if latency_ns is None else latency_ns > sla_ns
+    return {
+        "timing_policy_id": session.config.timing_policy_id,
+        "realtime_timing_enforced": session.config.realtime_timing_enforced,
+        "dispatch_to_observation_ns": latency_ns,
+        "dispatch_to_observation_sla_ns": sla_ns,
+        "dispatch_to_observation_sla_missed": missed,
+        "miss_is_performance_only": bool(
+            missed and not session.config.realtime_timing_enforced
+        ),
+    }
+
+
+def _fallback_switch_metadata(
+    session: CTDARuntimeSession,
+    receipt: Any,
+) -> dict[str, Any]:
+    return {
+        **asdict(receipt),
+        "command": list(session.fallback_command()),
+        "actuation_and_postcondition_established": (
+            receipt.actuation_and_postcondition_established
+        ),
+        "established_for_timing_policy": (
+            session.fallback_established_for_timing_policy(receipt)
+        ),
+        "performance_timing": {
+            "timing_policy_id": session.config.timing_policy_id,
+            "realtime_timing_enforced": session.config.realtime_timing_enforced,
+            "trigger_to_observation_ns": receipt.switch_latency_ns,
+            "switch_latency_sla_ns": receipt.switch_latency_bound_ns,
+            "switch_latency_sla_missed": (
+                not receipt.within_switch_latency_bound
+            ),
+            "miss_is_performance_only": bool(
+                not receipt.within_switch_latency_bound
+                and not session.config.realtime_timing_enforced
+            ),
+        },
     }
 
 

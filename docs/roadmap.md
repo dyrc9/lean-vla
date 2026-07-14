@@ -189,7 +189,9 @@ TPR、FPR 均为 `not_evaluated`。Lean p99 超出控制周期，当前按 offli
 固定 `affordance/task 2/init 0` 的真实 GPU probe 已验证 fallback postcondition 只要求
 `collision,cost` 且 observation complete。固定 50 ms switch receipt 在三次完整 repeat 中只通过
 2/3，因此该 receipt gate 记录为失败；它不再阻塞 3--5 prefix slow-interlock calibration，但任何
-后续结果都不得描述为 real-time，超时 receipt 必须继续 fail closed，不能筛掉。
+后续结果都不得描述为 real-time，超时 receipt 必须原样保留且严格 `succeeded=false`，不能筛掉。
+在 `slow-interlock-diagnostic-v1` 下，只有 latency miss 本身不再升级为 method failure；actuation、
+receipt integrity 或 fallback postcondition 任一失败仍 fail closed。
 
 首次 5-prefix clean 尝试发现 `create_initialized_env()` 应用 selected init 后，online runner 因
 环境缺少 `_get_observations()` 又调用 `reset()`，所以 episode 实际绑定到另一个 reset state。该
@@ -218,15 +220,20 @@ task/init/seed/witness 的重跑在第一 prefix 的 100 ms authorized-duration 
 超过 50 ms。累计 path 与 observed kinematic margin 均为正，故不能把失败写成运动超界。whole-chunk
 authorization 仍未获授权。
 
+用户已授权优先验证 method validity。当前协议因此显式区分 `strict-real-time-v1` 与
+`slow-interlock-diagnostic-v1`：后者记录但不执行 control-period observation SLA 与 fallback
+switch-latency SLA；authorization expiry、contract deadline、trace horizon、运动学/不变量、
+completion/progress、累计预算和 fallback actuation/postcondition 不变。该策略绑定进 tube assumptions
+及 runtime metadata，并有 strict/slow 双向 fake-env tests；下一 gate 是全量验证、clean preflight
+和唯一一次固定配置 calibration，不是直接增加 episode。
+
 ## 6. P4：远程发布攻击 workload pilot
 
-状态：**累计 bounded-stutter 已通过本地 CPU/Lean 与 strict preflight；唯一 GPU 重跑在首 prefix
-authorized-duration 和 fallback-latency 边界 fail closed，3--5 prefix gate 未通过**。P1/P2
+状态：**累计 bounded-stutter 已通过本地 CPU/Lean 与 strict preflight；历史 GPU 重跑在首 prefix
+墙钟 observation/fallback SLA 失败；method-validity timing policy 已获授权并进入重新验证**。P1/P2
 correctness、golden parity 与 affordance observation completeness 已通过；real-time latency 明确
 未通过并已降级 claim。fail-closed preflight manifest 与 clean + Lean slow-interlock smoke 已
-脚本化。本轮已按“一次 calibration、失败即停”执行且没有追加 episode。下一步只有在单独授权并
-同步定义 Python/Lean/wire 的 observed-duration/jitter 合同后才可改方法；未经新的 clean method gate
-不得启动主表。
+脚本化。未经新的 clean method gate 不得启动主表。
 环境见 [`remote_execution.md`](remote_execution.md)。
 
 在 60-episode pilot 前增加 upstream reproduction gate，详见

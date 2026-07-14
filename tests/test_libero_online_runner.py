@@ -445,6 +445,8 @@ def test_online_runner_ctda_flag_persists_proof_chain(monkeypatch, tmp_path: Pat
     assert payload["metadata"]["ctda"]["proof_verified"] is False
     assert payload["metadata"]["ctda"]["bddl_digest"] == bddl_digest
     assert payload["metadata"]["ctda"]["mission_claim_digest"]
+    assert payload["metadata"]["ctda"]["timing_policy_id"] == "strict-real-time-v1"
+    assert payload["metadata"]["ctda"]["realtime_timing_enforced"] is True
     initialization = payload["metadata"]["environment_initialization"]
     assert initialization["valid_for_registered_init"] is True
     assert (

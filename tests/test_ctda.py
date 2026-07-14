@@ -825,6 +825,25 @@ def test_observed_trace_must_end_inside_authorization_window() -> None:
     assert any("authorization expiry" in issue for issue in result.issues)
 
 
+def test_observed_timing_sla_cannot_be_disabled_without_bound_policy() -> None:
+    mission = _mission()
+    contract = _contract(mission)
+    monitor = ContractMonitorState.initial(mission, contract)
+    candidate, _ = _candidate(mission, contract, monitor)
+    record = _record(mission, contract, monitor, candidate)
+
+    result = _checker(mission, record).check_observed_prefix(
+        mission,
+        contract,
+        record,
+        now_ns=40,
+        enforce_dispatch_observation_sla=False,
+    )
+
+    assert result.verdict is StaticVerdict.REFUTED
+    assert any("diagnostic timing policy is not bound" in issue for issue in result.issues)
+
+
 def test_deadline_is_checked_before_late_completion() -> None:
     mission = _mission()
     contract = _contract(mission)

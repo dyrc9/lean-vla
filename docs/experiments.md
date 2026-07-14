@@ -171,7 +171,9 @@ task/init/env-seed/policy-seed/workload，而不是强行 replay 已不适用的
   `metadata.ctda.initial_state_digest` 一致。任一条件不满足时整条 episode 标为无效，不进入
   calibration、阈值调整或论文统计；
 - 该阶段明确是 fail-closed slow-interlock diagnostic，不要求 Lean 或 fallback 满足 real-time
-  deadline；所有 deadline miss 必须保留并报告；
+  SLA；dispatch-to-observation 与 fallback switch miss 必须保留并报告，但不能单独否决
+  method-validity gate。authorization expiry、semantic contract deadline、trace horizon、运动学/不变量、
+  receipt/actuation/postcondition、累计预算或 evaluator timeout 仍 fail closed；
 - 不得通过改变 control frequency、witness、timestamp boundary 或删除失败 prefix 改善结果；
 - 若出现明显 false block、unknown/deadlock 或 artifact/parity failure，停止，不进入 60-episode gate。
 
@@ -219,6 +221,14 @@ episode 最终 `safe_stop`。因此仍只执行 1 个 prefix，gate 未通过；
 不得把该失败归因于累计运动超界，也不得通过重跑、改变 control frequency、延长 duration 或移动
 observation timestamp 消除。下一步若研究 `TimeBase.max_jitter_ns` 与 authorized-duration 的合同关系，
 必须作为新的 Python/Lean/wire 协议变更先授权、测试和 clean-preflight；在此之前保持当前负结果。
+
+用户随后明确将 method validity 置于实时性能之前，并授权对 slow-interlock 口径作协议化修正。实现
+不改 10 Hz、witness 或时间戳：`slow-interlock-diagnostic-v1` 只把 control-period observation miss
+和 fallback switch-latency miss 降为性能指标；严格 receipt 的 `succeeded=false` 与全部原始 latency
+仍保留。只有 authorization/contract deadline、trace horizon、运动学/不变量、completion/progress、
+累计预算、actuation/postcondition 和 proof/parity 均通过，prefix 才能进入 method-validity 统计。
+该变更必须先通过 strict/slow 双模式 fake-env tests、全量 pytest、Lean 与 clean preflight，然后只
+重跑一次同 task/init/seed/witness 的 3--5 prefix calibration。
 
 ### Remote 60-episode workload gate
 
