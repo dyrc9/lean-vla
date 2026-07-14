@@ -360,8 +360,8 @@ prefix：registered init digest 一致，count `0 -> 1`，四阶段 proof/parity
 `safe_pending`，phase 保持 `approach`，observed displacement 有正 margin。第二次 fresh OpenPI
 inference 仍为 envelope 内微动作，但一次性 budget 已耗尽，因此新 prefix-pre Lean evaluation 和
 `env.step` 均为零，最终 replan。只执行 1/5 prefix，calibration 仍未通过。不要继续增加 episode；
-当前已授权并本地实现 repeated micro-action 的合同级累计版本；它仍须在 clean commit 上重跑
-strict preflight。whole-chunk authorization 仍未授权，完整 chunk 只保存为 audit log。
+当前 repeated micro-action 的合同级累计版本已在 `74152a9` 完成 clean strict preflight 和唯一一次
+GPU 重跑，但新 gate 仍失败。whole-chunk authorization 仍未授权，完整 chunk 只保存为 audit log。
 
 OpenPI rollout 必须使用 `uv --project external/openpi run python`。ProofAlign 根项目的 `.venv` 不含
 OpenPI 声明的完整依赖；2026-07-14 的一次错误启动因此在首个 policy action 前报
@@ -381,11 +381,24 @@ completion/contract progress、deadline 耗尽或字段不一致都必须 fail c
 不代表第二 proposal 又完成四阶段。正式计数必须按 unique request id 和 stage transaction 计；该
 run 的唯一 Lean request 数为 4，第二 proposal 的新 Lean stage 数为 0。
 
+`74152a9` 累计版本的 strict preflight 已通过，随后唯一一次 GPU 重跑使用空闲的 policy GPU 3 和
+EGL GPU 5；task/init/env seed/policy RNG/witness/checkpoint/config 均保持不变。registered-init gate
+通过，完整 10-action chunk、`openpi:000000`、1 个 executed action 与 9-action tail 均落盘。首个
+stutter 的 predicted translation 3.617 µm、六维 command-path norm `9.3073e-05`、observed
+kinematic margin 25.754 µm，均未超界；但 observation 在 dispatch 后 104.926 ms 到达，超过 100 ms
+authorized duration 4.926 ms。observed-prefix 由 Python/Lean 一致 refute，未进入 monitor-step。
+fallback postcondition 成立但 trigger-to-observation 56.910 ms 超过 50 ms，最终 `safe_stop`。因此
+只执行 1 个 prefix，gate 仍失败；不得追加 episode。
+
+该结果位于 `results/remote_gpu_clean_prefix3_20260714_74152a9/`。下一轮若改变
+observed-duration/jitter 关系，必须先作为 Python/Lean/wire 协议变更授权；不得只延长 duration、移动
+timestamp 或改变 control frequency。
+
 具体 command 在迁移时从当前 `--help` 生成，不从 archive 复制。本次 clean prefix calibration 保留
 以下固定实验参数：
 
 ```text
---max-steps 3
+--max-steps 5
 --max-chunk-steps 1
 --continue-on-replan
 --camera-height 256

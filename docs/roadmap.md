@@ -18,8 +18,8 @@ trusted frozen mission
 
 当前 GPU 环境已完成 single-prefix diagnostic 和一次 bounded-stutter clean 重跑。后续 GPU rollout
 仍只在相应 readiness gate 通过后分阶段执行；历史 3--5 prefix gate 在第二个新微动作处因一次性
-budget 耗尽而失败。累计版本已通过本地 CPU/Lean，只有形成 clean commit 并通过 strict preflight
-后才开放一次相同配置的 3--5 prefix 重跑。
+budget 耗尽而失败。累计版本随后通过本地 CPU/Lean 与 strict preflight，但唯一一次相同配置重跑
+在首 prefix 的 authorized-duration 边界失败；当前没有新的 GPU 扩样本入口。
 
 ## 1. 冻结原则
 
@@ -213,18 +213,20 @@ no-progress index/limit；completion/contract progress 在 phase 更新前 fail 
 dispatch。
 
 本地累计实现已通过 216 passed / 1 skipped 与 Lean 12 jobs；这些仍只是 CPU/fake-env 与 Python
-binder 语义，不是 Lean raw-action proof。下一 gate 是在 clean commit 上跑 strict GPU preflight，
-随后只重跑一次相同 task/init/seed/witness 的 3--5 prefix calibration。whole-chunk authorization
-仍未获授权。
+binder 语义，不是 Lean raw-action proof。`74152a9` strict GPU preflight 随后通过，但唯一一次相同
+task/init/seed/witness 的重跑在第一 prefix 的 100 ms authorized-duration 边界失败，fallback 也再次
+超过 50 ms。累计 path 与 observed kinematic margin 均为正，故不能把失败写成运动超界。whole-chunk
+authorization 仍未获授权。
 
 ## 6. P4：远程发布攻击 workload pilot
 
-状态：**累计 bounded-stutter 已在本地实现并通过 CPU/Lean；尚未 strict-preflight/GPU 重跑，
-3--5 prefix gate 仍未通过**。P1/P2
+状态：**累计 bounded-stutter 已通过本地 CPU/Lean 与 strict preflight；唯一 GPU 重跑在首 prefix
+authorized-duration 和 fallback-latency 边界 fail closed，3--5 prefix gate 未通过**。P1/P2
 correctness、golden parity 与 affordance observation completeness 已通过；real-time latency 明确
 未通过并已降级 claim。fail-closed preflight manifest 与 clean + Lean slow-interlock smoke 已
-脚本化。下一步只允许 clean commit -> strict preflight -> 同 task/init/seed/witness 一次 3--5 prefix
-calibration；失败即停。未经新的 clean method gate 不得启动主表。
+脚本化。本轮已按“一次 calibration、失败即停”执行且没有追加 episode。下一步只有在单独授权并
+同步定义 Python/Lean/wire 的 observed-duration/jitter 合同后才可改方法；未经新的 clean method gate
+不得启动主表。
 环境见 [`remote_execution.md`](remote_execution.md)。
 
 在 60-episode pilot 前增加 upstream reproduction gate，详见

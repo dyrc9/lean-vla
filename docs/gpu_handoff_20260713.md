@@ -2,10 +2,9 @@
 
 起始版本：`230e32937a194530054616f9232adb7f9973586c`
 
-最新更新：2026-07-14，本次真实 GPU run 使用的 ProofAlign committed HEAD 为
-`e2e4d47ed00e0c48d8513d7f1c34e2666b8f615d`；run 后 canonical 结论另作本地文档 commit，均未 push。
-本轮累计 bounded-stutter 代码尚未做新的真实 GPU run；当前只有 216 passed / 1 skipped 与 Lean
-12 jobs 的本地证据。
+最新更新：2026-07-14。历史一次性 run 使用 `e2e4d47`；本轮累计 bounded-stutter 真实 GPU run
+使用 committed HEAD `74152a9492298155810244ddcbb6509f22d47241`，run 后 canonical 结论另作本地
+文档 commit，均未 push。
 
 ## 当前状态
 
@@ -55,6 +54,14 @@
   `no_progress_patience=3`。OpenPI/episode artifact 还会保存完整归一化 chunk、policy-call ID、实际
   policy actions 与丢弃 tail。该实现尚待 clean-commit strict preflight 和一次相同配置的 3--5
   prefix GPU calibration。
+- `74152a9` strict preflight：`ready=true`、零 blocker/warning、216 passed / 1 skipped、Lean 12
+  jobs，三套 checkout clean。policy GPU 1 被其他用户占用，因此记录并使用同型号空闲 GPU 3；EGL
+  仍为 GPU 5。
+- 唯一一次累计版本 run 的 registered-init gate 通过；首个 prefix 的 predicted translation 3.617
+  µm、六维 command-path norm `9.3073e-05`、observed kinematic margin 25.754 µm，完整 10-action
+  chunk/call/executed/tail 均落盘。但 dispatch-to-observation 104.926 ms 超过 100 ms authorized
+  duration 4.926 ms，observed-prefix 被 Python/Lean 一致 refute；fallback postcondition 成立但
+  56.910 ms 超过 50 ms，最终 `safe_stop`。只执行 1 prefix，未追加 episode，gate 仍失败。
 
 关键 artifact：
 
@@ -66,15 +73,17 @@
 - `results/remote_gpu_clean_prefix5_20260714_2c532ca_v2/`（valid-init clean binder blocker）
 - `results/remote_gpu_clean_prefix5_20260714_e2e4d47/`（bounded-stutter 首 prefix 通过、第二 proposal
   budget exhausted；gate 未通过）
+- `results/remote_gpu_clean_prefix3_20260714_74152a9/`（累计合同 strict preflight 通过；首 prefix
+  authorized-duration 与 fallback-latency fail closed；gate 未通过）
 
 ## 下一步只做什么
 
-1. 将累计合同形成 clean commit；确认 216 passed / 1 skipped、Lean 12 jobs、diff check 通过。
-2. 在该 commit 上重新 strict preflight，并在启动前检查 GPU 占用。
-3. 只重跑一次相同 `affordance/task 2/init 0`、env seed 7、policy seed 0、10 Hz、同一 witness 的
-   3--5 prefix calibration；`max_chunk_steps=1`，不追加 episode稀释失败。
-4. 新 gate 通过后才依次做 SABER/Phantom 官方复现；通过 upstream signal gate 后才做最小 paired
-   pilot。whole-chunk authorization 仍不在范围内。
+1. 保留 `74152a9` preflight、raw episode、三个唯一 Lean request、fallback receipt、gate
+   validation、run notes 和 SHA256SUMS；结论固定为 gate failed。
+2. 不追加 episode，不改 control frequency、duration、timestamp 或 witness。若继续，先单独授权并
+   定义 observed-duration 与 `TimeBase.max_jitter_ns` 的 Python/Lean/wire 语义和 tests。
+3. 新 3--5 prefix gate 通过前仍不运行 SABER/Phantom 官方复现、60 episodes 或 paired pilot。
+   whole-chunk authorization 仍不在范围内。
 
 本次下一步仍不是 60-episode、SABER 或 Phantom 主实验。不要把 slow-interlock 结果描述成实时
 执行，也不要用 CTDA verdict 自己生成 ground-truth TPR/FPR。
