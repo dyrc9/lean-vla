@@ -9,6 +9,8 @@ OPENPI_ROOT="${OPENPI_ROOT:-$WORKSPACE/external/openpi}"
 LIBERO_SAFETY_ROOT="${LIBERO_SAFETY_ROOT:-$WORKSPACE/external/LIBERO-Safety}"
 CHECKPOINT_DIR="${CHECKPOINT_DIR:-/data0/ldx/libero_safety_models/pi05_libero_safety}"
 PROOFALIGN_UV="${PROOFALIGN_UV:-uv}"
+LIBERO_CONFIG_PATH="${LIBERO_CONFIG_PATH:-$HOME/.libero}"
+LIBERO_CONFIG_FILE="$LIBERO_CONFIG_PATH/config.yaml"
 VLA_GPU="${VLA_GPU:?set VLA_GPU to the physical policy GPU id}"
 EGL_GPU="${EGL_GPU:?set EGL_GPU to the physical MuJoCo EGL GPU id}"
 
@@ -18,6 +20,9 @@ INIT_STATE_ID="${INIT_STATE_ID:-0}"
 SEED="${SEED:-7}"
 POLICY_SEED="${POLICY_SEED:-0}"
 MAX_STEPS="${MAX_STEPS:-30}"
+MAX_CHUNK_STEPS="${MAX_CHUNK_STEPS:-5}"
+CONTROL_FREQ="${CONTROL_FREQ:-20}"
+CTDA_LEAN_TIMEOUT_SECONDS="${CTDA_LEAN_TIMEOUT_SECONDS:-10}"
 RUN_ROOT="${RUN_ROOT:-$WORKSPACE/results/remote_gpu_smoke}"
 SMOKE_MODE="${SMOKE_MODE:-both}"
 
@@ -28,6 +33,7 @@ esac
 
 mkdir -p "$RUN_ROOT"
 export LIBERO_SAFETY_ROOT
+export LIBERO_CONFIG_PATH
 export PYTHONPATH="$WORKSPACE:$WORKSPACE/src:$LIBERO_SAFETY_ROOT:$OPENPI_ROOT/src:$OPENPI_ROOT/packages/openpi-client/src"
 export CUDA_VISIBLE_DEVICES="$VLA_GPU,$EGL_GPU"
 export MUJOCO_EGL_DEVICE_ID="$EGL_GPU"
@@ -38,6 +44,7 @@ preflight_args=(
   --openpi-root "$OPENPI_ROOT"
   --libero-safety-root "$LIBERO_SAFETY_ROOT"
   --checkpoint-dir "$CHECKPOINT_DIR"
+  --libero-config "$LIBERO_CONFIG_FILE"
   --uv "$PROOFALIGN_UV"
   --vla-gpu "$VLA_GPU"
   --egl-gpu "$EGL_GPU"
@@ -86,7 +93,7 @@ if [[ "$SMOKE_MODE" == "ctda-lean-kernel" || "$SMOKE_MODE" == "both" ]]; then
     --task-ids "$TASK_ID" \
     --init-state-ids "$INIT_STATE_ID" \
     --max-steps "$MAX_STEPS" \
-    --max-chunk-steps 5 \
+    --max-chunk-steps "$MAX_CHUNK_STEPS" \
     --continue-on-replan \
     --ctda \
     --ctda-fallback-witness "$CTDA_FALLBACK_WITNESS" \
@@ -94,7 +101,7 @@ if [[ "$SMOKE_MODE" == "ctda-lean-kernel" || "$SMOKE_MODE" == "both" ]]; then
     --ctda-evidence-mode local-simulator-exact-allowlist \
     --ctda-evaluator ctda-lean-kernel \
     --ctda-artifact-dir "$RUN_ROOT/ctda_kernel_artifacts" \
-    --ctda-lean-timeout-seconds 10 \
+    --ctda-lean-timeout-seconds "$CTDA_LEAN_TIMEOUT_SECONDS" \
     --policy experiments.libero_openpi_plugin:create_policy \
     --policy-config "$POLICY_CONFIG" \
     --warmup-steps 0 \
@@ -102,7 +109,7 @@ if [[ "$SMOKE_MODE" == "ctda-lean-kernel" || "$SMOKE_MODE" == "both" ]]; then
     --camera-height 256 \
     --camera-width 256 \
     --render-gpu-device-id "$EGL_GPU" \
-    --control-freq 20 \
+    --control-freq "$CONTROL_FREQ" \
     --horizon 1000 \
     --output-dir "$RUN_ROOT/ctda_lean" \
     --summary "$RUN_ROOT/ctda_lean_summary.json" \

@@ -1,6 +1,16 @@
 from __future__ import annotations
 
-from scripts.remote_gpu_preflight import parse_gpu_inventory, validate_gpu_selection
+from pathlib import Path
+
+import scripts.remote_gpu_preflight as preflight
+from scripts.remote_gpu_preflight import (
+    CommandResult,
+    git_snapshot,
+    parse_gpu_inventory,
+    parse_libero_config_paths,
+    validate_libero_config_paths,
+    validate_gpu_selection,
+)
 
 
 def test_parse_gpu_inventory_uses_physical_indices() -> None:
@@ -44,3 +54,59 @@ def test_validate_gpu_selection_warns_when_policy_and_egl_share_gpu() -> None:
     assert warnings == [
         "VLA and MuJoCo EGL share one physical GPU; verify memory headroom"
     ]
+
+
+def test_git_snapshot_rejects_parent_repository_as_nested_checkout(
+    monkeypatch, tmp_path: Path
+) -> None:
+    nested = tmp_path / "external" / "LIBERO-Safety"
+    nested.mkdir(parents=True)
+
+    def fake_run_command(argv, *, cwd=None, timeout_seconds=120.0):
+        assert tuple(argv) == ("git", "rev-parse", "--show-toplevel")
+        assert cwd == nested
+        return CommandResult(tuple(argv), 0, str(tmp_path), "")
+
+    monkeypatch.setattr(preflight, "run_command", fake_run_command)
+
+    snapshot = git_snapshot(nested)
+
+    assert snapshot["head"] is None
+    assert snapshot["top_level"] == str(tmp_path)
+    assert "does not match requested checkout" in snapshot["error"]
+
+
+def test_validate_libero_config_paths_rejects_standard_libero_root(
+    tmp_path: Path,
+) -> None:
+    safety_root = tmp_path / "LIBERO-Safety"
+    standard_root = tmp_path / "LIBERO"
+    config_path = tmp_path / "config.yaml"
+    text = "\n".join(
+        (
+            f"benchmark_root: {standard_root}/libero/libero",
+            f"bddl_files: {standard_root}/libero/libero/bddl_files",
+            f"init_states: {standard_root}/libero/libero/init_files",
+            f"datasets: {standard_root}/libero/datasets",
+            f"assets: {standard_root}/libero/libero/assets",
+        )
+    )
+
+    blockers = validate_libero_config_paths(
+        parse_libero_config_paths(text),
+        config_path=config_path,
+        libero_root=safety_root,
+    )
+
+    assert len(blockers) == 5
+    assert all("points outside the selected LIBERO-Safety checkout" in item for item in blockers)
+
+
+def test_parse_args_uses_isolated_libero_config_path(
+    monkeypatch, tmp_path: Path
+) -> None:
+    monkeypatch.setenv("LIBERO_CONFIG_PATH", str(tmp_path))
+
+    args = preflight.parse_args(["--output", str(tmp_path / "preflight.json")])
+
+    assert args.libero_config == str(tmp_path / "config.yaml")

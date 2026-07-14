@@ -1,12 +1,13 @@
 # Remote / GPU Execution Runbook
 
-更新日期：2026-07-10
+更新日期：2026-07-14
 
 本文是远程环境、迁移和 GPU 运行的唯一 canonical 说明。旧 benchmark handoff、OpenVLA mock
 批次、legacy commands 和 SABER run notes 已归档。
 
-当前本地环境没有 GPU。迁移前必须先完成 [`roadmap.md`](roadmap.md) 的 CPU/Lean readiness
-gate。
+当前 workspace 位于可访问 GPU 的机器，已完成 single-prefix diagnostic，但尚未完成 clean
+3--5 prefix calibration。任何新运行仍必须先完成 [`roadmap.md`](roadmap.md) 的 CPU/Lean 与 clean
+checkout readiness gate。
 
 ## 1. 重要边界
 
@@ -40,8 +41,9 @@ gate。
 大模型、数据、weights 和 cache 放 `/data0/ldx`；源码、patch、配置和小型 JSON artifact 留在
 workspace。不要在 `/data0/ldx` 新建代码工作区。
 
-LIBERO-Safety upstream assets 仍需让 `libero/libero/assets` 和 `~/.libero/config.yaml` 指向正确
-checkout/assets。
+LIBERO-Safety upstream assets 仍需让 `libero/libero/assets` 指向正确 assets。用户的全局
+`~/.libero/config.yaml` 当前属于 standard LIBERO，不得覆盖；ProofAlign 运行使用独立
+`LIBERO_CONFIG_PATH`。
 
 ## 3. Git 不会带走的内容
 
@@ -119,11 +121,11 @@ export PYTHONPATH="$PWD:$PWD/src:$PWD/external/LIBERO-Safety:$PWD/external/openp
 不要把旧文档中的裸 `conda run -n proofalign-libero python ...` 当 canonical；已完成的 GPU run
 曾因该环境缺 `imageio` 失败，成功入口是上述 OpenPI uv project。
 
-Lean 在旧机器上的 known-good 路径：
+Lean 在当前机器上的 known-good 路径：
 
 ```bash
-PATH=/home/ldx/.local/lean-4.24.0/bin:$PATH lean --version
-(cd lean && PATH=/home/ldx/.local/lean-4.24.0/bin:$PATH lake build ProofAlign)
+PATH=/home/ldx/lean-vla/.tools/lean-4.24.0-linux/bin:$PATH lean --version
+(cd lean && PATH=/home/ldx/lean-vla/.tools/lean-4.24.0-linux/bin:$PATH lake build ProofAlign)
 ```
 
 ## 5. GPU / EGL 映射
@@ -166,12 +168,14 @@ manifest 启动实验。
 ```bash
 export VLA_GPU=4
 export EGL_GPU=5
+export LIBERO_CONFIG_PATH=/tmp/proofalign_libero_safety_config
 
 python3 scripts/remote_gpu_preflight.py \
   --workspace "$PWD" \
   --openpi-root "$PWD/external/openpi" \
   --libero-safety-root "$PWD/external/LIBERO-Safety" \
   --checkpoint-dir /data0/ldx/libero_safety_models/pi05_libero_safety \
+  --libero-config "$LIBERO_CONFIG_PATH/config.yaml" \
   --uv "$PROOFALIGN_UV" \
   --vla-gpu "$VLA_GPU" \
   --egl-gpu "$EGL_GPU" \
@@ -334,9 +338,11 @@ SHA-256。该 manifest 仍是 `operator-pinned-simulator-test-only`，不是 ver
 - prompt/`proofalign_action` tamper 不改变 mission-rooted contract；
 - request 与 kernel replay artifact 已落盘。
 
-本地 CPU shadow 的 Lean p99 为 semantic 约 1.95 s，其余 stage 约 0.65--0.67 s，远超 20 Hz
-control period。远程第一步只能跑一个 clean episode 的 shadow/slow-interlock smoke，并记录远程
-p50/p95/p99。若仍超 deadline，固定为 offline audit；不得通过放宽授权窗口声称 real-time。
+本地 CPU shadow 与远程真实 GPU probe 都确认 Lean stages 远超 control period；固定 50 ms
+fallback switch gate 也只通过 2/3。当前已固定为 fail-closed slow interlock/offline audit，不再以
+deadline 通过作为非实时实验的前置条件。下一步只运行 3--5 prefix clean calibration 并记录完整
+latency/miss；不得通过放宽授权窗口、改变 control frequency、移动时间戳或筛选 prefix 声称
+real-time。
 
 具体 command 在迁移时从当前 `--help` 生成，不从 archive 复制。保留以下固定实验参数：
 

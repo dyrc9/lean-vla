@@ -23,6 +23,13 @@ from typing import Any, Sequence
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_CHECKPOINT = Path("/data0/ldx/libero_safety_models/pi05_libero_safety")
+LIBERO_CONFIG_KEYS = (
+    "benchmark_root",
+    "bddl_files",
+    "init_states",
+    "datasets",
+    "assets",
+)
 
 
 @dataclass(frozen=True)
@@ -127,12 +134,78 @@ def file_digest(path: Path) -> str | None:
     return sha256(path.read_bytes()).hexdigest() if path.is_file() else None
 
 
+def parse_libero_config_paths(text: str) -> dict[str, str]:
+    """Parse the flat path-only subset used by LIBERO's config.yaml."""
+
+    values: dict[str, str] = {}
+    for raw_line in text.splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#"):
+            continue
+        key, separator, value = line.partition(":")
+        key = key.strip()
+        if separator and key in LIBERO_CONFIG_KEYS:
+            values[key] = value.strip().strip("'\"")
+    return values
+
+
+def validate_libero_config_paths(
+    values: dict[str, str], *, config_path: Path, libero_root: Path
+) -> list[str]:
+    blockers: list[str] = []
+    benchmark_root = libero_root / "libero" / "libero"
+    expected = {
+        "benchmark_root": benchmark_root,
+        "bddl_files": benchmark_root / "bddl_files",
+        "init_states": benchmark_root / "init_files",
+        "datasets": libero_root / "libero" / "datasets",
+        "assets": benchmark_root / "assets",
+    }
+    for key, expected_path in expected.items():
+        value = values.get(key)
+        if not value:
+            blockers.append(f"LIBERO config is missing {key}: {config_path}")
+            continue
+        configured = Path(value).expanduser()
+        if not configured.is_absolute():
+            configured = config_path.parent / configured
+        if configured.resolve() != expected_path.resolve():
+            blockers.append(
+                f"LIBERO config {key} points outside the selected LIBERO-Safety "
+                f"checkout: {configured.resolve()} != {expected_path.resolve()}"
+            )
+    return blockers
+
+
 def git_snapshot(path: Path) -> dict[str, Any]:
+    requested_root = path.expanduser().resolve()
+    top_level = run_command(("git", "rev-parse", "--show-toplevel"), cwd=requested_root)
+    reported_root: Path | None = None
+    if top_level.returncode == 0 and top_level.stdout:
+        reported_root = Path(top_level.stdout).expanduser().resolve()
+    if reported_root != requested_root:
+        if reported_root is None:
+            error = top_level.stderr or f"no Git top-level found for {requested_root}"
+        else:
+            error = (
+                f"Git top-level {reported_root} does not match requested checkout "
+                f"{requested_root}"
+            )
+        return {
+            "path": str(requested_root),
+            "top_level": str(reported_root) if reported_root is not None else None,
+            "head": None,
+            "branch": None,
+            "dirty": None,
+            "status": [],
+            "error": error,
+        }
     head = run_command(("git", "rev-parse", "HEAD"), cwd=path)
     branch = run_command(("git", "branch", "--show-current"), cwd=path)
     status = run_command(("git", "status", "--porcelain=v1"), cwd=path)
     return {
-        "path": str(path),
+        "path": str(requested_root),
+        "top_level": str(reported_root),
         "head": head.stdout if head.returncode == 0 else None,
         "branch": branch.stdout if branch.returncode == 0 else None,
         "dirty": bool(status.stdout) if status.returncode == 0 else None,
@@ -169,6 +242,23 @@ def collect_preflight(args: argparse.Namespace) -> dict[str, Any]:
         expected = path.is_file() if label == "libero_config" else path.is_dir()
         if not expected:
             blockers.append(f"required {label} is missing: {path}")
+
+    libero_config_paths: dict[str, str] = {}
+    if libero_config.is_file():
+        try:
+            libero_config_paths = parse_libero_config_paths(
+                libero_config.read_text(encoding="utf-8")
+            )
+        except (OSError, UnicodeError) as exc:
+            blockers.append(f"LIBERO config is unreadable: {libero_config}: {exc}")
+        else:
+            blockers.extend(
+                validate_libero_config_paths(
+                    libero_config_paths,
+                    config_path=libero_config,
+                    libero_root=libero_root,
+                )
+            )
 
     required_commands = {
         "git": "git",
@@ -282,6 +372,7 @@ def collect_preflight(args: argparse.Namespace) -> dict[str, Any]:
         "blockers": blockers,
         "warnings": warnings,
         "paths": {label: str(path) for label, path in required_paths.items()},
+        "libero_config_paths": libero_config_paths,
         "commands": command_paths,
         "repositories": repositories,
         "versions": versions,
@@ -313,7 +404,13 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         default=str(REPO_ROOT / "external" / "LIBERO-Safety"),
     )
     parser.add_argument("--checkpoint-dir", default=str(DEFAULT_CHECKPOINT))
-    parser.add_argument("--libero-config", default=str(Path.home() / ".libero" / "config.yaml"))
+    parser.add_argument(
+        "--libero-config",
+        default=str(
+            Path(os.environ.get("LIBERO_CONFIG_PATH", str(Path.home() / ".libero")))
+            / "config.yaml"
+        ),
+    )
     parser.add_argument("--uv", default=os.environ.get("PROOFALIGN_UV", "uv"))
     parser.add_argument("--vla-gpu", default=os.environ.get("VLA_GPU"))
     parser.add_argument("--egl-gpu", default=os.environ.get("EGL_GPU"))
