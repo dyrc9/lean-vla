@@ -12,6 +12,7 @@ from proofalign.benchmark.libero_online_runner import (
     LiberoOnlineIntegrationError,
     LiberoTaskRuntime,
     _environment_action_bounds,
+    _environment_controller_kinematic_binding,
     _prepare_ctda_trust_root,
     _validate_ctda_fallback_manifest,
     _resolve_task_bddl_path,
@@ -38,6 +39,21 @@ class FakeSim:
     data = FakeSimData()
 
 
+class FakeController:
+    name = "OSC_POSE"
+    use_delta = True
+    control_dim = 6
+    input_min = [-1.0] * 6
+    input_max = [1.0] * 6
+    output_min = [-2.0] * 6
+    output_max = [2.0] * 6
+
+
+class FakeRobot:
+    def __init__(self) -> None:
+        self.controller = FakeController()
+
+
 class FakeOnlineEnv:
     def __init__(self) -> None:
         self.sim = FakeSim()
@@ -55,6 +71,7 @@ class FakeOnlineEnv:
         self.collision = False
         self.cost = {}
         self.action_spec = ([-1.0] * 7, [1.0] * 7)
+        self.robots = [FakeRobot()]
 
     def seed(self, seed):
         self.seed_value = seed
@@ -88,6 +105,83 @@ def test_ctda_action_bounds_unwrap_libero_control_env() -> None:
 
     assert low == (-1.0,) * 7
     assert high == (1.0,) * 7
+
+
+def test_ctda_kinematics_bind_to_live_controller_mapping() -> None:
+    class ControlEnvWrapper:
+        def __init__(self) -> None:
+            self.env = FakeOnlineEnv()
+
+    binding = _environment_controller_kinematic_binding(
+        ControlEnvWrapper(),
+        action_low=(-1.0,) * 7,
+        action_high=(1.0,) * 7,
+    )
+
+    assert binding.controller_type == "OSC_POSE"
+    assert binding.control_delta is True
+    assert binding.translation_scale_m == 2.0
+    assert len(binding.binding_digest) == 64
+
+
+@pytest.mark.parametrize(
+    ("mutate", "match"),
+    [
+        (lambda controller: setattr(controller, "use_delta", False), "delta control"),
+        (
+            lambda controller: (
+                setattr(
+                    controller,
+                    "output_min",
+                    [-2.0, -1.0, -2.0, -2.0, -2.0, -2.0],
+                ),
+                setattr(
+                    controller,
+                    "output_max",
+                    [2.0, 1.0, 2.0, 2.0, 2.0, 2.0],
+                ),
+            ),
+            "not isotropic",
+        ),
+        (
+            lambda controller: setattr(controller, "control_dim", 3),
+            "six-dimensional",
+        ),
+    ],
+)
+def test_ctda_live_controller_binding_fails_closed(mutate, match: str) -> None:
+    env = FakeOnlineEnv()
+    mutate(env.robots[0].controller)
+
+    with pytest.raises(LiberoOnlineIntegrationError, match=match):
+        _environment_controller_kinematic_binding(
+            env,
+            action_low=(-1.0,) * 7,
+            action_high=(1.0,) * 7,
+        )
+
+
+def test_ctda_live_controller_binding_rejects_missing_controller() -> None:
+    env = FakeOnlineEnv()
+    env.robots = []
+
+    with pytest.raises(LiberoOnlineIntegrationError, match="exactly one"):
+        _environment_controller_kinematic_binding(
+            env,
+            action_low=(-1.0,) * 7,
+            action_high=(1.0,) * 7,
+        )
+
+
+def test_ctda_live_controller_binding_rejects_action_bound_mismatch() -> None:
+    env = FakeOnlineEnv()
+
+    with pytest.raises(LiberoOnlineIntegrationError, match="input maximum differs"):
+        _environment_controller_kinematic_binding(
+            env,
+            action_low=(-1.0,) * 7,
+            action_high=(0.5,) * 7,
+        )
 
 
 def test_online_runner_uses_initialized_real_env_shape(monkeypatch, tmp_path: Path):
@@ -468,7 +562,7 @@ def test_online_runner_ctda_flag_persists_proof_chain(monkeypatch, tmp_path: Pat
         "translation_increment_m": 0.0,
         "translation_consumed_before_m": 0.0,
         "translation_consumed_after_m": 0.0,
-        "cumulative_translation_budget_m": 0.0001,
+        "cumulative_translation_budget_m": 0.004,
         "motion_command_increment": 0.0,
         "motion_command_consumed_before": 0.0,
         "motion_command_consumed_after": 0.0,
@@ -483,6 +577,22 @@ def test_online_runner_ctda_flag_persists_proof_chain(monkeypatch, tmp_path: Pat
         "lower": [-1.0] * 7,
         "upper": [1.0] * 7,
     }
+    controller_binding = payload["metadata"]["ctda"][
+        "controller_kinematic_binding"
+    ]
+    assert controller_binding["controller_type"] == "OSC_POSE"
+    assert controller_binding["control_delta"] is True
+    assert controller_binding["translation_scale_m"] == 2.0
+    assert len(controller_binding["binding_digest"]) == 64
+    assert payload["metadata"]["ctda"]["translation_scale_m"] == 2.0
+    assert payload["metadata"]["ctda"]["bounded_stutter_budget"] == {
+        "translation_m": 0.004,
+        "normalized_six_dimensional_command_path": 0.002,
+        "derivation": "translation_scale_m * normalized_command_path_budget",
+    }
+    assert payload["metadata"]["ctda"]["dynamics_model_id"].endswith(
+        controller_binding["binding_digest"]
+    )
 
 
 def test_ctda_rejects_attack_record_that_redefines_trusted_instruction(

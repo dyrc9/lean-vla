@@ -376,8 +376,11 @@ OpenPI 声明的完整依赖；2026-07-14 的一次错误启动因此在首个 p
 
 累计 bounded-stutter 重跑必须检查每个 episode/prefix 中：candidate 的
 `bounded_stutter=true`、递增 index、`persistent_no_progress_limit=3`；单次与累计前后 predicted
-translation、六维 command-path norm 分别不超过总预算 `0.0001 m` 与 `0.002`；metadata 的
-contract deadline 在所有 stutter 间一致；monitor verdict 只能为 `safe_pending`，active phase 始终
+translation、六维 command-path norm 分别不超过 controller-derived 总预算与 `0.002`；当前
+`OSC_POSE` live scale 为 2.0 时前者必须精确记录为 `0.004 m`。metadata 还必须保存 live controller
+type/delta/dimension/input/output/environment bounds、binding digest、派生 scale 与 dynamics model id；
+任一项和实际环境不一致都不得运行。contract deadline 在所有 stutter 间一致；monitor verdict
+只能为 `safe_pending`，active phase 始终
 为 `approach`。还必须核对完整 `proposed_action_chunk`、唯一 `policy_call_id`、
 `executed_policy_actions` 和 `discarded_action_chunk_tail`。累计超界、第四个 no-progress stutter、
 completion/contract progress、deadline 耗尽或字段不一致都必须 fail closed；非 stutter 远离动作仍
@@ -406,6 +409,10 @@ CPU/Lean/strict-preflight，再只重跑一次相同配置。
 frozen `OSC_POSE` source（SHA-256 `7de1425a...`）：live scale 2.0，CTDA scale 0.05。不要重跑或调
 `model_error_m`；先绑定 effective controller config。注意正确 scale 会使首 prefix predicted
 translation 0.127 mm 超过现有 stutter 总预算 0.1 mm，预算变更必须另有预先声明依据。
+
+该依据现已固定为既有 normalized six-dimensional command-path budget `0.002`，物理平移预算只由
+live controller scale 相乘派生；当前值为 `0.004 m`。历史 `7587c47` artifact 不重解释。新代码先
+通过 CPU/Lean、clean commit 与 strict preflight，然后只运行一次相同固定配置 calibration。
 
 具体 command 在迁移时从当前 `--help` 生成，不从 archive 复制。本次 clean prefix calibration 保留
 以下固定实验参数：

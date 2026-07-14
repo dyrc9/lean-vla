@@ -242,6 +242,14 @@ blocker/warning。首 prefix 的 109.034 ms observation SLA miss 被完整记录
 但正确 scale 下首 action 的 predicted translation 已为 0.127 mm，超过另行冻结的累计 stutter budget
 0.1 mm。后续必须单独给出预算修改的预先物理依据；未经授权不能直接调到能容纳本次样本。
 
+新的独立依据已获授权：沿用在失败样本出现前就冻结的归一化六维 command-path budget `0.002`，
+将物理累计 translation bound 定义为 `live_translation_scale_m * 0.002`。因此当前 `OSC_POSE` 的
+合同值为 `2.0 * 0.002 = 0.004 m`；`model_error_m=0.0001 m` 不变并只用于 reachable-tube 的模型
+误差项。实现必须从 live env controller 读取并绑定 mapping，不能再从源码路径或常数猜测；只有单臂
+六维、delta、零中心且平移三轴等向的 `OSC_POSE` 与 environment action bounds 完全一致时才能启动。
+该版本仍是 consumer-side Python binder 语义，不升级为 Lean raw-action proof。全量验证与 clean
+preflight 通过后，只允许一次相同 task/init/seed/witness calibration。
+
 ### Remote 60-episode workload gate
 
 - physical suites：`affordance,obstacle_avoidance,human_safety,obstacle_avoidance_human`；

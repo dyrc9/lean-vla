@@ -233,6 +233,13 @@ frozen controller source 随后证明 `OSC_POSE` translation scale 为 2.0，而
 是绑定 live controller config；但按正确 scale 首 prefix 的 predicted translation 为 0.127 mm，已
 超过冻结 0.1 mm stutter budget，因此预算是否修订仍需独立、非样本拟合的方法依据。
 
+用户随后授权采用控制器绑定的运动学合同：保留早已冻结的归一化六维 command-path budget
+`0.002`，将累计预测平移上界定义为该预算乘 live controller translation scale。当前有效
+`OSC_POSE` scale 为 2.0，故得到 `0.004 m`；这不是用 observed verdict 拟合阈值，历史 0.1 mm gate
+也不回写为成功。runner 当前从 live controller 提取并 digest-bind type/delta/dimension/input/output/
+environment bounds，缺失、错配、非零中心或非等向均 fail closed。下一 gate 仍是全量 CPU/Lean、
+clean strict preflight 与唯一一次固定 calibration。
+
 ## 6. P4：远程发布攻击 workload pilot
 
 状态：**timing-policy gate 已通过其目标检查；固定 GPU calibration 在第二 prefix 暴露 40 倍 live

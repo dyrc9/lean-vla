@@ -653,17 +653,38 @@ def test_bounded_stutter_does_not_admit_large_rotation_or_translation(
     assert any("moves away" in issue for issue in translation.check.issues)
 
 
-def test_bounded_stutter_must_fit_frozen_model_error() -> None:
+def test_bounded_stutter_must_fit_command_path_kinematic_bound() -> None:
     binder = RawProposalBinderConfig(
         stutter_translation_bound_m=0.001,
         stutter_motion_command_bound=0.02,
         stutter_no_progress_limit=3,
     )
-    with pytest.raises(ValueError, match="model-error allowance"):
-        ConditionalKinematicConfig(model_error_m=0.0001, raw_binder=binder)
+    config = ConditionalKinematicConfig(model_error_m=0.0001, raw_binder=binder)
+    assert config.raw_binder.stutter_translation_bound_m == 0.001
+
+    oversized = replace(binder, stutter_translation_bound_m=0.0011)
+    with pytest.raises(ValueError, match="command-path-derived kinematic bound"):
+        ConditionalKinematicConfig(model_error_m=0.0001, raw_binder=oversized)
 
     with pytest.raises(ValueError, match="enabled together"):
         RawProposalBinderConfig(stutter_translation_bound_m=0.0001)
+
+
+def test_live_scale_supports_normalized_cumulative_stutter_budget() -> None:
+    binder = RawProposalBinderConfig(
+        translation_scale_m=2.0,
+        stutter_translation_bound_m=0.004,
+        stutter_motion_command_bound=0.002,
+        stutter_no_progress_limit=3,
+    )
+
+    config = ConditionalKinematicConfig(
+        translation_scale_m=2.0,
+        model_error_m=0.0001,
+        raw_binder=binder,
+    )
+
+    assert config.raw_binder.stutter_translation_bound_m == 0.004
 
 
 def test_raw_binder_rejects_release_outside_mission_region(

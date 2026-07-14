@@ -4,7 +4,7 @@ import argparse
 from hashlib import sha256
 import importlib
 import json
-from math import isfinite
+from math import isclose, isfinite
 import os
 import secrets
 import shutil
@@ -57,6 +57,40 @@ class LiberoTaskRuntime:
     init_state_id: int
     frozen_bddl_bytes: bytes | None = None
     metadata: dict[str, Any] = field(default_factory=dict)
+
+
+@dataclass(frozen=True)
+class LiveControllerKinematicBinding:
+    """Fail-closed snapshot of the controller mapping used by the live env."""
+
+    source: str
+    controller_type: str
+    control_delta: bool
+    control_dim: int
+    input_min: tuple[float, ...]
+    input_max: tuple[float, ...]
+    output_min: tuple[float, ...]
+    output_max: tuple[float, ...]
+    environment_action_lower: tuple[float, ...]
+    environment_action_upper: tuple[float, ...]
+    translation_scale_m: float
+    binding_digest: str = field(init=False)
+
+    def __post_init__(self) -> None:
+        payload = {
+            "source": self.source,
+            "controller_type": self.controller_type,
+            "control_delta": self.control_delta,
+            "control_dim": self.control_dim,
+            "input_min": self.input_min,
+            "input_max": self.input_max,
+            "output_min": self.output_min,
+            "output_max": self.output_max,
+            "environment_action_lower": self.environment_action_lower,
+            "environment_action_upper": self.environment_action_upper,
+            "translation_scale_m": self.translation_scale_m,
+        }
+        object.__setattr__(self, "binding_digest", digest_payload(payload))
 
 
 class ZeroActionPolicy:
@@ -630,6 +664,11 @@ def _configure_ctda(
     control_period_ns = max(1, round(1_000_000_000 / max(1, int(args.control_freq))))
     spec_id = f"{args.benchmark}:{runtime.task_id}:{runtime.init_state_id}"
     action_low, action_high = _environment_action_bounds(wrapper.env)
+    controller_binding = _environment_controller_kinematic_binding(
+        wrapper.env,
+        action_low=action_low,
+        action_high=action_high,
+    )
     safety_spec_digest = digest_payload(asdict(spec))
     fallback_manifest = _validate_ctda_fallback_manifest(
         fallback_bytes,
@@ -696,8 +735,16 @@ def _configure_ctda(
         raise LiberoOnlineIntegrationError(f"unknown CTDA evaluator mode: {evaluator_mode}")
     lean_timeout_seconds = float(getattr(args, "ctda_lean_timeout_seconds", 10.0))
     slow_interlock = evaluator_mode == "ctda-lean-kernel"
-    translation_scale_m = 0.05
+    translation_scale_m = controller_binding.translation_scale_m
     model_error_m = 0.0001
+    stutter_motion_command_bound = 0.002
+    stutter_translation_bound_m = (
+        translation_scale_m * stutter_motion_command_bound
+    )
+    dynamics_model_id = (
+        "libero-live-osc-pose-delta-v2:"
+        f"{controller_binding.binding_digest}"
+    )
     authorization_slack_ns = (
         max(control_period_ns, round(lean_timeout_seconds * 1_000_000_000))
         if slow_interlock
@@ -724,6 +771,7 @@ def _configure_ctda(
             authorization_slack_ns=authorization_slack_ns,
             translation_scale_m=translation_scale_m,
             model_error_m=model_error_m,
+            dynamics_model_id=dynamics_model_id,
             timing_policy_id=(
                 "slow-interlock-diagnostic-v1"
                 if slow_interlock
@@ -735,15 +783,13 @@ def _configure_ctda(
             fallback_action=tuple(float(value) for value in fallback_manifest["fallback_action"]),
             semantic_evidence=evidence,
             raw_binder=RawProposalBinderConfig(
-                version="mission-raw-binder-libero-panda-v4-cumulative-stutter",
+                version="mission-raw-binder-libero-panda-v5-live-controller-stutter",
                 gripper_close_threshold=0.2,
                 gripper_open_threshold=-0.2,
                 close_direction=1,
                 translation_scale_m=translation_scale_m,
-                stutter_translation_bound_m=model_error_m,
-                stutter_motion_command_bound=(
-                    model_error_m / translation_scale_m
-                ),
+                stutter_translation_bound_m=stutter_translation_bound_m,
+                stutter_motion_command_bound=stutter_motion_command_bound,
                 stutter_no_progress_limit=wrapper.no_progress_patience,
             ),
         ),
@@ -775,6 +821,17 @@ def _configure_ctda(
         "environment_action_bounds": {
             "lower": list(action_low),
             "upper": list(action_high),
+        },
+        "controller_kinematic_binding": asdict(controller_binding),
+        "dynamics_model_id": dynamics_model_id,
+        "translation_scale_m": translation_scale_m,
+        "model_error_m": model_error_m,
+        "bounded_stutter_budget": {
+            "translation_m": stutter_translation_bound_m,
+            "normalized_six_dimensional_command_path": (
+                stutter_motion_command_bound
+            ),
+            "derivation": "translation_scale_m * normalized_command_path_budget",
         },
         "fallback_action_digest": digest_payload(
             tuple(float(value) for value in fallback_manifest["fallback_action"])
@@ -881,6 +938,132 @@ def _environment_action_bounds(env: Any) -> tuple[tuple[float, ...], tuple[float
     if not low or len(low) != len(high) or any(a > b for a, b in zip(low, high)):
         raise LiberoOnlineIntegrationError("environment action_spec bounds are malformed")
     return low, high
+
+
+def _environment_controller_kinematic_binding(
+    env: Any,
+    *,
+    action_low: tuple[float, ...],
+    action_high: tuple[float, ...],
+) -> LiveControllerKinematicBinding:
+    current = env
+    visited: set[int] = set()
+    robots: Any = None
+    while current is not None and id(current) not in visited:
+        visited.add(id(current))
+        candidate = getattr(current, "robots", None)
+        if candidate is not None:
+            robots = candidate
+            break
+        current = getattr(current, "env", None)
+    try:
+        robot_count = len(robots)
+    except (TypeError, AttributeError):
+        robot_count = 0
+    if robot_count != 1:
+        raise LiberoOnlineIntegrationError(
+            "CTDA requires exactly one live robot controller for kinematic binding"
+        )
+    controller = getattr(robots[0], "controller", None)
+    if controller is None:
+        raise LiberoOnlineIntegrationError(
+            "CTDA live robot does not expose its controller"
+        )
+    controller_type = getattr(controller, "name", None)
+    if callable(controller_type):
+        controller_type = controller_type()
+    if controller_type != "OSC_POSE":
+        raise LiberoOnlineIntegrationError(
+            "CTDA live kinematic contract requires the OSC_POSE controller"
+        )
+    if getattr(controller, "use_delta", None) is not True:
+        raise LiberoOnlineIntegrationError(
+            "CTDA live kinematic contract requires OSC_POSE delta control"
+        )
+    control_dim = getattr(controller, "control_dim", None)
+    if type(control_dim) is not int or control_dim != 6:
+        raise LiberoOnlineIntegrationError(
+            "CTDA live kinematic contract requires a six-dimensional controller"
+        )
+    input_min = _finite_controller_vector(controller, "input_min")
+    input_max = _finite_controller_vector(controller, "input_max")
+    output_min = _finite_controller_vector(controller, "output_min")
+    output_max = _finite_controller_vector(controller, "output_max")
+    if any(
+        len(vector) != control_dim
+        for vector in (input_min, input_max, output_min, output_max)
+    ):
+        raise LiberoOnlineIntegrationError(
+            "CTDA controller mapping vectors do not match its six-dimensional command"
+        )
+    if len(action_low) < control_dim or len(action_high) < control_dim:
+        raise LiberoOnlineIntegrationError(
+            "CTDA environment action bounds do not cover the live controller command"
+        )
+    for index in range(control_dim):
+        if not isclose(input_min[index], action_low[index], rel_tol=0.0, abs_tol=1e-12):
+            raise LiberoOnlineIntegrationError(
+                "CTDA controller input minimum differs from environment action bounds"
+            )
+        if not isclose(input_max[index], action_high[index], rel_tol=0.0, abs_tol=1e-12):
+            raise LiberoOnlineIntegrationError(
+                "CTDA controller input maximum differs from environment action bounds"
+            )
+    translation_scales: list[float] = []
+    for index in range(3):
+        input_width = input_max[index] - input_min[index]
+        output_width = output_max[index] - output_min[index]
+        if input_width <= 0.0 or output_width <= 0.0:
+            raise LiberoOnlineIntegrationError(
+                "CTDA live controller has a non-positive translation mapping range"
+            )
+        if not isclose(input_min[index] + input_max[index], 0.0, rel_tol=0.0, abs_tol=1e-12):
+            raise LiberoOnlineIntegrationError(
+                "CTDA live controller translation input mapping is not zero-centered"
+            )
+        if not isclose(output_min[index] + output_max[index], 0.0, rel_tol=0.0, abs_tol=1e-12):
+            raise LiberoOnlineIntegrationError(
+                "CTDA live controller translation output mapping is not zero-centered"
+            )
+        translation_scales.append(output_width / input_width)
+    if any(
+        not isclose(scale, translation_scales[0], rel_tol=1e-12, abs_tol=1e-12)
+        for scale in translation_scales[1:]
+    ):
+        raise LiberoOnlineIntegrationError(
+            "CTDA live controller translation mapping is not isotropic"
+        )
+    return LiveControllerKinematicBinding(
+        source="live-env.robots[0].controller",
+        controller_type=controller_type,
+        control_delta=True,
+        control_dim=control_dim,
+        input_min=input_min,
+        input_max=input_max,
+        output_min=output_min,
+        output_max=output_max,
+        environment_action_lower=action_low,
+        environment_action_upper=action_high,
+        translation_scale_m=translation_scales[0],
+    )
+
+
+def _finite_controller_vector(controller: Any, attribute: str) -> tuple[float, ...]:
+    value = getattr(controller, attribute, None)
+    if hasattr(value, "tolist"):
+        value = value.tolist()
+    if not isinstance(value, (tuple, list)):
+        raise LiberoOnlineIntegrationError(
+            f"CTDA live controller {attribute} is not a vector"
+        )
+    result: list[float] = []
+    for item in value:
+        if type(item) not in (int, float) or not isfinite(float(item)):
+            raise LiberoOnlineIntegrationError(
+                f"CTDA live controller {attribute} contains a non-finite value"
+            )
+        result.append(float(item))
+    return tuple(result)
 
 
 def _finite_numeric_tuple(value: Any, label: str) -> tuple[float, ...]:

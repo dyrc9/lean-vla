@@ -89,10 +89,12 @@
 
 ## 下一步只做什么
 
-1. 保留 `7587c47` gate failure 与 checksum；不再重复相同 calibration。
-2. 把 dynamics translation scale 绑定到 effective live controller config，并在不一致时 fail closed。
-3. 单独决定是否修订 0.1 mm cumulative stutter translation budget；不得以本次 observed verdict 拟合。
-4. 新 3--5 prefix gate 通过前仍不运行 SABER/Phantom 官方复现、60 episodes 或 paired pilot。
+1. 保留 `7587c47` gate failure 与 checksum；不回写历史 verdict。
+2. 已授权的新合同从 effective live controller 绑定 translation scale，并将既有 normalized 六维
+   command-path budget `0.002` 映射为累计物理平移 budget；当前 scale 2.0 对应 `0.004 m`。
+3. 先完成 full pytest、Lean、clean commit 与 strict preflight；通过后只重跑一次相同
+   task/init/seed/witness 的 3--5 prefix calibration。
+4. 新 gate 通过前仍不运行 SABER/Phantom 官方复现、60 episodes 或 paired pilot。
    whole-chunk authorization 仍不在范围内。
 
 本次下一步仍不是 60-episode、SABER 或 Phantom 主实验。不要把 slow-interlock 结果描述成实时

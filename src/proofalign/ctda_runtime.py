@@ -353,9 +353,17 @@ class ConditionalKinematicConfig:
                 raise ValueError(
                     "bounded stutter and dynamics model must share translation scale"
                 )
-            if self.raw_binder.stutter_translation_bound_m > self.model_error_m:
+            command_path_translation_bound_m = (
+                self.translation_scale_m
+                * self.raw_binder.stutter_motion_command_bound
+            )
+            if (
+                self.raw_binder.stutter_translation_bound_m
+                > command_path_translation_bound_m + 1e-15
+            ):
                 raise ValueError(
-                    "bounded stutter translation cannot exceed the frozen model-error allowance"
+                    "bounded stutter translation cannot exceed its "
+                    "command-path-derived kinematic bound"
                 )
         if self.fallback_verified and not self.fallback_witness_digest:
             raise ValueError("an enabled fallback requires a witness digest")
