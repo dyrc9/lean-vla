@@ -678,6 +678,9 @@ class PrefixCandidate:
     filter_envelope_witness_digest: str
     proposal_admissible: bool | None
     filter_preserves_contract: bool | None
+    bounded_stutter: bool = False
+    bounded_stutter_index: int | None = None
+    bounded_stutter_budget: int | None = None
     pre_evidence: tuple[str, ...] = ()
     semantic_attestations: tuple[EvidenceAttestation, ...] = ()
     guard_attestations: tuple[EvidenceAttestation, ...] = ()
@@ -691,6 +694,21 @@ class PrefixCandidate:
         _require_text("filter_envelope_witness_digest", self.filter_envelope_witness_digest)
         _require_optional_bool("proposal_admissible", self.proposal_admissible)
         _require_optional_bool("filter_preserves_contract", self.filter_preserves_contract)
+        _require_bool("bounded_stutter", self.bounded_stutter)
+        if self.bounded_stutter:
+            if (
+                type(self.bounded_stutter_index) is not int
+                or self.bounded_stutter_index < 0
+                or type(self.bounded_stutter_budget) is not int
+                or self.bounded_stutter_budget <= 0
+                or self.bounded_stutter_index >= self.bounded_stutter_budget
+            ):
+                raise ValueError("bounded stutter index must be inside its retry budget")
+        elif (
+            self.bounded_stutter_index is not None
+            or self.bounded_stutter_budget is not None
+        ):
+            raise ValueError("non-stutter candidate cannot carry a stutter retry budget")
         object.__setattr__(self, "pre_evidence", _freeze_evidence(self.pre_evidence))
         object.__setattr__(self, "semantic_attestations", tuple(self.semantic_attestations))
         object.__setattr__(self, "guard_attestations", tuple(self.guard_attestations))

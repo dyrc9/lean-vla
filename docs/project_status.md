@@ -29,7 +29,7 @@ calibration 仍未通过，后续大实验继续关闭。
   Lean `by decide` 检查；unavailable/tampered request fail closed。
 - 27-case CPU golden/shadow corpus 为 0 Python/Lean mismatch；无独立 ground truth 时 false block/
   TPR/FPR 明确输出 `not_evaluated`。
-- 当前全量为 208 passed / 1 skipped，Lean `lake build ProofAlign` 为 12 jobs 成功。
+- 当前全量为 212 passed / 1 skipped，Lean `lake build ProofAlign` 为 12 jobs 成功。
 - 纯攻击 runner 与 defense runner 已解耦，适合在远程机器上产生版本化 workload 后配对评估。
 - `remote_gpu_preflight.py` 会 fail closed 检查独立 Git top-level、模型、GPU physical id、版本、
   选定 LIBERO-Safety 的五个 config path 和本地 verification；`run_remote_gpu_smoke.sh` 显式绑定
@@ -50,6 +50,10 @@ calibration 仍未通过，后续大实验继续关闭。
    Lean `proven` artifact，零 `env.step`。其预测平移约 2.835 微米、目标距离增加约 2.735 微米，
    暴露 bounded-stutter/micro-action abstraction blocker；尚不能评估 clean retention、unknown/
    deadlock 和 evaluator tax。
+   当前工作树已实现最小 Pick/approach bounded-stutter：非闭合动作、预测平移不超过既有
+   `model_error_m=0.0001 m`、六维 motion-command norm 不超过 `0.002`、每合同最多一次、沿用
+   contract deadline，且任何观测 progress 都 fail closed、不推进 phase。该扩展仍是 consumer-side
+   Python binder，不是 Lean 对 raw action 的独立语义证明；真实 GPU gate 尚待重跑。
 4. 旧 notes 中的 60-episode baseline、12-episode Dual Lean、SABER 和 EDPA 结果没有完整 raw
    artifact 保存在当前 checkout，不能仅凭叙述重建主表。
 5. 当前本地旧 heuristic artifact 出现极高 false rejection，且 synthetic golden corpus 没有独立
@@ -59,11 +63,10 @@ calibration 仍未通过，后续大实验继续关闭。
 
 ## 当前唯一优先级
 
-1. 保留 `2c532ca` valid-init clean blocker artifact；不得靠增加 episode、改变 chunking 或调大
-   `direction_epsilon` 稀释 1/1 pre-dispatch rejection；
-2. 若扩展方法范围，先用独立 clean-policy evidence 冻结 bounded-stutter/micro-action 合同，并证明
-   stutter 不推进 phase、受 retry/time/translation budget 约束；不能把 CTDA 自己的 verdict 当
-   ground truth。修复后重新走 clean commit、strict preflight 和 3--5 prefix calibration；
+1. 将 bounded-stutter 修改形成 clean commit，严格重跑 CPU/Lean/GPU preflight；
+2. 仅重跑相同 task/init/seed/witness 的 3--5 prefix calibration，检查 stutter classification、一次性
+   retry budget、四阶段 Lean parity、零 phase advance、observed displacement/margin 和 fallback；
+   不能把 CTDA 自己的 verdict 当 ground truth；
 3. 仅在 clean false-block/unknown/deadlock 信号可接受后，按
    [`reproduction_plan.md`](reproduction_plan.md) 复现 SABER、Phantom Menace、SAFE 和 FIPER 的
    官方 pipeline；

@@ -447,6 +447,20 @@ def test_online_runner_ctda_flag_persists_proof_chain(monkeypatch, tmp_path: Pat
     assert diagnostics["cumulative_observed_displacement_m"] == 0.0
     assert diagnostics["cumulative_translation_bound_m"] > 0.0
     assert diagnostics["model_error_allowance_m"] == 0.0001
+    bounded_stutter = payload["trace"][0]["ctda"]["bounded_stutter"]
+    assert bounded_stutter == {
+        "enabled": False,
+        "count_before": 0,
+        "count_after": 0,
+        "retry_budget": 1,
+        "translation_bound_m": 0.0001,
+        "motion_command_bound": 0.002,
+        "contract_deadline_ns": None,
+    }
+    assert (
+        payload["trace"][0]["ctda"]["record"]["candidate"]["bounded_stutter"]
+        is False
+    )
     assert payload["metadata"]["ctda"]["environment_action_bounds"] == {
         "lower": [-1.0] * 7,
         "upper": [1.0] * 7,

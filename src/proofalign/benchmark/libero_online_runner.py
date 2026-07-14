@@ -696,6 +696,8 @@ def _configure_ctda(
         raise LiberoOnlineIntegrationError(f"unknown CTDA evaluator mode: {evaluator_mode}")
     lean_timeout_seconds = float(getattr(args, "ctda_lean_timeout_seconds", 10.0))
     slow_interlock = evaluator_mode == "ctda-lean-kernel"
+    translation_scale_m = 0.05
+    model_error_m = 0.0001
     authorization_slack_ns = (
         max(control_period_ns, round(lean_timeout_seconds * 1_000_000_000))
         if slow_interlock
@@ -720,17 +722,24 @@ def _configure_ctda(
             control_period_ns=control_period_ns,
             contract_budget_ns=contract_budget_ns,
             authorization_slack_ns=authorization_slack_ns,
-            model_error_m=0.0001,
+            translation_scale_m=translation_scale_m,
+            model_error_m=model_error_m,
             fallback_id="hold",
             fallback_witness_digest=fallback_digest,
             fallback_verified=True,
             fallback_action=tuple(float(value) for value in fallback_manifest["fallback_action"]),
             semantic_evidence=evidence,
             raw_binder=RawProposalBinderConfig(
-                version="mission-raw-binder-libero-panda-v2",
+                version="mission-raw-binder-libero-panda-v3-bounded-stutter",
                 gripper_close_threshold=0.2,
                 gripper_open_threshold=-0.2,
                 close_direction=1,
+                translation_scale_m=translation_scale_m,
+                stutter_translation_bound_m=model_error_m,
+                stutter_motion_command_bound=(
+                    model_error_m / translation_scale_m
+                ),
+                max_stutter_prefixes=1,
             ),
         ),
         evaluator=evaluator,

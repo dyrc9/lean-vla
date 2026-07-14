@@ -738,6 +738,13 @@ class ProofAlignLiberoWrapper:
                     contract_id=ctda_prepared.candidate.proposal.contract_id,
                     dispatch_ns=ctda_dispatch_ns,
                     observe_ns=ctda_observe_ns,
+                    bounded_stutter=ctda_prepared.bounded_stutter,
+                    bounded_stutter_count_before=(
+                        ctda_prepared.bounded_stutter_count_before
+                    ),
+                    bounded_stutter_count_after=(
+                        self.ctda_session.bounded_stutter_count
+                    ),
                 )
             else:
                 try:
@@ -771,6 +778,13 @@ class ProofAlignLiberoWrapper:
                         record_payload=asdict(record),
                         dispatch_ns=ctda_dispatch_ns,
                         observe_ns=ctda_observe_ns,
+                        bounded_stutter=ctda_prepared.bounded_stutter,
+                        bounded_stutter_count_before=(
+                            ctda_prepared.bounded_stutter_count_before
+                        ),
+                        bounded_stutter_count_after=(
+                            self.ctda_session.bounded_stutter_count
+                        ),
                     )
                 except Exception as exc:
                     ctda_violation_at_ns = monotonic_ns()
@@ -791,6 +805,13 @@ class ProofAlignLiberoWrapper:
                         contract_id=ctda_prepared.candidate.proposal.contract_id,
                         dispatch_ns=ctda_dispatch_ns,
                         observe_ns=ctda_observe_ns,
+                        bounded_stutter=ctda_prepared.bounded_stutter,
+                        bounded_stutter_count_before=(
+                            ctda_prepared.bounded_stutter_count_before
+                        ),
+                        bounded_stutter_count_after=(
+                            self.ctda_session.bounded_stutter_count
+                        ),
                     )
             if ctda_effect_result is not None and not ctda_effect_result.passed:
                 try:
@@ -1384,6 +1405,9 @@ def _ctda_metadata(
     record_payload: dict[str, Any] | None = None,
     dispatch_ns: int | None = None,
     observe_ns: int | None = None,
+    bounded_stutter: bool | None = None,
+    bounded_stutter_count_before: int | None = None,
+    bounded_stutter_count_after: int | None = None,
 ) -> dict[str, Any]:
     active_contract = session.supervisor.active_contract
     monitor = session.supervisor.monitor_state
@@ -1422,6 +1446,25 @@ def _ctda_metadata(
         "record": record_payload,
         "dispatch_monotonic_ns": dispatch_ns,
         "observe_monotonic_ns": observe_ns,
+        "bounded_stutter": (
+            {
+                "enabled": bounded_stutter,
+                "count_before": bounded_stutter_count_before,
+                "count_after": bounded_stutter_count_after,
+                "retry_budget": session.config.raw_binder.max_stutter_prefixes,
+                "translation_bound_m": (
+                    session.config.raw_binder.stutter_translation_bound_m
+                ),
+                "motion_command_bound": (
+                    session.config.raw_binder.stutter_motion_command_bound
+                ),
+                "contract_deadline_ns": (
+                    active_contract.deadline_ns if active_contract else None
+                ),
+            }
+            if bounded_stutter is not None
+            else None
+        ),
         "evaluator_mode": session.evaluator_mode,
         "wire_artifacts": wire_artifacts,
         "assurance_scope": getattr(

@@ -176,6 +176,9 @@ class RawProposalBinderConfig:
     grasp_neighborhood_m: float = 0.25
     translation_scale_m: float = 0.05
     direction_epsilon: float = 1e-9
+    stutter_translation_bound_m: float = 0.0
+    stutter_motion_command_bound: float = 0.0
+    max_stutter_prefixes: int = 0
     config_digest: str = field(init=False)
 
     def __post_init__(self) -> None:
@@ -187,6 +190,8 @@ class RawProposalBinderConfig:
             "grasp_neighborhood_m",
             "translation_scale_m",
             "direction_epsilon",
+            "stutter_translation_bound_m",
+            "stutter_motion_command_bound",
         ):
             if not isfinite(float(getattr(self, name))):
                 raise ValueError(f"{name} must be finite")
@@ -200,8 +205,19 @@ class RawProposalBinderConfig:
             self.grasp_neighborhood_m <= 0
             or self.translation_scale_m <= 0
             or self.direction_epsilon < 0
+            or self.stutter_translation_bound_m < 0
+            or self.stutter_motion_command_bound < 0
         ):
             raise ValueError("raw binder geometry thresholds are invalid")
+        if type(self.max_stutter_prefixes) is not int or self.max_stutter_prefixes < 0:
+            raise ValueError("raw binder stutter retry budget must be a non-negative integer")
+        stutter_values = (
+            self.stutter_translation_bound_m,
+            self.stutter_motion_command_bound,
+            self.max_stutter_prefixes,
+        )
+        if any(stutter_values) and not all(stutter_values):
+            raise ValueError("raw binder stutter bounds and retry budget must be enabled together")
         object.__setattr__(
             self,
             "config_digest",
@@ -214,8 +230,19 @@ class RawProposalBinderConfig:
                     "grasp_neighborhood_m": self.grasp_neighborhood_m,
                     "translation_scale_m": self.translation_scale_m,
                     "direction_epsilon": self.direction_epsilon,
+                    "stutter_translation_bound_m": self.stutter_translation_bound_m,
+                    "stutter_motion_command_bound": self.stutter_motion_command_bound,
+                    "max_stutter_prefixes": self.max_stutter_prefixes,
                 }
             ),
+        )
+
+    @property
+    def bounded_stutter_enabled(self) -> bool:
+        return bool(
+            self.stutter_translation_bound_m
+            and self.stutter_motion_command_bound
+            and self.max_stutter_prefixes
         )
 
 
@@ -230,10 +257,15 @@ class RawProposalBinderResult:
     command_digest: str
     config_digest: str
     issues: tuple[str, ...] = ()
+    bounded_stutter: bool = False
     witness_digest: str = field(init=False)
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "issues", tuple(str(item) for item in self.issues))
+        if type(self.bounded_stutter) is not bool:
+            raise TypeError("bounded_stutter must be bool")
+        if self.bounded_stutter and self.verdict is not StaticVerdict.PROVEN:
+            raise ValueError("only a proven raw proposal can be a bounded stutter")
         object.__setattr__(
             self,
             "witness_digest",
@@ -246,6 +278,7 @@ class RawProposalBinderResult:
                     "command_digest": self.command_digest,
                     "config_digest": self.config_digest,
                     "issues": self.issues,
+                    "bounded_stutter": self.bounded_stutter,
                 }
             ),
         )
@@ -289,6 +322,15 @@ class ConditionalKinematicConfig:
             raise ValueError("translation_scale_m must be finite and non-negative")
         if not isfinite(self.model_error_m) or self.model_error_m < 0:
             raise ValueError("model_error_m must be finite and non-negative")
+        if self.raw_binder.bounded_stutter_enabled:
+            if self.raw_binder.translation_scale_m != self.translation_scale_m:
+                raise ValueError(
+                    "bounded stutter and dynamics model must share translation scale"
+                )
+            if self.raw_binder.stutter_translation_bound_m > self.model_error_m:
+                raise ValueError(
+                    "bounded stutter translation cannot exceed the frozen model-error allowance"
+                )
         if self.fallback_verified and not self.fallback_witness_digest:
             raise ValueError("an enabled fallback requires a witness digest")
         object.__setattr__(self, "fallback_action", tuple(self.fallback_action))
@@ -317,6 +359,8 @@ class PreparedPrefix:
     before_state: Any
     state_digest: str
     start_ns: int
+    bounded_stutter: bool = False
+    bounded_stutter_count_before: int = 0
 
 
 @dataclass(frozen=True)
@@ -626,6 +670,7 @@ class CTDARuntimeSession:
     evidence_issuer: CTDAEvidenceIssuer | None = None
     evaluator: CTDAEvaluator | None = None
     proposal_index: int = 0
+    bounded_stutter_count: int = 0
     active_execution: ContractExecution | None = None
     last_fallback_receipt: FallbackSwitchReceipt | None = None
     evaluation_artifacts: list[CTDAEvaluationArtifact] = field(default_factory=list)
@@ -699,6 +744,7 @@ class CTDARuntimeSession:
         self.supervisor.pending_authorization_digest = None
         self.supervisor.terminal_verdict = None
         self.proposal_index = 0
+        self.bounded_stutter_count = 0
         self.active_execution = None
         self.last_fallback_receipt = None
         self.evaluation_artifacts.clear()
@@ -1168,10 +1214,29 @@ class CTDARuntimeSession:
                 if binder_result.verdict is StaticVerdict.INCONSISTENT:
                     return PrepareResult(StaticCheckResult.inconsistent(*binder_result.issues))
                 return PrepareResult(StaticCheckResult.refuted(*binder_result.issues))
+            if (
+                binder_result.bounded_stutter
+                and self.bounded_stutter_count
+                >= self.config.raw_binder.max_stutter_prefixes
+            ):
+                return PrepareResult(
+                    StaticCheckResult.refuted(
+                        "raw binder bounded-stutter retry budget is exhausted"
+                    )
+                )
             proposal_admissible = True
             duration_ns = len(commands) * self.config.control_period_ns
             model_digest = digest_text(self.config.dynamics_model_id)
             assumptions = _kinematic_assumptions(self.config, safety_spec)
+            if binder_result.bounded_stutter:
+                assumptions += (
+                    "bounded_stutter_pick_approach_only",
+                    "bounded_stutter_non_closing_gripper",
+                    f"bounded_stutter_translation_m<={self.config.raw_binder.stutter_translation_bound_m}",
+                    f"bounded_stutter_motion_command_norm<={self.config.raw_binder.stutter_motion_command_bound}",
+                    f"bounded_stutter_retry_budget={self.config.raw_binder.max_stutter_prefixes}",
+                    "bounded_stutter_zero_phase_advance",
+                )
             prefix_safe = _prefix_clearance_safe(
                 current_state, commands, safety_spec, self.config
             )
@@ -1196,6 +1261,9 @@ class CTDARuntimeSession:
                         if self.config.fallback_verified
                         else None
                     ),
+                    "bounded_stutter": binder_result.bounded_stutter,
+                    "bounded_stutter_count_before": self.bounded_stutter_count,
+                    "bounded_stutter_budget": self.config.raw_binder.max_stutter_prefixes,
                 }
             )
             tube = ReachableTube(
@@ -1255,6 +1323,9 @@ class CTDARuntimeSession:
                     "proposal_binding_digest": proposal.binding_digest,
                     "raw_binder_witness_digest": binder_result.witness_digest,
                     "raw_binder_config_digest": binder_result.config_digest,
+                    "bounded_stutter": binder_result.bounded_stutter,
+                    "bounded_stutter_count_before": self.bounded_stutter_count,
+                    "bounded_stutter_budget": self.config.raw_binder.max_stutter_prefixes,
                     "proposal_admissible": True,
                 }
             )
@@ -1271,6 +1342,9 @@ class CTDARuntimeSession:
                     "proposal_digest": proposal.binding_digest,
                     "raw_binder_witness_digest": binder_result.witness_digest,
                     "raw_binder_config_digest": binder_result.config_digest,
+                    "bounded_stutter": binder_result.bounded_stutter,
+                    "bounded_stutter_count_before": self.bounded_stutter_count,
+                    "bounded_stutter_budget": self.config.raw_binder.max_stutter_prefixes,
                     "admissible": True,
                 },
                 issued_at_ns=now,
@@ -1332,6 +1406,17 @@ class CTDARuntimeSession:
                 filter_envelope_witness_digest=filter_witness,
                 proposal_admissible=proposal_admissible,
                 filter_preserves_contract=True,
+                bounded_stutter=binder_result.bounded_stutter,
+                bounded_stutter_index=(
+                    self.bounded_stutter_count
+                    if binder_result.bounded_stutter
+                    else None
+                ),
+                bounded_stutter_budget=(
+                    self.config.raw_binder.max_stutter_prefixes
+                    if binder_result.bounded_stutter
+                    else None
+                ),
                 semantic_attestations=self.supervisor.active_semantic_attestations,
                 guard_attestations=guard_attestations,
                 proposal_contract_attestation=proposal_attestation,
@@ -1388,8 +1473,12 @@ class CTDARuntimeSession:
             before_state,
             state_digest,
             now,
+            binder_result.bounded_stutter,
+            self.bounded_stutter_count,
         )
         self.proposal_index += 1
+        if binder_result.bounded_stutter:
+            self.bounded_stutter_count += 1
         return PrepareResult(check, prepared)
 
     def observe_prefix(
@@ -1510,6 +1599,18 @@ class CTDARuntimeSession:
             prior_observed_atoms=monitor.observed_atoms,
         )
         events = tuple(item[0] for item in events_with_samples)
+        if prepared.bounded_stutter:
+            progress_atoms = set(contract.guarantees) | {
+                f"phase:{contract.expected_next_phase}"
+            }
+            observed_progress = tuple(
+                event.atom for event in events if event.atom in progress_atoms
+            )
+            if observed_progress:
+                raise RuntimeError(
+                    "bounded stutter produced contract progress; fail closed without phase advance: "
+                    + ",".join(observed_progress)
+                )
         links = tuple(
             AbstractionLink(
                 event_index=index,
@@ -1709,8 +1810,12 @@ class CTDARuntimeSession:
         if self.active_execution is None:
             raise RuntimeError("CTDA execution chain was not initialised")
         self.active_execution = self.active_execution.append(record)
+        if prepared.bounded_stutter and result.verdict is MonitorVerdict.SAFE_PENDING:
+            if self.supervisor.active_phase != contract.phase_before:
+                raise RuntimeError("bounded stutter advanced the semantic phase")
         if result.complete:
             self.active_execution = None
+            self.bounded_stutter_count = 0
         return result, record
 
 
@@ -1777,7 +1882,11 @@ def bind_raw_proposal(
     state_digest = digest_legacy_state(state)
     command_digest = digest_payload(commands)
 
-    def result(verdict: StaticVerdict, *issues: str) -> RawProposalBinderResult:
+    def result(
+        verdict: StaticVerdict,
+        *issues: str,
+        bounded_stutter: bool = False,
+    ) -> RawProposalBinderResult:
         return RawProposalBinderResult(
             verdict=verdict,
             mission_digest=mission.spec_digest,
@@ -1786,6 +1895,7 @@ def bind_raw_proposal(
             command_digest=command_digest,
             config_digest=config.config_digest,
             issues=tuple(issues),
+            bounded_stutter=bounded_stutter,
         )
 
     if not mission.verify_integrity() or not contract.verify_integrity():
@@ -1821,6 +1931,12 @@ def bind_raw_proposal(
 
     translation = tuple(sum(command[index] for command in flattened) for index in range(3))
     translation_norm = sqrt(sum(value * value for value in translation))
+    predicted_translation_m = translation_norm * config.translation_scale_m
+    cumulative_motion_command_norm = (
+        sum(sqrt(sum(value * value for value in command[:6])) for command in flattened)
+        if all(len(command) >= 7 for command in flattened)
+        else float("inf")
+    )
     if config.close_direction < 0:
         close_requested = any(
             command[-1] <= config.gripper_close_threshold for command in flattened
@@ -1851,6 +1967,15 @@ def bind_raw_proposal(
         target_distance = sqrt(sum(value * value for value in target_delta))
         if close_requested and target_distance > config.grasp_neighborhood_m:
             return result(StaticVerdict.REFUTED, "raw binder closes outside the target neighborhood")
+        bounded_stutter = bool(
+            config.bounded_stutter_enabled
+            and not close_requested
+            and predicted_translation_m <= config.stutter_translation_bound_m
+            and cumulative_motion_command_norm
+            <= config.stutter_motion_command_bound
+        )
+        if bounded_stutter:
+            return result(StaticVerdict.PROVEN, bounded_stutter=True)
         if translation_norm > config.direction_epsilon:
             direction_dot = sum(
                 command * target for command, target in zip(translation, target_delta)

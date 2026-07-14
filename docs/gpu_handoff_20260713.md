@@ -3,12 +3,12 @@
 起始版本：`230e32937a194530054616f9232adb7f9973586c`
 
 最新更新：2026-07-14，当前 ProofAlign committed HEAD
-`2c532ca9c456b161ef4d21265b26ea5a380021ff`；当前仅规范文档有未提交更新，代码 clean。
+`f736637`；bounded-stutter 代码、测试与规范更新仍在本地工作树，尚未提交。
 
 ## 当前状态
 
-- 当前工作树全量测试：208 passed / 1 skipped；Lean build 12 jobs 成功。init-state provenance 与
-  kinematic diagnostic 的定向测试为 81 passed。
+- 当前工作树全量测试：212 passed / 1 skipped；Lean build 12 jobs 成功。bounded-stutter 相关
+  CTDA/runner 定向测试为 85 passed。
 - OpenPI checkout：`15a9616a00943ada6c20a0f158e3adb39df2ccac`，clean。
 - LIBERO-Safety checkout：`ef0f79b70fc50c5fb612a1bbc1cf8b6c033a702a`，clean standalone
   Git top-level，tracked runtime files 与官方 checkout 差异为 0。
@@ -36,6 +36,9 @@
   refute（`moves away from the mission target`），零 `env.step`、零 fallback。预测平移约 2.835
   微米、目标距离增加约 2.735 微米；这是 blocking/abstraction signal，不是独立 ground-truth
   false positive。3--5 prefix gate 未通过。
+- 用户已授权最小 bounded-stutter 扩展。当前实现只允许 Pick/approach 非闭合微动作，复用
+  `model_error_m=0.0001 m`，六维 motion-command norm bound `0.002`，每合同一次并受 deadline
+  约束；candidate/witness 绑定 flag/index/budget，观测 progress 时 phase 更新前 fail closed。
 
 关键 artifact：
 
@@ -48,14 +51,11 @@
 
 ## 下一步只做什么
 
-1. 两个 `2c532ca` result 目录的 `run_notes.md` 与 `SHA256SUMS` 已生成并校验；保留错误启动和
-   valid blocker，不覆盖、不筛样本。当前五份规范文档更新尚未提交，commit 仍需用户明确授权。
-2. 不再运行更多 episode 或 60-episode/攻击主实验。当前 1/1 clean proposal rejection 已触发
-   binder/abstraction kill criterion。
-3. 若用户授权扩展方法，先设计 bounded-stutter/micro-action contract：独立 clean-policy evidence、
-   translation/retry/time budget、零 phase advance，并为 producer-independent binding 加回归测试。
-4. 方法修复后重新 commit、strict preflight，再从同一冻结 task/init/seed/witness 的 3--5 prefix
-   calibration 开始。
+1. 审查并提交当前 bounded-stutter 代码、测试和规范文档；不 push、不建 PR。
+2. clean checkout 后重跑 strict preflight，并在启动前重新检查 GPU。
+3. 只按同一冻结 task/init/seed/witness 重跑 3--5 prefix calibration，重点验收 stutter count、
+   safe-pending、零 phase advance、四阶段 parity 和 observed kinematic diagnostics。
+4. 该 gate 通过前仍不运行 60-episode 或攻击主实验。
 
 本次下一步仍不是 60-episode、SABER 或 Phantom 主实验。不要把 slow-interlock 结果描述成实时
 执行，也不要用 CTDA verdict 自己生成 ground-truth TPR/FPR。

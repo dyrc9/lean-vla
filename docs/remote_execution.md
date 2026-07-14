@@ -360,6 +360,11 @@ OpenPI rollout 必须使用 `uv --project external/openpi run python`。ProofAli
 OpenPI 声明的完整依赖；2026-07-14 的一次错误启动因此在首个 policy action 前报
 `ModuleNotFoundError: numpydantic`，该失败已单独保存且不计为 episode。
 
+bounded-stutter 重跑还必须检查 episode 中：candidate 的 `bounded_stutter=true`、index `0`、budget
+`1`；CTDA metadata 的 count `0 -> 1`、translation bound `0.0001 m`、motion-command bound
+`0.002`；首个 monitor verdict 为 `safe_pending` 且 active phase 仍为 `approach`。第二个 stutter
+必须 fail closed；非 stutter 远离动作仍必须 refute。任何字段不一致都停止，不继续扩样本。
+
 具体 command 在迁移时从当前 `--help` 生成，不从 archive 复制。保留以下固定实验参数：
 
 ```text

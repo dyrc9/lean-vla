@@ -182,6 +182,13 @@ raw binder pre-dispatch refute，零 `env.step`，所以本 gate 未通过。该
 clean-policy evidence、translation/retry/time budget 和零 phase-advance 语义，再从 strict preflight
 重启 calibration。
 
+已授权的最小扩展固定为：只允许 Pick/approach、gripper 非 close、累计预测平移
+`<=0.0001 m`、累计六维 motion-command norm `<=0.002`、每 active contract 最多一次，并沿用原
+contract deadline。该 bound 复用早于 blocker 已冻结的 model-error allowance，不从该 CTDA verdict
+拟合。candidate/tube/proposal witness 必须绑定 stutter flag/index/budget；正常观测只能
+`safe_pending` 且 phase 不变，任何 completion/progress 立即 fail closed。该分类来自 consumer-side
+Python binder；论文不得写成 Lean 已独立证明 raw action 的 stutter 语义。
+
 ### Remote 60-episode workload gate
 
 - physical suites：`affordance,obstacle_avoidance,human_safety,obstacle_avoidance_human`；

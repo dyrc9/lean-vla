@@ -325,6 +325,150 @@ def test_raw_binder_supports_libero_panda_positive_close_direction(
     assert result.check.verdict is StaticVerdict.PROVEN
 
 
+def _enable_single_bounded_stutter(session: CTDARuntimeSession) -> None:
+    translation_scale_m = 0.05
+    model_error_m = 0.0001
+    session.config = replace(
+        session.config,
+        translation_scale_m=translation_scale_m,
+        model_error_m=model_error_m,
+        raw_binder=RawProposalBinderConfig(
+            version="libero-panda-bounded-stutter-test",
+            gripper_close_threshold=0.2,
+            gripper_open_threshold=-0.2,
+            close_direction=1,
+            translation_scale_m=translation_scale_m,
+            stutter_translation_bound_m=model_error_m,
+            stutter_motion_command_bound=model_error_m / translation_scale_m,
+            max_stutter_prefixes=1,
+        ),
+    )
+
+
+def test_bounded_stutter_is_single_use_and_does_not_advance_phase(
+    safe_state, safe_spec
+) -> None:
+    session = _session(safe_state, safe_spec, fallback_verified=True)
+    _enable_single_bounded_stutter(session)
+    action = action_from_dict({"type": "Pick", "object": "mug", "part": "handle"})
+    raw = [
+        -2.9359772193421688e-05,
+        -3.973322361683698e-05,
+        2.783448300552882e-05,
+        -4.214741228427549e-05,
+        -3.560969454670382e-05,
+        -4.817225890894894e-05,
+        -1.0,
+    ]
+
+    prepared = session.prepare_prefix(
+        action, safe_state, (raw,), safe_spec, now_ns=1_000_000
+    )
+
+    assert prepared.check.verdict is StaticVerdict.PROVEN
+    assert prepared.prepared is not None
+    assert prepared.prepared.bounded_stutter is True
+    assert prepared.prepared.bounded_stutter_count_before == 0
+    assert prepared.prepared.candidate.bounded_stutter is True
+    assert prepared.prepared.candidate.bounded_stutter_index == 0
+    assert prepared.prepared.candidate.bounded_stutter_budget == 1
+    assert session.bounded_stutter_count == 1
+
+    exhausted = session.prepare_prefix(
+        action, safe_state, (raw,), safe_spec, now_ns=1_500_000
+    )
+    assert exhausted.check.verdict is StaticVerdict.REFUTED
+    assert exhausted.prepared is None
+    assert any("stutter retry budget is exhausted" in issue for issue in exhausted.check.issues)
+    assert session.proposal_index == 1
+
+    monitored, _ = session.observe_prefix(
+        prepared.prepared,
+        (safe_state.clone(),),
+        (raw,),
+        safe_spec,
+        dispatch_ns=2_000_000,
+        observation_times_ns=(3_000_000,),
+    )
+
+    assert monitored.verdict is MonitorVerdict.SAFE_PENDING
+    assert session.supervisor.active_phase == "approach"
+    assert session.supervisor.active_contract is not None
+    assert session.bounded_stutter_count == 1
+    assert session.supervisor.active_phase == "approach"
+
+
+def test_bounded_stutter_fails_closed_on_unexpected_contract_progress(
+    safe_state, safe_spec
+) -> None:
+    session = _session(safe_state, safe_spec, fallback_verified=True)
+    _enable_single_bounded_stutter(session)
+    action = action_from_dict({"type": "Pick", "object": "mug", "part": "handle"})
+    raw = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0]
+    prepared = session.prepare_prefix(
+        action, safe_state, (raw,), safe_spec, now_ns=1_000_000
+    )
+    assert prepared.prepared is not None
+    assert prepared.prepared.bounded_stutter is True
+
+    with pytest.raises(RuntimeError, match="bounded stutter produced contract progress"):
+        session.observe_prefix(
+            prepared.prepared,
+            (_held_state(safe_state),),
+            (raw,),
+            safe_spec,
+            dispatch_ns=2_000_000,
+            observation_times_ns=(3_000_000,),
+        )
+
+    assert session.supervisor.active_phase == "approach"
+    assert session.bounded_stutter_count == 1
+
+
+def test_bounded_stutter_does_not_admit_large_rotation_or_translation(
+    safe_state, safe_spec
+) -> None:
+    action = action_from_dict({"type": "Pick", "object": "mug", "part": "handle"})
+
+    rotation_session = _session(safe_state, safe_spec, fallback_verified=True)
+    _enable_single_bounded_stutter(rotation_session)
+    rotation = rotation_session.prepare_prefix(
+        action,
+        safe_state,
+        ([0.0, 0.0, 0.0, 0.01, 0.0, 0.0, -1.0],),
+        safe_spec,
+        now_ns=1_000_000,
+    )
+    assert rotation.check.verdict is StaticVerdict.UNKNOWN
+    assert rotation.prepared is None
+
+    translation_session = _session(safe_state, safe_spec, fallback_verified=True)
+    _enable_single_bounded_stutter(translation_session)
+    translation = translation_session.prepare_prefix(
+        action,
+        safe_state,
+        ([-0.1, -0.1, 0.0, 0.0, 0.0, 0.0, -1.0],),
+        safe_spec,
+        now_ns=1_000_000,
+    )
+    assert translation.check.verdict is StaticVerdict.REFUTED
+    assert translation.prepared is None
+    assert any("moves away" in issue for issue in translation.check.issues)
+
+
+def test_bounded_stutter_must_fit_frozen_model_error() -> None:
+    binder = RawProposalBinderConfig(
+        stutter_translation_bound_m=0.001,
+        stutter_motion_command_bound=0.02,
+        max_stutter_prefixes=1,
+    )
+    with pytest.raises(ValueError, match="model-error allowance"):
+        ConditionalKinematicConfig(model_error_m=0.0001, raw_binder=binder)
+
+    with pytest.raises(ValueError, match="enabled together"):
+        RawProposalBinderConfig(stutter_translation_bound_m=0.0001)
+
+
 def test_raw_binder_rejects_release_outside_mission_region(
     safe_state, safe_spec
 ) -> None:
