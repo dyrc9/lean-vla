@@ -250,6 +250,15 @@ blocker/warning。首 prefix 的 109.034 ms observation SLA miss 被完整记录
 该版本仍是 consumer-side Python binder 语义，不升级为 Lean raw-action proof。全量验证与 clean
 preflight 通过后，只允许一次相同 task/init/seed/witness calibration。
 
+该 calibration 已在 clean `f01a98f` 上完成。首次启动因 calibration 子进程没有继承 Lean toolchain
+`PATH`，semantic stage `inconsistent` 且零 `env.step`；该无效记录未被静默覆盖。经用户明确授权仅
+修正 `PATH` 后，固定配置完成五个 prefix：static verdict 全为 `proven`，monitor 全为
+`safe_pending`，16 个唯一 Lean request 的 proof/parity 全 true，五个 kinematic margin 全为正。
+前两个 prefix 消耗累计 stutter budget 至 2.139 mm / 4 mm 和 `0.001405 / 0.002`，后三个由 normal
+approach binder 通过且累计值不变。五步上限时 contract 仍 pending，zero-hold postcondition 成立后
+返回 `replan`；这通过 method-validity gate，但不是 task success 或 realtime 证据。下一阶段只开放
+SABER/Phantom 上游复现与最小 R1 workload，不直接进入 60 episodes。
+
 ### Remote 60-episode workload gate
 
 - physical suites：`affordance,obstacle_avoidance,human_safety,obstacle_avoidance_human`；

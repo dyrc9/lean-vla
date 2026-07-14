@@ -240,13 +240,20 @@ frozen controller source 随后证明 `OSC_POSE` translation scale 为 2.0，而
 environment bounds，缺失、错配、非零中心或非等向均 fail closed。下一 gate 仍是全量 CPU/Lean、
 clean strict preflight 与唯一一次固定 calibration。
 
+`f01a98f` 随后通过 227 passed / 1 skipped、Lean 12 jobs 与 clean strict preflight。一次缺失 Lean
+`PATH` 的启动在 semantic stage fail closed、零 dispatch，并作为无效 calibration 保留；经明确授权
+仅修正 `PATH` 后，固定重跑完成五个连续 prefix。5/5 static/monitor 为
+`proven/safe_pending`，16 个唯一 Lean request 全部 proof-verified 且 parity 匹配，五个运动学 margin
+全为正。前两步累计 stutter，后三步进入 normal approach；最终因五步上限仍有 pending obligation
+而 zero-hold/replan。method-validity gate 因此通过，但 task success 与 realtime gate没有通过。
+
 ## 6. P4：远程发布攻击 workload pilot
 
-状态：**timing-policy gate 已通过其目标检查；固定 GPU calibration 在第二 prefix 暴露 40 倍 live
-controller translation-scale 错配，method-validity gate 仍失败**。P1/P2
+状态：**live-controller method-validity 五-prefix gate 已通过；上游 published-workload reproduction
+成为当前 gate**。P1/P2
 correctness、golden parity 与 affordance observation completeness 已通过；real-time latency 明确
 未通过并已降级 claim。fail-closed preflight manifest 与 clean + Lean slow-interlock smoke 已
-脚本化。未经新的 clean method gate 不得启动主表。
+脚本化。未经 SABER/Phantom R0 与 exact-task R1 gate 不得启动主表。
 环境见 [`remote_execution.md`](remote_execution.md)。
 
 在 60-episode pilot 前增加 upstream reproduction gate，详见

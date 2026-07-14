@@ -71,6 +71,11 @@
 - frozen `OSC_POSE` config 的 translation scale 是 2.0，CTDA hard-code 是 0.05。source-grounded
   重算覆盖两次观测，但也使首 prefix predicted translation 0.127 mm 超过现有 stutter budget 0.1 mm；
   这需要新的预算决策，不能按样本直接放宽。
+- `f01a98f` 已绑定 live controller 并由 normalized command budget 派生 4 mm translation budget；
+  227 passed / 1 skipped、Lean 12 jobs、strict preflight 通过。PATH-only corrected calibration 完成
+  五个 `proven/safe_pending` prefix，五个 tube margin 全正，16 个 Lean request proof/parity 全 true。
+  前两步累计 stutter 后三步 normal approach；五步上限以 zero-hold/replan 收束。一次 111.279 ms
+  prefix miss 和 76.205 ms fallback miss 保持为性能负结果。
 
 关键 artifact：
 
@@ -86,15 +91,17 @@
   authorized-duration 与 fallback-latency fail closed；gate 未通过）
 - `results/remote_gpu_clean_prefix3_20260714_7587c47/`（timing policy 目标通过；第二 prefix 暴露
   live-controller scale mismatch；38 个 artifact checksums 已验证）
+- `results/remote_gpu_clean_prefix3_20260714_f01a98f/`（Lean `PATH` 缺失的无效启动；零 dispatch）
+- `results/remote_gpu_clean_prefix3_20260714_f01a98f_pathfix/`（五-prefix method-validity gate 通过；
+  task/realtime gate 未通过；全部 artifact checksums 已验证）
 
 ## 下一步只做什么
 
-1. 保留 `7587c47` gate failure 与 checksum；不回写历史 verdict。
-2. 已授权的新合同从 effective live controller 绑定 translation scale，并将既有 normalized 六维
-   command-path budget `0.002` 映射为累计物理平移 budget；当前 scale 2.0 对应 `0.004 m`。
-3. 先完成 full pytest、Lean、clean commit 与 strict preflight；通过后只重跑一次相同
-   task/init/seed/witness 的 3--5 prefix calibration。
-4. 新 gate 通过前仍不运行 SABER/Phantom 官方复现、60 episodes 或 paired pilot。
+1. 保留全部历史 failure 与 checksum；不回写 verdict。
+2. 登记并核验现有 SABER official LoRA/OpenPI R0 records；只把 constraint-violation 写成方向成立，
+   action-inflation 写成较弱，task-failure 写成未复现强效果。
+3. 准备 Phantom Menace 官方 clean + deterministic camera-transform R0。
+4. 两个 R0 通过后才生成 exact-task R1 workload；此前不运行 60 episodes 或 paired pilot。
    whole-chunk authorization 仍不在范围内。
 
 本次下一步仍不是 60-episode、SABER 或 Phantom 主实验。不要把 slow-interlock 结果描述成实时

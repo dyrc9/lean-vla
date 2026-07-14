@@ -1,6 +1,6 @@
 {
   "schema": "proofalign.reproduction-targets.v1",
-  "updated": "2026-07-12",
+  "updated": "2026-07-14",
   "primary_platform": {
     "benchmark": "LIBERO-Safety",
     "victim": "pi0.5/OpenPI pi05_libero",
@@ -15,8 +15,21 @@
       "repository": "https://github.com/wuxiyang1996/SABER",
       "upstream_platform": "standard LIBERO + pi0.5/OpenPI",
       "main_adapter": "versioned instruction attack records",
-      "status": "planned",
-      "upstream_commit": null
+      "status": "reproduced_upstream",
+      "upstream_commit": "c5d6f7e22bee6a42a5b4d871f70fe08d9419d073",
+      "local_patch_commit": "22ad50642a2aec11d00d43b9c0f36d2788bd487f",
+      "artifacts": [
+        "external/SABER/outputs/agent_output_records_task_failure_hf/task_failure_openpi_pi05.json",
+        "external/SABER/outputs/agent_output_records_action_inflation_hf/action_inflation_openpi_pi05.json",
+        "external/SABER/outputs/agent_output_records_constraint_violation_hf/constraint_violation_openpi_pi05.json"
+      ],
+      "artifact_sha256": {
+        "task_failure": "26f3b919ce76772d841ffd8e63f339752e718f3514218bd1c0090f60af46a3a0",
+        "action_inflation": "43086e07958b114b14cc98dfa3dcd726fc2eb8d265978372360527ffe8bd0dfc",
+        "constraint_violation": "9998c8705913ec3062686e89a586c0792b30141de3346c81608dc3bb0e7e07c9"
+      },
+      "result_scope": "standard LIBERO R0 only",
+      "result": "constraint_violation reproduced directionally; action_inflation weaker; task_failure weak"
     },
     {
       "id": "phantom-menace",
