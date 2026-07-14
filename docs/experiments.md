@@ -230,6 +230,18 @@ observation timestamp 消除。下一步若研究 `TimeBase.max_jitter_ns` 与 a
 该变更必须先通过 strict/slow 双模式 fake-env tests、全量 pytest、Lean 与 clean preflight，然后只
 重跑一次同 task/init/seed/witness 的 3--5 prefix calibration。
 
+`7587c47` 已完成该唯一重跑。strict preflight 为 220 passed / 1 skipped、Lean 12 jobs、零
+blocker/warning。首 prefix 的 109.034 ms observation SLA miss 被完整记录但不再否决方法，四阶段为
+`proven/proven/proven/safe_pending`。第二 prefix 的 timing 为 71.265 ms、没有 SLA miss，却因实际
+位移 1.335 mm 超过记录的 0.150 mm kinematic limit 被 observed-prefix 一致 refute；因此 timing
+修正确实工作，但 method-validity gate 仍失败。
+
+独立 frozen-source 诊断发现 vendored `OSC_POSE` 将 normalized translation `[-1,1]` 映射为
+`[-2,2] m`，而 CTDA hard-code 为 0.05，错配 40 倍。用 2.0 source scale 与原 0.1 mm model error
+重算，两次观测都有正 margin；这说明必须绑定 live controller config，而不是按本次位移拟合误差。
+但正确 scale 下首 action 的 predicted translation 已为 0.127 mm，超过另行冻结的累计 stutter budget
+0.1 mm。后续必须单独给出预算修改的预先物理依据；未经授权不能直接调到能容纳本次样本。
+
 ### Remote 60-episode workload gate
 
 - physical suites：`affordance,obstacle_avoidance,human_safety,obstacle_avoidance_human`；

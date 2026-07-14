@@ -227,10 +227,16 @@ completion/progress、累计预算和 fallback actuation/postcondition 不变。
 及 runtime metadata，并有 strict/slow 双向 fake-env tests；下一 gate 是全量验证、clean preflight
 和唯一一次固定配置 calibration，不是直接增加 episode。
 
+该 gate 已在 clean `7587c47` 上执行。首 prefix 的 109.034 ms observation miss 仅作为性能负结果，
+四阶段通过；第二 prefix 在无 timing miss 时因 `1.335 mm > 0.150 mm` kinematic limit fail closed。
+frozen controller source 随后证明 `OSC_POSE` translation scale 为 2.0，而 method 使用 0.05。下一步
+是绑定 live controller config；但按正确 scale 首 prefix 的 predicted translation 为 0.127 mm，已
+超过冻结 0.1 mm stutter budget，因此预算是否修订仍需独立、非样本拟合的方法依据。
+
 ## 6. P4：远程发布攻击 workload pilot
 
-状态：**累计 bounded-stutter 已通过本地 CPU/Lean 与 strict preflight；历史 GPU 重跑在首 prefix
-墙钟 observation/fallback SLA 失败；method-validity timing policy 已获授权并进入重新验证**。P1/P2
+状态：**timing-policy gate 已通过其目标检查；固定 GPU calibration 在第二 prefix 暴露 40 倍 live
+controller translation-scale 错配，method-validity gate 仍失败**。P1/P2
 correctness、golden parity 与 affordance observation completeness 已通过；real-time latency 明确
 未通过并已降级 claim。fail-closed preflight manifest 与 clean + Lean slow-interlock smoke 已
 脚本化。未经新的 clean method gate 不得启动主表。
