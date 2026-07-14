@@ -1,6 +1,6 @@
 # ProofAlign 当前与目标架构
 
-更新日期：2026-07-10
+更新日期：2026-07-14
 
 本文描述代码中已经存在的路径，以及 first sprint 需要闭合的目标路径。方法语义以
 [`method.md`](method.md) 为准。
@@ -48,7 +48,7 @@ layer。
 | `src/proofalign/ctda_shadow.py` | JSON/JSONL/episode/fixture CPU replay、parity、latency、provenance | synthetic corpus 不提供 ground truth |
 | `src/proofalign/benchmark/libero_online_wrapper.py` | LIBERO reset、policy call、raw-step dispatch、trace 和 fallback | simulator adapter 属于声明 TCB |
 | `src/proofalign/benchmark/libero_online_runner.py` | task root、SafetySpec、fallback manifest、evaluator mode 和 CLI | simulator adapter 属于 TCB |
-| `experiments/libero_openpi_plugin.py` | pi0.5/OpenPI inference 与 action chunk | 当前 `proofalign_action` 来自 instruction heuristic，只能作兼容 metadata |
+| `experiments/libero_openpi_plugin.py` | pi0.5/OpenPI inference、完整归一化 action chunk 与 policy-call audit id | `proofalign_action` 来自 instruction heuristic，只能作兼容 metadata |
 | `experiments/libero_vla_plugin.py` | legacy action abstraction 与 OpenVLA diagnostic | 不是 paper CTDA contract authority |
 | `src/proofalign/lean_bridge.py` | legacy Lean claim bridge | 不用于 paper CTDA wire path |
 | `lean/ProofAlign/CTDA.lean` | CTDA datatypes、staged checks、monitor、theorem | 核心 typed specification |
@@ -97,6 +97,10 @@ policy `proofalign_action` 只能记录在 untrusted metadata 中，不能改变
 
 从 trusted state 和 raw commands 判断 prefix 是否与 active contract 一致。binder verdict 必须由
 consumer 计算，不能接受 policy 自报 Boolean。最小支持 `Pick`/`Place` slice。
+
+Pick/approach 的 bounded-stutter 分支使用合同级累计预测平移、累计六维 command-path、持久
+no-progress 与原 deadline 四重上限。预算在 authorization commit 时消耗，reset/replan 不退款；其
+连续动作解释仍属于 Python binder/adapter TCB，而不是 Lean raw-action theorem。
 
 ### 4.4 CTDA evaluator transaction
 

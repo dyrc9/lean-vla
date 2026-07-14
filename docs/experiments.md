@@ -182,21 +182,29 @@ raw binder pre-dispatch refute，零 `env.step`，所以本 gate 未通过。该
 clean-policy evidence、translation/retry/time budget 和零 phase-advance 语义，再从 strict preflight
 重启 calibration。
 
-已授权的最小扩展固定为：只允许 Pick/approach、gripper 非 close、累计预测平移
-`<=0.0001 m`、累计六维 motion-command norm `<=0.002`、每 active contract 最多一次，并沿用原
-contract deadline。该 bound 复用早于 blocker 已冻结的 model-error allowance，不从该 CTDA verdict
-拟合。candidate/tube/proposal witness 必须绑定 stutter flag/index/budget；正常观测只能
-`safe_pending` 且 phase 不变，任何 completion/progress 立即 fail closed。该分类来自 consumer-side
-Python binder；论文不得写成 Lean 已独立证明 raw action 的 stutter 语义。
+已授权的累计扩展固定为：只允许 Pick/approach、gripper 非 close；同一 active contract 上累计预测
+translation path `<=0.0001 m`、累计六维 motion-command path norm `<=0.002`。该 bound 复用早于
+blocker 已冻结的 model-error allowance，不从本次 CTDA verdict 拟合。每次 stutter 只在
+authorization commit 后消耗预算，replan 或同一 mission nonce 内的 reset 不退款；第一次授权固定
+原 contract deadline。零幅度 prefix 也消耗持久 no-progress count，其上限沿用既有
+`no_progress_patience=3`，不是按本次样本把 retry budget 从 1 改成 3。
 
-`e2e4d47` clean strict-preflight 重跑已验证第一个 stutter：四阶段 Lean 为
+candidate/tube/proposal witness 必须绑定 stutter flag/index、单次增量、累计前后值、两类总预算和
+no-progress 上限；正常观测只能 `safe_pending` 且 phase 不变，任何 completion/contract progress、
+累计超界或 deadline 耗尽立即 fail closed。该分类来自 consumer-side Python binder；论文不得写成
+Lean 已独立证明 raw continuous action 的 stutter 语义。OpenPI 每次调用还必须保存完整归一化
+action chunk、policy-call ID、实际执行的 policy command 与未执行 tail；这些纯日志字段不得改变
+`max_chunk_steps=1` 的控制行为。
+
+历史 `e2e4d47` clean strict-preflight 重跑已验证第一个一次性 stutter：四阶段 Lean 为
 `proven/proven/proven/safe_pending`，proof/parity 全 true，count `0 -> 1`，phase 保持
 `approach`，观测位移 65.119 µm 小于 102.835 µm limit。随后一次新的 OpenPI inference 仍产生
 envelope 内微动作，但一次性 budget 已耗尽，在新 prefix-pre Lean evaluation 与 `env.step` 前
 replan。第二 trace entry 重复的 wire artifacts 只是 session history，不能计为新证明。因此只完成
-1/5 executed prefix，本 gate 仍失败；零 fallback 也不增加 50 ms latency evidence。不得直接提高
-retry budget、改变 chunking 或追加 episode；repeated-micro-action/whole-chunk binding 需要新的明确
-方法授权与独立累计界。
+1/5 executed prefix，本 gate 仍失败；零 fallback 也不增加 50 ms latency evidence。当前累计合同
+实现必须先从 clean commit、全量 CPU/Lean 与 strict preflight 重新开始；通过后只重跑一次相同
+task/init/seed/witness 的 3--5 prefix calibration，不能用额外 episode 稀释失败。whole-chunk
+authorization 仍未获授权，完整 chunk 只作日志。
 
 ### Remote 60-episode workload gate
 
@@ -239,6 +247,7 @@ analysis config。
 - active mission/contract/config digest；
 - per-prefix request/verdict/latency；
 - raw proposal、authorized/applied command、receipt 和 trace digest；
+- 完整 policy action chunk、policy-call ID、实际执行的 policy actions 与丢弃 tail；
 - independent label 与 provenance；
 - task success、cost/collision、runner warnings/failure；
 - output file checksum。

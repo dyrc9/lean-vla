@@ -17,8 +17,9 @@ trusted frozen mission
 ```
 
 当前 GPU 环境已完成 single-prefix diagnostic 和一次 bounded-stutter clean 重跑。后续 GPU rollout
-仍只在相应 readiness gate 通过后分阶段执行；本次 3--5 prefix gate 在第二个新微动作处因一次性
-budget 耗尽而失败，当前没有开放新的 GPU 扩样本入口。
+仍只在相应 readiness gate 通过后分阶段执行；历史 3--5 prefix gate 在第二个新微动作处因一次性
+budget 耗尽而失败。累计版本已通过本地 CPU/Lean，只有形成 clean commit 并通过 strict preflight
+后才开放一次相同配置的 3--5 prefix 重跑。
 
 ## 1. 冻结原则
 
@@ -201,25 +202,29 @@ episode 是 init-handoff diagnostic，不是有效 calibration sample；其中 o
 blocking/abstraction signal，不是独立 ground-truth false positive；按 >10% kill criterion 停止扩
 实验，不能用更多 episode 稀释 1/1 rejection。
 
-经用户授权，`e2e4d47` 已实现 `mission-raw-binder-libero-panda-v3-bounded-stutter`。它只允许
-Pick/approach 的非闭合前缀；translation bound 直接复用冻结的 `model_error_m=0.0001 m`，六维
-motion-command norm bound 为由同一 scale 推导的 `0.002`，每个 active contract 最多授权一次，
-并继续受原 contract deadline 约束。stutter candidate/tube/proposal witness 保存 classification、
-index 和 budget；观测到 completion/phase progress 时在 supervisor phase 更新前 fail closed。远离
-目标且超出 stutter bound 的 proposal 仍 refute。clean strict preflight 为 212 passed / 1 skipped、
-Lean 12 jobs。真实 GPU 首 prefix 已验证 count `0 -> 1`、四阶段 proof/parity、`safe_pending`、零
-phase advance 和正 kinematic margin；但第二次新策略推理也属于微动作，一次性 budget 已耗尽，
-pre-dispatch replan。只执行 1/5 prefix，因此 calibration 与 P4 gate 仍关闭。重复微动作或 whole-
-chunk binding 是未授权的新方法范围，不能从该样本直接放宽。
+历史 `e2e4d47` 一次性 bounded-stutter 已在真实 GPU 验证首 prefix，但第二个新微动作因 count budget
+耗尽而 pre-dispatch replan，只执行 1/5 prefix。经本轮用户授权，Python binder 已改为
+`mission-raw-binder-libero-panda-v4-cumulative-stutter`：Pick/approach 非闭合微动作共享 active
+contract 的累计 `0.0001 m` predicted-translation path 和 `0.002` 六维 command-path norm；授权时
+扣减，reset/replan 不退款，第一次授权固定原 deadline。持久 no-progress 上限沿用既有
+`no_progress_patience=3`。candidate/tube/proposal witness 绑定单次增量、累计前后值、总预算和
+no-progress index/limit；completion/contract progress 在 phase 更新前 fail closed。OpenPI adapter
+另保存完整归一化 chunk、policy-call ID、实际执行 command 和丢弃 tail，不改变单-command CTDA
+dispatch。
+
+本地累计实现已通过 216 passed / 1 skipped 与 Lean 12 jobs；这些仍只是 CPU/fake-env 与 Python
+binder 语义，不是 Lean raw-action proof。下一 gate 是在 clean commit 上跑 strict GPU preflight，
+随后只重跑一次相同 task/init/seed/witness 的 3--5 prefix calibration。whole-chunk authorization
+仍未获授权。
 
 ## 6. P4：远程发布攻击 workload pilot
 
-状态：**init handoff 与一次 bounded-stutter prefix 已在真实 GPU 验证；第二个新微动作因一次性
-budget 耗尽而 pre-dispatch replan，3--5 prefix gate 未通过**。P1/P2
+状态：**累计 bounded-stutter 已在本地实现并通过 CPU/Lean；尚未 strict-preflight/GPU 重跑，
+3--5 prefix gate 仍未通过**。P1/P2
 correctness、golden parity 与 affordance observation completeness 已通过；real-time latency 明确
 未通过并已降级 claim。fail-closed preflight manifest 与 clean + Lean slow-interlock smoke 已
-脚本化。下一步先冻结 blocker；除非单独授权并定义 repeated-micro-action/whole-chunk 合同，否则
-不再追加 GPU episode。未经新的 clean method gate 不得启动主表。
+脚本化。下一步只允许 clean commit -> strict preflight -> 同 task/init/seed/witness 一次 3--5 prefix
+calibration；失败即停。未经新的 clean method gate 不得启动主表。
 环境见 [`remote_execution.md`](remote_execution.md)。
 
 在 60-episode pilot 前增加 upstream reproduction gate，详见

@@ -730,7 +730,7 @@ def _configure_ctda(
             fallback_action=tuple(float(value) for value in fallback_manifest["fallback_action"]),
             semantic_evidence=evidence,
             raw_binder=RawProposalBinderConfig(
-                version="mission-raw-binder-libero-panda-v3-bounded-stutter",
+                version="mission-raw-binder-libero-panda-v4-cumulative-stutter",
                 gripper_close_threshold=0.2,
                 gripper_open_threshold=-0.2,
                 close_direction=1,
@@ -739,7 +739,7 @@ def _configure_ctda(
                 stutter_motion_command_bound=(
                     model_error_m / translation_scale_m
                 ),
-                max_stutter_prefixes=1,
+                stutter_no_progress_limit=wrapper.no_progress_patience,
             ),
         ),
         evaluator=evaluator,
@@ -976,6 +976,10 @@ def _write_result(
                 "region": step.action.region,
                 "raw_action": step.raw_action,
                 "raw_actions": step.raw_actions,
+                "policy_call_id": step.policy_call_id,
+                "proposed_action_chunk": step.proposed_action_chunk,
+                "executed_policy_actions": step.executed_policy_actions,
+                "discarded_action_chunk_tail": step.discarded_action_chunk_tail,
                 "proofalign_action": step.proofalign_action or action_to_dict(step.action),
                 "chunk_id": step.chunk_id,
                 "contract": step.contract,

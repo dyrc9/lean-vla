@@ -49,6 +49,7 @@ class OpenPIPolicy:
     _policy: Any = None
     _image_tools: Any = None
     _initial_rng: Any = None
+    _policy_call_index: int = 0
 
     def reset_episode(self) -> None:
         # Batch evaluation reuses the loaded policy.  Restore the checkpoint
@@ -56,6 +57,7 @@ class OpenPIPolicy:
         # The pure pi0.5 runner likewise resets the OpenPI RNG for every episode.
         if self._loaded and self._initial_rng is not None and hasattr(self._policy, "_rng"):
             self._policy._rng = self._initial_rng
+        self._policy_call_index = 0
 
     def __call__(self, instruction: str, observation: Any, history: list[ExecutionStep]) -> dict[str, Any]:
         del history
@@ -65,8 +67,14 @@ class OpenPIPolicy:
         actions = _normalize_action_chunk(action_chunk)
         if not actions:
             raise RuntimeError("OpenPI policy returned no actions.")
+        policy_call_id = f"openpi:{self._policy_call_index:06d}"
+        self._policy_call_index += 1
         return {
             "raw_action": actions[: self.config.max_actions_per_call],
+            # Audit-only fields.  Keep the complete model output even though the
+            # existing control path still exposes at most max_actions_per_call.
+            "policy_call_id": policy_call_id,
+            "policy_action_chunk": actions,
             "proofalign_action": heuristic_contract_from_instruction(instruction),
             "vla_metadata": {
                 "backend": "openpi",

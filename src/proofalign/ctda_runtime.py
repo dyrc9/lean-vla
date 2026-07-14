@@ -178,7 +178,7 @@ class RawProposalBinderConfig:
     direction_epsilon: float = 1e-9
     stutter_translation_bound_m: float = 0.0
     stutter_motion_command_bound: float = 0.0
-    max_stutter_prefixes: int = 0
+    stutter_no_progress_limit: int = 0
     config_digest: str = field(init=False)
 
     def __post_init__(self) -> None:
@@ -209,15 +209,22 @@ class RawProposalBinderConfig:
             or self.stutter_motion_command_bound < 0
         ):
             raise ValueError("raw binder geometry thresholds are invalid")
-        if type(self.max_stutter_prefixes) is not int or self.max_stutter_prefixes < 0:
-            raise ValueError("raw binder stutter retry budget must be a non-negative integer")
+        if (
+            type(self.stutter_no_progress_limit) is not int
+            or self.stutter_no_progress_limit < 0
+        ):
+            raise ValueError(
+                "raw binder stutter no-progress limit must be a non-negative integer"
+            )
         stutter_values = (
             self.stutter_translation_bound_m,
             self.stutter_motion_command_bound,
-            self.max_stutter_prefixes,
+            self.stutter_no_progress_limit,
         )
         if any(stutter_values) and not all(stutter_values):
-            raise ValueError("raw binder stutter bounds and retry budget must be enabled together")
+            raise ValueError(
+                "raw binder cumulative stutter bounds and no-progress limit must be enabled together"
+            )
         object.__setattr__(
             self,
             "config_digest",
@@ -232,7 +239,7 @@ class RawProposalBinderConfig:
                     "direction_epsilon": self.direction_epsilon,
                     "stutter_translation_bound_m": self.stutter_translation_bound_m,
                     "stutter_motion_command_bound": self.stutter_motion_command_bound,
-                    "max_stutter_prefixes": self.max_stutter_prefixes,
+                    "stutter_no_progress_limit": self.stutter_no_progress_limit,
                 }
             ),
         )
@@ -242,7 +249,7 @@ class RawProposalBinderConfig:
         return bool(
             self.stutter_translation_bound_m
             and self.stutter_motion_command_bound
-            and self.max_stutter_prefixes
+            and self.stutter_no_progress_limit
         )
 
 
@@ -258,6 +265,8 @@ class RawProposalBinderResult:
     config_digest: str
     issues: tuple[str, ...] = ()
     bounded_stutter: bool = False
+    stutter_translation_m: float = 0.0
+    stutter_motion_command_norm: float = 0.0
     witness_digest: str = field(init=False)
 
     def __post_init__(self) -> None:
@@ -266,6 +275,15 @@ class RawProposalBinderResult:
             raise TypeError("bounded_stutter must be bool")
         if self.bounded_stutter and self.verdict is not StaticVerdict.PROVEN:
             raise ValueError("only a proven raw proposal can be a bounded stutter")
+        for name in ("stutter_translation_m", "stutter_motion_command_norm"):
+            value = getattr(self, name)
+            if not isfinite(float(value)) or value < 0:
+                raise ValueError(f"{name} must be finite and non-negative")
+        if not self.bounded_stutter and (
+            self.stutter_translation_m != 0.0
+            or self.stutter_motion_command_norm != 0.0
+        ):
+            raise ValueError("non-stutter binder result cannot consume stutter budget")
         object.__setattr__(
             self,
             "witness_digest",
@@ -279,6 +297,8 @@ class RawProposalBinderResult:
                     "config_digest": self.config_digest,
                     "issues": self.issues,
                     "bounded_stutter": self.bounded_stutter,
+                    "stutter_translation_m": self.stutter_translation_m,
+                    "stutter_motion_command_norm": self.stutter_motion_command_norm,
                 }
             ),
         )
@@ -361,6 +381,10 @@ class PreparedPrefix:
     start_ns: int
     bounded_stutter: bool = False
     bounded_stutter_count_before: int = 0
+    bounded_stutter_translation_before_m: float = 0.0
+    bounded_stutter_translation_after_m: float = 0.0
+    bounded_stutter_motion_before: float = 0.0
+    bounded_stutter_motion_after: float = 0.0
 
 
 @dataclass(frozen=True)
@@ -671,6 +695,9 @@ class CTDARuntimeSession:
     evaluator: CTDAEvaluator | None = None
     proposal_index: int = 0
     bounded_stutter_count: int = 0
+    bounded_stutter_translation_consumed_m: float = 0.0
+    bounded_stutter_motion_consumed: float = 0.0
+    bounded_stutter_deadline_ns: int | None = None
     active_execution: ContractExecution | None = None
     last_fallback_receipt: FallbackSwitchReceipt | None = None
     evaluation_artifacts: list[CTDAEvaluationArtifact] = field(default_factory=list)
@@ -744,7 +771,9 @@ class CTDARuntimeSession:
         self.supervisor.pending_authorization_digest = None
         self.supervisor.terminal_verdict = None
         self.proposal_index = 0
-        self.bounded_stutter_count = 0
+        # A reset/replan within the same mission nonce must not mint a fresh
+        # micro-action allowance.  Only successful non-stutter contract
+        # completion moves to a new contract budget below.
         self.active_execution = None
         self.last_fallback_receipt = None
         self.evaluation_artifacts.clear()
@@ -1126,11 +1155,20 @@ class CTDARuntimeSession:
 
         if self.supervisor.active_contract is None:
             try:
+                deadline_ns = now + self.config.contract_budget_ns
+                if self.bounded_stutter_deadline_ns is not None:
+                    deadline_ns = min(deadline_ns, self.bounded_stutter_deadline_ns)
+                if deadline_ns <= now:
+                    return PrepareResult(
+                        StaticCheckResult.refuted(
+                            "original bounded-stutter contract deadline is exhausted"
+                        )
+                    )
                 contract = contract_from_mission_phase(
                     self.supervisor.mission,
                     current_phase=self.supervisor.active_phase,
                     issued_at_ns=now,
-                    deadline_ns=now + self.config.contract_budget_ns,
+                    deadline_ns=deadline_ns,
                     fallback_id=self.config.fallback_id,
                 )
                 contract = replace(
@@ -1214,16 +1252,42 @@ class CTDARuntimeSession:
                 if binder_result.verdict is StaticVerdict.INCONSISTENT:
                     return PrepareResult(StaticCheckResult.inconsistent(*binder_result.issues))
                 return PrepareResult(StaticCheckResult.refuted(*binder_result.issues))
-            if (
-                binder_result.bounded_stutter
-                and self.bounded_stutter_count
-                >= self.config.raw_binder.max_stutter_prefixes
-            ):
-                return PrepareResult(
-                    StaticCheckResult.refuted(
-                        "raw binder bounded-stutter retry budget is exhausted"
+            stutter_translation_after_m = (
+                self.bounded_stutter_translation_consumed_m
+                + binder_result.stutter_translation_m
+            )
+            stutter_motion_after = (
+                self.bounded_stutter_motion_consumed
+                + binder_result.stutter_motion_command_norm
+            )
+            if binder_result.bounded_stutter:
+                if (
+                    self.bounded_stutter_count
+                    >= self.config.raw_binder.stutter_no_progress_limit
+                ):
+                    return PrepareResult(
+                        StaticCheckResult.refuted(
+                            "raw binder persistent bounded-stutter no-progress limit is exhausted"
+                        )
                     )
-                )
+                if (
+                    stutter_translation_after_m
+                    > self.config.raw_binder.stutter_translation_bound_m
+                ):
+                    return PrepareResult(
+                        StaticCheckResult.refuted(
+                            "raw binder cumulative bounded-stutter predicted-translation budget is exceeded"
+                        )
+                    )
+                if (
+                    stutter_motion_after
+                    > self.config.raw_binder.stutter_motion_command_bound
+                ):
+                    return PrepareResult(
+                        StaticCheckResult.refuted(
+                            "raw binder cumulative bounded-stutter six-dimensional command-path budget is exceeded"
+                        )
+                    )
             proposal_admissible = True
             duration_ns = len(commands) * self.config.control_period_ns
             model_digest = digest_text(self.config.dynamics_model_id)
@@ -1232,9 +1296,13 @@ class CTDARuntimeSession:
                 assumptions += (
                     "bounded_stutter_pick_approach_only",
                     "bounded_stutter_non_closing_gripper",
-                    f"bounded_stutter_translation_m<={self.config.raw_binder.stutter_translation_bound_m}",
-                    f"bounded_stutter_motion_command_norm<={self.config.raw_binder.stutter_motion_command_bound}",
-                    f"bounded_stutter_retry_budget={self.config.raw_binder.max_stutter_prefixes}",
+                    "bounded_stutter_cumulative_translation_m<="
+                    f"{self.config.raw_binder.stutter_translation_bound_m}",
+                    "bounded_stutter_cumulative_motion_command_path_norm<="
+                    f"{self.config.raw_binder.stutter_motion_command_bound}",
+                    "bounded_stutter_persistent_no_progress_limit="
+                    f"{self.config.raw_binder.stutter_no_progress_limit}",
+                    "bounded_stutter_budget_consumed_at_authorization",
                     "bounded_stutter_zero_phase_advance",
                 )
             prefix_safe = _prefix_clearance_safe(
@@ -1263,7 +1331,29 @@ class CTDARuntimeSession:
                     ),
                     "bounded_stutter": binder_result.bounded_stutter,
                     "bounded_stutter_count_before": self.bounded_stutter_count,
-                    "bounded_stutter_budget": self.config.raw_binder.max_stutter_prefixes,
+                    "bounded_stutter_no_progress_limit": (
+                        self.config.raw_binder.stutter_no_progress_limit
+                    ),
+                    "bounded_stutter_translation_m": binder_result.stutter_translation_m,
+                    "bounded_stutter_translation_consumed_before_m": (
+                        self.bounded_stutter_translation_consumed_m
+                    ),
+                    "bounded_stutter_translation_consumed_after_m": (
+                        stutter_translation_after_m
+                    ),
+                    "bounded_stutter_translation_budget_m": (
+                        self.config.raw_binder.stutter_translation_bound_m
+                    ),
+                    "bounded_stutter_motion_command_norm": (
+                        binder_result.stutter_motion_command_norm
+                    ),
+                    "bounded_stutter_motion_consumed_before": (
+                        self.bounded_stutter_motion_consumed
+                    ),
+                    "bounded_stutter_motion_consumed_after": stutter_motion_after,
+                    "bounded_stutter_motion_budget": (
+                        self.config.raw_binder.stutter_motion_command_bound
+                    ),
                 }
             )
             tube = ReachableTube(
@@ -1325,7 +1415,29 @@ class CTDARuntimeSession:
                     "raw_binder_config_digest": binder_result.config_digest,
                     "bounded_stutter": binder_result.bounded_stutter,
                     "bounded_stutter_count_before": self.bounded_stutter_count,
-                    "bounded_stutter_budget": self.config.raw_binder.max_stutter_prefixes,
+                    "bounded_stutter_no_progress_limit": (
+                        self.config.raw_binder.stutter_no_progress_limit
+                    ),
+                    "bounded_stutter_translation_m": binder_result.stutter_translation_m,
+                    "bounded_stutter_translation_consumed_before_m": (
+                        self.bounded_stutter_translation_consumed_m
+                    ),
+                    "bounded_stutter_translation_consumed_after_m": (
+                        stutter_translation_after_m
+                    ),
+                    "bounded_stutter_translation_budget_m": (
+                        self.config.raw_binder.stutter_translation_bound_m
+                    ),
+                    "bounded_stutter_motion_command_norm": (
+                        binder_result.stutter_motion_command_norm
+                    ),
+                    "bounded_stutter_motion_consumed_before": (
+                        self.bounded_stutter_motion_consumed
+                    ),
+                    "bounded_stutter_motion_consumed_after": stutter_motion_after,
+                    "bounded_stutter_motion_budget": (
+                        self.config.raw_binder.stutter_motion_command_bound
+                    ),
                     "proposal_admissible": True,
                 }
             )
@@ -1344,7 +1456,13 @@ class CTDARuntimeSession:
                     "raw_binder_config_digest": binder_result.config_digest,
                     "bounded_stutter": binder_result.bounded_stutter,
                     "bounded_stutter_count_before": self.bounded_stutter_count,
-                    "bounded_stutter_budget": self.config.raw_binder.max_stutter_prefixes,
+                    "bounded_stutter_no_progress_limit": (
+                        self.config.raw_binder.stutter_no_progress_limit
+                    ),
+                    "bounded_stutter_translation_consumed_after_m": (
+                        stutter_translation_after_m
+                    ),
+                    "bounded_stutter_motion_consumed_after": stutter_motion_after,
                     "admissible": True,
                 },
                 issued_at_ns=now,
@@ -1412,8 +1530,38 @@ class CTDARuntimeSession:
                     if binder_result.bounded_stutter
                     else None
                 ),
-                bounded_stutter_budget=(
-                    self.config.raw_binder.max_stutter_prefixes
+                bounded_stutter_no_progress_limit=(
+                    self.config.raw_binder.stutter_no_progress_limit
+                    if binder_result.bounded_stutter
+                    else None
+                ),
+                bounded_stutter_translation_m=(
+                    binder_result.stutter_translation_m
+                    if binder_result.bounded_stutter
+                    else None
+                ),
+                bounded_stutter_translation_consumed_before_m=(
+                    self.bounded_stutter_translation_consumed_m
+                    if binder_result.bounded_stutter
+                    else None
+                ),
+                bounded_stutter_translation_budget_m=(
+                    self.config.raw_binder.stutter_translation_bound_m
+                    if binder_result.bounded_stutter
+                    else None
+                ),
+                bounded_stutter_motion_command_norm=(
+                    binder_result.stutter_motion_command_norm
+                    if binder_result.bounded_stutter
+                    else None
+                ),
+                bounded_stutter_motion_consumed_before=(
+                    self.bounded_stutter_motion_consumed
+                    if binder_result.bounded_stutter
+                    else None
+                ),
+                bounded_stutter_motion_budget=(
+                    self.config.raw_binder.stutter_motion_command_bound
                     if binder_result.bounded_stutter
                     else None
                 ),
@@ -1475,10 +1623,18 @@ class CTDARuntimeSession:
             now,
             binder_result.bounded_stutter,
             self.bounded_stutter_count,
+            self.bounded_stutter_translation_consumed_m,
+            stutter_translation_after_m,
+            self.bounded_stutter_motion_consumed,
+            stutter_motion_after,
         )
         self.proposal_index += 1
         if binder_result.bounded_stutter:
+            if self.bounded_stutter_deadline_ns is None:
+                self.bounded_stutter_deadline_ns = contract.deadline_ns
             self.bounded_stutter_count += 1
+            self.bounded_stutter_translation_consumed_m = stutter_translation_after_m
+            self.bounded_stutter_motion_consumed = stutter_motion_after
         return PrepareResult(check, prepared)
 
     def observe_prefix(
@@ -1498,6 +1654,16 @@ class CTDARuntimeSession:
         monitor = self.supervisor.monitor_state
         if contract is None or monitor is None:
             raise RuntimeError("no CTDA contract is active for the execution receipt")
+        if prepared.bounded_stutter and (
+            self.bounded_stutter_translation_consumed_m
+            != prepared.bounded_stutter_translation_after_m
+            or self.bounded_stutter_motion_consumed
+            != prepared.bounded_stutter_motion_after
+            or self.bounded_stutter_deadline_ns != contract.deadline_ns
+        ):
+            raise RuntimeError(
+                "bounded stutter cumulative authorization budget state changed before observation"
+            )
         if not states_after or len(states_after) != len(executed_actions):
             raise ValueError("states_after and executed_actions must be non-empty and aligned")
         if dispatch_ns is None or observation_times_ns is None:
@@ -1816,6 +1982,9 @@ class CTDARuntimeSession:
         if result.complete:
             self.active_execution = None
             self.bounded_stutter_count = 0
+            self.bounded_stutter_translation_consumed_m = 0.0
+            self.bounded_stutter_motion_consumed = 0.0
+            self.bounded_stutter_deadline_ns = None
         return result, record
 
 
@@ -1886,6 +2055,8 @@ def bind_raw_proposal(
         verdict: StaticVerdict,
         *issues: str,
         bounded_stutter: bool = False,
+        stutter_translation_m: float = 0.0,
+        stutter_motion_command_norm: float = 0.0,
     ) -> RawProposalBinderResult:
         return RawProposalBinderResult(
             verdict=verdict,
@@ -1896,6 +2067,8 @@ def bind_raw_proposal(
             config_digest=config.config_digest,
             issues=tuple(issues),
             bounded_stutter=bounded_stutter,
+            stutter_translation_m=stutter_translation_m,
+            stutter_motion_command_norm=stutter_motion_command_norm,
         )
 
     if not mission.verify_integrity() or not contract.verify_integrity():
@@ -1931,7 +2104,13 @@ def bind_raw_proposal(
 
     translation = tuple(sum(command[index] for command in flattened) for index in range(3))
     translation_norm = sqrt(sum(value * value for value in translation))
-    predicted_translation_m = translation_norm * config.translation_scale_m
+    predicted_translation_m = (
+        sum(
+            sqrt(sum(value * value for value in command[:3]))
+            for command in flattened
+        )
+        * config.translation_scale_m
+    )
     cumulative_motion_command_norm = (
         sum(sqrt(sum(value * value for value in command[:6])) for command in flattened)
         if all(len(command) >= 7 for command in flattened)
@@ -1975,7 +2154,12 @@ def bind_raw_proposal(
             <= config.stutter_motion_command_bound
         )
         if bounded_stutter:
-            return result(StaticVerdict.PROVEN, bounded_stutter=True)
+            return result(
+                StaticVerdict.PROVEN,
+                bounded_stutter=True,
+                stutter_translation_m=predicted_translation_m,
+                stutter_motion_command_norm=cumulative_motion_command_norm,
+            )
         if translation_norm > config.direction_epsilon:
             direction_dot = sum(
                 command * target for command, target in zip(translation, target_delta)

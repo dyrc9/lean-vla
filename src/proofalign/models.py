@@ -318,6 +318,10 @@ class ExecutionStep:
     chunk_id: str | None = None
     contract: dict[str, Any] | None = None
     raw_actions: list[Any] = field(default_factory=list)
+    policy_call_id: str | None = None
+    proposed_action_chunk: list[Any] = field(default_factory=list)
+    executed_policy_actions: list[Any] = field(default_factory=list)
+    discarded_action_chunk_tail: list[Any] = field(default_factory=list)
     trace_summary: TraceSummary | None = None
     ctda: dict[str, Any] = field(default_factory=dict)
 

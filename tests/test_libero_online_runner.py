@@ -98,6 +98,11 @@ def test_online_runner_uses_initialized_real_env_shape(monkeypatch, tmp_path: Pa
             [
                 {
                     "raw_action": [0, 0, 0, 0, 0, 0, 0],
+                    "policy_call_id": "replay:000000",
+                    "policy_action_chunk": [
+                        [0, 0, 0, 0, 0, 0, 0],
+                        [0.1, 0, 0, 0, 0, 0, 0],
+                    ],
                     "proofalign_action": {"type": "Pick", "object": "mug", "part": "body"},
                 }
             ]
@@ -145,6 +150,11 @@ def test_online_runner_uses_initialized_real_env_shape(monkeypatch, tmp_path: Pa
     payload = json.loads(output_path.read_text(encoding="utf-8"))
     assert payload["decision"] == "allow"
     assert payload["trace"][0]["action"] == "Pick"
+    assert payload["trace"][0]["policy_call_id"] == "replay:000000"
+    assert payload["trace"][0]["executed_policy_actions"] == [[0, 0, 0, 0, 0, 0, 0]]
+    assert payload["trace"][0]["discarded_action_chunk_tail"] == [
+        [0.1, 0, 0, 0, 0, 0, 0]
+    ]
 
 
 def test_online_runner_preserves_selected_init_observation_without_reset(
@@ -452,9 +462,15 @@ def test_online_runner_ctda_flag_persists_proof_chain(monkeypatch, tmp_path: Pat
         "enabled": False,
         "count_before": 0,
         "count_after": 0,
-        "retry_budget": 1,
-        "translation_bound_m": 0.0001,
-        "motion_command_bound": 0.002,
+        "persistent_no_progress_limit": 3,
+        "translation_increment_m": 0.0,
+        "translation_consumed_before_m": 0.0,
+        "translation_consumed_after_m": 0.0,
+        "cumulative_translation_budget_m": 0.0001,
+        "motion_command_increment": 0.0,
+        "motion_command_consumed_before": 0.0,
+        "motion_command_consumed_after": 0.0,
+        "cumulative_motion_command_budget": 0.002,
         "contract_deadline_ns": None,
     }
     assert (

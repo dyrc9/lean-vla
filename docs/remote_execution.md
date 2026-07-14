@@ -355,32 +355,38 @@ real-time。
 修复已在 `2c532ca` clean checkout 完成，并重跑 strict preflight。corrected run 的 registered-init
 gate 通过，但首个 OpenPI proposal 被旧 raw binder pre-dispatch refute，零 `env.step`。
 
-最小 bounded-stutter 方法随后在 `e2e4d47` clean commit 上通过 strict preflight 和真实 GPU 首
+历史最小 bounded-stutter 方法随后在 `e2e4d47` clean commit 上通过 strict preflight 和真实 GPU 首
 prefix：registered init digest 一致，count `0 -> 1`，四阶段 proof/parity true，monitor
 `safe_pending`，phase 保持 `approach`，observed displacement 有正 margin。第二次 fresh OpenPI
 inference 仍为 envelope 内微动作，但一次性 budget 已耗尽，因此新 prefix-pre Lean evaluation 和
 `env.step` 均为零，最终 replan。只执行 1/5 prefix，calibration 仍未通过。不要继续增加 episode；
-重复微动作/whole-chunk binding 必须先作为新方法独立授权和定义，不能直接提高 budget。
+当前已授权并本地实现 repeated micro-action 的合同级累计版本；它仍须在 clean commit 上重跑
+strict preflight。whole-chunk authorization 仍未授权，完整 chunk 只保存为 audit log。
 
 OpenPI rollout 必须使用 `uv --project external/openpi run python`。ProofAlign 根项目的 `.venv` 不含
 OpenPI 声明的完整依赖；2026-07-14 的一次错误启动因此在首个 policy action 前报
 `ModuleNotFoundError: numpydantic`，该失败已单独保存且不计为 episode。
 
-bounded-stutter 重跑还必须检查 episode 中：candidate 的 `bounded_stutter=true`、index `0`、budget
-`1`；CTDA metadata 的 count `0 -> 1`、translation bound `0.0001 m`、motion-command bound
-`0.002`；首个 monitor verdict 为 `safe_pending` 且 active phase 仍为 `approach`。第二个 stutter
-必须 fail closed；非 stutter 远离动作仍必须 refute。任何字段不一致都停止，不继续扩样本。
+累计 bounded-stutter 重跑必须检查每个 episode/prefix 中：candidate 的
+`bounded_stutter=true`、递增 index、`persistent_no_progress_limit=3`；单次与累计前后 predicted
+translation、六维 command-path norm 分别不超过总预算 `0.0001 m` 与 `0.002`；metadata 的
+contract deadline 在所有 stutter 间一致；monitor verdict 只能为 `safe_pending`，active phase 始终
+为 `approach`。还必须核对完整 `proposed_action_chunk`、唯一 `policy_call_id`、
+`executed_policy_actions` 和 `discarded_action_chunk_tail`。累计超界、第四个 no-progress stutter、
+completion/contract progress、deadline 耗尽或字段不一致都必须 fail closed；非 stutter 远离动作仍
+必须 refute。
 
-`e2e4d47` 已满足上述预期检查并在第二个 stutter fail closed。注意 trace 级 `wire_artifacts` 是
-session 累计历史：第二个 precheck entry 重复首 prefix 的四个 request id，不代表第二 proposal 又
-完成四阶段。正式计数必须按 unique request id 和 stage transaction 计；该 run 的唯一 Lean request
-数为 4，第二 proposal 的新 Lean stage 数为 0。
+历史 `e2e4d47` 只满足一次性版本并在第二个 stutter fail closed，不能作为累计版本证据。注意 trace
+级 `wire_artifacts` 是 session 累计历史：第二个 precheck entry 重复首 prefix 的四个 request id，
+不代表第二 proposal 又完成四阶段。正式计数必须按 unique request id 和 stage transaction 计；该
+run 的唯一 Lean request 数为 4，第二 proposal 的新 Lean stage 数为 0。
 
-具体 command 在迁移时从当前 `--help` 生成，不从 archive 复制。保留以下固定实验参数：
+具体 command 在迁移时从当前 `--help` 生成，不从 archive 复制。本次 clean prefix calibration 保留
+以下固定实验参数：
 
 ```text
---max-steps 600
---max-chunk-steps 5
+--max-steps 3
+--max-chunk-steps 1
 --continue-on-replan
 --camera-height 256
 --camera-width 256

@@ -151,6 +151,12 @@ def test_chunk_allow_path_accumulates_trace_summary():
     result = wrapper.step_chunk(
         {
             "raw_action": [[0.1, 0.0, 0.0, 0.0], [0.1, 0.0, 0.0, 0.0]],
+            "policy_call_id": "openpi:000000",
+            "policy_action_chunk": [
+                [0.1, 0.0, 0.0, 0.0],
+                [0.1, 0.0, 0.0, 0.0],
+                [0.2, 0.0, 0.0, 0.0],
+            ],
             "proofalign_action": {"type": "Pick", "object": "mug", "part": "handle"},
         },
         max_chunk_steps=2,
@@ -164,6 +170,13 @@ def test_chunk_allow_path_accumulates_trace_summary():
     assert result.step.trace_summary.num_raw_steps == 1
     assert result.step.trace_summary.object_became_held is True
     assert result.step.raw_actions == [[0.1, 0.0, 0.0, 0.0]]
+    assert result.step.policy_call_id == "openpi:000000"
+    assert len(result.step.proposed_action_chunk) == 3
+    assert result.step.executed_policy_actions == [(0.1, 0.0, 0.0, 0.0)]
+    assert result.step.discarded_action_chunk_tail == [
+        (0.1, 0.0, 0.0, 0.0),
+        (0.2, 0.0, 0.0, 0.0),
+    ]
 
 
 def test_chunk_intent_reject_prevents_env_step():
@@ -187,6 +200,8 @@ def test_chunk_intent_reject_prevents_env_step():
     assert env.step_count == 0
     assert result.step.trace_summary
     assert result.step.trace_summary.num_raw_steps == 0
+    assert result.step.executed_policy_actions == []
+    assert result.step.discarded_action_chunk_tail == [(0.1, 0.0, 0.0, -1.0)]
 
 
 def test_chunk_collision_or_cost_triggers_safe_stop():

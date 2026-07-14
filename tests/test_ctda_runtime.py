@@ -325,7 +325,7 @@ def test_raw_binder_supports_libero_panda_positive_close_direction(
     assert result.check.verdict is StaticVerdict.PROVEN
 
 
-def _enable_single_bounded_stutter(session: CTDARuntimeSession) -> None:
+def _enable_cumulative_bounded_stutter(session: CTDARuntimeSession) -> None:
     translation_scale_m = 0.05
     model_error_m = 0.0001
     session.config = replace(
@@ -333,23 +333,23 @@ def _enable_single_bounded_stutter(session: CTDARuntimeSession) -> None:
         translation_scale_m=translation_scale_m,
         model_error_m=model_error_m,
         raw_binder=RawProposalBinderConfig(
-            version="libero-panda-bounded-stutter-test",
+            version="libero-panda-cumulative-bounded-stutter-test",
             gripper_close_threshold=0.2,
             gripper_open_threshold=-0.2,
             close_direction=1,
             translation_scale_m=translation_scale_m,
             stutter_translation_bound_m=model_error_m,
             stutter_motion_command_bound=model_error_m / translation_scale_m,
-            max_stutter_prefixes=1,
+            stutter_no_progress_limit=3,
         ),
     )
 
 
-def test_bounded_stutter_is_single_use_and_does_not_advance_phase(
+def test_bounded_stutter_accumulates_authorized_budget_without_phase_advance(
     safe_state, safe_spec
 ) -> None:
     session = _session(safe_state, safe_spec, fallback_verified=True)
-    _enable_single_bounded_stutter(session)
+    _enable_cumulative_bounded_stutter(session)
     action = action_from_dict({"type": "Pick", "object": "mug", "part": "handle"})
     raw = [
         -2.9359772193421688e-05,
@@ -371,16 +371,15 @@ def test_bounded_stutter_is_single_use_and_does_not_advance_phase(
     assert prepared.prepared.bounded_stutter_count_before == 0
     assert prepared.prepared.candidate.bounded_stutter is True
     assert prepared.prepared.candidate.bounded_stutter_index == 0
-    assert prepared.prepared.candidate.bounded_stutter_budget == 1
+    candidate = prepared.prepared.candidate
+    assert candidate.bounded_stutter_no_progress_limit == 3
+    assert candidate.bounded_stutter_translation_consumed_before_m == 0.0
+    assert candidate.bounded_stutter_translation_m > 0.0
+    assert candidate.bounded_stutter_translation_budget_m == 0.0001
+    assert candidate.bounded_stutter_motion_consumed_before == 0.0
+    assert candidate.bounded_stutter_motion_command_norm > 0.0
+    assert candidate.bounded_stutter_motion_budget == 0.002
     assert session.bounded_stutter_count == 1
-
-    exhausted = session.prepare_prefix(
-        action, safe_state, (raw,), safe_spec, now_ns=1_500_000
-    )
-    assert exhausted.check.verdict is StaticVerdict.REFUTED
-    assert exhausted.prepared is None
-    assert any("stutter retry budget is exhausted" in issue for issue in exhausted.check.issues)
-    assert session.proposal_index == 1
 
     monitored, _ = session.observe_prefix(
         prepared.prepared,
@@ -397,12 +396,28 @@ def test_bounded_stutter_is_single_use_and_does_not_advance_phase(
     assert session.bounded_stutter_count == 1
     assert session.supervisor.active_phase == "approach"
 
+    second = session.prepare_prefix(
+        action, safe_state, (raw,), safe_spec, now_ns=4_000_000
+    )
+    assert second.check.verdict is StaticVerdict.PROVEN
+    assert second.prepared is not None
+    assert second.prepared.candidate.bounded_stutter_index == 1
+    assert (
+        second.prepared.bounded_stutter_translation_before_m
+        == prepared.prepared.bounded_stutter_translation_after_m
+    )
+    assert (
+        second.prepared.bounded_stutter_motion_before
+        == prepared.prepared.bounded_stutter_motion_after
+    )
+    assert session.bounded_stutter_count == 2
+
 
 def test_bounded_stutter_fails_closed_on_unexpected_contract_progress(
     safe_state, safe_spec
 ) -> None:
     session = _session(safe_state, safe_spec, fallback_verified=True)
-    _enable_single_bounded_stutter(session)
+    _enable_cumulative_bounded_stutter(session)
     action = action_from_dict({"type": "Pick", "object": "mug", "part": "handle"})
     raw = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0]
     prepared = session.prepare_prefix(
@@ -425,13 +440,115 @@ def test_bounded_stutter_fails_closed_on_unexpected_contract_progress(
     assert session.bounded_stutter_count == 1
 
 
+def test_bounded_stutter_refuses_cumulative_command_path_overrun(
+    safe_state, safe_spec
+) -> None:
+    session = _session(safe_state, safe_spec, fallback_verified=True)
+    _enable_cumulative_bounded_stutter(session)
+    action = action_from_dict({"type": "Pick", "object": "mug", "part": "handle"})
+    raw = [0.0, 0.0, 0.0, 0.0011, 0.0, 0.0, -1.0]
+
+    first = session.prepare_prefix(
+        action, safe_state, (raw,), safe_spec, now_ns=1_000_000
+    )
+    assert first.prepared is not None
+    monitored, _ = session.observe_prefix(
+        first.prepared,
+        (safe_state.clone(),),
+        (raw,),
+        safe_spec,
+        dispatch_ns=2_000_000,
+        observation_times_ns=(3_000_000,),
+    )
+    assert monitored.verdict is MonitorVerdict.SAFE_PENDING
+
+    overrun = session.prepare_prefix(
+        action, safe_state, (raw,), safe_spec, now_ns=4_000_000
+    )
+    assert overrun.check.verdict is StaticVerdict.REFUTED
+    assert overrun.prepared is None
+    assert any(
+        "command-path budget is exceeded" in issue
+        for issue in overrun.check.issues
+    )
+    assert session.bounded_stutter_motion_consumed == pytest.approx(0.0011)
+
+
+def test_bounded_stutter_has_persistent_no_progress_limit(
+    safe_state, safe_spec
+) -> None:
+    session = _session(safe_state, safe_spec, fallback_verified=True)
+    _enable_cumulative_bounded_stutter(session)
+    action = action_from_dict({"type": "Pick", "object": "mug", "part": "handle"})
+    raw = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0]
+
+    for index in range(3):
+        start = 1_000_000 + index * 3_000_000
+        prepared = session.prepare_prefix(
+            action, safe_state, (raw,), safe_spec, now_ns=start
+        )
+        assert prepared.prepared is not None
+        monitored, _ = session.observe_prefix(
+            prepared.prepared,
+            (safe_state.clone(),),
+            (raw,),
+            safe_spec,
+            dispatch_ns=start + 1_000_000,
+            observation_times_ns=(start + 2_000_000,),
+        )
+        assert monitored.verdict is MonitorVerdict.SAFE_PENDING
+
+    exhausted = session.prepare_prefix(
+        action, safe_state, (raw,), safe_spec, now_ns=11_000_000
+    )
+    assert exhausted.check.verdict is StaticVerdict.REFUTED
+    assert exhausted.prepared is None
+    assert any(
+        "persistent bounded-stutter no-progress limit is exhausted" in issue
+        for issue in exhausted.check.issues
+    )
+
+
+def test_bounded_stutter_reset_cannot_refund_budget_or_deadline(
+    safe_state, safe_spec
+) -> None:
+    session = _session(safe_state, safe_spec, fallback_verified=True)
+    _enable_cumulative_bounded_stutter(session)
+    action = action_from_dict({"type": "Pick", "object": "mug", "part": "handle"})
+    raw = [0.0, 0.0, 0.0, 0.0011, 0.0, 0.0, -1.0]
+
+    first = session.prepare_prefix(
+        action, safe_state, (raw,), safe_spec, now_ns=1_000_000
+    )
+    assert first.prepared is not None
+    original_deadline = session.bounded_stutter_deadline_ns
+    assert original_deadline is not None
+
+    session.reset()
+    assert session.bounded_stutter_count == 1
+    assert session.bounded_stutter_motion_consumed == pytest.approx(0.0011)
+    assert session.bounded_stutter_deadline_ns == original_deadline
+    overrun = session.prepare_prefix(
+        action, safe_state, (raw,), safe_spec, now_ns=2_000_000
+    )
+    assert overrun.check.verdict is StaticVerdict.REFUTED
+    assert any("command-path budget is exceeded" in issue for issue in overrun.check.issues)
+
+    session.reset()
+    expired = session.prepare_prefix(
+        action, safe_state, (raw,), safe_spec, now_ns=original_deadline + 1
+    )
+    assert expired.check.verdict is StaticVerdict.REFUTED
+    assert any("original bounded-stutter contract deadline" in issue for issue in expired.check.issues)
+
+
 def test_bounded_stutter_does_not_admit_large_rotation_or_translation(
     safe_state, safe_spec
 ) -> None:
     action = action_from_dict({"type": "Pick", "object": "mug", "part": "handle"})
 
     rotation_session = _session(safe_state, safe_spec, fallback_verified=True)
-    _enable_single_bounded_stutter(rotation_session)
+    _enable_cumulative_bounded_stutter(rotation_session)
     rotation = rotation_session.prepare_prefix(
         action,
         safe_state,
@@ -443,7 +560,7 @@ def test_bounded_stutter_does_not_admit_large_rotation_or_translation(
     assert rotation.prepared is None
 
     translation_session = _session(safe_state, safe_spec, fallback_verified=True)
-    _enable_single_bounded_stutter(translation_session)
+    _enable_cumulative_bounded_stutter(translation_session)
     translation = translation_session.prepare_prefix(
         action,
         safe_state,
@@ -460,7 +577,7 @@ def test_bounded_stutter_must_fit_frozen_model_error() -> None:
     binder = RawProposalBinderConfig(
         stutter_translation_bound_m=0.001,
         stutter_motion_command_bound=0.02,
-        max_stutter_prefixes=1,
+        stutter_no_progress_limit=3,
     )
     with pytest.raises(ValueError, match="model-error allowance"):
         ConditionalKinematicConfig(model_error_m=0.0001, raw_binder=binder)

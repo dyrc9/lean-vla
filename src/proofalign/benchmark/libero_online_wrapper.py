@@ -373,6 +373,9 @@ class ProofAlignLiberoWrapper:
         if self.ctda_session is not None:
             return self.step_chunk(raw_action, max_chunk_steps=1)
         total_start = perf_counter()
+        policy_call_id, proposed_action_chunk = _policy_action_audit(
+            raw_action, default_call_id=f"policy:{len(self.trace):06d}"
+        )
         if self.current_state is None:
             self.current_state = self.state_observer.observe(self.env, self.current_observation)
         before = self.current_state.clone()
@@ -417,6 +420,9 @@ class ProofAlignLiberoWrapper:
                     "env_step": 0.0,
                     "wrapper_step_wall": perf_counter() - total_start,
                 },
+                policy_call_id=policy_call_id,
+                proposed_action_chunk=proposed_action_chunk,
+                discarded_action_chunk_tail=proposed_action_chunk,
             )
             self.trace.append(step)
             return LiberoStepResult(
@@ -470,6 +476,10 @@ class ProofAlignLiberoWrapper:
                 "env_step": env_time,
                 "wrapper_step_wall": perf_counter() - total_start,
             },
+            policy_call_id=policy_call_id,
+            proposed_action_chunk=proposed_action_chunk,
+            executed_policy_actions=[_frozen_action_copy(env_action)],
+            discarded_action_chunk_tail=proposed_action_chunk[1:],
         )
         self.trace.append(step)
         self.current_observation = observation
@@ -485,6 +495,9 @@ class ProofAlignLiberoWrapper:
     ) -> LiberoStepResult:
         total_start = perf_counter()
         requested_max_steps = max_chunk_steps or self.max_chunk_steps
+        policy_call_id, proposed_action_chunk = _policy_action_audit(
+            raw_action, default_call_id=f"policy:{len(self.trace):06d}"
+        )
         # Until incremental observation/authorization is available, one CTDA
         # authorization covers exactly one raw command. This prevents a failed
         # first observation from being followed by more commands in the chunk.
@@ -555,6 +568,9 @@ class ProofAlignLiberoWrapper:
                 chunk_id=chunk_id or f"chunk_{len(self.trace)}",
                 contract=action_to_dict(symbolic_action),
                 raw_actions=[],
+                policy_call_id=policy_call_id,
+                proposed_action_chunk=proposed_action_chunk,
+                discarded_action_chunk_tail=proposed_action_chunk,
                 trace_summary=TraceSummary(num_raw_steps=0, boundary_reason="intent_reject"),
             )
             self.trace.append(step)
@@ -627,6 +643,9 @@ class ProofAlignLiberoWrapper:
                     chunk_id=chunk_id or f"chunk_{len(self.trace)}",
                     contract=action_to_dict(symbolic_action),
                     raw_actions=[],
+                    policy_call_id=policy_call_id,
+                    proposed_action_chunk=proposed_action_chunk,
+                    discarded_action_chunk_tail=proposed_action_chunk,
                     trace_summary=TraceSummary(num_raw_steps=0, boundary_reason="ctda_precheck"),
                     ctda=ctda_metadata,
                 )
@@ -702,6 +721,13 @@ class ProofAlignLiberoWrapper:
         else:
             summary.boundary_reason = "max_chunk_steps"
 
+        # Capture the policy portion before a possible supervisor fallback is
+        # appended to executed_actions.  The complete proposal remains audit
+        # metadata and never changes the dispatch path.
+        executed_policy_actions = [
+            _frozen_action_copy(action) for action in executed_actions
+        ]
+
         self.current_observation = observation
         post_certs = CertificateBundle.from_dicts(symbolic_action.params.get("post_certificates"))
         ctda_effect_result: CheckResult | None = None
@@ -745,6 +771,18 @@ class ProofAlignLiberoWrapper:
                     bounded_stutter_count_after=(
                         self.ctda_session.bounded_stutter_count
                     ),
+                    bounded_stutter_translation_before_m=(
+                        ctda_prepared.bounded_stutter_translation_before_m
+                    ),
+                    bounded_stutter_translation_after_m=(
+                        ctda_prepared.bounded_stutter_translation_after_m
+                    ),
+                    bounded_stutter_motion_before=(
+                        ctda_prepared.bounded_stutter_motion_before
+                    ),
+                    bounded_stutter_motion_after=(
+                        ctda_prepared.bounded_stutter_motion_after
+                    ),
                 )
             else:
                 try:
@@ -785,6 +823,18 @@ class ProofAlignLiberoWrapper:
                         bounded_stutter_count_after=(
                             self.ctda_session.bounded_stutter_count
                         ),
+                        bounded_stutter_translation_before_m=(
+                            ctda_prepared.bounded_stutter_translation_before_m
+                        ),
+                        bounded_stutter_translation_after_m=(
+                            ctda_prepared.bounded_stutter_translation_after_m
+                        ),
+                        bounded_stutter_motion_before=(
+                            ctda_prepared.bounded_stutter_motion_before
+                        ),
+                        bounded_stutter_motion_after=(
+                            ctda_prepared.bounded_stutter_motion_after
+                        ),
                     )
                 except Exception as exc:
                     ctda_violation_at_ns = monotonic_ns()
@@ -811,6 +861,18 @@ class ProofAlignLiberoWrapper:
                         ),
                         bounded_stutter_count_after=(
                             self.ctda_session.bounded_stutter_count
+                        ),
+                        bounded_stutter_translation_before_m=(
+                            ctda_prepared.bounded_stutter_translation_before_m
+                        ),
+                        bounded_stutter_translation_after_m=(
+                            ctda_prepared.bounded_stutter_translation_after_m
+                        ),
+                        bounded_stutter_motion_before=(
+                            ctda_prepared.bounded_stutter_motion_before
+                        ),
+                        bounded_stutter_motion_after=(
+                            ctda_prepared.bounded_stutter_motion_after
                         ),
                     )
             if ctda_effect_result is not None and not ctda_effect_result.passed:
@@ -930,6 +992,12 @@ class ProofAlignLiberoWrapper:
             chunk_id=chunk_id or f"chunk_{len(self.trace)}",
             contract=action_to_dict(symbolic_action),
             raw_actions=list(executed_actions),
+            policy_call_id=policy_call_id,
+            proposed_action_chunk=proposed_action_chunk,
+            executed_policy_actions=executed_policy_actions,
+            discarded_action_chunk_tail=proposed_action_chunk[
+                len(executed_policy_actions) :
+            ],
             trace_summary=summary,
             ctda=ctda_metadata,
         )
@@ -1408,6 +1476,10 @@ def _ctda_metadata(
     bounded_stutter: bool | None = None,
     bounded_stutter_count_before: int | None = None,
     bounded_stutter_count_after: int | None = None,
+    bounded_stutter_translation_before_m: float | None = None,
+    bounded_stutter_translation_after_m: float | None = None,
+    bounded_stutter_motion_before: float | None = None,
+    bounded_stutter_motion_after: float | None = None,
 ) -> dict[str, Any]:
     active_contract = session.supervisor.active_contract
     monitor = session.supervisor.monitor_state
@@ -1451,15 +1523,36 @@ def _ctda_metadata(
                 "enabled": bounded_stutter,
                 "count_before": bounded_stutter_count_before,
                 "count_after": bounded_stutter_count_after,
-                "retry_budget": session.config.raw_binder.max_stutter_prefixes,
-                "translation_bound_m": (
+                "persistent_no_progress_limit": (
+                    session.config.raw_binder.stutter_no_progress_limit
+                ),
+                "translation_increment_m": (
+                    None
+                    if bounded_stutter_translation_before_m is None
+                    or bounded_stutter_translation_after_m is None
+                    else bounded_stutter_translation_after_m
+                    - bounded_stutter_translation_before_m
+                ),
+                "translation_consumed_before_m": bounded_stutter_translation_before_m,
+                "translation_consumed_after_m": bounded_stutter_translation_after_m,
+                "cumulative_translation_budget_m": (
                     session.config.raw_binder.stutter_translation_bound_m
                 ),
-                "motion_command_bound": (
+                "motion_command_increment": (
+                    None
+                    if bounded_stutter_motion_before is None
+                    or bounded_stutter_motion_after is None
+                    else bounded_stutter_motion_after
+                    - bounded_stutter_motion_before
+                ),
+                "motion_command_consumed_before": bounded_stutter_motion_before,
+                "motion_command_consumed_after": bounded_stutter_motion_after,
+                "cumulative_motion_command_budget": (
                     session.config.raw_binder.stutter_motion_command_bound
                 ),
                 "contract_deadline_ns": (
-                    active_contract.deadline_ns if active_contract else None
+                    session.bounded_stutter_deadline_ns
+                    or (active_contract.deadline_ns if active_contract else None)
                 ),
             }
             if bounded_stutter is not None
@@ -1515,6 +1608,33 @@ def raw_actions_from_raw(raw_action: Any, max_chunk_steps: int) -> list[Any]:
         except Exception:
             return list(env_action)[:max_chunk_steps]
     return [env_action]
+
+
+def _policy_action_audit(
+    raw_action: Any,
+    *,
+    default_call_id: str,
+) -> tuple[str, list[Any]]:
+    """Return audit-only policy-call identity and the untruncated chunk."""
+
+    policy_call_id = default_call_id
+    complete_chunk: Any = env_action_from_raw(raw_action)
+    if isinstance(raw_action, dict):
+        supplied_call_id = raw_action.get("policy_call_id")
+        if isinstance(supplied_call_id, str) and supplied_call_id.strip():
+            policy_call_id = supplied_call_id
+        if "policy_action_chunk" in raw_action:
+            complete_chunk = raw_action["policy_action_chunk"]
+        elif "raw_action" not in raw_action:
+            return policy_call_id, []
+    if _looks_like_action_chunk(complete_chunk):
+        try:
+            values = [complete_chunk[index] for index in range(len(complete_chunk))]
+        except Exception:
+            values = list(complete_chunk)
+    else:
+        values = [complete_chunk]
+    return policy_call_id, [_frozen_action_copy(value) for value in values]
 
 
 def _ctda_mission_action(session: CTDARuntimeSession) -> Action:

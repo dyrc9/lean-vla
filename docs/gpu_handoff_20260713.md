@@ -4,6 +4,8 @@
 
 最新更新：2026-07-14，本次真实 GPU run 使用的 ProofAlign committed HEAD 为
 `e2e4d47ed00e0c48d8513d7f1c34e2666b8f615d`；run 后 canonical 结论另作本地文档 commit，均未 push。
+本轮累计 bounded-stutter 代码尚未做新的真实 GPU run；当前只有 216 passed / 1 skipped 与 Lean
+12 jobs 的本地证据。
 
 ## 当前状态
 
@@ -36,7 +38,7 @@
   refute（`moves away from the mission target`），零 `env.step`、零 fallback。预测平移约 2.835
   微米、目标距离增加约 2.735 微米；这是 blocking/abstraction signal，不是独立 ground-truth
   false positive。3--5 prefix gate 未通过。
-- 用户已授权最小 bounded-stutter 扩展。当前实现只允许 Pick/approach 非闭合微动作，复用
+- 历史 `e2e4d47` 一次性 bounded-stutter 只允许 Pick/approach 非闭合微动作，复用
   `model_error_m=0.0001 m`，六维 motion-command norm bound `0.002`，每合同一次并受 deadline
   约束；candidate/witness 绑定 flag/index/budget，观测 progress 时 phase 更新前 fail closed。
 - `e2e4d47` 真实 GPU 重跑使用 policy GPU 1 / EGL GPU 5；启动前两卡均为 3 MiB、0%。registered
@@ -47,6 +49,12 @@
   Lean prefix-pre 和 `env.step` 前 replan。只执行 1/5 prefix；3--5 gate 仍失败。第二 trace entry
   的四个 wire artifacts 是 session history 重复，不是第二轮证明。零 fallback，因此不增加 50 ms
   latency evidence。
+- 本轮已获授权并实现 `mission-raw-binder-libero-panda-v4-cumulative-stutter`：同 active contract
+  的累计 predicted translation path `<=0.0001 m`、累计六维 command-path norm `<=0.002`；授权时
+  扣减，reset/replan 不退款，保留第一次 stutter 的 deadline，并沿用既有
+  `no_progress_patience=3`。OpenPI/episode artifact 还会保存完整归一化 chunk、policy-call ID、实际
+  policy actions 与丢弃 tail。该实现尚待 clean-commit strict preflight 和一次相同配置的 3--5
+  prefix GPU calibration。
 
 关键 artifact：
 
@@ -61,12 +69,12 @@
 
 ## 下一步只做什么
 
-1. 保留 `e2e4d47` run 的 raw episode、四个唯一 Lean request/replay、proposal diagnostic、gate
-   validation、run notes 与 SHA256SUMS；结论固定为 gate failed。
-2. 不追加 episode，不直接提高 stutter budget，不改 chunking。若要继续，先由用户单独授权
-   repeated-micro-action/whole-chunk contract，并冻结累计运动/次数/deadline/phase 语义与 tests。
-3. 新方法形成 clean commit 后才重新 strict preflight，并在启动前重新检查 GPU。
-4. 新 3--5 prefix gate 通过前仍不运行 60-episode 或攻击主实验。
+1. 将累计合同形成 clean commit；确认 216 passed / 1 skipped、Lean 12 jobs、diff check 通过。
+2. 在该 commit 上重新 strict preflight，并在启动前检查 GPU 占用。
+3. 只重跑一次相同 `affordance/task 2/init 0`、env seed 7、policy seed 0、10 Hz、同一 witness 的
+   3--5 prefix calibration；`max_chunk_steps=1`，不追加 episode稀释失败。
+4. 新 gate 通过后才依次做 SABER/Phantom 官方复现；通过 upstream signal gate 后才做最小 paired
+   pilot。whole-chunk authorization 仍不在范围内。
 
 本次下一步仍不是 60-episode、SABER 或 Phantom 主实验。不要把 slow-interlock 结果描述成实时
 执行，也不要用 CTDA verdict 自己生成 ground-truth TPR/FPR。

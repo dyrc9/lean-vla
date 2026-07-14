@@ -680,7 +680,13 @@ class PrefixCandidate:
     filter_preserves_contract: bool | None
     bounded_stutter: bool = False
     bounded_stutter_index: int | None = None
-    bounded_stutter_budget: int | None = None
+    bounded_stutter_no_progress_limit: int | None = None
+    bounded_stutter_translation_m: float | None = None
+    bounded_stutter_translation_consumed_before_m: float | None = None
+    bounded_stutter_translation_budget_m: float | None = None
+    bounded_stutter_motion_command_norm: float | None = None
+    bounded_stutter_motion_consumed_before: float | None = None
+    bounded_stutter_motion_budget: float | None = None
     pre_evidence: tuple[str, ...] = ()
     semantic_attestations: tuple[EvidenceAttestation, ...] = ()
     guard_attestations: tuple[EvidenceAttestation, ...] = ()
@@ -699,16 +705,53 @@ class PrefixCandidate:
             if (
                 type(self.bounded_stutter_index) is not int
                 or self.bounded_stutter_index < 0
-                or type(self.bounded_stutter_budget) is not int
-                or self.bounded_stutter_budget <= 0
-                or self.bounded_stutter_index >= self.bounded_stutter_budget
+                or type(self.bounded_stutter_no_progress_limit) is not int
+                or self.bounded_stutter_no_progress_limit <= 0
+                or self.bounded_stutter_index
+                >= self.bounded_stutter_no_progress_limit
             ):
-                raise ValueError("bounded stutter index must be inside its retry budget")
-        elif (
-            self.bounded_stutter_index is not None
-            or self.bounded_stutter_budget is not None
-        ):
-            raise ValueError("non-stutter candidate cannot carry a stutter retry budget")
+                raise ValueError(
+                    "bounded stutter index must be inside its persistent no-progress limit"
+                )
+            cumulative_fields = (
+                self.bounded_stutter_translation_m,
+                self.bounded_stutter_translation_consumed_before_m,
+                self.bounded_stutter_translation_budget_m,
+                self.bounded_stutter_motion_command_norm,
+                self.bounded_stutter_motion_consumed_before,
+                self.bounded_stutter_motion_budget,
+            )
+            if any(
+                type(value) not in (int, float)
+                or not isfinite(float(value))
+                or float(value) < 0
+                for value in cumulative_fields
+            ):
+                raise ValueError("bounded stutter cumulative budget fields are invalid")
+            if (
+                float(self.bounded_stutter_translation_consumed_before_m)
+                + float(self.bounded_stutter_translation_m)
+                > float(self.bounded_stutter_translation_budget_m)
+                or float(self.bounded_stutter_motion_consumed_before)
+                + float(self.bounded_stutter_motion_command_norm)
+                > float(self.bounded_stutter_motion_budget)
+            ):
+                raise ValueError("bounded stutter candidate exceeds a cumulative budget")
+        else:
+            stutter_fields = (
+                self.bounded_stutter_index,
+                self.bounded_stutter_no_progress_limit,
+                self.bounded_stutter_translation_m,
+                self.bounded_stutter_translation_consumed_before_m,
+                self.bounded_stutter_translation_budget_m,
+                self.bounded_stutter_motion_command_norm,
+                self.bounded_stutter_motion_consumed_before,
+                self.bounded_stutter_motion_budget,
+            )
+            if any(value is not None for value in stutter_fields):
+                raise ValueError(
+                    "non-stutter candidate cannot carry cumulative stutter budget state"
+                )
         object.__setattr__(self, "pre_evidence", _freeze_evidence(self.pre_evidence))
         object.__setattr__(self, "semantic_attestations", tuple(self.semantic_attestations))
         object.__setattr__(self, "guard_attestations", tuple(self.guard_attestations))
