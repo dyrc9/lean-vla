@@ -253,7 +253,10 @@ clean strict preflight 与唯一一次固定 calibration。
 成为当前 gate**。P1/P2
 correctness、golden parity 与 affordance observation completeness 已通过；real-time latency 明确
 未通过并已降级 claim。fail-closed preflight manifest 与 clean + Lean slow-interlock smoke 已
-脚本化。未经 SABER/Phantom R0 与 exact-task R1 gate 不得启动主表。
+脚本化。SABER standard-LIBERO R0 已核验为部分方向复现。Phantom 三种 deterministic transform 的
+9 组 CPU smoke 与官方 OpenPI WebSocket 闭环已通过，但 fresh-RNG clean task 0/1 失败，且当前
+standard LIBERO/robosuite 环境未隔离，故 Phantom R0 仍关闭。未经 Phantom R0 与 exact-task R1 gate
+不得启动主表。
 环境见 [`remote_execution.md`](remote_execution.md)。
 
 在 60-episode pilot 前增加 upstream reproduction gate，详见

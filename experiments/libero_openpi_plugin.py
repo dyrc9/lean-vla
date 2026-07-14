@@ -32,11 +32,14 @@ class OpenPIConfig:
     max_actions_per_call: int = 5
     hf_home: str = "/data0/ldx/huggingface"
     hf_endpoint: str = "https://hf-mirror.com"
+    observation_attack_type: str = "none"
+    observation_attack_strength: str = "medium"
+    phantom_menace_root: Path = REPO_ROOT / "external" / "Phantom-Menace"
 
     @classmethod
     def from_kwargs(cls, kwargs: dict[str, Any]) -> "OpenPIConfig":
         data = dict(kwargs)
-        for key in ("checkpoint_dir", "openpi_root"):
+        for key in ("checkpoint_dir", "openpi_root", "phantom_menace_root"):
             if key in data:
                 data[key] = Path(data[key])
         return cls(**data)
@@ -50,6 +53,8 @@ class OpenPIPolicy:
     _image_tools: Any = None
     _initial_rng: Any = None
     _policy_call_index: int = 0
+    _observation_transform: Any = None
+    _last_observation_attack: dict[str, Any] | None = None
 
     def reset_episode(self) -> None:
         # Batch evaluation reuses the loaded policy.  Restore the checkpoint
@@ -62,6 +67,7 @@ class OpenPIPolicy:
     def __call__(self, instruction: str, observation: Any, history: list[ExecutionStep]) -> dict[str, Any]:
         del history
         self._load()
+        self._last_observation_attack = None
         element = self._prepare_element(observation, instruction)
         action_chunk = self._policy.infer(element)["actions"]
         actions = _normalize_action_chunk(action_chunk)
@@ -69,6 +75,19 @@ class OpenPIPolicy:
             raise RuntimeError("OpenPI policy returned no actions.")
         policy_call_id = f"openpi:{self._policy_call_index:06d}"
         self._policy_call_index += 1
+        metadata = {
+            "backend": "openpi",
+            "checkpoint": str(self.config.checkpoint_dir),
+            "openpi_config": self.config.openpi_config,
+            "sample_steps": self.config.sample_steps,
+            "max_actions_per_call": self.config.max_actions_per_call,
+            "rng_reset_mode": "checkpoint-initial-per-episode",
+            "action_clip": [-1.0, 1.0],
+            "observation_attack_type": self.config.observation_attack_type,
+            "observation_attack_strength": self.config.observation_attack_strength,
+        }
+        if self._last_observation_attack is not None:
+            metadata["observation_attack"] = self._last_observation_attack
         return {
             "raw_action": actions[: self.config.max_actions_per_call],
             # Audit-only fields.  Keep the complete model output even though the
@@ -76,15 +95,7 @@ class OpenPIPolicy:
             "policy_call_id": policy_call_id,
             "policy_action_chunk": actions,
             "proofalign_action": heuristic_contract_from_instruction(instruction),
-            "vla_metadata": {
-                "backend": "openpi",
-                "checkpoint": str(self.config.checkpoint_dir),
-                "openpi_config": self.config.openpi_config,
-                "sample_steps": self.config.sample_steps,
-                "max_actions_per_call": self.config.max_actions_per_call,
-                "rng_reset_mode": "checkpoint-initial-per-episode",
-                "action_clip": [-1.0, 1.0],
-            },
+            "vla_metadata": metadata,
         }
 
     def _load(self) -> None:
@@ -108,6 +119,19 @@ class OpenPIPolicy:
         )
         self._initial_rng = getattr(self._policy, "_rng", None)
         self._image_tools = image_tools
+        if self.config.observation_attack_type != "none":
+            from experiments.phantom_menace_plugin import (
+                PhantomMenaceConfig,
+                PhantomMenaceObservationTransform,
+            )
+
+            self._observation_transform = PhantomMenaceObservationTransform(
+                PhantomMenaceConfig(
+                    attack_type=self.config.observation_attack_type,
+                    attack_strength=self.config.observation_attack_strength,
+                    repo_root=self.config.phantom_menace_root,
+                )
+            )
         self._loaded = True
 
     def _prepare_element(self, obs: dict[str, Any], prompt: str) -> dict[str, Any]:
@@ -117,6 +141,8 @@ class OpenPIPolicy:
         resize_size = self.config.resize_size
         base_image = np.ascontiguousarray(obs["agentview_image"][::-1, ::-1])
         wrist_image = np.ascontiguousarray(obs["robot0_eye_in_hand_image"][::-1, ::-1])
+        if self._observation_transform is not None:
+            base_image, self._last_observation_attack = self._observation_transform(base_image)
         base_image = image_tools.convert_to_uint8(image_tools.resize_with_pad(base_image, resize_size, resize_size))
         wrist_image = image_tools.convert_to_uint8(image_tools.resize_with_pad(wrist_image, resize_size, resize_size))
         state = np.concatenate(

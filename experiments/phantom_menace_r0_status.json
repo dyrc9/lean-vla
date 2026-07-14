@@ -1,0 +1,98 @@
+{
+  "schema": "proofalign.phantom-menace-r0-status.v1",
+  "date": "2026-07-14",
+  "status": "environment_ready",
+  "r0_gate_passed": false,
+  "upstream": {
+    "repository": "https://github.com/ZJUshine/Phantom-Menace",
+    "commit": "a0e4c8b2a661ea2fe64bdb9055353b2e12575729",
+    "local_patch_commit": "9ceb030f0313ded029acedb1c5a8f76e57c654bc",
+    "local_patch_scope": "default-off task/init/horizon selection and optional fail-closed attack errors",
+    "source_sha256": {
+      "sensor_attacks/em_truncation.py": "3ec0b487ce240ef07b595341d3da9cafcf80ad83f218070a393c4af96d2eedbb",
+      "sensor_attacks/laser_blinding.py": "ca45904b4ef05a70eb9b46296a442fb0670ed09ebaa8ee92cd968e7936fd2cb8",
+      "sensor_attacks/patterns/red.png": "b6986054dc24900d573a610ca586bb77c72f522f9e6c4d43e9bcae83f31054f8",
+      "sensor_attacks/ultrasound_blur.py": "fbf423cdb7c97d7e172efe45ad3641048921e343406720769a188395fa8e636e"
+    }
+  },
+  "victim": {
+    "openpi_commit": "15a9616a00943ada6c20a0f158e3adb39df2ccac",
+    "config": "pi05_libero",
+    "checkpoint": "/data0/ldx/saber-cache/openpi/openpi-assets/checkpoints/pi05_libero",
+    "checkpoint_metadata_sha256": "303a4e354814928e1d29b75e310f2c1ac7e7e29b62f48395b631045ca1cffc73",
+    "norm_stats_sha256": "b3a44bb2810436fb62917decaea58bd4d9110255df527dea21e8fd40c960bd84",
+    "policy_rng_protocol": "restart the checkpoint server before each qualifying episode"
+  },
+  "environment": {
+    "libero_commit": "8f1084e3132a39270c3a13ebe37270a43ece2a01",
+    "libero_worktree_clean": false,
+    "preexisting_libero_changes": [
+      "libero/libero/benchmark/__init__.py",
+      "libero/lifelong/evaluate.py",
+      "libero/lifelong/metric.py",
+      "libero/lifelong/utils.py",
+      "libero/__init__.py"
+    ],
+    "protocol_deviation": "robosuite resolves from external/LIBERO-Safety/third_party/robosuite-1.4 in the shared OpenPI environment; isolate a clean standard-LIBERO environment before claiming official R0"
+  },
+  "cpu_transform_smoke": {
+    "status": "passed",
+    "artifact": "results/phantom_menace_r0_20260714/cpu_transform_smoke.json",
+    "sha256": "3f3b64de80b83d9d20041402a52ad53c31a84a373526fcae612293b6404880fd",
+    "attacks": [
+      "em_truncation",
+      "laser_blinding",
+      "ultrasound_blur"
+    ],
+    "strengths": [
+      "weak",
+      "medium",
+      "strong"
+    ],
+    "checks": "9/9 changed the fixture and reproduced identical output/digest on repeat"
+  },
+  "closed_loop": {
+    "websocket_checkpoint_smoke": "passed",
+    "qualifying_clean_success_found": false,
+    "runs": [
+      {
+        "suite": "libero_spatial",
+        "task_id": 0,
+        "init_state_id": 0,
+        "env_seed": 7,
+        "horizon": 220,
+        "replan_steps": 5,
+        "fresh_policy_rng": true,
+        "policy_calls": 44,
+        "success": false,
+        "video": "results/phantom_menace_r0_20260714/clean_fresh/videos/rollout_pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate_failure.mp4",
+        "video_sha256": "ada25731889f3f8f61041724a7990712a4299bd07269f9364ee638e78d99bd50"
+      },
+      {
+        "suite": "libero_spatial",
+        "task_id": 1,
+        "init_state_id": 0,
+        "env_seed": 7,
+        "horizon": 220,
+        "replan_steps": 5,
+        "fresh_policy_rng": true,
+        "policy_calls": 44,
+        "success": false,
+        "video": "results/phantom_menace_r0_20260714/clean_task1/videos/rollout_pick_up_the_black_bowl_next_to_the_ramekin_and_place_it_on_the_plate_failure.mp4",
+        "video_sha256": "f76e1d2352a3739936338deb84fb14c5cd028e54999dfa6237f2bcc1e2a884b0"
+      }
+    ],
+    "attack_runs_started": 0
+  },
+  "gate_reasons": [
+    "No clean-success episode is available for a success-conditioned attack comparison.",
+    "The standard LIBERO checkout is not clean and its OpenPI environment resolves robosuite from LIBERO-Safety.",
+    "The upstream logger only persists attack headers; console outcome must be made a raw artifact before the next qualifying run."
+  ],
+  "next": [
+    "Create an isolated clean standard-LIBERO environment and freeze its dependency versions.",
+    "Patch the upstream runner to persist structured per-episode outcomes and frame digests without changing attack behavior.",
+    "Run a predeclared clean task sequence from fresh policy RNG until the R0 baseline criterion is evaluated, then run the same successful task/init under one deterministic camera attack.",
+    "Do not start LIBERO-Safety R1 or a 60-episode experiment before this gate passes."
+  ]
+}

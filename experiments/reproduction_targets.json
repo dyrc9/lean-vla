@@ -39,8 +39,21 @@
       "repository": "https://github.com/ZJUshine/Phantom-Menace",
       "upstream_platform": "standard LIBERO + OpenPI/OpenVLA",
       "main_adapter": "versioned observation transform plugin",
-      "status": "planned",
-      "upstream_commit": null
+      "status": "environment_ready",
+      "upstream_commit": "a0e4c8b2a661ea2fe64bdb9055353b2e12575729",
+      "local_patch_commit": "9ceb030f0313ded029acedb1c5a8f76e57c654bc",
+      "artifacts": [
+        "results/phantom_menace_r0_20260714/cpu_transform_smoke.json",
+        "results/phantom_menace_r0_20260714/clean_fresh/",
+        "results/phantom_menace_r0_20260714/clean_task1/"
+      ],
+      "artifact_sha256": {
+        "cpu_transform_smoke": "3f3b64de80b83d9d20041402a52ad53c31a84a373526fcae612293b6404880fd",
+        "clean_task0_video": "ada25731889f3f8f61041724a7990712a4299bd07269f9364ee638e78d99bd50",
+        "clean_task1_video": "f76e1d2352a3739936338deb84fb14c5cd028e54999dfa6237f2bcc1e2a884b0"
+      },
+      "result_scope": "CPU transform R0 plus official closed-loop diagnostics",
+      "result": "all 3 deterministic camera transforms pass weak/medium/strong repeat checks; fresh-RNG clean task 0 and task 1 both fail, so official attack R0 remains gated"
     },
     {
       "id": "edpa",

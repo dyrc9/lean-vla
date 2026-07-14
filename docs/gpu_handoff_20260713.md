@@ -94,14 +94,25 @@
 - `results/remote_gpu_clean_prefix3_20260714_f01a98f/`（Lean `PATH` 缺失的无效启动；零 dispatch）
 - `results/remote_gpu_clean_prefix3_20260714_f01a98f_pathfix/`（五-prefix method-validity gate 通过；
   task/realtime gate 未通过；全部 artifact checksums 已验证）
+- `results/phantom_menace_r0_20260714/`（Phantom 9 组 CPU transform smoke 通过；官方 WebSocket
+  闭环通过；fresh-RNG task 0/1 clean baseline 均失败，R0 未通过）
+
+Phantom Menace 上游固定为 `a0e4c8b2a661ea2fe64bdb9055353b2e12575729`，本地最小运行限制补丁为
+`9ceb030f0313ded029acedb1c5a8f76e57c654bc`。机器记录见
+`experiments/phantom_menace_r0_status.json`。注意当前 `external/LIBERO` 有进入本轮前就存在的修改，
+而 OpenPI 环境把 robosuite 解析到 `external/LIBERO-Safety/third_party/robosuite-1.4`；后续不能把这两条
+clean failure 写成官方 baseline，必须先建独立 clean standard-LIBERO 环境。所有本轮 GPU server
+已停止。保存前全量校验为 239 passed / 1 skipped，Lean build 12 jobs 成功，Phantom 结果目录的
+5 项 SHA-256 全部复核通过。
 
 ## 下一步只做什么
 
 1. 保留全部历史 failure 与 checksum；不回写 verdict。
 2. 登记并核验现有 SABER official LoRA/OpenPI R0 records；只把 constraint-violation 写成方向成立，
    action-inflation 写成较弱，task-failure 写成未复现强效果。
-3. 准备 Phantom Menace 官方 clean + deterministic camera-transform R0。
-4. 两个 R0 通过后才生成 exact-task R1 workload；此前不运行 60 episodes 或 paired pilot。
+3. Phantom deterministic transform 已通过；下一次先隔离 clean standard-LIBERO 环境并补结构化
+   outcome/frame-digest 日志，再继续官方 clean + camera-transform R0。
+4. Phantom R0 通过后才生成 exact-task R1 workload；此前不运行 60 episodes 或 paired pilot。
    whole-chunk authorization 仍不在范围内。
 
 本次下一步仍不是 60-episode、SABER 或 Phantom 主实验。不要把 slow-interlock 结果描述成实时
