@@ -2,13 +2,13 @@
 
 起始版本：`230e32937a194530054616f9232adb7f9973586c`
 
-最新更新：2026-07-14，当前 ProofAlign committed HEAD
-`f736637`；bounded-stutter 代码、测试与规范更新仍在本地工作树，尚未提交。
+最新更新：2026-07-14，本次真实 GPU run 使用的 ProofAlign committed HEAD 为
+`e2e4d47ed00e0c48d8513d7f1c34e2666b8f615d`；run 后 canonical 结论另作本地文档 commit，均未 push。
 
 ## 当前状态
 
-- 当前工作树全量测试：212 passed / 1 skipped；Lean build 12 jobs 成功。bounded-stutter 相关
-  CTDA/runner 定向测试为 85 passed。
+- `e2e4d47` strict preflight：212 passed / 1 skipped；Lean build 12 jobs 成功；零
+  blocker/warning，三个独立 checkout 都 clean。
 - OpenPI checkout：`15a9616a00943ada6c20a0f158e3adb39df2ccac`，clean。
 - LIBERO-Safety checkout：`ef0f79b70fc50c5fb612a1bbc1cf8b6c033a702a`，clean standalone
   Git top-level，tracked runtime files 与官方 checkout 差异为 0。
@@ -39,6 +39,14 @@
 - 用户已授权最小 bounded-stutter 扩展。当前实现只允许 Pick/approach 非闭合微动作，复用
   `model_error_m=0.0001 m`，六维 motion-command norm bound `0.002`，每合同一次并受 deadline
   约束；candidate/witness 绑定 flag/index/budget，观测 progress 时 phase 更新前 fail closed。
+- `e2e4d47` 真实 GPU 重跑使用 policy GPU 1 / EGL GPU 5；启动前两卡均为 3 MiB、0%。registered
+  init gate 与 digest 通过。首 proposal 被分类为 bounded stutter 并执行一次：四阶段 Lean
+  `proven/proven/proven/safe_pending`，全部 proof/parity true，count `0 -> 1`，phase 保持
+  `approach`，观测位移 65.119 µm，limit 102.835 µm，margin 37.716 µm。
+- 观测后 fresh OpenPI inference 产生第二个 envelope 内微动作，但一次性 budget 已耗尽，故在新
+  Lean prefix-pre 和 `env.step` 前 replan。只执行 1/5 prefix；3--5 gate 仍失败。第二 trace entry
+  的四个 wire artifacts 是 session history 重复，不是第二轮证明。零 fallback，因此不增加 50 ms
+  latency evidence。
 
 关键 artifact：
 
@@ -48,14 +56,17 @@
 - `results/remote_gpu_clean_prefix5_20260714_7bab2d9/`（无效 init-handoff diagnostic）
 - `results/remote_gpu_clean_prefix5_20260714_2c532ca/`（错误 uv project，零 prefix，保留为启动失败）
 - `results/remote_gpu_clean_prefix5_20260714_2c532ca_v2/`（valid-init clean binder blocker）
+- `results/remote_gpu_clean_prefix5_20260714_e2e4d47/`（bounded-stutter 首 prefix 通过、第二 proposal
+  budget exhausted；gate 未通过）
 
 ## 下一步只做什么
 
-1. 审查并提交当前 bounded-stutter 代码、测试和规范文档；不 push、不建 PR。
-2. clean checkout 后重跑 strict preflight，并在启动前重新检查 GPU。
-3. 只按同一冻结 task/init/seed/witness 重跑 3--5 prefix calibration，重点验收 stutter count、
-   safe-pending、零 phase advance、四阶段 parity 和 observed kinematic diagnostics。
-4. 该 gate 通过前仍不运行 60-episode 或攻击主实验。
+1. 保留 `e2e4d47` run 的 raw episode、四个唯一 Lean request/replay、proposal diagnostic、gate
+   validation、run notes 与 SHA256SUMS；结论固定为 gate failed。
+2. 不追加 episode，不直接提高 stutter budget，不改 chunking。若要继续，先由用户单独授权
+   repeated-micro-action/whole-chunk contract，并冻结累计运动/次数/deadline/phase 语义与 tests。
+3. 新方法形成 clean commit 后才重新 strict preflight，并在启动前重新检查 GPU。
+4. 新 3--5 prefix gate 通过前仍不运行 60-episode 或攻击主实验。
 
 本次下一步仍不是 60-episode、SABER 或 Phantom 主实验。不要把 slow-interlock 结果描述成实时
 执行，也不要用 CTDA verdict 自己生成 ground-truth TPR/FPR。

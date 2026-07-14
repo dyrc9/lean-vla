@@ -353,8 +353,14 @@ real-time。
 2026-07-14 的首次 5-prefix 尝试在 strict preflight 后运行，但随后发现 online runner 二次 reset
 替换了 benchmark init 0。该 episode 只保留为 init-handoff diagnostic，不能算 clean calibration；
 修复已在 `2c532ca` clean checkout 完成，并重跑 strict preflight。corrected run 的 registered-init
-gate 通过，但首个 OpenPI proposal 被 raw binder pre-dispatch refute，零 `env.step`，所以 calibration
-仍未通过。不要继续增加 episode；下一方法步骤必须先独立定义 bounded-stutter/micro-action 合同。
+gate 通过，但首个 OpenPI proposal 被旧 raw binder pre-dispatch refute，零 `env.step`。
+
+最小 bounded-stutter 方法随后在 `e2e4d47` clean commit 上通过 strict preflight 和真实 GPU 首
+prefix：registered init digest 一致，count `0 -> 1`，四阶段 proof/parity true，monitor
+`safe_pending`，phase 保持 `approach`，observed displacement 有正 margin。第二次 fresh OpenPI
+inference 仍为 envelope 内微动作，但一次性 budget 已耗尽，因此新 prefix-pre Lean evaluation 和
+`env.step` 均为零，最终 replan。只执行 1/5 prefix，calibration 仍未通过。不要继续增加 episode；
+重复微动作/whole-chunk binding 必须先作为新方法独立授权和定义，不能直接提高 budget。
 
 OpenPI rollout 必须使用 `uv --project external/openpi run python`。ProofAlign 根项目的 `.venv` 不含
 OpenPI 声明的完整依赖；2026-07-14 的一次错误启动因此在首个 policy action 前报
@@ -364,6 +370,11 @@ bounded-stutter 重跑还必须检查 episode 中：candidate 的 `bounded_stutt
 `1`；CTDA metadata 的 count `0 -> 1`、translation bound `0.0001 m`、motion-command bound
 `0.002`；首个 monitor verdict 为 `safe_pending` 且 active phase 仍为 `approach`。第二个 stutter
 必须 fail closed；非 stutter 远离动作仍必须 refute。任何字段不一致都停止，不继续扩样本。
+
+`e2e4d47` 已满足上述预期检查并在第二个 stutter fail closed。注意 trace 级 `wire_artifacts` 是
+session 累计历史：第二个 precheck entry 重复首 prefix 的四个 request id，不代表第二 proposal 又
+完成四阶段。正式计数必须按 unique request id 和 stage transaction 计；该 run 的唯一 Lean request
+数为 4，第二 proposal 的新 Lean stage 数为 0。
 
 具体 command 在迁移时从当前 `--help` 生成，不从 archive 复制。保留以下固定实验参数：
 

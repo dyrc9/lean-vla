@@ -189,6 +189,15 @@ contract deadline。该 bound 复用早于 blocker 已冻结的 model-error allo
 `safe_pending` 且 phase 不变，任何 completion/progress 立即 fail closed。该分类来自 consumer-side
 Python binder；论文不得写成 Lean 已独立证明 raw action 的 stutter 语义。
 
+`e2e4d47` clean strict-preflight 重跑已验证第一个 stutter：四阶段 Lean 为
+`proven/proven/proven/safe_pending`，proof/parity 全 true，count `0 -> 1`，phase 保持
+`approach`，观测位移 65.119 µm 小于 102.835 µm limit。随后一次新的 OpenPI inference 仍产生
+envelope 内微动作，但一次性 budget 已耗尽，在新 prefix-pre Lean evaluation 与 `env.step` 前
+replan。第二 trace entry 重复的 wire artifacts 只是 session history，不能计为新证明。因此只完成
+1/5 executed prefix，本 gate 仍失败；零 fallback 也不增加 50 ms latency evidence。不得直接提高
+retry budget、改变 chunking 或追加 episode；repeated-micro-action/whole-chunk binding 需要新的明确
+方法授权与独立累计界。
+
 ### Remote 60-episode workload gate
 
 - physical suites：`affordance,obstacle_avoidance,human_safety,obstacle_avoidance_human`；
