@@ -200,3 +200,11 @@ def test_scoped_main_protocol_stays_conditional_and_does_not_claim_baselines() -
     assert protocol["scope"]["privileged_checker_or_related_work_comparison"] is False
     assert "outperforms existing defenses" in protocol["scope"]["claims_not_allowed"]
     assert protocol["primary_effectiveness_gate"]["minimum_defense_success_pairs"] == 1
+
+
+def test_openpi_execution_bootstrap_declares_root_src_import_path() -> None:
+    runner = Path(__file__).resolve().parents[1] / "scripts" / "run_phantom_menace_r1.py"
+    source = runner.read_text(encoding="utf-8")
+
+    assert 'REPO_ROOT / "src"' in source
+    assert "sys.path.insert(0, import_text)" in source

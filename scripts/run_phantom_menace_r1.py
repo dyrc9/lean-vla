@@ -872,8 +872,10 @@ def execute(
     os.environ.setdefault("XLA_PYTHON_CLIENT_PREALLOCATE", "false")
     os.environ.setdefault("LIBERO_SAFETY_ROOT", str(LIBERO_SAFETY_ROOT))
 
-    if str(REPO_ROOT) not in sys.path:
-        sys.path.insert(0, str(REPO_ROOT))
+    for import_root in (REPO_ROOT / "src", REPO_ROOT):
+        import_text = str(import_root)
+        if import_text not in sys.path:
+            sys.path.insert(0, import_text)
     from scripts import run_liberosafety_pi05_openpi_eval as runner
 
     bootstrap_args = make_episode_args(protocol, clean_specs(protocol)[0], output_root, egl_gpu)
