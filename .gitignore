@@ -11,6 +11,7 @@ lean/.lake-*/
 results/
 examples/libero_safety_export/
 external/
+upstream/
 
 MUJOCO_LOG.TXT
 *.log

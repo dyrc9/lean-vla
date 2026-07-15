@@ -1,0 +1,48 @@
+{
+  "schema": "proofalign.safe-fiper-r0-environments.v1",
+  "recorded_at": "2026-07-15T19:00:00+08:00",
+  "uv": {
+    "path": "/home/ldx/.conda/envs/proofalign-libero/bin/uv",
+    "version": "0.11.25",
+    "cache_dir": "/data0/ldx/uv-cache",
+    "python_install_dir": "/data0/ldx/uv-python"
+  },
+  "safe_detector": {
+    "path": "/data0/ldx/uv-envs/safe-r0",
+    "python": "3.10.20",
+    "torch": "2.7.1+cu126",
+    "numpy": "1.26.4",
+    "scipy": "1.15.3",
+    "requirements": "experiments/safe_fiper_r0_env/safe_requirements.txt",
+    "requirements_sha256": "8f3d427098ea59e15ddeebb82458c7556adf0c9d228f6b96ae74f27d4f6252e2"
+  },
+  "safe_openpi_server": {
+    "path": "/data0/ldx/uv-envs/safe-r0-openpi",
+    "python": "3.11.15",
+    "jax": "0.5.0",
+    "torch": "2.6.0+cu124",
+    "numpy": "2.0.2",
+    "lock": "upstream/SAFE-openpi/uv.lock",
+    "lock_sha256": "0b7bc1b66a7d6f5b1fe8cf9ee85e86108a8cc287ce3f246bc551872a6512a17a"
+  },
+  "safe_libero_client": {
+    "path": "/data0/ldx/uv-envs/safe-r0-libero-client",
+    "python": "3.8.20",
+    "torch": "1.11.0+cu113",
+    "numpy": "1.22.4",
+    "mujoco": "3.2.3",
+    "robosuite": "1.4.1",
+    "openpi_requirements_sha256": "821008c9804ec835bccee66ab93c177f47a62a845c010497b5aea06829331727",
+    "libero_requirements_sha256": "23ef4abd0a9809a8075d626d2ee09181e474c6cdf046ad340de134e383afea01"
+  },
+  "fiper": {
+    "path": "/data0/ldx/uv-envs/fiper-r0",
+    "python": "3.11.15",
+    "torch": "2.7.1+cu126",
+    "numpy": "1.26.4",
+    "scipy": "1.17.1",
+    "zarr": "2.18.7",
+    "requirements": "experiments/safe_fiper_r0_env/fiper_requirements.txt",
+    "requirements_sha256": "a348cb79a9ff098f0ce164a69a794d2836bcaad6529d0366e1aae4bce50f34dd"
+  }
+}

@@ -1,0 +1,164 @@
+{
+  "schema": "proofalign.fiper-r0-protocol.v1",
+  "created_at": "2026-07-15T16:00:00+08:00",
+  "protocol_id": "fiper-official-published-rollouts-r0-20260715",
+  "protocol_status": "assets_and_environment_ready_for_gpu_execution",
+  "official_run_results_observed": false,
+  "deferment": {
+    "deferred_at": "2026-07-15",
+    "reason": "User prioritized the primary ProofAlign method-validity experiment.",
+    "assets_downloaded": true,
+    "gpu_execution_started": false,
+    "blocks_phantom_r1_or_scoped_main_experiment": false,
+    "required_before_any_FIPER_comparison_claim": true
+  },
+  "scope": {
+    "phase": "R0_official_upstream_reproduction",
+    "detector": "FIPER",
+    "use_official_published_rollouts": true,
+    "pi05_adapter_experiment": false,
+    "proofalign_defense_experiment": false,
+    "synthetic_data_can_satisfy_r0": false,
+    "paired_pilot_authorized": false,
+    "main_table_authorized": false,
+    "execution_deferred_by_user": false
+  },
+  "source": {
+    "proofalign_parent_commit": "313ee443ec0d341e1fbaed48ce02d7b544e171fd",
+    "repository": "https://github.com/learnsyslab/fiper",
+    "commit": "13d79c5c3069def843e454787ff128defc249838",
+    "checkout": "upstream/fiper",
+    "license": "MIT",
+    "all_checkout_files_must_match_and_be_clean": true,
+    "sha256": {
+      "LICENSE": "3ea82f025c1eb2e80cfc4f1e60623e702ab9366cd1512c05ec7393702cee99cb",
+      "README.md": "650ec1508b82e564fba1d26cdd41beb450cfc6cfaa389bed51a9a5baca6a1be2",
+      "environment.yml": "4b1cc3e957319ca0e2875596eeb443ba66023a76a2d8e3f48238a89ce5b132ae",
+      "configs/default.yaml": "475ba14a4e2ca6ec1d08d46d07f88dd2075eeec82084e21b3e96e2a6efc39e74",
+      "configs/eval/base.yaml": "e3564cbde7f4c0f4b714325c2d7b4e74b3838995128e947d96ba2affc1eb9348",
+      "configs/eval/rnd_oe.yaml": "4127ff1a7c3d7a71ff7379b558de960f04483327483fd0aa91d42ad467edfbd9",
+      "configs/eval/entropy.yaml": "9e5956ad125bdf2568c3f8d3c0bcc4ff7c5ad1abb93ff68a97cd4fbfdac1c9ca",
+      "configs/eval/rnd_parameters.yaml": "c8d0e9611bfc27a5ba93b7f5057bf708db558bf114df00a5d6b6da8e4e128476",
+      "scripts/run_fiper.py": "921c29e1362832db5d0182ed53068a9f023d60a1dc4c61e5634fbfbda3429129",
+      "tasks/task_manager.py": "e13cc422976e1f2553d96d8027f19545fdee4a614bcb1e512077731ab0b85abc",
+      "datasets/rollout_datasets.py": "ec8eaf75ffff7b443341dd74c4cd97fe270ea3669a19849048cd11a9f1105adf",
+      "evaluation/evaluation_manager.py": "f0b17259b53ae75e94b37490cd96ce44ae5c92098fe042d88a872634e7b44c48"
+    }
+  },
+  "environment": {
+    "python": "3.11",
+    "definition": "upstream/fiper/environment.yml",
+    "uv": "/home/ldx/.conda/envs/proofalign-libero/bin/uv",
+    "uv_cache_dir": "/data0/ldx/uv-cache",
+    "uv_python_install_dir": "/data0/ldx/uv-python",
+    "isolated_environment": "/data0/ldx/uv-envs/fiper-r0",
+    "artifact_root": "/data0/ldx/safe-fiper-r0/fiper",
+    "isolated_checkout": "upstream/fiper",
+    "resolved_environment_manifest": "experiments/safe_fiper_r0_env/resolved_environments.json",
+    "resolved_environment_manifest_sha256": "076c64cacf5177ba4594ff9eef3efb884c11d079d7b91d6da3c55d8322eac039",
+    "network_services_allowed_during_scored_run": false,
+    "source_modifications_allowed": false,
+    "dependency_lock_and_gpu_inventory_must_be_written_to_manifest": true
+  },
+  "dataset": {
+    "official_download_page": "https://drive.google.com/drive/folders/1VuI3eQmFHT2QKCSYZGQ2pAuuhwNJkGCu",
+    "artifact_file_id": "1rQmt3bH0qG6L7IS1SHsTP6hHmykEoa8T",
+    "artifact_filename": "fiper_data.zip",
+    "artifact_expected_size_bytes": 5676727608,
+    "artifact_local_path": "/data0/ldx/safe-fiper-r0/fiper/fiper_data.zip",
+    "artifact_sha256": "00922af40e54b23ce4434402858116fbfd485ca06852f09d180ff192868bf191",
+    "artifact_digest_report": "/data0/ldx/safe-fiper-r0/fiper/archive_digest.json",
+    "artifact_digest_report_sha256": "6976891c143228df81fff45ed98dfa17e94a5fc40c623350dac2e01a78e2086f",
+    "extracted_data_root": "/data0/ldx/safe-fiper-r0/fiper/extracted/data_all",
+    "extracted_tree_manifest": "/data0/ldx/safe-fiper-r0/fiper/extracted_tree_manifest.json",
+    "extracted_tree_manifest_sha256": "4ac61ab133fc4017cde9bc50b972f716dfdd804c3c84cae04b3465f5a484a0a1",
+    "extracted_tree_sha256": "2f3b45203aa788e5a47fdc36d9352097fd5b8bc91c1127720ec18ee445081d2e",
+    "extracted_file_count": 3030,
+    "extracted_total_file_bytes": 21153402168,
+    "trusted_pickle_inspection_report": "/data0/ldx/safe-fiper-r0/fiper/rollout_inspection.json",
+    "trusted_pickle_inspection_report_sha256": "05c0159fc5666d948279dd04bf1c395b130c81372f99049aa54ede4a826b1fa9",
+    "tasks_in_order": ["sorting", "stacking", "push_t", "pretzel", "push_chair"],
+    "directory_template": "upstream/fiper/data/{task}/rollouts/{calibration|test}",
+    "minimum_files_per_task_split_from_upstream_code": 5,
+    "required_pickle_extensions": [".pkl", ".pickle"],
+    "trusted_pickle_only": true,
+    "accepted_top_level_shapes": [
+      "dict with metadata and rollout keys",
+      "list whose first item contains metadata"
+    ],
+    "required_step_keys_for_primary_methods": ["obs_embedding", "action_pred"],
+    "required_metadata": ["successful", "rollout_subtype"],
+    "calibration_rollouts_must_all_be_successful": false,
+    "threshold_calibration_uses_successful_rollouts_only": true,
+    "preprocessing_and_rnd_training_use_full_calibration_subset": true,
+    "test_rollouts_must_include_success_and_failure": true,
+    "rollout_subtype_mapping": {
+      "id": ["ca", "id", "calibration", "na"],
+      "ood": "all_other_values"
+    },
+    "official_asset_digest_must_be_frozen_before_execution": true
+  },
+  "official_pipeline": {
+    "entrypoint": "python scripts/run_fiper.py",
+    "launcher": "scripts/run_fiper_compat.py",
+    "compatibility_shim": {
+      "reason": "The unpinned upstream environment references np.bool, which NumPy removed in 1.24.",
+      "operation": "define np.bool as the identical np.bool_ scalar type before runpy executes the frozen entrypoint",
+      "upstream_source_modified": false,
+      "numerical_computation_changed": false
+    },
+    "tasks": ["sorting", "stacking", "push_t", "pretzel", "push_chair"],
+    "rnd_models": ["rnd_oe", "rnd_a"],
+    "other_methods": ["entropy", "similarity", "tc", "logpzo"],
+    "primary_components": ["rnd_oe", "entropy"],
+    "primary_combinations": ["rnd_oe OR entropy", "rnd_oe AND entropy"],
+    "random_seeds": [0, 1, 2, 42, 43],
+    "window_sizes": [1, 2, 3, 4, 5, 7, 9, 11, 13, 15, 20, 25, 30, 35, 40, 45, 50],
+    "quantiles": [0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99],
+    "threshold_styles": ["tvt_quantile", "tvt_cp_band", "ct_quantile"],
+    "threshold_extension": "last",
+    "detection_patience": 0,
+    "rnd_training": {
+      "epochs": 250,
+      "batch_size": 256,
+      "learning_rate": 0.0001,
+      "optimizer": "adamw",
+      "train_ratio": 0.9
+    },
+    "full_default_pipeline_required_for_r0_claim": true,
+    "reduced_smoke_can_satisfy_r0": false
+  },
+  "pi05_future_adapter_contract": {
+    "starts_only_after_r0_pass": true,
+    "observation_embedding_required": true,
+    "same_observation_for_all_action_samples": true,
+    "explicit_rng_seed_per_policy_call_required": true,
+    "sampled_action_chunk_shape_and_action_space_digest_required": true,
+    "multi_sample_compute_included_in_latency_and_gpu_tax": true,
+    "calibration_uses_clean_success_only": true,
+    "online_windows_reset_at_episode_boundary": true
+  },
+  "readiness_gate": {
+    "required_before_execution": [
+      "source_preflight_passes",
+      "official_rollout archive is downloaded without conversion",
+      "archive and extracted-tree SHA256 manifests are frozen",
+      "all five task schemas validate",
+      "every task has successful calibration rollouts for threshold fitting",
+      "preprocessing and RND training retain the complete official calibration subset",
+      "every test task contains both success and failure labels",
+      "isolated environment imports",
+      "fresh result directory and hardware manifest are recorded"
+    ],
+    "current_blockers": [
+      "fresh GPU inventory and an idle selected GPU are required before execution",
+      "the official full pipeline has not yet been executed"
+    ]
+  },
+  "classification": {
+    "pass": "reproduced_upstream",
+    "blocked": "blocked_upstream",
+    "no_raw_artifact_status": "planned",
+    "pi05_adapter_work_starts_only_after_pass": true
+  }
+}

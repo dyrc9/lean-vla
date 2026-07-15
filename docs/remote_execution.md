@@ -547,15 +547,21 @@ pgrep -af 'eval_attack_vla.py|VLLM::EngineCore|model-service'
 完成了配对闭环。task 2 clean 与固定 `laser_blinding-medium` 均成功，攻击还使用更少动作；虽 20/20
 policy frame 确实改变，攻击效力方向仍未复现。完整环境、JSONL、policy records、视频与 checksum
 位于 `results/phantom_menace_r0_20260715/`。状态为 `blocked_upstream`，不得调强度或进入 R1。
+这是旧 task-2 单对 R0 的终止状态，其原始 artifact 和结论不得被新结果覆盖。
 
 Phantom 的运行控制与 structured logging 是 `external/` 内的两个本地提交，不能随根仓库自然推送。
 根仓库已保存 `experiments/patches/phantom_menace_r0_runner.mbox.b64`（payload SHA-256
 `e0c12e8c5fb07cbfdf79b32270972356611c613f78b06c378bb73ac486389cde`；解码 mbox SHA-256
 `b8fe708aa4a8db65fb37a44530a55274a620b73260edf703e9423821ff2a0b3e`）。在 clean upstream
 `a0e4c8b2...` 上解码后执行 `git am --committer-date-is-author-date` 可精确重建
-`d03fcbdfa4d49985dabd60e11e12008e2af3a783`。用户已授权一次新的预注册 R0b；其 Conda-uv 环境变量、
-fresh server/client 命令、固定网格、artifact gate 和停止条件统一见
-[`next_agent_prompt_20260715.md`](next_agent_prompt_20260715.md)。旧 task 2 pair 必须保留且不计入新 gate。
+`d03fcbdfa4d49985dabd60e11e12008e2af3a783`。分离的预注册 R0b 已按
+[`next_agent_prompt_20260715.md`](next_agent_prompt_20260715.md) 执行完毕；旧 task 2 pair 已保留且
+未计入新 gate。R0b 的 task 3/4 启动错误在无 outcome 时 fail closed，task 5/6/7 init 0
+成为 qualifying clean pairs；27/27 attacked episodes 全部有效，`laser_blinding/strong`
+在 3/3 pair 上失败，通过 workload-discovery gate。完整结果位于
+`results/phantom_menace_r0b_20260715/`，机器状态见
+`experiments/phantom_menace_r0b_status.json`。不得重跑 R0b；下一次 Phantom GPU 运行必须是另行提交的
+held-out LIBERO-Safety R1 protocol，且不得修改 attack 或 victim。
 远程可重建的小型 client 输入位于 `experiments/phantom_menace_r0_env/`；不要依赖被 `.gitignore`
 排除的 result-local requirements/config/overlay。raw videos、JSONL 和 policy records 不随 Git push，
 仍需单独按 `SHA256SUMS` 归档或复制。

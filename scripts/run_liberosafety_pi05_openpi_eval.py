@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import collections
+from hashlib import sha256
 import json
 import math
 import os
@@ -10,7 +11,7 @@ import sys
 from collections import Counter, defaultdict
 from pathlib import Path
 from time import perf_counter
-from typing import Any
+from typing import Any, Callable
 
 import numpy as np
 
@@ -56,6 +57,7 @@ def main() -> None:
     )
     tasks = build_task_plan(args)
     attack_records = load_attack_record_index(args.attack_record)
+    observation_transform = make_observation_transform(args)
     write_run_config(output_dir, args, tasks)
 
     episodes: list[dict[str, Any]] = []
@@ -73,6 +75,7 @@ def main() -> None:
                 init_state_id=init_state_id,
                 attack_records=attack_records,
                 output_dir=output_dir,
+                observation_transform=observation_transform,
             )
             episodes.append(episode)
         except Exception as exc:
@@ -120,17 +123,38 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--save-video", action="store_true")
     parser.add_argument("--continue-on-error", action="store_true")
     parser.add_argument("--attack-record", type=Path, help="JSON/JSONL file with SABER-style instruction overrides.")
+    parser.add_argument(
+        "--observation-attack-type",
+        choices=("none", "laser_blinding", "em_truncation", "ultrasound_blur"),
+        default="none",
+    )
+    parser.add_argument(
+        "--observation-attack-strength",
+        choices=("weak", "medium", "strong"),
+        default="strong",
+    )
+    parser.add_argument(
+        "--phantom-menace-root",
+        type=Path,
+        default=REPO_ROOT / "external" / "Phantom-Menace",
+    )
     return parser.parse_args()
 
 
 def configure_paths(args: argparse.Namespace) -> None:
     if not OPENPI_ROOT.exists():
         raise RuntimeError(f"OpenPI checkout not found: {OPENPI_ROOT}")
+    libero_safety_root = Path(
+        os.environ.get("LIBERO_SAFETY_ROOT", REPO_ROOT / "external" / "LIBERO-Safety")
+    ).resolve()
+    os.environ.setdefault("LIBERO_SAFETY_ROOT", str(libero_safety_root))
     for path in (OPENPI_ROOT / "src", OPENPI_ROOT / "packages" / "openpi-client" / "src"):
         path_text = str(path)
         if path_text not in sys.path:
             sys.path.insert(0, path_text)
-    os.environ.setdefault("LIBERO_SAFETY_ROOT", str(REPO_ROOT / "external" / "LIBERO-Safety"))
+    libero_text = str(libero_safety_root)
+    if libero_text not in sys.path:
+        sys.path.insert(0, libero_text)
     os.environ.setdefault("HF_ENDPOINT", "https://hf-mirror.com")
     os.environ.setdefault("HF_HOME", "/data0/ldx/huggingface")
     os.environ.setdefault("HUGGINGFACE_HUB_CACHE", "/data0/ldx/huggingface/hub")
@@ -184,6 +208,7 @@ def run_episode(
     init_state_id: int,
     attack_records: dict[tuple[str, int, int], dict[str, Any]],
     output_dir: Path,
+    observation_transform: Callable[[np.ndarray], tuple[np.ndarray, dict[str, Any]]] | None = None,
 ) -> dict[str, Any]:
     set_policy_seed(policy, jax, policy_seed)
     runtime = load_libero_task_runtime(
@@ -204,6 +229,7 @@ def run_episode(
     env = create_env(runtime, args)
     trace: list[dict[str, Any]] = []
     replay_images: list[np.ndarray] = []
+    frame_audits: list[dict[str, Any]] = []
     action_plan: collections.deque[Any] = collections.deque()
     episode_start = perf_counter()
     success_by_done = False
@@ -230,9 +256,18 @@ def run_episode(
                     break
                 continue
 
-            if not action_plan:
-                element, replay_image = prepare_openpi_element(obs, runtime.instruction, image_tools, args.resize_size)
+            started_policy_call = not action_plan
+            if started_policy_call:
+                element, replay_image, frame_audit = prepare_openpi_element(
+                    obs,
+                    runtime.instruction,
+                    image_tools,
+                    args.resize_size,
+                    observation_transform=observation_transform,
+                )
                 replay_images.append(replay_image)
+                frame_audit = {**frame_audit, "policy_call_index": len(frame_audits)}
+                frame_audits.append(frame_audit)
                 policy_start = perf_counter()
                 action_chunk = policy.infer(element)["actions"]
                 policy_time = perf_counter() - policy_start
@@ -250,7 +285,19 @@ def run_episode(
             env_start = perf_counter()
             obs, reward, done, info = normalize_env_step(env.step(action.tolist()))
             env_time = perf_counter() - env_start
-            trace.append(make_trace_record(step_id, "policy", action, reward, done, info, policy_time, env_time))
+            trace.append(
+                make_trace_record(
+                    step_id,
+                    "policy",
+                    action,
+                    reward,
+                    done,
+                    info,
+                    policy_time,
+                    env_time,
+                    policy_call=(frame_audits[-1] if started_policy_call else None),
+                )
+            )
             if done:
                 success_by_done = True
                 stop_reason = "env_done"
@@ -277,6 +324,13 @@ def run_episode(
                 "seed": args.seed,
                 "policy_seed": policy_seed,
                 "paper_track": "Embodied Physical Safety Track" if suite in PHYSICAL_SUITES else "Semantic/extra suite rollout",
+                "initial_state_sha256": array_digest(runtime.init_state),
+                "observation_attack_type": getattr(args, "observation_attack_type", "none"),
+                "observation_attack_strength": (
+                    getattr(args, "observation_attack_strength", None)
+                    if getattr(args, "observation_attack_type", "none") != "none"
+                    else None
+                ),
             },
             "task_success": bool(task_success),
             "strict_success_no_cost": strict_success,
@@ -284,6 +338,7 @@ def run_episode(
             "unsafe_cost_or_collision": unsafe,
             "decision": stop_reason,
             "trace": trace,
+            "observation_frame_audits": frame_audits,
             "runtime": {"episode_wall_time_seconds": perf_counter() - episode_start},
         }
         seed_suffix = f"_pseed{policy_seed}" if getattr(args, "_multiple_policy_seeds", False) else ""
@@ -312,11 +367,39 @@ def create_env(runtime: Any, args: argparse.Namespace) -> Any:
     return env
 
 
-def prepare_openpi_element(obs: dict[str, Any], prompt: str, image_tools: Any, resize_size: int) -> tuple[dict[str, Any], np.ndarray]:
+def prepare_openpi_element(
+    obs: dict[str, Any],
+    prompt: str,
+    image_tools: Any,
+    resize_size: int,
+    *,
+    observation_transform: Callable[[np.ndarray], tuple[np.ndarray, dict[str, Any]]] | None = None,
+) -> tuple[dict[str, Any], np.ndarray, dict[str, Any]]:
     base_image = np.ascontiguousarray(obs["agentview_image"][::-1, ::-1])
     wrist_image = np.ascontiguousarray(obs["robot0_eye_in_hand_image"][::-1, ::-1])
+    clean_image = base_image
+    if observation_transform is None:
+        digest_value = frame_digest(clean_image)
+        frame_audit = {
+            "schema": "proofalign.observation-frame-audit.v1",
+            "attack_type": "none",
+            "attack_strength": None,
+            "attack_parameters": {},
+            "camera": "agentview",
+            "clean_frame_sha256": digest_value,
+            "attacked_frame_sha256": digest_value,
+            "frame_shape": list(clean_image.shape),
+            "frame_dtype": str(clean_image.dtype),
+            "changed": False,
+            "mean_absolute_delta": 0.0,
+            "source_paths": [],
+            "source_sha256": {},
+        }
+    else:
+        base_image, frame_audit = observation_transform(clean_image)
     base_image = image_tools.convert_to_uint8(image_tools.resize_with_pad(base_image, resize_size, resize_size))
     wrist_image = image_tools.convert_to_uint8(image_tools.resize_with_pad(wrist_image, resize_size, resize_size))
+    replay_image = base_image
     state = np.concatenate(
         (
             obs["robot0_eef_pos"],
@@ -329,7 +412,48 @@ def prepare_openpi_element(obs: dict[str, Any], prompt: str, image_tools: Any, r
         "observation/wrist_image": wrist_image,
         "observation/state": state,
         "prompt": str(prompt),
-    }, base_image
+    }, replay_image, frame_audit
+
+
+def make_observation_transform(
+    args: argparse.Namespace,
+) -> Callable[[np.ndarray], tuple[np.ndarray, dict[str, Any]]] | None:
+    attack_type = getattr(args, "observation_attack_type", "none")
+    if attack_type == "none":
+        return None
+    from experiments.phantom_menace_plugin import (
+        PhantomMenaceConfig,
+        PhantomMenaceObservationTransform,
+    )
+
+    return PhantomMenaceObservationTransform(
+        PhantomMenaceConfig(
+            attack_type=attack_type,
+            attack_strength=args.observation_attack_strength,
+            repo_root=args.phantom_menace_root,
+        )
+    )
+
+
+def array_digest(value: Any) -> str | None:
+    if value is None:
+        return None
+    if hasattr(value, "detach"):
+        value = value.detach().cpu().numpy()
+    array = np.ascontiguousarray(np.asarray(value))
+    header = json.dumps(
+        {"dtype": str(array.dtype), "shape": list(array.shape)},
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+    return sha256(header + b"\0" + array.tobytes(order="C")).hexdigest()
+
+
+def frame_digest(value: Any) -> str:
+    """Match Phantom-Menace's frozen raw-byte frame digest exactly."""
+    if hasattr(value, "detach"):
+        value = value.detach().cpu().numpy()
+    return sha256(np.ascontiguousarray(np.asarray(value)).tobytes(order="C")).hexdigest()
 
 
 def get_observation(env: Any) -> Any:
@@ -360,8 +484,9 @@ def make_trace_record(
     info: dict[str, Any],
     policy_time: float,
     env_time: float,
+    policy_call: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    return {
+    record = {
         "step_id": step_id,
         "phase": phase,
         "action": np.asarray(action).tolist(),
@@ -370,6 +495,9 @@ def make_trace_record(
         "env_info": info,
         "runtime_seconds": {"policy": float(policy_time), "env_step": float(env_time)},
     }
+    if policy_call is not None:
+        record["policy_call"] = policy_call
+    return record
 
 
 def check_task_success(env: Any) -> bool:

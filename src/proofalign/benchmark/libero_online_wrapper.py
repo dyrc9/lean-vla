@@ -373,7 +373,7 @@ class ProofAlignLiberoWrapper:
         if self.ctda_session is not None:
             return self.step_chunk(raw_action, max_chunk_steps=1)
         total_start = perf_counter()
-        policy_call_id, proposed_action_chunk = _policy_action_audit(
+        policy_call_id, proposed_action_chunk, policy_metadata = _policy_action_audit(
             raw_action, default_call_id=f"policy:{len(self.trace):06d}"
         )
         if self.current_state is None:
@@ -421,6 +421,7 @@ class ProofAlignLiberoWrapper:
                     "wrapper_step_wall": perf_counter() - total_start,
                 },
                 policy_call_id=policy_call_id,
+                policy_metadata=policy_metadata,
                 proposed_action_chunk=proposed_action_chunk,
                 discarded_action_chunk_tail=proposed_action_chunk,
             )
@@ -477,6 +478,7 @@ class ProofAlignLiberoWrapper:
                 "wrapper_step_wall": perf_counter() - total_start,
             },
             policy_call_id=policy_call_id,
+            policy_metadata=policy_metadata,
             proposed_action_chunk=proposed_action_chunk,
             executed_policy_actions=[_frozen_action_copy(env_action)],
             discarded_action_chunk_tail=proposed_action_chunk[1:],
@@ -495,7 +497,7 @@ class ProofAlignLiberoWrapper:
     ) -> LiberoStepResult:
         total_start = perf_counter()
         requested_max_steps = max_chunk_steps or self.max_chunk_steps
-        policy_call_id, proposed_action_chunk = _policy_action_audit(
+        policy_call_id, proposed_action_chunk, policy_metadata = _policy_action_audit(
             raw_action, default_call_id=f"policy:{len(self.trace):06d}"
         )
         # Until incremental observation/authorization is available, one CTDA
@@ -569,6 +571,7 @@ class ProofAlignLiberoWrapper:
                 contract=action_to_dict(symbolic_action),
                 raw_actions=[],
                 policy_call_id=policy_call_id,
+                policy_metadata=policy_metadata,
                 proposed_action_chunk=proposed_action_chunk,
                 discarded_action_chunk_tail=proposed_action_chunk,
                 trace_summary=TraceSummary(num_raw_steps=0, boundary_reason="intent_reject"),
@@ -644,6 +647,7 @@ class ProofAlignLiberoWrapper:
                     contract=action_to_dict(symbolic_action),
                     raw_actions=[],
                     policy_call_id=policy_call_id,
+                    policy_metadata=policy_metadata,
                     proposed_action_chunk=proposed_action_chunk,
                     discarded_action_chunk_tail=proposed_action_chunk,
                     trace_summary=TraceSummary(num_raw_steps=0, boundary_reason="ctda_precheck"),
@@ -994,6 +998,7 @@ class ProofAlignLiberoWrapper:
             contract=action_to_dict(symbolic_action),
             raw_actions=list(executed_actions),
             policy_call_id=policy_call_id,
+            policy_metadata=policy_metadata,
             proposed_action_chunk=proposed_action_chunk,
             executed_policy_actions=executed_policy_actions,
             discarded_action_chunk_tail=proposed_action_chunk[
@@ -1675,11 +1680,12 @@ def _policy_action_audit(
     raw_action: Any,
     *,
     default_call_id: str,
-) -> tuple[str, list[Any]]:
-    """Return audit-only policy-call identity and the untruncated chunk."""
+) -> tuple[str, list[Any], dict[str, Any]]:
+    """Return policy-call identity, untruncated chunk, and audit metadata."""
 
     policy_call_id = default_call_id
     complete_chunk: Any = env_action_from_raw(raw_action)
+    policy_metadata: dict[str, Any] = {}
     if isinstance(raw_action, dict):
         supplied_call_id = raw_action.get("policy_call_id")
         if isinstance(supplied_call_id, str) and supplied_call_id.strip():
@@ -1687,7 +1693,10 @@ def _policy_action_audit(
         if "policy_action_chunk" in raw_action:
             complete_chunk = raw_action["policy_action_chunk"]
         elif "raw_action" not in raw_action:
-            return policy_call_id, []
+            return policy_call_id, [], policy_metadata
+        supplied_metadata = raw_action.get("vla_metadata")
+        if isinstance(supplied_metadata, dict):
+            policy_metadata = _frozen_action_copy(supplied_metadata)
     if _looks_like_action_chunk(complete_chunk):
         try:
             values = [complete_chunk[index] for index in range(len(complete_chunk))]
@@ -1695,7 +1704,11 @@ def _policy_action_audit(
             values = list(complete_chunk)
     else:
         values = [complete_chunk]
-    return policy_call_id, [_frozen_action_copy(value) for value in values]
+    return (
+        policy_call_id,
+        [_frozen_action_copy(value) for value in values],
+        policy_metadata,
+    )
 
 
 def _ctda_mission_action(session: CTDARuntimeSession) -> Action:

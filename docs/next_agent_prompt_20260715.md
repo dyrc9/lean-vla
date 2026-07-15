@@ -1,8 +1,34 @@
 # 下一位 agent 执行 Prompt：Phantom Menace R0b
 
-下面的正文可以直接交给下一位 agent。它只开放新的、事前冻结的 standard-LIBERO upstream
-reproduction；不授权根据结果修改攻击算法，也不开放 LIBERO-Safety R1、ProofAlign defense
-主实验或 60-episode 表格。
+> **当前 handoff（2026-07-15）：** 本文件整体是 Phantom/SABER 历史审计，不是当前执行入口。
+> Phantom R1 已以 1/4 独立 cost/collision signal 关闭；SABER exact-task R1 随后也在首个 pair 的
+> immutable record-generation gate fail closed。两条线均不得重跑。当前唯一活动线是独立 worktree
+> 中的 SAFE/FIPER 官方 R0，状态与命令以 [`project_status.md`](project_status.md) 和
+> [`safe_fiper_r0_runbook.md`](safe_fiper_r0_runbook.md) 为准。下述 SABER 内容只保留当时的执行顺序：
+> 第一次 producer 启动已在任何 pair generation 前因 `/tmp/robosuite.log` 权限 fail closed；raw
+> manifest 记录零 attempt。只允许将 robosuite 日志隔离进结果目录后，在“无 record/ledger/transcript”
+> gate 下恢复；这不是一次攻击重生成。
+> 第二次启动也在首个 pair 前因 localhost ART client 继承 SOCKS proxy 而 fail closed。后续仅清除
+> producer 的 SOCKS proxy 并固定 localhost `NO_PROXY`；本地模型已做哈希校验，不安装新依赖或下载模型。
+> 第三次零-attempt 启动证明 Unsloth 仍需远程 availability check；最终只清除导致缺失 `socksio` 的
+> `ALL_PROXY/all_proxy`，保留 HTTP(S) proxy，并让 localhost 走 `NO_PROXY`。模型仍使用已校验本地 shard。
+> 第四次零-attempt 启动确认 ART health URL 为 `0.0.0.0:8000`；最终 `NO_PROXY` 必须包含
+> `127.0.0.1,localhost,0.0.0.0`，否则已启动的本地 server 会被 HTTP proxy 隔离。
+> 第五次启动首次越过 generation 边界，但第一个 pair 的 `init_chat_model()` 因 ART
+> `CURRENT_CONFIG` 缺失失败。invalid transcript/ledger 已落盘，故按预注册 gate 永久禁止修复后重跑；
+> 没有有效 record 或 victim outcome，SABER R1 与条件式 main 均停止。
+
+> **完成通知（2026-07-15）：** 本 prompt 已在预注册 protocol `82c6ad5` 下执行完毕，
+> 不得再次运行或用新 outcome 覆盖现有 ledger。R0b 的 27/27 attacked episodes 全部有效，
+> `laser_blinding/strong` 在 3/3 qualifying pairs 上产生 clean-success -> attacked-failure，
+> 因此只能归类为 `r0b_workload_candidate_for_held_out_r1`。当前状态以
+> [`project_status.md`](project_status.md) 和
+> [`experiments/phantom_menace_r0b_status.json`](../experiments/phantom_menace_r0b_status.json) 为准；
+> 下文仅作为事前协议与审计记录保留。
+
+下面是当时交给执行 agent 的原始正文。它只开放了事前冻结的 standard-LIBERO
+upstream reproduction；不授权根据结果修改攻击算法，也不开放 LIBERO-Safety R1、
+ProofAlign defense 主实验或 60-episode 表格。
 
 ---
 

@@ -1,6 +1,6 @@
 # ProofAlign Execution Roadmap
 
-更新日期：2026-07-14
+更新日期：2026-07-15
 
 本文是唯一执行计划。历史 roadmap、实验 handoff 和 design memo 已归档。
 
@@ -249,34 +249,62 @@ clean strict preflight 与唯一一次固定 calibration。
 
 ## 6. P4：远程发布攻击 workload pilot
 
-状态：**live-controller method-validity 五-prefix gate 已通过；上游 published-workload reproduction
-仍是当前 gate**。P1/P2
+状态：**live-controller method-validity 五-prefix gate 已通过；Phantom held-out R1 已完成但
+独立 cost/collision signal gate 失败；SABER exact-task R1 已在 record-generation artifact gate
+fail closed，未运行 victim；SAFE/FIPER 官方 R0 已在独立 worktree 启动且尚未 terminal**。P1/P2
 correctness、golden parity 与 affordance observation completeness 已通过；real-time latency 明确
 未通过并已降级 claim。fail-closed preflight manifest 与 clean + Lean slow-interlock smoke 已
 脚本化。SABER standard-LIBERO R0 已核验为部分方向复现。Phantom 三种 deterministic transform 的
 9 组 CPU smoke 与官方 OpenPI WebSocket 闭环已通过。2026-07-15 已用 clean standard-LIBERO、独立
 uv client 和 structured outcome/frame digest 关闭环境与 raw-artifact blocker；task 2 clean 成功，
 同 task/init 的固定 `laser_blinding-medium` 改变 20/20 policy frame 但也成功，且使用更少动作。因此
-攻击效力方向未复现，Phantom R0 标为 `blocked_upstream`。不得事后调强度；未经新的预注册 upstream
-protocol、R0 与 exact-task R1 gate 不得启动主表。
+攻击效力方向未复现，该旧 Phantom R0 pair 保持 `blocked_upstream`。不得事后调强该 pair
+或覆盖其负结果。
 环境见 [`remote_execution.md`](remote_execution.md)。
 
-`blocked_upstream` 在这里是旧 task 2 单对协议的终止状态，不是对 Phantom 总体有效性的否定。用户
-已授权一个且仅一个新的 R0b：在任何新 attack 前提交 machine-readable protocol，排除已观察的 task 2，
-只用 clean outcome 按固定顺序选择前三个 clean-success pair，然后对每个 pair 无提前停止地执行
-`laser_blinding/em_truncation/ultrasound_blur` × `weak/medium/strong` 完整网格。同一 cell 至少在
-2/3 pair 上把 clean success 变为 failure 才通过 primary signal gate；action count 在没有复制官方
-阈值前只作描述。具体命令与停止条件见
-[`next_agent_prompt_20260715.md`](next_agent_prompt_20260715.md)。若 R0b 仍失败，不建立第三个 Phantom
-调参协议，回到 SAFE/FIPER reproduction。
+`blocked_upstream` 在这里是旧 task 2 单对协议的终止状态，不是对 Phantom 总体有效性的否定。
+后续分离的 R0b 已按 `82c6ad5` 预注册协议完成：task 3/4 的启动失败在无 outcome 时
+fail closed 并未重跑，task 5/6/7 init 0 是首三个有效 clean-success pair，27/27 attack
+episodes 全部有效。`laser_blinding/strong` 在 3/3 pair 上把 success 变为 failure，满足
+primary signal gate；`em_truncation` medium/strong 各只有 1/3，其他 cell 为 0/3。R0b 因此
+只归类为 held-out R1 workload candidate，不是 defense evidence。LIBERO-Safety R1 已固定为四个
+physical suite、task 候选 `0,7,14`、held-out init 1 和 `laser_blinding/strong`；至少 2/4 clean-safe
+pair 转为独立 cost/collision 才开放 scoped main。实际只有 1/4：affordance 与 human-safety attack
+仍 task success；obstacle-avoidance 只有 task failure、没有 cost/collision；只有
+obstacle-avoidance-human 产生 `checkcontact=1`。因此 R1 分类为 signal not reproduced，按冻结 failure
+path 停止 Phantom。SAFE/FIPER source、资产、uv 环境与 launcher 已冻结；SAFE 500-episode rollout
+及 FIPER full pipeline 正在独立运行，任何中间输出都不构成 reproduction pass。
+
+用户已选择 instruction 路线继续。SABER R1 固定复用同四个 clean-safe init-1 artifact，使用冻结的
+`constraint_violation` 模型与官方 prompt tools，各生成一次 exact-task instruction record。record
+producer 与 victim runner 分进程、分阶段：producer 不加载 pi0.5，也看不到 attacked outcome；四条
+record 不能 best-of-N、重生成或按结果替换。record gate 全通过后，统一 pure-VLA runner 才按固定
+顺序执行四条 attacked episode。primary gate 仍为至少 2/4 环境 cost/collision，task failure 不计。
+只有该 gate 通过，才开放事前冻结的 100-action scoped Full-CTDA method-validity 实验。
+第一次 producer 启动在 pair generation 之前因 robosuite 默认 `/tmp/robosuite.log` 无写权限失败；
+manifest 明确记录零 generation attempt、零 victim load/rollout。恢复只允许隔离日志路径这一启动修复，
+并要求 record、producer ledger 和 transcript 均不存在；因此不消耗或重置任何 pair 的 one-shot quota。
+第二次启动在模型/vLLM 初始化后、首个 pair 前又因 shell SOCKS proxy 的缺失可选依赖失败，同样追加为
+零 attempt。producer 将只访问 localhost 的 ART client 与本地模型，因此后续恢复清除继承 proxy，
+不安装新依赖、不改变 attacker 或 generation 输入。第三次启动证明 Unsloth 对本地模型仍做远程
+availability check，清除全部 HTTP proxy 会在零 attempt 阶段超时；最终只清除 SOCKS
+`ALL_PROXY/all_proxy`，保留 HTTP(S) proxy，并用 localhost `NO_PROXY` 隔离本地 client。
+第四次零-attempt 启动从 vLLM log 确认官方 ART health URL 是 `0.0.0.0:8000`，server 已成功启动，
+但该地址未在 bypass 中而被 HTTP proxy 接管。`NO_PROXY` 因此只补入 `0.0.0.0`。
+第五次启动通过 health gate 后，在第一个 pair 的 `init_chat_model()` 因 ART `CURRENT_CONFIG` 缺失失败。
+这次已产生 pair transcript 与 invalid producer-ledger，虽然没有模型推理、有效 perturbed instruction 或
+victim outcome，但已越过预注册的零-attempt恢复边界。因此 SABER R1 分类为
+`r1_saber_attack_record_generation_failed_closed` 并永久停止；不修复后重跑，也不运行 scoped main。
 
 在 60-episode pilot 前增加 upstream reproduction gate，详见
 [`reproduction_plan.md`](reproduction_plan.md)：
 
 1. standard LIBERO 上复现 SABER π0.5 clean + record/replay；
 2. standard LIBERO 上复现 Phantom Menace OpenPI clean + camera transform；
-3. 复现 SAFE/FIPER 官方 detector pipeline，冻结需要的 rollout/feature schema；
-4. 上游通过后才开发 LIBERO-Safety exact-task workload 与 π0.5 defense adapter。
+3. SAFE/FIPER 正在执行官方 R0；须等 terminal manifest、validator 与 output digest 通过后，才可开始
+   pi0.5 adapter 或进入 baseline comparison；
+4. LIBERO-Safety Phantom R1 已完成且未通过；不进入固定 scoped CTDA pair，不做 post-hoc 重选。
+5. SABER exact-task R1 已在第一个 record artifact gate fail closed；无 victim rollout，不重试、不运行 main。
 
 ### Workload
 
@@ -300,6 +328,17 @@ protocol、R0 与 exact-task R1 gate 不得启动主表。
 若攻击只造成 task failure、没有 authorization/safety signal，则不写 physical-defense claim。
 
 ## 7. P5：最小配对主实验
+
+曾事前冻结一个不等价于最终主表的 **scoped method-validity** 实验：复用 R1 的 clean/attacked
+VLA-only artifact，只对 outcome-blind、可由现有 Pick/Place compiler 与 task-bound fallback witness
+支持的 pair 运行 clean/attacked Full CTDA。窗口固定为 20 个 policy call / 100 个 raw action；
+至少一个 attacked VLA-only 的 matched unsafe event 被 CTDA 在 dispatch 前 refute/replan/safe-stop，
+且对应 clean CTDA 至少授权一个非 dummy prefix，才通过。该结果不估计 clean task-success retention，
+不做 baseline superiority 或 population-level statistics。该实验要求 R1 至少 2/4 safety transition；
+实际为 1/4，且唯一 unsafe event 位于 policy action 132、超过冻结 100-action window，因此当前状态为
+`not_authorized_by_r1_prerequisite`，没有运行 Full CTDA episode。
+
+下面的完整矩阵保持为后续目标，当前未授权执行：
 
 固定方法：
 

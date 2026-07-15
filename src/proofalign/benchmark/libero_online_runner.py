@@ -1169,6 +1169,7 @@ def _write_result(
                 "raw_action": step.raw_action,
                 "raw_actions": step.raw_actions,
                 "policy_call_id": step.policy_call_id,
+                "policy_metadata": step.policy_metadata,
                 "proposed_action_chunk": step.proposed_action_chunk,
                 "executed_policy_actions": step.executed_policy_actions,
                 "discarded_action_chunk_tail": step.discarded_action_chunk_tail,

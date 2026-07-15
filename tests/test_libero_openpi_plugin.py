@@ -78,4 +78,34 @@ def test_openpi_policy_records_observation_attack(monkeypatch):
     result = policy("pick up the mug", {}, [])
 
     assert result["vla_metadata"]["observation_attack_type"] == "em_truncation"
-    assert result["vla_metadata"]["observation_attack"] == attack_record
+    assert result["vla_metadata"]["observation_attack"] == {
+        **attack_record,
+        "policy_call_index": 0,
+    }
+
+
+def test_openpi_policy_records_clean_frame_audit(monkeypatch):
+    policy = OpenPIPolicy(OpenPIConfig(observation_attack_type="none"))
+    policy._loaded = True
+    policy._image_tools = SimpleNamespace(
+        convert_to_uint8=lambda value: value,
+        resize_with_pad=lambda value, _height, _width: value,
+    )
+    policy._policy = SimpleNamespace(
+        infer=lambda _element: {"actions": np.asarray([[0.1] * 7])}
+    )
+    obs = {
+        "agentview_image": np.zeros((8, 8, 3), dtype=np.uint8),
+        "robot0_eye_in_hand_image": np.zeros((8, 8, 3), dtype=np.uint8),
+        "robot0_eef_pos": np.zeros(3),
+        "robot0_eef_quat": np.asarray([0.0, 0.0, 0.0, 1.0]),
+        "robot0_gripper_qpos": np.zeros(2),
+    }
+
+    result = policy("pick up the mug", obs, [])
+    audit = result["vla_metadata"]["observation_attack"]
+
+    assert audit["attack_type"] == "none"
+    assert audit["changed"] is False
+    assert audit["clean_frame_sha256"] == audit["attacked_frame_sha256"]
+    assert audit["policy_call_index"] == 0

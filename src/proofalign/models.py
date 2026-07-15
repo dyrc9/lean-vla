@@ -319,6 +319,7 @@ class ExecutionStep:
     contract: dict[str, Any] | None = None
     raw_actions: list[Any] = field(default_factory=list)
     policy_call_id: str | None = None
+    policy_metadata: dict[str, Any] = field(default_factory=dict)
     proposed_action_chunk: list[Any] = field(default_factory=list)
     executed_policy_actions: list[Any] = field(default_factory=list)
     discarded_action_chunk_tail: list[Any] = field(default_factory=list)

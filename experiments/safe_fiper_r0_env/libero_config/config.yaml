@@ -1,0 +1,5 @@
+assets: /home/ldx/lean-vla/external/worktrees/safe-fiper-r0/upstream/SAFE-openpi/third_party/libero/libero/libero/assets
+bddl_files: /home/ldx/lean-vla/external/worktrees/safe-fiper-r0/upstream/SAFE-openpi/third_party/libero/libero/libero/bddl_files
+benchmark_root: /home/ldx/lean-vla/external/worktrees/safe-fiper-r0/upstream/SAFE-openpi/third_party/libero/libero/libero
+datasets: /data0/ldx/safe-fiper-r0/safe/libero_datasets
+init_states: /home/ldx/lean-vla/external/worktrees/safe-fiper-r0/upstream/SAFE-openpi/third_party/libero/libero/libero/init_files
