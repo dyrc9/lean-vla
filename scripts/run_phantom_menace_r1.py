@@ -91,6 +91,36 @@ def atomic_json(path: Path, value: dict[str, Any]) -> None:
     os.replace(temporary, path)
 
 
+def ensure_libero_runtime_config(output_root: Path) -> dict[str, Any]:
+    benchmark_root = LIBERO_SAFETY_ROOT / "libero" / "libero"
+    payload = {
+        "assets": str(benchmark_root / "assets"),
+        "bddl_files": str(benchmark_root / "bddl_files"),
+        "benchmark_root": str(benchmark_root),
+        "datasets": str(LIBERO_SAFETY_ROOT / "libero" / "datasets"),
+        "init_states": str(benchmark_root / "init_files"),
+    }
+    config_dir = output_root / "runtime" / "libero_config"
+    config_path = config_dir / "config.yaml"
+    if config_path.exists():
+        try:
+            observed = json.loads(config_path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError as exc:
+            raise ProtocolError(f"existing LIBERO runtime config is invalid: {exc}") from exc
+        if observed != payload:
+            raise ProtocolError("existing LIBERO runtime config differs from frozen checkout paths")
+    else:
+        atomic_json(config_path, payload)
+    for key, path in payload.items():
+        if key != "datasets" and not Path(path).exists():
+            raise ProtocolError(f"LIBERO runtime path is missing: {key}={path}")
+    return {
+        "directory": str(config_dir),
+        "config": payload,
+        "sha256": file_digest(config_path),
+    }
+
+
 def run_command(
     argv: Sequence[str | os.PathLike[str]], *, cwd: Path
 ) -> subprocess.CompletedProcess[str]:
@@ -892,6 +922,10 @@ def execute(
     os.environ.setdefault("JAX_COMPILATION_CACHE_DIR", "/data0/ldx/jax-cache/phantom-r1")
     os.environ.setdefault("XLA_PYTHON_CLIENT_PREALLOCATE", "false")
     os.environ.setdefault("LIBERO_SAFETY_ROOT", str(LIBERO_SAFETY_ROOT))
+    libero_config = ensure_libero_runtime_config(output_root)
+    os.environ["LIBERO_CONFIG_PATH"] = libero_config["directory"]
+    manifest["execution"]["libero_runtime_config"] = libero_config
+    atomic_json(manifest_path, manifest)
 
     for import_root in (REPO_ROOT / "src", REPO_ROOT):
         import_text = str(import_root)

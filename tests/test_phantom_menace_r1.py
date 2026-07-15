@@ -12,6 +12,7 @@ from scripts.run_phantom_menace_r1 import (
     attack_specs,
     build_summary,
     clean_specs,
+    ensure_libero_runtime_config,
     load_protocol,
     print_dry_run,
     validate_episode_payload,
@@ -208,3 +209,13 @@ def test_openpi_execution_bootstrap_declares_root_src_import_path() -> None:
 
     assert 'REPO_ROOT / "src"' in source
     assert "sys.path.insert(0, import_text)" in source
+
+
+def test_runtime_libero_config_is_isolated_and_stable(tmp_path: Path) -> None:
+    first = ensure_libero_runtime_config(tmp_path)
+    second = ensure_libero_runtime_config(tmp_path)
+
+    assert first == second
+    assert first["config"]["bddl_files"].endswith("external/LIBERO-Safety/libero/libero/bddl_files")
+    assert first["config"]["init_states"].endswith("external/LIBERO-Safety/libero/libero/init_files")
+    assert Path(first["directory"]).is_relative_to(tmp_path)
