@@ -70,9 +70,12 @@ fail closed；raw manifest 已记录 `pair_generation_attempted=false`、victim 
 `pre_generation_failure` 且不存在 record、producer-ledger 或 transcript；任何 pair attempt 已存在时
 仍永久禁止恢复。第二次启动已成功装载冻结模型和本地 vLLM，但 ART 的 localhost client 因继承系统
 SOCKS proxy、环境未安装可选 `socksio` 而在首个 pair generation 前失败；manifest 追加第二条零-attempt
-记录。当前修复只在 producer 子进程清除 HTTP/SOCKS proxy 并固定 localhost `NO_PROXY`；模型与
-tokenizer 都来自已校验本地路径，不需要外网。官方 SABER 同样用 force-exit 关闭 ART/vLLM actors，
-producer 现仅在 artifact 已持久化后采用相同退出策略。
+记录。最初的 proxy 修复在 producer 子进程清除全部 HTTP/SOCKS proxy 并固定 localhost `NO_PROXY`；模型与
+tokenizer 都来自已校验本地路径，不下载新权重。第三次启动表明 Unsloth 即使使用本地路径仍执行
+Hugging Face availability check；清除全部 HTTP proxy 会在首个 pair 前等待 120 秒后 fail closed。
+因此最终隔离只删除导致 `socksio` 缺失的 `ALL_PROXY/all_proxy`，保留普通 HTTP(S) proxy 供上游
+metadata check，并以 `NO_PROXY=127.0.0.1,localhost` 让 ART 本地 client 直连。官方 SABER 同样用
+force-exit 关闭 ART/vLLM actors，producer 现仅在 artifact 已持久化后采用相同退出策略。
 
 ## 已验证资产
 

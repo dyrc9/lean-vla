@@ -30,11 +30,7 @@ DEFAULT_OUTPUT = REPO_ROOT / "results" / "saber_liberosafety_r1_20260715"
 SABER_ROOT = REPO_ROOT / "external" / "SABER"
 LOCAL_SERVER_PROXY_KEYS = (
     "ALL_PROXY",
-    "HTTPS_PROXY",
-    "HTTP_PROXY",
     "all_proxy",
-    "https_proxy",
-    "http_proxy",
 )
 
 
@@ -508,10 +504,10 @@ async def _generate_records(
     robosuite_log.parent.mkdir(parents=True, exist_ok=True)
     os.environ["ROBOSUITE_LOG_PATH"] = str(robosuite_log)
     # ART starts a localhost OpenAI-compatible vLLM server. httpx eagerly
-    # instantiates every proxy transport from the inherited shell even when
-    # localhost is in NO_PROXY, so an unrelated SOCKS proxy would require an
-    # unpinned optional dependency. The frozen model is local; no network is
-    # needed during record generation.
+    # instantiates the inherited ALL_PROXY SOCKS transport even when localhost
+    # is in NO_PROXY, which would require an unpinned optional dependency.
+    # Preserve the ordinary HTTP(S) proxy because upstream Unsloth performs a
+    # remote availability check even for this hash-bound local model path.
     for key in LOCAL_SERVER_PROXY_KEYS:
         os.environ.pop(key, None)
     os.environ["NO_PROXY"] = "127.0.0.1,localhost"
@@ -754,14 +750,16 @@ def execute(
                 "local_server_proxy_policy": {
                     "cleared_environment_keys": list(LOCAL_SERVER_PROXY_KEYS),
                     "no_proxy": "127.0.0.1,localhost",
-                    "external_network_required": False,
+                    "model_download_required": False,
+                    "http_proxy_retained_for_upstream_metadata": True,
                 },
             },
         }
     manifest["attack_record_generation"]["local_server_proxy_policy"] = {
         "cleared_environment_keys": list(LOCAL_SERVER_PROXY_KEYS),
         "no_proxy": "127.0.0.1,localhost",
-        "external_network_required": False,
+        "model_download_required": False,
+        "http_proxy_retained_for_upstream_metadata": True,
     }
     atomic_json(manifest_path, manifest)
     try:

@@ -234,6 +234,8 @@ def test_producer_source_never_imports_or_calls_victim_loader() -> None:
     assert '"victim_rollout_used": False' in source
     assert 'os.environ["ROBOSUITE_LOG_PATH"]' in source
     assert "LOCAL_SERVER_PROXY_KEYS" in source
+    assert '"ALL_PROXY"' in source and '"all_proxy"' in source
+    assert '"HTTPS_PROXY"' not in source
     assert 'os.environ["NO_PROXY"] = "127.0.0.1,localhost"' in source
     assert "os._exit(exit_code)" in source
 
