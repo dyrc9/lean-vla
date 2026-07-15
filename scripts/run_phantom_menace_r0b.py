@@ -516,14 +516,14 @@ def server_command(protocol: dict[str, Any]) -> list[str]:
     return [
         str(OPENPI_PYTHON),
         str(POLICY_SERVER),
+        "--port",
+        str(protocol["execution"]["server_port"]),
+        "--record",
         "policy:checkpoint",
         "--policy.config",
         protocol["victim"]["config"],
         "--policy.dir",
         protocol["victim"]["checkpoint"],
-        "--port",
-        str(protocol["execution"]["server_port"]),
-        "--record",
     ]
 
 

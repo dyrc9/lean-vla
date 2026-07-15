@@ -16,6 +16,7 @@ from scripts.run_phantom_menace_r0b import (
     load_protocol,
     print_dry_run,
     qualifying_pairs,
+    server_command,
     validate_episode_artifacts,
     validate_protocol,
 )
@@ -196,3 +197,14 @@ def test_client_command_has_no_dynamic_attack_selection(tmp_path: Path) -> None:
     assert command[command.index("--args.max-steps-override") + 1] == "220"
     assert "--args.fail-on-attack-error" in command
     assert "--args.no-use-wandb" in command
+
+
+def test_server_top_level_options_precede_tyro_policy_subcommand() -> None:
+    protocol = load_protocol(DEFAULT_PROTOCOL)
+
+    command = server_command(protocol)
+
+    subcommand_index = command.index("policy:checkpoint")
+    assert command.index("--port") < subcommand_index
+    assert command.index("--record") < subcommand_index
+    assert command.index("--policy.config") > subcommand_index
