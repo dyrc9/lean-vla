@@ -7,6 +7,9 @@
 > `scripts/generate_saber_liberosafety_records.py` 与 `scripts/run_saber_liberosafety_r1.py`。
 > 必须先提交这四类资产并通过全量 Python/Lean 验证，才能生成第一条 one-shot attack record；
 > 生成前不得加载 victim，生成后不得重生成或按 attacked outcome 选 record。SAFE/FIPER 继续暂缓。
+> 第一次 producer 启动已在任何 pair generation 前因 `/tmp/robosuite.log` 权限 fail closed；raw
+> manifest 记录零 attempt。只允许将 robosuite 日志隔离进结果目录后，在“无 record/ledger/transcript”
+> gate 下恢复；这不是一次攻击重生成。
 
 > **完成通知（2026-07-15）：** 本 prompt 已在预注册 protocol `82c6ad5` 下执行完毕，
 > 不得再次运行或用新 outcome 覆盖现有 ledger。R0b 的 27/27 attacked episodes 全部有效，

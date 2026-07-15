@@ -14,6 +14,7 @@ from scripts.generate_saber_liberosafety_records import (
     print_dry_run as print_producer_dry_run,
     validate_attack_record,
     validate_clean_artifact,
+    validate_pre_generation_resume,
     validate_protocol,
     validate_record_bundle,
 )
@@ -231,3 +232,23 @@ def test_producer_source_never_imports_or_calls_victim_loader() -> None:
     assert "create_trained_policy" not in source
     assert "run_vla_episode" not in source
     assert '"victim_rollout_used": False' in source
+    assert 'os.environ["ROBOSUITE_LOG_PATH"]' in source
+
+
+def test_only_audited_zero_attempt_startup_failure_can_resume(tmp_path: Path) -> None:
+    protocol = load_protocol()
+    manifest = {
+        "schema": "proofalign.saber-liberosafety-r1-run.v1",
+        "status": "pre_generation_failure",
+        "protocol": {"sha256": file_digest(DEFAULT_PROTOCOL)},
+        "attack_record_generation": {"attack_gpus_physical_ids": [3, 5]},
+        "pre_generation_failures": [
+            {"pair_generation_attempted": False, "error": "PermissionError"}
+        ],
+    }
+    validate_pre_generation_resume(protocol, DEFAULT_PROTOCOL, tmp_path, manifest, "3,5")
+
+    (tmp_path / "transcripts").mkdir()
+    (tmp_path / "transcripts" / "01_attempt.json").write_text("{}", encoding="utf-8")
+    with pytest.raises(ProtocolError, match="generation attempt"):
+        validate_pre_generation_resume(protocol, DEFAULT_PROTOCOL, tmp_path, manifest, "3,5")

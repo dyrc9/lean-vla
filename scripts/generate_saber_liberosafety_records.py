@@ -431,6 +431,47 @@ def append_ledger(path: Path, record: dict[str, Any]) -> None:
         os.fsync(stream.fileno())
 
 
+def generation_attempt_artifacts_exist(
+    protocol: dict[str, Any], output_root: Path
+) -> bool:
+    records_path = output_root / protocol["artifact_policy"]["attack_records"]
+    ledger_path = output_root / protocol["artifact_policy"]["producer_ledger"]
+    transcript_root = output_root / "transcripts"
+    return bool(
+        records_path.exists()
+        or (ledger_path.exists() and ledger_path.stat().st_size > 0)
+        or (transcript_root.exists() and any(transcript_root.iterdir()))
+    )
+
+
+def validate_pre_generation_resume(
+    protocol: dict[str, Any],
+    protocol_path: Path,
+    output_root: Path,
+    manifest: dict[str, Any],
+    attack_gpus: str,
+) -> None:
+    if manifest.get("schema") != "proofalign.saber-liberosafety-r1-run.v1":
+        raise ProtocolError("existing producer manifest schema is invalid")
+    if manifest.get("status") != "pre_generation_failure":
+        raise ProtocolError("existing output is not an auditable pre-generation failure")
+    if generation_attempt_artifacts_exist(protocol, output_root):
+        raise ProtocolError(
+            "a pair generation attempt already exists; record generation cannot resume"
+        )
+    if manifest.get("protocol", {}).get("sha256") != file_digest(protocol_path):
+        raise ProtocolError("pre-generation failure used a different protocol")
+    expected_gpus = [int(item) for item in attack_gpus.split(",")]
+    observed_gpus = manifest.get("attack_record_generation", {}).get(
+        "attack_gpus_physical_ids"
+    )
+    if observed_gpus != expected_gpus:
+        raise ProtocolError("pre-generation failure used a different GPU selection")
+    failures = manifest.get("pre_generation_failures")
+    if not isinstance(failures, list) or not failures:
+        raise ProtocolError("pre-generation failure lacks an append-only audit record")
+
+
 def _jsonable(value: Any) -> Any:
     if value is None or isinstance(value, (str, int, float, bool)):
         return value
@@ -455,6 +496,9 @@ async def _generate_records(
     attack_gpus: str,
     server_port: int | None,
 ) -> list[dict[str, Any]]:
+    robosuite_log = output_root / "runtime" / "robosuite" / "robosuite.log"
+    robosuite_log.parent.mkdir(parents=True, exist_ok=True)
+    os.environ["ROBOSUITE_LOG_PATH"] = str(robosuite_log)
     # eval_attack_vla performs its GPU pre-parse at import time.  Give it a
     # minimal official-compatible argv, then restore this producer's argv.
     original_argv = sys.argv[:]
@@ -656,30 +700,68 @@ def execute(
     sources = assert_frozen_sources(protocol, protocol_path)
     selected = validate_gpu_selection(gpu_inventory(), attack_gpus)
     output_root = output_root.resolve()
-    if output_root.exists() and any(output_root.iterdir()):
-        raise ProtocolError(
-            f"refusing to generate into nonempty one-shot output directory: {output_root}"
-        )
     output_root.mkdir(parents=True, exist_ok=True)
     manifest_path = output_root / protocol["artifact_policy"]["manifest"]
-    manifest = {
-        "schema": "proofalign.saber-liberosafety-r1-run.v1",
-        "created_at": utc_now(),
-        "status": "generating_attack_records",
-        "protocol": sources["required_files"]["protocol"],
-        "sources": sources,
-        "attack_record_generation": {
-            "attack_gpus_physical_ids": [int(item) for item in attack_gpus.split(",")],
-            "selected_gpu": selected,
+    if manifest_path.exists():
+        manifest = load_json(manifest_path)
+        if not isinstance(manifest, dict):
+            raise ProtocolError("existing producer manifest is not an object")
+        validate_pre_generation_resume(
+            protocol, protocol_path, output_root, manifest, attack_gpus
+        )
+        history = list(manifest.get("source_history", []))
+        history.append({"observed_at": utc_now(), **sources})
+        manifest["source_history"] = history
+        manifest["sources"] = sources
+        manifest["status"] = "generating_attack_records"
+        manifest["resumed_at"] = utc_now()
+    else:
+        if any(output_root.iterdir()):
+            raise ProtocolError(
+                f"refusing to generate into nonempty output without a manifest: {output_root}"
+            )
+        manifest = {
+            "schema": "proofalign.saber-liberosafety-r1-run.v1",
+            "created_at": utc_now(),
+            "status": "generating_attack_records",
+            "protocol": sources["required_files"]["protocol"],
+            "sources": sources,
+            "source_history": [{"observed_at": utc_now(), **sources}],
+            "pre_generation_failures": [],
+            "attack_record_generation": {
+                "attack_gpus_physical_ids": [int(item) for item in attack_gpus.split(",")],
+                "selected_gpu": selected,
+                "victim_loaded": False,
+                "victim_rollout_used": False,
+                "one_generation_per_pair": True,
+            },
+        }
+    atomic_json(manifest_path, manifest)
+    try:
+        records = asyncio.run(
+            _generate_records(protocol, protocol_path, output_root, attack_gpus, server_port)
+        )
+    except Exception as exc:
+        attempted = generation_attempt_artifacts_exist(protocol, output_root)
+        failure = {
+            "observed_at": utc_now(),
+            "error": f"{type(exc).__name__}: {exc}",
+            "pair_generation_attempted": attempted,
             "victim_loaded": False,
             "victim_rollout_used": False,
-            "one_generation_per_pair": True,
-        },
-    }
-    atomic_json(manifest_path, manifest)
-    records = asyncio.run(
-        _generate_records(protocol, protocol_path, output_root, attack_gpus, server_port)
-    )
+        }
+        if attempted:
+            manifest["status"] = "record_generation_failed"
+            failures = list(manifest.get("record_generation_failures", []))
+            failures.append(failure)
+            manifest["record_generation_failures"] = failures
+        else:
+            manifest["status"] = "pre_generation_failure"
+            failures = list(manifest.get("pre_generation_failures", []))
+            failures.append(failure)
+            manifest["pre_generation_failures"] = failures
+        atomic_json(manifest_path, manifest)
+        raise
     bundle = {
         "schema": "proofalign.saber-exact-task-record-bundle.v1",
         "created_at": utc_now(),
@@ -745,7 +827,14 @@ def main(argv: list[str] | None = None) -> int:
             )
         print(json.dumps(summary, indent=2, sort_keys=True))
         return 0
-    except (OSError, KeyError, ValueError, ProtocolError, subprocess.TimeoutExpired) as exc:
+    except (
+        OSError,
+        KeyError,
+        ValueError,
+        RuntimeError,
+        ProtocolError,
+        subprocess.TimeoutExpired,
+    ) as exc:
         print(
             json.dumps({"ok": False, "error": f"{type(exc).__name__}: {exc}"}, indent=2),
             file=sys.stderr,
