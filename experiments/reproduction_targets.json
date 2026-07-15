@@ -23,6 +23,7 @@
         "external/SABER/outputs/agent_output_records_action_inflation_hf/action_inflation_openpi_pi05.json",
         "external/SABER/outputs/agent_output_records_constraint_violation_hf/constraint_violation_openpi_pi05.json",
         "experiments/saber_liberosafety_r1_protocol.json",
+        "experiments/saber_liberosafety_r1_status.json",
         "experiments/proofalign_saber_main_protocol.json",
         "scripts/generate_saber_liberosafety_records.py",
         "scripts/run_saber_liberosafety_r1.py"
@@ -32,10 +33,11 @@
         "action_inflation": "43086e07958b114b14cc98dfa3dcd726fc2eb8d265978372360527ffe8bd0dfc",
         "constraint_violation": "9998c8705913ec3062686e89a586c0792b30141de3346c81608dc3bb0e7e07c9"
       },
-      "result_scope": "standard LIBERO R0 only",
-      "result": "constraint_violation reproduced directionally; action_inflation weaker; task_failure weak",
-      "exact_task_r1_status": "preregistered_before_record_generation; no LIBERO-Safety SABER record or attacked outcome observed",
-      "next_protocol": "generate exactly four outcome-blind exact-task constraint_violation records, then run the fixed 2-of-4 independent cost/collision gate; no regeneration or best-of-N"
+      "result_scope": "standard LIBERO R0 result plus a fail-closed LIBERO-Safety exact-task R1 record-generation attempt",
+      "result": "constraint_violation reproduced directionally on standard LIBERO; exact-task LIBERO-Safety R1 failed its immutable record artifact gate before any victim outcome",
+      "exact_task_r1_status": "r1_saber_attack_record_generation_failed_closed; zero valid records, zero victim episodes, attack effectiveness not evaluated",
+      "next_protocol": "stop this SABER R1 without producer repair/retry or record replacement; conditional scoped main is not authorized",
+      "handoff": "experiments/saber_liberosafety_r1_status.json"
     },
     {
       "id": "phantom-menace",

@@ -16,6 +16,9 @@
 > `ALL_PROXY/all_proxy`，保留 HTTP(S) proxy，并让 localhost 走 `NO_PROXY`。模型仍使用已校验本地 shard。
 > 第四次零-attempt 启动确认 ART health URL 为 `0.0.0.0:8000`；最终 `NO_PROXY` 必须包含
 > `127.0.0.1,localhost,0.0.0.0`，否则已启动的本地 server 会被 HTTP proxy 隔离。
+> 第五次启动首次越过 generation 边界，但第一个 pair 的 `init_chat_model()` 因 ART
+> `CURRENT_CONFIG` 缺失失败。invalid transcript/ledger 已落盘，故按预注册 gate 永久禁止修复后重跑；
+> 没有有效 record 或 victim outcome，SABER R1 与条件式 main 均停止。
 
 > **完成通知（2026-07-15）：** 本 prompt 已在预注册 protocol `82c6ad5` 下执行完毕，
 > 不得再次运行或用新 outcome 覆盖现有 ledger。R0b 的 27/27 attacked episodes 全部有效，

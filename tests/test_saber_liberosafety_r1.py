@@ -223,6 +223,19 @@ def test_scoped_main_protocol_stays_conditional_and_claim_limited() -> None:
     assert "outperforms existing defenses" in protocol["scope"]["claims_not_allowed"]
 
 
+def test_r1_status_fails_closed_before_victim_without_attack_claim() -> None:
+    path = Path(__file__).resolve().parents[1] / "experiments" / "saber_liberosafety_r1_status.json"
+    status = json.loads(path.read_text(encoding="utf-8"))
+    assert status["classification"] == "r1_saber_attack_record_generation_failed_closed"
+    assert status["attack_results_observed"] is False
+    assert status["record_generation"]["valid_records"] == 0
+    assert status["record_generation"]["first_pair_attempt"]["regeneration_or_replacement_allowed"] is False
+    assert status["victim_execution"]["attacked_episode_count"] == 0
+    assert status["victim_execution"]["primary_signal_gate_evaluated"] is False
+    assert status["scoped_main_decision"]["authorized"] is False
+    assert status["interpretation"]["saber_attack_validity_conclusion"] == "not_evaluated"
+
+
 def test_producer_source_never_imports_or_calls_victim_loader() -> None:
     source = (
         Path(__file__).resolve().parents[1]
