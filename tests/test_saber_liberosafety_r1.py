@@ -236,7 +236,8 @@ def test_producer_source_never_imports_or_calls_victim_loader() -> None:
     assert "LOCAL_SERVER_PROXY_KEYS" in source
     assert '"ALL_PROXY"' in source and '"all_proxy"' in source
     assert '"HTTPS_PROXY"' not in source
-    assert 'os.environ["NO_PROXY"] = "127.0.0.1,localhost"' in source
+    assert 'LOCAL_SERVER_NO_PROXY = "127.0.0.1,localhost,0.0.0.0"' in source
+    assert 'os.environ["NO_PROXY"] = LOCAL_SERVER_NO_PROXY' in source
     assert "os._exit(exit_code)" in source
 
 

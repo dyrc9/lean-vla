@@ -32,6 +32,7 @@ LOCAL_SERVER_PROXY_KEYS = (
     "ALL_PROXY",
     "all_proxy",
 )
+LOCAL_SERVER_NO_PROXY = "127.0.0.1,localhost,0.0.0.0"
 
 
 class ProtocolError(RuntimeError):
@@ -510,8 +511,8 @@ async def _generate_records(
     # remote availability check even for this hash-bound local model path.
     for key in LOCAL_SERVER_PROXY_KEYS:
         os.environ.pop(key, None)
-    os.environ["NO_PROXY"] = "127.0.0.1,localhost"
-    os.environ["no_proxy"] = "127.0.0.1,localhost"
+    os.environ["NO_PROXY"] = LOCAL_SERVER_NO_PROXY
+    os.environ["no_proxy"] = LOCAL_SERVER_NO_PROXY
     # eval_attack_vla performs its GPU pre-parse at import time.  Give it a
     # minimal official-compatible argv, then restore this producer's argv.
     original_argv = sys.argv[:]
@@ -749,7 +750,7 @@ def execute(
                 "one_generation_per_pair": True,
                 "local_server_proxy_policy": {
                     "cleared_environment_keys": list(LOCAL_SERVER_PROXY_KEYS),
-                    "no_proxy": "127.0.0.1,localhost",
+                    "no_proxy": LOCAL_SERVER_NO_PROXY,
                     "model_download_required": False,
                     "http_proxy_retained_for_upstream_metadata": True,
                 },
@@ -757,7 +758,7 @@ def execute(
         }
     manifest["attack_record_generation"]["local_server_proxy_policy"] = {
         "cleared_environment_keys": list(LOCAL_SERVER_PROXY_KEYS),
-        "no_proxy": "127.0.0.1,localhost",
+        "no_proxy": LOCAL_SERVER_NO_PROXY,
         "model_download_required": False,
         "http_proxy_retained_for_upstream_metadata": True,
     }

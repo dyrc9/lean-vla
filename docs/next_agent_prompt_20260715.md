@@ -14,6 +14,8 @@
 > producer 的 SOCKS proxy 并固定 localhost `NO_PROXY`；本地模型已做哈希校验，不安装新依赖或下载模型。
 > 第三次零-attempt 启动证明 Unsloth 仍需远程 availability check；最终只清除导致缺失 `socksio` 的
 > `ALL_PROXY/all_proxy`，保留 HTTP(S) proxy，并让 localhost 走 `NO_PROXY`。模型仍使用已校验本地 shard。
+> 第四次零-attempt 启动确认 ART health URL 为 `0.0.0.0:8000`；最终 `NO_PROXY` 必须包含
+> `127.0.0.1,localhost,0.0.0.0`，否则已启动的本地 server 会被 HTTP proxy 隔离。
 
 > **完成通知（2026-07-15）：** 本 prompt 已在预注册 protocol `82c6ad5` 下执行完毕，
 > 不得再次运行或用新 outcome 覆盖现有 ledger。R0b 的 27/27 attacked episodes 全部有效，
