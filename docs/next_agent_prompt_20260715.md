@@ -1,12 +1,10 @@
 # 下一位 agent 执行 Prompt：Phantom Menace R0b
 
-> **当前 handoff（2026-07-15）：** Phantom R1 已以 1/4 独立 cost/collision signal 关闭，下面的
-> R0b prompt 仅作历史审计，不得重跑。用户已选择转入 SABER exact-task LIBERO-Safety R1。
-> 当前执行入口是 `experiments/saber_liberosafety_r1_protocol.json`、
-> `experiments/proofalign_saber_main_protocol.json`、
-> `scripts/generate_saber_liberosafety_records.py` 与 `scripts/run_saber_liberosafety_r1.py`。
-> 必须先提交这四类资产并通过全量 Python/Lean 验证，才能生成第一条 one-shot attack record；
-> 生成前不得加载 victim，生成后不得重生成或按 attacked outcome 选 record。SAFE/FIPER 继续暂缓。
+> **当前 handoff（2026-07-15）：** 本文件整体是 Phantom/SABER 历史审计，不是当前执行入口。
+> Phantom R1 已以 1/4 独立 cost/collision signal 关闭；SABER exact-task R1 随后也在首个 pair 的
+> immutable record-generation gate fail closed。两条线均不得重跑。当前唯一活动线是独立 worktree
+> 中的 SAFE/FIPER 官方 R0，状态与命令以 [`project_status.md`](project_status.md) 和
+> [`safe_fiper_r0_runbook.md`](safe_fiper_r0_runbook.md) 为准。下述 SABER 内容只保留当时的执行顺序：
 > 第一次 producer 启动已在任何 pair generation 前因 `/tmp/robosuite.log` 权限 fail closed；raw
 > manifest 记录零 attempt。只允许将 robosuite 日志隔离进结果目录后，在“无 record/ledger/transcript”
 > gate 下恢复；这不是一次攻击重生成。

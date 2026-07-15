@@ -8,7 +8,7 @@ archive 中的内容。
 
 建议按以下顺序阅读：
 
-1. [`project_status.md`](project_status.md)：当前真实进展、已验证资产和 P0 阻塞。
+1. [`project_status.md`](project_status.md)：顶部状态矩阵给出当前真实进展、执行顺序和阻塞。
 2. [`method.md`](method.md)：唯一 normative 方法定义、威胁模型和 claim boundary。
 3. [`system_architecture.md`](system_architecture.md)：当前实现与目标闭环的模块对应。
 4. [`roadmap.md`](roadmap.md)：唯一执行优先级、阶段 gate 和停止条件。
@@ -16,9 +16,11 @@ archive 中的内容。
 6. [`reproduction_plan.md`](reproduction_plan.md)：发布攻击、现有防御与 CTDA 的复现证据链。
 7. [`implementation_notes.md`](implementation_notes.md)：本地 CPU/Lean 开发与验证约定。
 8. [`remote_execution.md`](remote_execution.md)：迁移到远程 GPU 后的环境、路径和运行协议。
-9. [`paper_story.md`](paper_story.md)：收缩后的论文叙事和可写贡献。
-10. [`related_work.md`](related_work.md)：研究定位；不作为实现状态或 CLI 来源。
-11. [`next_agent_prompt_20260715.md`](next_agent_prompt_20260715.md)：已执行的 Phantom R0b 事前
+9. [`safe_fiper_r0_runbook.md`](safe_fiper_r0_runbook.md)：独立 baseline worktree、已下载资产、uv
+   环境、活动运行与 terminal 验证清单。
+10. [`paper_story.md`](paper_story.md)：收缩后的论文叙事和可写贡献。
+11. [`related_work.md`](related_work.md)：研究定位；不作为实现状态或 CLI 来源。
+12. [`next_agent_prompt_20260715.md`](next_agent_prompt_20260715.md)：已执行的 Phantom R0b 事前
     协议与审计记录；不再是可重跑的当前交接 prompt。
 
 ## 当前方法口径
