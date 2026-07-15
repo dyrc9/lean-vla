@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Read-only, fail-closed preflight for the deferred SAFE/FIPER reproductions.
+"""Read-only, fail-closed preflight for the SAFE and FIPER R0 reproductions.
 
 The preflight intentionally does not unpickle rollout files. Both upstream
 pipelines use Python pickle, so schema inspection must only happen after an
@@ -21,6 +21,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 SAFE_PROTOCOL = REPO_ROOT / "experiments" / "safe_r0_protocol.json"
 FIPER_PROTOCOL = REPO_ROOT / "experiments" / "fiper_r0_protocol.json"
 PHANTOM_R1_PROTOCOL = REPO_ROOT / "experiments" / "phantom_menace_r1_protocol.json"
+CANONICAL_UV = "/home/ldx/.conda/envs/proofalign-libero/bin/uv"
 PHYSICAL_SUITES = (
     "affordance",
     "obstacle_avoidance",
@@ -47,8 +48,6 @@ def require(condition: bool, message: str) -> None:
 
 def validate_safe_protocol(protocol: dict[str, Any]) -> None:
     require(protocol.get("schema") == "proofalign.safe-r0-protocol.v1", "SAFE schema changed")
-    require(protocol.get("protocol_status") == "deferred_by_user_before_assets", "SAFE deferment changed")
-    require(protocol.get("deferment", {}).get("blocks_phantom_r1_or_scoped_main_experiment") is False, "SAFE cannot block the scoped main experiment")
     scope = protocol.get("scope", {})
     require(scope.get("victim") == "OpenPI pi0", "SAFE R0 must remain on official pi0")
     require(scope.get("pi05_adapter_experiment") is False, "SAFE R0 cannot include pi0.5 adapter work")
@@ -64,19 +63,51 @@ def validate_safe_protocol(protocol: dict[str, Any]) -> None:
     require(detector.get("official_seeds") == [0, 1, 2], "SAFE seed list changed")
     require(detector.get("full_official_multirun_required_for_r0_claim") is True, "SAFE full-matrix gate removed")
     require(detector.get("reduced_smoke_can_satisfy_r0") is False, "SAFE smoke cannot satisfy R0")
+    environment = protocol.get("environment", {})
+    require(environment.get("uv") == CANONICAL_UV, "SAFE environment manager changed")
+    require(
+        environment.get("detector_environment") == "/data0/ldx/uv-envs/safe-r0",
+        "SAFE isolated environment changed",
+    )
+    require(
+        environment.get("openpi_server_environment") == "/data0/ldx/uv-envs/safe-r0-openpi",
+        "SAFE OpenPI server environment changed",
+    )
+    require(
+        environment.get("libero_client_environment") == "/data0/ldx/uv-envs/safe-r0-libero-client",
+        "SAFE LIBERO client environment changed",
+    )
+    require(
+        bool(rollout.get("checkpoint_tree_manifest_sha256")),
+        "SAFE checkpoint manifest digest is not frozen",
+    )
 
 
 def validate_fiper_protocol(protocol: dict[str, Any]) -> None:
     require(protocol.get("schema") == "proofalign.fiper-r0-protocol.v1", "FIPER schema changed")
-    require(protocol.get("protocol_status") == "deferred_by_user_before_assets", "FIPER deferment changed")
-    require(protocol.get("deferment", {}).get("blocks_phantom_r1_or_scoped_main_experiment") is False, "FIPER cannot block the scoped main experiment")
     dataset = protocol.get("dataset", {})
     require(
         dataset.get("tasks_in_order") == ["sorting", "stacking", "push_t", "pretzel", "push_chair"],
         "FIPER task order changed",
     )
-    require(dataset.get("calibration_rollouts_must_all_be_successful") is True, "FIPER clean calibration gate removed")
+    require(
+        dataset.get("calibration_rollouts_must_all_be_successful") is False,
+        "FIPER official mixed calibration semantics changed",
+    )
+    require(
+        dataset.get("threshold_calibration_uses_successful_rollouts_only") is True,
+        "FIPER successful threshold subset changed",
+    )
+    require(
+        dataset.get("preprocessing_and_rnd_training_use_full_calibration_subset") is True,
+        "FIPER full calibration training subset changed",
+    )
     pipeline = protocol.get("official_pipeline", {})
+    require(pipeline.get("launcher") == "scripts/run_fiper_compat.py", "FIPER compatibility launcher changed")
+    require(
+        pipeline.get("compatibility_shim", {}).get("upstream_source_modified") is False,
+        "FIPER upstream source must remain unmodified",
+    )
     require(pipeline.get("primary_components") == ["rnd_oe", "entropy"], "FIPER primary components changed")
     require(pipeline.get("random_seeds") == [0, 1, 2, 42, 43], "FIPER seeds changed")
     require(
@@ -85,9 +116,25 @@ def validate_fiper_protocol(protocol: dict[str, Any]) -> None:
     )
     require(pipeline.get("full_default_pipeline_required_for_r0_claim") is True, "FIPER full-pipeline gate removed")
     require(pipeline.get("reduced_smoke_can_satisfy_r0") is False, "FIPER smoke cannot satisfy R0")
+    environment = protocol.get("environment", {})
+    require(environment.get("uv") == CANONICAL_UV, "FIPER environment manager changed")
+    require(
+        environment.get("isolated_environment") == "/data0/ldx/uv-envs/fiper-r0",
+        "FIPER isolated environment changed",
+    )
+    require(
+        dataset.get("artifact_expected_size_bytes") == 5_676_727_608,
+        "FIPER official archive size changed",
+    )
+    require(
+        dataset.get("artifact_sha256") == "00922af40e54b23ce4434402858116fbfd485ca06852f09d180ff192868bf191",
+        "FIPER official archive digest changed",
+    )
 
 
 def validate_phantom_r1_protocol(protocol: dict[str, Any]) -> None:
+    """Retain the independent main-line guard for the frozen Phantom R1 protocol."""
+
     require(
         protocol.get("schema") == "proofalign.phantom-menace-r1-protocol.v1",
         "Phantom R1 schema changed",
@@ -99,7 +146,7 @@ def validate_phantom_r1_protocol(protocol: dict[str, Any]) -> None:
     )
     scope = protocol.get("scope", {})
     require(scope.get("execution_authorized_after_protocol_commit") is True, "Phantom R1 execution is not authorized")
-    require(scope.get("execution_requires_safe_and_fiper_r0_readiness_decision") is False, "deferred baselines cannot block Phantom R1")
+    require(scope.get("execution_requires_safe_and_fiper_r0_readiness_decision") is False, "SAFE/FIPER cannot retroactively block Phantom R1")
     episode = protocol.get("episode_config", {})
     require(episode.get("init_state_id") == 1, "Phantom R1 must remain held out from init 0")
     require(episode.get("camera_attacked") == "agentview", "Phantom R1 camera changed")
@@ -185,44 +232,81 @@ def check_safe_assets(
     checkpoint: Path | None,
     rollout_root: Path | None,
 ) -> dict[str, Any]:
-    blockers: list[str] = []
+    checkpoint_blockers: list[str] = []
+    rollout_blockers: list[str] = []
     checkpoint_record: dict[str, Any] = {"path": str(checkpoint) if checkpoint else None}
     if checkpoint is None or not checkpoint.is_dir():
-        blockers.append("SAFE pi0_libero checkpoint directory is not available")
+        checkpoint_blockers.append("SAFE pi0_libero checkpoint directory is not available")
     else:
         checkpoint_record["present"] = True
-        checkpoint_record["manifest_frozen"] = bool(
-            protocol["rollout_generation"].get("checkpoint_manifest_sha256")
+        rollout = protocol["rollout_generation"]
+        manifest_path = Path(rollout["checkpoint_tree_manifest"])
+        expected_manifest_digest = rollout["checkpoint_tree_manifest_sha256"]
+        observed_manifest_digest = digest(manifest_path)
+        checkpoint_record.update(
+            {
+                "manifest": str(manifest_path),
+                "expected_manifest_sha256": expected_manifest_digest,
+                "observed_manifest_sha256": observed_manifest_digest,
+                "manifest_match": observed_manifest_digest == expected_manifest_digest,
+            }
         )
-        if not checkpoint_record["manifest_frozen"]:
-            blockers.append("SAFE checkpoint manifest digest is not frozen in protocol")
+        if observed_manifest_digest != expected_manifest_digest:
+            checkpoint_blockers.append("SAFE checkpoint tree manifest is missing or its digest changed")
+        else:
+            manifest = load_json(manifest_path)
+            expected_fields = {
+                "root": str(checkpoint.resolve()),
+                "tree_sha256": rollout["checkpoint_tree_sha256"],
+                "file_count": rollout["checkpoint_file_count"],
+                "total_file_bytes": rollout["checkpoint_total_file_bytes"],
+            }
+            for key, expected in expected_fields.items():
+                if manifest.get(key) != expected:
+                    checkpoint_blockers.append(f"SAFE checkpoint manifest {key} changed")
+        tokenizer = Path(rollout["tokenizer_local_path"])
+        checkpoint_record["tokenizer"] = {
+            "path": str(tokenizer),
+            "expected_sha256": rollout["tokenizer_sha256"],
+            "observed_sha256": digest(tokenizer),
+        }
+        if not tokenizer.is_file() or tokenizer.stat().st_size != rollout["tokenizer_size_bytes"]:
+            checkpoint_blockers.append("SAFE tokenizer is missing or its size changed")
+        elif checkpoint_record["tokenizer"]["observed_sha256"] != rollout["tokenizer_sha256"]:
+            checkpoint_blockers.append("SAFE tokenizer digest changed")
 
     env_records: list[Path] = []
     policy_records: list[Path] = []
     if rollout_root is None or not rollout_root.is_dir():
-        blockers.append("SAFE official pi0-libero_10 rollout root is not available")
+        rollout_blockers.append("SAFE official pi0-libero_10 rollout root is not available")
     else:
         env_records = pickle_files(rollout_root / "env_records")
         policy_records = sorted((rollout_root / "policy_records").glob("*meta.pkl"))
         expected = protocol["rollout_generation"]["expected_episode_count"]
         if len(env_records) != expected:
-            blockers.append(f"SAFE env record count is {len(env_records)}, expected {expected}")
+            rollout_blockers.append(f"SAFE env record count is {len(env_records)}, expected {expected}")
         if not policy_records:
-            blockers.append("SAFE policy meta records are absent")
-        blockers.append("SAFE trusted-pickle schema/count inspection has not been executed")
-        blockers.append("SAFE rollout-tree SHA256 manifest is not frozen")
+            rollout_blockers.append("SAFE policy meta records are absent")
+        rollout_blockers.append("SAFE trusted-pickle schema/count inspection has not been executed")
+        rollout_blockers.append("SAFE rollout-tree SHA256 manifest is not frozen")
     return {
         "checkpoint": checkpoint_record,
         "rollout_root": str(rollout_root) if rollout_root else None,
         "env_record_count": len(env_records),
         "policy_record_count": len(policy_records),
-        "blockers": blockers,
+        "checkpoint_ready": not checkpoint_blockers,
+        "rollout_ready": not rollout_blockers,
+        "checkpoint_blockers": checkpoint_blockers,
+        "rollout_blockers": rollout_blockers,
+        "blockers": [*checkpoint_blockers, *rollout_blockers],
     }
 
 
 def check_fiper_assets(protocol: dict[str, Any], *, data_root: Path | None) -> dict[str, Any]:
     blockers: list[str] = []
     counts: dict[str, dict[str, int]] = {}
+    dataset = protocol["dataset"]
+    data_root = data_root or Path(dataset["extracted_data_root"])
     minimum = int(protocol["dataset"]["minimum_files_per_task_split_from_upstream_code"])
     if data_root is None or not data_root.is_dir():
         blockers.append("FIPER official rollout data root is not available")
@@ -236,9 +320,105 @@ def check_fiper_assets(protocol: dict[str, Any], *, data_root: Path | None) -> d
                     blockers.append(
                         f"FIPER {task}/{split} has {count} pickle files, minimum is {minimum}"
                     )
-        blockers.append("FIPER trusted-pickle schema/label inspection has not been executed")
-        blockers.append("FIPER archive and extracted-tree SHA256 manifests are not frozen")
-    return {"data_root": str(data_root) if data_root else None, "counts": counts, "blockers": blockers}
+
+    archive = Path(dataset["artifact_local_path"])
+    if not archive.is_file() or archive.stat().st_size != dataset["artifact_expected_size_bytes"]:
+        blockers.append("FIPER official archive is missing or its size changed")
+
+    report_specs = (
+        ("archive_digest", Path(dataset["artifact_digest_report"]), dataset["artifact_digest_report_sha256"]),
+        (
+            "tree_manifest",
+            Path(dataset["extracted_tree_manifest"]),
+            dataset["extracted_tree_manifest_sha256"],
+        ),
+        (
+            "pickle_inspection",
+            Path(dataset["trusted_pickle_inspection_report"]),
+            dataset["trusted_pickle_inspection_report_sha256"],
+        ),
+    )
+    reports: dict[str, Any] = {}
+    for name, path, expected_digest in report_specs:
+        observed_digest = digest(path)
+        reports[name] = {
+            "path": str(path),
+            "expected_sha256": expected_digest,
+            "observed_sha256": observed_digest,
+            "match": observed_digest == expected_digest,
+        }
+        if observed_digest != expected_digest:
+            blockers.append(f"FIPER {name} report is missing or its digest changed")
+
+    if reports["archive_digest"]["match"]:
+        archive_report = load_json(Path(dataset["artifact_digest_report"]))
+        if archive_report.get("size") != dataset["artifact_expected_size_bytes"]:
+            blockers.append("FIPER archive digest report size changed")
+        if archive_report.get("sha256") != dataset["artifact_sha256"]:
+            blockers.append("FIPER archive digest report SHA256 changed")
+    if reports["tree_manifest"]["match"]:
+        tree_report = load_json(Path(dataset["extracted_tree_manifest"]))
+        for key, expected in {
+            "root": str(data_root.resolve()),
+            "tree_sha256": dataset["extracted_tree_sha256"],
+            "file_count": dataset["extracted_file_count"],
+            "total_file_bytes": dataset["extracted_total_file_bytes"],
+        }.items():
+            if tree_report.get(key) != expected:
+                blockers.append(f"FIPER extracted-tree manifest {key} changed")
+    if reports["pickle_inspection"]["match"]:
+        inspection = load_json(Path(dataset["trusted_pickle_inspection_report"]))
+        if inspection.get("valid") is not True:
+            blockers.append("FIPER trusted-pickle inspection is not valid")
+        for task in dataset["tasks_in_order"]:
+            task_report = inspection.get("tasks", {}).get(task, {})
+            calibration = task_report.get("calibration", {})
+            test = task_report.get("test", {})
+            if calibration.get("success_count", 0) < 1:
+                blockers.append(f"FIPER {task} lacks successful calibration rollouts")
+            if test.get("success_count", 0) < 1 or test.get("failure_count", 0) < 1:
+                blockers.append(f"FIPER {task} test labels are not mixed")
+            for split, split_report in (("calibration", calibration), ("test", test)):
+                if split_report.get("file_count") != counts.get(task, {}).get(split):
+                    blockers.append(f"FIPER {task}/{split} count differs from trusted inspection")
+    return {
+        "data_root": str(data_root) if data_root else None,
+        "counts": counts,
+        "reports": reports,
+        "ready": not blockers,
+        "blockers": blockers,
+    }
+
+
+def check_python_environment(
+    path: Path,
+    *,
+    modules: tuple[str, ...],
+    pythonpath: tuple[Path, ...] = (),
+    env: dict[str, str] | None = None,
+) -> dict[str, Any]:
+    python = path / "bin" / "python"
+    blockers: list[str] = []
+    if not python.is_file():
+        blockers.append(f"environment Python is missing: {python}")
+        return {"path": str(path), "python": str(python), "blockers": blockers}
+    setup = ["import os, sys"]
+    if pythonpath:
+        setup.append(f"sys.path[:0] = {[str(item.resolve()) for item in pythonpath]!r}")
+    for key, value in (env or {}).items():
+        setup.append(f"os.environ[{key!r}] = {value!r}")
+    program = "; ".join([*setup, *(f"import {module}" for module in modules), "print(sys.version)"])
+    rc, stdout, stderr = command((str(python), "-c", program), cwd=REPO_ROOT)
+    if rc != 0:
+        blockers.append(f"environment import check failed for {path}: {stderr or stdout}")
+    return {
+        "path": str(path),
+        "python": str(python),
+        "modules": list(modules),
+        "pythonpath": [str(item.resolve()) for item in pythonpath],
+        "version": stdout if rc == 0 else None,
+        "blockers": blockers,
+    }
 
 
 def collect_preflight(
@@ -251,21 +431,17 @@ def collect_preflight(
     workspace = workspace.resolve()
     safe = load_json(workspace / "experiments" / "safe_r0_protocol.json")
     fiper = load_json(workspace / "experiments" / "fiper_r0_protocol.json")
-    phantom = load_json(workspace / "experiments" / "phantom_menace_r1_protocol.json")
     validate_safe_protocol(safe)
     validate_fiper_protocol(fiper)
-    validate_phantom_r1_protocol(phantom)
 
     safe_git = git_check(workspace / safe["source"]["safe_checkout"], safe["source"]["safe_commit"])
     safe_openpi_git = git_check(
         workspace / safe["source"]["safe_openpi_checkout"], safe["source"]["safe_openpi_commit"]
     )
     fiper_git = git_check(workspace / fiper["source"]["checkout"], fiper["source"]["commit"])
-    phantom_git = git_check(workspace / "external" / "Phantom-Menace", phantom["source"]["phantom_patched_runner_commit"])
-    libero_git = git_check(workspace / "external" / "LIBERO-Safety", phantom["source"]["libero_safety_commit"])
-    openpi_git = git_check(workspace / "external" / "openpi", phantom["source"]["openpi_commit"])
-
-    safe_digests, safe_digest_blockers = digest_check(workspace / "external", safe["source"]["sha256"])
+    safe_digests, safe_digest_blockers = digest_check(
+        workspace / safe["source"]["digest_root"], safe["source"]["sha256"]
+    )
     fiper_digests, fiper_digest_blockers = digest_check(
         workspace / fiper["source"]["checkout"], fiper["source"]["sha256"]
     )
@@ -294,49 +470,86 @@ def collect_preflight(
                     f"SAFE-openpi submodule mismatch: {path} {observed_head} != {expected_head}"
                 )
 
-    safe_assets = check_safe_assets(
-        safe, checkpoint=safe_checkpoint, rollout_root=safe_rollout_root
-    )
+    safe_checkpoint = safe_checkpoint or Path(safe["rollout_generation"]["checkpoint_local_path"])
+    safe_assets = check_safe_assets(safe, checkpoint=safe_checkpoint, rollout_root=safe_rollout_root)
     fiper_assets = check_fiper_assets(fiper, data_root=fiper_data_root)
-    r1_declared_blockers = list(phantom["execution_gate"]["current_blockers"])
-
+    environments = {
+        "safe_detector": check_python_environment(
+            Path(safe["environment"]["detector_environment"]),
+            modules=("failure_prob", "torch", "hydra"),
+        ),
+        "safe_openpi_server": check_python_environment(
+            Path(safe["environment"]["openpi_server_environment"]),
+            modules=("openpi", "jax", "torch"),
+        ),
+        "safe_libero_client": check_python_environment(
+            Path(safe["environment"]["libero_client_environment"]),
+            modules=("openpi_client", "libero.libero", "mujoco", "torch"),
+            pythonpath=(workspace / safe["source"]["safe_openpi_checkout"] / "third_party" / "libero",),
+            env={
+                "LIBERO_CONFIG_PATH": str(
+                    workspace / "experiments" / "safe_fiper_r0_env" / "libero_config"
+                )
+            },
+        ),
+        "fiper": check_python_environment(
+            Path(fiper["environment"]["isolated_environment"]),
+            modules=("torch", "hydra", "zarr"),
+        ),
+    }
+    environment_blockers = [
+        blocker for record in environments.values() for blocker in record["blockers"]
+    ]
     source_blockers = [
         *safe_git["blockers"],
         *safe_openpi_git["blockers"],
         *fiper_git["blockers"],
-        *phantom_git["blockers"],
-        *libero_git["blockers"],
-        *openpi_git["blockers"],
         *safe_digest_blockers,
         *fiper_digest_blockers,
         *submodule_blockers,
     ]
-    blockers = [*source_blockers, *safe_assets["blockers"], *fiper_assets["blockers"]]
+    blockers = [
+        *source_blockers,
+        *environment_blockers,
+        *safe_assets["blockers"],
+        *fiper_assets["blockers"],
+    ]
+    input_readiness = {
+        "safe_rollout": not (
+            source_blockers
+            or environments["safe_openpi_server"]["blockers"]
+            or environments["safe_libero_client"]["blockers"]
+            or safe_assets["checkpoint_blockers"]
+        ),
+        "safe_detector": not (
+            source_blockers
+            or environments["safe_detector"]["blockers"]
+            or safe_assets["blockers"]
+        ),
+        "fiper": not (
+            source_blockers or environments["fiper"]["blockers"] or fiper_assets["blockers"]
+        ),
+    }
     return {
         "schema": "proofalign.baseline-reproduction-preflight.v1",
         "workspace": str(workspace),
         "ready": not blockers,
         "source_ready": not source_blockers,
         "gpu_execution_authorized": False,
-        "execution_deferred_by_user": True,
-        "blocks_phantom_r1_or_scoped_main_experiment": False,
         "protocols": {
             "safe": str(workspace / "experiments" / "safe_r0_protocol.json"),
             "fiper": str(workspace / "experiments" / "fiper_r0_protocol.json"),
-            "phantom_r1": str(workspace / "experiments" / "phantom_menace_r1_protocol.json"),
         },
         "git": {
             "safe": safe_git,
             "safe_openpi": safe_openpi_git,
             "fiper": fiper_git,
-            "phantom": phantom_git,
-            "libero_safety": libero_git,
-            "openpi": openpi_git,
         },
         "source_digests": {"safe": safe_digests, "fiper": fiper_digests},
+        "environments": environments,
+        "input_readiness": input_readiness,
         "safe_assets": safe_assets,
         "fiper_assets": fiper_assets,
-        "phantom_r1_declared_blockers": r1_declared_blockers,
         "blockers": blockers,
     }
 

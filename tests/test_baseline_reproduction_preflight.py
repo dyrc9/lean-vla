@@ -71,8 +71,7 @@ def test_fiper_asset_check_counts_each_task_and_split(tmp_path: Path) -> None:
         counts == {"calibration": 5, "test": 5}
         for counts in report["counts"].values()
     )
-    assert any("trusted-pickle" in blocker for blocker in report["blockers"])
-    assert any("SHA256" in blocker for blocker in report["blockers"])
+    assert any("count differs from trusted inspection" in blocker for blocker in report["blockers"])
 
 
 def test_current_preflight_is_read_only_and_blocks_gpu_execution() -> None:
@@ -80,15 +79,24 @@ def test_current_preflight_is_read_only_and_blocks_gpu_execution() -> None:
 
     assert report["schema"] == "proofalign.baseline-reproduction-preflight.v1"
     assert report["ready"] is False
-    assert report["source_ready"] is True
     assert report["gpu_execution_authorized"] is False
-    assert report["execution_deferred_by_user"] is True
-    assert report["blocks_phantom_r1_or_scoped_main_experiment"] is False
-    assert not any("submodule" in blocker for blocker in report["blockers"])
-    assert any("FIPER official rollout data root" in blocker for blocker in report["blockers"])
-    assert any("SAFE pi0_libero checkpoint" in blocker for blocker in report["blockers"])
-    assert report["git"]["safe"]["clean"] is True
-    assert report["git"]["fiper"]["clean"] is True
+    assert report["safe_assets"]["checkpoint_ready"] is True
+    assert report["safe_assets"]["rollout_ready"] is False
+    assert any("SAFE official pi0-libero_10 rollout root" in blocker for blocker in report["blockers"])
+    if (ROOT / "upstream").is_dir():
+        assert report["source_ready"] is True
+        assert not any("submodule" in blocker for blocker in report["blockers"])
+        assert report["input_readiness"]["fiper"] is True
+        assert report["git"]["safe"]["clean"] is True
+        assert report["git"]["fiper"]["clean"] is True
+    else:
+        # The merged main worktree intentionally does not duplicate the ignored
+        # source checkouts owned by the dedicated reproduction worktree.
+        assert report["source_ready"] is False
+        assert report["input_readiness"]["fiper"] is False
+        assert report["git"]["safe"]["clean"] is None
+        assert report["git"]["fiper"]["clean"] is None
+        assert any("checkout missing" in blocker for blocker in report["blockers"])
 
 
 def test_protocol_json_is_canonical_parseable() -> None:
