@@ -756,7 +756,7 @@ def run_episode(
     readiness_timeout: float,
     episode_timeout: float,
 ) -> dict[str, Any]:
-    assert_frozen_sources(protocol)
+    source_snapshots = assert_frozen_sources(protocol)
     ensure_port_free(int(protocol["execution"]["server_port"]))
     episode_dir = result_root / spec.episode_id
     if episode_dir.exists():
@@ -838,6 +838,7 @@ def run_episode(
         "egl_gpu_physical_id": egl_gpu,
         "port": protocol["execution"]["server_port"],
         "source_commits": {
+            "proofalign": source_snapshots["proofalign"]["commit"],
             "phantom": protocol["source"]["phantom_patched_runner_commit"],
             "standard_libero": protocol["source"]["standard_libero_commit"],
             "openpi": protocol["source"]["openpi_commit"],
@@ -893,6 +894,14 @@ def create_or_load_manifest(
             raise ProtocolError("existing manifest uses a different policy GPU")
         if execution.get("egl_gpu_physical_id") != egl_gpu:
             raise ProtocolError("existing manifest uses a different EGL GPU")
+        history = list(manifest.get("orchestrator_commit_history", []))
+        original_commit = manifest.get("source", {}).get("proofalign", {}).get("commit")
+        for commit in (original_commit, snapshots["proofalign"]["commit"]):
+            if commit and commit not in history:
+                history.append(commit)
+        manifest["orchestrator_commit_history"] = history
+        manifest["source"] = snapshots
+        atomic_json(manifest_path, manifest)
         return manifest
 
     result_root.mkdir(parents=True, exist_ok=True)
@@ -906,6 +915,7 @@ def create_or_load_manifest(
             "attack_results_observed_at_preregistration": False,
         },
         "source": snapshots,
+        "orchestrator_commit_history": [snapshots["proofalign"]["commit"]],
         "victim": protocol["victim"],
         "environment": environment,
         "execution": {
