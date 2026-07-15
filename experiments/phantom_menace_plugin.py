@@ -14,7 +14,7 @@ import numpy as np
 REPO_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_PHANTOM_ROOT = REPO_ROOT / "external" / "Phantom-Menace"
 UPSTREAM_COMMIT = "a0e4c8b2a661ea2fe64bdb9055353b2e12575729"
-LOCAL_PATCH_COMMIT = "9ceb030f0313ded029acedb1c5a8f76e57c654bc"
+LOCAL_PATCH_COMMIT = "d03fcbdfa4d49985dabd60e11e12008e2af3a783"
 PLUGIN_VERSION = "proofalign.phantom-menace-observation-transform.v1"
 
 # These hashes freeze the upstream implementations used by the adapter.  The

@@ -5,9 +5,9 @@
 本文是远程环境、迁移和 GPU 运行的唯一 canonical 说明。旧 benchmark handoff、OpenVLA mock
 批次、legacy commands 和 SABER run notes 已归档。
 
-当前 workspace 位于可访问 GPU 的机器，已完成 single-prefix diagnostic，但尚未完成 clean
-3--5 prefix calibration。任何新运行仍必须先完成 [`roadmap.md`](roadmap.md) 的 CPU/Lean 与 clean
-checkout readiness gate。
+当前 workspace 位于可访问 GPU 的机器，已完成 live-controller 五-prefix method-validity calibration；
+当前 gate 是 published-workload upstream reproduction，不是继续扩 CTDA prefix 或直接跑主表。任何
+新运行仍必须先完成 [`roadmap.md`](roadmap.md) 的 CPU/Lean 与 clean checkout readiness gate。
 
 ## 1. 重要边界
 
@@ -541,6 +541,12 @@ pgrep -af 'eval_attack_vla.py|VLLM::EngineCore|model-service'
 3. FIPER：先用官方数据复现 RND/ACE + conformal pipeline，再接 π0.5 multi-sample audit output；
 4. EDPA：先在官方 π0/standard-LIBERO 生成 patch；OpenVLA-only adversarial training 单独记账；
 5. RoboGuard：只做 semantic graph/plan adapter spike，不阻塞 P0 主表。
+
+2026-07-15 Phantom Menace 使用 Conda 中的 uv、`/data0/ldx/uv-cache`、独立 client env
+`/data0/ldx/uv-envs/phantom-r0-client`、clean standard-LIBERO `8f1084e` 和 PyPI robosuite 1.4.0
+完成了配对闭环。task 2 clean 与固定 `laser_blinding-medium` 均成功，攻击还使用更少动作；虽 20/20
+policy frame 确实改变，攻击效力方向仍未复现。完整环境、JSONL、policy records、视频与 checksum
+位于 `results/phantom_menace_r0_20260715/`。状态为 `blocked_upstream`，不得调强度或进入 R1。
 
 每个 checkout 使用独立环境；不要把它们的 torch/JAX/Spot/LLM 依赖强装进 ProofAlign root env。
 机器可读 target 清单为 `experiments/reproduction_targets.json`。clone 后立刻把 exact commit、license、

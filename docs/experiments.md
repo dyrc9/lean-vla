@@ -151,6 +151,11 @@ task/init/env-seed/policy-seed/workload，而不是强行 replay 已不适用的
 - 保存 upstream commit、checkpoint、command、raw artifact 和 protocol deviation；
 - 未通过时标记 `blocked_upstream`，不得直接在 ProofAlign runner 中“近似复现”。
 
+2026-07-15 的 Phantom Menace 隔离 R0 已关闭 clean checkout、robosuite source 与 structured artifact
+blocker：`libero_spatial` task 2/init 0 clean 与预先固定的 `laser_blinding-medium` 均成功，攻击输入
+20/20 frame digest 发生变化，但 attacked run 为 96 actions，少于 clean 的 121。该结果不支持攻击
+效力方向，按 `blocked_upstream` 冻结；不得据此改强度或启动 LIBERO-Safety R1。
+
 ### CPU fixture gate
 
 - 小型 typed clean/negative fixture；

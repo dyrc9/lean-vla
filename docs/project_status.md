@@ -1,6 +1,6 @@
 # Project Status
 
-更新日期：2026-07-14
+更新日期：2026-07-15
 
 ## 一句话状态
 
@@ -44,7 +44,13 @@ method-validity prefix gate 已通过，但任务未在五步内完成且 realti
 也已冻结并通过。官方 WebSocket + pi0.5 + standard-LIBERO 闭环已打通，但 fresh-policy-RNG 的
 `libero_spatial` task 0 和 task 1 clean episode 均在 220 步失败；同时当前 standard LIBERO checkout
 有预存修改，OpenPI 环境中的 robosuite 实际解析到 LIBERO-Safety。因此 Phantom R0 仍未通过，未启动
-attack episode。
+attack episode。2026-07-15 已在 clean `8f1084e` detached worktree 和独立 uv client 环境中关闭这两个
+环境 blocker，并由 `d03fcbd` 上游 logging patch 持久化 episode outcome 与逐 policy-call frame
+digest。预声明序列的 task 2/init 0 clean 在 121 个动作后成功；fresh-policy-RNG 的同 task/init
+`laser_blinding-medium` 确实改变 20/20 policy frame，但在 96 个动作后同样成功。该 pair 的 init-state
+与首张 clean frame digest 完全一致，故闭环与 transform 证据有效；但 task-success degradation 和
+action inflation 方向均未复现。按 no-retuning 规则，Phantom R0 现标为 `blocked_upstream`，R1 与
+60-episode gate 继续关闭。
 
 ## 已验证资产
 
@@ -85,18 +91,21 @@ attack episode。
   stutter 消耗 2.139 mm / 4 mm 与 `0.001405 / 0.002`，后三步不退款也不再增加 stutter count；
   5/5 tube/model/invariant 通过，完整 action chunk audit 落盘。一步 111.279 ms prefix miss 与
   76.205 ms fallback miss 继续作为性能负结果，不能支持 realtime claim。
-- Phantom Menace 上游固定为 `a0e4c8b2a661ea2fe64bdb9055353b2e12575729`，最小 task/init/horizon/
-  fail-closed 运行补丁为 `9ceb030f0313ded029acedb1c5a8f76e57c654bc`。ProofAlign observation
+- Phantom Menace 上游固定为 `a0e4c8b2a661ea2fe64bdb9055353b2e12575729`，task/init/horizon、
+  fail-closed 与 structured outcome/frame-digest logging 补丁固定为
+  `d03fcbdfa4d49985dabd60e11e12008e2af3a783`。ProofAlign observation
   transform plugin 直接加载并校验上游源码，不复制算法；3 种攻击 × 3 档强度的重复输出与 digest
-  全部一致，CPU smoke SHA-256 为 `3f3b64de...04880fd`。
+  全部一致，CPU smoke SHA-256 为 `f77f40e6...d39863`。隔离 standard-LIBERO clean/attack pair 的
+  结构化 artifact、25/20 个 policy records、视频和 environment manifest 已由 `SHA256SUMS` 校验。
 
 ## 尚未闭合
 
 1. 历史 SABER 官方 LoRA/OpenPI R0 原始记录已经重新核验：constraint-violation 方向成立，
    action-inflation 较弱，task-failure 未复现强效果；它仍是 standard LIBERO 上游结果，不能冒充
-   LIBERO-Safety exact-task R1。Phantom Menace 的 deterministic transform 与闭环环境已就绪，但
-   clean task 0/1 均失败，且 standard LIBERO/robosuite 环境未隔离；官方 R0 仍关闭。SAFE 和 FIPER
-   尚未完成官方 pipeline。
+   LIBERO-Safety exact-task R1。Phantom Menace 的环境与 raw-artifact blocker 已关闭，且固定
+   camera transform 确实进入 policy input；但 paired attacked episode 与 clean 都成功，attacked
+   还使用更少动作，因此未复现攻击效力方向，现按 `blocked_upstream` 关闭 R0。SAFE 和 FIPER 尚未
+   完成官方 pipeline。
 2. 当前 Lean evaluator 为每个 request 生成并编译 replay source；远程单-prefix四阶段也约为
    0.9--1.3 s/stage。Lean verification 与 fallback switch 都不满足 real-time claim，后续只按
    slow interlock/offline audit 报告并保留完整 latency distribution。
@@ -124,13 +133,13 @@ attack episode。
 
 ## 当前唯一优先级
 
-1. 为 Phantom Menace 建立独立、clean 的 standard LIBERO/robosuite 环境，并让上游 runner 持久化
-   structured episode outcome 与 frame digest；
-2. 按预先声明的 task 顺序取得合格 clean baseline，再对相同 task/init/fresh policy RNG 运行一个
-   deterministic camera attack；不得按攻击结果调强度；
-3. Phantom R0 通过后才为 exact LIBERO-Safety task 生成 SABER instruction 与 Phantom camera R1 workload；
-4. 补 OpenPI feature/multi-sample、SAFE/FIPER alarm adapter；
-5. published-workload 与 baseline readiness gate 通过后才启动最小 paired GPU pilot，仍不上 60 episodes。
+1. 冻结并报告 Phantom R0 的 `blocked_upstream` 负结果；不得按结果提高强度、换 family 或把像素
+   变化本身写成攻击效力；
+2. 独立复现 SAFE 与 FIPER 官方 detector/calibration pipeline，冻结 rollout、feature、multi-sample
+   与 alarm schema；
+3. 官方 pipeline 通过后补 OpenPI feature/multi-sample audit API 和统一 fallback adapter；
+4. Phantom R0 未通过前不生成 Phantom LIBERO-Safety R1；published-workload 与 baseline readiness
+   gate 未通过前不启动 paired GPU pilot 或 60 episodes。
 
 ## 当前可写与不可写
 
@@ -154,6 +163,8 @@ attack episode。
   latency 两个冻结时序界 fail closed，未形成 repeated-prefix 证据。
 - slow-interlock 的 observation/fallback SLA miss 可以作为性能负结果单独报告；这不代表满足实时
   bound，也不覆盖 authorization expiry、contract deadline 或任何安全/完整性失败。
+- Phantom 的隔离 clean/attack pair 证明固定 camera transform 进入了 policy input 且 artifact 可审计；
+  该 attacked episode 仍成功，故只能报告攻击效力方向未复现，不能报告 Phantom R0 通过。
 
 不可写：
 
@@ -166,3 +177,4 @@ attack episode。
 - 3--5 prefix method-validity calibration 证明了 clean retention/utility；
 - 系统证明真实机器人或连续动力学安全；
 - 防御已经优于 baseline 或能够防御某个攻击。
+- Phantom camera attack 已在当前 victim/task 上产生 task-success degradation 或 action inflation。
