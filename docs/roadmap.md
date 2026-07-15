@@ -283,6 +283,9 @@ record 不能 best-of-N、重生成或按结果替换。record gate 全通过后
 第一次 producer 启动在 pair generation 之前因 robosuite 默认 `/tmp/robosuite.log` 无写权限失败；
 manifest 明确记录零 generation attempt、零 victim load/rollout。恢复只允许隔离日志路径这一启动修复，
 并要求 record、producer ledger 和 transcript 均不存在；因此不消耗或重置任何 pair 的 one-shot quota。
+第二次启动在模型/vLLM 初始化后、首个 pair 前又因 shell SOCKS proxy 的缺失可选依赖失败，同样追加为
+零 attempt。producer 将只访问 localhost 的 ART client 与本地模型，因此后续恢复清除继承 proxy，
+不安装新依赖、不访问网络、不改变 attacker 或 generation 输入。
 
 在 60-episode pilot 前增加 upstream reproduction gate，详见
 [`reproduction_plan.md`](reproduction_plan.md)：

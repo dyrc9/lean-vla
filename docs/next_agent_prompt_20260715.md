@@ -10,6 +10,8 @@
 > 第一次 producer 启动已在任何 pair generation 前因 `/tmp/robosuite.log` 权限 fail closed；raw
 > manifest 记录零 attempt。只允许将 robosuite 日志隔离进结果目录后，在“无 record/ledger/transcript”
 > gate 下恢复；这不是一次攻击重生成。
+> 第二次启动也在首个 pair 前因 localhost ART client 继承 SOCKS proxy 而 fail closed。后续仅清除
+> producer 的 proxy 环境并固定 localhost `NO_PROXY`；本地模型已做哈希校验，不安装依赖或访问外网。
 
 > **完成通知（2026-07-15）：** 本 prompt 已在预注册 protocol `82c6ad5` 下执行完毕，
 > 不得再次运行或用新 outcome 覆盖现有 ledger。R0b 的 27/27 attacked episodes 全部有效，

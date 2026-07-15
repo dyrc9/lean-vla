@@ -28,6 +28,14 @@ DEFAULT_PROTOCOL = REPO_ROOT / "experiments" / "saber_liberosafety_r1_protocol.j
 MAIN_PROTOCOL = REPO_ROOT / "experiments" / "proofalign_saber_main_protocol.json"
 DEFAULT_OUTPUT = REPO_ROOT / "results" / "saber_liberosafety_r1_20260715"
 SABER_ROOT = REPO_ROOT / "external" / "SABER"
+LOCAL_SERVER_PROXY_KEYS = (
+    "ALL_PROXY",
+    "HTTPS_PROXY",
+    "HTTP_PROXY",
+    "all_proxy",
+    "https_proxy",
+    "http_proxy",
+)
 
 
 class ProtocolError(RuntimeError):
@@ -499,6 +507,15 @@ async def _generate_records(
     robosuite_log = output_root / "runtime" / "robosuite" / "robosuite.log"
     robosuite_log.parent.mkdir(parents=True, exist_ok=True)
     os.environ["ROBOSUITE_LOG_PATH"] = str(robosuite_log)
+    # ART starts a localhost OpenAI-compatible vLLM server. httpx eagerly
+    # instantiates every proxy transport from the inherited shell even when
+    # localhost is in NO_PROXY, so an unrelated SOCKS proxy would require an
+    # unpinned optional dependency. The frozen model is local; no network is
+    # needed during record generation.
+    for key in LOCAL_SERVER_PROXY_KEYS:
+        os.environ.pop(key, None)
+    os.environ["NO_PROXY"] = "127.0.0.1,localhost"
+    os.environ["no_proxy"] = "127.0.0.1,localhost"
     # eval_attack_vla performs its GPU pre-parse at import time.  Give it a
     # minimal official-compatible argv, then restore this producer's argv.
     original_argv = sys.argv[:]
@@ -734,8 +751,18 @@ def execute(
                 "victim_loaded": False,
                 "victim_rollout_used": False,
                 "one_generation_per_pair": True,
+                "local_server_proxy_policy": {
+                    "cleared_environment_keys": list(LOCAL_SERVER_PROXY_KEYS),
+                    "no_proxy": "127.0.0.1,localhost",
+                    "external_network_required": False,
+                },
             },
         }
+    manifest["attack_record_generation"]["local_server_proxy_policy"] = {
+        "cleared_environment_keys": list(LOCAL_SERVER_PROXY_KEYS),
+        "no_proxy": "127.0.0.1,localhost",
+        "external_network_required": False,
+    }
     atomic_json(manifest_path, manifest)
     try:
         records = asyncio.run(
@@ -832,6 +859,7 @@ def main(argv: list[str] | None = None) -> int:
         KeyError,
         ValueError,
         RuntimeError,
+        ImportError,
         ProtocolError,
         subprocess.TimeoutExpired,
     ) as exc:
@@ -843,4 +871,9 @@ def main(argv: list[str] | None = None) -> int:
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    exit_code = main()
+    sys.stdout.flush()
+    sys.stderr.flush()
+    # Match the official SABER evaluator: ART/vLLM background actors can keep
+    # interpreter shutdown alive indefinitely after artifacts are durable.
+    os._exit(exit_code)
