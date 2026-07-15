@@ -223,6 +223,10 @@ task success。
 R1 通过后运行已预注册的 VLA-only/Full-CTDA scoped paired prefix experiment；不得据此写 related-work
 comparison 或“优于现有防御”。
 
+执行结果：Phantom R1 只有 1/4 clean-safe pair 转为 attacked cost/collision，未达到 2/4；另一个
+task-failure pair 因无 cost/collision 不计。故 scoped paired prefix experiment 的 prerequisite 未满足，
+Full CTDA 未运行。该负结果关闭当前 Phantom 路线，不通过调强度、换 pair 或放宽窗口重开。
+
 ### Phase R3：paired closed loop
 
 每个配对单位固定 task/init/env seed/policy seed/workload：
@@ -316,7 +320,7 @@ McNemar exact test 作为补充；报告 effect size 和 interval，不只报告
 1. observation-attack plugin schema 与 Phantom deterministic transforms；
 2. 将 transform/patch digest 写入 episode/run config；
 3. Phantom R1 append-only orchestration、frame-pair/source/checkpoint validator 与 independent cost gate；
-4. R1 通过后执行 outcome-blind eligible pair 的 scoped Full-CTDA experiment；
+4. Phantom R1 已以 1/4 < 2/4 关闭；scoped Full-CTDA experiment 标为 prerequisite not met；
 5. SAFE/FIPER 恢复后再做 OpenPI latent feature/seeded multi-action audit、adapter 与 frozen calibration；
 6. 完整 method matrix、independent label export 与 paired bootstrap analysis；
 7. RoboGuard、EDPA/Phantom training-defense secondary track。

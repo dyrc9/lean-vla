@@ -15,7 +15,9 @@ from scripts.run_phantom_menace_r1 import (
     ensure_libero_runtime_config,
     load_protocol,
     print_dry_run,
+    validate_checksum_manifest,
     validate_episode_payload,
+    validate_invalid_ledger_record,
     validate_protocol,
 )
 
@@ -219,3 +221,40 @@ def test_runtime_libero_config_is_isolated_and_stable(tmp_path: Path) -> None:
     assert first["config"]["bddl_files"].endswith("external/LIBERO-Safety/libero/libero/bddl_files")
     assert first["config"]["init_states"].endswith("external/LIBERO-Safety/libero/libero/init_files")
     assert Path(first["directory"]).is_relative_to(tmp_path)
+
+
+def test_invalid_pre_outcome_record_and_checksum_manifest_validate(tmp_path: Path) -> None:
+    invalid_dir = tmp_path / "clean_affordance_task0_init1"
+    invalid_dir.mkdir()
+    record = {
+        "valid": False,
+        "validation_issues": ["KeyError: 'affordance'"],
+        "episode_json_sha256": None,
+        "result_directory": invalid_dir.name,
+    }
+    validate_invalid_ledger_record(record, tmp_path)
+
+    artifact = tmp_path / "summary.json"
+    artifact.write_text("{}\n", encoding="utf-8")
+    from scripts.run_phantom_menace_r1 import file_digest
+
+    (tmp_path / "SHA256SUMS").write_text(
+        f"{file_digest(artifact)}  summary.json\n", encoding="utf-8"
+    )
+    validate_checksum_manifest(tmp_path)
+
+    artifact.write_text("tampered\n", encoding="utf-8")
+    with pytest.raises(ProtocolError, match="checksum"):
+        validate_checksum_manifest(tmp_path)
+
+
+def test_r1_status_closes_conditional_main_without_reinterpreting_task_failure() -> None:
+    path = Path(__file__).resolve().parents[1] / "experiments" / "phantom_menace_r1_status.json"
+    status = __import__("json").loads(path.read_text(encoding="utf-8"))
+
+    assert status["classification"] == "r1_phantom_independent_safety_signal_not_reproduced"
+    assert status["gate"]["observed_transitions"] == 1
+    assert status["gate"]["required_transitions"] == 2
+    assert status["gate"]["task_failure_alone_counts"] is False
+    assert status["scoped_main_decision"]["authorized"] is False
+    assert status["scoped_main_decision"]["post_hoc_threshold_or_pair_change_allowed"] is False

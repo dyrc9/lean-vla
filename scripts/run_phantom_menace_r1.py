@@ -854,6 +854,44 @@ def write_checksums(output_root: Path) -> None:
     (output_root / "SHA256SUMS").write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
+def validate_checksum_manifest(output_root: Path) -> None:
+    manifest = output_root / "SHA256SUMS"
+    if not manifest.is_file():
+        raise ProtocolError("R1 SHA256SUMS is missing")
+    for line_number, line in enumerate(manifest.read_text(encoding="utf-8").splitlines(), 1):
+        if not line.strip():
+            continue
+        try:
+            expected, relative = line.split("  ", 1)
+        except ValueError as exc:
+            raise ProtocolError(f"invalid SHA256SUMS line {line_number}") from exc
+        path = (output_root / relative).resolve()
+        try:
+            path.relative_to(output_root.resolve())
+        except ValueError as exc:
+            raise ProtocolError(f"checksum path escapes output root: {relative}") from exc
+        if not path.is_file() or file_digest(path) != expected:
+            raise ProtocolError(f"checksum mismatch or missing artifact: {relative}")
+
+
+def validate_invalid_ledger_record(record: dict[str, Any], output_root: Path) -> None:
+    issues = record.get("validation_issues")
+    if not isinstance(issues, list) or not issues:
+        raise ProtocolError("invalid ledger record lacks its fail-closed issue")
+    if record.get("episode_json_sha256") is not None:
+        raise ProtocolError("invalid pre-outcome ledger record unexpectedly binds an episode JSON")
+    result_directory = record.get("result_directory")
+    if not isinstance(result_directory, str):
+        raise ProtocolError("invalid ledger record lacks its result directory")
+    path = (output_root / result_directory).resolve()
+    try:
+        path.relative_to(output_root.resolve())
+    except ValueError as exc:
+        raise ProtocolError("invalid ledger result directory escapes output root") from exc
+    if not path.is_dir():
+        raise ProtocolError(f"invalid ledger result directory is missing: {result_directory}")
+
+
 def execute(
     protocol: dict[str, Any],
     protocol_path: Path,
@@ -1020,6 +1058,9 @@ def validate_existing(protocol: dict[str, Any], output_root: Path) -> dict[str, 
     ledger = read_ledger(ledger_path)
     by_id = {str(record.get("episode_id")): record for record in ledger}
     for record in ledger:
+        if record.get("valid") is not True:
+            validate_invalid_ledger_record(record, output_root)
+            continue
         spec = EpisodeSpec(
             suite=str(record["suite"]),
             task_id=int(record["task_id"]),
@@ -1059,6 +1100,7 @@ def validate_existing(protocol: dict[str, Any], output_root: Path) -> dict[str, 
                 issues.append(f"ledger {key} differs from recomputed artifact value")
         if issues:
             raise ProtocolError(f"existing episode {spec.episode_id} is invalid: {issues}")
+    validate_checksum_manifest(output_root)
     return build_summary(protocol, ledger)
 
 
