@@ -7,20 +7,23 @@ This reproduction is isolated from the primary ProofAlign worktree.
 - canonical uv: `/home/ldx/.conda/envs/proofalign-libero/bin/uv`
 - caches and large artifacts: `/data0/ldx`
 
-## Status snapshot (2026-07-15 17:02 Asia/Shanghai)
+## Closeout snapshot (2026-07-15 17:33 Asia/Shanghai)
 
 The source, asset, environment, preflight, and launcher work is complete and
-committed. The two official R0 executions are still in progress, so neither
-baseline is classified as reproduced yet and neither is authorized for the
+committed. At the user's end-of-day closeout, both long-running official R0
+executions were stopped with `SIGINT` followed by process-group verification.
+Neither baseline is classified as reproduced and neither is authorized for the
 ProofAlign comparison table.
 
 | Baseline | Current state | Auditable location | Next gate |
 |---|---|---|---|
-| SAFE | Official `pi0_libero_10` rollout generation is running; 175 of 500 env records existed at this snapshot. | `/data0/ldx/safe-fiper-r0/safe/runs/safe-pi0-libero10-r0-20260715` | Finish all 500 episodes, validate env/policy record counts and schemas, freeze the rollout tree, then run the full official detector matrix. |
-| FIPER | The unchanged official entrypoint failed on the removed `np.bool` alias and is preserved. The compatibility run has passed that point and is still executing the official full pipeline. | failed: `/data0/ldx/safe-fiper-r0/fiper/runs/fiper-r0-20260715`; active: `/data0/ldx/safe-fiper-r0/fiper/runs/fiper-r0-compat1-20260715` | Wait for a terminal manifest, validate all task/seed/method results, then classify the official R0 reproduction. |
+| SAFE | Interrupted after 335 of 500 env records had been written. The partial corpus is preserved but cannot satisfy the detector gate. | `/data0/ldx/safe-fiper-r0/safe/runs/safe-pi0-libero10-r0-20260715` | No continuation is authorized. A future decision must define a fresh run or a separately validated resume protocol before reaching 500/500 and running the detector matrix. |
+| FIPER | The unchanged entrypoint's `np.bool` failure is preserved. The compatibility run passed it but was interrupted during seed 0 / `push_t` / `rnd_oe`; the full matrix did not complete. | failed: `/data0/ldx/safe-fiper-r0/fiper/runs/fiper-r0-20260715`; interrupted: `/data0/ldx/safe-fiper-r0/fiper/runs/fiper-r0-compat1-20260715` | No continuation is authorized. Any future execution must use a fresh result directory and repeat the complete official pipeline. |
 
-The counts above are a timestamped handoff snapshot, not a final metric. A log
-mtime or a partially written output tree must never be interpreted as a pass.
+The count and training position above are a timestamped interruption record,
+not final metrics. Neither interrupted directory contains a terminal
+`run_manifest.json`; the logs and partial output trees must never be interpreted
+as a pass or combined post hoc with another run.
 The protocol JSON files remain the pre-execution registration; their
 `official_run_results_observed` fields intentionally describe the moment the
 protocol was frozen rather than the later runtime status.
@@ -54,8 +57,8 @@ Use the canonical uv binary, not whichever `uv` happens to be on `PATH`:
 /home/ldx/.conda/envs/proofalign-libero/bin/uv --version
 ```
 
-The resolved environments are reusable and must not be recreated while the
-active processes are using them:
+The resolved environments are reusable and should not be recreated merely
+because the executions were interrupted:
 
 - SAFE detector: `/data0/ldx/uv-envs/safe-r0` (Python 3.10);
 - SAFE OpenPI server: `/data0/ldx/uv-envs/safe-r0-openpi` (official uv lock,
@@ -78,9 +81,10 @@ The ignored `upstream/` directory contains three isolated, clean checkouts:
 - SAFE OpenPI: `9c99ed53f6a0c9be93a1c63cee5792620777d96b`;
 - FIPER: `13d79c5c3069def843e454787ff128defc249838`.
 
-Merging this branch into the main repository does not move the large assets,
-rewrite those source trees, or stop an already running process. Keep the
-dedicated worktree until both runs have reached a terminal, validated state.
+Merging this branch into the main repository does not move the large assets or
+rewrite those source trees. The dedicated worktree remains clean and retained
+for audit; deleting it is a separate destructive cleanup decision because its
+ignored `upstream/` source checkouts are not stored in the main worktree.
 
 ## Read-only preflight
 
@@ -141,3 +145,7 @@ After each process exits:
    `blocked_upstream`, never from a partial log;
 6. only after an upstream pass, begin any pi0.5 adapter or unified fallback
    work as a separate, preregistered experiment.
+
+The 2026-07-15 interrupted runs fail item 1 and therefore stop at this
+checklist. Do not relabel them `completed`, infer missing results, reuse their
+result directories, or start downstream adapter work.
