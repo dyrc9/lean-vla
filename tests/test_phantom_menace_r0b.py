@@ -12,6 +12,7 @@ from scripts.run_phantom_menace_r0b import (
     EpisodeSpec,
     ProtocolError,
     attack_specs,
+    client_env,
     client_command,
     load_protocol,
     print_dry_run,
@@ -208,3 +209,11 @@ def test_server_top_level_options_precede_tyro_policy_subcommand() -> None:
     assert command.index("--port") < subcommand_index
     assert command.index("--record") < subcommand_index
     assert command.index("--policy.config") > subcommand_index
+
+
+def test_client_egl_environment_uses_selected_physical_id() -> None:
+    environment = client_env(5)
+
+    assert environment["CUDA_VISIBLE_DEVICES"] == "5"
+    assert environment["MUJOCO_EGL_DEVICE_ID"] == "5"
+    assert environment["MUJOCO_GL"] == "egl"

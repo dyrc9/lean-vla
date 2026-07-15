@@ -389,7 +389,7 @@ def client_env(egl_gpu: int | None) -> dict[str, str]:
         env.update(
             {
                 "CUDA_VISIBLE_DEVICES": str(egl_gpu),
-                "MUJOCO_EGL_DEVICE_ID": "0",
+                "MUJOCO_EGL_DEVICE_ID": str(egl_gpu),
                 "MUJOCO_GL": "egl",
                 "PYOPENGL_PLATFORM": "egl",
             }
