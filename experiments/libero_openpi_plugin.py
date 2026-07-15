@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import math
+from hashlib import sha256
 import os
 import sys
 from dataclasses import dataclass, field
@@ -87,7 +88,10 @@ class OpenPIPolicy:
             "observation_attack_strength": self.config.observation_attack_strength,
         }
         if self._last_observation_attack is not None:
-            metadata["observation_attack"] = self._last_observation_attack
+            metadata["observation_attack"] = {
+                **self._last_observation_attack,
+                "policy_call_index": self._policy_call_index - 1,
+            }
         return {
             "raw_action": actions[: self.config.max_actions_per_call],
             # Audit-only fields.  Keep the complete model output even though the
@@ -143,6 +147,23 @@ class OpenPIPolicy:
         wrist_image = np.ascontiguousarray(obs["robot0_eye_in_hand_image"][::-1, ::-1])
         if self._observation_transform is not None:
             base_image, self._last_observation_attack = self._observation_transform(base_image)
+        else:
+            frame_digest = sha256(base_image.tobytes(order="C")).hexdigest()
+            self._last_observation_attack = {
+                "schema": "proofalign.observation-frame-audit.v1",
+                "attack_type": "none",
+                "attack_strength": None,
+                "attack_parameters": {},
+                "camera": "agentview",
+                "clean_frame_sha256": frame_digest,
+                "attacked_frame_sha256": frame_digest,
+                "frame_shape": list(base_image.shape),
+                "frame_dtype": str(base_image.dtype),
+                "changed": False,
+                "mean_absolute_delta": 0.0,
+                "source_paths": [],
+                "source_sha256": {},
+            }
         base_image = image_tools.convert_to_uint8(image_tools.resize_with_pad(base_image, resize_size, resize_size))
         wrist_image = image_tools.convert_to_uint8(image_tools.resize_with_pad(wrist_image, resize_size, resize_size))
         state = np.concatenate(

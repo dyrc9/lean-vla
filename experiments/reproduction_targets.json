@@ -82,7 +82,7 @@
       },
       "result_scope": "CPU transform R0, isolated official task-2 pair, and preregistered standard-LIBERO R0b workload discovery",
       "result": "the old task-2 R0 pair remains a negative result; the separate preregistered R0b completed a valid 27-episode grid and laser_blinding-strong turned success into failure on all three clean-success pairs, satisfying the R0b workload-discovery gate",
-      "next_protocol": "preregister a held-out LIBERO-Safety R1 workload using laser_blinding-strong without changing the upstream attack, while independently reproducing SAFE and FIPER; no paired pilot or 60-episode table until their readiness gates pass",
+      "next_protocol": "execute the committed held-out LIBERO-Safety R1 protocol using laser_blinding-strong without changing the upstream attack; if its independent cost/collision gate passes, execute the separately preregistered scoped VLA-only versus Full-CTDA paired prefix experiment",
       "handoff": "experiments/phantom_menace_r0b_status.json"
     },
     {
@@ -105,7 +105,9 @@
       "upstream_platform": "LIBERO + OpenVLA/pi0/pi0-FAST",
       "main_adapter": "pi0.5 latent feature and alarm plugin",
       "status": "planned",
-      "upstream_commit": null
+      "upstream_commit": "b6036abe07b2b2bb9996afb2c07f13d6a9f507c0",
+      "execution_deferred_by_user": true,
+      "deferment_scope": "before checkpoint/assets/GPU execution; required again before any SAFE comparison claim"
     },
     {
       "id": "fiper",
@@ -116,7 +118,9 @@
       "upstream_platform": "generative robot policies",
       "main_adapter": "pi0.5 observation embedding plus seeded action samples",
       "status": "planned",
-      "upstream_commit": null
+      "upstream_commit": "13d79c5c3069def843e454787ff128defc249838",
+      "execution_deferred_by_user": true,
+      "deferment_scope": "before rollout download/environment/GPU execution; required again before any FIPER comparison claim"
     },
     {
       "id": "roboguard",

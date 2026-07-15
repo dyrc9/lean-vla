@@ -1,6 +1,6 @@
 # ProofAlign Execution Roadmap
 
-更新日期：2026-07-14
+更新日期：2026-07-15
 
 本文是唯一执行计划。历史 roadmap、实验 handoff 和 design memo 已归档。
 
@@ -250,7 +250,8 @@ clean strict preflight 与唯一一次固定 calibration。
 ## 6. P4：远程发布攻击 workload pilot
 
 状态：**live-controller method-validity 五-prefix gate 已通过；Phantom R0b 已发现一个可进入
-held-out R1 的上游 workload，SAFE/FIPER reproduction 与 R1 事前协议是当前 gate**。P1/P2
+held-out R1 的上游 workload；SAFE/FIPER 已按用户决定暂缓，当前 gate 是已提交的 R1 protocol 与
+独立 cost/collision signal**。P1/P2
 correctness、golden parity 与 affordance observation completeness 已通过；real-time latency 明确
 未通过并已降级 claim。fail-closed preflight manifest 与 clean + Lean slow-interlock smoke 已
 脚本化。SABER standard-LIBERO R0 已核验为部分方向复现。Phantom 三种 deterministic transform 的
@@ -266,16 +267,18 @@ uv client 和 structured outcome/frame digest 关闭环境与 raw-artifact block
 fail closed 并未重跑，task 5/6/7 init 0 是首三个有效 clean-success pair，27/27 attack
 episodes 全部有效。`laser_blinding/strong` 在 3/3 pair 上把 success 变为 failure，满足
 primary signal gate；`em_truncation` medium/strong 各只有 1/3，其他 cell 为 0/3。R0b 因此
-只归类为 held-out R1 workload candidate，不是 defense evidence。下一步必须分别冻结
-LIBERO-Safety R1 protocol 与 SAFE/FIPER 官方 pipeline；两者 readiness gate 之前不启动主表。
+只归类为 held-out R1 workload candidate，不是 defense evidence。LIBERO-Safety R1 已固定为四个
+physical suite、task 候选 `0,7,14`、held-out init 1 和 `laser_blinding/strong`；至少 2/4 clean-safe
+pair 转为独立 cost/collision 才开放 scoped main。SAFE/FIPER source freeze 保留，但资产与执行暂缓，
+不阻塞该小实验，也不能出现在其比较结论里。
 
 在 60-episode pilot 前增加 upstream reproduction gate，详见
 [`reproduction_plan.md`](reproduction_plan.md)：
 
 1. standard LIBERO 上复现 SABER π0.5 clean + record/replay；
 2. standard LIBERO 上复现 Phantom Menace OpenPI clean + camera transform；
-3. 复现 SAFE/FIPER 官方 detector pipeline，冻结需要的 rollout/feature schema；
-4. 上游通过后才开发 LIBERO-Safety exact-task workload 与 π0.5 defense adapter。
+3. SAFE/FIPER 暂缓；恢复时仍须先完成官方 detector pipeline 并冻结 rollout/feature schema；
+4. 当前仅执行已提交的 LIBERO-Safety Phantom R1，R1 通过后才进入固定 scoped CTDA pair。
 
 ### Workload
 
@@ -299,6 +302,15 @@ LIBERO-Safety R1 protocol 与 SAFE/FIPER 官方 pipeline；两者 readiness gate
 若攻击只造成 task failure、没有 authorization/safety signal，则不写 physical-defense claim。
 
 ## 7. P5：最小配对主实验
+
+当前先执行一个不等价于最终主表的 **scoped method-validity** 实验：复用 R1 的 clean/attacked
+VLA-only artifact，只对 outcome-blind、可由现有 Pick/Place compiler 与 task-bound fallback witness
+支持的 pair 运行 clean/attacked Full CTDA。窗口固定为 20 个 policy call / 100 个 raw action；
+至少一个 attacked VLA-only 的 matched unsafe event 被 CTDA 在 dispatch 前 refute/replan/safe-stop，
+且对应 clean CTDA 至少授权一个非 dummy prefix，才通过。该结果不估计 clean task-success retention，
+不做 baseline superiority 或 population-level statistics。
+
+下面的完整矩阵保持为后续目标，当前未授权执行：
 
 固定方法：
 
