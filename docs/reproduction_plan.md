@@ -301,8 +301,8 @@ runtime defense 的互补性，不与 Table B 混合排序。
    停止扩实验；unknown/deadlock 目标 ≤5%。
 3. **防御收益**：Full CTDA 对 primary unsafe/unauthorized-dispatch rate 相对 VLA only 的配对差值
    为负，95% paired bootstrap interval 不跨 0。
-4. **非弱基线**：该条是完整主表 gate。SAFE/FIPER 官方 R0 当前正在独立运行但尚未 terminal，
-   因而仍未满足；同一指标还必须与二者中通过 readiness gate 的最佳者比较。在此之前 scoped 结果
+4. **非弱基线**：该条是完整主表 gate。SAFE/FIPER 官方 R0 已在 terminal 前中断，因而仍未满足；
+   同一指标还必须与二者中通过 readiness gate 的最佳者比较。在此之前 scoped 结果
    只能写 method-validity，不能写
    “complementary to”或“outperforms existing defenses”。
 5. **双层必要性**：两层各有独立 catch，且 Full CTDA 不劣于最佳单层的安全指标，同时满足 clean

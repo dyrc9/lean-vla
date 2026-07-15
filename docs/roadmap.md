@@ -251,7 +251,7 @@ clean strict preflight 与唯一一次固定 calibration。
 
 状态：**live-controller method-validity 五-prefix gate 已通过；Phantom held-out R1 已完成但
 独立 cost/collision signal gate 失败；SABER exact-task R1 已在 record-generation artifact gate
-fail closed，未运行 victim；SAFE/FIPER 官方 R0 已在独立 worktree 启动且尚未 terminal**。P1/P2
+fail closed，未运行 victim；SAFE/FIPER 官方 R0 均在收尾时中断且未复现**。P1/P2
 correctness、golden parity 与 affordance observation completeness 已通过；real-time latency 明确
 未通过并已降级 claim。fail-closed preflight manifest 与 clean + Lean slow-interlock smoke 已
 脚本化。SABER standard-LIBERO R0 已核验为部分方向复现。Phantom 三种 deterministic transform 的
@@ -272,8 +272,8 @@ physical suite、task 候选 `0,7,14`、held-out init 1 和 `laser_blinding/stro
 pair 转为独立 cost/collision 才开放 scoped main。实际只有 1/4：affordance 与 human-safety attack
 仍 task success；obstacle-avoidance 只有 task failure、没有 cost/collision；只有
 obstacle-avoidance-human 产生 `checkcontact=1`。因此 R1 分类为 signal not reproduced，按冻结 failure
-path 停止 Phantom。SAFE/FIPER source、资产、uv 环境与 launcher 已冻结；SAFE 500-episode rollout
-及 FIPER full pipeline 正在独立运行，任何中间输出都不构成 reproduction pass。
+path 停止 Phantom。SAFE/FIPER source、资产、uv 环境与 launcher 已冻结；SAFE 在 335/500 records、
+FIPER 在 seed 0 / `push_t` / `rnd_oe` 时中断。两者均无 terminal manifest，中间输出不构成 pass。
 
 用户已选择 instruction 路线继续。SABER R1 固定复用同四个 clean-safe init-1 artifact，使用冻结的
 `constraint_violation` 模型与官方 prompt tools，各生成一次 exact-task instruction record。record
@@ -301,8 +301,8 @@ victim outcome，但已越过预注册的零-attempt恢复边界。因此 SABER 
 
 1. standard LIBERO 上复现 SABER π0.5 clean + record/replay；
 2. standard LIBERO 上复现 Phantom Menace OpenPI clean + camera transform；
-3. SAFE/FIPER 正在执行官方 R0；须等 terminal manifest、validator 与 output digest 通过后，才可开始
-   pi0.5 adapter 或进入 baseline comparison；
+3. SAFE/FIPER 官方 R0 已中断且当前不续跑；未来须由 fresh/resume 事前协议重新开放，并通过 terminal
+   manifest、validator 与 output digest，才可开始 pi0.5 adapter 或进入 baseline comparison；
 4. LIBERO-Safety Phantom R1 已完成且未通过；不进入固定 scoped CTDA pair，不做 post-hoc 重选。
 5. SABER exact-task R1 已在第一个 record artifact gate fail closed；无 victim rollout，不重试、不运行 main。
 

@@ -2,8 +2,8 @@
 
 > **当前 handoff（2026-07-15）：** 本文件整体是 Phantom/SABER 历史审计，不是当前执行入口。
 > Phantom R1 已以 1/4 独立 cost/collision signal 关闭；SABER exact-task R1 随后也在首个 pair 的
-> immutable record-generation gate fail closed。两条线均不得重跑。当前唯一活动线是独立 worktree
-> 中的 SAFE/FIPER 官方 R0，状态与命令以 [`project_status.md`](project_status.md) 和
+> immutable record-generation gate fail closed。两条线均不得重跑。SAFE/FIPER 官方 R0 后来也在
+> terminal 前中断；当前没有活动实验。状态与命令以 [`project_status.md`](project_status.md) 和
 > [`safe_fiper_r0_runbook.md`](safe_fiper_r0_runbook.md) 为准。下述 SABER 内容只保留当时的执行顺序：
 > 第一次 producer 启动已在任何 pair generation 前因 `/tmp/robosuite.log` 权限 fail closed；raw
 > manifest 记录零 attempt。只允许将 robosuite 日志隔离进结果目录后，在“无 record/ledger/transcript”
