@@ -727,6 +727,9 @@ def execute_episode(
         "valid": not issues,
         "validation_issues": issues,
         "episode_json_sha256": file_digest(artifact_path) if artifact_path.is_file() else None,
+        "proofalign_commit": checked_output(("git", "rev-parse", "HEAD"), cwd=REPO_ROOT),
+        "orchestrator_sha256": file_digest(Path(__file__).resolve()),
+        "victim_runner_sha256": file_digest(RUNNER_PATH),
         **details,
     }
     append_ledger(ledger_path, record)
@@ -844,6 +847,17 @@ def execute(
             raise ProtocolError("existing R1 manifest uses a different policy GPU")
         if execution_record.get("egl_gpu_physical_id") != egl_gpu:
             raise ProtocolError("existing R1 manifest uses a different EGL GPU")
+        history = list(manifest.get("source_history", []))
+        current_source = {
+            "observed_at": utc_now(),
+            "proofalign_commit": checked_output(("git", "rev-parse", "HEAD"), cwd=REPO_ROOT),
+            **sources,
+        }
+        if not history or history[-1].get("proofalign_commit") != current_source["proofalign_commit"]:
+            history.append(current_source)
+        manifest["source_history"] = history
+        manifest["sources"] = sources
+        atomic_json(manifest_path, manifest)
     else:
         manifest = {
             "schema": "proofalign.phantom-menace-r1-run.v1",
@@ -851,6 +865,13 @@ def execute(
             "status": "running_clean_screening",
             "protocol": sources["required_files"]["protocol"],
             "sources": sources,
+            "source_history": [
+                {
+                    "observed_at": utc_now(),
+                    "proofalign_commit": checked_output(("git", "rev-parse", "HEAD"), cwd=REPO_ROOT),
+                    **sources,
+                }
+            ],
             "victim": protocol["victim"],
             "episode_config": protocol["episode_config"],
             "execution": {

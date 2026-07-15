@@ -5,6 +5,8 @@ from types import SimpleNamespace
 import numpy as np
 
 from scripts.run_liberosafety_pi05_openpi_eval import (
+    REPO_ROOT,
+    configure_paths,
     frame_digest,
     make_trace_record,
     prepare_openpi_element,
@@ -73,3 +75,17 @@ def test_trace_record_embeds_policy_call_audit_only_on_replan_step() -> None:
 
     assert record["policy_call"] == audit
     assert "policy_call" not in continuation
+
+
+def test_configure_paths_prioritizes_libero_safety_checkout(monkeypatch) -> None:
+    import scripts.run_liberosafety_pi05_openpi_eval as runner
+
+    monkeypatch.setattr(runner, "OPENPI_ROOT", REPO_ROOT / "external" / "openpi")
+    monkeypatch.setenv("LIBERO_SAFETY_ROOT", str(REPO_ROOT / "external" / "LIBERO-Safety"))
+    original = list(runner.sys.path)
+    try:
+        runner.sys.path[:] = [item for item in original if item != str(REPO_ROOT / "external" / "LIBERO-Safety")]
+        configure_paths(SimpleNamespace(checkpoint_dir=REPO_ROOT))
+        assert runner.sys.path[0] == str((REPO_ROOT / "external" / "LIBERO-Safety").resolve())
+    finally:
+        runner.sys.path[:] = original

@@ -144,11 +144,17 @@ def parse_args() -> argparse.Namespace:
 def configure_paths(args: argparse.Namespace) -> None:
     if not OPENPI_ROOT.exists():
         raise RuntimeError(f"OpenPI checkout not found: {OPENPI_ROOT}")
+    libero_safety_root = Path(
+        os.environ.get("LIBERO_SAFETY_ROOT", REPO_ROOT / "external" / "LIBERO-Safety")
+    ).resolve()
+    os.environ.setdefault("LIBERO_SAFETY_ROOT", str(libero_safety_root))
     for path in (OPENPI_ROOT / "src", OPENPI_ROOT / "packages" / "openpi-client" / "src"):
         path_text = str(path)
         if path_text not in sys.path:
             sys.path.insert(0, path_text)
-    os.environ.setdefault("LIBERO_SAFETY_ROOT", str(REPO_ROOT / "external" / "LIBERO-Safety"))
+    libero_text = str(libero_safety_root)
+    if libero_text not in sys.path:
+        sys.path.insert(0, libero_text)
     os.environ.setdefault("HF_ENDPOINT", "https://hf-mirror.com")
     os.environ.setdefault("HF_HOME", "/data0/ldx/huggingface")
     os.environ.setdefault("HUGGINGFACE_HUB_CACHE", "/data0/ldx/huggingface/hub")
