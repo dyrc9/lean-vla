@@ -18,8 +18,8 @@ archive 中的内容。
 8. [`remote_execution.md`](remote_execution.md)：迁移到远程 GPU 后的环境、路径和运行协议。
 9. [`paper_story.md`](paper_story.md)：收缩后的论文叙事和可写贡献。
 10. [`related_work.md`](related_work.md)：研究定位；不作为实现状态或 CLI 来源。
-11. [`next_agent_prompt_20260715.md`](next_agent_prompt_20260715.md)：当前唯一一次 Phantom R0b 的
-    可直接交接 prompt、Conda-uv 环境和逐 episode 运行协议。
+11. [`next_agent_prompt_20260715.md`](next_agent_prompt_20260715.md)：已执行的 Phantom R0b 事前
+    协议与审计记录；不再是可重跑的当前交接 prompt。
 
 ## 当前方法口径
 

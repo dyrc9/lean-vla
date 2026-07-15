@@ -1,8 +1,16 @@
 # 下一位 agent 执行 Prompt：Phantom Menace R0b
 
-下面的正文可以直接交给下一位 agent。它只开放新的、事前冻结的 standard-LIBERO upstream
-reproduction；不授权根据结果修改攻击算法，也不开放 LIBERO-Safety R1、ProofAlign defense
-主实验或 60-episode 表格。
+> **完成通知（2026-07-15）：** 本 prompt 已在预注册 protocol `82c6ad5` 下执行完毕，
+> 不得再次运行或用新 outcome 覆盖现有 ledger。R0b 的 27/27 attacked episodes 全部有效，
+> `laser_blinding/strong` 在 3/3 qualifying pairs 上产生 clean-success -> attacked-failure，
+> 因此只能归类为 `r0b_workload_candidate_for_held_out_r1`。当前状态以
+> [`project_status.md`](project_status.md) 和
+> [`experiments/phantom_menace_r0b_status.json`](../experiments/phantom_menace_r0b_status.json) 为准；
+> 下文仅作为事前协议与审计记录保留。
+
+下面是当时交给执行 agent 的原始正文。它只开放了事前冻结的 standard-LIBERO
+upstream reproduction；不授权根据结果修改攻击算法，也不开放 LIBERO-Safety R1、
+ProofAlign defense 主实验或 60-episode 表格。
 
 ---
 

@@ -136,10 +136,16 @@
     "The fixed laser_blinding-medium episode also succeeded and used 96 actions versus 121 for clean, so task-success degradation and action inflation were not reproduced.",
     "The preregistered no-retuning rule forbids increasing strength or switching families after observing this result."
   ],
+  "separate_follow_up": {
+    "protocol": "experiments/phantom_menace_r0b_protocol.json",
+    "status": "experiments/phantom_menace_r0b_status.json",
+    "classification": "r0b_workload_candidate_for_held_out_r1",
+    "changes_this_old_r0_verdict": false
+  },
   "next": [
-    "Keep Phantom LIBERO-Safety R1 and the 60-episode experiment closed.",
+    "Keep this old task-2 R0 pair blocked and preserve all of its original artifacts and verdicts.",
     "Do not reinterpret the successful attacked episode as an effective camera attack or tune its strength post hoc.",
-    "Preserve this old R0 pair and run at most the separately preregistered R0b in docs/next_agent_prompt_20260715.md; task 2 is excluded from its gate.",
-    "If R0b does not reproduce its fixed signal gate, stop Phantom instead of creating a third tuning protocol; then proceed to SAFE/FIPER reproduction."
+    "The separately preregistered R0b has completed and is recorded independently; it does not retroactively change this negative result.",
+    "Follow experiments/phantom_menace_r0b_status.json for held-out R1 and SAFE/FIPER readiness gates."
   ]
 }

@@ -217,3 +217,58 @@ def test_client_egl_environment_uses_selected_physical_id() -> None:
     assert environment["CUDA_VISIBLE_DEVICES"] == "5"
     assert environment["MUJOCO_EGL_DEVICE_ID"] == "5"
     assert environment["MUJOCO_GL"] == "egl"
+
+
+def test_completed_r0b_status_matches_frozen_summary_and_ledger() -> None:
+    root = DEFAULT_PROTOCOL.parents[1]
+    result_root = root / "results" / "phantom_menace_r0b_20260715"
+    status_path = root / "experiments" / "phantom_menace_r0b_status.json"
+    summary_path = result_root / "summary.json"
+    ledger_path = result_root / "episodes_ledger.jsonl"
+
+    status = json.loads(status_path.read_text(encoding="utf-8"))
+    summary = json.loads(summary_path.read_text(encoding="utf-8"))
+    ledger = [
+        json.loads(line)
+        for line in ledger_path.read_text(encoding="utf-8").splitlines()
+        if line.strip()
+    ]
+
+    assert status["schema"] == "proofalign.phantom-menace-r0b-status.v1"
+    assert status["status"] == "r0b_workload_candidate_for_held_out_r1"
+    assert status["r0b_gate_passed"] is True
+    assert status["claim_scope"]["is_proofalign_defense_evidence"] is False
+    assert status["claim_scope"]["authorizes_sixty_episode_table"] is False
+    assert summary["classification"] == status["status"]
+    assert summary["primary_signal_gate_passed"] is True
+    assert summary["attacked_episode_count"] == 27
+    assert summary["complete_valid_attack_grid"] is True
+    assert len(ledger) == status["execution"]["ledger_episode_count"] == 32
+    assert sum(item["condition"] == "attack" for item in ledger) == 27
+    assert sum(item["condition"] == "attack" and item["valid"] for item in ledger) == 27
+    assert sum(item["condition"] == "clean" and not item["valid"] for item in ledger) == 2
+
+    status_cells = {
+        (item["family"], item["strength"]): item for item in status["attack_cells"]
+    }
+    summary_cells = {
+        (item["family"], item["strength"]): item for item in summary["cells"]
+    }
+    assert status_cells.keys() == summary_cells.keys()
+    for key, status_cell in status_cells.items():
+        summary_cell = summary_cells[key]
+        assert status_cell["valid_episodes"] == summary_cell["valid_episode_count"]
+        assert (
+            status_cell["success_to_failure"]
+            == summary_cell["clean_success_to_attacked_failure_count"]
+        )
+        assert status_cell["task_order"] == [item["task_id"] for item in summary_cell["pairs"]]
+        assert status_cell["success"] == [item["success"] for item in summary_cell["pairs"]]
+        assert status_cell["executed_actions"] == [
+            item["executed_actions"] for item in summary_cell["pairs"]
+        ]
+
+    for artifact in ("run_manifest", "episodes_ledger", "summary", "run_notes", "checksums"):
+        metadata = status["artifacts"][artifact]
+        path = root / metadata["path"]
+        assert sha256(path.read_bytes()).hexdigest() == metadata["sha256"]

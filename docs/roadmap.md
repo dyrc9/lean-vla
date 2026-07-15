@@ -249,26 +249,25 @@ clean strict preflight 与唯一一次固定 calibration。
 
 ## 6. P4：远程发布攻击 workload pilot
 
-状态：**live-controller method-validity 五-prefix gate 已通过；上游 published-workload reproduction
-仍是当前 gate**。P1/P2
+状态：**live-controller method-validity 五-prefix gate 已通过；Phantom R0b 已发现一个可进入
+held-out R1 的上游 workload，SAFE/FIPER reproduction 与 R1 事前协议是当前 gate**。P1/P2
 correctness、golden parity 与 affordance observation completeness 已通过；real-time latency 明确
 未通过并已降级 claim。fail-closed preflight manifest 与 clean + Lean slow-interlock smoke 已
 脚本化。SABER standard-LIBERO R0 已核验为部分方向复现。Phantom 三种 deterministic transform 的
 9 组 CPU smoke 与官方 OpenPI WebSocket 闭环已通过。2026-07-15 已用 clean standard-LIBERO、独立
 uv client 和 structured outcome/frame digest 关闭环境与 raw-artifact blocker；task 2 clean 成功，
 同 task/init 的固定 `laser_blinding-medium` 改变 20/20 policy frame 但也成功，且使用更少动作。因此
-攻击效力方向未复现，Phantom R0 标为 `blocked_upstream`。不得事后调强度；未经新的预注册 upstream
-protocol、R0 与 exact-task R1 gate 不得启动主表。
+攻击效力方向未复现，该旧 Phantom R0 pair 保持 `blocked_upstream`。不得事后调强该 pair
+或覆盖其负结果。
 环境见 [`remote_execution.md`](remote_execution.md)。
 
-`blocked_upstream` 在这里是旧 task 2 单对协议的终止状态，不是对 Phantom 总体有效性的否定。用户
-已授权一个且仅一个新的 R0b：在任何新 attack 前提交 machine-readable protocol，排除已观察的 task 2，
-只用 clean outcome 按固定顺序选择前三个 clean-success pair，然后对每个 pair 无提前停止地执行
-`laser_blinding/em_truncation/ultrasound_blur` × `weak/medium/strong` 完整网格。同一 cell 至少在
-2/3 pair 上把 clean success 变为 failure 才通过 primary signal gate；action count 在没有复制官方
-阈值前只作描述。具体命令与停止条件见
-[`next_agent_prompt_20260715.md`](next_agent_prompt_20260715.md)。若 R0b 仍失败，不建立第三个 Phantom
-调参协议，回到 SAFE/FIPER reproduction。
+`blocked_upstream` 在这里是旧 task 2 单对协议的终止状态，不是对 Phantom 总体有效性的否定。
+后续分离的 R0b 已按 `82c6ad5` 预注册协议完成：task 3/4 的启动失败在无 outcome 时
+fail closed 并未重跑，task 5/6/7 init 0 是首三个有效 clean-success pair，27/27 attack
+episodes 全部有效。`laser_blinding/strong` 在 3/3 pair 上把 success 变为 failure，满足
+primary signal gate；`em_truncation` medium/strong 各只有 1/3，其他 cell 为 0/3。R0b 因此
+只归类为 held-out R1 workload candidate，不是 defense evidence。下一步必须分别冻结
+LIBERO-Safety R1 protocol 与 SAFE/FIPER 官方 pipeline；两者 readiness gate 之前不启动主表。
 
 在 60-episode pilot 前增加 upstream reproduction gate，详见
 [`reproduction_plan.md`](reproduction_plan.md)：

@@ -39,7 +39,7 @@
       "repository": "https://github.com/ZJUshine/Phantom-Menace",
       "upstream_platform": "standard LIBERO + OpenPI/OpenVLA",
       "main_adapter": "versioned observation transform plugin",
-      "status": "blocked_upstream",
+      "status": "reproduced_upstream",
       "upstream_commit": "a0e4c8b2a661ea2fe64bdb9055353b2e12575729",
       "local_patch_commit": "d03fcbdfa4d49985dabd60e11e12008e2af3a783",
       "artifacts": [
@@ -52,7 +52,14 @@
         "results/phantom_menace_r0_20260714/clean_task1/",
         "results/phantom_menace_r0_20260715/run_manifest.json",
         "results/phantom_menace_r0_20260715/clean_task2/episodes.jsonl",
-        "results/phantom_menace_r0_20260715/attack_task2_laser_medium/episodes.jsonl"
+        "results/phantom_menace_r0_20260715/attack_task2_laser_medium/episodes.jsonl",
+        "experiments/phantom_menace_r0b_protocol.json",
+        "experiments/phantom_menace_r0b_status.json",
+        "results/phantom_menace_r0b_20260715/run_manifest.json",
+        "results/phantom_menace_r0b_20260715/episodes_ledger.jsonl",
+        "results/phantom_menace_r0b_20260715/summary.json",
+        "results/phantom_menace_r0b_20260715/run_notes.md",
+        "results/phantom_menace_r0b_20260715/SHA256SUMS"
       ],
       "artifact_sha256": {
         "runner_patch_payload": "e0c12e8c5fb07cbfdf79b32270972356611c613f78b06c378bb73ac486389cde",
@@ -65,12 +72,18 @@
         "clean_task1_video": "f76e1d2352a3739936338deb84fb14c5cd028e54999dfa6237f2bcc1e2a884b0",
         "isolated_pair_manifest": "d722f600b0bf15753ed372151c4298aec45284f8b5de1fb79cb6df43ae2d3301",
         "clean_task2_episode": "f03ca31ed16c083e52385123690e3b108fb087b6acfbc4544d882576404e87ba",
-        "laser_medium_task2_episode": "b8f8e5758e7cb6a52ef048ba4a36010ea491898e9e0e87b80199e942bb059606"
+        "laser_medium_task2_episode": "b8f8e5758e7cb6a52ef048ba4a36010ea491898e9e0e87b80199e942bb059606",
+        "r0b_protocol": "7a1e566a77a22d3c1ee2466067a6f7aa016245918aa4ba876c3c9ecc1c904060",
+        "r0b_manifest": "64e08c2811ac54c26eca46d2cbfa828034e6b928c04c3c657971e59d19915d8b",
+        "r0b_ledger": "e6d0e677ec079803bfe40b54739d13881636478c87e12279362f2c8084040f73",
+        "r0b_summary": "ca55e57dcd3e1f45c56932bfb287a4b95ff17659bfff5cf774528cb0cce01c94",
+        "r0b_notes": "8a34d38613ab8905b4a4f6b386c2f66ea90d7670d00fe895de9d700ee98bc4bc",
+        "r0b_checksums": "bd2181faec7ba98ca2754ee92704ae516b361bff019538a555aa98feeebb8fd8"
       },
-      "result_scope": "CPU transform R0 plus isolated official clean/attack closed-loop pair",
-      "result": "environment and raw-artifact blockers closed; task 2 clean and fixed laser_blinding-medium both succeeded, with attacked run using fewer actions, so the upstream attack-effect direction was not reproduced and the old R0 pair is blocked",
-      "next_protocol": "one newly preregistered R0b full 3-family x 3-strength grid on the first three clean-success pairs from the fixed task/init sequence; task 2 excluded; no R1 or defense experiment until the R0b signal gate passes",
-      "handoff": "docs/next_agent_prompt_20260715.md"
+      "result_scope": "CPU transform R0, isolated official task-2 pair, and preregistered standard-LIBERO R0b workload discovery",
+      "result": "the old task-2 R0 pair remains a negative result; the separate preregistered R0b completed a valid 27-episode grid and laser_blinding-strong turned success into failure on all three clean-success pairs, satisfying the R0b workload-discovery gate",
+      "next_protocol": "preregister a held-out LIBERO-Safety R1 workload using laser_blinding-strong without changing the upstream attack, while independently reproducing SAFE and FIPER; no paired pilot or 60-episode table until their readiness gates pass",
+      "handoff": "experiments/phantom_menace_r0b_status.json"
     },
     {
       "id": "edpa",
