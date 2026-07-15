@@ -2,7 +2,9 @@
 
 These environments follow `docs/remote_execution.md`: the Conda-provided uv is
 the only environment manager, caches and environments live under `/data0/ldx`,
-and source remains in the Git worktree.
+and frozen source checkouts remain under the main repository's ignored
+`external/{SAFE,SAFE-openpi,fiper}` directories. The temporary reproduction
+worktree has been removed.
 
 Canonical locations:
 
@@ -29,22 +31,22 @@ export UV_PYTHON_INSTALL_DIR=/data0/ldx/uv-python
   --python /data0/ldx/uv-envs/safe-r0/bin/python \
   --requirement experiments/safe_fiper_r0_env/safe_requirements.txt
 "$PROOFALIGN_UV" pip install --python /data0/ldx/uv-envs/safe-r0/bin/python \
-  --no-deps --editable upstream/SAFE
+  --no-deps --editable external/SAFE
 
 "$PROOFALIGN_UV" venv --python 3.8 /data0/ldx/uv-envs/safe-r0-libero-client
 "$PROOFALIGN_UV" pip sync --index-strategy unsafe-best-match \
   --python /data0/ldx/uv-envs/safe-r0-libero-client/bin/python \
-  upstream/SAFE-openpi/examples/libero/requirements.txt \
-  upstream/SAFE-openpi/third_party/libero/requirements.txt \
+  external/SAFE-openpi/examples/libero/requirements.txt \
+  external/SAFE-openpi/third_party/libero/requirements.txt \
   --extra-index-url https://download.pytorch.org/whl/cu113
 "$PROOFALIGN_UV" pip install \
   --python /data0/ldx/uv-envs/safe-r0-libero-client/bin/python \
-  --editable upstream/SAFE-openpi/packages/openpi-client \
-  --editable upstream/SAFE-openpi/third_party/libero
+  --editable external/SAFE-openpi/packages/openpi-client \
+  --editable external/SAFE-openpi/third_party/libero
 
 UV_PROJECT_ENVIRONMENT=/data0/ldx/uv-envs/safe-r0-openpi \
   GIT_LFS_SKIP_SMUDGE=1 \
-  "$PROOFALIGN_UV" --project upstream/SAFE-openpi sync --frozen
+  "$PROOFALIGN_UV" --project external/SAFE-openpi sync --frozen
 
 "$PROOFALIGN_UV" venv --python 3.11.15 /data0/ldx/uv-envs/fiper-r0
 "$PROOFALIGN_UV" pip install --index-strategy unsafe-best-match \
@@ -54,7 +56,7 @@ UV_PROJECT_ENVIRONMENT=/data0/ldx/uv-envs/safe-r0-openpi \
 
 Do not use the existing pi0.5 checkpoints for SAFE R0.  The frozen upstream
 protocol requires OpenPI `pi0_libero`, downloaded through the frozen
-`upstream/SAFE-openpi` project.  FIPER R0 uses the official published rollout
+`external/SAFE-openpi` project.  FIPER R0 uses the official published rollout
 archive and does not need an OpenPI checkpoint.
 
 The SAFE client also needs `NUMBA_CACHE_DIR` on a writable filesystem and this
@@ -62,9 +64,10 @@ robosuite release expects the physical EGL id, for example
 `CUDA_VISIBLE_DEVICES=2 MUJOCO_EGL_DEVICE_ID=2`. The audited launcher sets both.
 
 FIPER runtime outputs must not be written into the frozen extracted-data tree.
-Each runtime task directory contains only a `rollouts` symlink to the official
-data; processed tensors, RND checkpoints, and results are written beside that
-link in a fresh `/data0/ldx/safe-fiper-r0/fiper/runtime_data_*` directory.
+The audited launcher creates `RUN/runtime_data`: each task directory contains
+only a `rollouts` symlink to the official data, while processed tensors, RND
+checkpoints, and results are written beside that link. Its temporary
+`external/fiper/data` symlink is removed when the launcher exits.
 
 SAFE's upstream instructions permit current compatible detector dependencies;
 SciPy is pinned to 1.15.3 because the newer 1.17 line requires Python 3.11,

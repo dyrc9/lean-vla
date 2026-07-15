@@ -16,8 +16,8 @@ archive 中的内容。
 6. [`reproduction_plan.md`](reproduction_plan.md)：发布攻击、现有防御与 CTDA 的复现证据链。
 7. [`implementation_notes.md`](implementation_notes.md)：本地 CPU/Lean 开发与验证约定。
 8. [`remote_execution.md`](remote_execution.md)：迁移到远程 GPU 后的环境、路径和运行协议。
-9. [`safe_fiper_r0_runbook.md`](safe_fiper_r0_runbook.md)：独立 baseline worktree、已下载资产、uv
-   环境、活动运行与 terminal 验证清单。
+9. [`safe_fiper_r0_runbook.md`](safe_fiper_r0_runbook.md)：SAFE/FIPER 已下载资产、固定源码、uv
+   环境、主仓库运行命令与 terminal 验证清单。
 10. [`paper_story.md`](paper_story.md)：收缩后的论文叙事和可写贡献。
 11. [`related_work.md`](related_work.md)：研究定位；不作为实现状态或 CLI 来源。
 12. [`next_agent_prompt_20260715.md`](next_agent_prompt_20260715.md)：已执行的 Phantom R0b 事前

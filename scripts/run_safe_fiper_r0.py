@@ -26,6 +26,9 @@ DEFAULT_SAFE_OPENPI_ENV = Path("/data0/ldx/uv-envs/safe-r0-openpi")
 DEFAULT_SAFE_CLIENT_ENV = Path("/data0/ldx/uv-envs/safe-r0-libero-client")
 DEFAULT_FIPER_ENV = Path("/data0/ldx/uv-envs/fiper-r0")
 DEFAULT_OPENPI_DATA_HOME = Path("/data0/ldx/safe-fiper-r0/openpi")
+DEFAULT_SAFE_ROOT = REPO_ROOT / "external" / "SAFE"
+DEFAULT_SAFE_OPENPI_ROOT = REPO_ROOT / "external" / "SAFE-openpi"
+DEFAULT_FIPER_ROOT = REPO_ROOT / "external" / "fiper"
 
 
 class LaunchError(RuntimeError):
@@ -176,6 +179,7 @@ def fiper_plan(args: argparse.Namespace) -> list[CommandSpec]:
     env = shared_env() | {
         "PATH": f"{args.fiper_env.resolve() / 'bin'}:{os.environ.get('PATH', '')}",
         "CUDA_VISIBLE_DEVICES": str(args.policy_gpu),
+        "PROOFALIGN_FIPER_ROOT": str(args.fiper_root.resolve()),
     }
     return [
         CommandSpec(
@@ -183,6 +187,7 @@ def fiper_plan(args: argparse.Namespace) -> list[CommandSpec]:
             argv=(
                 str(args.fiper_env.resolve() / "bin" / "python"),
                 str((REPO_ROOT / "scripts" / "run_fiper_compat.py").resolve()),
+                f"hydra.run.dir={args.run_dir.resolve() / 'hydra'}",
             ),
             cwd=str(args.fiper_root.resolve()),
             env=env,
@@ -305,6 +310,35 @@ def execute_sequential(args: argparse.Namespace, specs: list[CommandSpec]) -> No
             raise LaunchError(f"{spec.name} exited with code {result.returncode}; see {log_path}")
 
 
+def prepare_fiper_runtime_data(args: argparse.Namespace) -> tuple[Path, Path]:
+    """Expose immutable rollouts through a fresh, run-owned FIPER data tree."""
+
+    protocol = load_json(args.fiper_protocol)
+    source_root = Path(protocol["dataset"]["extracted_data_root"]).resolve()
+    runtime_root = args.run_dir.resolve() / "runtime_data"
+    data_link = args.fiper_root.resolve() / "data"
+    if data_link.exists() or data_link.is_symlink():
+        raise LaunchError(f"refusing to replace existing FIPER data path: {data_link}")
+    runtime_root.mkdir(parents=True, exist_ok=False)
+    for task in protocol["dataset"]["tasks_in_order"]:
+        rollout_source = source_root / task / "rollouts"
+        if not rollout_source.is_dir():
+            raise LaunchError(f"official FIPER rollout directory is missing: {rollout_source}")
+        task_root = runtime_root / task
+        task_root.mkdir()
+        (task_root / "rollouts").symlink_to(rollout_source, target_is_directory=True)
+    data_link.symlink_to(runtime_root, target_is_directory=True)
+    return data_link, runtime_root
+
+
+def remove_fiper_data_link(data_link: Path, runtime_root: Path) -> None:
+    if not data_link.is_symlink():
+        return
+    if data_link.resolve() != runtime_root.resolve():
+        raise LaunchError(f"FIPER data link changed during execution: {data_link}")
+    data_link.unlink()
+
+
 def write_json(path: Path, payload: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
@@ -320,9 +354,9 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--uv", type=Path, default=DEFAULT_UV)
     parser.add_argument("--safe-protocol", type=Path, default=REPO_ROOT / "experiments" / "safe_r0_protocol.json")
     parser.add_argument("--fiper-protocol", type=Path, default=REPO_ROOT / "experiments" / "fiper_r0_protocol.json")
-    parser.add_argument("--safe-root", type=Path, default=REPO_ROOT / "upstream" / "SAFE")
-    parser.add_argument("--safe-openpi-root", type=Path, default=REPO_ROOT / "upstream" / "SAFE-openpi")
-    parser.add_argument("--fiper-root", type=Path, default=REPO_ROOT / "upstream" / "fiper")
+    parser.add_argument("--safe-root", type=Path, default=DEFAULT_SAFE_ROOT)
+    parser.add_argument("--safe-openpi-root", type=Path, default=DEFAULT_SAFE_OPENPI_ROOT)
+    parser.add_argument("--fiper-root", type=Path, default=DEFAULT_FIPER_ROOT)
     parser.add_argument("--safe-env", type=Path, default=DEFAULT_SAFE_ENV)
     parser.add_argument("--safe-openpi-env", type=Path, default=DEFAULT_SAFE_OPENPI_ENV)
     parser.add_argument("--safe-client-env", type=Path, default=DEFAULT_SAFE_CLIENT_ENV)
@@ -363,17 +397,29 @@ def main(argv: list[str] | None = None) -> int:
         raise LaunchError(f"refusing to reuse result directory: {args.run_dir}")
     args.run_dir.mkdir(parents=True, exist_ok=False)
     write_json(args.run_dir / "run_manifest.json", run_manifest)
+    fiper_runtime: tuple[Path, Path] | None = None
     try:
         if args.target == "safe-rollout":
             execute_safe_rollout(args, specs)
+        elif args.target == "fiper":
+            fiper_runtime = prepare_fiper_runtime_data(args)
+            execute_sequential(args, specs)
         else:
             execute_sequential(args, specs)
+    except KeyboardInterrupt:
+        run_manifest["status"] = "interrupted"
+        run_manifest["error"] = "KeyboardInterrupt"
+        write_json(args.run_dir / "run_manifest.json", run_manifest)
+        return 130
     except (LaunchError, OSError) as exc:
         run_manifest["status"] = "failed"
         run_manifest["error"] = f"{type(exc).__name__}: {exc}"
         write_json(args.run_dir / "run_manifest.json", run_manifest)
         print(run_manifest["error"], file=sys.stderr)
         return 2
+    finally:
+        if fiper_runtime is not None:
+            remove_fiper_data_link(*fiper_runtime)
     run_manifest["status"] = "completed"
     write_json(args.run_dir / "run_manifest.json", run_manifest)
     return 0

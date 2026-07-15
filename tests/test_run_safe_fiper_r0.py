@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -9,6 +11,8 @@ from scripts.run_safe_fiper_r0 import (
     fiper_plan,
     main,
     parse_args,
+    prepare_fiper_runtime_data,
+    remove_fiper_data_link,
     safe_detector_plan,
     safe_rollout_plan,
 )
@@ -56,7 +60,9 @@ def test_detector_and_fiper_plans_use_isolated_uv_environments(tmp_path: Path) -
     assert safe.env["WANDB_MODE"] == "offline"
     assert fiper.argv[0] == "/data0/ldx/uv-envs/fiper-r0/bin/python"
     assert fiper.argv[1].endswith("/scripts/run_fiper_compat.py")
+    assert fiper.argv[2].startswith("hydra.run.dir=")
     assert fiper.env["UV_CACHE_DIR"] == "/data0/ldx/uv-cache"
+    assert fiper.env["PROOFALIGN_FIPER_ROOT"].endswith("/external/fiper")
 
 
 def test_safe_rollout_refuses_implicit_or_shared_gpu(tmp_path: Path) -> None:
@@ -71,3 +77,41 @@ def test_safe_rollout_refuses_implicit_or_shared_gpu(tmp_path: Path) -> None:
         main(base)
     with pytest.raises(LaunchError, match="distinct"):
         main(base + ["--policy-gpu", "3", "--egl-gpu", "3"])
+
+
+def test_fiper_runtime_data_is_fresh_and_source_link_is_temporary(tmp_path: Path) -> None:
+    source = tmp_path / "official"
+    for task in ("sorting", "push_t"):
+        (source / task / "rollouts").mkdir(parents=True)
+    protocol = tmp_path / "fiper_protocol.json"
+    protocol.write_text(
+        json.dumps(
+            {
+                "dataset": {
+                    "extracted_data_root": str(source),
+                    "tasks_in_order": ["sorting", "push_t"],
+                }
+            }
+        ),
+        encoding="utf-8",
+    )
+    fiper_root = tmp_path / "fiper"
+    run_dir = tmp_path / "run"
+    fiper_root.mkdir()
+    run_dir.mkdir()
+    launch_args = SimpleNamespace(
+        fiper_protocol=protocol,
+        fiper_root=fiper_root,
+        run_dir=run_dir,
+    )
+
+    data_link, runtime_root = prepare_fiper_runtime_data(launch_args)
+
+    assert data_link.is_symlink()
+    assert data_link.resolve() == runtime_root
+    assert (runtime_root / "sorting" / "rollouts").resolve() == source / "sorting" / "rollouts"
+    assert (runtime_root / "push_t" / "rollouts").resolve() == source / "push_t" / "rollouts"
+
+    remove_fiper_data_link(data_link, runtime_root)
+    assert not data_link.exists()
+    assert runtime_root.is_dir()

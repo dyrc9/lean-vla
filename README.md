@@ -21,7 +21,9 @@ It is not an end-to-end physical safety proof.
   `external/worktrees/safe-fiper-r0` worktree. They were interrupted during the
   2026-07-15 closeout and are not reproduction results. Their already
   downloaded, hash-frozen assets, partial outputs, and uv environments remain
-  under `/data0/ldx` for audit.
+  under `/data0/ldx` for audit. The dedicated worktree has been removed; frozen
+  source checkouts remain in `external/{SAFE,SAFE-openpi,fiper}`, and future
+  commands run from the main repository.
 - The legacy dual checker calls Lean for concrete Boolean claims.
 - Python contains a typed CTDA reference runtime and LIBERO single-prefix loop.
 - Lean contains CTDA datatypes, staged checkers, a persistent finite-prefix

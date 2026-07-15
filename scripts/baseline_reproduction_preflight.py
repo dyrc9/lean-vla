@@ -424,6 +424,7 @@ def check_python_environment(
 def collect_preflight(
     workspace: Path,
     *,
+    source_root: Path | None = None,
     safe_checkpoint: Path | None = None,
     safe_rollout_root: Path | None = None,
     fiper_data_root: Path | None = None,
@@ -434,20 +435,19 @@ def collect_preflight(
     validate_safe_protocol(safe)
     validate_fiper_protocol(fiper)
 
-    safe_git = git_check(workspace / safe["source"]["safe_checkout"], safe["source"]["safe_commit"])
-    safe_openpi_git = git_check(
-        workspace / safe["source"]["safe_openpi_checkout"], safe["source"]["safe_openpi_commit"]
-    )
-    fiper_git = git_check(workspace / fiper["source"]["checkout"], fiper["source"]["commit"])
-    safe_digests, safe_digest_blockers = digest_check(
-        workspace / safe["source"]["digest_root"], safe["source"]["sha256"]
-    )
+    source_root = (source_root or workspace / safe["source"]["digest_root"]).resolve()
+    safe_root = source_root / Path(safe["source"]["safe_checkout"]).name
+    safe_openpi_root = source_root / Path(safe["source"]["safe_openpi_checkout"]).name
+    fiper_root = source_root / Path(fiper["source"]["checkout"]).name
+    safe_git = git_check(safe_root, safe["source"]["safe_commit"])
+    safe_openpi_git = git_check(safe_openpi_root, safe["source"]["safe_openpi_commit"])
+    fiper_git = git_check(fiper_root, fiper["source"]["commit"])
+    safe_digests, safe_digest_blockers = digest_check(source_root, safe["source"]["sha256"])
     fiper_digests, fiper_digest_blockers = digest_check(
-        workspace / fiper["source"]["checkout"], fiper["source"]["sha256"]
+        fiper_root, fiper["source"]["sha256"]
     )
 
     submodule_blockers: list[str] = []
-    safe_openpi_root = workspace / safe["source"]["safe_openpi_checkout"]
     rc, submodules, error = command(("git", "submodule", "status"), cwd=safe_openpi_root)
     required_submodules = safe["source"]["required_submodules"]
     if rc != 0:
@@ -485,7 +485,7 @@ def collect_preflight(
         "safe_libero_client": check_python_environment(
             Path(safe["environment"]["libero_client_environment"]),
             modules=("openpi_client", "libero.libero", "mujoco", "torch"),
-            pythonpath=(workspace / safe["source"]["safe_openpi_checkout"] / "third_party" / "libero",),
+            pythonpath=(safe_openpi_root / "third_party" / "libero",),
             env={
                 "LIBERO_CONFIG_PATH": str(
                     workspace / "experiments" / "safe_fiper_r0_env" / "libero_config"
@@ -533,6 +533,7 @@ def collect_preflight(
     return {
         "schema": "proofalign.baseline-reproduction-preflight.v1",
         "workspace": str(workspace),
+        "source_root": str(source_root),
         "ready": not blockers,
         "source_ready": not source_blockers,
         "gpu_execution_authorized": False,
@@ -557,6 +558,7 @@ def collect_preflight(
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--workspace", type=Path, default=REPO_ROOT)
+    parser.add_argument("--source-root", type=Path)
     parser.add_argument("--safe-checkpoint", type=Path)
     parser.add_argument("--safe-rollout-root", type=Path)
     parser.add_argument("--fiper-data-root", type=Path)
@@ -570,6 +572,7 @@ def main(argv: list[str] | None = None) -> int:
     try:
         report = collect_preflight(
             args.workspace,
+            source_root=args.source_root,
             safe_checkpoint=args.safe_checkpoint,
             safe_rollout_root=args.safe_rollout_root,
             fiper_data_root=args.fiper_data_root,

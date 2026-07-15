@@ -9,6 +9,7 @@ the detector's numerical computation.
 
 from __future__ import annotations
 
+import os
 import runpy
 from pathlib import Path
 
@@ -16,13 +17,17 @@ import numpy as np
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-UPSTREAM_ENTRYPOINT = REPO_ROOT / "upstream" / "fiper" / "scripts" / "run_fiper.py"
+DEFAULT_FIPER_ROOT = REPO_ROOT / "external" / "fiper"
 
 
 def main() -> None:
     if "bool" not in np.__dict__:
         np.bool = np.bool_  # type: ignore[attr-defined]
-    runpy.run_path(str(UPSTREAM_ENTRYPOINT), run_name="__main__")
+    fiper_root = Path(os.environ.get("PROOFALIGN_FIPER_ROOT", DEFAULT_FIPER_ROOT)).resolve()
+    entrypoint = fiper_root / "scripts" / "run_fiper.py"
+    if not entrypoint.is_file():
+        raise FileNotFoundError(f"frozen FIPER entrypoint is missing: {entrypoint}")
+    runpy.run_path(str(entrypoint), run_name="__main__")
 
 
 if __name__ == "__main__":

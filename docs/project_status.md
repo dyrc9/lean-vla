@@ -15,9 +15,11 @@
 | 60-episode / Table B | **未授权** | 攻击 safety-signal 与 baseline readiness 尚未同时通过 | SAFE/FIPER 最终 gate 及新的事前 workload authorization 之前不启动 |
 
 SAFE/FIPER 的大型输入没有重新下载：它们统一复用 `/data0/ldx/safe-fiper-r0` 下已冻结的资产，
-由 `/home/ldx/.conda/envs/proofalign-libero/bin/uv` 管理 `/data0/ldx/uv-envs/*` 环境。独立运行、路径、
-hash 和 closeout checklist 见 [`safe_fiper_r0_runbook.md`](safe_fiper_r0_runbook.md)。335/500 和 FIPER
-停止位置只是带时间戳的中断记录，不是最终指标。
+由 `/home/ldx/.conda/envs/proofalign-libero/bin/uv` 管理 `/data0/ldx/uv-envs/*` 环境。原专用
+worktree 已清理；三个固定源码仓库保留在主目录 `external/{SAFE,SAFE-openpi,fiper}`，以后从主仓库
+使用 fresh result directory 运行。路径、命令、hash 和 terminal checklist 见
+[`safe_fiper_r0_runbook.md`](safe_fiper_r0_runbook.md)。335/500 和 FIPER 停止位置只是带时间戳的
+中断记录，不是最终指标。
 
 当前没有本项目 GPU 实验在运行。SAFE/FIPER partial outputs、首次 FIPER 失败和中断日志原样保留；
 未经新的事前决策不续跑、不拼接结果、不开发 pi0.5 baseline adapter，也不启动主表。
