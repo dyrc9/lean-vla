@@ -50,7 +50,10 @@ digest。预声明序列的 task 2/init 0 clean 在 121 个动作后成功；fre
 `laser_blinding-medium` 确实改变 20/20 policy frame，但在 96 个动作后同样成功。该 pair 的 init-state
 与首张 clean frame digest 完全一致，故闭环与 transform 证据有效；但 task-success degradation 和
 action inflation 方向均未复现。按 no-retuning 规则，Phantom R0 现标为 `blocked_upstream`，R1 与
-60-episode gate 继续关闭。
+60-episode gate 继续关闭。这里的 `blocked_upstream` 只关闭这个已观察的 task 2 单对协议，不表示
+Phantom Menace 被证伪或永久停止复现。用户已授权把新的预注册 R0b 提到下一优先级：在启动任何新
+attack 前冻结新的 clean-only task screening、三 family × 三 strength 完整网格和一致性 gate；旧
+task 2 pair 不进入新 gate，且 R0b 仍不开放 R1 或主实验。
 
 ## 已验证资产
 
@@ -97,6 +100,14 @@ action inflation 方向均未复现。按 no-retuning 规则，Phantom R0 现标
   transform plugin 直接加载并校验上游源码，不复制算法；3 种攻击 × 3 档强度的重复输出与 digest
   全部一致，CPU smoke SHA-256 为 `f77f40e6...d39863`。隔离 standard-LIBERO clean/attack pair 的
   结构化 artifact、25/20 个 policy records、视频和 environment manifest 已由 `SHA256SUMS` 校验。
+- 上述两个本地 runner commit 已导出为根仓库跟踪的
+  `experiments/patches/phantom_menace_r0_runner.mbox.b64`；payload SHA-256 为
+  `e0c12e8c...389cde`，解码后 mbox SHA-256 为 `b8fe708a...f2a0b3e`。从冻结 upstream parent 用
+  `git am --committer-date-is-author-date` 可精确重建 `d03fcbd`，避免根仓库推送遗漏被忽略的
+  `external/` 本地历史。
+- 隔离 client 的 uv requirements、robosuite `sitecustomize` overlay 与 clean LIBERO path config 已复制
+  到受版本控制的 `experiments/phantom_menace_r0_env/`；原始视频、JSONL 和 policy records 仍留在被
+  忽略的本机 `results/`，不会被错误地当作已上传到 Git 远程。
 
 ## 尚未闭合
 
@@ -133,13 +144,16 @@ action inflation 方向均未复现。按 no-retuning 规则，Phantom R0 现标
 
 ## 当前唯一优先级
 
-1. 冻结并报告 Phantom R0 的 `blocked_upstream` 负结果；不得按结果提高强度、换 family 或把像素
-   变化本身写成攻击效力；
-2. 独立复现 SAFE 与 FIPER 官方 detector/calibration pipeline，冻结 rollout、feature、multi-sample
-   与 alarm schema；
-3. 官方 pipeline 通过后补 OpenPI feature/multi-sample audit API 和统一 fallback adapter；
-4. Phantom R0 未通过前不生成 Phantom LIBERO-Safety R1；published-workload 与 baseline readiness
-   gate 未通过前不启动 paired GPU pilot 或 60 episodes。
+1. 保留并报告 Phantom 旧 R0 的 `blocked_upstream` 负结果；不得回头修改该 pair 或把像素变化本身
+   写成攻击效力；
+2. 按 [`next_agent_prompt_20260715.md`](next_agent_prompt_20260715.md) 先提交新的 R0b protocol，再在
+   未观察 attack outcome 的任务上运行完整三 family × 三 strength grid。R0b 是合法的新预注册复现，
+   不是对旧结果的事后调强；若新 gate 仍不通过，停止 Phantom，不建立第三个搜索协议；
+3. R0b 完成后独立复现 SAFE 与 FIPER 官方 detector/calibration pipeline，冻结 rollout、feature、
+   multi-sample 与 alarm schema；
+4. 官方 pipeline 通过后补 OpenPI feature/multi-sample audit API 和统一 fallback adapter；
+5. R0b 通过也只能预注册后续 held-out R1 workload；published-workload 与 baseline readiness gate
+   未通过前不启动 paired GPU pilot 或 60 episodes。
 
 ## 当前可写与不可写
 

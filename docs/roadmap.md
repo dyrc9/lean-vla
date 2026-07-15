@@ -261,6 +261,15 @@ uv client 和 structured outcome/frame digest 关闭环境与 raw-artifact block
 protocol、R0 与 exact-task R1 gate 不得启动主表。
 环境见 [`remote_execution.md`](remote_execution.md)。
 
+`blocked_upstream` 在这里是旧 task 2 单对协议的终止状态，不是对 Phantom 总体有效性的否定。用户
+已授权一个且仅一个新的 R0b：在任何新 attack 前提交 machine-readable protocol，排除已观察的 task 2，
+只用 clean outcome 按固定顺序选择前三个 clean-success pair，然后对每个 pair 无提前停止地执行
+`laser_blinding/em_truncation/ultrasound_blur` × `weak/medium/strong` 完整网格。同一 cell 至少在
+2/3 pair 上把 clean success 变为 failure 才通过 primary signal gate；action count 在没有复制官方
+阈值前只作描述。具体命令与停止条件见
+[`next_agent_prompt_20260715.md`](next_agent_prompt_20260715.md)。若 R0b 仍失败，不建立第三个 Phantom
+调参协议，回到 SAFE/FIPER reproduction。
+
 在 60-episode pilot 前增加 upstream reproduction gate，详见
 [`reproduction_plan.md`](reproduction_plan.md)：
 

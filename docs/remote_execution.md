@@ -548,6 +548,18 @@ pgrep -af 'eval_attack_vla.py|VLLM::EngineCore|model-service'
 policy frame 确实改变，攻击效力方向仍未复现。完整环境、JSONL、policy records、视频与 checksum
 位于 `results/phantom_menace_r0_20260715/`。状态为 `blocked_upstream`，不得调强度或进入 R1。
 
+Phantom 的运行控制与 structured logging 是 `external/` 内的两个本地提交，不能随根仓库自然推送。
+根仓库已保存 `experiments/patches/phantom_menace_r0_runner.mbox.b64`（payload SHA-256
+`e0c12e8c5fb07cbfdf79b32270972356611c613f78b06c378bb73ac486389cde`；解码 mbox SHA-256
+`b8fe708aa4a8db65fb37a44530a55274a620b73260edf703e9423821ff2a0b3e`）。在 clean upstream
+`a0e4c8b2...` 上解码后执行 `git am --committer-date-is-author-date` 可精确重建
+`d03fcbdfa4d49985dabd60e11e12008e2af3a783`。用户已授权一次新的预注册 R0b；其 Conda-uv 环境变量、
+fresh server/client 命令、固定网格、artifact gate 和停止条件统一见
+[`next_agent_prompt_20260715.md`](next_agent_prompt_20260715.md)。旧 task 2 pair 必须保留且不计入新 gate。
+远程可重建的小型 client 输入位于 `experiments/phantom_menace_r0_env/`；不要依赖被 `.gitignore`
+排除的 result-local requirements/config/overlay。raw videos、JSONL 和 policy records 不随 Git push，
+仍需单独按 `SHA256SUMS` 归档或复制。
+
 每个 checkout 使用独立环境；不要把它们的 torch/JAX/Spot/LLM 依赖强装进 ProofAlign root env。
 机器可读 target 清单为 `experiments/reproduction_targets.json`。clone 后立刻把 exact commit、license、
 checkpoint 和 patch digest 写入 run manifest；在完成官方 reproduction 前不要改 upstream attack 或

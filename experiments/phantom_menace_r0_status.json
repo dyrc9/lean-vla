@@ -7,6 +7,9 @@
     "repository": "https://github.com/ZJUshine/Phantom-Menace",
     "commit": "a0e4c8b2a661ea2fe64bdb9055353b2e12575729",
     "local_patch_commit": "d03fcbdfa4d49985dabd60e11e12008e2af3a783",
+    "local_patch_payload": "experiments/patches/phantom_menace_r0_runner.mbox.b64",
+    "local_patch_payload_sha256": "e0c12e8c5fb07cbfdf79b32270972356611c613f78b06c378bb73ac486389cde",
+    "local_patch_decoded_mbox_sha256": "b8fe708aa4a8db65fb37a44530a55274a620b73260edf703e9423821ff2a0b3e",
     "local_patch_scope": "default-off task/init/horizon selection, optional fail-closed attack errors, and structured episode/frame-digest logging",
     "source_sha256": {
       "sensor_attacks/em_truncation.py": "3ec0b487ce240ef07b595341d3da9cafcf80ad83f218070a393c4af96d2eedbb",
@@ -32,6 +35,7 @@
     "uv": "/home/ldx/.conda/envs/proofalign-libero/bin/uv",
     "uv_cache_dir": "/data0/ldx/uv-cache",
     "client_environment": "/data0/ldx/uv-envs/phantom-r0-client",
+    "tracked_rebuild_assets": "experiments/phantom_menace_r0_env",
     "protocol_deviation": "Python 3.11 / Torch 2.7.1 uses TORCH_FORCE_NO_WEIGHTS_ONLY_LOAD=1 to preserve upstream LIBERO's trusted local init-state loading behavior"
   },
   "cpu_transform_smoke": {
@@ -135,6 +139,7 @@
   "next": [
     "Keep Phantom LIBERO-Safety R1 and the 60-episode experiment closed.",
     "Do not reinterpret the successful attacked episode as an effective camera attack or tune its strength post hoc.",
-    "Proceed only with a newly preregistered upstream protocol or an independent P0 target such as SAFE/FIPER reproduction."
+    "Preserve this old R0 pair and run at most the separately preregistered R0b in docs/next_agent_prompt_20260715.md; task 2 is excluded from its gate.",
+    "If R0b does not reproduce its fixed signal gate, stop Phantom instead of creating a third tuning protocol; then proceed to SAFE/FIPER reproduction."
   ]
 }
