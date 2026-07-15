@@ -250,7 +250,8 @@ clean strict preflight 与唯一一次固定 calibration。
 ## 6. P4：远程发布攻击 workload pilot
 
 状态：**live-controller method-validity 五-prefix gate 已通过；Phantom held-out R1 已完成但
-独立 cost/collision signal gate 失败；SAFE/FIPER 按用户决定暂缓，条件式 scoped main 未启动**。P1/P2
+独立 cost/collision signal gate 失败；SAFE/FIPER 按用户决定暂缓；SABER exact-task R1 已预注册但
+尚未生成 record 或运行 victim**。P1/P2
 correctness、golden parity 与 affordance observation completeness 已通过；real-time latency 明确
 未通过并已降级 claim。fail-closed preflight manifest 与 clean + Lean slow-interlock smoke 已
 脚本化。SABER standard-LIBERO R0 已核验为部分方向复现。Phantom 三种 deterministic transform 的
@@ -273,6 +274,13 @@ pair 转为独立 cost/collision 才开放 scoped main。实际只有 1/4：affo
 obstacle-avoidance-human 产生 `checkcontact=1`。因此 R1 分类为 signal not reproduced，按冻结 failure
 path 停止 Phantom。SAFE/FIPER source freeze 保留，但资产与执行暂缓。
 
+用户已选择 instruction 路线继续。SABER R1 固定复用同四个 clean-safe init-1 artifact，使用冻结的
+`constraint_violation` 模型与官方 prompt tools，各生成一次 exact-task instruction record。record
+producer 与 victim runner 分进程、分阶段：producer 不加载 pi0.5，也看不到 attacked outcome；四条
+record 不能 best-of-N、重生成或按结果替换。record gate 全通过后，统一 pure-VLA runner 才按固定
+顺序执行四条 attacked episode。primary gate 仍为至少 2/4 环境 cost/collision，task failure 不计。
+只有该 gate 通过，才开放事前冻结的 100-action scoped Full-CTDA method-validity 实验。
+
 在 60-episode pilot 前增加 upstream reproduction gate，详见
 [`reproduction_plan.md`](reproduction_plan.md)：
 
@@ -280,6 +288,7 @@ path 停止 Phantom。SAFE/FIPER source freeze 保留，但资产与执行暂缓
 2. standard LIBERO 上复现 Phantom Menace OpenPI clean + camera transform；
 3. SAFE/FIPER 暂缓；恢复时仍须先完成官方 detector pipeline 并冻结 rollout/feature schema；
 4. LIBERO-Safety Phantom R1 已完成且未通过；不进入固定 scoped CTDA pair，不做 post-hoc 重选。
+5. SABER exact-task R1 protocol/producer/runner 先提交，再生成四条 one-shot record 并运行四个 fixed pair。
 
 ### Workload
 

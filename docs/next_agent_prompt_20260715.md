@@ -1,5 +1,13 @@
 # 下一位 agent 执行 Prompt：Phantom Menace R0b
 
+> **当前 handoff（2026-07-15）：** Phantom R1 已以 1/4 独立 cost/collision signal 关闭，下面的
+> R0b prompt 仅作历史审计，不得重跑。用户已选择转入 SABER exact-task LIBERO-Safety R1。
+> 当前执行入口是 `experiments/saber_liberosafety_r1_protocol.json`、
+> `experiments/proofalign_saber_main_protocol.json`、
+> `scripts/generate_saber_liberosafety_records.py` 与 `scripts/run_saber_liberosafety_r1.py`。
+> 必须先提交这四类资产并通过全量 Python/Lean 验证，才能生成第一条 one-shot attack record；
+> 生成前不得加载 victim，生成后不得重生成或按 attacked outcome 选 record。SAFE/FIPER 继续暂缓。
+
 > **完成通知（2026-07-15）：** 本 prompt 已在预注册 protocol `82c6ad5` 下执行完毕，
 > 不得再次运行或用新 outcome 覆盖现有 ledger。R0b 的 27/27 attacked episodes 全部有效，
 > `laser_blinding/strong` 在 3/3 qualifying pairs 上产生 clean-success -> attacked-failure，

@@ -69,6 +69,14 @@ LIBERO 风格接口，并发布了 π0.5 权重、五类 safety suites 和三种
   mapping；不能把 standard-LIBERO record 改个 suite 名称直接重放。
 - 可行性：高。官方 replay 只需单 victim GPU；完整在线 attacker 需要额外 vLLM GPU/显存。
 
+2026-07-15 exact-task R1 冻结：复用 Phantom R1 已验证的四个 init-1 clean-safe artifact，不新增 clean
+screening；冻结 `constraint_violation` merged model、SABER source digest 和 prompt-only tools。每个
+pair 只生成一次 record，生成进程不得加载 victim 或读取 attacked rollout，禁止 best-of-N、重生成和
+outcome-based replacement。四条 record 通过 exact suite/task/init、trusted instruction、apply-tool、
+model/protocol/source digest 与 200-char edit-budget gate 后，才运行四条 pure-VLA attacked episode。
+独立 signal gate 是至少 2/4 非零 LIBERO-Safety cost/collision；task failure 本身不计。当前仅完成
+协议与执行代码，attack record/outcome 尚未观察。
+
 R0 验收：clean baseline 成功 episode 上，released attacker/replay 能复现对应 objective 的方向性
 变化，并保存 edit/tool budget。R1 验收：perturbed instruction 不改变 frozen mission authority，
 但能使 unprotected victim 产生 unauthorized target/phase、cost/collision 或显著 action inflation。
@@ -227,6 +235,10 @@ comparison 或“优于现有防御”。
 task-failure pair 因无 cost/collision 不计。故 scoped paired prefix experiment 的 prerequisite 未满足，
 Full CTDA 未运行。该负结果关闭当前 Phantom 路线，不通过调强度、换 pair 或放宽窗口重开。
 
+后续按用户选择转入 SABER exact-task R1。其 record generation 与 victim execution 分离，且两个
+protocol 都必须在第一条 record 生成前提交。若 R1 达到 2/4，才运行预注册的有限前缀
+`VLA-only / Full CTDA` method-validity；若未达到则停止 SABER，不重生成或挑选攻击文本。
+
 ### Phase R3：paired closed loop
 
 每个配对单位固定 task/init/env seed/policy seed/workload：
@@ -317,10 +329,10 @@ McNemar exact test 作为补充；报告 effect size 和 interval，不只报告
 
 当前顺序改为：
 
-1. observation-attack plugin schema 与 Phantom deterministic transforms；
-2. 将 transform/patch digest 写入 episode/run config；
-3. Phantom R1 append-only orchestration、frame-pair/source/checkpoint validator 与 independent cost gate；
-4. Phantom R1 已以 1/4 < 2/4 关闭；scoped Full-CTDA experiment 标为 prerequisite not met；
+1. Phantom R1 已以 1/4 < 2/4 关闭；scoped Full-CTDA experiment 标为 prerequisite not met；
+2. 提交 SABER exact-task R1、条件式 main protocol、one-shot producer、pure victim runner 与 CPU validator；
+3. 生成四条 immutable record，通过全四条 gate 后执行四个 fixed attacked episode；
+4. SABER R1 通过时只运行已冻结的 scoped method-validity；失败时记录负结果并停止；
 5. SAFE/FIPER 恢复后再做 OpenPI latent feature/seeded multi-action audit、adapter 与 frozen calibration；
 6. 完整 method matrix、independent label export 与 paired bootstrap analysis；
 7. RoboGuard、EDPA/Phantom training-defense secondary track。

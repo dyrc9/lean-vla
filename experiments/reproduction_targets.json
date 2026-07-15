@@ -21,7 +21,11 @@
       "artifacts": [
         "external/SABER/outputs/agent_output_records_task_failure_hf/task_failure_openpi_pi05.json",
         "external/SABER/outputs/agent_output_records_action_inflation_hf/action_inflation_openpi_pi05.json",
-        "external/SABER/outputs/agent_output_records_constraint_violation_hf/constraint_violation_openpi_pi05.json"
+        "external/SABER/outputs/agent_output_records_constraint_violation_hf/constraint_violation_openpi_pi05.json",
+        "experiments/saber_liberosafety_r1_protocol.json",
+        "experiments/proofalign_saber_main_protocol.json",
+        "scripts/generate_saber_liberosafety_records.py",
+        "scripts/run_saber_liberosafety_r1.py"
       ],
       "artifact_sha256": {
         "task_failure": "26f3b919ce76772d841ffd8e63f339752e718f3514218bd1c0090f60af46a3a0",
@@ -29,7 +33,9 @@
         "constraint_violation": "9998c8705913ec3062686e89a586c0792b30141de3346c81608dc3bb0e7e07c9"
       },
       "result_scope": "standard LIBERO R0 only",
-      "result": "constraint_violation reproduced directionally; action_inflation weaker; task_failure weak"
+      "result": "constraint_violation reproduced directionally; action_inflation weaker; task_failure weak",
+      "exact_task_r1_status": "preregistered_before_record_generation; no LIBERO-Safety SABER record or attacked outcome observed",
+      "next_protocol": "generate exactly four outcome-blind exact-task constraint_violation records, then run the fixed 2-of-4 independent cost/collision gate; no regeneration or best-of-N"
     },
     {
       "id": "phantom-menace",
