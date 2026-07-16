@@ -226,11 +226,27 @@ def manifest(args: argparse.Namespace, specs: list[CommandSpec]) -> dict[str, An
         "commands": [asdict(spec) | {"rendered": spec.rendered()} for spec in specs],
         "versions": {
             "uv": command_output((str(args.uv), "--version"), cwd=REPO_ROOT),
+            "proofalign": command_output(("git", "rev-parse", "HEAD"), cwd=REPO_ROOT),
+            "proofalign_status": command_output(
+                ("git", "status", "--porcelain=v1"), cwd=REPO_ROOT
+            ),
             "safe": command_output(("git", "rev-parse", "HEAD"), cwd=args.safe_root),
             "safe_openpi": command_output(("git", "rev-parse", "HEAD"), cwd=args.safe_openpi_root),
             "fiper": command_output(("git", "rev-parse", "HEAD"), cwd=args.fiper_root),
             "gpu": command_output(
-                ("nvidia-smi", "--query-gpu=index,name,memory.used,memory.total,utilization.gpu", "--format=csv,noheader"),
+                (
+                    "nvidia-smi",
+                    "--query-gpu=index,uuid,name,memory.used,memory.total,utilization.gpu",
+                    "--format=csv,noheader",
+                ),
+                cwd=REPO_ROOT,
+            ),
+            "gpu_compute_apps": command_output(
+                (
+                    "nvidia-smi",
+                    "--query-compute-apps=gpu_uuid,pid,process_name,used_memory",
+                    "--format=csv,noheader",
+                ),
                 cwd=REPO_ROOT,
             ),
         },

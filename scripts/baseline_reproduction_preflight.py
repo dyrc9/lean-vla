@@ -396,6 +396,7 @@ def check_python_environment(
     modules: tuple[str, ...],
     pythonpath: tuple[Path, ...] = (),
     env: dict[str, str] | None = None,
+    cwd: Path = REPO_ROOT,
 ) -> dict[str, Any]:
     python = path / "bin" / "python"
     blockers: list[str] = []
@@ -408,7 +409,7 @@ def check_python_environment(
     for key, value in (env or {}).items():
         setup.append(f"os.environ[{key!r}] = {value!r}")
     program = "; ".join([*setup, *(f"import {module}" for module in modules), "print(sys.version)"])
-    rc, stdout, stderr = command((str(python), "-c", program), cwd=REPO_ROOT)
+    rc, stdout, stderr = command((str(python), "-c", program), cwd=cwd)
     if rc != 0:
         blockers.append(f"environment import check failed for {path}: {stderr or stdout}")
     return {
@@ -416,6 +417,7 @@ def check_python_environment(
         "python": str(python),
         "modules": list(modules),
         "pythonpath": [str(item.resolve()) for item in pythonpath],
+        "cwd": str(cwd.resolve()),
         "version": stdout if rc == 0 else None,
         "blockers": blockers,
     }
@@ -477,15 +479,20 @@ def collect_preflight(
         "safe_detector": check_python_environment(
             Path(safe["environment"]["detector_environment"]),
             modules=("failure_prob", "torch", "hydra"),
+            cwd=safe_root,
         ),
         "safe_openpi_server": check_python_environment(
             Path(safe["environment"]["openpi_server_environment"]),
             modules=("openpi", "jax", "torch"),
+            pythonpath=(safe_openpi_root / "src",),
         ),
         "safe_libero_client": check_python_environment(
             Path(safe["environment"]["libero_client_environment"]),
             modules=("openpi_client", "libero.libero", "mujoco", "torch"),
-            pythonpath=(safe_openpi_root / "third_party" / "libero",),
+            pythonpath=(
+                safe_openpi_root / "third_party" / "libero",
+                safe_openpi_root / "packages" / "openpi-client" / "src",
+            ),
             env={
                 "LIBERO_CONFIG_PATH": str(
                     workspace / "experiments" / "safe_fiper_r0_env" / "libero_config"

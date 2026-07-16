@@ -10,6 +10,7 @@ from scripts.run_safe_fiper_r0 import (
     LaunchError,
     fiper_plan,
     main,
+    manifest,
     parse_args,
     prepare_fiper_runtime_data,
     remove_fiper_data_link,
@@ -63,6 +64,38 @@ def test_detector_and_fiper_plans_use_isolated_uv_environments(tmp_path: Path) -
     assert fiper.argv[2].startswith("hydra.run.dir=")
     assert fiper.env["UV_CACHE_DIR"] == "/data0/ldx/uv-cache"
     assert fiper.env["PROOFALIGN_FIPER_ROOT"].endswith("/external/fiper")
+
+
+def test_manifest_records_root_and_gpu_process_provenance(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    calls: list[tuple[tuple[str, ...], Path]] = []
+
+    def fake_command_output(argv, *, cwd):
+        calls.append((tuple(argv), cwd))
+        return {"argv": list(argv), "returncode": 0, "stdout": "ok", "stderr": ""}
+
+    monkeypatch.setattr("scripts.run_safe_fiper_r0.command_output", fake_command_output)
+    launch_args = args("fiper", tmp_path)
+    report = manifest(launch_args, fiper_plan(launch_args))
+
+    assert report["versions"]["proofalign"]["returncode"] == 0
+    assert report["versions"]["proofalign_status"]["returncode"] == 0
+    assert report["versions"]["gpu"]["returncode"] == 0
+    assert report["versions"]["gpu_compute_apps"]["returncode"] == 0
+    queried = {argv for argv, _cwd in calls}
+    assert ("git", "rev-parse", "HEAD") in queried
+    assert ("git", "status", "--porcelain=v1") in queried
+    assert (
+        "nvidia-smi",
+        "--query-gpu=index,uuid,name,memory.used,memory.total,utilization.gpu",
+        "--format=csv,noheader",
+    ) in queried
+    assert (
+        "nvidia-smi",
+        "--query-compute-apps=gpu_uuid,pid,process_name,used_memory",
+        "--format=csv,noheader",
+    ) in queried
 
 
 def test_safe_rollout_refuses_implicit_or_shared_gpu(tmp_path: Path) -> None:

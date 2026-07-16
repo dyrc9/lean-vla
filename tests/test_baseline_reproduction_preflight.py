@@ -3,6 +3,7 @@ from __future__ import annotations
 from copy import deepcopy
 import json
 from pathlib import Path
+import sys
 
 import pytest
 
@@ -12,6 +13,7 @@ from scripts.baseline_reproduction_preflight import (
     SAFE_PROTOCOL,
     ProtocolError,
     check_fiper_assets,
+    check_python_environment,
     collect_preflight,
     load_json,
     validate_fiper_protocol,
@@ -74,8 +76,47 @@ def test_fiper_asset_check_counts_each_task_and_split(tmp_path: Path) -> None:
     assert any("count differs from trusted inspection" in blocker for blocker in report["blockers"])
 
 
+def test_python_environment_check_records_runtime_import_context(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    calls: list[tuple[tuple[str, ...], Path]] = []
+
+    def fake_command(argv, *, cwd):
+        calls.append((tuple(argv), cwd))
+        return 0, "Python test version", ""
+
+    monkeypatch.setattr("scripts.baseline_reproduction_preflight.command", fake_command)
+    environment = Path(sys.executable).resolve().parents[1]
+    source_path = tmp_path / "source"
+
+    report = check_python_environment(
+        environment,
+        modules=("example_package",),
+        pythonpath=(source_path,),
+        env={"EXAMPLE_SETTING": "enabled"},
+        cwd=tmp_path,
+    )
+
+    assert report["blockers"] == []
+    assert report["cwd"] == str(tmp_path.resolve())
+    assert report["pythonpath"] == [str(source_path.resolve())]
+    assert calls[0][1] == tmp_path
+    program = calls[0][0][-1]
+    assert str(source_path.resolve()) in program
+    assert "EXAMPLE_SETTING" in program
+    assert "import example_package" in program
+
+
 def test_current_preflight_is_read_only_and_blocks_gpu_execution() -> None:
-    report = collect_preflight(ROOT)
+    source_root = ROOT / "external"
+    source_checkouts_present = all(
+        (source_root / name / ".git").exists()
+        for name in ("SAFE", "SAFE-openpi", "fiper")
+    )
+    report = collect_preflight(
+        ROOT,
+        source_root=source_root if source_checkouts_present else None,
+    )
 
     assert report["schema"] == "proofalign.baseline-reproduction-preflight.v1"
     assert report["ready"] is False
@@ -83,15 +124,20 @@ def test_current_preflight_is_read_only_and_blocks_gpu_execution() -> None:
     assert report["safe_assets"]["checkpoint_ready"] is True
     assert report["safe_assets"]["rollout_ready"] is False
     assert any("SAFE official pi0-libero_10 rollout root" in blocker for blocker in report["blockers"])
-    if (ROOT / "upstream").is_dir():
+    if source_checkouts_present:
         assert report["source_ready"] is True
         assert not any("submodule" in blocker for blocker in report["blockers"])
+        assert report["input_readiness"]["safe_rollout"] is True
+        assert report["input_readiness"]["safe_detector"] is False
         assert report["input_readiness"]["fiper"] is True
+        assert all(
+            not environment["blockers"]
+            for environment in report["environments"].values()
+        )
         assert report["git"]["safe"]["clean"] is True
         assert report["git"]["fiper"]["clean"] is True
     else:
-        # The merged main worktree intentionally does not duplicate the ignored
-        # source checkouts owned by the dedicated reproduction worktree.
+        # A clean clone intentionally omits the ignored external checkouts.
         assert report["source_ready"] is False
         assert report["input_readiness"]["fiper"] is False
         assert report["git"]["safe"]["clean"] is None
