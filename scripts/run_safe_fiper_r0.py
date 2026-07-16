@@ -63,6 +63,76 @@ def load_json(path: Path) -> dict[str, Any]:
     return payload
 
 
+def validate_fiper_restart_authorization(args: argparse.Namespace) -> None:
+    path = args.restart_authorization
+    if path is None:
+        raise LaunchError("fresh FIPER execution requires --restart-authorization")
+    authorization = load_json(path)
+    checks = (
+        (
+            authorization.get("schema")
+            == "proofalign.fiper-r0-restart-authorization.v1",
+            "restart authorization schema changed",
+        ),
+        (
+            authorization.get("protocol_status")
+            == "preregistered_execution_authorized_after_commit",
+            "restart authorization is not executable",
+        ),
+        (authorization.get("scope", {}).get("target") == "fiper", "restart target changed"),
+        (
+            authorization.get("parent_protocol", {}).get("sha256")
+            == file_sha256(args.fiper_protocol),
+            "frozen FIPER protocol digest changed",
+        ),
+        (
+            authorization.get("source", {}).get("commit")
+            == command_output(("git", "rev-parse", "HEAD"), cwd=args.fiper_root).get("stdout"),
+            "frozen FIPER source commit changed",
+        ),
+        (
+            authorization.get("environment", {}).get("path")
+            == str(args.fiper_env.resolve()),
+            "FIPER environment path changed",
+        ),
+        (
+            authorization.get("environment", {}).get("reuse_existing_environment") is True,
+            "restart must reuse the existing FIPER environment",
+        ),
+        (
+            authorization.get("environment", {}).get("create_environment") is False,
+            "restart cannot create an environment",
+        ),
+        (
+            authorization.get("environment", {}).get("install_dependencies") is False,
+            "restart cannot install dependencies",
+        ),
+        (
+            authorization.get("execution", {}).get("run_dir") == str(args.run_dir.resolve()),
+            "fresh result directory changed",
+        ),
+        (
+            authorization.get("execution", {}).get("policy_gpu") == args.policy_gpu,
+            "selected FIPER GPU changed",
+        ),
+        (
+            authorization.get("result_directory_policy", {}).get("mode") == "fresh",
+            "FIPER restart must use a fresh result directory",
+        ),
+        (
+            authorization.get("result_directory_policy", {}).get("resume_prior_attempt") is False,
+            "FIPER restart cannot resume a prior attempt",
+        ),
+        (
+            authorization.get("result_directory_policy", {}).get("merge_partial_outputs") is False,
+            "FIPER restart cannot merge partial outputs",
+        ),
+    )
+    for condition, message in checks:
+        if not condition:
+            raise LaunchError(message)
+
+
 def shared_env() -> dict[str, str]:
     return {
         "HF_HOME": "/data0/ldx/huggingface",
@@ -210,6 +280,8 @@ def command_output(argv: Iterable[str], *, cwd: Path) -> dict[str, Any]:
 
 def manifest(args: argparse.Namespace, specs: list[CommandSpec]) -> dict[str, Any]:
     protocols = [args.fiper_protocol] if args.target == "fiper" else [args.safe_protocol]
+    if args.restart_authorization is not None:
+        protocols.append(args.restart_authorization)
     return {
         "schema": "proofalign.safe-fiper-r0-run-manifest.v1",
         "created_at": datetime.now(timezone.utc).isoformat(),
@@ -231,8 +303,17 @@ def manifest(args: argparse.Namespace, specs: list[CommandSpec]) -> dict[str, An
                 ("git", "status", "--porcelain=v1"), cwd=REPO_ROOT
             ),
             "safe": command_output(("git", "rev-parse", "HEAD"), cwd=args.safe_root),
+            "safe_status": command_output(
+                ("git", "status", "--porcelain=v1"), cwd=args.safe_root
+            ),
             "safe_openpi": command_output(("git", "rev-parse", "HEAD"), cwd=args.safe_openpi_root),
+            "safe_openpi_status": command_output(
+                ("git", "status", "--porcelain=v1"), cwd=args.safe_openpi_root
+            ),
             "fiper": command_output(("git", "rev-parse", "HEAD"), cwd=args.fiper_root),
+            "fiper_status": command_output(
+                ("git", "status", "--porcelain=v1"), cwd=args.fiper_root
+            ),
             "gpu": command_output(
                 (
                     "nvidia-smi",
@@ -252,6 +333,51 @@ def manifest(args: argparse.Namespace, specs: list[CommandSpec]) -> dict[str, An
         },
         "status": "dry_run" if args.dry_run else "started",
     }
+
+
+def validate_execution_manifest(args: argparse.Namespace, run_manifest: dict[str, Any]) -> None:
+    versions = run_manifest["versions"]
+    required_commands = (
+        "uv",
+        "proofalign",
+        "proofalign_status",
+        "safe",
+        "safe_status",
+        "safe_openpi",
+        "safe_openpi_status",
+        "fiper",
+        "fiper_status",
+        "gpu",
+        "gpu_compute_apps",
+    )
+    for name in required_commands:
+        if versions[name].get("returncode") != 0:
+            raise LaunchError(f"manifest provenance command failed: {name}")
+    for name in ("proofalign_status", "safe_status", "safe_openpi_status", "fiper_status"):
+        if versions[name].get("stdout"):
+            raise LaunchError(f"execute requires a clean checkout: {name}")
+    if args.target != "fiper":
+        return
+    authorization = load_json(args.restart_authorization)
+    selected_uuid = authorization["execution"]["gpu_uuid"]
+    selected_index = str(args.policy_gpu)
+    inventory = [
+        [field.strip() for field in line.split(",")]
+        for line in versions["gpu"].get("stdout", "").splitlines()
+        if line.strip()
+    ]
+    if not any(
+        len(fields) >= 2 and fields[0] == selected_index and fields[1] == selected_uuid
+        for fields in inventory
+    ):
+        raise LaunchError("selected FIPER GPU index/UUID no longer matches authorization")
+    compute_uuids = {
+        line.split(",", 1)[0].strip()
+        for line in versions["gpu_compute_apps"].get("stdout", "").splitlines()
+        if line.strip()
+    }
+    if selected_uuid in compute_uuids:
+        raise LaunchError("selected FIPER GPU gained a compute process before execute")
 
 
 def wait_for_port(host: str, port: int, process: subprocess.Popen[str], timeout: float) -> None:
@@ -370,6 +496,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--uv", type=Path, default=DEFAULT_UV)
     parser.add_argument("--safe-protocol", type=Path, default=REPO_ROOT / "experiments" / "safe_r0_protocol.json")
     parser.add_argument("--fiper-protocol", type=Path, default=REPO_ROOT / "experiments" / "fiper_r0_protocol.json")
+    parser.add_argument("--restart-authorization", type=Path)
     parser.add_argument("--safe-root", type=Path, default=DEFAULT_SAFE_ROOT)
     parser.add_argument("--safe-openpi-root", type=Path, default=DEFAULT_SAFE_OPENPI_ROOT)
     parser.add_argument("--fiper-root", type=Path, default=DEFAULT_FIPER_ROOT)
@@ -399,6 +526,8 @@ def main(argv: list[str] | None = None) -> int:
         raise LaunchError("--policy-gpu must be selected from a fresh nvidia-smi inventory")
     if args.target == "safe-rollout" and (args.egl_gpu < 0 or args.egl_gpu == args.policy_gpu):
         raise LaunchError("SAFE rollout requires distinct explicit --policy-gpu and --egl-gpu values")
+    if args.target == "fiper" and (args.execute or args.restart_authorization is not None):
+        validate_fiper_restart_authorization(args)
     if args.target == "safe-rollout":
         specs = safe_rollout_plan(args)
     elif args.target == "safe-detector":
@@ -409,6 +538,7 @@ def main(argv: list[str] | None = None) -> int:
     print(json.dumps(run_manifest, indent=2, sort_keys=True))
     if args.dry_run:
         return 0
+    validate_execution_manifest(args, run_manifest)
     if args.run_dir.exists():
         raise LaunchError(f"refusing to reuse result directory: {args.run_dir}")
     args.run_dir.mkdir(parents=True, exist_ok=False)

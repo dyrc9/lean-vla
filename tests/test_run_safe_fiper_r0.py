@@ -16,6 +16,8 @@ from scripts.run_safe_fiper_r0 import (
     remove_fiper_data_link,
     safe_detector_plan,
     safe_rollout_plan,
+    validate_execution_manifest,
+    validate_fiper_restart_authorization,
 )
 
 
@@ -81,6 +83,7 @@ def test_manifest_records_root_and_gpu_process_provenance(
 
     assert report["versions"]["proofalign"]["returncode"] == 0
     assert report["versions"]["proofalign_status"]["returncode"] == 0
+    assert report["versions"]["fiper_status"]["returncode"] == 0
     assert report["versions"]["gpu"]["returncode"] == 0
     assert report["versions"]["gpu_compute_apps"]["returncode"] == 0
     queried = {argv for argv, _cwd in calls}
@@ -96,6 +99,103 @@ def test_manifest_records_root_and_gpu_process_provenance(
         "--query-compute-apps=gpu_uuid,pid,process_name,used_memory",
         "--format=csv,noheader",
     ) in queried
+
+
+def test_fiper_restart_authorization_freezes_existing_environment_and_fresh_run(
+    tmp_path: Path,
+) -> None:
+    authorization = json.loads(
+        (ROOT / "experiments" / "fiper_r0_restart_20260716.json").read_text(encoding="utf-8")
+    )
+    run_dir = tmp_path / "fresh-run"
+    authorization["execution"]["run_dir"] = str(run_dir.resolve())
+    authorization["execution"]["policy_gpu"] = 3
+    authorization_path = tmp_path / "authorization.json"
+    authorization_path.write_text(json.dumps(authorization), encoding="utf-8")
+    launch_args = parse_args(
+        [
+            "--target",
+            "fiper",
+            "--dry-run",
+            "--run-dir",
+            str(run_dir),
+            "--policy-gpu",
+            "3",
+            "--restart-authorization",
+            str(authorization_path),
+        ]
+    )
+
+    validate_fiper_restart_authorization(launch_args)
+
+    authorization["environment"]["create_environment"] = True
+    authorization_path.write_text(json.dumps(authorization), encoding="utf-8")
+    with pytest.raises(LaunchError, match="cannot create an environment"):
+        validate_fiper_restart_authorization(launch_args)
+
+
+def test_fiper_execute_requires_restart_authorization(tmp_path: Path) -> None:
+    with pytest.raises(LaunchError, match="restart-authorization"):
+        main(
+            [
+                "--target",
+                "fiper",
+                "--execute",
+                "--run-dir",
+                str(tmp_path / "fresh-run"),
+                "--policy-gpu",
+                "1",
+            ]
+        )
+
+
+def test_execution_manifest_rejects_selected_gpu_process(tmp_path: Path) -> None:
+    authorization = json.loads(
+        (ROOT / "experiments" / "fiper_r0_restart_20260716.json").read_text(encoding="utf-8")
+    )
+    run_dir = tmp_path / "fresh-run"
+    authorization["execution"]["run_dir"] = str(run_dir.resolve())
+    authorization_path = tmp_path / "authorization.json"
+    authorization_path.write_text(json.dumps(authorization), encoding="utf-8")
+    launch_args = parse_args(
+        [
+            "--target",
+            "fiper",
+            "--execute",
+            "--run-dir",
+            str(run_dir),
+            "--policy-gpu",
+            "1",
+            "--restart-authorization",
+            str(authorization_path),
+        ]
+    )
+    clean = {"returncode": 0, "stdout": "", "stderr": ""}
+    versions = {
+        name: dict(clean)
+        for name in (
+            "uv",
+            "proofalign",
+            "proofalign_status",
+            "safe",
+            "safe_status",
+            "safe_openpi",
+            "safe_openpi_status",
+            "fiper",
+            "fiper_status",
+            "gpu",
+            "gpu_compute_apps",
+        )
+    }
+    gpu_uuid = authorization["execution"]["gpu_uuid"]
+    versions["gpu"]["stdout"] = f"1, {gpu_uuid}, NVIDIA RTX 6000 Ada Generation, 3 MiB"
+    run_manifest = {"versions": versions}
+
+    validate_execution_manifest(launch_args, run_manifest)
+
+    versions["gpu_compute_apps"]["stdout"] = f"{gpu_uuid}, 1234, python, 1024 MiB"
+    with pytest.raises(LaunchError, match="gained a compute process"):
+        validate_execution_manifest(launch_args, run_manifest)
 
 
 def test_safe_rollout_refuses_implicit_or_shared_gpu(tmp_path: Path) -> None:

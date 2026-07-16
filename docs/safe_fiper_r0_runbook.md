@@ -19,6 +19,12 @@ terminal gate，因此都不能写成“复现成功”，也不能进入 ProofA
 result directory，也禁止从日志推断缺失结果。SAFE 如需继续，必须先冻结 fresh 或 resume
 协议；FIPER 只能在全新的 result directory 重跑完整官方矩阵。
 
+2026-07-16 的 fresh restart 另由
+`experiments/fiper_r0_restart_20260716.json` 事前授权。它固定复用现有
+`/data0/ldx/uv-envs/fiper-r0`，禁止创建环境或安装依赖，并把 GPU、唯一 fresh result directory、
+parent protocol digest 与“不续接/不拼接”规则绑定到 launcher。正式 `--execute` 缺少该授权文件或
+任一绑定字段不一致时必须 fail closed。
+
 原专用 worktree `external/worktrees/safe-fiper-r0` 已在收尾文档和代码合入主仓库后删除。
 以后从主仓库 `/home/ldx/lean-vla` 运行，不需要重新创建 ProofAlign worktree。
 
@@ -195,13 +201,15 @@ FIPER commit `13d79c5` 使用了 NumPy 已删除的 `np.bool`。项目入口
 ```bash
 cd /home/ldx/lean-vla
 PY=/home/ldx/lean-vla/.venv/bin/python
-RUN=/data0/ldx/safe-fiper-r0/fiper/runs/fiper-r0-fresh-YYYYMMDD-HHMMSS
+AUTH=/home/ldx/lean-vla/experiments/fiper_r0_restart_20260716.json
+RUN=/data0/ldx/safe-fiper-r0/fiper/runs/fiper-r0-fresh-20260716-104000
 
 test ! -e "$RUN"
 "$PY" scripts/run_safe_fiper_r0.py \
   --target fiper --execute --run-dir "$RUN" \
+  --restart-authorization "$AUTH" \
   --fiper-root /home/ldx/lean-vla/external/fiper \
-  --policy-gpu GPU_ID
+  --policy-gpu 1
 ```
 
 launcher 会自动创建 `$RUN/runtime_data/{task}`，每个 task 只用 `rollouts` symlink 引用冻结的官方
