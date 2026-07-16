@@ -321,8 +321,8 @@ P1/P2 correctness、27-case parity 和五-prefix method-validity 已允许 E0/E1
 
 状态：**不再阻塞 P4；live-controller method-validity 五-prefix gate 已通过；Phantom held-out R1 已完成但
 独立 cost/collision signal gate 失败；SABER exact-task R1 已在 record-generation artifact gate
-fail closed，未运行 victim；SAFE 未复现，FIPER 的 2026-07-16 fresh R0 已启动但当前没有
-terminal pass**。P1/P2
+fail closed，未运行 victim；SAFE 未复现，FIPER 的第二条 2026-07-16 fresh R0 正在后台运行但当前
+没有 terminal pass**。P1/P2
 correctness、golden parity 与 affordance observation completeness 已通过；real-time latency 明确
 未通过并已降级 claim。fail-closed preflight manifest 与 clean + Lean slow-interlock smoke 已
 脚本化。SABER standard-LIBERO R0 已核验为部分方向复现。Phantom 三种 deterministic transform 的

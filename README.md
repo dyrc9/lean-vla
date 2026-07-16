@@ -27,7 +27,9 @@ It is not an end-to-end physical safety proof.
   source checkouts remain in `external/{SAFE,SAFE-openpi,fiper}`, and future
   commands run from the main repository. A 2026-07-16 fresh FIPER attempt reused
   the existing environment but exited without a terminal manifest; its partial
-  outputs remain audit-only and do not block ProofAlign self-evaluation.
+  outputs remain audit-only. A second isolated fresh run now uses the same existing
+  environment under a user-systemd service. Neither run blocks ProofAlign
+  self-evaluation, and only a completed terminal manifest can enter comparison.
 - The legacy dual checker calls Lean for concrete Boolean claims.
 - Python contains a typed CTDA reference runtime and LIBERO single-prefix loop.
 - Lean contains CTDA datatypes, staged checkers, a persistent finite-prefix

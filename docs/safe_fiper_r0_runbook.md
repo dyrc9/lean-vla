@@ -12,6 +12,10 @@ SAFE 仍保持停止。FIPER 的第一条 2026-07-16 fresh run 在 seed 0 的 `p
 transient service 与 SSH 会话解耦。任何 run 在 terminal gate 前都不能写成“复现成功”，也不能进入
 ProofAlign 比较表。
 
+第二条 run 于 2026-07-16 13:33 启动为 `proofalign-fiper-r0-fresh2.service`。用户 manager 当前
+`Linger=no`：单个 SSH/工具会话断开不会终止该 service，但如果该用户的所有登录 session 都结束，
+要获得跨全注销保证需由系统管理员开启 linger。不要为此把 launcher 退回当前终端前台运行。
+
 | Baseline | 中断位置 | 审计产物 | 当前判定 |
 |---|---|---|---|
 | SAFE | 500 个 episode 中写出 335 个 env pickle | `/data0/ldx/safe-fiper-r0/safe/runs/safe-pi0-libero10-r0-20260715` | partial corpus；无 completed manifest，不得训练 detector |
