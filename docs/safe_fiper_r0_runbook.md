@@ -4,23 +4,28 @@
 [`project_status.md`](project_status.md) 为准，冻结实验定义分别在
 `experiments/safe_r0_protocol.json` 和 `experiments/fiper_r0_protocol.json`。
 
-## 当前结论（2026-07-15 17:33 Asia/Shanghai）
+## 当前结论（2026-07-16 13:30 Asia/Shanghai）
 
-两条官方长任务均已停止，当前没有本项目 SAFE/FIPER 进程。它们都没有完成
-terminal gate，因此都不能写成“复现成功”，也不能进入 ProofAlign 比较表。
+SAFE 仍保持停止。FIPER 的第一条 2026-07-16 fresh run 在 seed 0 的 `pretzel/rnd_a` 训练结束后
+无 traceback、无 terminal manifest 退出；该目录保持 partial/audit-only。用户要求 baseline 后台继续，
+因此第二条独立 fresh run 由 `experiments/fiper_r0_restart2_20260716.json` 授权，并使用 user systemd
+transient service 与 SSH 会话解耦。任何 run 在 terminal gate 前都不能写成“复现成功”，也不能进入
+ProofAlign 比较表。
 
 | Baseline | 中断位置 | 审计产物 | 当前判定 |
 |---|---|---|---|
 | SAFE | 500 个 episode 中写出 335 个 env pickle | `/data0/ldx/safe-fiper-r0/safe/runs/safe-pi0-libero10-r0-20260715` | partial corpus；无 completed manifest，不得训练 detector |
 | FIPER 原始入口 | seed 0 / `sorting` 时触发上游 `np.bool` 兼容性错误 | `/data0/ldx/safe-fiper-r0/fiper/runs/fiper-r0-20260715`，manifest 状态为 `failed` | 保留为首次失败证据 |
 | FIPER compatibility run | seed 0；完成 `sorting`、`stacking`，在 `push_t / rnd_oe` 训练中中断 | `/data0/ldx/safe-fiper-r0/fiper/runs/fiper-r0-compat1-20260715` | partial outputs；无 completed manifest |
+| FIPER first fresh run | seed 0；前三个 task 已评测，`pretzel/rnd_a` 训练结束后进程消失 | `/data0/ldx/safe-fiper-r0/fiper/runs/fiper-r0-fresh-20260716-104000` | manifest 仍为 `started`；partial outputs，不得拼接 |
 
 上述位置只是中断快照，不是最终指标。禁止把 partial outputs 与未来运行拼接，禁止复用这些
 result directory，也禁止从日志推断缺失结果。SAFE 如需继续，必须先冻结 fresh 或 resume
 协议；FIPER 只能在全新的 result directory 重跑完整官方矩阵。
 
-2026-07-16 的 fresh restart 另由
-`experiments/fiper_r0_restart_20260716.json` 事前授权。它固定复用现有
+2026-07-16 的 fresh restart 分别由
+`experiments/fiper_r0_restart_20260716.json` 和 `experiments/fiper_r0_restart2_20260716.json`
+事前授权。它们固定复用现有
 `/data0/ldx/uv-envs/fiper-r0`，禁止创建环境或安装依赖，并把 GPU、唯一 fresh result directory、
 parent protocol digest 与“不续接/不拼接”规则绑定到 launcher。正式 `--execute` 缺少该授权文件或
 任一绑定字段不一致时必须 fail closed。
@@ -201,8 +206,8 @@ FIPER commit `13d79c5` 使用了 NumPy 已删除的 `np.bool`。项目入口
 ```bash
 cd /home/ldx/lean-vla
 PY=/home/ldx/lean-vla/.venv/bin/python
-AUTH=/home/ldx/lean-vla/experiments/fiper_r0_restart_20260716.json
-RUN=/data0/ldx/safe-fiper-r0/fiper/runs/fiper-r0-fresh-20260716-104000
+AUTH=/home/ldx/lean-vla/experiments/fiper_r0_restart2_20260716.json
+RUN=/data0/ldx/safe-fiper-r0/fiper/runs/fiper-r0-fresh2-20260716-133000
 
 test ! -e "$RUN"
 "$PY" scripts/run_safe_fiper_r0.py \
