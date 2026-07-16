@@ -1,6 +1,6 @@
 # ProofAlign Execution Roadmap
 
-更新日期：2026-07-15
+更新日期：2026-07-16
 
 本文是唯一执行计划。历史 roadmap、实验 handoff 和 design memo 已归档。
 
@@ -30,6 +30,27 @@ budget 耗尽而失败。累计版本随后通过本地 CPU/Lean 与 strict pref
 5. 不把 Python verdict 改名为 Lean proof。
 6. 不跑大规模 GPU 主表来掩盖 false block 或 evaluator gap。
 7. 不从 `docs/archive/` 恢复旧口径。
+
+### 1.1 2026-07-16 执行优先级（覆盖后文历史顺序）
+
+当前主线改为 **ProofAlign-first evaluation**。外部攻击与 baseline 复现保留为独立后台线，
+但不再作为评测我们自己方法的前置条件。执行依赖固定为：
+
+```text
+主线：E0 支持范围与协议冻结
+        -> E1 clean utility / coverage 配对 pilot
+        -> E2 mission-only / trace-only / Full CTDA 消融
+        -> E3 closed-loop intervention 与任务结果
+        -> E4 verifier / 系统代价与鲁棒性
+        -> E5 外部 baseline / workload 最终对比
+
+后台线：SAFE / FIPER 官方复现与已冻结 workload 审计 -----------┘
+```
+
+其中 E0--E4 回答“我们的系统在明确支持的范围内是否工作、付出什么代价、两层是否各有贡献”，
+不等待 SAFE/FIPER terminal pass，也不等待新的 attack signal。E5 才回答“相对现有方法怎样”。
+攻击 efficacy 仍必须有独立、事前冻结的 workload signal；Phantom/SABER 的既有负结果和停止条件
+不因优先级调整而重开。
 
 ## 2. P0：文档与 claim scope freeze
 
@@ -247,11 +268,61 @@ clean strict preflight 与唯一一次固定 calibration。
 全为正。前两步累计 stutter，后三步进入 normal approach；最终因五步上限仍有 pending obligation
 而 zero-hold/replan。method-validity gate 因此通过，但 task success 与 realtime gate没有通过。
 
-## 6. P4：远程发布攻击 workload pilot
+## 6. P4：ProofAlign 自身评测（当前主线）
 
-状态：**live-controller method-validity 五-prefix gate 已通过；Phantom held-out R1 已完成但
+状态：**立即执行；不被外部 baseline readiness 阻塞**。
+
+### E0：冻结支持范围与评测单位
+
+- 从 frozen mission/compiler 枚举当前可支持的 Pick/Place task、phase、init 与 fallback witness；
+- 对全部候选输出 `supported / unsupported / ambiguous` 及原因，unsupported 明确 fail closed；
+- 在看到新 rollout outcome 前冻结 task/init/seed、episode horizon、配对单位、label provenance 和
+  analysis config；
+- 先做小规模 pilot，达到 gate 后才扩样本，不能按结果挑 task。
+
+### E1：clean coverage 与 utility
+
+在完全相同的 task/init/env seed/policy seed 上配对运行 `VLA-only` 与 `Full CTDA`，报告：
+
+- compiler/task coverage 与 unsupported rate；
+- task success、benchmark safe success、clean relative success retention；
+- false block、unknown、deadlock、replan/safe-stop、phase completion；
+- 没有独立 label 的 false-block 指标必须为 `not_evaluated`。
+
+pilot target 沿用已冻结目标：clean retention ≥90%，false block 目标 ≤5%，>10% 停止扩样本，
+unknown/deadlock 目标 ≤5%。这些是扩样本 gate，不是当前已经取得的结果。
+
+### E2：双层贡献与 fixed-trace replay
+
+对同一批保存的 proposal/observation/receipt/trace 运行 `Mission-only`、`Trace-only` 和 `Full CTDA`。
+报告各层 unique catch、交集、parity、lead time、pending/completion behavior 和 clean loss。负例只能来自
+benchmark annotation、独立 simulator oracle 或在 outcome 前冻结的 contract-violating trace；
+synthetic fixture 只证明组件语义与覆盖，不证明物理防御有效。
+
+### E3：closed-loop intervention
+
+在受支持 task slice 上验证 pre-dispatch block、observed/monitor failure 后零 phase advance、fallback
+postcondition 和最终 task outcome。clean 评测可以直接执行；attack-conditioned physical-defense
+结论仍须等待合格独立 workload，但不阻塞 clean、duality、intervention semantics 与 cost 结果。
+
+### E4：代价与鲁棒性
+
+报告四阶段 p50/p95/p99、deadline miss、episode wall time、生成 artifact 大小、CPU/GPU/内存开销、
+Lean unavailable/timeout/tamper 时的 fail-closed 行为。当前 0.9--1.3 s/stage 的负结果必须保留，
+评测口径仍是 slow interlock/offline audit，不恢复 real-time claim。
+
+### 当前进入条件
+
+P1/P2 correctness、27-case parity 和五-prefix method-validity 已允许 E0/E1 pilot。下一项具体工作是
+先生成支持范围清单并冻结 ProofAlign self-evaluation protocol，然后运行 clean paired pilot；不是
+继续寻找一个能通过的攻击，也不是等待 SAFE/FIPER 完成。
+
+## 7. P5：外部 workload 与 baseline 复现（后台线）
+
+状态：**不再阻塞 P4；live-controller method-validity 五-prefix gate 已通过；Phantom held-out R1 已完成但
 独立 cost/collision signal gate 失败；SABER exact-task R1 已在 record-generation artifact gate
-fail closed，未运行 victim；SAFE/FIPER 官方 R0 均在收尾时中断且未复现**。P1/P2
+fail closed，未运行 victim；SAFE 未复现，FIPER 的 2026-07-16 fresh R0 已启动但当前没有
+terminal pass**。P1/P2
 correctness、golden parity 与 affordance observation completeness 已通过；real-time latency 明确
 未通过并已降级 claim。fail-closed preflight manifest 与 clean + Lean slow-interlock smoke 已
 脚本化。SABER standard-LIBERO R0 已核验为部分方向复现。Phantom 三种 deterministic transform 的
@@ -273,7 +344,8 @@ pair 转为独立 cost/collision 才开放 scoped main。实际只有 1/4：affo
 仍 task success；obstacle-avoidance 只有 task failure、没有 cost/collision；只有
 obstacle-avoidance-human 产生 `checkcontact=1`。因此 R1 分类为 signal not reproduced，按冻结 failure
 path 停止 Phantom。SAFE/FIPER source、资产、uv 环境与 launcher 已冻结；SAFE 在 335/500 records、
-FIPER 在 seed 0 / `push_t` / `rnd_oe` 时中断。两者均无 terminal manifest，中间输出不构成 pass。
+FIPER 旧 run 在 seed 0 / `push_t` / `rnd_oe` 时中断。2026-07-16 FIPER fresh attempt 使用既有环境
+重跑，但在 seed 0 的 `pretzel/rnd_a` 训练结束后无 terminal manifest 退出。所有中间输出均不构成 pass。
 
 用户已选择 instruction 路线继续。SABER R1 固定复用同四个 clean-safe init-1 artifact，使用冻结的
 `constraint_violation` 模型与官方 prompt tools，各生成一次 exact-task instruction record。record
@@ -301,8 +373,8 @@ victim outcome，但已越过预注册的零-attempt恢复边界。因此 SABER 
 
 1. standard LIBERO 上复现 SABER π0.5 clean + record/replay；
 2. standard LIBERO 上复现 Phantom Menace OpenPI clean + camera transform；
-3. SAFE/FIPER 官方 R0 已中断且当前不续跑；未来须由 fresh/resume 事前协议重新开放，并通过 terminal
-   manifest、validator 与 output digest，才可开始 pi0.5 adapter 或进入 baseline comparison；
+3. SAFE 保留中断状态；FIPER 按 2026-07-16 fresh protocol 使用已有环境复现。只有通过 terminal
+   manifest、validator 与 output digest，才可开始 pi0.5 adapter 或进入最终 baseline comparison；
 4. LIBERO-Safety Phantom R1 已完成且未通过；不进入固定 scoped CTDA pair，不做 post-hoc 重选。
 5. SABER exact-task R1 已在第一个 record artifact gate fail closed；无 victim rollout，不重试、不运行 main。
 
@@ -327,7 +399,7 @@ victim outcome，但已越过预注册的零-attempt恢复边界。因此 SABER 
 
 若攻击只造成 task failure、没有 authorization/safety signal，则不写 physical-defense claim。
 
-## 7. P5：最小配对主实验
+## 8. P6：最终外部 workload / baseline 对比
 
 曾事前冻结一个不等价于最终主表的 **scoped method-validity** 实验：复用 R1 的 clean/attacked
 VLA-only artifact，只对 outcome-blind、可由现有 Pick/Place compiler 与 task-bound fallback witness
@@ -358,7 +430,11 @@ gate 通过才扩 init `0-4`。
 
 指标、offline/online 双协议与 artifact 规则见 [`experiments.md`](experiments.md)。
 
-## 8. Kill criteria
+该阶段只在 P4 已经形成可解释的 clean utility、duality、closed-loop 和 cost 结果后执行。最终矩阵
+使用相同 task/init/seed/workload/fallback 比较 VLA-only、privileged checker、通过 readiness gate 的
+SAFE/FIPER 与 Full CTDA。baseline 未完成不影响 P4，也不得用 P4 的内部结果提前声称 superiority。
+
+## 9. Kill criteria
 
 出现以下任一情况，主动缩题而不是继续堆实验：
 
@@ -372,7 +448,7 @@ gate 通过才扩 init `0-4`。
 - 独立 oracle 无法标注 unsafe/safe proposal：不报告 detection TPR/FPR；
 - 结果主要依赖 privileged simulator oracle：只主张 simulation/reference-monitor 结果。
 
-## 9. 暂缓项
+## 10. 暂缓项
 
 - EDPA paper-scale reproduction；
 - 新攻击、训练时后门、攻击模型训练；

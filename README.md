@@ -16,14 +16,18 @@ It is not an end-to-end physical safety proof.
 
 - The canonical progress dashboard is [docs/project_status.md](docs/project_status.md):
   CTDA's five-prefix method-validity gate passed, while real-time enforcement,
-  Phantom R1, and SABER R1 have explicit negative or fail-closed outcomes.
+  Phantom R1, and SABER R1 have explicit negative or fail-closed outcomes. The
+  current mainline is ProofAlign-first evaluation: supported-slice clean utility,
+  duality, closed-loop intervention, and cost come before external comparisons.
 - SAFE and FIPER official R0 attempts used the dedicated
   `external/worktrees/safe-fiper-r0` worktree. They were interrupted during the
   2026-07-15 closeout and are not reproduction results. Their already
   downloaded, hash-frozen assets, partial outputs, and uv environments remain
   under `/data0/ldx` for audit. The dedicated worktree has been removed; frozen
   source checkouts remain in `external/{SAFE,SAFE-openpi,fiper}`, and future
-  commands run from the main repository.
+  commands run from the main repository. A 2026-07-16 fresh FIPER attempt reused
+  the existing environment but exited without a terminal manifest; its partial
+  outputs remain audit-only and do not block ProofAlign self-evaluation.
 - The legacy dual checker calls Lean for concrete Boolean claims.
 - Python contains a typed CTDA reference runtime and LIBERO single-prefix loop.
 - Lean contains CTDA datatypes, staged checkers, a persistent finite-prefix
