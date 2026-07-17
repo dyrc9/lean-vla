@@ -29,24 +29,31 @@
    postcondition；
 8. canonical wire 使用 UTF-8、strict fields、finite typed values 和 integer nanoseconds。
 
-## 下一实现改动
+## E1 shared-observer 实现（已完成）
 
-E1-v3 的唯一已知 paired-validity blocker是 observation schema 非对称：Full CTDA 在初态 observation 前
-安装 `task_manifest.contact_query`，VLA-only 没有。下一 runner 应提取共享初始化函数，或在
-`run_vla_only_episode_with_plugins()` 中显式接受同一个 frozen task manifest，并在第一次
+E1-v3 的 paired-validity blocker 是 observation schema 非对称：Full CTDA 在初态 observation 前
+安装 `task_manifest.contact_query`，VLA-only 没有。当前 `run_vla_only_episode_with_plugins()` 已显式
+接受同一个 frozen task manifest，并在第一次
 `state_observer.observe()` 前设置：
 
 ```python
 wrapper.state_observer.contact_part_queries = (task_manifest.contact_query,)
 ```
 
-这只是 observer schema 对齐；不得给 baseline 添加 CTDA/legacy action gate。需要测试：
+这只是 observer schema 对齐；baseline 仍使用 `UnguardedObservationChecker`，没有 CTDA/legacy action
+gate。新 runner 同时把实际 OpenPI RNG 绑定到 `policy_seed=1`，而不是只把 seed 写入 episode id。
+测试和真实 no-dispatch probe 已证明：
 
 - shared initialized observation -> identical digest；
 - different query/manifest -> digest mismatch and preflight block；
 - VLA-only trace 无 CTDA records，checker 始终 observational allow；
 - Full CTDA 初态 digest 仍匹配 frozen E0 init0 digest；
-- real policy output probe 不调用 `env.step()`。
+- real policy output probe 24/24 arm 不调用 `env.step()`；
+- 12/12 pair 的 initial digest、first chunk 和 E0 frozen digest 匹配。
+
+独立入口为 `scripts/run_proofalign_e1_clean_utility.py` 与
+`experiments/proofalign_e1_clean_utility_protocol.json`。共享 VLA-only module 只增加 frozen manifest
+observer-schema 支持；旧 E1-v1/v2/v3 protocol 和 result 未被修改或续接。
 
 ## 验证
 

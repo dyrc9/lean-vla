@@ -8,13 +8,16 @@
 
 ## 1. 当前结论
 
-ProofAlign 在冻结的 LIBERO-Safety affordance task slice 和固定 CPU/Lean fault matrix 内，已经证明
-了有限的 simulator safety preservation 与 fail-closed 组件语义。当前不能证明 clean task utility
-retention、物理安全、verified recovery、通用 attack defense 或 real-time enforcement。
+ProofAlign 在冻结的 LIBERO-Safety affordance task slice 和固定 CPU/Lean fault matrix 内，已经得到
+有限的 simulator safety preservation、fail-closed 组件语义和一个有效 clean utility trade-off pilot。
+该 pilot 的 Full CTDA task/safe-success retention 都是 0，说明当前方法在该 slice/seed 上有很大
+completion loss。当前不能证明总体 task utility、物理安全、verified recovery、通用 attack defense
+或 real-time enforcement。
 
 简写为：
 
-> 安全机制在已测范围内按设计拒绝不充分授权，但正常任务完成度的配对代价仍未得到有效评估。
+> 安全机制在已测范围内按设计拒绝不充分授权；有效 clean 配对显示当前实现以 0 retention 换取这种
+> 保守行为，completion trade-off 很大。
 
 ## 2. 结果总表
 
@@ -22,7 +25,7 @@ retention、物理安全、verified recovery、通用 attack defense 或 real-ti
 |---|---|---|---|
 | method validity | pass | 固定单任务 5/5 prefix，16 个唯一 Lean request proof/parity 通过 | persistent contract 和 staged evaluator 能闭环运行 |
 | E0 support | complete | `12 supported / 63 unsupported` | 非实时支持范围固定为 affordance task `0,1,2,3,5,6,7,8,10,11,12,13` 的 init 0 |
-| E1 clean utility | terminal-invalid | v1/v2/v3 均无有效 pair | task-success retention、paired safe success、clean loss 均不得推断 |
+| E1 clean utility | complete, scoped pilot | seed-1 新 pilot 12/12 valid pair；VLA-only 8/12、Full CTDA 0/12 task/safe success | 固定 simulator slice/seed 上 retention 0、method-attributable utility loss 8/12 |
 | E3 clean safety | complete | 12/12 valid preserved；117/117 dispatch 有完整负 collision/cost；0 hard-invariant failure | 固定 clean simulator slice 上 observed safety preserved |
 | E3 post-dispatch | complete, primary unknown | 0 contained / 0 failed / 12 unknown | 行为上全部 fail closed 并 zero-hold，但冻结 labeler 的 receipt schema gap 阻止正式 containment claim |
 | E4 robustness | complete | v2 36/36 pass；1 control + 35 fault | 固定 CPU/Lean 组件故障矩阵内 fail closed |
@@ -48,7 +51,9 @@ task 4/9/14 因跨 seed 初态 digest 不一致而排除。其余 suite/task 不
 - [`proofalign_e0_v2_gate_decision.json`](../experiments/proofalign_e0_v2_gate_decision.json)
 - [`proofalign_e0_v2_fallback_audit_summary.json`](../experiments/proofalign_e0_v2_fallback_audit_summary.json)
 
-## 4. E1：为什么没有 utility 结论
+## 4. E1：clean utility trade-off
+
+### 旧 terminal-invalid runs
 
 - v1：physical CUDA/EGL 绑定错误，environment construction 前失败；
 - v2：真实 policy output 的 nested metadata 在 dispatch 前被旧 serializer 拒绝；
@@ -59,8 +64,35 @@ v3 中 VLA-only `7/12` task success 和 Full CTDA `0/12` 只是无效配对 arti
 retention，也不能解释为正式 completion trade-off。已 dispatch 的 policy-seed 0 pair 不得覆盖或当作
 同一实验重跑。
 
+### 新 policy-seed 1 pilot
+
+独立 protocol/runner 在两臂第一次 state digest 前安装相同的 task-manifest contact query，并把实际
+OpenPI RNG 固定为新 `policy_seed=1`。启动前 12/12 pair 的 initial digest、E0 frozen digest 和 first
+policy chunk 均匹配，24/24 probe arm 的 `env.step_count=0`。唯一 fresh run 得到：
+
+- 12/12 valid pair，24/24 valid episode，0 excluded；
+- VLA-only task success `8/12`，safe success `8/12`；
+- Full CTDA task success `0/12`，safe success `0/12`；
+- task-success retention `0/8 = 0`，safe-success retention `0/8 = 0`；paired difference 为
+  `-8/12 = -0.667`，冻结 bootstrap 95% interval `[-0.917, -0.417]`；
+- method-attributable utility loss `8/12`；
+- VLA-only collision/cost coverage `3129/3129`，Full CTDA `117/117`，observed unsafe 都是 0；
+- Full CTDA `12` 个 block episode、`12` deadlock、`0` phase completion；2640/2640 Lean artifact
+  proof-verified 且 Python/Lean parity match；
+- 两臂各 `12/12` episode unknown，原因都是缺少 human-hand 与 obstacle distance provenance。
+  experimental validity、task/safe success、unsafe 和 unknown 是分开的冻结标签，因此 unknown 不会
+  后验改成 invalid，也不会抹去按 collision/cost 规则计算的 safe success；
+- closed-loop block 没有独立 action-level counterfactual label，只报告 intervention，不报告 false
+  positive rate。
+
+该结果只支持固定 12-task simulator slice 和该 policy seed 上的描述性 trade-off。它不表明 CTDA
+“总体上”有 0 utility，也不提供物理安全、攻击防御、availability 或 real-time 结论。
+
 机器入口：
 
+- [`proofalign_e1_clean_utility_terminal_summary.json`](../experiments/proofalign_e1_clean_utility_terminal_summary.json)
+- [`proofalign_e1_clean_utility_protocol.json`](../experiments/proofalign_e1_clean_utility_protocol.json)
+- `results/proofalign_e1_clean_utility_seed1_20260717/`
 - [`proofalign_e1_v3_terminal_invalid_summary.json`](../experiments/proofalign_e1_v3_terminal_invalid_summary.json)
 - `results/proofalign_e1_clean_pilot_v3_20260717/`
 
@@ -130,7 +162,7 @@ v2 正式结果：
 
 ## 8. 下一证据缺口
 
-优先补一个新的 clean paired utility pilot：修复两臂 observer schema，使 VLA-only 与 Full CTDA 在
-相同 contact-enriched initial observation 上产生完全相同的初态 digest；使用未执行过的新
-policy seed 和新 output root。它可以估计 scoped task-success retention 和 method-attributable utility
-loss，但仍不是总体或物理安全证明。
+优先解释新 clean pilot 的 completion loss：从 retained trace 区分 raw binder block、persistent
+no-progress、observation provenance unknown 与 phase progression 的贡献。该分析不能把 closed-loop
+block 后验命名为 false positive；独立 action-level counterfactual 需要新冻结的 fixed-trace protocol。
+在理解 0 retention 前不扩大 task/seed 范围，也不把该 simulator pilot 推广为总体或物理安全证明。

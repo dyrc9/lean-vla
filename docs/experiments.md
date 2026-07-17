@@ -36,7 +36,7 @@
 - fallback 必须有 typed actuator receipt 和完整 postcondition evidence；
 - timing policy 固定为 slow-interlock diagnostic。
 
-## 3. 下一 clean paired pilot
+## 3. 已完成的 clean paired utility pilot
 
 ### Unit
 
@@ -44,17 +44,26 @@
 (suite, task_id, init_state_id, env_seed, policy_seed, workload)
 ```
 
-固定候选：E0-v2 的 12 个 affordance task、`init_state_id=0`、`env_seed=7`、新的
-`policy_seed=1`、`workload=clean`。policy-seed 0 已被 E1-v3 使用，不得覆盖。
+固定 unit 为 E0-v2 的 12 个 affordance task、`init_state_id=0`、`env_seed=7`、新的
+`policy_seed=1`、`workload=clean`。policy-seed 0 的 E1-v3 未被覆盖或 resume。
 
 ### 必须先关闭的 blocker
 
-E1-v3 的两臂 observation schema 不同。新 runner 必须在 VLA-only 与 Full CTDA 的第一次
-`state_observer.observe()` 前安装同一个 task-manifest contact query。测试必须同时证明：
+E1-v3 的两臂 observation schema 不同。新 runner 已在 VLA-only 与 Full CTDA 的第一次
+`state_observer.observe()` 前安装同一个 task-manifest contact query。测试与 no-dispatch probe 已证明：
 
 - 同一 fake/real initialized observation 的 state digest 完全相同；
 - baseline 仍使用 unguarded checker，零 CTDA authorization；
 - policy metadata、first policy chunk 和 task/init provenance 可序列化并精确配对。
+
+### Terminal result
+
+- 12/12 valid pair，24/24 valid episode；
+- VLA-only task/safe success 8/12，Full CTDA 0/12，retention 0；
+- 两臂 collision/cost coverage 100%、unsafe 0；
+- Full CTDA block/deadlock 12、phase completion 0、Lean parity mismatch 0；
+- 两臂 unknown episode 都是 12/12，来自 human/obstacle distance provenance 缺失；
+- method-attributable utility loss 8/12；closed-loop block 没有 false-positive label。
 
 ### Primary metrics
 
