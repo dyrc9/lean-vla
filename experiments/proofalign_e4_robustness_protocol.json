@@ -1,0 +1,97 @@
+{
+  "schema": "proofalign.e4.robustness-protocol.v1",
+  "frozen_at": "2026-07-17T14:10:00+08:00",
+  "status": "frozen_ready_for_execution",
+  "method_base_commit": "c08f3e615af82e31f72d2a3af1c805f1ee4c58b4",
+  "claim_boundary": "A fixed CPU/Lean component-semantics matrix evaluates whether verifier unavailability, replay timeout, checker/request binding corruption, non-authorizing shadow mode, frozen wire-level binding faults, retained-artifact digest mutation, and exact fake-environment/runtime fault contracts fail closed. It does not run a GPU policy or physical simulator rollout and does not establish physical safety, verified recovery, attack defense, real-time enforcement, availability, or utility.",
+  "timing_is_gate": false,
+  "gpu_or_simulator_execution": false,
+  "fresh_absent_output_root_required": true,
+  "rerun_or_replace_case": false,
+  "unknown_or_missing_evidence_passes": false,
+  "required_files": [
+    {
+      "path": "scripts/run_proofalign_e4_robustness.py",
+      "sha256": "0ad7a067ea1e5495ce4a4e6e4cbb1496ce6001bfb4ecf011d0ebdd4821640aa6"
+    },
+    {
+      "path": "src/proofalign/ctda_evaluator.py",
+      "sha256": "ef28457b890e0de0dff73ad0484ffc82a12414ba7522c60ab614e9c734b40f62"
+    },
+    {
+      "path": "src/proofalign/ctda_shadow.py",
+      "sha256": "66f7387c5637106add762257772beeb7d2b5baf6a64307c7defecec7af40f5fb"
+    },
+    {
+      "path": "src/proofalign/ctda_wire.py",
+      "sha256": "b4519d277a2ad87598350c0a121eddf5e35ebc4e6c3822a3b9b3d914ce18769f"
+    },
+    {
+      "path": "tests/test_libero_online_wrapper.py",
+      "sha256": "254a90ff9844529c24a4525ece80ceb772ba441109c0db97c371821b45ccc7ac"
+    },
+    {
+      "path": "tests/test_ctda_runtime.py",
+      "sha256": "b0d5c58c565ac2bb0afb4106b7fbb6e2ab0b541e10dcf73fc2164599c3a0cc71"
+    }
+  ],
+  "lean": {
+    "version": "4.24.0",
+    "toolchain_bin": ".tools/lean-4.24.0-linux/bin",
+    "lean_sha256": "8fadc3ed92cc9decb94c96ee9c0876e91e03a3a5e69138f32114f02789e2766c",
+    "lake_sha256": "5f3828d1d1977654cf5602c40ac4ee52b64f7dcf34d64c5877d7b7d2d3616344",
+    "timeout_seconds": 20.0
+  },
+  "execution": {
+    "default_output_root": "results/proofalign_e4_robustness_20260717",
+    "pytest_timeout_seconds": 120.0,
+    "record_every_frozen_case": true,
+    "latency_recorded_but_not_classified": true
+  },
+  "classification": {
+    "pass": "Every frozen case is recorded and its exact expected fail-closed or control assertion passes. Fault cases must not authorize a static prefix or complete a monitor step; proof-backed negative Lean verdicts remain acceptable evidence of rejection.",
+    "fail": "Any frozen case is missing, raises an unretained error, authorizes/completes across its injected fault, fails its exact fake-environment/runtime assertion, or fails retained-artifact digest mutation detection.",
+    "control": "The nominal real-Lean semantic request must be kernel-proven with Python/Lean parity; it is excluded from the fail-closed fault numerator.",
+    "timing": "Diagnostic only; the known slow-interlock timing result is preserved separately and no latency threshold is applied here."
+  },
+  "cases": [
+    {"case_id": "control_kernel_semantic", "kind": "kernel_control", "role": "control", "scenario": "semantic_proven", "expected_verdict": "proven"},
+    {"case_id": "lean_unavailable_semantic", "kind": "lean_unavailable", "role": "fault", "scenario": "semantic_proven", "expected_verdict": "inconsistent"},
+    {"case_id": "lean_timeout_prefix", "kind": "lean_timeout", "role": "fault", "scenario": "prefix_proven", "timeout_seconds": 0.05, "expected_verdict": "inconsistent"},
+    {"case_id": "checker_digest_tamper", "kind": "checker_digest_tamper", "role": "fault", "scenario": "semantic_proven", "expected_verdict": "inconsistent"},
+    {"case_id": "canonical_request_id_tamper", "kind": "canonical_wire_tamper", "role": "fault", "scenario": "prefix_proven", "expected_verdict": "inconsistent"},
+    {"case_id": "shadow_nominal_non_authorizing", "kind": "shadow_non_authorizing", "role": "fault", "scenario": "prefix_proven", "expected_verdict": "proven"},
+
+    {"case_id": "prefix_spec_tamper", "kind": "golden_fault", "role": "fault", "scenario": "prefix_spec_tamper", "expected_verdict": "refuted"},
+    {"case_id": "prefix_nonce_tamper", "kind": "golden_fault", "role": "fault", "scenario": "prefix_nonce_tamper", "expected_verdict": "refuted"},
+    {"case_id": "prefix_state_tamper", "kind": "golden_fault", "role": "fault", "scenario": "prefix_state_tamper", "expected_verdict": "refuted"},
+    {"case_id": "prefix_monitor_tamper", "kind": "golden_fault", "role": "fault", "scenario": "prefix_monitor_tamper", "expected_verdict": "refuted"},
+    {"case_id": "prefix_contract_tamper", "kind": "golden_fault", "role": "fault", "scenario": "prefix_contract_tamper", "expected_verdict": "refuted"},
+    {"case_id": "prefix_proposal_tamper", "kind": "golden_fault", "role": "fault", "scenario": "prefix_proposal_tamper", "expected_verdict": "refuted"},
+    {"case_id": "prefix_command_tamper", "kind": "golden_fault", "role": "fault", "scenario": "prefix_command_tamper", "expected_verdict": "refuted"},
+    {"case_id": "prefix_timebase_tamper", "kind": "golden_fault", "role": "fault", "scenario": "prefix_timebase_tamper", "expected_verdict": "refuted"},
+    {"case_id": "prefix_stale", "kind": "golden_fault", "role": "fault", "scenario": "prefix_stale", "expected_verdict": "refuted"},
+    {"case_id": "prefix_replay", "kind": "golden_fault", "role": "fault", "scenario": "prefix_replay", "expected_verdict": "refuted"},
+    {"case_id": "observed_receipt_mismatch", "kind": "golden_fault", "role": "fault", "scenario": "observed_receipt_mismatch", "expected_verdict": "refuted"},
+    {"case_id": "observed_command_mismatch", "kind": "golden_fault", "role": "fault", "scenario": "observed_command_mismatch", "expected_verdict": "refuted"},
+    {"case_id": "observed_trace_provenance_mismatch", "kind": "golden_fault", "role": "fault", "scenario": "observed_trace_provenance_mismatch", "expected_verdict": "refuted"},
+    {"case_id": "observed_timestamp_rollback", "kind": "golden_fault", "role": "fault", "scenario": "observed_timestamp_rollback", "expected_verdict": "refuted"},
+    {"case_id": "monitor_violated", "kind": "golden_fault", "role": "fault", "scenario": "monitor_violated", "expected_verdict": "violated"},
+    {"case_id": "monitor_timestamp_rollback", "kind": "golden_fault", "role": "fault", "scenario": "monitor_timestamp_rollback", "expected_verdict": "inconsistent"},
+    {"case_id": "monitor_cross_episode", "kind": "golden_fault", "role": "fault", "scenario": "monitor_cross_episode", "expected_verdict": "inconsistent"},
+    {"case_id": "monitor_provenance_mismatch", "kind": "golden_fault", "role": "fault", "scenario": "monitor_provenance_mismatch", "expected_verdict": "inconsistent"},
+    {"case_id": "monitor_missing_completion", "kind": "golden_fault", "role": "fault", "scenario": "monitor_missing_completion", "expected_verdict": "safe_pending"},
+    {"case_id": "retained_artifact_digest_tamper", "kind": "artifact_digest_tamper", "role": "fault"},
+
+    {"case_id": "wrapper_lean_unavailable_zero_dispatch", "kind": "pytest_contract", "role": "fault", "nodeid": "tests/test_libero_online_wrapper.py::test_ctda_lean_unavailable_has_zero_fake_env_dispatch", "asserted_contract": "Lean unavailable yields SAFE_STOP and zero fake-env dispatch."},
+    {"case_id": "wrapper_prefix_tamper_zero_dispatch", "kind": "pytest_contract", "role": "fault", "nodeid": "tests/test_libero_online_wrapper.py::test_ctda_tampered_prefix_wire_has_zero_fake_env_dispatch", "asserted_contract": "Tampered prefix wire yields SAFE_STOP and zero fake-env dispatch."},
+    {"case_id": "wrapper_observed_failure_no_phase_advance", "kind": "pytest_contract", "role": "fault", "nodeid": "tests/test_libero_online_wrapper.py::test_ctda_observed_or_monitor_failure_cannot_advance_phase[observed_prefix]", "asserted_contract": "Observed-prefix proof failure cannot advance phase."},
+    {"case_id": "wrapper_monitor_failure_no_phase_advance", "kind": "pytest_contract", "role": "fault", "nodeid": "tests/test_libero_online_wrapper.py::test_ctda_observed_or_monitor_failure_cannot_advance_phase[monitor_step]", "asserted_contract": "Monitor proof failure cannot advance phase."},
+    {"case_id": "fallback_receipt_tamper_detected", "kind": "pytest_contract", "role": "fault", "nodeid": "tests/test_ctda_runtime.py::test_fallback_switch_receipt_binds_pre_and_post_state", "asserted_contract": "A changed fallback post-state digest fails typed receipt integrity verification."},
+    {"case_id": "fallback_unsafe_postcondition_rejected", "kind": "pytest_contract", "role": "fault", "nodeid": "tests/test_ctda_runtime.py::test_fallback_success_is_computed_and_rejects_clearance_below_margin", "asserted_contract": "Clearance below the frozen margin cannot establish fallback success."},
+    {"case_id": "fallback_missing_human_clearance_rejected", "kind": "pytest_contract", "role": "fault", "nodeid": "tests/test_ctda_runtime.py::test_fallback_missing_suite_required_clearance_fails_closed[human_hand-min_distance_to_human_hand]", "asserted_contract": "Missing required human clearance observation fails closed."},
+    {"case_id": "fallback_missing_obstacle_clearance_rejected", "kind": "pytest_contract", "role": "fault", "nodeid": "tests/test_ctda_runtime.py::test_fallback_missing_suite_required_clearance_fails_closed[obstacle-min_distance_to_obstacle]", "asserted_contract": "Missing required obstacle clearance observation fails closed."},
+    {"case_id": "fallback_missing_actuator_evidence_rejected", "kind": "pytest_contract", "role": "fault", "nodeid": "tests/test_ctda_runtime.py::test_fallback_without_actuator_evidence_is_requested_only", "asserted_contract": "Fallback without actuator evidence remains requested-only and unsuccessful."},
+    {"case_id": "fallback_observation_failure_unknown", "kind": "pytest_contract", "role": "fault", "nodeid": "tests/test_ctda_runtime.py::test_fallback_observation_failure_is_unknown_and_attempt_is_persisted", "asserted_contract": "Fallback observation failure remains unsuccessful/inconsistent and is retained."}
+  ]
+}
