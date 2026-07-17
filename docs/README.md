@@ -1,66 +1,49 @@
 # ProofAlign 文档入口
 
-本目录只把少量文档定义为当前事实来源。历史实验记录、旧设计、旧命令和阶段性 handoff
-已经移到 [`archive/`](archive/README.md)。除非任务明确要求历史追溯，agent 不应读取或引用
-archive 中的内容。
+更新日期：2026-07-17
 
-## Canonical 文档
+## 当前事实来源
 
-建议按以下顺序阅读：
+建议按顺序阅读：
 
-1. [`project_status.md`](project_status.md)：顶部状态矩阵给出当前真实进展、执行顺序和阻塞。
-2. [`method.md`](method.md)：唯一 normative 方法定义、威胁模型和 claim boundary。
-3. [`system_architecture.md`](system_architecture.md)：当前实现与目标闭环的模块对应。
-4. [`roadmap.md`](roadmap.md)：唯一执行优先级、阶段 gate 和停止条件。
-5. [`experiments.md`](experiments.md)：最小配对实验、指标和 artifact 规则。
-6. [`e0_support_audit.md`](e0_support_audit.md)：E0 v1 负结果、E0 v2 exact manifest/init/fallback 审计、
-   当前 12-task non-real-time supported slice 与机器协议入口。
-7. [`e1_clean_pilot.md`](e1_clean_pilot.md)：E1-v1/v2/v3 无效执行、immutable artifact 与失败边界。
-8. [`e3_safety_evaluation.md`](e3_safety_evaluation.md)：独立 Full-CTDA clean safety 结果、fallback
-   stratum、artifact hash 与 claim boundary。
-9. [`e3_postdispatch_intervention.md`](e3_postdispatch_intervention.md)：事前冻结并已终止的 post-dispatch
-   observation-failure / zero-hold fallback challenge、12/12 primary unknown 结果与 claim boundary。
-10. [`e4_robustness_evaluation.md`](e4_robustness_evaluation.md)：Lean unavailable/timeout、wire/artifact/
-    receipt tamper 与 fake-env transaction 的 35/35 scoped fail-closed 结果。
-11. [`reproduction_plan.md`](reproduction_plan.md)：发布攻击、现有防御与 CTDA 的复现证据链。
-12. [`implementation_notes.md`](implementation_notes.md)：本地 CPU/Lean 开发与验证约定。
-13. [`remote_execution.md`](remote_execution.md)：迁移到远程 GPU 后的环境、路径和运行协议。
-14. [`safe_fiper_r0_runbook.md`](safe_fiper_r0_runbook.md)：SAFE/FIPER 已下载资产、固定源码、uv
-   环境、主仓库运行命令与 terminal 验证清单。
-15. [`paper_story.md`](paper_story.md)：收缩后的论文叙事和可写贡献。
-16. [`related_work.md`](related_work.md)：研究定位；不作为实现状态或 CLI 来源。
-17. [`next_agent_prompt_20260715.md`](next_agent_prompt_20260715.md)：已执行的 Phantom R0b 事前
-    协议与审计记录；不再是可重跑的当前交接 prompt。
+1. [`project_status.md`](project_status.md)：当前状态、可写/不可写结论和唯一主任务。
+2. [`evaluation_results.md`](evaluation_results.md)：E0--E4 统一结果与机器 artifact 入口。
+3. [`method.md`](method.md)：normative 方法、威胁模型和 claim boundary。
+4. [`system_architecture.md`](system_architecture.md)：实现模块和信任边界。
+5. [`roadmap.md`](roadmap.md)：当前 clean utility 阶段与后续顺序。
+6. [`experiments.md`](experiments.md)：实验冻结、配对、指标和失败规则。
+7. [`remote_execution.md`](remote_execution.md)：当前 Python/Lean/OpenPI/GPU 环境和运行顺序。
+8. [`implementation_notes.md`](implementation_notes.md)：代码入口、不变量和下一 observer fix。
+9. [`next_experiment_prompt.md`](next_experiment_prompt.md)：可直接交给下一位 agent 的执行 prompt。
 
-## 当前方法口径
+外部线：
 
-当前核心是一个有限范围的 **mission-rooted persistent dual monitor**：
+- [`reproduction_plan.md`](reproduction_plan.md)：Phantom/SABER/SAFE/FIPER 状态与 E5 gate。
+- [`safe_fiper_r0_runbook.md`](safe_fiper_r0_runbook.md)：当前 FIPER 后台复现 runbook。
 
-- `MissionRefinementGate`：合同必须来自 trusted, locally frozen benchmark mission、当前
-  phase 和 residual obligation；policy-facing prompt 无权重写任务根。
-- `TraceConformanceGate`：raw proposal、实际 dispatch 和累计 observed trace 必须绑定同一
-  合同；没有 completion witness 不得推进 phase。
+论文材料：
 
-当前 runner 可选择 `ctda-python-reference`、`ctda-lean-kernel` 和 `ctda-shadow`。有限 Pick/Place
-paper path 已改为 mission-rooted contract 与 independent raw binder；`ctda-lean-kernel` 的四个
-stage 确实生成并检查 replay artifact，golden parity 为零 mismatch。当前 Lean p99 仍远超 control
-period，因此只能表述为 slow interlock/offline audit，仍不能把系统表述为完整 proof-carrying VLA、
-real-time safety monitor 或 physical safety proof。
+- [`paper/paper_story.md`](paper/paper_story.md)
+- [`paper/related_work.md`](paper/related_work.md)
 
-## 冲突处理
+## Archive
 
-当文档、代码和历史记录不一致时：
+已终止阶段的长结果文档、旧 handoff 和旧命令位于 [`archive/`](archive/README.md)。它们保留用于
+审计，但不是当前方法、CLI、状态或计划的事实来源。机器 JSON 和已提交 `results/` 才是正式实验记录。
 
-1. 方法与 claim 以 [`method.md`](method.md) 为准；
-2. 当前优先级以 [`roadmap.md`](roadmap.md) 为准；
-3. CLI、schema 和默认值以当前代码、测试和 `--help` 为准；
-4. 远程机器路径与迁移清单以 [`remote_execution.md`](remote_execution.md) 为准；
-5. `archive/` 永远不是当前事实来源。
+## 冲突规则
 
-## 文档维护规则
+1. 方法以 `method.md` 为准；
+2. 当前结果以 `evaluation_results.md` 和机器 JSON 为准；
+3. 当前优先级以 `roadmap.md` 为准；
+4. CLI 以代码 `--help` 为准；
+5. 环境以 `remote_execution.md` 为准；
+6. archive 不覆盖 canonical 文档。
 
-- 不再新增日期型状态文档；状态统一更新 `project_status.md`。
-- 不再新增并行 roadmap；任务统一进入 `roadmap.md`。
-- 远程环境和成功命令只更新 `remote_execution.md`。
-- 实验完成后保存原始 artifact 和机器可重建 summary；不要只写一份结果叙述。
-- 方法字段、Lean semantics、Python evaluator 和实验标签必须同步更新。
+## 维护规则
+
+- 不再新增日期型 status、handoff 或每阶段一份长报告；
+- 新结果更新统一结果文档并保存 protocol/ledger/manifest/terminal summary；
+- 已终止 protocol/result 不覆盖、不重标；
+- 运行环境变化只更新 `remote_execution.md`；
+- 详细历史通过 Git 和 archive 追溯。

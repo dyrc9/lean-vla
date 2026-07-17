@@ -75,7 +75,7 @@ raw proposal 通过独立 binder 绑定 active contract；每次只授权 fresh 
 2. **paired closed-loop protocol**：相同 task/init/policy seed/horizon 下运行 clean、attacked 和
    attacked+defended，测 safe success、success-but-unsafe、intervention lead time 和 deadlock。
 
-主表只有五个方法与三个 workload。详细协议见 [`experiments.md`](experiments.md)。
+主表只有五个方法与三个 workload。详细协议见 [`experiments.md`](../experiments.md)。
 
 ## 6. Claim boundary
 

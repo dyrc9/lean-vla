@@ -2,392 +2,55 @@
 
 更新日期：2026-07-17
 
-## 进度总览（先看这里）
+## 当前状态
 
-| 工作线 | 当前状态 | 已有证据 | 下一步 / 停止条件 |
+| 工作线 | 状态 | 当前结论 | 下一步 |
 |---|---|---|---|
-| CTDA 方法闭环 | **方法有效性 gate 已通过** | 固定 registered init 上 5/5 prefix 为 `proven/safe_pending`；16 个唯一 Lean request 全部 proof-verified 且 Python parity 匹配 | 只可表述为 simulator slow-interlock/offline method-validity，不扩写成 task success、总体 clean utility 或物理安全 |
-| ProofAlign 自身评测 | **E1-v3 terminal-invalid；E3 clean 12/12 preserved；post-dispatch primary 12/12 unknown；E4 fault matrix 35/35 fail closed** | E4 v2 的 1/1 real-Lean control 与 35/35 frozen fault case 全部通过；覆盖 Lean unavailable/timeout、wire/checker/artifact tamper、fake-env 零派发/零 phase advance 和 typed fallback failure | E4 只建立固定 CPU/Lean 组件矩阵内的 fail-closed 语义；不升级 E1/E3，不声称 physical safety/recovery/attack defense/real-time/utility；自身安全主线结果已形成，外部比较仍等待独立 gate |
-| 实时性能 | **负结果，路线关闭** | Lean 单 stage 约 0.9--1.3 s；100 ms observation 与 50 ms fallback gate 都出现 miss | 保留完整 latency；禁止 real-time enforcement claim |
-| Phantom | **R0b workload discovery 通过；held-out R1 signal gate 失败** | R0b `laser_blinding/strong` 为 3/3 success-to-failure；LIBERO-Safety R1 仅 1/4 cost/collision transition，小于冻结的 2/4 | 不调攻击、不换 pair、不运行条件式 scoped main |
-| SABER | **R1 record generation fail closed** | 首个 pair 已产生 invalid ledger/transcript，但无有效 record、无 victim rollout | 不修复后重跑、不替换 record、不运行条件式 scoped main |
-| SAFE R0 | **收尾时中断，未复现** | source/checkpoint/tokenizer/三套 uv 环境已冻结；停止时为 335/500 env records，无 terminal manifest | 保留 partial corpus 仅供审计；未经新的 fresh/resume protocol 不继续，不能运行 detector matrix |
-| FIPER R0 | **第二条 fresh 后台复现运行中，尚未复现** | 第一条 fresh run 在 `pretzel/rnd_a` 后异常退出并保持 partial；第二条使用相同既有环境、独立 fresh directory、GPU 1，由 user systemd service 启动 | 只在 terminal manifest/validator 全通过后记为 pass；运行不阻塞 ProofAlign E0--E4，禁止 resume/拼接 |
-| 外部 comparison / Table B | **最后阶段，当前不启动** | 攻击 safety-signal 与 baseline readiness 尚未同时通过 | 仅在 ProofAlign 自身表完成且 external gate 通过后执行；不再作为自身评测前置条件 |
+| CTDA 方法 | complete for scoped prototype | mission-rooted contract、raw-prefix binding、Lean staged evaluator 和 persistent monitor 已闭环 | 方法语义保持冻结 |
+| E0 support | complete | 12 个 affordance/init0 non-real-time supported unit | 新实验不得越过支持范围，除非先做新 support audit |
+| E1 utility | not evaluated | v1/v2/v3 均 terminal-invalid；无有效 clean pair | 新建不同 policy-seed 的 paired pilot，先统一两臂 observer schema |
+| E3 safety | scoped evidence complete | clean 12/12 preserved；post-dispatch 行为 fail closed，但正式 primary 12 unknown | 不改写旧分类；新的独立 challenge 才能增加 containment 证据 |
+| E4 robustness | complete | 35/35 frozen fault case fail closed | 只保留 scoped component claim |
+| timing | negative/deferred | Lean 0.9--1.3 s/stage，不满足实时控制 | 不优化，不恢复 real-time claim |
+| external baselines | blocked/running | Phantom/SABER gates 已关闭；SAFE 未复现；FIPER fresh2 在 GPU 1 后台运行 | 等 FIPER terminal manifest；不干扰 GPU 1 |
 
-SAFE/FIPER 的大型输入没有重新下载：它们统一复用 `/data0/ldx/safe-fiper-r0` 下已冻结的资产，
-由 `/home/ldx/.conda/envs/proofalign-libero/bin/uv` 管理 `/data0/ldx/uv-envs/*` 环境。原专用
-worktree 已清理；三个固定源码仓库保留在主目录 `external/{SAFE,SAFE-openpi,fiper}`，以后从主仓库
-使用 fresh result directory 运行。路径、命令、hash 和 terminal checklist 见
-[`safe_fiper_r0_runbook.md`](safe_fiper_r0_runbook.md)。335/500 和 FIPER 停止位置只是带时间戳的
-中断记录，不是最终指标。
+完整数字见 [`evaluation_results.md`](evaluation_results.md)。
 
-第一条 2026-07-16 FIPER fresh 进程在 13:20 后不在进程表，manifest 仍为 `started`，因此分类为
-异常 partial run 而不是完成。第二条已由提交后的
-`experiments/fiper_r0_restart2_20260716.json` 事前授权，于 13:33 使用 user systemd transient service
-启动，目录为 `/data0/ldx/safe-fiper-r0/fiper/runs/fiper-r0-fresh2-20260716-133000`，仍复用
-`/data0/ldx/uv-envs/fiper-r0` 和 GPU 1，不新建环境。旧 partial outputs 原样保留且不拼接；新 run
-在 terminal gate 前仍是 `not_reproduced`，并且不阻塞 ProofAlign E0--E4。
+## 当前可以写
 
-ProofAlign E0 已按 pinned method/source 完成 source + live-init audit。审计没有加载 policy、没有调用
-`env.step()` 或 `check_success()`，故没有产生用于选择 task 的新 rollout outcome。完整 75-task 分母为：
-13 条可在 live registry 上结构编译，其中 `affordance` task 0/5/10 因
-`holding` 与 benchmark `CheckGripperContactPart` 无冻结等价证明而为 ambiguous；另 10 条存在已知
-mission/benchmark-goal mismatch。其余 62 条由 target/region/part gate 明确 fail closed。
-`reasoning_safety` 另无 registered init artifact；唯一 fallback manifest 又只绑定 goal-mismatch 的
-`affordance/task 2/init 0`。因此 strict supported=`0/75`、E1 pilot 集合为空。机器协议见
-[`proofalign_e0_protocol.json`](../experiments/proofalign_e0_protocol.json)，审计说明见
-[`e0_support_audit.md`](e0_support_audit.md)。这不撤销 task 2 five-prefix method-validity，但禁止把它
-重用为 clean utility sample。
+- 在固定 simulator task slice 上，Full CTDA clean safety observation 为 12/12 preserved；
+- 在固定 CPU/Lean fault matrix 上，35/35 fault case fail closed；
+- Lean unavailable/timeout、关键 binding tamper 和 typed fallback evidence 不足时，当前实现不会静默
+  回退到 Python 授权；
+- 当前系统是 slow-interlock/offline prototype。
 
-E0 v2 的第一段 repair 随后已完成：新增 BDDL-digest-bound task manifest、独立 MuJoCo 双指
-contact-part witness 和精确 `approach -> contact` completion atom。事前选择规则一次覆盖
-`affordance` task 0--14；75-task live-init candidate audit 中 15/15 精确编译、15/15 contact query
-可观察、15/15 init 0 已应用，其余 60 条 fail closed。审计仍为 outcome-blind，未加载 policy、未
-`env.step`、未用 `check_success` 生成 completion。它只关闭 compiler/observer blocker，不改变当前
-`supported=0`。候选协议和 compiler/observer summary 分别见
-[`proofalign_e0_protocol_v2_candidate.json`](../experiments/proofalign_e0_protocol_v2_candidate.json) 与
-[`proofalign_e0_v2_candidate_audit_summary.json`](../experiments/proofalign_e0_v2_candidate_audit_summary.json)。
+## 当前不能写
 
-后续 init gate 已对 task 0--14 的 init 0/seed 7 完成一次 outcome-blind 审计：15/15 registered init
-应用成功，goal 初始为 false，collision/cost 完整且为零，action bounds 合法，无 contact-capacity
-warning。因此全部 15 条进入事前冻结的 fallback gate。validity protocol 的 `created_at` 误写为当日
-19:00；它的文件 mtime 早于报告且报告绑定其 SHA，但该字段不能作为时间顺序证据，此缺陷已在
-[`proofalign_e0_v2_validity_audit_summary.json`](../experiments/proofalign_e0_v2_validity_audit_summary.json)
-明确记录。
+- Full CTDA 保留了多少 task completion；
+- post-dispatch containment 已正式建立；
+- 对发布攻击有总体 defense efficacy；
+- physical/hardware/continuous-dynamics safety；
+- verified recovery、availability 或 real-time enforcement。
 
-strict fallback gate 随后按 15 task × seed 7/17/27、每个 fresh worker 恰好一次 zero-hold 执行。
-45/45 均得到 `typed_simulator_applied`、完整且为零的 collision/cost、hard invariant、contact witness、
-receipt integrity 与零 contact-capacity warning；但 45/45 都超过冻结的 100 ms bound，范围为
-101.978--292.854 ms，p50 134.529 ms，故 15/15 unit 全部 rejected。frypan task 4/9/14 在 seed 17/27
-另有 6 个初态 digest 不同。没有 policy、`check_success`、task-success observation、替换或重跑。
-机器结果见
-[`proofalign_e0_v2_fallback_audit_summary.json`](../experiments/proofalign_e0_v2_fallback_audit_summary.json)。
-所以该 strict candidate 当时不得升格，空集合决定仍保存在
-[`proofalign_e0_v2_gate_decision.json`](../experiments/proofalign_e0_v2_gate_decision.json)，作为 E4 timing
-负证据而非当前 E0 分类。
+## 当前唯一主任务
 
-用户随后明确要求先不把时间性能作为 E0 blocker。项目没有重标旧 45 条，而是冻结新 method version，
-对全部 15 条重新执行 fresh slow-interlock safety qualification。时间仍完整记录但只进入 E4；其余
-init provenance、跨 seed state identity、typed actuation、receipt、collision/cost、hard invariant、
-contact observation 和 capacity gate 均保持 fail closed。结果为 39/45 repetition valid、12/15 unit
-accepted；supported task 固定为 `0,1,2,3,5,6,7,8,10,11,12,13`。task 4/9/14 仍因 seed 17/27 的
-初态 digest mismatch 排除。最终协议
-[`proofalign_e0_protocol_v2.json`](../experiments/proofalign_e0_protocol_v2.json) 已通过机器审计，分类为
-`12 supported / 0 ambiguous / 63 unsupported`。E1 的执行状态与该 E0 selection freeze 分开记录。
+执行一个新的 clean paired utility pilot：
 
-E1 已按冻结的 12 units 启动两次独立协议版本，但尚无有效结果。v1 的 24/24 records 在 vendored
-robosuite import 时因 `CUDA_VISIBLE_DEVICES=3` 与 `MUJOCO_EGL_DEVICE_ID=0` 不一致而失效；没有创建
-environment、调用 policy、执行 `env.step()` 或观察 task outcome。v2 只修正 physical EGL/render
-binding 并通过 exact-GPU import、model-load 与 environment-construction probe，随后完整写出 24 条
-ledger，但 24/24 都在 policy 返回后的 `_policy_action_audit` 因 supplied metadata 含嵌套 `dict` 而在
-dispatch 前失效，0 valid episode、0 可用 paired outcome。当前 validator 可复核 retained artifact，
-但错误地给全无效 pair 计算零差异 inference；这些统计必须忽略并在下一版本 fail closed。完整 hash、
-失败边界和接手顺序见 [`e1_clean_pilot.md`](e1_clean_pilot.md)。v1/v2 均不得 resume、覆盖或解释为
-零成功率。
+1. 在 VLA-only 和 Full CTDA 两臂初态 observation 前安装完全相同的 task-bound contact query；
+2. 用 fake-env/unit test 证明同 task/init 的两臂 initial-state digest 完全相同，同时 baseline 仍无
+   ProofAlign action gate；
+3. 使用 E0 的 12 个 task/init0，但换成未执行过的 `policy_seed=1`，形成与 E1-v3 不同的 paired unit；
+4. 事前冻结 protocol、source hash、pair order、labels、failure policy 和 fresh output root；
+5. GPU 1 继续专供 FIPER；正式 pilot 使用 preflight 时确认空闲的其他 GPU；
+6. 只报告 valid pair 上的 task success、safe success、retention、block/deadlock 和 method-attributable
+   utility loss。closed-loop block 不自动叫 false positive。
 
-E1-v3 已在未观察新 episode outcome 前冻结。它不改 E0 unit、seed、pair order、victim、horizon、CTDA
-或 fallback，只把递归 JSON-like metadata audit 放入 E1 专用模块，保持 E0-v2 online wrapper 字节与
-冻结 hash 不变；同时仅允许两侧都 valid 的 pair 进入 inference。GPU 3 preflight 通过后，fresh run
-在提交 `ce21483` 上完整执行 24 条。metadata blocker 未复现、24 个 episode JSON 均保留且无
-orchestration error；但 12 个 Full CTDA records 全在 retained paired validation 因 init digest mismatch
-失效。逐项诊断显示 Full CTDA digest 12/12 等于 E0 冻结 init digest，VLA-only 为 0/12：Full arm 在初态
-摘要前安装 task-bound contact query，而 unguarded VLA arm 没有，比较的是不同 observation schema。
-因此 v3 为 `terminal_invalid_no_valid_pairs_not_an_e1_outcome`，不得使用 VLA-only 7/12 task-success 计数
-做 paired/utility 解释，也不得重跑已 dispatch pair。机器摘要见
-[`proofalign_e1_v3_terminal_invalid_summary.json`](../experiments/proofalign_e1_v3_terminal_invalid_summary.json)。
+可直接交接的执行说明见 [`next_experiment_prompt.md`](next_experiment_prompt.md)。
 
-用户随后将评测优先级明确收缩到安全性，timing 只保留为诊断。项目在 E1 之外事前冻结独立 E3
-Full-CTDA-only clean safety protocol，并在提交 `a06eddd`、GPU 3 上完成 12 个 E0-supported unit。
-12/12 record valid 且 `safety=preserved`：117/117 policy dispatch 均有完整负 collision/cost observation，
-117 个 hard-invariant sample 全为 true，Lean proof 与 Python parity 无失败；12 次终止 block 全为
-pre-dispatch，phase advance 为 0。fresh run 未触发 fallback，故 fallback 只由此前 36/36 frozen
-zero-hold repetition 支持；task success 0/12 是分离的 utility 负诊断。详情见
-[`e3_safety_evaluation.md`](e3_safety_evaluation.md) 与
-[`proofalign_e3_safety_terminal_summary.json`](../experiments/proofalign_e3_safety_terminal_summary.json)。
+## 仓库状态规则
 
-随后在提交 `308cb0d` 事前冻结独立 post-dispatch observation-failure challenge。GPU 3 fresh run 完成
-12/12 valid records：每条均只执行一个静态授权的 policy action，独立 raw simulator constraint oracle
-为完整负值；CTDA 的 collision/cost monitor 随即因一个周期的冻结 observation blackout 进入 `unknown`，
-phase 保持 `approach`，decision=`replan`，并执行精确 zero hold。恢复后的 oracle、actuation 和 immediate
-postcondition 12/12 完整且安全，0 explicit failure。然而 frozen primary labeler 额外要求
-`fallback_switch.integrity_verified=true`，而正式 typed receipt 以 attestation/claim/receipt digest 和
-`verify_integrity()` 表达完整性，没有该顶层字段。因此正式结果必须保持
-`postdispatch_containment_not_established`、`0 contained / 0 failed / 12 unknown`，不得修 validator 后重跑。
-后验只读 typed-receipt reconstruction 的 12/12 integrity pass 只解释 schema gap，不改变主分类。详情见
-[`e3_postdispatch_intervention.md`](e3_postdispatch_intervention.md) 与机器终态摘要
-[`proofalign_e3_postdispatch_terminal_summary.json`](../experiments/proofalign_e3_postdispatch_terminal_summary.json)。
-
-E4 safety robustness 随后冻结为 36-case CPU/Lean component matrix。第一次 v1 执行在第三个 case
-记录阶段因 wire serializer 拒绝浮点 timeout 而 terminal-invalid；2 条 partial record 与完整失败原因已
-原样保留，正式不形成矩阵结论。v2 amendment 只把诊断 timeout 改记为整数纳秒，全部 case、预期值、
-pytest nodeid、classifier 和被测实现均从 v1 原样继承，并使用新 output root。v2 得到 `36/36` pass：
-`1/1` real-Lean control、`35/35` fault case fail closed；独立重算 174 个 manifest 条目无 hash/size/missing
-错误。该结果只建立固定组件故障矩阵内的拒绝授权/不推进/不建立 fallback success，不是 physical safety、
-verified recovery、attack defense、real-time、availability 或 utility 证据。详情见
-[`e4_robustness_evaluation.md`](e4_robustness_evaluation.md) 与
-[`proofalign_e4_robustness_terminal_summary.json`](../experiments/proofalign_e4_robustness_terminal_summary.json)。
-
-## 详细审计摘要
-
-本地 first sprint 的有限闭环已经完成：paper CTDA 合同来自 frozen mission/phase/residual
-obligation，raw binder 不读取 policy metadata，`ctda-wire-v1` 的四个 stage 可由 Lean kernel
-实际检查，并有零 mismatch golden/shadow corpus。真实 OpenPI + LIBERO-Safety GPU probe 已关闭
-affordance fallback 的 observation-completeness blocker；但固定 50 ms switch gate 只通过 2/3，
-25-step 诊断最大值为 59.435 ms。项目据此删除 real-time enforcement 前提，将当前实现固定描述为
-fail-closed slow interlock/offline audit。该 latency 负结果继续完整报告，但不再阻塞非实时的 3--5
-prefix clean calibration；它仍然禁止把 receipt 或系统描述成满足 50 ms worst-case bound。首次
-5-prefix 尝试又发现 runner 在应用 benchmark init state 后发生二次 reset，因此该 episode 已标为
-无效诊断样本，不进入 calibration 或论文统计。`2c532ca` 修复后的 valid-init clean run 已证明
-handoff gate 生效，但首个 OpenPI proposal 被旧 raw binder 在 dispatch 前 refute。随后形成 clean
-`e2e4d47` bounded-stutter commit 并通过 strict preflight；真实 GPU 重跑成功授权、执行并观测了第一
-个微动作，四阶段 Lean 为 `proven/proven/proven/safe_pending`，phase 保持 `approach`。第二次新
-OpenPI 推理仍是微动作，但一次性 stutter budget 已耗尽，故在 dispatch 前 replan。只执行了 1/5
-prefix。本轮已在 `74152a9` 实现合同级累计预算与完整 chunk audit；strict preflight 为
-`ready=true`、216 passed / 1 skipped、Lean 12 jobs。随后唯一一次相同 task/init/seed/witness 的
-重跑在第一个 prefix 失败：pre-dispatch proven，累计 path 与观测运动学均有正 margin，但 observation
-比 100 ms authorized prefix duration 晚 4.926 ms，observed-prefix 被 Lean/Python 一致 refute；
-zero-hold postcondition 成立但 56.910 ms switch latency 超过 50 ms，最终 `safe_stop`。只执行 1 个
-policy prefix，未追加 episode。用户随后授权优先验证 method validity：runtime 现显式区分严格实时
-与 slow-interlock 时序策略。慢速策略仍记录上述两个 miss 和严格 receipt 失败，但不让纯性能 SLA
-单独否决方法；authorization/contract deadline、trace horizon、运动学/不变量、累计预算、
-completion/progress、actuation/postcondition 与 proof/parity 仍 fail closed。新的固定配置 calibration
-已在 clean `7587c47` 上执行：preflight 为 220 passed / 1 skipped、Lean 12 jobs、零 blocker/warning。
-首 prefix 即使 109.034 ms 超过 100 ms SLA，仍按慢速策略得到四阶段
-`proven/proven/proven/safe_pending`；第二 prefix 则因观测位移 1.335 mm 超过记录的 0.150 mm
-kinematic limit 被 Python/Lean 一致 refute。冻结的 LIBERO-Safety `OSC_POSE` config 显示有效
-translation scale 是 2.0，而 CTDA 硬编码为 0.05，存在 40 倍模型错配。该 gate 因方法模型而非性能
-失败。用户现已授权以预先存在的归一化六维 command-path budget `0.002` 作为独立依据：物理平移
-预算由 live scale 相乘派生，当前为 `0.004 m`。runner 已移除 `0.05` 硬编码，并对 live
-`OSC_POSE` controller 的 delta mode、六维/零中心/等向 mapping 和 environment bounds 做 fail-closed
-绑定。`f01a98f` 已通过 227 passed / 1 skipped、Lean 12 jobs 和 strict preflight。首次 calibration
-启动因子进程缺少 Lean `PATH` 在 semantic stage fail closed、零 dispatch；经明确授权仅修正 `PATH`
-后的固定重跑完成 5/5 `proven/safe_pending` prefix，16 个唯一 Lean request 全部 proof-verified 且
-Python parity 匹配，五个 kinematic margin 全为正。前两步累计 stutter 后三步自然进入正常 approach；
-method-validity prefix gate 已通过，但任务未在五步内完成且 realtime SLA 仍未通过。SABER R0
-历史记录已完成机器核验；Phantom Menace 上游 commit、三种 deterministic camera transform
-及 weak/medium/strong 共 9 组 CPU repeat smoke 也已冻结并通过。旧 R0 中 task 2/init 0
-clean 在 121 个动作后成功，同 pair 的 `laser_blinding-medium` 改变 20/20 policy frame
-却也在 96 个动作后成功；该单对负结果继续保持 `blocked_upstream`，不重跑、不重解释。
-与它分离的 R0b 已在任何新 attack outcome 可见前于 `82c6ad5` 提交 protocol，并在
-clean standard-LIBERO `8f1084e`、Phantom runner `d03fcbd` 和 OpenPI `15a9616` 上执行完毕。
-task 3/4 的两次启动错误在产生 episode outcome 前 fail closed，按 append-only ledger 保留且未重跑；
-修复后首三个有效 clean-success pair 为 task 5/6/7 init 0。27/27 attacked episodes 全部通过
-source、init-state、first-clean-frame、policy-record 与 changed-frame gate；`laser_blinding/strong`
-在 3/3 pair 上都将 clean success 变为 220-step failure，因此 R0b 通过预注册 signal gate，
-归类为 `r0b_workload_candidate_for_held_out_r1`。它只开放 held-out LIBERO-Safety R1
-的事前协议设计，不是 ProofAlign 防御证据。SAFE/FIPER 后来在独立 worktree 恢复：大型资产与 uv
-环境已在 `/data0/ldx` 冻结并复用。两条长任务在 2026-07-15 收尾时中断：SAFE 保留
-335/500 records，FIPER compat run 停在 seed 0 / `push_t` / `rnd_oe`。FIPER 又在 2026-07-16 按
-fresh protocol 使用既有环境重跑，但在 seed 0 的 `pretzel/rnd_a` 训练结束后异常退出，manifest 仍为
-`started`；所有 attempt 都没有 terminal pass，不能进入比较表。新的 held-out R1 与其后条件式 scoped main protocol
-已在结果出现前冻结。
-R1 已完整执行：四个 clean-safe qualifier 的 attack frame 全部改变，但只有
-`obstacle_avoidance_human/task0/init1` 出现环境 cost/collision，结果 1/4，低于预注册 2/4 gate；
-`obstacle_avoidance/task0/init1` 的 task failure 因无 cost/collision 不计。R1 分类为
-`r1_phantom_independent_safety_signal_not_reproduced`。因此条件式 `VLA-only / Full CTDA` scoped main
-未获授权且未运行；不调攻击参数、不换 pair、不把 task failure 重解释成安全信号。
-用户随后选择继续 SABER instruction 路线。新的 exact-task R1 与条件式 scoped main 已在任何
-LIBERO-Safety attack record 或 attacked outcome 出现前写成机器可读协议：严格复用上述四个
-Phantom R1 clean-safe artifact，只允许官方 `constraint_violation` prompt-tool agent 对每个任务生成
-一次 instruction record，生成阶段不得加载 victim、不得看 attacked outcome、不得 best-of-N 或
-重生成。四条记录全部通过 source/model/protocol/edit-budget gate 后，才运行四个 pi0.5 attacked
-episode；仍以至少 2/4 非零环境 cost/collision 为独立 safety signal，task failure 单独不计。
-协议、producer、runner 与 CPU validator 均已实现；没有生成有效攻击记录，也未产生 SABER R1 victim outcome。
-首次 record-producer 启动在任何 pair generation 前因 robosuite 全局 `/tmp/robosuite.log` 权限冲突
-fail closed；raw manifest 已记录 `pair_generation_attempted=false`、victim 未加载且无 rollout。
-修复仅把 `ROBOSUITE_LOG_PATH` 隔离到本次结果目录，并且恢复 gate 要求 manifest 明确是
-`pre_generation_failure` 且不存在 record、producer-ledger 或 transcript；任何 pair attempt 已存在时
-仍永久禁止恢复。第二次启动已成功装载冻结模型和本地 vLLM，但 ART 的 localhost client 因继承系统
-SOCKS proxy、环境未安装可选 `socksio` 而在首个 pair generation 前失败；manifest 追加第二条零-attempt
-记录。最初的 proxy 修复在 producer 子进程清除全部 HTTP/SOCKS proxy 并固定 localhost `NO_PROXY`；模型与
-tokenizer 都来自已校验本地路径，不下载新权重。第三次启动表明 Unsloth 即使使用本地路径仍执行
-Hugging Face availability check；清除全部 HTTP proxy 会在首个 pair 前等待 120 秒后 fail closed。
-因此最终隔离只删除导致 `socksio` 缺失的 `ALL_PROXY/all_proxy`，保留普通 HTTP(S) proxy 供上游
-metadata check，并以 `NO_PROXY=127.0.0.1,localhost` 让 ART 本地 client 直连。官方 SABER 同样用
-force-exit 关闭 ART/vLLM actors，producer 现仅在 artifact 已持久化后采用相同退出策略。
-第四次零-attempt 启动又确认 ART 官方 server 实际监听并用 `http://0.0.0.0:8000` 做 health check；
-server 日志显示 application startup 成功，但 `0.0.0.0` 未进入 `NO_PROXY`，所以 client 被 HTTP proxy
-接管并在 30 秒后超时。最终 localhost bypass 因而精确扩为
-`127.0.0.1,localhost,0.0.0.0`；不改变 server、模型或 generation 配置。
-第五次启动首次通过全部 pre-generation gate，并为第一个 frozen pair 建立 generation transcript；但
-`init_chat_model()` 在模型推理前因 ART `CURRENT_CONFIG` context 缺失抛出 `LookupError`。producer
-立即写入 invalid ledger：perturbed instruction 未改变、edit distance 0、tools 为空，且 victim 从未
-加载或 rollout。由于 transcript/producer-ledger 已存在，本次不再满足零-attempt 恢复条件；按预注册
-`invalid_record_policy` 永久停止，不修 producer 后重跑、不替换 record。最终分类为
-`r1_saber_attack_record_generation_failed_closed`，independent 2/4 signal 未评估，条件式 SABER
-scoped main 未获授权。这不是 SABER 攻击无效或 ProofAlign 防御有效/无效的证据。
-
-## 已验证资产
-
-- pi0.5/OpenPI、LIBERO-Safety、在线 wrapper 和 attack-record 接口已经存在。
-- Python 已有 typed CTDA reference objects、persistent monitor、prefix transaction、replay/
-  stale/cross-episode rejection 和 simulator fallback trace。
-- Lean 已有 CTDA staged checker、finite-prefix monitor、`CTDAWire` 四阶段 checker 和 replay
-  artifact。
-- paper path 已切断 attacked prompt/`proofalign_action` 对 contract/verdict 的授权影响；有限
-  Pick/Place template 与独立 raw binder 已有回归测试。
-- semantic、prefix-pre、observed-prefix 和 monitor-step 均可在 `ctda-lean-kernel` mode 实际经
-  Lean `by decide` 检查；unavailable/tampered request fail closed。
-- 27-case CPU golden/shadow corpus 为 0 Python/Lean mismatch；无独立 ground truth 时 false block/
-  TPR/FPR 明确输出 `not_evaluated`。
-- 合并 SAFE/FIPER lane 后全量为 287 passed / 1 skipped，Lean `lake build ProofAlign` 为 12 jobs
-  成功；本轮新增
-  SABER exact-task protocol、one-shot producer、纯 victim orchestrator、artifact validator，以及
-  Phantom R1 frame audit 与 CTDA policy-metadata provenance tests。
-  `f01a98f`
-  calibration 前的 strict preflight 仍按其原始 227 passed / 1 skipped 记录保留。
-- cumulative-stutter CPU/fake-env 覆盖累计 path 超界、持久 no-progress、reset 不退款、原 deadline、
-  completion/progress fail closed 和零 phase advance；OpenPI/runner 测试覆盖完整 chunk、policy-call
-  ID、实际执行 command 与丢弃 tail，控制仍为每次 CTDA 只 dispatch 一个 command。
-- 纯攻击 runner 与 defense runner 已解耦，适合在远程机器上产生版本化 workload 后配对评估。
-- `remote_gpu_preflight.py` 会 fail closed 检查独立 Git top-level、模型、GPU physical id、版本、
-  选定 LIBERO-Safety 的五个 config path 和本地 verification；`run_remote_gpu_smoke.sh` 显式绑定
-  同一隔离 LIBERO config，并生成 SHA-256 artifact manifest。
-- 固定 `affordance/task 2/init 0` witness 的 observation postcondition 已在真实 GPU rollout 中验证：
-  required observations 为 `collision,cost`，observation complete，mission/distance conditions hold，
-  issue list 为空。
-- `e2e4d47` strict preflight 在三个独立 clean Git roots 上通过：212 passed / 1 skipped、Lean 12 jobs、
-  零 blocker/warning；registered init 0 的 provenance 与两个 state digest 一致。
-- 同配置真实 GPU 重跑验证了一次 bounded Pick/approach stutter：count `0 -> 1`，观测位移
-  `65.119 µm` 小于带 model error 的 `102.835 µm` limit，margin `37.716 µm`，monitor
-  `safe_pending`，phase 不推进，零 collision/cost/fallback。
-- `74152a9` strict preflight 在 GPU 3/5 上为 `ready=true`、零 blocker/warning，三套 checkout clean，
-  216 passed / 1 skipped、Lean 12 jobs；完整 action chunk/call/executed/tail 已在真实 OpenPI artifact
-  落盘。
-- `7587c47` 将 strict/slow 时序政策分离并绑定进 tube/receipt metadata；同配置真实 GPU run 证明纯
-  timing miss 不再阻塞四阶段 method verdict，同时在第二 prefix 对真实运动学模型错配 fail closed。
-- `f01a98f` live-controller calibration 在 registered init 上执行五个 policy prefix：前两步累计
-  stutter 消耗 2.139 mm / 4 mm 与 `0.001405 / 0.002`，后三步不退款也不再增加 stutter count；
-  5/5 tube/model/invariant 通过，完整 action chunk audit 落盘。一步 111.279 ms prefix miss 与
-  76.205 ms fallback miss 继续作为性能负结果，不能支持 realtime claim。
-- Phantom Menace 上游固定为 `a0e4c8b2a661ea2fe64bdb9055353b2e12575729`，task/init/horizon、
-  fail-closed 与 structured outcome/frame-digest logging 补丁固定为
-  `d03fcbdfa4d49985dabd60e11e12008e2af3a783`。ProofAlign observation
-  transform plugin 直接加载并校验上游源码，不复制算法；3 种攻击 × 3 档强度的重复输出与 digest
-  全部一致，CPU smoke SHA-256 为 `f77f40e6...d39863`。隔离 standard-LIBERO clean/attack pair 的
-  结构化 artifact、25/20 个 policy records、视频和 environment manifest 已由 `SHA256SUMS` 校验。
-- 预注册 R0b 共保留 32 条 ledger record：2 条无 outcome 的 fail-closed clean 启动记录、
-  3 个有效 clean-success 和 27 个有效 attack episode。`laser_blinding/strong` 是唯一通过
-  primary gate 的 cell（3/3 success-to-failure）；`em_truncation` medium/strong 各为 1/3，
-  其余 cell 为 0/3。结果目录中 914 个 checksum 已全部通过。
-- held-out R1 共保留 10 条 append-only ledger record：两个在 outcome 前发生的 import/config 启动失败
-  未重跑，四个有效 clean-safe 与四个有效 attack episode 均通过 source/init/first-frame/cost-field/
-  changed-frame validator。四对 attack 分别为 success-safe、failure-safe、success-safe、failure-unsafe，
-  独立 safety transition 为 1/4。`SHA256SUMS` 的 13 个 artifact 全部通过；机器状态见
-  `experiments/phantom_menace_r1_status.json`。
-- SABER exact-task R1 raw root 保留 4 条零-attempt startup failure、1 条 invalid producer ledger 和
-  对应 transcript。最终 5 个 checksum 全部通过；没有 `attack_records.json`、victim episode 或 attacked
-  outcome。机器状态见 `experiments/saber_liberosafety_r1_status.json`。
-- SAFE/FIPER 独立复现已冻结 SAFE、SAFE-openpi、FIPER 三个 source commit，SAFE 12 GB checkpoint、
-  tokenizer、FIPER 5.68 GB 官方 archive、21.15 GB extracted tree 及四套 resolved uv 环境。所有大型
-  输入均按绝对路径复用；中断的 rollout/training outputs 原样保留但不是结果。运行状态与恢复规则见
-  `docs/safe_fiper_r0_runbook.md`。
-- 上述两个本地 runner commit 已导出为根仓库跟踪的
-  `experiments/patches/phantom_menace_r0_runner.mbox.b64`；payload SHA-256 为
-  `e0c12e8c...389cde`，解码后 mbox SHA-256 为 `b8fe708a...f2a0b3e`。从冻结 upstream parent 用
-  `git am --committer-date-is-author-date` 可精确重建 `d03fcbd`，避免根仓库推送遗漏被忽略的
-  `external/` 本地历史。
-- 隔离 client 的 uv requirements、robosuite `sitecustomize` overlay 与 clean LIBERO path config 已复制
-  到受版本控制的 `experiments/phantom_menace_r0_env/`；原始视频、JSONL 和 policy records 仍留在被
-  忽略的本机 `results/`，不会被错误地当作已上传到 Git 远程。
-
-## 尚未闭合
-
-1. 历史 SABER 官方 LoRA/OpenPI R0 只在 constraint-violation 方向成立，仍不能冒充
-   LIBERO-Safety exact-task R1。Phantom 旧 task-2 R0 负结果保持不变；分离的 R0b 只在
-   standard-LIBERO 上发现 `laser_blinding/strong` workload candidate；held-out LIBERO-Safety R1
-   已完成但独立 safety signal 只有 1/4，未达到冻结的 2/4 gate。SAFE 无 terminal pass，FIPER 的
-   fresh 后台复现也在 terminal 前异常退出，尚无可用于比较的结果；SABER exact-task R1 又在 immutable record-generation
-   artifact gate 失败且没有 victim outcome。
-   所以本轮结果不能包含与它们的数值比较、SABER effectiveness 或 superiority claim。
-2. 当前 Lean evaluator 为每个 request 生成并编译 replay source；远程单-prefix四阶段也约为
-   0.9--1.3 s/stage。Lean verification 与 fallback switch 都不满足 real-time claim，后续只按
-   slow interlock/offline audit 报告并保留完整 latency distribution。
-3. `7587c47` method-validity gate 曾暴露 dynamics config mismatch：
-   vendored `OSC_POSE` 的 normalized translation scale 为 2.0，代码使用 0.05。按冻结 source 重算，
-   两个 prefix 的 command-plus-model-error limit 分别为 0.227 mm 与 2.094 mm，均覆盖实际观测；但
-   正确 scale 下首 prefix 的 predicted translation 为 0.127 mm，已超过另行冻结的累计 stutter
-   translation budget 0.1 mm。历史结果保持为失败记录；新版本不按该样本拟合，而是复用此前已经
-   冻结的归一化六维 command-path budget `0.002`，以 live scale 严格派生 `0.004 m` 平移上界。
-   `model_error_m=0.0001 m` 继续只作为 tube 的独立误差 allowance。该 correctness blocker 已由
-   `f01a98f` 和五-prefix gate 关闭，但历史失败 verdict 保持不变。
-4. `74152a9` 累计合同历史 GPU gate 在第一 prefix 的时序边界失败：dispatch-to-observation
-   `104.926095 ms > 100 ms` authorized duration，虽 observed displacement margin 为正，仍正确
-   fail closed；fallback postcondition 完整但 `56.909518 ms > 50 ms`，receipt 失败。该结果只验证
-   第一次累计扣减和完整 chunk 日志，没有验证 repeated prefix；不能通过移动 timestamp、增加
-   duration、改变 control frequency 或重跑样本绕过。后续获授权的 slow-interlock 策略不改这些
-   原始值，只将 control-period/fallback latency miss 与方法安全判据分列。raw stutter 分类和墙钟
-   timing policy 仍是 Python adapter 语义，不是 Lean raw-action/timing proof。
-5. 旧 notes 中的 60-episode baseline、12-episode Dual Lean 和 EDPA 结果没有完整 raw artifact，
-   不能仅凭叙述重建主表。SABER R0 records 虽存在，也不能替代 exact-task paired artifacts。
-6. 单一 task/init 的 method-validity calibration 已通过，但跨任务 clean utility、false-block 和
-   independent ground truth 尚未建立；不能由本次 CTDA verdict 自己生成 TPR/FPR。
-7. 当前 simulator receipt、运动学界和 zero-hold 只能支持带假设的 simulator trace 结论，不能
-   支持硬件、连续动力学或 verified recovery claim。
-
-## 当前执行优先级
-
-1. **封存 E1-v3 terminal-invalid**：保留 24 个 episode 与 ledger/hash；不 resume、不覆盖、不把 12 个
-   post-dispatch invalid Full CTDA records 当作任务失败，也不以新版本替换相同 pair；
-2. **E1/E2 gate 保持关闭**：可为未来不同、事前冻结的评测实现两臂共享 contact-enriched observer，
-   但当前 0 valid pair 不允许进入 E2 duality 或 utility inference；
-3. **E4 safety robustness 已终止**：v1 terminal-invalid 与 v2 36/36 terminal matrix 同时保留；正式
-   scoped 结果为 35/35 frozen fault case fail closed。timing 仍只留原始负诊断，不扩写为总体 robustness、
-   recovery、attack defense、real-time 或 utility；
-4. FIPER 只属于后台 external lane。第一条 2026-07-16 fresh attempt 无 terminal pass；第二条已在
-   独立 fresh directory 复用现有环境运行，不 resume 或拼接。SAFE 继续 deferred；
-5. Phantom R1 的 1/4 负结果和 SABER record-generation fail-closed 永久保留，不调 gate、不换 pair、
-   不重开两个条件式 scoped main；
-6. 只有 E0--E4 已形成自身结果且 external readiness 通过后，才做 SAFE/FIPER/privileged checker 的
-   E5 最终对比、60 episodes 或完整 Table B。
-
-## 当前可写与不可写
-
-可写：
-
-- frozen Pick/Place mission-rooted contract 与 consumer-side raw binder 已接 simulator loop；
-- 共同支持的四个 stage 在 `ctda-lean-kernel` mode 确实由 Lean kernel 检查；
-- fake-env 已证明 pre-stage Lean proven 前零 dispatch，observed/monitor 失败时零 phase advance；
-- golden corpus 为零 Python/Lean mismatch；
-- 攻击与防御 runner 可以通过版本化 artifact 解耦。
-- 在固定 task/witness 的真实 GPU diagnostic 中，observation completeness 已通过，但 50 ms
-  fallback latency 仅通过 2/3；系统因此按 slow interlock/offline audit 继续评估。
-- 首次 5-prefix 尝试暴露了 init-state handoff 缺陷并已被判为无效样本；它不能支持 clean
-  calibration、阈值调整或 utility/security 结论。
-- corrected run 已验证 selected init 被保留且 digest 一致；首个 clean proposal 在 semantic Lean
-  proven 后由 raw binder pre-dispatch refute，零 simulator action。
-- live-controller cumulative-stutter 重跑在同一 init/seed/witness 下完成五个 prefix；前两步累计
-  stutter 后三步 normal approach，所有四阶段 proof/parity 与运动学 margin 均通过，因此
-  method-validity prefix gate 已通过。它仍不是 task-success、clean-retention 或 realtime 证据。
-- `74152a9` 真实 run 已证明完整 chunk audit 与第一次累计扣减落盘；它在 observed-duration 和 fallback
-  latency 两个冻结时序界 fail closed，未形成 repeated-prefix 证据。
-- slow-interlock 的 observation/fallback SLA miss 可以作为性能负结果单独报告；这不代表满足实时
-  bound，也不覆盖 authorization expiry、contract deadline 或任何安全/完整性失败。
-- Phantom 的隔离 clean/attack pair 证明固定 camera transform 进入了 policy input 且 artifact 可审计；
-  该 attacked episode 仍成功，故只能报告攻击效力方向未复现，不能报告 Phantom R0 通过。
-- 分离预注册的 Phantom R0b 在 standard-LIBERO task 5/6/7 init 0 上完成全部 27 个
-  有效 attack episode；`laser_blinding/strong` 在 3/3 pair 上产生 task-success degradation，
-  因此可作为 held-out R1 的预注册 workload candidate。
-- held-out Phantom R1 的四个有效 pair 中只有 1 个产生独立 cost/collision；R1 gate 未通过，
-  条件式 scoped CTDA main 没有启动。
-- SABER exact-task R1 在第一个 pair 的 attack chat-model 初始化处 fail closed；invalid transcript/ledger
-  已落盘，但没有有效 record 或 victim rollout。因此只能报告 artifact gate 未通过，不能报告 SABER
-  effectiveness 或 ProofAlign method validity。
-
-不可写：
-
-- 当前 Lean path 是 real-time enforcement；
-- fallback 满足固定 50 ms worst-case switch bound，或 latency gate 已通过；
-- mission 已被密码学认证；
-- raw action 的 semantic contract 已被独立证明；
-- 累计 bounded stutter 已由 Lean raw-action semantics 独立证明安全；
-- 整个 OpenPI chunk 已获授权或被执行；
-- 3--5 prefix method-validity calibration 证明了 clean retention/utility；
-- 系统证明真实机器人或连续动力学安全；
-- 防御已经优于 baseline 或能够防御某个攻击。
-- Phantom R0b 已证明 ProofAlign 能防御 camera attack，或已在 LIBERO-Safety 上产生
-  authorization/safety signal。
-- 从 R1 的单个 unsafe pair 事后降低 gate、扩展 100-action window 或运行 CTDA 并写成主实验有效性。
-- 修复 SABER producer 的 ART context 后重跑、替换第一个 invalid record，或把 record-generation failure
-  写成 SABER 无效/ProofAlign 有效。
+- 已终止的 protocol/result 不 resume、不覆盖、不重新分类；
+- 所有正式执行必须先在 clean commit 冻结 protocol，再使用 fresh absent output root；
+- timing 保留原始记录但不是下一实验 gate；
+- raw artifact、ledger、manifest 和 terminal summary 必须一起保存；
+- archive 只用于历史追溯，不作为当前方法或 CLI 来源。

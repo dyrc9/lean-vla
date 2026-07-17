@@ -9,13 +9,16 @@
 
 - `pre_scope_freeze_20260710/`：2026-07-10 scope freeze 前的完整文档快照，包括 legacy Dual
   Lean、过宽的 CTDA upgrade memo、旧 GPU handoff、旧实验计划和日期型结果记录。
+- `evaluations/`：已终止 E0/E1/E3/E4 阶段的详细叙述报告；当前数字已合并到
+  [`../evaluation_results.md`](../evaluation_results.md)。
+- `handoffs/`：已经执行或过期的 GPU/agent 交接 prompt。
 - `artifacts/saber_patches/`：先前成功运行 SABER LoRA eval 所使用的外部仓库 patch。它们依赖
   对应 upstream commit；没有 commit 匹配时不得直接应用。
 
 ## 当前入口
 
-返回 [`../README.md`](../README.md) 查看 canonical 文档列表。当前 CLI 以代码和 `--help` 为
-准，远程配置以 [`../remote_execution.md`](../remote_execution.md) 为准。
+返回 [`../README.md`](../README.md) 查看 canonical 文档列表。当前 CLI 以代码和 `--help` 为准，
+环境配置以 [`../remote_execution.md`](../remote_execution.md) 为准。
 
 ## 归档原则
 

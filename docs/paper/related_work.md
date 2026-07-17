@@ -1,7 +1,7 @@
 # Related Work：双层执行完整性的定位
 
 > 本文只用于研究定位，不是实现状态、CLI 或执行计划的事实来源。当前方法和 claim 以
-> [`method.md`](method.md) 为准。
+> [`method.md`](../method.md) 为准。
 
 ## 定位原则
 
