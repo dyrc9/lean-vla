@@ -1,6 +1,6 @@
 # E1 clean paired pilot 交接记录
 
-更新日期：2026-07-16 18:25 CST
+更新日期：2026-07-17 11:20 CST
 
 本文是 E1 当前唯一执行交接页。E0 支持范围仍以
 [`proofalign_e0_protocol_v2.json`](../experiments/proofalign_e0_protocol_v2.json) 为准；E1 指标与
@@ -19,6 +19,9 @@ artifact、失败边界和下一次接手顺序。
   JSON 或可用 task/safe-success outcome。
 - 因此 **E1 仍未取得一个有效 paired result，E2 不得开始**。v1/v2 目录都不得 resume、覆盖、删行或
   作为零成功率结果使用。
+- E1-v3 已形成 24/24 terminal artifact：12 个 VLA-only record valid，12 个 Full CTDA record 均在
+  post-dispatch paired-init digest validation 失效，0 valid pair、inference=`not_evaluated`。v3 同样
+  不得 resume、覆盖或替换。
 - E1 不纳入 latency、deadline 或资源分类；这些仍留到 E4。GPU 1 的 FIPER 后台线未被 E1 使用。
 
 ## 2. 冻结实现与协议
@@ -141,8 +144,27 @@ CPU gate 为 E1 focused `14 passed`、online wrapper `31 passed`；Lean 12 jobs 
 GPU 3 fresh preflight 为 `ready=true`：physical CUDA/EGL 均为 3，15-task registry 与 checkpoint 通过，
 policy call `openpi:000000` 返回并审计 10 actions，metadata SHA-256 为
 `f339032e9190e40443a8273ecdcfc8c029c46954f5365bf1bef5d334108bd0bb`，`env_step_called=false`。
-协议为 `experiments/proofalign_e1_clean_pilot_protocol_v3.json`，计划 fresh root 为
-`results/proofalign_e1_clean_pilot_v3_20260717`。本节记录时该 root 尚未创建、仍无有效 E1 outcome。
+协议为 `experiments/proofalign_e1_clean_pilot_protocol_v3.json`，fresh root 为
+`results/proofalign_e1_clean_pilot_v3_20260717`。
+
+### 7.1 v3 terminal 结果
+
+服务 `proofalign-e1-clean-pilot-v3.service`（invocation `02ae763e...`）在 GPU 3 正常完成；24 行 ledger、
+24 个 episode JSON 均存在，无 orchestration error。terminal hashes：
+
+| 文件 | SHA-256 |
+|---|---|
+| `run_manifest.json` | `2499e0c412a9d87564060def3ebeff922a4bbf15ac6d2de12404dee4f9f14f9e` |
+| `episodes_ledger.jsonl` | `30cce17232ca44e2be14948c4e64ee83bef8c3742ba15b34b9ed4a5906efe6e2` |
+| `summary.json` | `182aff53d1afc0421e5efc8f928dd3cebd21f70fc9462b3660ccfeba164e1a29` |
+
+12/12 Full CTDA record 的唯一 validation issue 均为 `paired initial observed state digests differ`。
+逐项只读核对显示 Full CTDA digest 12/12 等于 E0 validity freeze，VLA-only 0/12；原因是 Full arm 在
+初态 digest 前安装 task-bound contact query，VLA-only arm 使用未 enrichment 的 observer。因此这是
+配对观察 schema 错配，不是 `set_init_state` 失败；但 gate 已在 dispatch 后触发，ledger 必须保持
+invalid，不得 post-hoc 重标或重跑相同 pair。机器结论见
+`experiments/proofalign_e1_v3_terminal_invalid_summary.json`。E1 utility/effectiveness、retention、
+false-block 和 paired difference 均未评估，E2 不得启动。
 
 ## 8. 后台运行与会话边界
 

@@ -6,7 +6,7 @@ from pathlib import Path
 
 from scripts import audit_proofalign_e0_fallback as fallback_audit
 from scripts import audit_proofalign_e0_slow_interlock_fallback as slow_fallback_audit
-from scripts import audit_proofalign_e0_protocol_v2 as protocol_v2_audit
+from scripts import audit_proofalign_e0_protocol_v2_committed as protocol_v2_audit
 from proofalign.benchmark.libero_online_runner import _validate_ctda_fallback_manifest
 
 
@@ -112,6 +112,8 @@ def test_frozen_e0_v2_protocol_has_exact_nonempty_e1_slice() -> None:
     report = protocol_v2_audit.audit(FROZEN_V2_PROTOCOL)
 
     assert report["ready"] is True
+    assert report["method_base_is_ancestor"] is True
+    assert report["current_head"]
     assert report["counts"] == {
         "total": 75,
         "supported": 12,

@@ -3,14 +3,15 @@
 冻结日期：2026-07-16
 
 当前机器协议：[`proofalign_e0_protocol_v2.json`](../experiments/proofalign_e0_protocol_v2.json)
-当前审计工具：[`audit_proofalign_e0_protocol_v2.py`](../scripts/audit_proofalign_e0_protocol_v2.py)
+冻结时审计工具：[`audit_proofalign_e0_protocol_v2.py`](../scripts/audit_proofalign_e0_protocol_v2.py)
+提交后审计入口：[`audit_proofalign_e0_protocol_v2_committed.py`](../scripts/audit_proofalign_e0_protocol_v2_committed.py)
 历史 v1 协议：[`proofalign_e0_protocol.json`](../experiments/proofalign_e0_protocol.json)
 
 ## 1. 结论
 
 当前 E0 v2 non-real-time freeze 对 LIBERO-Safety 75 个 task 得到
-`12 supported / 0 ambiguous / 63 unsupported`。E1-v1/v2 后续均形成 invalid execution records，尚无
-有效 paired result；任何 fresh E1 版本仍必须包含全部且仅 affordance task
+`12 supported / 0 ambiguous / 63 unsupported`。E1-v1/v2/v3 后续均形成 invalid execution records，尚无
+有效 paired result；任何未来独立、事前注册的 E1 版本仍必须包含全部且仅 affordance task
 `0,1,2,3,5,6,7,8,10,11,12,13`。时间性能不参与 E0 分类，统一进入 E4；这仍不是 task rollout、
 utility、real-time enforcement 或 attack-defense 结果。E1 执行状态见
 [`e1_clean_pilot.md`](e1_clean_pilot.md)。
@@ -276,7 +277,10 @@ method-version 内重跑。机器摘要为
 
 最终 [`proofalign_e0_protocol_v2.json`](../experiments/proofalign_e0_protocol_v2.json) 已冻结并由
 `scripts/audit_proofalign_e0_protocol_v2.py` 验证：`12 supported / 0 ambiguous / 63 unsupported`。
-E0 selection freeze 到此保持不变。后续 E1-v1/v2 的执行均为 invalid integration records，当前仍无
+该冻结审计器本身被 method hash 固定，且保留了冻结时“HEAD 等于 base commit”的检查；冻结文件提交后
+使用 `scripts/audit_proofalign_e0_protocol_v2_committed.py`，它先验证 base commit 是当前 HEAD 的祖先，
+再复用原审计器检查全部 pinned bytes、evidence、benchmark 与分类，不修改冻结协议或原审计器。
+E0 selection freeze 到此保持不变。后续 E1-v1/v2/v3 的执行均为 invalid integration records，当前仍无
 有效 paired result；完整状态已转到 [`e1_clean_pilot.md`](e1_clean_pilot.md)。任何 fresh E1 版本仍必须
 包含全部且仅上述 12 task，统一 init 0、env seed 7、policy seed 0；不得用 task 4/9/14 或其他 suite
 替补。时间与 deadline miss 在 E4 完整报告，禁止 real-time claim。

@@ -264,10 +264,12 @@ invalid。两轮均为 0 valid episode，E1 的 task/safe success、retention、
 旧 read-only validator 能验证 v2 manifest/ledger 数量与 hash，却错误地仍对全无效 pair 计算
 bootstrap/McNemar；这些旧 inference 不得进入结果表。v3 已把 recursive JSON-like metadata audit 隔离为
 E1-only adapter，恢复 E0-v2 wrapper 的冻结 hash，并规定只有两侧都 valid 的 pair 才进入统计。GPU 3
-真实 OpenPI policy-output preflight 已审计完整 10-action output、严格序列化 metadata，且未调用
-`env.step()`。v3 使用 fresh root；v1/v2 不 resume、不覆盖、不拼接。完整执行证据与接手步骤见
-[`e1_clean_pilot.md`](e1_clean_pilot.md)。正式 v3 paired execution 尚未开始，E2 继续被有效 E1 artifacts
-阻塞，但 E4 timing 仍按原计划单独处理。
+preflight 与 fresh execution 已完成：24/24 episode JSON 落盘，12 VLA-only records valid，但 12 Full
+CTDA records 全在 post-dispatch paired-init digest gate 因 observer schema 不同而 invalid。Full digest
+12/12 匹配 E0 freeze，VLA-only 0/12；所以物理 init application 并未失败，但也没有一个 protocol-valid
+pair。最终 inference 为 `not_evaluated_no_valid_pairs`。v1/v2/v3 不 resume、不覆盖、不拼接，不得替换
+已 dispatch pair。完整证据见 [`e1_clean_pilot.md`](e1_clean_pilot.md) 与机器 terminal summary；E2 关闭，
+E4 timing 仍按独立边界处理。
 
 ### 并行 external reproduction lane（不是 E0--E4 前置条件）
 

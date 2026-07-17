@@ -271,9 +271,9 @@ clean strict preflight 与唯一一次固定 calibration。
 ## 6. P4：ProofAlign 自身评测（当前主线）
 
 状态：**E0 v2 已冻结 non-real-time supported slice：12 supported / 0 ambiguous / 63 unsupported。
-E1-v1/v2 已执行但均为 invalid infrastructure/integration records；E1-v3 已修复 metadata/analysis
-gate 并通过真实 policy-output 无 dispatch preflight，当前仍为 0 valid paired episode。下一步是 fresh
-v3 execution。时间性能统一留到 E4，外部 baseline readiness 不阻塞主线**。
+E1-v1/v2 均为 invalid infrastructure/integration records；E1-v3 完成 24/24 artifact，但因两臂初态
+observation schema 不同造成 12/12 Full CTDA post-dispatch digest validation failure，最终 0 valid pair、
+inference=`not_evaluated`。相同 pair 不得替换，E2 继续关闭；时间性能只可在独立 E4 边界审计**。
 
 ### E0：冻结支持范围与评测单位
 
@@ -330,10 +330,11 @@ validator 对 retained artifacts 的机械检查退出 0，但它仍对全无效
 忽略并在 v3 修复。执行 hash、原始目录和恢复规则见 [`e1_clean_pilot.md`](e1_clean_pilot.md)。
 
 2026-07-17 v3 amendment 已在新 outcome 前冻结：递归 metadata freeze 只在 E1-v3 进程安装，E0-v2
-wrapper 的冻结 hash 保持不变；summary 只让两侧都 valid 的 pair 进入统计，0 valid pair 明确为
-`not_evaluated_no_valid_pairs`。GPU 3 exact-CUDA/EGL、checkpoint、task0/init0 environment 与真实 OpenPI
-output audit 均通过，完整 10-action output 可冻结/序列化，且 probe 未调用 `env.step()`。正式 fresh
-result root 尚未创建。
+wrapper 的冻结 hash 保持不变；summary 只让两侧都 valid 的 pair 进入统计。GPU 3 preflight 通过后，
+fresh execution 记录 24/24 episode；metadata audit 未再失败，但 12/12 Full CTDA record 在 post-dispatch
+pair validator 因 init digest mismatch 失效。Full digest 12/12 等于 E0 冻结 digest，VLA-only 0/12，
+根因是两臂初态 observer 是否包含 task-bound contact observation。最终 `valid_pairs=0`、
+`not_evaluated_no_valid_pairs`；已 dispatch pair 不替换，详见 v3 terminal summary。
 
 ### E2：双层贡献与 fixed-trace replay
 
@@ -358,10 +359,9 @@ Lean unavailable/timeout/tamper 时的 fail-closed 行为。当前 0.9--1.3 s/st
 
 P1/P2 correctness、27-case parity 和 five-prefix method-validity 已允许执行 E0；exact manifest/contact
 observer、init-validity 与 fresh slow-interlock safety qualification 已完成，E0 v2 现有 12 个 supported
-unit。E1-v3 metadata、analysis 与 no-dispatch policy-output preflight gate 已通过；下一项具体工作是在
-新目录 fresh 执行相同 12 units；不是 resume/覆盖 v1/v2，不是加入被排除的 frypan task，
-不是继续寻找一个能通过的攻击，也不是等待 SAFE/FIPER 完成。只有得到有效 E1 paired artifacts 才进入
-E2。deadline/latency 只在 E4 汇总，仍禁止 real-time claim。
+unit。E1-v3 已 terminal-invalid；v1/v2/v3 均不得 resume/覆盖，尤其不得以 observer 修复替换 v3 已
+dispatch 的相同 12 pairs。未来可在不同、事前冻结的评测中统一两臂 contact-enriched observer，但当前
+0 valid pair 不得进入 E2。deadline/latency 只可在独立 E4 边界汇总，仍禁止 real-time claim。
 
 ## 7. P5：外部 workload 与 baseline 复现（后台线）
 

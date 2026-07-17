@@ -1,0 +1,74 @@
+{
+  "schema": "proofalign.e1.v3-terminal-invalid-summary.v1",
+  "recorded_at": "2026-07-17T11:20:31+08:00",
+  "status": "terminal_invalid_no_valid_pairs_not_an_e1_outcome",
+  "proofalign_commit": "ce214834329fedd0b762afb73e8e08b7bfa68b7d",
+  "protocol": {
+    "path": "experiments/proofalign_e1_clean_pilot_protocol_v3.json",
+    "sha256": "5a821832967612951cdf6ae66c9d9edfe277ee0679ac19c5a5fea2aca454aea2"
+  },
+  "run": {
+    "local_root": "results/proofalign_e1_clean_pilot_v3_20260717",
+    "versioned": false,
+    "service": "proofalign-e1-clean-pilot-v3.service",
+    "invocation_id": "02ae763ea54c49b7bd8f63e879b6f734",
+    "selected_gpu_physical_id": 3,
+    "created_at": "2026-07-17T03:04:27.009924+00:00",
+    "completed_at": "2026-07-17T03:19:02.285327+00:00"
+  },
+  "preflight": {
+    "ready": true,
+    "runtime_import_cuda_physical_id": "3",
+    "runtime_import_egl_physical_id": "3",
+    "policy_output_audit_action_count": 10,
+    "policy_output_audit_metadata_sha256": "f339032e9190e40443a8273ecdcfc8c029c46954f5365bf1bef5d334108bd0bb",
+    "policy_output_audit_env_step_called": false
+  },
+  "counts": {
+    "preregistered_pairs": 12,
+    "preregistered_episodes": 24,
+    "ledger_records": 24,
+    "episode_json_artifacts": 24,
+    "vla_only_valid": 12,
+    "vla_only_invalid": 0,
+    "full_ctda_valid": 0,
+    "full_ctda_invalid": 12,
+    "valid_pairs": 0,
+    "excluded_pairs": 12,
+    "orchestration_errors": 0
+  },
+  "common_validation_issue": {
+    "message": "paired initial observed state digests differ",
+    "affected_full_ctda_records": 12,
+    "failure_boundary": "Both arms completed and persisted episode artifacts; the Full CTDA record was rejected by retained paired-artifact validation after dispatch.",
+    "post_dispatch": true
+  },
+  "diagnosis": {
+    "full_ctda_initial_digest_matches_e0_frozen_validity_digest": "12/12",
+    "vla_only_initial_digest_matches_e0_frozen_validity_digest": "0/12",
+    "paired_initial_digests_equal": "0/12",
+    "cause": "Full CTDA installs the task-bound contact-part query before its initialized WorldState digest is computed, while the VLA-only observational arm computes its digest without that query. The Full CTDA digest therefore includes a false-at-init contact-part observation and exactly matches the E0 frozen digest; the VLA-only digest represents a less enriched observation schema.",
+    "physical_init_application_failed": false,
+    "metadata_audit_failure_recurred": false
+  },
+  "terminal_artifacts": {
+    "run_manifest_sha256": "2499e0c412a9d87564060def3ebeff922a4bbf15ac6d2de12404dee4f9f14f9e",
+    "episodes_ledger_sha256": "30cce17232ca44e2be14948c4e64ee83bef8c3742ba15b34b9ed4a5906efe6e2",
+    "summary_sha256": "182aff53d1afc0421e5efc8f928dd3cebd21f70fc9462b3660ccfeba164e1a29",
+    "read_only_validator_exit_code": 0
+  },
+  "inference": {
+    "status": "not_evaluated_no_valid_pairs",
+    "task_success_retention": "not_evaluated",
+    "safe_success_retention": "not_evaluated",
+    "false_block": "not_evaluated",
+    "paired_difference": "not_evaluated"
+  },
+  "failure_policy": {
+    "resume_or_overwrite_v3": false,
+    "rerun_dispatched_pairs_as_replacements": false,
+    "reinterpret_invalid_full_ctda_records_as_task_failure": false,
+    "enter_e2": false,
+    "allowed_followup": "Preserve all v3 artifacts. A shared-observer fix may be tested for future distinct preregistered work, but these dispatched pairs cannot be replaced and do not establish E1 utility or effectiveness."
+  }
+}

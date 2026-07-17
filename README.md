@@ -29,11 +29,14 @@ It is not an end-to-end physical safety proof.
     before environment construction because of a physical-EGL binding error; E1-v2
     fixed that startup path but all 24 preregistered records failed before dispatch on
     unsupported nested policy metadata. Both runs are retained as invalid evidence.
-    E1-v3 now isolates recursive policy-metadata freezing from the byte-frozen E0
-    wrapper, excludes invalid pairs from inference, and has passed an exact-GPU real
-    policy-output preflight with no simulator dispatch. Its fresh paired execution is
-    next; there is still no valid E1 result. Duality, closed-loop intervention, and
-    cost remain after a valid E1 and before external comparison.
+    E1-v3 then isolated recursive policy-metadata freezing from the byte-frozen E0
+    wrapper, excluded invalid pairs from inference, and passed an exact-GPU real
+    policy-output preflight. Its fresh run retained all 24 artifacts, but all 12 Full
+    CTDA records were rejected after dispatch because the enriched CTDA initial-state
+    digest was compared with a less enriched VLA-only observation digest. Thus v3 is
+    terminal-invalid with zero valid pairs and no E1 inference. Those dispatched pairs
+    cannot be replaced; duality remains blocked, while cost can only be audited later
+    under the separate E4 boundary.
 - SAFE and FIPER official R0 attempts used the dedicated
   `external/worktrees/safe-fiper-r0` worktree. They were interrupted during the
   2026-07-15 closeout and are not reproduction results. Their already
