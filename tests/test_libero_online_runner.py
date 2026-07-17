@@ -8,6 +8,8 @@ from pathlib import Path
 import pytest
 
 from proofalign.benchmark import libero_online_runner
+from proofalign.benchmark import libero_e1_runner
+from proofalign.benchmark.libero_e1_runner import run_vla_only_episode_with_plugins
 from proofalign.benchmark.libero_online_runner import (
     LiberoOnlineIntegrationError,
     LiberoTaskRuntime,
@@ -20,7 +22,13 @@ from proofalign.benchmark.libero_online_runner import (
     run_online_episode_with_plugins,
 )
 from proofalign.ctda import digest_payload
+from proofalign.ctda import digest_legacy_state
 from proofalign.models import SafetySpec
+from proofalign.benchmark.libero_online_wrapper import (
+    DefaultLiberoActionAbstractor,
+    ProofAlignLiberoWrapper,
+)
+from proofalign.benchmark.libero_task_manifest import LiberoTaskManifest
 
 
 @dataclass
@@ -94,6 +102,82 @@ class FakeOnlineEnv:
 
     def close(self):
         self.closed = True
+
+
+def test_vla_only_installs_manifest_before_initial_digest_and_has_no_ctda_trace(
+    monkeypatch, tmp_path: Path
+) -> None:
+    bddl_path = tmp_path / "fake.bddl"
+    bddl_path.write_text("(define (problem fake))", encoding="utf-8")
+    runtime = LiberoTaskRuntime(
+        benchmark=None,
+        task=None,
+        task_id=0,
+        task_name="fake_task",
+        instruction="pick up the mug by the body",
+        bddl_file=bddl_path,
+        init_state=[1, 2, 3],
+        init_state_id=0,
+        metadata={"benchmark_name": "affordance", "task_id": 0},
+    )
+    manifest = LiberoTaskManifest(
+        suite="affordance",
+        task_id=0,
+        task_name="fake_task",
+        bddl_file="fake.bddl",
+        bddl_sha256=sha256(bddl_path.read_bytes()).hexdigest(),
+        instruction=runtime.instruction,
+        goal_predicate="CheckGripperContactPart",
+        target_object="mug",
+        geom_ids=("0",),
+    )
+    baseline_env = FakeOnlineEnv()
+    baseline_env._proofalign_initialized_observation = baseline_env._get_observations()
+    baseline_env._proofalign_selected_init_state_applied = True
+    baseline_env._proofalign_initialized_observation_source = "set_init_state"
+    monkeypatch.setattr(
+        libero_e1_runner, "load_libero_task_runtime", lambda **_kwargs: runtime
+    )
+    monkeypatch.setattr(
+        libero_e1_runner,
+        "create_initialized_env",
+        lambda _runtime, _args: baseline_env,
+    )
+    output = tmp_path / "vla.json"
+    args = libero_online_runner.parse_args(
+        ["--output", str(output), "--max-steps", "1", "--warmup-steps", "0"]
+    )
+    args.method_name = "vla_only"
+    args.paired_execution_config_digest = "paired-fixture"
+
+    run_vla_only_episode_with_plugins(
+        args,
+        policy=lambda *_args: {
+            "raw_action": [0.0] * 7,
+            "proofalign_action": {"type": "Pick", "object": "mug", "part": "body"},
+        },
+        action_abstractor=DefaultLiberoActionAbstractor(),
+        task_manifest=manifest,
+    )
+
+    payload = json.loads(output.read_text(encoding="utf-8"))
+    assert payload["metadata"]["task_manifest_digest"] == manifest.manifest_digest
+    assert payload["metadata"]["paired_execution_config_digest"] == "paired-fixture"
+    assert all(step["ctda"] == {} for step in payload["trace"])
+
+    full_env = FakeOnlineEnv()
+    full_observation = full_env._get_observations()
+    full_wrapper = ProofAlignLiberoWrapper(
+        full_env, runtime.instruction, SafetySpec.from_dict({}), max_chunk_steps=1
+    )
+    full_wrapper.state_observer.contact_part_queries = (manifest.contact_query,)
+    full_state = full_wrapper.state_observer.observe(full_env, full_observation)
+    assert (
+        payload["metadata"]["environment_initialization"][
+            "benchmark_init_observed_state_digest"
+        ]
+        == digest_legacy_state(full_state)
+    )
 
 
 def test_ctda_action_bounds_unwrap_libero_control_env() -> None:

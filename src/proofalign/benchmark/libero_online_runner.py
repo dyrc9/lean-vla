@@ -368,6 +368,9 @@ def run_online_episode_with_plugins(
             **runtime.metadata,
             "method_name": getattr(args, "method_name", None),
             "execution_config_digest": _execution_config_digest(args),
+            "paired_execution_config_digest": getattr(
+                args, "paired_execution_config_digest", None
+            ),
         },
     )
     env = create_initialized_env(runtime, args)
@@ -525,11 +528,13 @@ def _prepare_ctda_trust_root(
 def _load_ctda_task_manifest(
     runtime: LiberoTaskRuntime,
     args: argparse.Namespace,
+    *,
+    allow_observational_arm: bool = False,
 ) -> LiberoTaskManifest | None:
     registry_value = getattr(args, "ctda_task_manifest_registry", None)
     if not registry_value:
         return None
-    if not getattr(args, "ctda", False):
+    if not getattr(args, "ctda", False) and not allow_observational_arm:
         raise LiberoOnlineIntegrationError(
             "--ctda-task-manifest-registry is valid only with --ctda"
         )
@@ -1331,8 +1336,8 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument(
         "--ctda-task-manifest-registry",
         help=(
-            "Optional with --ctda: task-bound manifest registry replacing the legacy "
-            "instruction compiler for a source-pinned task slice."
+            "Task-bound manifest registry. Optional with --ctda; paired observational "
+            "runners may also consume it solely to align the state-observer schema."
         ),
     )
     parser.add_argument(

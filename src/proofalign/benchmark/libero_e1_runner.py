@@ -14,8 +14,10 @@ from time import perf_counter
 from typing import Any
 
 from proofalign.benchmark.libero_online_runner import (
+    LiberoTaskManifest,
     _check_task_success,
     _execution_config_digest,
+    _load_ctda_task_manifest,
     _write_result,
     build_action_abstractor,
     build_policy,
@@ -55,6 +57,7 @@ def run_vla_only_episode_with_plugins(
     *,
     policy: Any | None = None,
     action_abstractor: Any | None = None,
+    task_manifest: LiberoTaskManifest | None = None,
 ) -> tuple[ExecutionDecision, dict[str, Any]]:
     """Run one genuinely unguarded VLA-only E1 episode.
 
@@ -75,13 +78,26 @@ def run_vla_only_episode_with_plugins(
         init_state_id=args.init_state_id,
         bddl_file=args.bddl_file,
     )
+    if task_manifest is None:
+        task_manifest = _load_ctda_task_manifest(
+            runtime, args, allow_observational_arm=True
+        )
     runtime = replace(
         runtime,
         metadata={
             **runtime.metadata,
             "method_name": getattr(args, "method_name", None),
             "execution_config_digest": _execution_config_digest(args),
+            "paired_execution_config_digest": getattr(
+                args, "paired_execution_config_digest", None
+            ),
             "e1_vla_only_gate": "disabled_observational_wrapper_only",
+            "task_manifest_digest": (
+                task_manifest.manifest_digest if task_manifest is not None else None
+            ),
+            "task_manifest_registry_sha256": runtime.metadata.get(
+                "task_manifest_registry_sha256"
+            ),
         },
     )
     env = create_initialized_env(runtime, args)
@@ -103,6 +119,13 @@ def run_vla_only_episode_with_plugins(
             action_abstractor=action_abstractor,
             max_chunk_steps=int(args.max_chunk_steps),
         )
+        # This is observer schema only.  The baseline checker remains the
+        # always-allow UnguardedObservationChecker and no CTDA session exists.
+        # Installation must precede the first state_observer.observe() call.
+        if task_manifest is not None:
+            wrapper.state_observer.contact_part_queries = (
+                task_manifest.contact_query,
+            )
         selected_init_state_applied = bool(
             getattr(env, "_proofalign_selected_init_state_applied", False)
         )
@@ -179,4 +202,3 @@ def policy_call_count(payload: dict[str, Any]) -> int:
         for step in payload.get("trace", [])
         if isinstance(step.get("policy_call_id"), str)
     )
-

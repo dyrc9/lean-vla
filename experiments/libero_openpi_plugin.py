@@ -31,6 +31,7 @@ class OpenPIConfig:
     resize_size: int = 224
     sample_steps: int = 10
     max_actions_per_call: int = 5
+    policy_seed: int = 0
     hf_home: str = "/data0/ldx/huggingface"
     hf_endpoint: str = "https://hf-mirror.com"
     observation_attack_type: str = "none"
@@ -82,7 +83,8 @@ class OpenPIPolicy:
             "openpi_config": self.config.openpi_config,
             "sample_steps": self.config.sample_steps,
             "max_actions_per_call": self.config.max_actions_per_call,
-            "rng_reset_mode": "checkpoint-initial-per-episode",
+            "policy_seed": self.config.policy_seed,
+            "rng_reset_mode": "frozen-policy-seed-per-episode",
             "action_clip": [-1.0, 1.0],
             "observation_attack_type": self.config.observation_attack_type,
             "observation_attack_strength": self.config.observation_attack_strength,
@@ -121,6 +123,13 @@ class OpenPIPolicy:
             sample_kwargs={"num_steps": self.config.sample_steps},
             norm_stats=norm_stats,
         )
+        # The paired utility protocol treats policy_seed as part of the
+        # experimental unit.  Set the actual OpenPI sampling key, rather than
+        # merely recording the seed in episode metadata.  Seed 0 preserves the
+        # historical checkpoint-default behavior.
+        import jax
+
+        self._policy._rng = jax.random.key(self.config.policy_seed)
         self._initial_rng = getattr(self._policy, "_rng", None)
         self._image_tools = image_tools
         if self.config.observation_attack_type != "none":

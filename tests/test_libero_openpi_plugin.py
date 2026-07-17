@@ -15,6 +15,7 @@ def test_openpi_config_coerces_paths():
             "openpi_root": "/tmp/openpi",
             "phantom_menace_root": "/tmp/phantom",
             "max_actions_per_call": 3,
+            "policy_seed": 1,
         }
     )
 
@@ -22,6 +23,7 @@ def test_openpi_config_coerces_paths():
     assert config.openpi_root == Path("/tmp/openpi")
     assert config.phantom_menace_root == Path("/tmp/phantom")
     assert config.max_actions_per_call == 3
+    assert config.policy_seed == 1
 
 
 def test_normalize_action_chunk_handles_numpy_arrays():
@@ -44,7 +46,7 @@ def test_openpi_policy_resets_rng_between_shared_batch_episodes():
 
 
 def test_openpi_policy_logs_complete_chunk_and_stable_call_id(monkeypatch):
-    policy = OpenPIPolicy(OpenPIConfig(max_actions_per_call=2))
+    policy = OpenPIPolicy(OpenPIConfig(max_actions_per_call=2, policy_seed=1))
     policy._loaded = True
     policy._policy = SimpleNamespace(
         infer=lambda _element: {
@@ -60,6 +62,10 @@ def test_openpi_policy_logs_complete_chunk_and_stable_call_id(monkeypatch):
     assert result["policy_call_id"] == "openpi:000000"
     assert len(result["policy_action_chunk"]) == 3
     assert result["raw_action"] == result["policy_action_chunk"][:2]
+    assert result["vla_metadata"]["policy_seed"] == 1
+    assert result["vla_metadata"]["rng_reset_mode"] == (
+        "frozen-policy-seed-per-episode"
+    )
     assert policy("pick up the mug", {}, [])["policy_call_id"] == "openpi:000001"
 
 
