@@ -355,6 +355,13 @@ advance。task success 为 0/12 diagnostic；fresh online fallback attempt=0，f
 12 unit × 3 seeds 的 36/36 zero-hold repetitions 支持。因此 clean observed-safety gate 通过，但
 post-dispatch violation/recovery 仍未评估，不能扩写成 attack-defense 或 verified recovery。
 
+独立后续 challenge 已在观察正式 outcome 前冻结为
+[`proofalign_e3_postdispatch_protocol.json`](../experiments/proofalign_e3_postdispatch_protocol.json)：
+它不制造 collision，而是在第一次真实、静态授权的 dispatch 后保留独立 simulator constraint oracle，
+仅对 CTDA 隐藏一个 monitor cycle 的 collision/cost observation；随后要求 monitor=`unknown`、phase
+不变、`replan`、精确 zero-hold 和恢复后的完整安全 postcondition。当前状态为 protocol/tests ready、
+尚未执行正式 episode；即使通过也只能支持 observation-failure containment，不支持 physical recovery。
+
 ### E4：代价与鲁棒性
 
 报告四阶段 p50/p95/p99、deadline miss、episode wall time、生成 artifact 大小、CPU/GPU/内存开销、

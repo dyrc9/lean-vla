@@ -18,14 +18,16 @@ archive 中的内容。
 7. [`e1_clean_pilot.md`](e1_clean_pilot.md)：E1-v1/v2/v3 无效执行、immutable artifact 与失败边界。
 8. [`e3_safety_evaluation.md`](e3_safety_evaluation.md)：独立 Full-CTDA clean safety 结果、fallback
    stratum、artifact hash 与 claim boundary。
-9. [`reproduction_plan.md`](reproduction_plan.md)：发布攻击、现有防御与 CTDA 的复现证据链。
-10. [`implementation_notes.md`](implementation_notes.md)：本地 CPU/Lean 开发与验证约定。
-11. [`remote_execution.md`](remote_execution.md)：迁移到远程 GPU 后的环境、路径和运行协议。
-12. [`safe_fiper_r0_runbook.md`](safe_fiper_r0_runbook.md)：SAFE/FIPER 已下载资产、固定源码、uv
+9. [`e3_postdispatch_intervention.md`](e3_postdispatch_intervention.md)：事前冻结的 post-dispatch
+   observation-failure / zero-hold fallback challenge、分类与 claim boundary。
+10. [`reproduction_plan.md`](reproduction_plan.md)：发布攻击、现有防御与 CTDA 的复现证据链。
+11. [`implementation_notes.md`](implementation_notes.md)：本地 CPU/Lean 开发与验证约定。
+12. [`remote_execution.md`](remote_execution.md)：迁移到远程 GPU 后的环境、路径和运行协议。
+13. [`safe_fiper_r0_runbook.md`](safe_fiper_r0_runbook.md)：SAFE/FIPER 已下载资产、固定源码、uv
    环境、主仓库运行命令与 terminal 验证清单。
-13. [`paper_story.md`](paper_story.md)：收缩后的论文叙事和可写贡献。
-14. [`related_work.md`](related_work.md)：研究定位；不作为实现状态或 CLI 来源。
-15. [`next_agent_prompt_20260715.md`](next_agent_prompt_20260715.md)：已执行的 Phantom R0b 事前
+14. [`paper_story.md`](paper_story.md)：收缩后的论文叙事和可写贡献。
+15. [`related_work.md`](related_work.md)：研究定位；不作为实现状态或 CLI 来源。
+16. [`next_agent_prompt_20260715.md`](next_agent_prompt_20260715.md)：已执行的 Phantom R0b 事前
     协议与审计记录；不再是可重跑的当前交接 prompt。
 
 ## 当前方法口径
