@@ -284,6 +284,20 @@ fresh clean run 没有 post-dispatch block，因而未触发 online fallback；f
 协议、terminal hash、只读 validator 和完整 claim boundary 见
 [`e3_safety_evaluation.md`](e3_safety_evaluation.md)。
 
+### 2026-07-17 E3 post-dispatch observation-failure challenge
+
+该实验与 E3 clean 分离，在提交 `308cb0d` 事前冻结，并完整复用 12 个 E0-supported unit。干预不修改
+simulator state 或制造 collision：第一次静态授权的真实 policy dispatch 后，独立 adapter 先保留 raw
+`_check_constraint(false)` oracle，再只对 CTDA 隐藏一个 monitor cycle 的 collision/cost source。
+
+fresh run 形成 12/12 valid records，12/12 均实际进入 monitor=`unknown`、phase=`approach`、
+decision=`replan`，并执行 exact zero hold；恢复 oracle 与 fallback immediate postcondition 均完整且安全，
+0 explicit failure。冻结主 labeler 仍把全部记录标为 unknown，因为它要求 typed receipt schema 不输出的
+顶层 `integrity_verified` boolean。因此正式 conclusion 是 `postdispatch_containment_not_established`，
+不是 12/12 contained。后验 typed-receipt reconstruction 虽对 12/12 attestation/claim/receipt digest 和
+`verify_integrity()` 重算通过，也明确为 diagnostic-only，不改变主分类、不授权重跑。协议、artifact hash
+和 claim boundary 见 [`e3_postdispatch_intervention.md`](e3_postdispatch_intervention.md)。
+
 ### 并行 external reproduction lane（不是 E0--E4 前置条件）
 
 - SABER：官方 standard LIBERO + π0.5 clean/record/replay；

@@ -41,7 +41,14 @@ It is not an end-to-end physical safety proof.
     collision/cost observations, zero hard-invariant failures, and 12 pre-dispatch
     blocks with zero phase advance. Task success was 0/12 and no fresh online fallback
     was triggered, so this is clean simulator safety evidence rather than utility,
-    recovery, attack-defense, hardware-safety, or real-time evidence.
+    recovery, attack-defense, hardware-safety, or real-time evidence. A separately
+    preregistered post-dispatch observation-failure challenge then completed 12/12
+    valid records: every trace monitor-failed closed, replanned, applied the exact
+    zero hold, and observed a complete safe postcondition. Its frozen primary labeler
+    nevertheless classified all 12 as unknown because it required a top-level receipt
+    integrity boolean absent from the typed receipt schema. Post-hoc typed receipt
+    reconstruction verified all retained digests but does not upgrade the primary
+    `0 contained / 0 failed / 12 unknown` result or authorize a rerun.
 - SAFE and FIPER official R0 attempts used the dedicated
   `external/worktrees/safe-fiper-r0` worktree. They were interrupted during the
   2026-07-15 closeout and are not reproduction results. Their already
@@ -84,6 +91,7 @@ Start at [docs/README.md](docs/README.md). The canonical documents are:
 - [E0 support audit and frozen self-evaluation scope](docs/e0_support_audit.md)
 - [E1 clean paired pilot execution handoff](docs/e1_clean_pilot.md)
 - [E3 safety-only evaluation](docs/e3_safety_evaluation.md)
+- [E3 post-dispatch intervention result](docs/e3_postdispatch_intervention.md)
 - [E0 v2 candidate machine protocol](experiments/proofalign_e0_protocol_v2_candidate.json)
 - [E0 v2 init/fallback audit record](experiments/proofalign_e0_v2_fallback_audit_summary.json)
 - [E0 v2 candidate gate decision](experiments/proofalign_e0_v2_gate_decision.json)
@@ -91,6 +99,7 @@ Start at [docs/README.md](docs/README.md). The canonical documents are:
 - [Frozen E1-v2 startup amendment](experiments/proofalign_e1_clean_pilot_protocol_v2.json)
 - [Frozen E3 safety protocol](experiments/proofalign_e3_safety_protocol.json)
 - [E3 terminal machine summary](experiments/proofalign_e3_safety_terminal_summary.json)
+- [E3 post-dispatch terminal machine summary](experiments/proofalign_e3_postdispatch_terminal_summary.json)
 - [Attack/defense reproduction plan](docs/reproduction_plan.md)
 - [Implementation notes](docs/implementation_notes.md)
 - [Remote/GPU execution runbook](docs/remote_execution.md)

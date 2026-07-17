@@ -58,6 +58,11 @@ hard invariant、contact observation 与 immediate postcondition gate。
 “E3 已验证 live violation 后 recovery”。后者需要另一个事前冻结、带独立 simulator oracle 的
 post-dispatch intervention protocol；synthetic/fake-env fixture 只能证明实现语义。
 
+该独立 protocol 随后已完成，正式主分类为 `0 contained / 0 failed / 12 unknown`：12 条均观察到预期的
+post-dispatch monitor unknown、零 phase advance、zero-hold 和完整安全 postcondition，但冻结 labeler
+要求 typed receipt schema 并不存在的顶层 `integrity_verified` 字段。因此不能把它写成 containment
+已建立；完整边界见 [`e3_postdispatch_intervention.md`](e3_postdispatch_intervention.md)。
+
 ## Artifact 与复核
 
 | artifact | SHA-256 |
