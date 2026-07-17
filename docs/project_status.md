@@ -6,15 +6,32 @@
 
 | 工作线 | 状态 | 当前结论 | 下一步 |
 |---|---|---|---|
-| CTDA 方法 | complete for scoped prototype | mission-rooted contract、raw-prefix binding、Lean staged evaluator 和 persistent monitor 已闭环 | 方法语义保持冻结 |
+| CTDA 方法 | v1 frozen; revision required | 协议/实现/Lean parity 在冻结语义内有效，但 clean operational utility 不合格，当前方法不具备可接受的 runtime viability | 保留 v1 历史；先过 v2 离线设计与 liveness gate，再考虑新 rollout |
 | E0 support | complete | 12 个 affordance/init0 non-real-time supported unit | 新实验不得越过支持范围，除非先做新 support audit |
-| E1 utility | scoped pilot complete | policy-seed 1 的新 pilot 为 12/12 valid pair；VLA-only 8/12、Full CTDA 0/12 task/safe success，retention 0 | 保留大 completion loss；先做离线 block/unknown 归因，不扩写总体结论 |
+| E1 utility | scoped pilot complete | policy-seed 1 的新 pilot 为 12/12 valid pair；VLA-only 8/12、Full CTDA 0/12 task/safe success，retention 0 | 负结果和归因已保存；不扩写总体结论或重跑旧 unit |
 | E3 safety | scoped evidence complete | clean 12/12 preserved；post-dispatch 行为 fail closed，但正式 primary 12 unknown | 不改写旧分类；新的独立 challenge 才能增加 containment 证据 |
 | E4 robustness | complete | 35/35 frozen fault case fail closed | 只保留 scoped component claim |
 | timing | negative/deferred | Lean 0.9--1.3 s/stage，不满足实时控制 | 不优化，不恢复 real-time claim |
 | external baselines | blocked/running | Phantom/SABER gates 已关闭；SAFE 未复现；FIPER fresh2 在 GPU 1 后台运行 | 等 FIPER terminal manifest；不干扰 GPU 1 |
 
 完整数字见 [`evaluation_results.md`](evaluation_results.md)。
+
+## 方法 validity 判定
+
+“实验有效”和“方法可用”必须分开：
+
+- 新 E1 paired experiment 是有效的，12/12 pair 配对与 artifact validation 均通过；
+- 2640/2640 Lean proof/parity 通过，说明实现执行了冻结的离散 spec，但不验证阈值、state abstraction
+  或 utility 本身；
+- 当前 CTDA v1 的 clean operational utility 判定为 **fail on the evaluated slice/seed**：baseline 的
+  8 个 safe completion 一个也未保留，Full CTDA 0 phase completion；
+- 该 clean pilot 两臂 observed unsafe 都是 0，因而没有显示可补偿 completion loss 的 clean safety
+  benefit；两种距离 provenance 又在 24/24 episode 缺失；
+- 总判定是 **v1 不具备 operational claim readiness，必须修改**，而不是把有效负结果改称
+  terminal-invalid，也不是声称 CTDA 在所有分布上都无效。
+
+机器可读判定见
+[`proofalign_method_validity_decision_20260717.json`](../experiments/proofalign_method_validity_decision_20260717.json)。
 
 ## 当前可以写
 
@@ -49,8 +66,12 @@
    false positive；
 5. 两臂均为 12/12 episode unknown，因为 human/obstacle distance provenance 缺失；这与冻结的
    task/safe-success 标签正交，不改写为 invalid；
-6. 下一步先对 retained trace 做离线机制归因；任何方法修订或新 rollout 必须新 protocol/new root，
-   不重跑本轮。
+6. retained trace 归因完成：9/12 因 40 秒 semantic contract wall-clock window 无法再覆盖一个
+   prefix，3/12 因 persistent bounded-stutter no-progress limit 在 3 个 prefix 后耗尽；12/12 都在
+   approach 阶段 pre-dispatch refuted；
+7. 下一步是 CTDA v2 设计 gate：重定义/实现 contract lifetime 与 proof latency 的关系、校准 binder
+   liveness、补全 observation provenance，并事前冻结可接受 retention 与独立 safety endpoint。任何
+   修订或新 rollout 必须新 method version/protocol/seed 或 unit/new root，不重跑本轮。
 
 机器结果见
 [`proofalign_e1_clean_utility_terminal_summary.json`](../experiments/proofalign_e1_clean_utility_terminal_summary.json)，

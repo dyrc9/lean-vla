@@ -11,19 +11,21 @@
 ProofAlign 在冻结的 LIBERO-Safety affordance task slice 和固定 CPU/Lean fault matrix 内，已经得到
 有限的 simulator safety preservation、fail-closed 组件语义和一个有效 clean utility trade-off pilot。
 该 pilot 的 Full CTDA task/safe-success retention 都是 0，说明当前方法在该 slice/seed 上有很大
-completion loss。当前不能证明总体 task utility、物理安全、verified recovery、通用 attack defense
-或 real-time enforcement。
+completion loss。有效实验不等于方法可用：当前 CTDA v1 的 clean operational utility 判定为 fail，
+必须版本化修改后才能继续 runtime claim 或扩大 rollout。当前不能证明总体 task utility、物理安全、
+verified recovery、通用 attack defense 或 real-time enforcement。
 
 简写为：
 
-> 安全机制在已测范围内按设计拒绝不充分授权；有效 clean 配对显示当前实现以 0 retention 换取这种
-> 保守行为，completion trade-off 很大。
+> 安全机制在已测范围内按设计 fail closed；有效 clean 配对显示当前实现的 retention 为 0，同时没有
+> 观察到相对 baseline 的 clean safety improvement。因此 v1 不是当前可接受的 operational method。
 
 ## 2. 结果总表
 
 | 阶段 | 正式状态 | 结果 | 可以支持的结论 |
 |---|---|---|---|
-| method validity | pass | 固定单任务 5/5 prefix，16 个唯一 Lean request proof/parity 通过 | persistent contract 和 staged evaluator 能闭环运行 |
+| mechanism/internal validity | scoped pass | 固定单任务 5/5 prefix；E1 2640/2640 Lean request proof/parity 通过 | persistent contract 和 staged evaluator 按冻结离散 spec 闭环运行；不等于 operational validity |
+| operational method viability | fail for current v1 on evaluated slice/seed | Full CTDA 0/12 task/safe success、0/8 retention、0 phase completion；clean unsafe 两臂均为 0 | v1 必须修改；不得声称 clean utility 可接受或已证明 safety/utility benefit |
 | E0 support | complete | `12 supported / 63 unsupported` | 非实时支持范围固定为 affordance task `0,1,2,3,5,6,7,8,10,11,12,13` 的 init 0 |
 | E1 clean utility | complete, scoped pilot | seed-1 新 pilot 12/12 valid pair；VLA-only 8/12、Full CTDA 0/12 task/safe success | 固定 simulator slice/seed 上 retention 0、method-attributable utility loss 8/12 |
 | E3 clean safety | complete | 12/12 valid preserved；117/117 dispatch 有完整负 collision/cost；0 hard-invariant failure | 固定 clean simulator slice 上 observed safety preserved |
@@ -85,12 +87,21 @@ policy chunk 均匹配，24/24 probe arm 的 `env.step_count=0`。唯一 fresh r
 - closed-loop block 没有独立 action-level counterfactual label，只报告 intervention，不报告 false
   positive rate。
 
+保留 trace 的离线归因进一步显示：12 个 Full CTDA episode 都在 `approach` 阶段由 pre-dispatch
+static check `refuted`。其中 9 个（task 0/1/2/5/6/7/10/11/12）在各 dispatch 12 个 prefix 后因
+`semantic contract cannot cover another prefix` 停止；40 秒 semantic contract wall-clock window
+与 slow Lean interlock 组合，使下一 prefix 无法被覆盖。另外 3 个同属 pour template 的 task
+3/8/13 在各 dispatch 3 个 prefix 后因
+`raw binder persistent bounded-stutter no-progress limit is exhausted` 停止。该归因解释 block 机制，
+但没有 action-level counterfactual，仍不得把这些 intervention 改称 false positive。
+
 该结果只支持固定 12-task simulator slice 和该 policy seed 上的描述性 trade-off。它不表明 CTDA
 “总体上”有 0 utility，也不提供物理安全、攻击防御、availability 或 real-time 结论。
 
 机器入口：
 
 - [`proofalign_e1_clean_utility_terminal_summary.json`](../experiments/proofalign_e1_clean_utility_terminal_summary.json)
+- [`proofalign_method_validity_decision_20260717.json`](../experiments/proofalign_method_validity_decision_20260717.json)
 - [`proofalign_e1_clean_utility_protocol.json`](../experiments/proofalign_e1_clean_utility_protocol.json)
 - `results/proofalign_e1_clean_utility_seed1_20260717/`
 - [`proofalign_e1_v3_terminal_invalid_summary.json`](../experiments/proofalign_e1_v3_terminal_invalid_summary.json)
@@ -160,9 +171,19 @@ v2 正式结果：
 
 这些外部结果不改变 E0--E4 自身结论。
 
-## 8. 下一证据缺口
+## 8. 方法判定与下一证据缺口
 
-优先解释新 clean pilot 的 completion loss：从 retained trace 区分 raw binder block、persistent
-no-progress、observation provenance unknown 与 phase progression 的贡献。该分析不能把 closed-loop
-block 后验命名为 false positive；独立 action-level counterfactual 需要新冻结的 fixed-trace protocol。
-在理解 0 retention 前不扩大 task/seed 范围，也不把该 simulator pilot 推广为总体或物理安全证明。
+当前分层判定是：paired experiment internal validity 为 valid，冻结离散 spec 内的实现/parity 为 pass，
+但 CTDA v1 clean operational utility 为 fail；clean safety benefit 未由该 pilot 证明，超出
+collision/cost 的 observation provenance 也不完整。因此保留 v1 作为历史 evaluated spec，不直接
+放宽 40 秒 deadline 或 no-progress threshold 来追结果。
+
+CTDA v2 必须先解决：contract lifetime 究竟使用 physical wall clock 还是 plant/control logical time；
+若保留 physical time，当前 slow Lean 不能作为 online authority；若 proof 时保持 plant，则 dispatch 前
+必须重新观察并绑定 state freshness。binder progress/stutter 阈值须在 disjoint outcome-blind trace 上
+校准并证明 nominal approach-to-contact liveness，同时保留错误目标、错误 gripper、累计预算和
+fail-closed rejection。还需提供 typed human/obstacle distance provenance，或收窄 safety claim。
+
+下一次 real rollout 前必须事前冻结最低可接受 retention 和独立 safety endpoint，并先通过 fake-env、
+no-dispatch、fixed-trace nominal/adversarial gate。任何 v2 实验使用新 protocol、新 seed 或 unit 和 fresh
+root；旧 E1 不 resume、不覆盖、不重新分类。

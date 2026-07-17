@@ -1,9 +1,31 @@
 # ProofAlign / CTDA 方法定义
 
-更新日期：2026-07-14
+更新日期：2026-07-17
 
 本文是当前方法与 claim 的唯一 normative 定义。实现优先级见
 [`roadmap.md`](roadmap.md)。
+
+## 0. 版本与 validity 状态
+
+第 1--6 节描述已被 E1 clean utility pilot 实际评估的 **CTDA v1 frozen specification**。该版本不因
+负结果被后验改写；contract lifetime、binder threshold、observation requirement 或 phase logic 的任何
+改变都属于 CTDA v2。
+
+当前 validity 必须分层解释：
+
+- paired experiment internal validity：valid（12/12 valid pair）；
+- 实现与冻结离散 spec 的 Lean/Python parity：pass（2640/2640）；
+- clean operational utility：fail on the evaluated slice/seed（VLA-only 8/12，Full CTDA 0/12，
+  retention 0，phase completion 0）；
+- clean safety benefit：该 pilot 未证明（两臂 complete collision/cost observation 下 unsafe 都为 0）；
+- safety observation completeness：human-hand/obstacle distance provenance 在 24/24 episode 缺失；
+- 总判定：v1 可作为 scoped fail-closed/protocol prototype 保留，但不具备 operational claim
+  readiness，修改后才能继续扩大 runtime evaluation。
+
+保留 trace 中，9/12 Full episode 因 40 秒 semantic contract wall-clock coverage 耗尽停止，3/12 因
+persistent bounded-stutter no-progress limit 耗尽停止；12/12 都在 approach 阶段 pre-dispatch
+`refuted`。该 block 没有独立 action-level counterfactual，不命名为 false positive。机器可读判定见
+[`proofalign_method_validity_decision_20260717.json`](../experiments/proofalign_method_validity_decision_20260717.json)。
 
 ## 1. 研究问题
 
@@ -278,11 +300,29 @@ simulator adapter 应用、receipt/attestation 完整且立即 postcondition 成
   mismatch；
 - pending 与 completion 被显式区分。
 
-必须经过远程配对实验后才允许：
+E1 远程配对实验已经给出一个有效负结果：当前 v1 的 safe-success retention 为 0，不能声称 utility
+或 verifier tax 可接受；clean 两臂 observed unsafe 都为 0，也不能声称 dual method 在该 pilot 中有
+增量 safety benefit。现有 E3/E4 只支持各自冻结范围内的 safety preservation 和 fail-closed component
+语义，不能补写为总体 operational benefit。
 
-- dual method 相对 single layer 或 collision checker 有防护收益；
+CTDA v2 在任何新 real rollout 前必须：
+
+- 明确 semantic contract lifetime 使用 physical wall clock 还是 plant/control logical time；不能在看到
+  E1 结果后只延长 40 秒 deadline。若 physical wall time 仍是安全语义，当前 slow Lean evaluator 不能
+  作为 online authority；若 proof 期间 plant 被保持，dispatch 前必须重新观察并绑定 state freshness；
+- 在 disjoint、outcome-blind trace 上校准 progress/bounded-stutter，先证明 nominal
+  approach-to-contact liveness，同时保留错误目标、错误 gripper、累计预算和 fail-closed rejection；
+- 提供 typed human/obstacle distance provenance，或明确收窄相应 safety claim；
+- 事前冻结最低可接受 retention 和独立 safety endpoint，并通过 fake-env/no-dispatch/fixed-trace
+  nominal/adversarial gates。
+
+只有新的 method version、protocol、seed 或 unit 和 fresh output root 才能产生 v2 证据；旧 E1 不得
+resume、覆盖或重新分类。仍未允许声称：
+
+- dual method 相对 single layer 或 collision checker 有总体防护收益；
 - 对 instruction/camera attack 有效；
-- false block、safe-success retention 和 verifier tax 可接受。
+- closed-loop block 是 false positive；
+- safe-success retention、verifier tax 或实时性能可接受。
 
 ## 8. 当前非目标与 future work
 

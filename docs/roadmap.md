@@ -18,6 +18,8 @@ trade-off，不追求绝对安全或通用证明。
 5. **外部 workload gates**：Phantom held-out 和 SABER record gate 按冻结停止条件关闭。
 6. **E1 clean utility**：新 policy-seed 1 pilot 12/12 valid pair；VLA-only 8/12、Full CTDA 0/12
    task/safe success，retention 0，completion loss 原样封存。
+7. **v1 validity decision**：实验/internal parity 有效，但 clean operational utility 不合格；当前 v1
+   判定为 revision required，不再扩大 rollout 或 runtime claim。
 
 ## 已完成阶段：clean utility trade-off
 
@@ -49,17 +51,33 @@ shared-observer fix + tests
 
 所有 12 pair 均 valid，未触发 0-pair `not_evaluated`；大 completion loss 没有触发重跑或 gate 放宽。
 
-## 当前阶段：retained-trace utility failure analysis
+## 已完成阶段：retained-trace utility failure analysis
 
-先做不产生新 rollout 的离线归因：
+离线归因没有产生新 rollout，也没有改写旧结果：
 
-1. 统计 12 个 Full CTDA episode 的 binder verdict、no-progress budget、unknown provenance 和最终
-   approach phase；
-2. 保持 closed-loop block 为 intervention label；没有独立 action counterfactual 时不计算 false
-   positive；
-3. 若需要修改 binder/monitor 或补 fixed-trace counterfactual，必须新方法版本、新 protocol、新 seed/
-   unit 授权和 fresh root；不得 resume 或覆盖本轮；
-4. 在解释 retention 0 前，不扩大 task slice 或对总体 utility 作外推。
+1. 12/12 Full episode 最终都是 approach-phase pre-dispatch `refuted`，0 phase completion；
+2. 9/12 在 12 个 dispatch 后耗尽 40 秒 semantic contract wall-clock coverage；
+3. 3/12 pour task 在 3 个 dispatch 后耗尽 persistent bounded-stutter no-progress limit；
+4. 24/24 episode 缺 human/obstacle distance provenance；collision/cost coverage 完整但不能替代这些
+   safety dimensions；
+5. closed-loop block 继续只标 intervention；没有独立 action counterfactual 时不计算 false positive。
+
+## 当前阶段：CTDA v2 revision gate
+
+不直接对 v1 threshold 做结果驱动的放宽。按以下顺序推进：
+
+1. 明确 contract lifetime 的时基：physical wall clock 或 plant/control logical time；前者意味着当前
+   slow Lean 不能在线授权，后者必须增加 proof 后 state freshness re-observe/rebind；
+2. 在与 E1 outcome 隔离的 trace/unit 上校准 binder progress 与 bounded stutter，并同时验证 nominal
+   approach-to-contact liveness 和 adversarial rejection；
+3. 为 human-hand/obstacle distance 增加 typed provenance，或从安全 claim 中明确移除；
+4. 事前冻结最低可接受 task/safe-success retention 和独立 safety endpoint；仅 fail closed 不再足以
+   通过 method gate；
+5. fake-env/no-dispatch/fixed-trace gates 全部通过后，才允许冻结 CTDA v2、新 paired protocol、新 seed
+   或 unit 和 fresh root。
+
+v1 冻结判定见
+[`proofalign_method_validity_decision_20260717.json`](../experiments/proofalign_method_validity_decision_20260717.json)。
 
 ## 后续阶段
 
