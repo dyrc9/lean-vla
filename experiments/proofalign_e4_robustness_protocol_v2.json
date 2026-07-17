@@ -1,0 +1,45 @@
+{
+  "schema": "proofalign.e4.robustness-protocol.v2",
+  "frozen_at": "2026-07-17T14:16:00+08:00",
+  "status": "frozen_ready_for_execution",
+  "method_base_commit": "e9bb41f4840166e3f1c34ed6e10c52c5b7ef59cd",
+  "amends_protocol": {
+    "path": "experiments/proofalign_e4_robustness_protocol.json",
+    "sha256": "ee1371ef58e0bdc0c1f3e0ecccd86e3261f040e43e663cc5b0e8184dd6e49ac6"
+  },
+  "terminal_invalid_predecessor": {
+    "path": "experiments/proofalign_e4_robustness_v1_failure.json",
+    "sha256": "9156f12df49fd87a03e9396eeda971de6fb9a92862794eccf44eb8f84b637deb"
+  },
+  "amendment_scope": "serialization_float_to_integer_nanoseconds_only",
+  "predecessor_disposition": "V1 remains terminal-invalid with its partial output preserved. V2 uses a new output root and does not overwrite, resume, or reclassify V1.",
+  "outcome_independence": "The 36 cases, expected verdicts, assertion nodeids, classifier, implementation under test, and timing policy are inherited byte-for-byte from V1. Only the diagnostic timeout field in the result record changes from floating-point seconds to integer nanoseconds.",
+  "timing_is_gate": false,
+  "gpu_or_simulator_execution": false,
+  "required_files": [
+    {
+      "path": "scripts/run_proofalign_e4_robustness.py",
+      "sha256": "7dfc616270863e5369e1748c758286c2c11055d531a144048589a550f1c87dbb"
+    },
+    {
+      "path": "src/proofalign/ctda_evaluator.py",
+      "sha256": "ef28457b890e0de0dff73ad0484ffc82a12414ba7522c60ab614e9c734b40f62"
+    },
+    {
+      "path": "src/proofalign/ctda_shadow.py",
+      "sha256": "66f7387c5637106add762257772beeb7d2b5baf6a64307c7defecec7af40f5fb"
+    },
+    {
+      "path": "src/proofalign/ctda_wire.py",
+      "sha256": "b4519d277a2ad87598350c0a121eddf5e35ebc4e6c3822a3b9b3d914ce18769f"
+    },
+    {
+      "path": "tests/test_libero_online_wrapper.py",
+      "sha256": "254a90ff9844529c24a4525ece80ceb772ba441109c0db97c371821b45ccc7ac"
+    },
+    {
+      "path": "tests/test_ctda_runtime.py",
+      "sha256": "b0d5c58c565ac2bb0afb4106b7fbb6e2ab0b541e10dcf73fc2164599c3a0cc71"
+    }
+  ]
+}

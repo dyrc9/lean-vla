@@ -1,0 +1,1 @@
+Lean evaluator execution failed: Command '['lake', 'env', '/home/ldx/lean-vla/results/proofalign_e4_robustness_20260717/cases/lean_timeout_prefix/slow-lean', '/tmp/tmpi6s6cmzq/Replay.lean']' timed out after 0.05 seconds

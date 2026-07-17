@@ -42,9 +42,9 @@ from proofalign.ctda_wire import (  # noqa: E402
 
 
 SCHEMA = "proofalign.e4.robustness-result.v1"
-PROTOCOL_SCHEMA = "proofalign.e4.robustness-protocol.v1"
-DEFAULT_PROTOCOL = REPO_ROOT / "experiments" / "proofalign_e4_robustness_protocol.json"
-DEFAULT_OUTPUT = REPO_ROOT / "results" / "proofalign_e4_robustness_20260717"
+PROTOCOL_SCHEMA = "proofalign.e4.robustness-protocol.v2"
+DEFAULT_PROTOCOL = REPO_ROOT / "experiments" / "proofalign_e4_robustness_protocol_v2.json"
+DEFAULT_OUTPUT = REPO_ROOT / "results" / "proofalign_e4_robustness_v2_20260717"
 
 
 class ProtocolError(RuntimeError):
@@ -92,6 +92,41 @@ def load_protocol(path: Path) -> tuple[dict[str, Any], dict[str, Any]]:
         raise ProtocolError("timing must remain diagnostic-only")
     if protocol.get("gpu_or_simulator_execution") is not False:
         raise ProtocolError("E4 robustness must remain CPU/Lean-only")
+
+    amendment = protocol.get("amends_protocol")
+    failure = protocol.get("terminal_invalid_predecessor")
+    for binding, label in (
+        (amendment, "amended E4 protocol"),
+        (failure, "terminal-invalid predecessor record"),
+    ):
+        if not isinstance(binding, dict) or set(binding) != {"path", "sha256"}:
+            raise ProtocolError(f"malformed {label} binding")
+        bound = (REPO_ROOT / str(binding["path"])).resolve()
+        if not bound.is_relative_to(REPO_ROOT) or not bound.is_file():
+            raise ProtocolError(f"missing {label}")
+        if file_digest(bound) != binding["sha256"]:
+            raise ProtocolError(f"{label} digest mismatch")
+    predecessor = _load_object(
+        (REPO_ROOT / str(failure["path"])).resolve(),
+        "terminal-invalid predecessor record",
+    )
+    if predecessor.get("status") != "terminal_invalid_runner_serialization":
+        raise ProtocolError("predecessor is not frozen terminal-invalid")
+    if protocol.get("amendment_scope") != "serialization_float_to_integer_nanoseconds_only":
+        raise ProtocolError("E4 v2 amendment exceeds the frozen serialization repair")
+    base_protocol = _load_object(
+        (REPO_ROOT / str(amendment["path"])).resolve(), "amended E4 protocol"
+    )
+    if base_protocol.get("schema") != "proofalign.e4.robustness-protocol.v1":
+        raise ProtocolError("E4 v2 does not amend the frozen v1 matrix")
+    for inherited in ("claim_boundary", "lean", "execution", "classification", "cases"):
+        if inherited in protocol:
+            raise ProtocolError(f"E4 v2 must inherit {inherited} unchanged")
+        protocol[inherited] = base_protocol[inherited]
+    protocol["execution"] = {
+        **protocol["execution"],
+        "default_output_root": "results/proofalign_e4_robustness_v2_20260717",
+    }
 
     cases = protocol.get("cases")
     if not isinstance(cases, list) or not cases:
@@ -269,7 +304,7 @@ def _evaluate_case(
         )
         detail = {
             "stage": stage.value,
-            "injected_timeout_seconds": case["timeout_seconds"],
+            "injected_timeout_ns": int(float(case["timeout_seconds"]) * 1_000_000_000),
             "observed_verdict": result.verdict.value,
             "proof_verified": result.artifact.proof_verified,
             "gate_safe_response": _safe_response(stage, result),

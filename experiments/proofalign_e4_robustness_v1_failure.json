@@ -1,0 +1,30 @@
+{
+  "schema": "proofalign.e4.robustness-terminal-failure.v1",
+  "status": "terminal_invalid_runner_serialization",
+  "protocol": {
+    "path": "experiments/proofalign_e4_robustness_protocol.json",
+    "sha256": "ee1371ef58e0bdc0c1f3e0ecccd86e3261f040e43e663cc5b0e8184dd6e49ac6"
+  },
+  "frozen_execution_commit": "e9bb41f4840166e3f1c34ed6e10c52c5b7ef59cd",
+  "output_root": "results/proofalign_e4_robustness_20260717",
+  "output_root_created_at": "2026-07-17T14:10:13.147134227+08:00",
+  "abort_observed_at": "2026-07-17T14:10:14.508148076+08:00",
+  "frozen_case_count": 36,
+  "recorded_case_count_before_abort": 2,
+  "aborted_while_recording_case": "lean_timeout_prefix",
+  "exception": "WireValidationError: wire floats are forbidden; use integer nanoseconds and typed atoms",
+  "root_cause": "The runner placed the frozen 0.05-second timeout value into a result record and then used the CTDA wire serializer, which intentionally rejects floats.",
+  "repair_scope": "Represent the diagnostic injected timeout as integer nanoseconds in result records. Do not change a case, expected verdict, classifier, implementation under test, or timing gate.",
+  "partial_artifacts": {
+    "preserved": true,
+    "file_count": 18,
+    "sha256sum_manifest_digest": "f10e70d5e799d87458da450431288bff12e229d659a944a59e630de9401832af",
+    "recorded_case_digests": {
+      "control_kernel_semantic": "2438299512d2ed02b33133a751550ff29718f41d7eb322b31d6a8ef9694cd4ba",
+      "lean_unavailable_semantic": "5f17441eea2d323896752339a0df7948fc824913921ce5e3df8e58e1cf19930c"
+    }
+  },
+  "formal_conclusion": "not_established_no_terminal_matrix",
+  "case_outcomes_interpreted": false,
+  "replacement_or_overwrite": false
+}
