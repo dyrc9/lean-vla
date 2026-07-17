@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import asdict, dataclass, field
 from math import isfinite
+import re
 from time import monotonic_ns, perf_counter
 from typing import Any, Iterable, Protocol
 
@@ -24,6 +25,8 @@ from proofalign.models import (
     Decision,
     ExecutionDecision,
     ExecutionStep,
+    GripperContactPartObservation,
+    GripperContactPartQuery,
     Object,
     Pose,
     Region,
@@ -115,6 +118,13 @@ class LiberoStateObserver:
 
     default_safety_distance: float = 999.0
     region_radius: float = 0.08
+    contact_part_queries: tuple[GripperContactPartQuery, ...] = ()
+
+    def __post_init__(self) -> None:
+        self.contact_part_queries = tuple(
+            GripperContactPartQuery(item.object_id, item.geom_ids)
+            for item in self.contact_part_queries
+        )
 
     def observe(self, env: Any, observation: Any | None = None, info: dict[str, Any] | None = None) -> WorldState:
         info = info or {}
@@ -132,6 +142,7 @@ class LiberoStateObserver:
         )
         collision, collision_observed = self._collision(info, raw_env)
         cost_observed = self._cost_observed(info, raw_env)
+        contact_parts, missing_contact_parts = self._contact_part_observations(raw_env, sim)
         notes = ["state observed from LIBERO-Safety robosuite/MuJoCo backend"]
         for name, observed in (
             ("min_distance_to_human_hand", human_observed),
@@ -141,6 +152,10 @@ class LiberoStateObserver:
         ):
             if not observed:
                 notes.append(f"{_CTDA_UNKNOWN_OBSERVATION_PREFIX}{name}")
+        notes.extend(
+            f"{_CTDA_UNKNOWN_OBSERVATION_PREFIX}{query.atom}"
+            for query in missing_contact_parts
+        )
         return WorldState(
             objects=objects,
             regions=regions,
@@ -153,6 +168,7 @@ class LiberoStateObserver:
             min_distance_to_obstacle=obstacle_distance,
             collision=collision,
             last_action_success=bool(info.get("last_action_success", True)),
+            gripper_contact_parts=contact_parts,
             notes=notes,
         )
 
@@ -259,6 +275,80 @@ class LiberoStateObserver:
             except Exception:
                 continue
         return False
+
+    def _contact_part_observations(
+        self,
+        raw_env: Any,
+        sim: Any,
+    ) -> tuple[list[GripperContactPartObservation], list[GripperContactPartQuery]]:
+        """Independently mirror LIBERO's two-finger contact-part predicate.
+
+        This reads MuJoCo contacts and the benchmark-owned object/gripper geom
+        registries.  It does not call ``check_success`` or the predicate helper.
+        """
+
+        if not self.contact_part_queries:
+            return [], []
+        source: dict[str, Any] = {}
+        source.update(getattr(raw_env, "objects_dict", {}) or {})
+        source.update(getattr(raw_env, "fixtures_dict", {}) or {})
+        model = getattr(sim, "model", None)
+        data = getattr(sim, "data", None)
+        geom_id2name = getattr(model, "geom_id2name", None)
+        robots = getattr(raw_env, "robots", None) or []
+        try:
+            important_geoms = robots[0].gripper._important_geoms
+            left_geoms = _flatten_geom_names(important_geoms["left_fingerpad"])
+            right_geoms = _flatten_geom_names(important_geoms["right_fingerpad"])
+            contacts = tuple(data.contact[index] for index in range(int(data.ncon)))
+        except (AttributeError, IndexError, KeyError, TypeError, ValueError):
+            return [], list(self.contact_part_queries)
+        if not callable(geom_id2name) or not left_geoms or not right_geoms:
+            return [], list(self.contact_part_queries)
+
+        observations: list[GripperContactPartObservation] = []
+        missing: list[GripperContactPartQuery] = []
+        for query in self.contact_part_queries:
+            object_model = source.get(query.object_id)
+            contact_geoms = getattr(object_model, "contact_geoms", None)
+            if not isinstance(contact_geoms, (list, tuple)):
+                missing.append(query)
+                continue
+            selected_geoms = {
+                str(name)
+                for name in contact_geoms
+                if isinstance(name, str)
+                and _trailing_geom_id(name) in set(query.geom_ids)
+            }
+            if not selected_geoms:
+                missing.append(query)
+                continue
+            left_matches: set[str] = set()
+            right_matches: set[str] = set()
+            try:
+                for contact in contacts:
+                    first = _libero_contact_name(geom_id2name(contact.geom1))
+                    second = _libero_contact_name(geom_id2name(contact.geom2))
+                    left_matches.update(
+                        _contacted_object_geoms(first, second, left_geoms, selected_geoms)
+                    )
+                    right_matches.update(
+                        _contacted_object_geoms(first, second, right_geoms, selected_geoms)
+                    )
+            except (AttributeError, IndexError, TypeError, ValueError):
+                missing.append(query)
+                continue
+            observations.append(
+                GripperContactPartObservation(
+                    object_id=query.object_id,
+                    geom_ids=query.geom_ids,
+                    left_contact=bool(left_matches),
+                    right_contact=bool(right_matches),
+                    left_object_geoms=tuple(left_matches),
+                    right_object_geoms=tuple(right_matches),
+                )
+            )
+        return observations, missing
 
     def _distance(
         self,
@@ -1379,7 +1469,14 @@ def _merge_effect_results(
         return ctda
     if legacy.passed:
         return ctda
-    if monitor_verdict is MonitorVerdict.SAFE_PENDING and _only_postcondition_failures(legacy):
+    if monitor_verdict in {
+        MonitorVerdict.SAFE_PENDING,
+        MonitorVerdict.COMPLETE,
+    } and _only_postcondition_failures(legacy):
+        # The legacy Pick/Place effect checker uses ``holding`` / ``released``
+        # postconditions.  In CTDA mode the mission-rooted monitor is authoritative
+        # for task-specific completion (for example exact contact-part goals), while
+        # collision, clearance, frame, and certificate failures remain authoritative.
         return ctda
     return legacy
 
@@ -1766,6 +1863,43 @@ def unwrap_libero_env(env: Any) -> Any:
             break
         current = nested
     return current
+
+
+def _flatten_geom_names(value: Any) -> set[str]:
+    if isinstance(value, str):
+        return {value}
+    if isinstance(value, (list, tuple, set)):
+        result: set[str] = set()
+        for item in value:
+            result.update(_flatten_geom_names(item))
+        return result
+    return set()
+
+
+def _trailing_geom_id(name: str) -> str | None:
+    match = re.search(r"(\d+)$", name)
+    return str(int(match.group(1))) if match else None
+
+
+def _libero_contact_name(name: Any) -> str | None:
+    if not isinstance(name, str):
+        return None
+    # Deliberately mirror the pinned benchmark's _check_contact normalization.
+    return name[9:] if "pad_collision" in name else name
+
+
+def _contacted_object_geoms(
+    first: str | None,
+    second: str | None,
+    finger_geoms: set[str],
+    object_geoms: set[str],
+) -> set[str]:
+    result: set[str] = set()
+    if first in finger_geoms and second in object_geoms and second is not None:
+        result.add(second)
+    if second in finger_geoms and first in object_geoms and first is not None:
+        result.add(first)
+    return result
 
 
 def _pose_from_xyz(value: Any) -> Pose:

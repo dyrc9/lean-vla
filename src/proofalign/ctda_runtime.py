@@ -27,6 +27,7 @@ from proofalign.ctda import (
     KinematicSampleDiagnostics,
     MonitorCheckResult,
     MonitorVerdict,
+    MissionSpec,
     PlantSample,
     PlantTrace,
     PrefixAuthorization,
@@ -806,14 +807,42 @@ class CTDARuntimeSession:
             spec_id=spec_id,
             episode_nonce=nonce,
         )
+        return cls.from_unsigned_mission(
+            unsigned_mission,
+            config=runtime_config,
+            evidence_issuer=evidence_issuer,
+            now_ns=now,
+            evaluator=evaluator,
+        )
+
+    @classmethod
+    def from_unsigned_mission(
+        cls,
+        unsigned_mission: MissionSpec,
+        *,
+        config: ConditionalKinematicConfig | None = None,
+        evidence_issuer: CTDAEvidenceIssuer | None = None,
+        now_ns: int | None = None,
+        evaluator: CTDAEvaluator | None = None,
+    ) -> "CTDARuntimeSession":
+        """Authenticate an explicitly compiled mission and create its supervisor."""
+
+        if evidence_issuer is None:
+            raise ValueError("CTDA fails closed without an explicit typed evidence issuer")
+        if unsigned_mission.authority.authenticated:
+            raise ValueError("from_unsigned_mission requires an unbound mission authority")
+        if not unsigned_mission.verify_integrity():
+            raise ValueError("from_unsigned_mission received a tampered mission")
+        runtime_config = config or ConditionalKinematicConfig()
+        now = time.monotonic_ns() if now_ns is None else now_ns
         authority_attestation = evidence_issuer.issue(
             "authority",
             unsigned_mission.mission_claim_digest,
             payload=unsigned_mission.unsigned_payload(),
             issued_at_ns=now,
             valid_until_ns=now + runtime_config.evidence_validity_ns,
-            producer_id=authority.authority_id,
-            producer_version=authority.version,
+            producer_id=unsigned_mission.authority.authority_id,
+            producer_version=unsigned_mission.authority.version,
         )
         mission = bind_mission_authority(unsigned_mission, authority_attestation)
         checker = CTDAChecker(
@@ -2846,6 +2875,15 @@ def _derive_events(
             events.append(
                 (SymbolicEvent(timestamp, f"holding:{contract.target}", True, contract.target), index)
             )
+        for observation in getattr(state, "gripper_contact_parts", ()):
+            atom = getattr(observation, "atom", None)
+            if (
+                atom in contract.guarantees
+                and bool(getattr(observation, "satisfied", False))
+            ):
+                events.append(
+                    (SymbolicEvent(timestamp, atom, True, observation.object_id), index)
+                )
         if contract.target is not None and contract.region is not None:
             objects = getattr(state, "objects", {})
             regions = getattr(state, "regions", {})

@@ -1,0 +1,47 @@
+{
+  "schema": "proofalign.e0.audit-summary.v2-candidate",
+  "date": "2026-07-16",
+  "protocol": "experiments/proofalign_e0_protocol_v2_candidate.json",
+  "benchmark_commit": "ef0f79b70fc50c5fb612a1bbc1cf8b6c033a702a",
+  "command": "MPLCONFIGDIR=/tmp/proofalign-mpl PATH=/home/ldx/lean-vla/.tools/lean-4.24.0-linux/bin:$PATH .venv/bin/python scripts/audit_proofalign_e0.py --protocol experiments/proofalign_e0_protocol_v2_candidate.json --benchmark-root external/LIBERO-Safety --live-init --output /tmp/proofalign_e0_v2_candidate_live.json",
+  "full_report": {
+    "path_at_run_time": "/tmp/proofalign_e0_v2_candidate_live.json",
+    "sha256": "4a946560e95e4194a9ae54f9ef92fd53bf910f59ff8c9832b16c25b8a326b52f",
+    "bytes": 97646,
+    "versioned": false
+  },
+  "guardrails": {
+    "outcome_blind": true,
+    "policy_loaded": false,
+    "env_step_called": false,
+    "check_success_used_as_monitor_witness": false
+  },
+  "counts": {
+    "task_total": 75,
+    "structurally_compiled": 15,
+    "structurally_rejected": 60,
+    "supported": 0,
+    "ambiguous": 0,
+    "unsupported": 75,
+    "e1_pilot_units": 0
+  },
+  "candidate_slice": {
+    "suite": "affordance",
+    "task_ids": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
+    "compiler_status": "compiled",
+    "selected_init_state_applied": 15,
+    "exact_contact_query_observed": 15,
+    "contact_query_unknown": 0,
+    "goal_atom_prefix": "gripper_contact_part:",
+    "phases": ["approach", "contact"]
+  },
+  "other_init_facts": {
+    "all_physical_selected_init_state_applied": 60,
+    "reasoning_registered_init_present": 0
+  },
+  "warnings": [
+    "Several initializations emitted MuJoCo ncon=5000 warnings; no affected unit is admitted to E1 without a separate validity gate.",
+    "Two LIBERO :constraint parser warnings were printed; the selected affordance contact-part goals do not depend on that section."
+  ],
+  "conclusion": "The exact affordance goal compiler and raw-contact observer repair passed the outcome-blind live-init structural audit. E0 v2 remains unfinished because task-bound fallback and init/safety-observation validity gates are not frozen."
+}

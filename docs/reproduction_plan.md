@@ -24,6 +24,18 @@ E0--E4 不依赖 R0--R2；它们先回答 supported slice 内的 correctness、u
 authorization/safety signal 时不能用于 physical-defense claim；E5 没有配对实验和独立 label 时
 不能写“优于”。
 
+2026-07-16 E0 v1 outcome-blind audit 冻结为 `0 supported / 3 ambiguous / 72 unsupported`；随后 E0 v2
+已发布非空 supported set，原 task-manifest blocker 已关闭。该内部进展仍与 R0--R2 外部复现相互
+独立，不能通过等待或完成 SAFE/FIPER 来替代。
+
+E0 v2 的 exact compiler/observer 与 15/15 init/collision/cost validity 已通过。strict fallback timing
+负结果继续保留，但按用户明确的非实时口径，fresh slow-interlock safety qualification 得到
+12 supported / 63 unsupported；task 4/9/14 因跨 seed 初态 digest mismatch 排除。E1-v1/v2 随后均
+产生 24/24 invalid records：前者是环境创建前 CUDA/EGL startup failure，后者是 policy 返回后的
+pre-dispatch nested-metadata audit failure。因此当前仍无有效 E1 paired result，必须先修复并发布 fresh
+v3，不能进入 E2。详见 [`e1_clean_pilot.md`](e1_clean_pilot.md)。timing 统一进入 E4；这些结果不改变
+external lane 的任何 workload/readiness gate。
+
 ## 2. 固定平台与两个 benchmark 层次
 
 ### 2.1 Upstream reproduction layer

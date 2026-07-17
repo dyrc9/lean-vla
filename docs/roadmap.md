@@ -270,7 +270,10 @@ clean strict preflight 与唯一一次固定 calibration。
 
 ## 6. P4：ProofAlign 自身评测（当前主线）
 
-状态：**立即执行；不被外部 baseline readiness 阻塞**。
+状态：**E0 v2 已冻结 non-real-time supported slice：12 supported / 0 ambiguous / 63 unsupported。
+E1-v1/v2 已执行但均为 invalid infrastructure/integration records；E1-v3 已修复 metadata/analysis
+gate 并通过真实 policy-output 无 dispatch preflight，当前仍为 0 valid paired episode。下一步是 fresh
+v3 execution。时间性能统一留到 E4，外部 baseline readiness 不阻塞主线**。
 
 ### E0：冻结支持范围与评测单位
 
@@ -279,6 +282,33 @@ clean strict preflight 与唯一一次固定 calibration。
 - 在看到新 rollout outcome 前冻结 task/init/seed、episode horizon、配对单位、label provenance 和
   analysis config；
 - 先做小规模 pilot，达到 gate 后才扩样本，不能按结果挑 task。
+
+2026-07-16 outcome-blind 结果已冻结：五 suite 共 75 task，live structural compile 为 13，最终
+`supported=0 / ambiguous=3 / unsupported=72`。四个 physical suite 的 60 条 init 0 均存在并应用；
+`reasoning_safety` 15 条均无 registered init。13 条 structural candidate 中，3 条 affordance Pick
+只有 `holding` 与 benchmark `CheckGripperContactPart` 的未证等价，另 10 条有明确 goal/destination/
+semantic-constraint mismatch。唯一 fallback manifest 只绑定不合格的 `affordance/task 2/init 0`。
+详见 [`e0_support_audit.md`](e0_support_audit.md) 与
+[`proofalign_e0_protocol.json`](../experiments/proofalign_e0_protocol.json)。
+
+因此 E0 v1 的 E1 pilot 选择集按规则为空，不能启动 rollout 或拿历史 task 2 顶替。当前主线改为：
+实现 exact task-bound manifest compiler、补齐 task-bound fallback/observation/init gate，随后发布
+E0 v2 并重复同一 outcome-blind audit。只有 v2 的 supported 集合非空才进入下面 E1。
+
+第一项现已完成 candidate gate：事前规则一次选择全部 15 个 affordance single-contact-part goal，
+15/15 在 live init 上由 BDDL-digest-bound manifest 精确编译，15/15 raw MuJoCo contact query 可观察，
+且 completion atom 不再使用 `holding`。其余 60 条 fail closed；全程无 policy load/`env.step`。
+随后 15/15 init/collision/cost validity 通过且无 contact-capacity warning，并生成 15 个 task-bound
+zero-hold artifact。事前冻结的 45-repetition fallback audit 中，安全后置条件 45/45 通过，但严格
+100 ms switch gate 为 0/45（101.978--292.854 ms，p50 134.529 ms），因此 15/15 unit 全部 rejected；
+task 4/9/14 在 seed 17/27 另有 6 个初态 digest mismatch。分类仍是 75/75 unsupported、E1 集合为空。
+该 strict 负结果不得被重写；它保留为 E4 timing evidence。
+
+用户随后明确把 timing 从 E0 support 分类移到 E4。新 method version 在执行前固定同样的全部 15 个
+candidate、三 seed 和非时间 safety/provenance gate，并运行 fresh workers，未复用旧 repetition。
+结果为 39/45 valid、6/45 因跨 seed 初态 digest 不一致 invalid；task 4/9/14 rejected，其余
+`0,1,2,3,5,6,7,8,10,11,12,13` 共 12 条 accepted。`proofalign.e0.protocol.v2` 已冻结，E1 pilot
+必须完整使用这 12 条，不得按后续 success 替换。
 
 ### E1：clean coverage 与 utility
 
@@ -291,6 +321,19 @@ clean strict preflight 与唯一一次固定 calibration。
 
 pilot target 沿用已冻结目标：clean retention ≥90%，false block 目标 ≤5%，>10% 停止扩样本，
 unknown/deadlock 目标 ≤5%。这些是扩样本 gate，不是当前已经取得的结果。
+
+2026-07-16 执行记录：v1 在 environment construction 前因 physical CUDA/EGL id 混淆产生 24/24
+invalid startup records；v2 只修正该绑定并通过 exact-GPU preflight，随后 24/24 records 又在 policy
+返回后、dispatch 前因 action audit 不支持 supplied metadata 中的嵌套 `dict` 而 invalid。两轮均为
+0 valid episode，不能报告 success、safe success、retention、false block、deadlock 或配对差异。v2
+validator 对 retained artifacts 的机械检查退出 0，但它仍对全无效 pair 计算统计，故 inference 必须
+忽略并在 v3 修复。执行 hash、原始目录和恢复规则见 [`e1_clean_pilot.md`](e1_clean_pilot.md)。
+
+2026-07-17 v3 amendment 已在新 outcome 前冻结：递归 metadata freeze 只在 E1-v3 进程安装，E0-v2
+wrapper 的冻结 hash 保持不变；summary 只让两侧都 valid 的 pair 进入统计，0 valid pair 明确为
+`not_evaluated_no_valid_pairs`。GPU 3 exact-CUDA/EGL、checkpoint、task0/init0 environment 与真实 OpenPI
+output audit 均通过，完整 10-action output 可冻结/序列化，且 probe 未调用 `env.step()`。正式 fresh
+result root 尚未创建。
 
 ### E2：双层贡献与 fixed-trace replay
 
@@ -313,9 +356,12 @@ Lean unavailable/timeout/tamper 时的 fail-closed 行为。当前 0.9--1.3 s/st
 
 ### 当前进入条件
 
-P1/P2 correctness、27-case parity 和五-prefix method-validity 已允许 E0/E1 pilot。下一项具体工作是
-先生成支持范围清单并冻结 ProofAlign self-evaluation protocol，然后运行 clean paired pilot；不是
-继续寻找一个能通过的攻击，也不是等待 SAFE/FIPER 完成。
+P1/P2 correctness、27-case parity 和 five-prefix method-validity 已允许执行 E0；exact manifest/contact
+observer、init-validity 与 fresh slow-interlock safety qualification 已完成，E0 v2 现有 12 个 supported
+unit。E1-v3 metadata、analysis 与 no-dispatch policy-output preflight gate 已通过；下一项具体工作是在
+新目录 fresh 执行相同 12 units；不是 resume/覆盖 v1/v2，不是加入被排除的 frypan task，
+不是继续寻找一个能通过的攻击，也不是等待 SAFE/FIPER 完成。只有得到有效 E1 paired artifacts 才进入
+E2。deadline/latency 只在 E4 汇总，仍禁止 real-time claim。
 
 ## 7. P5：外部 workload 与 baseline 复现（后台线）
 

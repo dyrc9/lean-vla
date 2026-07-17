@@ -1,0 +1,67 @@
+{
+  "schema": "proofalign.e1.clean-paired-pilot-amendment.v2",
+  "frozen_at": "2026-07-16T18:20:00+08:00",
+  "status": "frozen_ready_for_preflight",
+  "claim_boundary": "Fresh execution version of the same E0-v2-authorized 12-unit descriptive clean paired pilot. V1 is retained as a zero-environment startup failure. V2 changes only GPU import/render binding and preflight coverage; it does not change tasks, task/init/env/policy seeds, method order, labels, horizon, policy, fallback, CTDA semantics, or analysis. Timing remains excluded to E4.",
+  "base_protocol": {
+    "path": "experiments/proofalign_e1_clean_pilot_protocol.json",
+    "sha256": "17a9580897bb9a6aa26f4c497e4ac8b9990ab14cdcbf5cbf0bdd3dbd8e12fd38"
+  },
+  "additional_required_files": [
+    {
+      "path": "scripts/run_proofalign_e1_paired_v2.py",
+      "sha256": "69ff7162206f09f527ff14161fe3d1d5a67f844338e2e4882f124abbc758aab6"
+    },
+    {
+      "path": "experiments/proofalign_e1_v1_startup_failure_summary.json",
+      "sha256": "32b663298ff44a3016479a8931fd21169df7d1bc927f6feeeed54f0456c15807"
+    }
+  ],
+  "prior_failed_run": {
+    "status": "invalid_shared_startup_failure_not_an_e1_outcome",
+    "replacement_or_overwrite": false,
+    "same_protocol_resume": false,
+    "fresh_protocol_version_required": true,
+    "artifacts": [
+      {
+        "path": "experiments/proofalign_e1_v1_startup_failure_summary.json",
+        "sha256": "32b663298ff44a3016479a8931fd21169df7d1bc927f6feeeed54f0456c15807"
+      }
+    ],
+    "local_raw_artifact_hashes": {
+      "run_manifest": "f01a1b23edfb2589005c5279bb25381ade7265ab9b03b77b4c14b00c61d3bd3f",
+      "episodes_ledger": "24a491a718cdd83b1ebedbf1ebc613f96d8e656f1764bb6481d0023555e40fac",
+      "summary": "e589ddb3a74a04674f1386c2de1b07c50e273c11bc44cf1f4d9a2f3a0e300de4"
+    }
+  },
+  "authorized_change": {
+    "cause": "V1 confused JAX's logical visible id with vendored robosuite's physical MUJOCO_EGL_DEVICE_ID validation.",
+    "cuda_visible_devices": "selected physical GPU id, so JAX observes logical device 0",
+    "mujoco_egl_device_id": "same selected physical GPU id",
+    "render_gpu_device_id": "same selected physical GPU id",
+    "new_preflight_gate": "Import LIBERO-Safety and robosuite.utils.binding_utils under the exact selected CUDA/EGL environment; require 15 affordance tasks and exact physical CUDA/EGL binding.",
+    "unchanged": [
+      "E0 supported set and 12 pilot units",
+      "VLA-only then Full CTDA pair order",
+      "init 0, env seed 7, policy seed 0",
+      "OpenPI checkpoint/config/RNG reset",
+      "600 raw-step limit and one dispatched action per policy call",
+      "task manifest and fallback bindings",
+      "Lean slow-interlock CTDA semantics",
+      "independent label and analysis rules"
+    ]
+  },
+  "runtime_correction": {
+    "launcher": "scripts/run_proofalign_e1_paired_v2.py",
+    "gpu_id_semantics": {
+      "jax_visible_device_inside_process": 0,
+      "mujoco_egl_device": "selected_physical_id",
+      "render_gpu_device": "selected_physical_id"
+    },
+    "selected_gpu_runtime_import_probe_required": true
+  },
+  "artifact_policy": {
+    "default_output_root": "results/proofalign_e1_clean_pilot_v2_20260716",
+    "must_not_reuse_v1_root": true
+  }
+}

@@ -17,8 +17,23 @@ It is not an end-to-end physical safety proof.
 - The canonical progress dashboard is [docs/project_status.md](docs/project_status.md):
   CTDA's five-prefix method-validity gate passed, while real-time enforcement,
   Phantom R1, and SABER R1 have explicit negative or fail-closed outcomes. The
-  current mainline is ProofAlign-first evaluation: supported-slice clean utility,
-  duality, closed-loop intervention, and cost come before external comparisons.
+  current mainline is ProofAlign-first evaluation. Its outcome-blind E0 v1 audit
+  found 13/75 live structural compiler candidates but zero strict E1-supported
+  units. The first E0 v2 repair now binds all 15 affordance contact-part goals to
+  exact BDDL digests and independently observes two-finger MuJoCo contacts; its
+  outcome-blind 75-task candidate audit compiled all 15 selected tasks, and all 15
+  passed the init/collision/cost gate. The strict timing failure remains recorded for
+  E4. After timing was explicitly moved out of E0, a fresh slow-interlock safety audit
+  accepted 12 tasks and rejected frypan tasks 4/9/14 for cross-seed initial-state digest
+    mismatch. E0 v2 is now frozen at 12 supported / 63 unsupported. E1-v1 then failed
+    before environment construction because of a physical-EGL binding error; E1-v2
+    fixed that startup path but all 24 preregistered records failed before dispatch on
+    unsupported nested policy metadata. Both runs are retained as invalid evidence.
+    E1-v3 now isolates recursive policy-metadata freezing from the byte-frozen E0
+    wrapper, excludes invalid pairs from inference, and has passed an exact-GPU real
+    policy-output preflight with no simulator dispatch. Its fresh paired execution is
+    next; there is still no valid E1 result. Duality, closed-loop intervention, and
+    cost remain after a valid E1 and before external comparison.
 - SAFE and FIPER official R0 attempts used the dedicated
   `external/worktrees/safe-fiper-r0` worktree. They were interrupted during the
   2026-07-15 closeout and are not reproduction results. Their already
@@ -58,6 +73,13 @@ Start at [docs/README.md](docs/README.md). The canonical documents are:
 - [Current and target architecture](docs/system_architecture.md)
 - [Execution roadmap](docs/roadmap.md)
 - [Experiment protocol](docs/experiments.md)
+- [E0 support audit and frozen self-evaluation scope](docs/e0_support_audit.md)
+- [E1 clean paired pilot execution handoff](docs/e1_clean_pilot.md)
+- [E0 v2 candidate machine protocol](experiments/proofalign_e0_protocol_v2_candidate.json)
+- [E0 v2 init/fallback audit record](experiments/proofalign_e0_v2_fallback_audit_summary.json)
+- [E0 v2 candidate gate decision](experiments/proofalign_e0_v2_gate_decision.json)
+- [Frozen E0 v2 protocol](experiments/proofalign_e0_protocol_v2.json)
+- [Frozen E1-v2 startup amendment](experiments/proofalign_e1_clean_pilot_protocol_v2.json)
 - [Attack/defense reproduction plan](docs/reproduction_plan.md)
 - [Implementation notes](docs/implementation_notes.md)
 - [Remote/GPU execution runbook](docs/remote_execution.md)
@@ -85,6 +107,8 @@ uv run pytest \
   tests/test_ctda_shadow.py \
   tests/test_libero_online_wrapper.py \
   tests/test_libero_online_runner.py \
+  tests/test_libero_task_manifest.py \
+  tests/test_proofalign_e0_audit.py \
   tests/test_lean_bridge.py
 ```
 

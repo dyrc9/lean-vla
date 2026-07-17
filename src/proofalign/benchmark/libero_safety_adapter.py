@@ -441,6 +441,7 @@ def _normalize_world_state(data: dict[str, Any]) -> dict[str, Any]:
         "collision": bool(data.get("collision", False)),
         "last_action_success": bool(data.get("last_action_success", True)),
         "relations": list(data.get("relations", [])),
+        "gripper_contact_parts": list(data.get("gripper_contact_parts", [])),
         "notes": list(data.get("notes", [])),
     }
     return world
@@ -529,6 +530,7 @@ def _parse_bddl_world(text: str) -> dict[str, Any]:
         "min_distance_to_obstacle": 999.0,
         "collision": False,
         "last_action_success": True,
+        "gripper_contact_parts": [],
         "notes": ["world state abstracted from LIBERO BDDL; continuous dynamics remain outside Lean's trusted boundary"],
     }
 

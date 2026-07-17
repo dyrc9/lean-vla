@@ -179,6 +179,96 @@ task/init/env-seed/policy-seed/workload，而不是强行 replay 已不适用的
 E1 pilot 沿用 clean retention ≥90%、false block 目标 ≤5%（>10% 停止扩样本）、unknown/deadlock
 目标 ≤5% 的既有 gate。pilot 失败时修正支持范围或降级 claim，不用增加 episode 稀释负结果。
 
+### 2026-07-16 E0 v1 冻结结果
+
+source + live-init audit 覆盖全部 75 task，且没有 policy load、`env.step()` 或 task outcome：
+
+- live structural compile `13/75`，明确 compiler fail closed `62/75`；
+- 最终 `supported=0`、`ambiguous=3`、`unsupported=72`；
+- physical suites 的 60 条 init 0 存在并应用，`reasoning_safety` 无 registered init；
+- 唯一 fallback artifact 绑定 `affordance/task 2/init 0`，但该 task 的 Place mission 与 benchmark
+  grasp-only success goal 不一致，不能进入 E1；
+- task/init/seed/horizon/pairing、safe-success/false-block/unknown/deadlock label 与 10,000 次 paired
+  bootstrap config 已冻结在
+  [`proofalign_e0_protocol.json`](../experiments/proofalign_e0_protocol.json)。
+
+所以 E1 v1 pilot units 必须为空。下一步不是运行空分母或按历史 success 挑 task，而是实现 exact
+task-manifest compiler、task-bound fallback 与 init/observation gate，发布 E0 v2。完整原因与复核命令见
+[`e0_support_audit.md`](e0_support_audit.md)。E1 的既有 utility gate 保留，待 v2 supported 非空后生效。
+
+### 2026-07-16 E0 v2 candidate（compiler/observer gate）
+
+事前选择规则固定为 pinned `affordance` suite 中“完整 BDDL goal 恰为一个
+`CheckGripperContactPart` atom”的全部 task，因此候选一次覆盖 task 0--14。新 manifest 逐 task
+绑定 BDDL SHA-256、target 和 geom-id set；completion 必须由独立扫描 MuJoCo raw contacts 得到左右
+指垫同时命中，不能由 `holding` 或 `env.check_success()` 代替。
+
+75-task outcome-blind live-init candidate audit 得到 15/15 selected exact compile、15/15 contact query
+可观察、15/15 init 0 应用，其余 60 条 fail closed；没有 policy load 或 `env.step()`。但本轮分类仍为
+`supported=0 / ambiguous=0 / unsupported=75`，E1 pilot 仍为空，因为 task-bound fallback、init-validity
+warning 和 collision/cost completeness 尚未冻结。机器协议与精简结果见
+[`proofalign_e0_protocol_v2_candidate.json`](../experiments/proofalign_e0_protocol_v2_candidate.json) 和
+[`proofalign_e0_v2_candidate_audit_summary.json`](../experiments/proofalign_e0_v2_candidate_audit_summary.json)。
+candidate 不得改名为 E0 v2 freeze，也不得据此启动 clean rollout。
+
+### 2026-07-16 E0 v2 candidate（init 与 strict fallback gate）
+
+init-validity protocol 对全部 15 个 selected task 固定 init 0、seed 7，且不允许 policy、`env.step` 或
+`check_success`。一次执行得到 15/15 valid：registered init 已应用，初始 exact goal 为 false，
+collision/cost 可观察且为零，7 维零动作在 action bounds 内，无 contact-capacity warning。版本化 summary
+为 [`proofalign_e0_v2_validity_audit_summary.json`](../experiments/proofalign_e0_v2_validity_audit_summary.json)。
+原 protocol 的 `created_at=19:00+08:00` 是错误的未来时间；summary 保留文件/report 顺序与 SHA 绑定，
+但明确禁止把该字段当作 chronological evidence。
+
+fallback protocol 在执行前冻结 15 个 task-bound artifact、seed `7/17/27`、每 unit 三次 fresh worker、
+每次恰好一个 `[0,0,0,0,0,0,0]` simulator action 和 100 ms switch bound。结果：
+
+- 45/45 typed simulator applied、receipt integrity、collision/cost completeness、no collision/no cost、
+  hard invariant、contact observation 与 contact-capacity gate 通过；
+- 0/45 在 100 ms 内；min/p50/p95/max 分别为 101.978/134.529/289.383/292.854 ms；
+- frypan task 4/9/14 的 seed 17/27 共 6 条不等于 seed-7 validity state digest；
+- 45 invalid、0 unknown，15/15 unit rejected；无 policy、success oracle、replacement 或 rerun。
+
+完整机器摘要为
+[`proofalign_e0_v2_fallback_audit_summary.json`](../experiments/proofalign_e0_v2_fallback_audit_summary.json)。
+安全后置条件与 timing 必须分列报告，但冻结的 combined gate 仍判失败；不能事后用 slow-interlock
+口径把本轮升级为 supported。E1 继续为空。
+
+### 2026-07-16 E0 v2 freeze（slow-interlock safety qualification）
+
+在用户明确要求“先不管时间性能”后，旧 strict report 未被重标；它继续作为 E4 timing evidence。
+新的 method version 在 fresh execution 前固定全部 15 个 candidate、seed `7/17/27` 和所有非时间 gate，
+并明确 `timing_gate_enforced=false`。45 个新 worker 没有复用旧 repetition，结果为：
+
+- 39/45 repetition 通过全部 E0 safety/provenance gate，0 unknown；
+- 6/45 仅在 `initial_state_matches_validity_gate` 失败，均来自 task 4/9/14 的 seed 17/27；
+- accepted task 为 `0,1,2,3,5,6,7,8,10,11,12,13`，共 12 条；
+- timing diagnostic 仍为 0/45 在 100 ms 内，min/p50/p95/max 为
+  105.220/139.805/292.412/305.708 ms，只进入 E4；
+- 无 policy、`check_success`、task outcome、replacement 或 method-version 内重跑。
+
+最终 [`proofalign_e0_protocol_v2.json`](../experiments/proofalign_e0_protocol_v2.json) 冻结为
+`12 supported / 0 ambiguous / 63 unsupported`。E1 必须使用全部且仅这 12 个 task 的 init 0/env seed
+7/policy seed 0。机器摘要见
+[`proofalign_e0_v2_slow_interlock_audit_summary.json`](../experiments/proofalign_e0_v2_slow_interlock_audit_summary.json)。
+
+### 2026-07-17 E1 paired execution status
+
+E1-v1 使用 12 pair/24 episode 的 append-only protocol 启动，但 physical CUDA/EGL id 配置不一致使
+24/24 records 在 environment construction 前失效。v2 amendment 只修该启动绑定，不改变 task、seed、
+order、policy、horizon、CTDA、fallback、label 或 analysis；exact-GPU preflight 通过后，它写出全部
+24 records，但 24/24 又在 policy 返回后的 pre-dispatch metadata audit 因嵌套 `dict` 不受支持而
+invalid。两轮均为 0 valid episode，E1 的 task/safe success、retention、false block、unknown/deadlock
+和 phase completion 都没有被有效测量。
+
+旧 read-only validator 能验证 v2 manifest/ledger 数量与 hash，却错误地仍对全无效 pair 计算
+bootstrap/McNemar；这些旧 inference 不得进入结果表。v3 已把 recursive JSON-like metadata audit 隔离为
+E1-only adapter，恢复 E0-v2 wrapper 的冻结 hash，并规定只有两侧都 valid 的 pair 才进入统计。GPU 3
+真实 OpenPI policy-output preflight 已审计完整 10-action output、严格序列化 metadata，且未调用
+`env.step()`。v3 使用 fresh root；v1/v2 不 resume、不覆盖、不拼接。完整执行证据与接手步骤见
+[`e1_clean_pilot.md`](e1_clean_pilot.md)。正式 v3 paired execution 尚未开始，E2 继续被有效 E1 artifacts
+阻塞，但 E4 timing 仍按原计划单独处理。
+
 ### 并行 external reproduction lane（不是 E0--E4 前置条件）
 
 - SABER：官方 standard LIBERO + π0.5 clean/record/replay；

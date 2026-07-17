@@ -6,6 +6,7 @@ import importlib
 import json
 from math import isclose, isfinite
 import os
+import re
 import secrets
 import shutil
 import sys
@@ -24,6 +25,12 @@ from proofalign.benchmark.libero_online_wrapper import (
     action_to_dict,
     make_libero_offscreen_env,
     normalize_env_step,
+)
+from proofalign.benchmark.libero_task_manifest import (
+    LiberoTaskManifest,
+    LiberoTaskManifestError,
+    compile_libero_task_manifest,
+    load_libero_task_manifest,
 )
 from proofalign.benchmark.libero_safety_adapter import LiberoSafetyAdapter, LiberoSafetyUnavailable
 from proofalign.ctda import AuthorityEnvelope, TimeBase, digest_legacy_state, digest_payload
@@ -340,6 +347,7 @@ def run_online_episode_with_plugins(
         bddl_file=args.bddl_file,
     )
     runtime = _prepare_ctda_trust_root(runtime, args)
+    task_manifest = _load_ctda_task_manifest(runtime, args)
     attack_records = load_attack_record_index(getattr(args, "attack_record", None))
     attack_record = get_attack_record(
         attack_records,
@@ -380,6 +388,8 @@ def run_online_episode_with_plugins(
         wrapper_kwargs["max_chunk_steps"] = getattr(args, "max_chunk_steps", 8)
         wrapper_kwargs["stop_on_replan"] = not getattr(args, "continue_on_replan", False)
         wrapper = ProofAlignLiberoWrapper(env, runtime.instruction, spec, **wrapper_kwargs)
+        if task_manifest is not None:
+            wrapper.state_observer.contact_part_queries = (task_manifest.contact_query,)
         selected_init_state_applied = bool(
             getattr(env, "_proofalign_selected_init_state_applied", False)
         )
@@ -428,7 +438,7 @@ def run_online_episode_with_plugins(
             "benchmark_init_observed_state_digest": benchmark_init_observed_state_digest,
         }
         if getattr(args, "ctda", False):
-            _configure_ctda(wrapper, runtime, spec, args)
+            _configure_ctda(wrapper, runtime, spec, args, task_manifest=task_manifest)
             if (
                 benchmark_init_observed_state_digest is not None
                 and runtime.metadata["ctda"]["initial_state_digest"]
@@ -512,6 +522,51 @@ def _prepare_ctda_trust_root(
     )
 
 
+def _load_ctda_task_manifest(
+    runtime: LiberoTaskRuntime,
+    args: argparse.Namespace,
+) -> LiberoTaskManifest | None:
+    registry_value = getattr(args, "ctda_task_manifest_registry", None)
+    if not registry_value:
+        return None
+    if not getattr(args, "ctda", False):
+        raise LiberoOnlineIntegrationError(
+            "--ctda-task-manifest-registry is valid only with --ctda"
+        )
+    registry_path = Path(str(registry_value)).expanduser().resolve()
+    if not registry_path.is_file():
+        raise LiberoOnlineIntegrationError(
+            f"CTDA task manifest registry does not exist: {registry_path}"
+        )
+    expected = str(
+        getattr(args, "ctda_task_manifest_registry_sha256", "") or ""
+    ).lower()
+    if not re.fullmatch(r"[0-9a-f]{64}", expected):
+        raise LiberoOnlineIntegrationError(
+            "--ctda-task-manifest-registry requires an explicit registry SHA-256"
+        )
+    actual = sha256(registry_path.read_bytes()).hexdigest()
+    if not secrets.compare_digest(actual, expected):
+        raise LiberoOnlineIntegrationError(
+            "CTDA task manifest registry digest does not match its trust anchor"
+        )
+    try:
+        manifest = load_libero_task_manifest(
+            registry_path,
+            suite=str(args.benchmark),
+            task_id=int(runtime.task_id),
+            bddl_path=runtime.bddl_file,
+        )
+    except LiberoTaskManifestError as exc:
+        raise LiberoOnlineIntegrationError(str(exc)) from exc
+    if manifest.task_name != runtime.task_name:
+        raise LiberoOnlineIntegrationError(
+            "CTDA task manifest task name differs from the benchmark task map"
+        )
+    runtime.metadata["task_manifest_registry_sha256"] = actual
+    return manifest
+
+
 def _execution_config_digest(args: argparse.Namespace) -> str:
     """Bind result reuse to behavior-affecting CLI inputs and artifact contents."""
 
@@ -523,6 +578,7 @@ def _execution_config_digest(args: argparse.Namespace) -> str:
         "attack_record",
         "safety_spec",
         "ctda_fallback_witness",
+        "ctda_task_manifest_registry",
     )
     artifacts: dict[str, str | None] = {}
     for name in artifact_args:
@@ -557,6 +613,9 @@ def _execution_config_digest(args: argparse.Namespace) -> str:
             "render_gpu_device_id": getattr(args, "render_gpu_device_id", None),
             "ctda": getattr(args, "ctda", False),
             "ctda_evidence_mode": getattr(args, "ctda_evidence_mode", None),
+            "ctda_task_manifest_registry_sha256": getattr(
+                args, "ctda_task_manifest_registry_sha256", None
+            ),
             "ctda_episode_nonce": getattr(args, "ctda_episode_nonce", None),
             "ctda_fallback_witness_sha256": getattr(
                 args, "ctda_fallback_witness_sha256", None
@@ -607,6 +666,8 @@ def _configure_ctda(
     runtime: LiberoTaskRuntime,
     spec: SafetySpec,
     args: argparse.Namespace,
+    *,
+    task_manifest: LiberoTaskManifest | None = None,
 ) -> None:
     if wrapper.current_state is None:
         raise LiberoOnlineIntegrationError("CTDA requires an observed initial state")
@@ -755,17 +816,8 @@ def _configure_ctda(
         if slow_interlock
         else 2_000_000_000
     )
-    wrapper.ctda_session = CTDARuntimeSession.from_legacy(
-        parse_intent(trusted_instruction),
-        wrapper.current_state,
-        spec,
-        authority,
-        time_base,
-        spec_id=spec_id,
-        episode_nonce=(getattr(args, "ctda_episode_nonce", None) or secrets.token_hex(16)),
-        evidence_issuer=issuer,
-        now_ns=created_at,
-        config=ConditionalKinematicConfig(
+    episode_nonce = getattr(args, "ctda_episode_nonce", None) or secrets.token_hex(16)
+    runtime_config = ConditionalKinematicConfig(
             control_period_ns=control_period_ns,
             contract_budget_ns=contract_budget_ns,
             authorization_slack_ns=authorization_slack_ns,
@@ -792,9 +844,38 @@ def _configure_ctda(
                 stutter_motion_command_bound=stutter_motion_command_bound,
                 stutter_no_progress_limit=wrapper.no_progress_patience,
             ),
-        ),
-        evaluator=evaluator,
     )
+    if task_manifest is None:
+        wrapper.ctda_session = CTDARuntimeSession.from_legacy(
+            parse_intent(trusted_instruction),
+            wrapper.current_state,
+            spec,
+            authority,
+            time_base,
+            spec_id=spec_id,
+            episode_nonce=episode_nonce,
+            evidence_issuer=issuer,
+            now_ns=created_at,
+            config=runtime_config,
+            evaluator=evaluator,
+        )
+    else:
+        unsigned_mission = compile_libero_task_manifest(
+            task_manifest,
+            wrapper.current_state,
+            spec,
+            authority,
+            time_base,
+            spec_id=spec_id,
+            episode_nonce=episode_nonce,
+        )
+        wrapper.ctda_session = CTDARuntimeSession.from_unsigned_mission(
+            unsigned_mission,
+            evidence_issuer=issuer,
+            now_ns=created_at,
+            config=runtime_config,
+            evaluator=evaluator,
+        )
     # Keep the validated artifact fields available for audit output without
     # treating the JSON declaration itself as a proof.
     setattr(wrapper.ctda_session, "fallback_manifest", fallback_manifest)
@@ -810,6 +891,12 @@ def _configure_ctda(
         "assurance_scope": fallback_manifest["assurance_scope"],
         "evidence_mode": evidence_mode,
         "bddl_digest": bddl_digest,
+        "task_manifest_digest": (
+            task_manifest.manifest_digest if task_manifest is not None else None
+        ),
+        "task_manifest_registry_sha256": runtime.metadata.get(
+            "task_manifest_registry_sha256"
+        ),
         "fallback_manifest_digest": fallback_digest,
         "safe_set_digest": fallback_manifest["safe_set_digest"],
         "assurance_artifact_digest": fallback_manifest["assurance_artifact_digest"],
@@ -1240,6 +1327,17 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument(
         "--ctda-fallback-witness-sha256",
         help="Required with --ctda: pinned SHA-256 trust anchor for the fallback witness.",
+    )
+    parser.add_argument(
+        "--ctda-task-manifest-registry",
+        help=(
+            "Optional with --ctda: task-bound manifest registry replacing the legacy "
+            "instruction compiler for a source-pinned task slice."
+        ),
+    )
+    parser.add_argument(
+        "--ctda-task-manifest-registry-sha256",
+        help="Required with --ctda-task-manifest-registry: pinned registry SHA-256.",
     )
     parser.add_argument(
         "--ctda-evidence-mode",

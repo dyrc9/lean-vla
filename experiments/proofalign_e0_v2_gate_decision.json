@@ -1,0 +1,52 @@
+{
+  "schema": "proofalign.e0.v2-candidate-gate-decision.v1",
+  "recorded_at": "2026-07-16T15:55:22+08:00",
+  "status": "candidate_rejected_not_promoted_to_proofalign.e0.protocol.v2",
+  "inputs": {
+    "candidate_protocol": {
+      "path": "experiments/proofalign_e0_protocol_v2_candidate.json",
+      "sha256": "551ad6075c9415c9a24ecabc0cd295bc995f6743f0db6cb7a99f1aac24a3ea9f"
+    },
+    "compiler_observer_summary": {
+      "path": "experiments/proofalign_e0_v2_candidate_audit_summary.json",
+      "sha256": "b2b87c11d9b0aa069ad9dbafe8183a793bd11f472663bf86b66253752c483758"
+    },
+    "validity_summary": {
+      "path": "experiments/proofalign_e0_v2_validity_audit_summary.json",
+      "sha256": "d8aef11f8118409baf1bf940febe9d0f990095e16679063e51999b914b73ec66"
+    },
+    "fallback_summary": {
+      "path": "experiments/proofalign_e0_v2_fallback_audit_summary.json",
+      "sha256": "c097d381912834dd75ffcdecd2eed294717eb4d11c73b5622ccef1a074050d11"
+    }
+  },
+  "gate_results": {
+    "task_universe": 75,
+    "exact_compiler_observer_pass": 15,
+    "init_validity_pass": 15,
+    "fallback_safety_postcondition_pass_units": 15,
+    "strict_combined_fallback_pass_units": 0,
+    "strict_fallback_repetitions_within_100ms": 0,
+    "strict_fallback_repetitions_total": 45,
+    "cross_seed_initial_state_mismatch_repetitions": 6
+  },
+  "final_classification": {
+    "supported": 0,
+    "ambiguous": 0,
+    "unsupported": 75,
+    "e1_pilot_units": []
+  },
+  "decision_rules": {
+    "combined_gate_is_authoritative": true,
+    "safety_postcondition_does_not_override_timing_failure": true,
+    "failed_or_unknown_repetitions_may_be_rerun_or_replaced": false,
+    "post_hoc_slow_interlock_reclassification_allowed": false
+  },
+  "next_method_version_requirements": [
+    "Before observing new outcomes, specify whether fallback timing belongs to E0 support qualification or E4 performance only.",
+    "Define whether a fixed registered init artifact must produce identical observed state digests across environment seeds.",
+    "If retaining a strict switch bound, optimize the fallback observation path before preregistering a new audit.",
+    "Do not start E1 until a new frozen E0 protocol has a nonempty supported set."
+  ],
+  "claim_boundary": "The 45/45 one-step simulator zero-hold safety postconditions are retained as a stratum result. They do not constitute verified recovery, real-time fallback, task success, or physical attack-defense efficacy."
+}

@@ -1,0 +1,22 @@
+{
+  "schema": "proofalign.ctda.fallback.v2",
+  "spec_id": "affordance:2:0",
+  "bddl_digest": "2f955180ff9dd1908c9b7699e10ad8a2f1323c8d93c58a87534929e8aa7af148",
+  "safety_spec_digest": "1dbfaaf3bac4c42c27318fb87d625a981faf544db1b3177c1da68d5dae514d19",
+  "controller_id": "hold",
+  "model_id": "libero-delta-kinematic-v1",
+  "assurance_scope": "operator-pinned-simulator-test-only",
+  "safe_set_digest": "87cadaf5613534f1e2b184ebe64c9caed8094f54b17c954b87d6493f3bb56e11",
+  "assurance_artifact_digest": "9e6bc6c2bd9d7fc08ef8e9e76f2da9c31826dfe39ab0b96d14235cfbc1786d57",
+  "operator_trusted": true,
+  "worst_case_switch_latency_ns": 100000000,
+  "fallback_action": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ]
+}

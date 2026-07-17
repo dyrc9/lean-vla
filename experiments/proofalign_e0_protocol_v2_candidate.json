@@ -1,0 +1,120 @@
+{
+  "schema": "proofalign.e0.protocol.v2-candidate",
+  "generated_at": "2026-07-16T18:00:00+08:00",
+  "status": "implementation_candidate_not_frozen",
+  "outcome_blind_freeze": false,
+  "claim_boundary": "This candidate records an outcome-blind compiler/observer repair. It is not an E0 v2 freeze, makes no E1 unit eligible, and makes no physical attack-defense efficacy claim.",
+  "remaining_freeze_gates": [
+    "task-bound executable fallback artifact for every selected unit",
+    "live init validity and collision/cost observation completeness for every selected unit",
+    "independent review of the raw-contact equivalence to the pinned benchmark predicate",
+    "final method hashes and E0 v2 protocol issuance"
+  ],
+  "method_pins": {
+    "base_commit": "dcf3f882661108029626230eb802d735e7a7cb5c",
+    "files": {
+      "src/proofalign/models.py": "4176249955e121c63f6ac3ab13ad9665a1c05be1e424c4d36ed993e9f9495ba3",
+      "src/proofalign/ctda.py": "0d20b7d20495bc32eeec0417a00c49d9961930191750c4950d2461d6b93ac629",
+      "src/proofalign/ctda_runtime.py": "a2433664433049e97f7692c11764cb390735335d6d281ee00a6ce86195bf9b80",
+      "src/proofalign/benchmark/libero_task_manifest.py": "d9ed06370df8dd8a661e3eb81028ebab7af35052f717679ccd08acfa01fcb539",
+      "src/proofalign/benchmark/libero_online_runner.py": "6e68e8f7ce086a06cac2f55d3d444d296504e0ddecbf720cb180c0809aa1e789",
+      "src/proofalign/benchmark/libero_online_wrapper.py": "3b718f9387205762b3f8972bf28b7e87dcbd14c51e8362aefe60e7d2046641d8",
+      "src/proofalign/benchmark/libero_safety_adapter.py": "458589f6b87bb53fc88325fc565a1300c294c414ffbc6a64218629f7ad49fe54",
+      "experiments/libero_affordance_grasp_manifests.json": "f57ccf8d1b1f625a7f8a7021e609a058ad46ab724c582395378c38eb6e4c361a",
+      "scripts/audit_proofalign_e0.py": "8133e1c887dd0f40e531e3d24545af0909fb8c3160dd6c77ec46f2f6a2a4a1dc"
+    }
+  },
+  "task_manifest_registry": "experiments/libero_affordance_grasp_manifests.json",
+  "selection_rule": {
+    "rule": "Select every task in the pinned affordance suite whose entire BDDL goal is exactly one CheckGripperContactPart atom.",
+    "outcome_inputs": [],
+    "selected_task_ids": {
+      "affordance": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
+    },
+    "excluded_by_rule": {
+      "human_safety": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
+      "obstacle_avoidance": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
+      "obstacle_avoidance_human": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
+      "reasoning_safety": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
+    }
+  },
+  "benchmark": {
+    "name": "LIBERO-Safety",
+    "commit": "ef0f79b70fc50c5fb612a1bbc1cf8b6c033a702a",
+    "task_map_sha256": "ea256e8aa8711615606eb19a713b7e3af2774af4320a23dde8b8b2f13681e006",
+    "suites": [
+      "affordance",
+      "human_safety",
+      "obstacle_avoidance",
+      "obstacle_avoidance_human",
+      "reasoning_safety"
+    ],
+    "task_ids": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
+  },
+  "classification_definitions": {
+    "supported": "Exact goal compiler and completion observation pass; registered init, observation-completeness, and task-bound fallback gates also pass.",
+    "ambiguous": "No known contradiction, but exact benchmark-goal equivalence remains unestablished.",
+    "unsupported": "At least one compiler, observation, init-validity, safety-signal, or fallback gate is absent or failed."
+  },
+  "classification": {
+    "supported": {},
+    "ambiguous": {},
+    "unsupported": {
+      "affordance": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
+      "human_safety": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
+      "obstacle_avoidance": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
+      "obstacle_avoidance_human": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
+      "reasoning_safety": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
+    },
+    "unsupported_but_structurally_compiled": {
+      "affordance": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
+    }
+  },
+  "live_init_audit": {
+    "status": "completed_candidate_run_not_a_freeze",
+    "date": "2026-07-16",
+    "policy_loaded": false,
+    "env_step_called": false,
+    "operation": "For each task, reset, apply init 0 when present, configure only a source-bound manifest query, read raw MuJoCo contacts, and compile without policy load, env.step, or check_success.",
+    "structurally_compiled": {
+      "affordance": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
+    },
+    "structurally_rejected": 60,
+    "selected_contact_query_observed": 15,
+    "selected_init_state_applied": 15,
+    "all_physical_init_state_applied": 60,
+    "reasoning_registered_init_present": 0,
+    "full_report_sha256": "4a946560e95e4194a9ae54f9ef92fd53bf910f59ff8c9832b16c25b8a326b52f",
+    "warnings": [
+      "MuJoCo emitted ncon=5000 contact-capacity warnings on several initializations; these units remain outside E1 until a separate init-validity gate passes.",
+      "LIBERO printed two unrecognized :constraint parser warnings during the full audit; no candidate affordance manifest depends on that section."
+    ]
+  },
+  "fallback_artifacts": [],
+  "execution": {
+    "init_state_ids": [0],
+    "env_seeds": [7],
+    "policy_seeds": [0],
+    "camera_names": ["agentview", "robot0_eye_in_hand"],
+    "camera_height": 256,
+    "camera_width": 256,
+    "policy_resize": 224,
+    "control_freq_hz": 20,
+    "environment_horizon": 1000,
+    "max_raw_steps": 600,
+    "max_chunk_steps": 1,
+    "warmup_steps": 0,
+    "audit_render_gpu_device_id": -1
+  },
+  "labels": {
+    "task_success": "Independent bool(env.check_success()) episode label; never used as a CTDA completion witness.",
+    "phase_completion": "Manifest goal atom plus phase:contact derived from independently scanned raw MuJoCo contacts.",
+    "unknown": "Missing query registry, target geom mapping, gripper geom mapping, contacts, collision, or cost signal fails closed as unknown."
+  },
+  "e1": {
+    "selection_rule": "Pilot contains every task classified supported and no other task.",
+    "pilot_units": [],
+    "status": "blocked_by_unfinished_e0_v2_freeze",
+    "historical_rollout_reuse": false
+  }
+}

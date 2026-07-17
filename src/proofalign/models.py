@@ -105,6 +105,94 @@ class Relation:
     target: str
 
 
+@dataclass(frozen=True)
+class GripperContactPartQuery:
+    """Task-rooted request for an exact LIBERO contact-part observation."""
+
+    object_id: str
+    geom_ids: tuple[str, ...]
+
+    def __post_init__(self) -> None:
+        object_id = str(self.object_id).strip()
+        geom_ids = tuple(sorted({str(item).strip() for item in self.geom_ids}, key=_geom_id_key))
+        if not object_id or not geom_ids or any(not item.isdigit() for item in geom_ids):
+            raise ValueError("contact-part query requires an object id and numeric geom ids")
+        object.__setattr__(self, "object_id", object_id)
+        object.__setattr__(self, "geom_ids", geom_ids)
+
+    @property
+    def atom(self) -> str:
+        return gripper_contact_part_atom(self.object_id, self.geom_ids)
+
+
+@dataclass(frozen=True)
+class GripperContactPartObservation:
+    """MuJoCo contact witness for LIBERO's two-finger contact-part predicate."""
+
+    object_id: str
+    geom_ids: tuple[str, ...]
+    left_contact: bool
+    right_contact: bool
+    left_object_geoms: tuple[str, ...] = ()
+    right_object_geoms: tuple[str, ...] = ()
+    source: str = "libero-mujoco-contact-scan-v1"
+
+    def __post_init__(self) -> None:
+        query = GripperContactPartQuery(self.object_id, self.geom_ids)
+        object.__setattr__(self, "object_id", query.object_id)
+        object.__setattr__(self, "geom_ids", query.geom_ids)
+        object.__setattr__(self, "left_object_geoms", tuple(sorted({str(item) for item in self.left_object_geoms})))
+        object.__setattr__(self, "right_object_geoms", tuple(sorted({str(item) for item in self.right_object_geoms})))
+        object.__setattr__(self, "left_contact", bool(self.left_contact))
+        object.__setattr__(self, "right_contact", bool(self.right_contact))
+        if not str(self.source).strip():
+            raise ValueError("contact-part observation source must be non-empty")
+
+    @property
+    def atom(self) -> str:
+        return gripper_contact_part_atom(self.object_id, self.geom_ids)
+
+    @property
+    def satisfied(self) -> bool:
+        return self.left_contact and self.right_contact
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> "GripperContactPartObservation":
+        return cls(
+            object_id=str(data["object_id"]),
+            geom_ids=tuple(str(item) for item in data.get("geom_ids", ())),
+            left_contact=bool(data.get("left_contact", False)),
+            right_contact=bool(data.get("right_contact", False)),
+            left_object_geoms=tuple(str(item) for item in data.get("left_object_geoms", ())),
+            right_object_geoms=tuple(str(item) for item in data.get("right_object_geoms", ())),
+            source=str(data.get("source", "libero-mujoco-contact-scan-v1")),
+        )
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "object_id": self.object_id,
+            "geom_ids": list(self.geom_ids),
+            "left_contact": self.left_contact,
+            "right_contact": self.right_contact,
+            "left_object_geoms": list(self.left_object_geoms),
+            "right_object_geoms": list(self.right_object_geoms),
+            "source": self.source,
+            "atom": self.atom,
+            "satisfied": self.satisfied,
+        }
+
+
+def gripper_contact_part_atom(object_id: str, geom_ids: tuple[str, ...] | list[str]) -> str:
+    query = tuple(sorted({str(item).strip() for item in geom_ids}, key=_geom_id_key))
+    if not str(object_id).strip() or not query or any(not item.isdigit() for item in query):
+        raise ValueError("contact-part atom requires an object id and numeric geom ids")
+    return f"gripper_contact_part:{str(object_id).strip()}:{','.join(query)}"
+
+
+def _geom_id_key(value: str) -> tuple[int, str]:
+    return (int(value), value) if value.isdigit() else (2**63 - 1, value)
+
+
 @dataclass
 class WorldState:
     objects: dict[str, Object] = field(default_factory=dict)
@@ -116,6 +204,7 @@ class WorldState:
     collision: bool = False
     last_action_success: bool = True
     relations: list[Relation] = field(default_factory=list)
+    gripper_contact_parts: list[GripperContactPartObservation] = field(default_factory=list)
     notes: list[str] = field(default_factory=list)
 
     @classmethod
@@ -130,6 +219,10 @@ class WorldState:
             collision=bool(data.get("collision", False)),
             last_action_success=bool(data.get("last_action_success", True)),
             relations=[Relation(**r) for r in data.get("relations", [])],
+            gripper_contact_parts=[
+                GripperContactPartObservation.from_dict(item)
+                for item in data.get("gripper_contact_parts", [])
+            ],
             notes=list(data.get("notes", [])),
         )
 
@@ -167,6 +260,7 @@ class WorldState:
             "collision": self.collision,
             "last_action_success": self.last_action_success,
             "relations": [r.__dict__ for r in self.relations],
+            "gripper_contact_parts": [item.to_dict() for item in self.gripper_contact_parts],
             "notes": list(self.notes),
         }
 

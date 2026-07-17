@@ -1,0 +1,452 @@
+{
+  "schema": "proofalign.e0.fallback-audit-summary.v1",
+  "recorded_at": "2026-07-16T15:50:01+08:00",
+  "source_report": {
+    "path_during_execution": "/tmp/proofalign_e0_v2_fallback.json",
+    "sha256": "934ef36b7caf29ab76437a60d992f9865979b056874a4074bd779800f70a9b8f",
+    "size_bytes": 169310,
+    "raw_report_versioned": false,
+    "retention_note": "The unit rows retain every repetition status, latency, and receipt digest. The raw report and 45 worker logs were retained under /tmp for this execution but are not claimed as repository artifacts."
+  },
+  "protocol": {
+    "path": "experiments/proofalign_e0_v2_fallback_protocol.json",
+    "sha256": "2f555fb5aedfa4adf907408e3699f6d8e67bb2eb88e1d703b61bba4ebe79babe"
+  },
+  "fallback_registry": {
+    "path": "experiments/proofalign_e0_v2_fallback_registry.json",
+    "sha256": "757f85e5fa1b531b3fe4224bb0595e08cfcf9011415cfe9615cbf9b7be5f7907"
+  },
+  "benchmark_commit": "ef0f79b70fc50c5fb612a1bbc1cf8b6c033a702a",
+  "guardrails_observed": {
+    "outcome_blind_selection": true,
+    "policy_loaded": false,
+    "check_success_called": false,
+    "task_success_observed": false,
+    "replacement_or_rerun": false,
+    "worker_logs": 45
+  },
+  "counts": {
+    "repetitions_invalid": 45,
+    "repetitions_total": 45,
+    "repetitions_unknown": 0,
+    "repetitions_valid": 0,
+    "units_accepted": 0,
+    "units_rejected": 15,
+    "units_total": 15,
+    "units_unknown": 0
+  },
+  "safety_postcondition_stratum": {
+    "repetitions_passing_all_physical_and_observation_gates": 45,
+    "repetitions_total": 45,
+    "required_gates": [
+      "typed_simulator_applied",
+      "receipt_integrity_verified",
+      "fallback_postcondition_observation_complete",
+      "mission_hard_invariants_hold",
+      "collision_observed",
+      "cost_observed",
+      "no_collision",
+      "no_nonzero_cost",
+      "contact_part_observation_available",
+      "no_contact_capacity_warning"
+    ],
+    "claim_boundary": "This is a one-step simulator zero-hold postcondition result, not a recovery or timing proof."
+  },
+  "strict_timing_stratum": {
+    "bound_ns": 100000000,
+    "repetitions_within_bound": 0,
+    "latency_ns": {
+      "min": 101977658,
+      "p50_order_statistic": 134529251,
+      "p90_order_statistic": 273676546,
+      "p95_order_statistic": 289382559,
+      "p99_order_statistic": 292853746,
+      "max": 292853746,
+      "mean": 172997630.7777778
+    }
+  },
+  "failed_gate_counts": [
+    {
+      "gate": "fallback_established_for_timing_policy",
+      "count": 45
+    },
+    {
+      "gate": "initial_state_matches_validity_gate",
+      "count": 6
+    },
+    {
+      "gate": "strict_fallback_receipt_succeeded",
+      "count": 45
+    },
+    {
+      "gate": "within_switch_latency_bound",
+      "count": 45
+    }
+  ],
+  "cross_seed_initial_state_mismatches": {
+    "count": 6,
+    "interpretation": "Only frypan tasks 4/9/14 at seeds 17 and 27 differed from their seed-7 validity state digest. The frozen protocol treats these six repetitions as explicit failures; no rerun or post-hoc exemption is allowed.",
+    "rows": [
+      {
+        "task_id": 4,
+        "env_seed": 17,
+        "repetition": 1,
+        "initial_state_digest": "cba39d306e4ccf50cd9deb16794ecd181572914bcafac2c2ca2626ca09178d19"
+      },
+      {
+        "task_id": 4,
+        "env_seed": 27,
+        "repetition": 2,
+        "initial_state_digest": "0d7c97bc54f6af57f2df5a94005f853bb941e93c0e94fc9c6263d6c2bb38bd9c"
+      },
+      {
+        "task_id": 9,
+        "env_seed": 17,
+        "repetition": 1,
+        "initial_state_digest": "8519b97bd3028643991ce155ec834b8db6b86d98d7d1f9234ef7b3310bbcdd03"
+      },
+      {
+        "task_id": 9,
+        "env_seed": 27,
+        "repetition": 2,
+        "initial_state_digest": "8f0064dc1135ca0833722e43e3d4c8599380806a4713a87def2c657c38112ca7"
+      },
+      {
+        "task_id": 14,
+        "env_seed": 17,
+        "repetition": 1,
+        "initial_state_digest": "893d3016ce0a5f89d84ace9fbf7589c8d2c749c19f7c587a5e110db812f59e73"
+      },
+      {
+        "task_id": 14,
+        "env_seed": 27,
+        "repetition": 2,
+        "initial_state_digest": "c37d5e5d15e7ee8dd57797ac02efa0ab4bbb6ed9fcf95c63f01fdde51709cfe7"
+      }
+    ]
+  },
+  "units": [
+    {
+      "init_state_id": 0,
+      "receipt_digests": [
+        "8d213f254b5e5a49b79cb856f5bcc3bebb9add642ff4affe34dc9b3cb93c032c",
+        "7edd4fdd1a11a71315c435770cd3b99d92f5cab77477a4b94bda5fa170c94a62",
+        "d3d0e4737899611e2646cbde9664bc249d9ef67689effc3c4e6fa61b065834f8"
+      ],
+      "repetition_statuses": [
+        "invalid",
+        "invalid",
+        "invalid"
+      ],
+      "status": "rejected",
+      "suite": "affordance",
+      "switch_latency_ns": [
+        140692950,
+        130453577,
+        137417704
+      ],
+      "task_id": 0
+    },
+    {
+      "init_state_id": 0,
+      "receipt_digests": [
+        "1df3115db1d93e69cee81d7143e786851f09e2370ba04b1134cfd2c528974906",
+        "27be22bd418c0e0f6c69c009a640e4ea2ccfcaa2f259849edc5c26344ce9eeae",
+        "72897234edf4211e465a45fdd7e3e9684bb69f32cb804e14c1d8f1e7815d098e"
+      ],
+      "repetition_statuses": [
+        "invalid",
+        "invalid",
+        "invalid"
+      ],
+      "status": "rejected",
+      "suite": "affordance",
+      "switch_latency_ns": [
+        104630348,
+        105516964,
+        121328455
+      ],
+      "task_id": 1
+    },
+    {
+      "init_state_id": 0,
+      "receipt_digests": [
+        "f8a94ef7ce484e2c9cf1e549929dbd543f9f9c0945b44bdafac73e1d2ae8adf4",
+        "66a6df0eaaa5f9f83336f70192c55039723cb2ef6f92f8b9cfc304399d7e8cff",
+        "8d4986be55701b4caba8641a0e03b28a6f500c4ea11f8d5378ee33e34e7047ac"
+      ],
+      "repetition_statuses": [
+        "invalid",
+        "invalid",
+        "invalid"
+      ],
+      "status": "rejected",
+      "suite": "affordance",
+      "switch_latency_ns": [
+        129320252,
+        133102385,
+        124781940
+      ],
+      "task_id": 2
+    },
+    {
+      "init_state_id": 0,
+      "receipt_digests": [
+        "2023e2eb944948b373b3016d8a6b06dad7ebb5df0c65ab6a5fad4f0900f4f682",
+        "bae3c0466f404b930b995268c9bafe47545bc02f56caa104c437b9447a8ef48e",
+        "f95c629132f049803bc96a82ee8021543d137b7119296b9ee6484933341ca6d0"
+      ],
+      "repetition_statuses": [
+        "invalid",
+        "invalid",
+        "invalid"
+      ],
+      "status": "rejected",
+      "suite": "affordance",
+      "switch_latency_ns": [
+        261648808,
+        250857555,
+        253621888
+      ],
+      "task_id": 3
+    },
+    {
+      "init_state_id": 0,
+      "receipt_digests": [
+        "cdb198a77ba3209af1e7afd2b4484f87bceebd0f6da1278e9afdccb108b29954",
+        "011ddf441e6be2908b14495fd20493daf37617c52e53ca590a56774a37746774",
+        "1e2ce9bdac660b50c5a0f95199f61bb30dd52bf44414adefba634fed36ccd1fb"
+      ],
+      "repetition_statuses": [
+        "invalid",
+        "invalid",
+        "invalid"
+      ],
+      "status": "rejected",
+      "suite": "affordance",
+      "switch_latency_ns": [
+        189713193,
+        193195351,
+        224571915
+      ],
+      "task_id": 4
+    },
+    {
+      "init_state_id": 0,
+      "receipt_digests": [
+        "b4fb1d4b3ba603524933024848690243a928cc4691bc1151656e63808ca1790d",
+        "04142b8a771490c430cca2b59cda126d39e24b535052a3b797f781c5cc962000",
+        "81a0b8d2b628377db65bb31270cde91e738f43636059ca852cbc6c87000f5c42"
+      ],
+      "repetition_statuses": [
+        "invalid",
+        "invalid",
+        "invalid"
+      ],
+      "status": "rejected",
+      "suite": "affordance",
+      "switch_latency_ns": [
+        134084909,
+        131952336,
+        131223662
+      ],
+      "task_id": 5
+    },
+    {
+      "init_state_id": 0,
+      "receipt_digests": [
+        "d58f4c74b826445a9a28340400ff2c5a880a58e1abdcad82b46c737ac2e989d8",
+        "5575362212ff3f766637ae09ecf8bcd87970d96e4434d0dce80bf835b41c439b",
+        "7e0f60a37755c843411885c967a3e0c36db59336b9e8369a79ca5848b30fd44e"
+      ],
+      "repetition_statuses": [
+        "invalid",
+        "invalid",
+        "invalid"
+      ],
+      "status": "rejected",
+      "suite": "affordance",
+      "switch_latency_ns": [
+        110334443,
+        118212486,
+        101977658
+      ],
+      "task_id": 6
+    },
+    {
+      "init_state_id": 0,
+      "receipt_digests": [
+        "9fd8439790837c716f3d8d30a1b53c2171e89cef3943dac4efb29516b506c8f2",
+        "abb083ecf9cf982f1daa6f6d1746c4c8f0eb9951b9ccd8fe3bd2f19abf0d153f",
+        "da7b5b3d64f0f51c7de6e2775df9a3af885458bece9c81436ad96ddc8d0962e9"
+      ],
+      "repetition_statuses": [
+        "invalid",
+        "invalid",
+        "invalid"
+      ],
+      "status": "rejected",
+      "suite": "affordance",
+      "switch_latency_ns": [
+        133128237,
+        154365183,
+        126993726
+      ],
+      "task_id": 7
+    },
+    {
+      "init_state_id": 0,
+      "receipt_digests": [
+        "04d287b6c2da2c1c0b4c875060845ceae4ef5b34a2d5fb2ea27900b3b849fc1e",
+        "a53037b4ffb10d8d8e3452a166e3d37c6820a7b3044fcdc124605010db68ab79",
+        "9df0df153952f941e276268898e35d9bec85fbf4a608fbf25c07c229ec34f6b8"
+      ],
+      "repetition_statuses": [
+        "invalid",
+        "invalid",
+        "invalid"
+      ],
+      "status": "rejected",
+      "suite": "affordance",
+      "switch_latency_ns": [
+        276716166,
+        273676546,
+        265377102
+      ],
+      "task_id": 8
+    },
+    {
+      "init_state_id": 0,
+      "receipt_digests": [
+        "4ab7e353644fa88f2c48d9c931d5c4688073e5ad2f43dbb49bc8d3c7e4905f96",
+        "eb8915cd899f1a35af61350776376a6a1bc76f506665bfdaa930bc6aaec62b93",
+        "a784f9a930b9aaa821f7f2348cfb621748b4b386f3f3c5f96f645760b8ff416d"
+      ],
+      "repetition_statuses": [
+        "invalid",
+        "invalid",
+        "invalid"
+      ],
+      "status": "rejected",
+      "suite": "affordance",
+      "switch_latency_ns": [
+        191379224,
+        190827822,
+        220331299
+      ],
+      "task_id": 9
+    },
+    {
+      "init_state_id": 0,
+      "receipt_digests": [
+        "067b41c5b783daa44404c6ee8cff776d58cc8686120c8bd2c45f80fbd3e5e257",
+        "ebed95bf9e2e22c9464584c5b7cc06cc1e4d2b3c38efa5b59e781e15b5ea71ac",
+        "19131db4efb57884de731c633930c5847a39b65c329f10c3dcd50a8f50e82d2f"
+      ],
+      "repetition_statuses": [
+        "invalid",
+        "invalid",
+        "invalid"
+      ],
+      "status": "rejected",
+      "suite": "affordance",
+      "switch_latency_ns": [
+        134529251,
+        132870227,
+        131994280
+      ],
+      "task_id": 10
+    },
+    {
+      "init_state_id": 0,
+      "receipt_digests": [
+        "28e142449d4961e84315bb4c9e1aad5756c8f49e0429222c132a30666d42fa3b",
+        "310c7f5e6b1d622fad199915a65c51425244cd00b4a283cbc65de57bc5738e3f",
+        "dd95eca4fa4f14ab698542a1bf764879146284416e3e8b30ecd90af563c919bc"
+      ],
+      "repetition_statuses": [
+        "invalid",
+        "invalid",
+        "invalid"
+      ],
+      "status": "rejected",
+      "suite": "affordance",
+      "switch_latency_ns": [
+        118864393,
+        106166704,
+        116267541
+      ],
+      "task_id": 11
+    },
+    {
+      "init_state_id": 0,
+      "receipt_digests": [
+        "9a2a4317c6e2024f6fad67339840649375fa5f3cea611a9d9055c73d9cbc5335",
+        "ab753781c732e0907a4c63283c8ba063cf77d480d897921e561514670c47b266",
+        "23b4005cc696117bc8a96fe05958aea46e456e134ff6edb34025938478c13ca7"
+      ],
+      "repetition_statuses": [
+        "invalid",
+        "invalid",
+        "invalid"
+      ],
+      "status": "rejected",
+      "suite": "affordance",
+      "switch_latency_ns": [
+        143127436,
+        121274079,
+        134412945
+      ],
+      "task_id": 12
+    },
+    {
+      "init_state_id": 0,
+      "receipt_digests": [
+        "e56294cbd7d7ff86e6faf85a2f09919de4ff318b438acaa249a7475d3413f0f6",
+        "4efba8634619648555e60d60bce9cf7f607a60e12892ab02c5712ce3e81fd1e0",
+        "a7e6b4a8b90ea936fb94008f63fc57b7397264de3eac2372eacb16d6e17f8119"
+      ],
+      "repetition_statuses": [
+        "invalid",
+        "invalid",
+        "invalid"
+      ],
+      "status": "rejected",
+      "suite": "affordance",
+      "switch_latency_ns": [
+        290351799,
+        289382559,
+        292853746
+      ],
+      "task_id": 13
+    },
+    {
+      "init_state_id": 0,
+      "receipt_digests": [
+        "f469b86212c3eb1c1917802db09c132e3bc742da47b8e09601a31c68adb71eb7",
+        "71c090e817ea74e9254ebf508217be08b3c264af0273e220e8e10b991ed4508a",
+        "33688401d4f32482088b228b0ef524326d2d71456a3f8213cac42df1b2db0e83"
+      ],
+      "repetition_statuses": [
+        "invalid",
+        "invalid",
+        "invalid"
+      ],
+      "status": "rejected",
+      "suite": "affordance",
+      "switch_latency_ns": [
+        271840845,
+        245341697,
+        194181799
+      ],
+      "task_id": 14
+    }
+  ],
+  "decision": {
+    "fallback_gate": "failed",
+    "accepted_units": [],
+    "e0_v2_promoted": false,
+    "e1_authorized": false,
+    "reason": "Every repetition missed the preregistered 100 ms bound; six also failed exact cross-seed initial-state equality. All task-bound zero-hold physical postconditions passed, but the strict combined gate rejects all 15 units."
+  }
+}
