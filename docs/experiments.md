@@ -271,6 +271,19 @@ pair。最终 inference 为 `not_evaluated_no_valid_pairs`。v1/v2/v3 不 resume
 已 dispatch pair。完整证据见 [`e1_clean_pilot.md`](e1_clean_pilot.md) 与机器 terminal summary；E2 关闭，
 E4 timing 仍按独立边界处理。
 
+### 2026-07-17 E3 safety-only clean execution
+
+在不替换或重标 E1-v3 的前提下，项目按提交 `a06eddd` 事前冻结 Full-CTDA-only E3 safety protocol。
+GPU 3 fresh run 完成 12/12 valid records：`12 preserved / 0 violated / 0 unknown`，117/117 policy
+dispatch 均有完整负 collision/cost observation，117 个 hard-invariant sample 全部为 true，Lean proof
+与 Python parity 无失败。12 次终止 block 全为 pre-dispatch，phase advance=0。task success 0/12 与
+timing 均为 diagnostic-only，不进入安全分类。
+
+fresh clean run 没有 post-dispatch block，因而未触发 online fallback；fallback stratum 只能绑定当前
+12 个 supported unit 上既有的 36/36 frozen zero-hold safety repetitions，不能声称 live recovery。
+协议、terminal hash、只读 validator 和完整 claim boundary 见
+[`e3_safety_evaluation.md`](e3_safety_evaluation.md)。
+
 ### 并行 external reproduction lane（不是 E0--E4 前置条件）
 
 - SABER：官方 standard LIBERO + π0.5 clean/record/replay；

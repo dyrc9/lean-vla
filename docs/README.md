@@ -15,15 +15,17 @@ archive 中的内容。
 5. [`experiments.md`](experiments.md)：最小配对实验、指标和 artifact 规则。
 6. [`e0_support_audit.md`](e0_support_audit.md)：E0 v1 负结果、E0 v2 exact manifest/init/fallback 审计、
    当前 12-task non-real-time supported slice 与机器协议入口。
-7. [`e1_clean_pilot.md`](e1_clean_pilot.md)：E1-v1/v2 无效执行、immutable artifact、失败边界与下次接手顺序。
-8. [`reproduction_plan.md`](reproduction_plan.md)：发布攻击、现有防御与 CTDA 的复现证据链。
-9. [`implementation_notes.md`](implementation_notes.md)：本地 CPU/Lean 开发与验证约定。
-10. [`remote_execution.md`](remote_execution.md)：迁移到远程 GPU 后的环境、路径和运行协议。
-11. [`safe_fiper_r0_runbook.md`](safe_fiper_r0_runbook.md)：SAFE/FIPER 已下载资产、固定源码、uv
+7. [`e1_clean_pilot.md`](e1_clean_pilot.md)：E1-v1/v2/v3 无效执行、immutable artifact 与失败边界。
+8. [`e3_safety_evaluation.md`](e3_safety_evaluation.md)：独立 Full-CTDA clean safety 结果、fallback
+   stratum、artifact hash 与 claim boundary。
+9. [`reproduction_plan.md`](reproduction_plan.md)：发布攻击、现有防御与 CTDA 的复现证据链。
+10. [`implementation_notes.md`](implementation_notes.md)：本地 CPU/Lean 开发与验证约定。
+11. [`remote_execution.md`](remote_execution.md)：迁移到远程 GPU 后的环境、路径和运行协议。
+12. [`safe_fiper_r0_runbook.md`](safe_fiper_r0_runbook.md)：SAFE/FIPER 已下载资产、固定源码、uv
    环境、主仓库运行命令与 terminal 验证清单。
-12. [`paper_story.md`](paper_story.md)：收缩后的论文叙事和可写贡献。
-13. [`related_work.md`](related_work.md)：研究定位；不作为实现状态或 CLI 来源。
-14. [`next_agent_prompt_20260715.md`](next_agent_prompt_20260715.md)：已执行的 Phantom R0b 事前
+13. [`paper_story.md`](paper_story.md)：收缩后的论文叙事和可写贡献。
+14. [`related_work.md`](related_work.md)：研究定位；不作为实现状态或 CLI 来源。
+15. [`next_agent_prompt_20260715.md`](next_agent_prompt_20260715.md)：已执行的 Phantom R0b 事前
     协议与审计记录；不再是可重跑的当前交接 prompt。
 
 ## 当前方法口径
