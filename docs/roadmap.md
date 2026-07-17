@@ -367,9 +367,19 @@ integrity pass，也不得改变主分类或授权重跑。该结果仍不支持
 
 ### E4：代价与鲁棒性
 
-报告四阶段 p50/p95/p99、deadline miss、episode wall time、生成 artifact 大小、CPU/GPU/内存开销、
-Lean unavailable/timeout/tamper 时的 fail-closed 行为。当前 0.9--1.3 s/stage 的负结果必须保留，
-评测口径仍是 slow interlock/offline audit，不恢复 real-time claim。
+状态：**安全鲁棒性矩阵完成；时间/资源性能按用户优先级暂不扩展**。
+
+正式 v2 CPU/Lean matrix 为 `36/36` pass，其中 `1/1` real-Lean control、`35/35` frozen fault case
+fail closed。覆盖 Lean unavailable/timeout、checker/request binding、shadow non-authorization、19 个
+wire binding/monitor fault、retained-artifact digest mutation，以及 10 个 fake-env/runtime 精确合同；
+pre-stage failure 零 dispatch，observed/monitor failure 零 phase advance，typed receipt/postcondition 证据
+不足时不得建立 fallback success。v1 曾因 result serializer 的浮点记录缺陷 terminal-invalid，partial
+artifact 和失败结论保持不变；v2 只改为整数纳秒并使用新 root。
+
+该结果只支持固定组件故障矩阵内的 fail-closed claim。四阶段 p50/p95/p99、deadline miss、episode wall
+time、CPU/GPU/内存没有在本轮作为 gate 扩展；当前 0.9--1.3 s/stage 的既有负结果必须保留，评测口径
+仍是 slow interlock/offline audit，不恢复 real-time claim。详见
+[`e4_robustness_evaluation.md`](e4_robustness_evaluation.md)。
 
 ### 当前进入条件
 
@@ -379,6 +389,8 @@ unit。E1-v3 已 terminal-invalid；v1/v2/v3 均不得 resume/覆盖，尤其不
 dispatch 的相同 12 pairs。独立 E3 clean safety 已通过，但不恢复 E1/E2 utility/duality gate。随后
 post-dispatch challenge 已 terminal-complete，但 frozen primary classification 为 12/12 unknown；不得修正
 labeler 后重跑或用 post-hoc receipt audit 升级。deadline/latency 仅保留诊断，仍禁止 real-time claim。
+E4 safety robustness v2 已完成 35/35 fault pass；这关闭当前组件安全鲁棒性项，但不打开 E1/E2 utility、
+physical recovery 或 attack-defense inference。
 
 ## 7. P5：外部 workload 与 baseline 复现（后台线）
 

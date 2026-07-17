@@ -172,12 +172,25 @@ task/init/env-seed/policy-seed/workload，而不是强行 replay 已不适用的
    parity mismatch 必须为 0，两层均须报告 unique catch 是否存在。
 4. **E3 closed loop**：测 dispatch block、phase-advance block、fallback postcondition 和最终 task outcome；
    只有合格 workload 才增加 attack-defense 列。
-5. **E4 cost**：报告 p50/p95/p99、deadline miss、wall time、artifact、CPU/GPU/内存；保持 slow-interlock
-   claim boundary。
+5. **E4 cost/robustness**：安全鲁棒性先按冻结的 CPU/Lean fault matrix 评估；时间性能按用户优先级
+   暂不扩展，既有 p50/p95/p99/deadline miss 负证据保留，继续保持 slow-interlock claim boundary。
 6. **E5 comparison**：最后才接 SAFE/FIPER/privileged checker 和发布 workload。
 
 E1 pilot 沿用 clean retention ≥90%、false block 目标 ≤5%（>10% 停止扩样本）、unknown/deadlock
 目标 ≤5% 的既有 gate。pilot 失败时修正支持范围或降级 claim，不用增加 episode 稀释负结果。
+
+### 2026-07-17 E4 fail-closed robustness 结果
+
+E4 v1 在结果记录器写第三个 case 时因浮点 timeout 与 wire serializer 不兼容而 terminal-invalid，原
+partial root 不覆盖、不计正式矩阵。事前冻结的 v2 amendment 只把该诊断值改为整数纳秒，原样继承
+36 个 case、预期 verdict、pytest nodeid、classifier 和被测实现，并在新 root 执行。
+
+v2 为 `36/36` pass：一个真实 Lean control 通过；35 个 fault case 全部 fail closed，包括
+Lean unavailable/timeout、checker/request/shadow/artifact、19 个 wire fault，以及 10 个 fake-env/runtime
+transaction 与 fallback receipt/postcondition 合同。timing 不作 gate，GPU/physical simulator 未执行。
+因此结论仅为 `established_for_frozen_component_matrix`；physical safety、verified recovery、attack
+defense、real-time、availability 和 task utility 均为 `not_evaluated` 或未建立。协议、hash 与逐类结果见
+[`e4_robustness_evaluation.md`](e4_robustness_evaluation.md)。
 
 ### 2026-07-16 E0 v1 冻结结果
 

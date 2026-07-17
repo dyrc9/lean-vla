@@ -48,7 +48,12 @@ It is not an end-to-end physical safety proof.
     nevertheless classified all 12 as unknown because it required a top-level receipt
     integrity boolean absent from the typed receipt schema. Post-hoc typed receipt
     reconstruction verified all retained digests but does not upgrade the primary
-    `0 contained / 0 failed / 12 unknown` result or authorize a rerun.
+    `0 contained / 0 failed / 12 unknown` result or authorize a rerun. E4 then froze a
+    CPU/Lean fail-closed robustness matrix. Its v1 runner was retained as terminal-invalid
+    after a result-serialization defect; a serialization-only v2 amendment used a new
+    root and passed 36/36 cases (1 real-Lean control and 35 fault cases). This establishes
+    only scoped component fail-closed behavior, not physical safety, recovery, attack
+    defense, real-time enforcement, availability, or task utility.
 - SAFE and FIPER official R0 attempts used the dedicated
   `external/worktrees/safe-fiper-r0` worktree. They were interrupted during the
   2026-07-15 closeout and are not reproduction results. Their already
@@ -92,6 +97,7 @@ Start at [docs/README.md](docs/README.md). The canonical documents are:
 - [E1 clean paired pilot execution handoff](docs/e1_clean_pilot.md)
 - [E3 safety-only evaluation](docs/e3_safety_evaluation.md)
 - [E3 post-dispatch intervention result](docs/e3_postdispatch_intervention.md)
+- [E4 fail-closed robustness evaluation](docs/e4_robustness_evaluation.md)
 - [E0 v2 candidate machine protocol](experiments/proofalign_e0_protocol_v2_candidate.json)
 - [E0 v2 init/fallback audit record](experiments/proofalign_e0_v2_fallback_audit_summary.json)
 - [E0 v2 candidate gate decision](experiments/proofalign_e0_v2_gate_decision.json)
