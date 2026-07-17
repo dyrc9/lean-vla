@@ -1,10 +1,17 @@
 {
   "schema": "proofalign.reproduction-targets.v1",
-  "updated": "2026-07-15",
+  "updated": "2026-07-17",
   "primary_platform": {
     "benchmark": "LIBERO-Safety",
     "victim": "pi0.5/OpenPI pi05_libero",
     "checkpoint": "LIBERO-Safety released pi0.5 checkpoint"
+  },
+  "attack_qualification_audit": {
+    "path": "experiments/attack_reproduction_evidence_audit_20260717.json",
+    "status": "no_attack_passed_full_qualification",
+    "qualified_attack_count": 0,
+    "all_experiments_paused": true,
+    "proofalign_attack_defense_comparison_authorized": false
   },
   "targets": [
     {
@@ -16,6 +23,7 @@
       "upstream_platform": "standard LIBERO + pi0.5/OpenPI",
       "main_adapter": "versioned instruction attack records",
       "status": "reproduced_upstream",
+      "defense_workload_qualified": false,
       "upstream_commit": "c5d6f7e22bee6a42a5b4d871f70fe08d9419d073",
       "local_patch_commit": "22ad50642a2aec11d00d43b9c0f36d2788bd487f",
       "artifacts": [
@@ -48,6 +56,7 @@
       "upstream_platform": "standard LIBERO + OpenPI/OpenVLA",
       "main_adapter": "versioned observation transform plugin",
       "status": "reproduced_upstream",
+      "defense_workload_qualified": false,
       "upstream_commit": "a0e4c8b2a661ea2fe64bdb9055353b2e12575729",
       "local_patch_commit": "d03fcbdfa4d49985dabd60e11e12008e2af3a783",
       "artifacts": [
@@ -124,10 +133,11 @@
       "repository": "https://github.com/vla-safe/SAFE",
       "upstream_platform": "LIBERO + OpenVLA/pi0/pi0-FAST",
       "main_adapter": "pi0.5 latent feature and alarm plugin",
-      "status": "planned",
+      "status": "not_reproduced_partial_stopped",
       "upstream_commit": "b6036abe07b2b2bb9996afb2c07f13d6a9f507c0",
-      "execution_deferred_by_user": true,
-      "deferment_scope": "before checkpoint/assets/GPU execution; required again before any SAFE comparison claim"
+      "execution_stopped": true,
+      "result": "335/500 documented partial env records; no completed manifest and no detector result",
+      "comparison_authorized": false
     },
     {
       "id": "fiper",
@@ -137,10 +147,12 @@
       "repository": "https://github.com/learnsyslab/fiper",
       "upstream_platform": "generative robot policies",
       "main_adapter": "pi0.5 observation embedding plus seeded action samples",
-      "status": "planned",
+      "status": "stopped_partial_not_reproduced",
       "upstream_commit": "13d79c5c3069def843e454787ff128defc249838",
-      "execution_deferred_by_user": true,
-      "deferment_scope": "before rollout download/environment/GPU execution; required again before any FIPER comparison claim"
+      "execution_stopped": true,
+      "result": "fresh2 stopped by user during seed_42/push_chair/rnd_oe training; manifest remains started and partial outputs are not results",
+      "stop_record": "experiments/fiper_r0_stop_20260717.json",
+      "comparison_authorized": false
     },
     {
       "id": "roboguard",

@@ -20,6 +20,8 @@ trade-off，不追求绝对安全或通用证明。
    task/safe success，retention 0，completion loss 原样封存。
 7. **v1 validity decision**：实验/internal parity 有效，但 clean operational utility 不合格；当前 v1
    判定为 revision required，不再扩大 rollout 或 runtime claim。
+8. **attack evidence audit**：Phantom held-out 为 1/4（gate 2/4）；正式 SABER exact-task 为 0
+   record/0 victim；SAFE/FIPER 均未 terminal reproduced。qualified attack count 为 0，所有实验暂停。
 
 ## 已完成阶段：clean utility trade-off
 
@@ -62,7 +64,21 @@ shared-observer fix + tests
    safety dimensions；
 5. closed-loop block 继续只标 intervention；没有独立 action counterfactual 时不计算 false positive。
 
-## 当前阶段：CTDA v2 revision gate
+## 当前阶段：research pause / attack foundation gate
+
+ProofAlign 当前只测到了 clean defense cost，没有有效攻击分母，也没有 measured defense benefit。
+在讨论 CTDA v2 前先完成以下决策：
+
+1. 是否仍把 published-attack defense 作为核心研究主张；
+2. 若保留，只允许先冻结 VLA-only threat-validation-only protocol；
+3. workload 必须忠实生成并实际作用于 victim，harm 来自独立 simulator safety endpoint；
+4. 使用 disjoint held-out task/seed，不复用已关闭的 Phantom/SABER unit，不按结果调攻击；
+5. 若没有攻击通过，删除或改变 attack-defense claim，而不是继续调参制造正结果。
+
+正式审计见 [`attack_reproduction_evidence_audit.md`](attack_reproduction_evidence_audit.md)。当前没有
+运行中的 ProofAlign、Phantom、SABER、SAFE 或 FIPER 实验。
+
+## 后续阶段：CTDA v2 revision gate
 
 不直接对 v1 threshold 做结果驱动的放宽。按以下顺序推进：
 
@@ -89,7 +105,7 @@ clean utility 结果已经形成；若考虑新的 post-dispatch challenge，仍
 ### E5 external comparison
 
 只有 baseline terminal readiness 和独立 workload safety signal 同时满足时才执行。当前 SAFE 未复现、
-FIPER fresh2 仍在 GPU 1 后台、Phantom/SABER 的条件式主实验已关闭，因此 E5 暂不启动。
+FIPER fresh2 已停止且未通过 terminal gate、Phantom/SABER 的条件式主实验已关闭，因此 E5 暂不启动。
 
 ## 永久 claim boundary
 

@@ -4,7 +4,7 @@
 [`project_status.md`](project_status.md) 为准，冻结实验定义分别在
 `experiments/safe_r0_protocol.json` 和 `experiments/fiper_r0_protocol.json`。
 
-## 当前结论（2026-07-16 13:30 Asia/Shanghai）
+## 当前结论（2026-07-17 16:25 Asia/Shanghai）
 
 SAFE 仍保持停止。FIPER 的第一条 2026-07-16 fresh run 在 seed 0 的 `pretzel/rnd_a` 训练结束后
 无 traceback、无 terminal manifest 退出；该目录保持 partial/audit-only。用户要求 baseline 后台继续，
@@ -12,9 +12,10 @@ SAFE 仍保持停止。FIPER 的第一条 2026-07-16 fresh run 在 seed 0 的 `p
 transient service 与 SSH 会话解耦。任何 run 在 terminal gate 前都不能写成“复现成功”，也不能进入
 ProofAlign 比较表。
 
-第二条 run 于 2026-07-16 13:33 启动为 `proofalign-fiper-r0-fresh2.service`。用户 manager 当前
-`Linger=no`：单个 SSH/工具会话断开不会终止该 service，但如果该用户的所有登录 session 都结束，
-要获得跨全注销保证需由系统管理员开启 linger。不要为此把 launcher 退回当前终端前台运行。
+第二条 run 于 2026-07-16 13:33 启动为 `proofalign-fiper-r0-fresh2.service`，并于
+2026-07-17 16:14:05 按用户要求正常停止。service 当前为 `inactive/dead`；这里的 systemd
+`Result=success` 只表示 stop 成功，不是 FIPER 实验成功。run manifest 仍为 `started`，所以正式分类为
+`stopped_partial_not_reproduced`。
 
 | Baseline | 中断位置 | 审计产物 | 当前判定 |
 |---|---|---|---|
@@ -22,10 +23,16 @@ ProofAlign 比较表。
 | FIPER 原始入口 | seed 0 / `sorting` 时触发上游 `np.bool` 兼容性错误 | `/data0/ldx/safe-fiper-r0/fiper/runs/fiper-r0-20260715`，manifest 状态为 `failed` | 保留为首次失败证据 |
 | FIPER compatibility run | seed 0；完成 `sorting`、`stacking`，在 `push_t / rnd_oe` 训练中中断 | `/data0/ldx/safe-fiper-r0/fiper/runs/fiper-r0-compat1-20260715` | partial outputs；无 completed manifest |
 | FIPER first fresh run | seed 0；前三个 task 已评测，`pretzel/rnd_a` 训练结束后进程消失 | `/data0/ldx/safe-fiper-r0/fiper/runs/fiper-r0-fresh-20260716-104000` | manifest 仍为 `started`；partial outputs，不得拼接 |
+| FIPER fresh2 | seeds 0/1/2 已走过全部 task；停止时位于 seed 42 `push_chair/rnd_oe` training，seed 43 未开始 | `/data0/ldx/safe-fiper-r0/fiper/runs/fiper-r0-fresh2-20260716-133000` | 用户停止；manifest `started`；30 个 partial result pickle 不是指标 |
 
 上述位置只是中断快照，不是最终指标。禁止把 partial outputs 与未来运行拼接，禁止复用这些
 result directory，也禁止从日志推断缺失结果。SAFE 如需继续，必须先冻结 fresh 或 resume
 协议；FIPER 只能在全新的 result directory 重跑完整官方矩阵。
+
+停止快照、外部 manifest/log SHA-256 和 partial inventory 已保存到
+[`fiper_r0_stop_20260717.json`](../experiments/fiper_r0_stop_20260717.json)。`external/fiper/data` 仍指向
+fresh2 的 stopped-run `runtime_data`，按当前审计要求原样保留；它不是 active process，也不授权
+resume。
 
 2026-07-16 的 fresh restart 分别由
 `experiments/fiper_r0_restart_20260716.json` 和 `experiments/fiper_r0_restart2_20260716.json`

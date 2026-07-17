@@ -12,7 +12,7 @@
 | SABER | record generation failed closed | 第一个 record 已产生 invalid ledger/transcript；不修复重跑、不运行 victim/main |
 | SAFE | not reproduced | 335/500 partial corpus 无 terminal manifest；只保留审计 |
 | FIPER fresh1 | not reproduced | `pretzel/rnd_a` 后无 terminal manifest；partial 保留 |
-| FIPER fresh2 | running | GPU 1、user systemd service；只在 terminal manifest + validator + hashes 全通过后记 reproduced |
+| FIPER fresh2 | stopped/not reproduced | 用户于 2026-07-17 要求停止；service inactive/dead，manifest `started`，partial 不计结果 |
 
 详细 FIPER 操作见 [`safe_fiper_r0_runbook.md`](safe_fiper_r0_runbook.md)。
 
@@ -33,7 +33,7 @@
 - synthetic prompt/camera mutation 不自动构成 attack efficacy；
 - partial log、active process 和模型成功加载都不是 reproduction pass；
 - external baseline 不能替代 ProofAlign 自身 ablation/utility 评估；
-- GPU 1 在 FIPER fresh2 terminal 前不可用于其他实验。
+- 当前所有外部实验暂停；任何 GPU 重新执行都需要新授权、fresh protocol/root 和 fresh inventory。
 
 ## FIPER terminal 检查
 
@@ -44,3 +44,7 @@ systemctl --user show proofalign-fiper-r0-fresh2.service \
 
 service 退出后仍不能直接写 pass。必须按 runbook 检查固定 run directory 的 manifest、expected cells、
 validator、artifact inventory 和 hash；任何缺失均保持 `not_reproduced`。
+
+fresh2 已停止且 manifest 仍为 `started`，因此无需继续 terminal validator；停止快照见
+[`fiper_r0_stop_20260717.json`](../experiments/fiper_r0_stop_20260717.json)。攻击基础的统一判定见
+[`attack_reproduction_evidence_audit.md`](attack_reproduction_evidence_audit.md)。

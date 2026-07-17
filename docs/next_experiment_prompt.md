@@ -1,5 +1,11 @@
 # 下一实验执行 Prompt
 
+> **Superseded / do not execute.** 该 clean utility pilot 已完成；2026-07-17 起所有实验暂停，FIPER
+> fresh2 已停止。当前研究 blocker 是 0 条攻击通过完整 qualification。新的执行必须以
+> [`attack_reproduction_evidence_audit.md`](attack_reproduction_evidence_audit.md) 和
+> [`roadmap.md`](roadmap.md) 为准，并获得新 protocol 与用户授权。以下内容仅保留为已完成实验的历史
+> prompt。
+
 把下面整段交给下一位 agent：
 
 ---
@@ -30,7 +36,7 @@
 - E3 clean 12/12 safety preserved；post-dispatch formal primary 为 12 unknown；
 - E4 v2 为 1/1 control + 35/35 fault fail closed；
 - timing 很慢但按用户要求不是下一实验 gate，仍禁止 real-time claim；
-- GPU 1 正在运行 FIPER fresh2，严禁使用或干扰。
+- 历史执行时 GPU 1 正在运行 FIPER fresh2；该服务已于 2026-07-17 停止。
 
 ## 本轮目标
 

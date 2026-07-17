@@ -71,19 +71,24 @@ nvidia-smi --query-compute-apps=gpu_uuid,pid,process_name,used_memory --format=c
 
 永久约束：
 
-- **GPU 1 禁止使用**：它属于后台 `proofalign-fiper-r0-fresh2.service`；
-- 2026-07-17 检查时 GPU 3 空闲，适合作为下一实验候选，但启动时必须重查；
-- 选择非 1 的 physical GPU，prelaunch used memory 目标 `<4096 MiB`；
+- 2026-07-17 16:14 起没有运行中的 ProofAlign/FIPER service；FIPER fresh2 已按用户要求停止；
+- 当前所有实验暂停，没有任何 GPU rollout 授权；
+- 若以后有新 protocol 与用户授权，必须重新查询 inventory，并选择 prelaunch used memory
+  `<4096 MiB` 的 physical GPU；不得沿用历史 GPU 编号；
 - E1 runner 的 CUDA、MuJoCo EGL 和 render device 都绑定同一 physical id；
 - JAX 在 `CUDA_VISIBLE_DEVICES=<physical id>` 的进程内通常看到 logical device 0，这是正常的；
-- 不停止、kill、renice 或修改 FIPER service/process。
+- 不把无关 GPU process 当成 ProofAlign 任务停止或修改。
 
-只读检查 FIPER：
+只读检查已停止的 FIPER service：
 
 ```bash
 systemctl --user show proofalign-fiper-r0-fresh2.service \
   --property=ActiveState,SubState,ExecMainStatus,ExecMainStartTimestamp,ExecMainExitTimestamp
 ```
+
+预期为 `inactive/dead`。run manifest 仍为 `started`，partial artifact 不能作为结果或 resume 来源；停止
+快照见
+[`fiper_r0_stop_20260717.json`](../experiments/fiper_r0_stop_20260717.json)。
 
 ## 5. 正式实验顺序
 

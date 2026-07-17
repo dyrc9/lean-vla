@@ -53,8 +53,9 @@ export PYTHONPATH=/home/ldx/lean-vla/src:/home/ldx/lean-vla
 (cd lean && lake build ProofAlign)
 ```
 
-The full suite currently retains one known failure in the generic external-baseline preflight because the active
-FIPER checkout contains its required `data` symlink; do not delete that binding to make the test green.
+The full suite currently retains one known failure in the generic external-baseline preflight because the stopped
+FIPER partial run left its audited `data` symlink binding; do not delete that binding merely to make the test green.
 
 GPU/OpenPI execution requires the additional environment and isolation rules in
-[docs/remote_execution.md](docs/remote_execution.md). GPU 1 is reserved for the active FIPER background run.
+[docs/remote_execution.md](docs/remote_execution.md). All project experiments are currently paused; no GPU rollout
+is authorized.

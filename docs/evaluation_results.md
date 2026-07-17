@@ -13,7 +13,8 @@ ProofAlign 在冻结的 LIBERO-Safety affordance task slice 和固定 CPU/Lean f
 该 pilot 的 Full CTDA task/safe-success retention 都是 0，说明当前方法在该 slice/seed 上有很大
 completion loss。有效实验不等于方法可用：当前 CTDA v1 的 clean operational utility 判定为 fail，
 必须版本化修改后才能继续 runtime claim 或扩大 rollout。当前不能证明总体 task utility、物理安全、
-verified recovery、通用 attack defense 或 real-time enforcement。
+verified recovery、通用 attack defense 或 real-time enforcement。外部攻击审计同时显示，当前没有一条
+攻击通过完整 held-out safety qualification，因此 attack-defense benefit 本身仍是 `not_evaluated`。
 
 简写为：
 
@@ -162,21 +163,31 @@ v2 正式结果：
 
 ## 7. 外部线
 
-- Phantom R0b 找到 camera workload signal，但 held-out R1 只有 1/4 independent cost/collision
-  transition，低于冻结的 2/4 gate，停止；
-- SABER R1 在第一个 record artifact gate fail closed，未运行 victim，停止；
-- SAFE partial run 无 terminal manifest，未复现；
-- FIPER fresh1 无 terminal manifest；fresh2 当前由 `proofalign-fiper-r0-fresh2.service` 在 GPU 1
-  后台运行，只有 terminal manifest/validator 全通过才能记为 reproduced。
+- Phantom 固定 medium-laser R0 中 clean 与 attacked 都成功；R0b 的 9 个 discovery cell 只有 strong
+  laser 产生 3/3 task failure。该 candidate 在 held-out LIBERO-Safety R1 只有 1/4 independent
+  cost/collision transition，低于冻结的 2/4 gate；唯一 unsafe 又发生在 action 132，超出 conditional
+  main 的 100-action window；
+- 早期 12-task SABER-style diagnostic 使用手工 attack record：clean 7/12、attacked 8/12 task
+  success，unsafe 从 0/12 到 1/12。它不是 official-agent reproduction，旧 `dual_lean` 也不是精确配对的
+  Full CTDA；
+- 正式 SABER exact-task R1 在第一条 record artifact gate fail closed，0 valid record、0 victim
+  episode，attack efficacy 为 `not_evaluated`；
+- SAFE partial run 无 terminal manifest，未复现，也未训练 detector；
+- FIPER fresh1 无 terminal manifest；fresh2 于 2026-07-17 按用户要求停止。service 为
+  `inactive/dead`，run manifest 仍为 `started`，最后观察到 seed 42 `push_chair/rnd_oe` training；30 个
+  partial result pickle 不满足完整 seed/task/method/window matrix，不能作为指标。
 
-这些外部结果不改变 E0--E4 自身结论。
+因此当前 qualified attack count 为 `0`，所有实验暂停。详细审计见
+[`attack_reproduction_evidence_audit.md`](attack_reproduction_evidence_audit.md)；FIPER 停止快照见
+[`fiper_r0_stop_20260717.json`](../experiments/fiper_r0_stop_20260717.json)。这些外部结果不改变 E0--E4
+已有事实，但阻止任何 attack-defense efficacy claim。
 
 ## 8. 方法判定与下一证据缺口
 
-当前分层判定是：paired experiment internal validity 为 valid，冻结离散 spec 内的实现/parity 为 pass，
-但 CTDA v1 clean operational utility 为 fail；clean safety benefit 未由该 pilot 证明，超出
-collision/cost 的 observation provenance 也不完整。因此保留 v1 作为历史 evaluated spec，不直接
-放宽 40 秒 deadline 或 no-progress threshold 来追结果。
+当前有两个独立 blocker。上游 blocker 是 attack foundation 未建立：没有攻击同时通过忠实应用、
+unguarded victim、独立 safety harm、held-out gate 和 terminal artifact。下游 blocker 是 CTDA v1：
+paired experiment internal validity 为 valid，冻结离散 spec 内的实现/parity 为 pass，但 clean
+operational utility 为 fail；clean safety benefit 未由该 pilot 证明，observation provenance 也不完整。
 
 CTDA v2 必须先解决：contract lifetime 究竟使用 physical wall clock 还是 plant/control logical time；
 若保留 physical time，当前 slow Lean 不能作为 online authority；若 proof 时保持 plant，则 dispatch 前
@@ -184,6 +195,7 @@ CTDA v2 必须先解决：contract lifetime 究竟使用 physical wall clock 还
 校准并证明 nominal approach-to-contact liveness，同时保留错误目标、错误 gripper、累计预算和
 fail-closed rejection。还需提供 typed human/obstacle distance provenance，或收窄 safety claim。
 
-下一次 real rollout 前必须事前冻结最低可接受 retention 和独立 safety endpoint，并先通过 fake-env、
-no-dispatch、fixed-trace nominal/adversarial gate。任何 v2 实验使用新 protocol、新 seed 或 unit 和 fresh
-root；旧 E1 不 resume、不覆盖、不重新分类。
+研究顺序改为 attack first：下一次 real rollout 若获授权，只能先是新的 VLA-only
+threat-validation-only protocol，使用 disjoint held-out task/seed 和独立 safety endpoint。只有攻击通过，
+才继续 CTDA v2，并事前冻结最低可接受 retention 与 defense safety endpoint。任何新实验使用新
+protocol、新 seed 或 unit 和 fresh root；旧结果不 resume、不覆盖、不重新分类。

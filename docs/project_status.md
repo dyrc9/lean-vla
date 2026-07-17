@@ -12,7 +12,8 @@
 | E3 safety | scoped evidence complete | clean 12/12 preserved；post-dispatch 行为 fail closed，但正式 primary 12 unknown | 不改写旧分类；新的独立 challenge 才能增加 containment 证据 |
 | E4 robustness | complete | 35/35 frozen fault case fail closed | 只保留 scoped component claim |
 | timing | negative/deferred | Lean 0.9--1.3 s/stage，不满足实时控制 | 不优化，不恢复 real-time claim |
-| external baselines | blocked/running | Phantom/SABER gates 已关闭；SAFE 未复现；FIPER fresh2 在 GPU 1 后台运行 | 等 FIPER terminal manifest；不干扰 GPU 1 |
+| attack foundation | not established | Phantom held-out 仅 1/4 independent safety transition；正式 SABER exact-task R1 为 0 record/0 victim episode | 所有实验暂停；先重新冻结 VLA-only threat-validity protocol |
+| external baselines | stopped/not reproduced | Phantom/SABER gates 已关闭；SAFE partial；FIPER fresh2 已按用户要求停止且 manifest 仍为 `started` | partial 只作审计，不 resume、不发布指标 |
 
 完整数字见 [`evaluation_results.md`](evaluation_results.md)。
 
@@ -51,8 +52,9 @@
 - 对发布攻击有总体 defense efficacy；
 - physical/hardware/continuous-dynamics safety；
 - verified recovery、availability 或 real-time enforcement。
+- 当前已经复现了足以支持 ProofAlign defense claim 的发布攻击。
 
-## 当前主任务
+## 已完成 clean utility 主任务
 
 新 clean paired utility pilot 已完成并封存：
 
@@ -76,6 +78,25 @@
 机器结果见
 [`proofalign_e1_clean_utility_terminal_summary.json`](../experiments/proofalign_e1_clean_utility_terminal_summary.json)，
 后续边界见 [`roadmap.md`](roadmap.md)。
+
+## 当前主任务：重新建立 attack foundation
+
+攻击证据审计的正式结论是 `0` 条 workload 通过完整 qualification：
+
+1. Phantom 固定 R0 的 medium laser 确实改变 20/20 policy frame，但 clean/attack 都成功；
+2. R0b discovery 只有 strong laser 产生 3/3 task failure，held-out LIBERO-Safety R1 最终只有 1/4
+   clean-safe → attacked-unsafe，低于 2/4 gate；
+3. 早期 SABER-style 记录是 `saber_style_manual`；clean 7/12、attacked 8/12 task success，只有 1/12
+   attacked unsafe，不能当作官方 SABER attack efficacy；
+4. 正式 SABER exact-task R1 在第一条 record 的 chat-model 初始化阶段失败，0 valid record、0 victim
+   rollout；
+5. SAFE/FIPER 都是 defense baseline 而不是 attack；SAFE partial，FIPER fresh2 于
+   2026-07-17 16:14:05 停止，terminal gate 未通过；
+6. 在新的 VLA-only threat-validation protocol 通过前，不修改 CTDA、不启动新 rollout、不声称
+   attack-defense benefit。
+
+完整叙述见 [`attack_reproduction_evidence_audit.md`](attack_reproduction_evidence_audit.md)，机器记录见
+[`attack_reproduction_evidence_audit_20260717.json`](../experiments/attack_reproduction_evidence_audit_20260717.json)。
 
 ## 仓库状态规则
 
