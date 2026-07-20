@@ -1,6 +1,6 @@
 # ProofAlign 文档入口
 
-更新日期：2026-07-17
+更新日期：2026-07-20
 
 ## 当前事实来源
 
@@ -8,21 +8,24 @@
 
 1. [`project_status.md`](project_status.md)：当前状态、可写/不可写结论和唯一主任务。
 2. [`evaluation_results.md`](evaluation_results.md)：E0--E4 统一结果与机器 artifact 入口。
-3. [`method.md`](method.md)：normative 方法、威胁模型和 claim boundary。
-4. [`system_architecture.md`](system_architecture.md)：实现模块和信任边界。
-5. [`roadmap.md`](roadmap.md)：当前 research pause、attack foundation gate 与后续顺序。
-6. [`experiments.md`](experiments.md)：实验冻结、配对、指标和失败规则。
-7. [`remote_execution.md`](remote_execution.md)：当前 Python/Lean/OpenPI/GPU 环境和运行顺序。
-8. [`implementation_notes.md`](implementation_notes.md)：代码入口、不变量和已完成 observer 配对修复。
-9. [`attack_reproduction_evidence_audit.md`](attack_reproduction_evidence_audit.md)：Phantom/SABER/SAFE/FIPER
+3. [`optimization_plan.md`](optimization_plan.md)：CTDA v2、SafeLIBERO/AEGIS、攻击 qualification、远端
+   里程碑与汇合 gate。
+4. [`roadmap.md`](roadmap.md)：当前双线重建优先级与永久边界。
+5. [`method.md`](method.md)：已冻结 normative 方法、威胁模型和 claim boundary。
+6. [`system_architecture.md`](system_architecture.md)：实现模块和信任边界。
+7. [`experiments.md`](experiments.md)：实验冻结、配对、指标和失败规则。
+8. [`remote_execution.md`](remote_execution.md)：当前 Python/Lean/OpenPI/GPU 环境和运行顺序。
+9. [`implementation_notes.md`](implementation_notes.md)：代码入口、不变量和已完成 observer 配对修复。
+10. [`attack_reproduction_evidence_audit.md`](attack_reproduction_evidence_audit.md)：Phantom/SABER/SAFE/FIPER
    证据审计与“0 qualified attack”判定。
 
 外部线：
 
-- [`reproduction_plan.md`](reproduction_plan.md)：Phantom/SABER/SAFE/FIPER 状态与 E5 gate。
+- [`reproduction_plan.md`](reproduction_plan.md)：旧 Phantom/SABER/SAFE/FIPER 状态，以及新的
+  SafeLIBERO/AEGIS、SABER constraint-violation、EDPA 与 E5 gate。
 - [`safe_fiper_r0_runbook.md`](safe_fiper_r0_runbook.md)：已停止 SAFE/FIPER partial 的审计与历史 runbook。
 
-[`next_experiment_prompt.md`](next_experiment_prompt.md) 已完成并 superseded，不是当前执行授权。
+[`next_experiment_prompt.md`](next_experiment_prompt.md) 是同步到工作机后的当前完整交接 prompt。
 
 论文材料：
 
@@ -38,7 +41,7 @@
 
 1. 方法以 `method.md` 为准；
 2. 当前结果以 `evaluation_results.md` 和机器 JSON 为准；
-3. 当前优先级以 `roadmap.md` 为准；
+3. 当前执行顺序以 `optimization_plan.md` 为准，摘要优先级以 `roadmap.md` 为准；
 4. CLI 以代码 `--help` 为准；
 5. 环境以 `remote_execution.md` 为准；
 6. archive 不覆盖 canonical 文档。

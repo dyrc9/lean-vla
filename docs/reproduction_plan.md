@@ -1,8 +1,8 @@
 # External Reproduction Plan
 
-更新日期：2026-07-17
+更新日期：2026-07-20
 
-外部 baseline/workload 是 E5，当前不阻塞 ProofAlign 自身 clean utility pilot。
+外部 baseline/workload 不阻塞 CTDA v2 的 outcome-blind 离线优化，但会阻塞最终 attack-defense E5。
 
 ## 当前状态
 
@@ -13,6 +13,8 @@
 | SAFE | not reproduced | 335/500 partial corpus 无 terminal manifest；只保留审计 |
 | FIPER fresh1 | not reproduced | `pretzel/rnd_a` 后无 terminal manifest；partial 保留 |
 | FIPER fresh2 | stopped/not reproduced | 用户于 2026-07-17 要求停止；service inactive/dead，manifest `started`，partial 不计结果 |
+| SafeLIBERO/AEGIS | new P0 readiness | pin 官方 source/data，先做 no-dispatch inventory、独立 safety oracle 与 exact-unit support audit |
+| EDPA + SafeLIBERO | new P1 threat track | 保持原始 patch definition；task failure 与独立 collision/cost transition 分开 |
 
 详细 FIPER 操作见 [`safe_fiper_r0_runbook.md`](safe_fiper_r0_runbook.md)。
 
@@ -24,7 +26,8 @@
 2. 发布 workload 在 held-out unit 上产生独立 collision/cost/authorization signal，不只是 task failure；
 3. comparison 的 task/init/seed/checkpoint/workload/metric 在 outcome 前冻结；
 4. ProofAlign 自身 clean utility/safety trade-off 已有有效 paired result；
-5. 不复用或改写已关闭的 Phantom/SABER unit。
+5. 不复用或改写已关闭的 Phantom/SABER unit；
+6. CTDA v2 clean utility gate 已通过，attack 与 CTDA support population 完全重合。
 
 ## 永久规则
 
@@ -33,7 +36,20 @@
 - synthetic prompt/camera mutation 不自动构成 attack efficacy；
 - partial log、active process 和模型成功加载都不是 reproduction pass；
 - external baseline 不能替代 ProofAlign 自身 ablation/utility 评估；
-- 当前所有外部实验暂停；任何 GPU 重新执行都需要新授权、fresh protocol/root 和 fresh inventory。
+- 旧外部实验全部保持停止；允许按 [`optimization_plan.md`](optimization_plan.md) 开展新的 read-only
+  readiness 和 producer 修复。任何 GPU 正式执行都需要新 protocol/root、fresh inventory 和全部 gate。
+
+## 新 P0/P1 顺序
+
+1. SafeLIBERO/AEGIS：只读 inventory -> pinned manifest -> outcome-blind candidate/classifier -> CTDA support
+   overlap -> 新 clean/safety-critical protocol；
+2. SABER P0：全新的 official constraint-violation producer -> immutable record validator -> VLA-only
+   clean/attack pair -> held-out independent safety gate；
+3. EDPA P1：原始 patch + SafeLIBERO -> VLA-only independent safety gate；
+4. 只有 workload terminal-qualified 且 population overlap，才冻结 attacked+defended matrix。
+
+旧 SABER exact-task R1 的 producer failure 只作诊断，不禁止在新 protocol/root/unit 上修复官方 producer；
+但不得续接旧 ledger、record 或 victim run。
 
 ## FIPER terminal 检查
 

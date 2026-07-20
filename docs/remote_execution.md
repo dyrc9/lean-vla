@@ -1,6 +1,6 @@
 # Current Execution Environment
 
-更新日期：2026-07-17
+更新日期：2026-07-20
 
 本文是当前机器运行 CPU/Lean、OpenPI/LIBERO-Safety 和 GPU 实验的唯一环境入口。CLI 具体参数仍以
 代码 `--help` 为准。
@@ -72,8 +72,11 @@ nvidia-smi --query-compute-apps=gpu_uuid,pid,process_name,used_memory --format=c
 永久约束：
 
 - 2026-07-17 16:14 起没有运行中的 ProofAlign/FIPER service；FIPER fresh2 已按用户要求停止；
-- 当前所有实验暂停，没有任何 GPU rollout 授权；
-- 若以后有新 protocol 与用户授权，必须重新查询 inventory，并选择 prelaunch used memory
+- 2026-07-17 的旧 ProofAlign/FIPER/Phantom/SABER/SAFE protocol 全部保持暂停，不得 resume；
+- 2026-07-20 起允许按 [`optimization_plan.md`](optimization_plan.md) 和
+  [`next_experiment_prompt.md`](next_experiment_prompt.md) 推进新的 CTDA v2/SafeLIBERO/attack 工作；
+  正式 GPU rollout 仍必须先有新 method/protocol、clean commit、fresh root 和全部 preflight gate；
+- 若新 protocol 与交接授权满足全部 gate，必须重新查询 inventory，并选择 prelaunch used memory
   `<4096 MiB` 的 physical GPU；不得沿用历史 GPU 编号；
 - E1 runner 的 CUDA、MuJoCo EGL 和 render device 都绑定同一 physical id；
 - JAX 在 `CUDA_VISIBLE_DEVICES=<physical id>` 的进程内通常看到 logical device 0，这是正常的；

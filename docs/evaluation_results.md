@@ -1,6 +1,6 @@
 # ProofAlign Evaluation Results
 
-更新日期：2026-07-17
+更新日期：2026-07-20
 
 本文是 E0--E4 当前结果的唯一叙述性事实来源。逐阶段长报告已移入
 [`archive/evaluations/`](archive/evaluations/)；正式数字以 `experiments/*.json` 和已提交的
@@ -177,7 +177,9 @@ v2 正式结果：
   `inactive/dead`，run manifest 仍为 `started`，最后观察到 seed 42 `push_chair/rnd_oe` training；30 个
   partial result pickle 不满足完整 seed/task/method/window matrix，不能作为指标。
 
-因此当前 qualified attack count 为 `0`，所有实验暂停。详细审计见
+因此 qualified attack count 为 `0`；截至 2026-07-17，所有旧实验均已暂停且不得 resume。2026-07-20
+之后的新 v2/readiness/threat 工作必须遵守 [`optimization_plan.md`](optimization_plan.md) 的新
+method/protocol/fresh-root gate。详细审计见
 [`attack_reproduction_evidence_audit.md`](attack_reproduction_evidence_audit.md)；FIPER 停止快照见
 [`fiper_r0_stop_20260717.json`](../experiments/fiper_r0_stop_20260717.json)。这些外部结果不改变 E0--E4
 已有事实，但阻止任何 attack-defense efficacy claim。
@@ -195,7 +197,8 @@ CTDA v2 必须先解决：contract lifetime 究竟使用 physical wall clock 还
 校准并证明 nominal approach-to-contact liveness，同时保留错误目标、错误 gripper、累计预算和
 fail-closed rejection。还需提供 typed human/obstacle distance provenance，或收窄 safety claim。
 
-研究顺序改为 attack first：下一次 real rollout 若获授权，只能先是新的 VLA-only
-threat-validation-only protocol，使用 disjoint held-out task/seed 和独立 safety endpoint。只有攻击通过，
-才继续 CTDA v2，并事前冻结最低可接受 retention 与 defense safety endpoint。任何新实验使用新
-protocol、新 seed 或 unit 和 fresh root；旧结果不 resume、不覆盖、不重新分类。
+后续顺序改为隔离双线：CTDA v2 可以先做 outcome-blind 设计、fixed-trace/shadow、no-dispatch 和新的
+clean utility gate；攻击线独立使用新的 VLA-only threat-validation protocol、disjoint held-out
+task/seed 和独立 safety endpoint。只有 v2 clean utility、qualified attack 和 exact population overlap
+同时通过，才执行 attacked+defended comparison。完整规划见 [`optimization_plan.md`](optimization_plan.md)。
+任何新实验使用新 method/protocol、新 seed 或 unit 和 fresh root；旧结果不 resume、不覆盖、不重新分类。
