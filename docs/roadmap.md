@@ -1,6 +1,6 @@
 # ProofAlign Roadmap
 
-更新日期：2026-07-17
+更新日期：2026-07-20
 
 ## 目标
 
@@ -64,33 +64,37 @@ shared-observer fix + tests
    safety dimensions；
 5. closed-loop block 继续只标 intervention；没有独立 action counterfactual 时不计算 false positive。
 
-## 当前阶段：research pause / attack foundation gate
+## 当前阶段：CTDA v2 与实验基础双线重建
 
-ProofAlign 当前只测到了 clean defense cost，没有有效攻击分母，也没有 measured defense benefit。
-在讨论 CTDA v2 前先完成以下决策：
+详细架构、里程碑、实验矩阵和停止条件以 [`optimization_plan.md`](optimization_plan.md) 为准。
+当前没有运行中的 ProofAlign、Phantom、SABER、SAFE 或 FIPER 正式实验。
 
-1. 是否仍把 published-attack defense 作为核心研究主张；
-2. 若保留，只允许先冻结 VLA-only threat-validation-only protocol；
-3. workload 必须忠实生成并实际作用于 victim，harm 来自独立 simulator safety endpoint；
-4. 使用 disjoint held-out task/seed，不复用已关闭的 Phantom/SABER unit，不按结果调攻击；
-5. 若没有攻击通过，删除或改变 attack-defense claim，而不是继续调参制造正结果。
+### 工作线 A：CTDA v2 outcome-blind 优化
 
-正式审计见 [`attack_reproduction_evidence_audit.md`](attack_reproduction_evidence_audit.md)。当前没有
-运行中的 ProofAlign、Phantom、SABER、SAFE 或 FIPER 实验。
+1. 冻结 contract epoch、proof/state freshness、分级 intervention、post-filter authorization、bounded
+   recovery 和 typed provenance；
+2. 选择 Lean-proven long-lived certificate + fast checker，或可证明 freshness 的 pipelined Lean；
+3. 保留 v1 replay，新建 v2 method/wire/schema；
+4. 先过 unit/fake-env、retained fixed-trace/shadow 和 no-dispatch gate；
+5. 事前冻结 utility/safety gate 后才运行新的 clean v2 pilot。
 
-## 后续阶段：CTDA v2 revision gate
+### 工作线 B：安全土壤与 VLA-only threat qualification
 
-不直接对 v1 threshold 做结果驱动的放宽。按以下顺序推进：
+1. P0 建立 SafeLIBERO/AEGIS pinned readiness、outcome-blind candidate/classifier 和 exact-unit support
+   audit；
+2. P0 从全新的 official SABER constraint-violation producer gate 开始，不续接旧 R1；
+3. P1 使用原始 EDPA patch 叠加 SafeLIBERO，task failure 与独立 safety harm 分开；
+4. workload 必须通过 immutable artifact、unguarded victim、independent safety transition、disjoint
+   held-out gate、terminal artifact 和 population overlap；
+5. 若仍无攻击通过，删除或收窄 attack-defense claim，而不是 outcome-driven 调攻击。
 
-1. 明确 contract lifetime 的时基：physical wall clock 或 plant/control logical time；前者意味着当前
-   slow Lean 不能在线授权，后者必须增加 proof 后 state freshness re-observe/rebind；
-2. 在与 E1 outcome 隔离的 trace/unit 上校准 binder progress 与 bounded stutter，并同时验证 nominal
-   approach-to-contact liveness 和 adversarial rejection；
-3. 为 human-hand/obstacle distance 增加 typed provenance，或从安全 claim 中明确移除；
-4. 事前冻结最低可接受 task/safe-success retention 和独立 safety endpoint；仅 fail closed 不再足以
-   通过 method gate；
-5. fake-env/no-dispatch/fixed-trace gates 全部通过后，才允许冻结 CTDA v2、新 paired protocol、新 seed
-   或 unit 和 fresh root。
+### 汇合 gate
+
+只有 CTDA v2 clean utility 合格、至少一个 workload threat-valid、独立 safety oracle 完整且 attack 与
+CTDA support population 完全重合，才执行 attacked+defended 正式比较。
+
+两线汇合前，attack outcome 不参与 v2 threshold/binder 调整，CTDA verdict 不参与 attack reward 或
+ground truth。
 
 v1 冻结判定见
 [`proofalign_method_validity_decision_20260717.json`](../experiments/proofalign_method_validity_decision_20260717.json)。
@@ -104,8 +108,9 @@ clean utility 结果已经形成；若考虑新的 post-dispatch challenge，仍
 
 ### E5 external comparison
 
-只有 baseline terminal readiness 和独立 workload safety signal 同时满足时才执行。当前 SAFE 未复现、
-FIPER fresh2 已停止且未通过 terminal gate、Phantom/SABER 的条件式主实验已关闭，因此 E5 暂不启动。
+只有 baseline terminal readiness、CTDA v2 clean utility、独立 workload safety signal 和 population
+overlap 同时满足时才执行。P0 低层闭环 baseline 改为已公开的 AEGIS；SAFE/FIPER 只在新的 terminal
+reproduction ready 后作为 detector baseline，旧 partial 不 resume。
 
 ## 永久 claim boundary
 
