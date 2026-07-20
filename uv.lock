@@ -2157,6 +2157,9 @@ sdist = { url = "https://files.pythonhosted.org/packages/cf/9c/fb5d48abfe5d791cd
 name = "proofalign"
 version = "0.1.0"
 source = { editable = "." }
+dependencies = [
+    { name = "cryptography" },
+]
 
 [package.optional-dependencies]
 dev = [
@@ -2207,6 +2210,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "accelerate", marker = "extra == 'vla'", specifier = ">=0.25.0" },
+    { name = "cryptography", specifier = ">=46,<50" },
     { name = "diffusers", marker = "extra == 'vla'", specifier = "==0.30.3" },
     { name = "dlimp", marker = "extra == 'vla'", git = "https://gh-proxy.com/https://github.com/moojink/dlimp_openvla?rev=040105d256bd28866cc6620621a3d5f7b6b91b46" },
     { name = "draccus", marker = "extra == 'vla'", specifier = "==0.8.0" },

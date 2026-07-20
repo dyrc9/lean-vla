@@ -4,16 +4,22 @@
 
 ## 当前状态
 
+当前唯一执行主线改为 **VLA-only 发布攻击复现与 threat qualification**。所有 ProofAlign/CTDA 自研
+method 的实现性实验、no-dispatch probe、clean pilot、attacked+defended rollout 和 baseline comparison
+全部暂停；在 VLA-only 攻击得到 terminal 结果且用户再次明确授权前，不恢复这些工作。既有 CTDA、
+Ed25519、typed geometry 和 AEGIS CBF/QP 结果只作为冻结历史保留，不构成当前施工任务。
+
 | 工作线 | 状态 | 当前结论 | 下一步 |
 |---|---|---|---|
-| CTDA 方法 | v1 frozen; revision required | 协议/实现/Lean parity 在冻结语义内有效，但 clean operational utility 不合格，当前方法不具备可接受的 runtime viability | 保留 v1 历史；按 `optimization_plan.md` 推进 v2 离线设计、fixed-trace/shadow 与 no-dispatch gate |
+| CTDA 方法 | frozen/deferred | v1 clean utility 不合格；v2 core/wire 与 no-action 基础结果已保存 | 不运行、不扩展、不启动 clean/attacked rollout；等待 VLA-only 攻击复现终态和用户重新授权 |
 | E0 support | complete | 12 个 affordance/init0 non-real-time supported unit | 新实验不得越过支持范围，除非先做新 support audit |
 | E1 utility | scoped pilot complete | policy-seed 1 的新 pilot 为 12/12 valid pair；VLA-only 8/12、Full CTDA 0/12 task/safe success，retention 0 | 负结果和归因已保存；不扩写总体结论或重跑旧 unit |
 | E3 safety | scoped evidence complete | clean 12/12 preserved；post-dispatch 行为 fail closed，但正式 primary 12 unknown | 不改写旧分类；新的独立 challenge 才能增加 containment 证据 |
 | E4 robustness | complete | 35/35 frozen fault case fail closed | 只保留 scoped component claim |
 | timing | negative/deferred | Lean 0.9--1.3 s/stage，不满足实时控制 | 不优化，不恢复 real-time claim |
-| attack foundation | not established | Phantom held-out 仅 1/4 independent safety transition；正式 SABER exact-task R1 为 0 record/0 victim episode | 与 v2 离线开发隔离并行；新 official SABER constraint-violation/EDPA workload 只能从 producer gate 开始 |
-| external baselines | rebuild planned | SAFE partial、FIPER stopped；当前缺低层闭环 safety-filter baseline | P0 做 SafeLIBERO/AEGIS readiness；旧 partial 只作审计，不 resume、不发布指标 |
+| attack foundation | **current sole execution track** | Phantom held-out 仅 1/4；旧 SABER exact-task R1 为 0 record/0 victim，qualified attack count 为 0 | 从 fresh protocol/root 修复 official SABER producer，验证 immutable artifact 后直接运行 VLA-only clean/attacked pair；随后才考虑 EDPA |
+| safety foundation | frozen/deferred | R0--R3、state r1、OpenRegion、signed geometry/CBF 均通过；所有新增 gate 的 `env.step/dispatch=0` | 不继续 perception、budget、recovery 或 CTDA support 工作 |
+| external baselines | frozen/deferred | AEGIS 只有 no-action core；SAFE partial、FIPER stopped | 不运行 AEGIS/SAFE/FIPER；当前只运行 unguarded VLA-only victim |
 
 完整数字见 [`evaluation_results.md`](evaluation_results.md)。
 
@@ -38,6 +44,20 @@
 
 - 在固定 simulator task slice 上，Full CTDA clean safety observation 为 12/12 preserved；
 - 在固定 CPU/Lean fault matrix 上，35/35 fault case fail closed；
+- 在冻结 v2 wire R0 corpus 上，6/6 stage、21/21 Python/Lean verdict parity 通过；这只证明 normalized
+  payload 判定一致；
+- 在冻结 drawer 50-init R2 上，exact official joint source、finite range、strict predicate agreement 均为
+  50/50，且禁止操作计数为 0；50 个值全为 `0.0 m`/closed，只支持 initial negative-class claim；
+- 在冻结 adapter R0 上，6/6 fake/adversarial case 覆盖 progress attestation、post-filter binding、stale/
+  cross-state rejection 和 recovery ledger non-refund，AST/运行禁止操作计数均为 0；issuer 仅为 test TCB；
+- 在冻结 strict-threshold R0 上，五个直接注入 qpos 的请求/读回和官方/reference predicate 为 5/5，
+  精确 `-0.14 m` 为 closed；这不构成自然 transition evidence；
+- 在冻结 crypto-evidence R0 上，Ed25519 exact producer/version 身份、tamper、wrong-key、revocation 和
+  signed progress integration 为 11/11；仅使用 ephemeral test key，不证明生产密钥安全；
+- 在冻结 AEGIS CBF/filter R0 上，9/9 unit 及 5/5 CVXPY/OSQP fixture parity 通过，最大误差
+  `4.44e-16`；签名 full-result tamper 在 authorization 前 hard-block，dispatch 为 0；
+- 在冻结 AEGIS geometry R0 上，8/8 unit 及 4/4 官方 `compute_h_coeffs_3d` parity 通过，最大误差
+  `1.53e-16`；几何 payload/signature/freshness/source/causality 异常均在系数推导前失败；
 - Lean unavailable/timeout、关键 binding tamper 和 typed fallback evidence 不足时，当前实现不会静默
   回退到 Python 授权；
 - 当前系统是 slow-interlock/offline prototype。
@@ -71,22 +91,54 @@
 6. retained trace 归因完成：9/12 因 40 秒 semantic contract wall-clock window 无法再覆盖一个
    prefix，3/12 因 persistent bounded-stutter no-progress limit 在 3 个 prefix 后耗尽；12/12 都在
    approach 阶段 pre-dispatch refuted；
-7. 下一步是 CTDA v2 设计 gate：重定义/实现 contract lifetime 与 proof latency 的关系、校准 binder
-   liveness、补全 observation provenance，并事前冻结可接受 retention 与独立 safety endpoint。任何
-   修订或新 rollout 必须新 method version/protocol/seed 或 unit/new root，不重跑本轮。
+7. CTDA v2 已把 proof latency 从 semantic lease 消耗中分离，但强制 proof 后重观察/rebind；固定 3-prefix
+   stutter 已替换为 authenticated progress/control-epoch ledger，replan 不退款。retained trace 只证明
+   9/3 归因可读和新语义不含旧 blocker，不构成 counterfactual dispatch/retention；任何新 rollout 仍须
+   新 method version/protocol/seed 或 unit/new root。
 
 机器结果见
 [`proofalign_e1_clean_utility_terminal_summary.json`](../experiments/proofalign_e1_clean_utility_terminal_summary.json)，
 后续边界见 [`roadmap.md`](roadmap.md)。
 
-## 当前主任务：CTDA v2 与安全实验基础双线重建
+## 当前唯一主任务：VLA-only 攻击复现
 
-完整执行规划见 [`optimization_plan.md`](optimization_plan.md)。当前顺序不再是 attack-first 单线程：
+完整执行规划见 [`optimization_plan.md`](optimization_plan.md)。当前不再并行推进 CTDA v2 或 AEGIS，
+只允许下面这条执行链：
 
-- 工作线 A 允许先推进 CTDA v2 设计、代码、fixed-trace/shadow 和 no-dispatch preflight；
-- 工作线 B 独立推进 SafeLIBERO/AEGIS readiness 和 VLA-only threat qualification；
-- 两线汇合前不执行 attacked+defended 正式 rollout，不让 attack outcome 参与 v2 threshold 校准，也不让
-  CTDA verdict 参与 attack ground truth。
+1. 在新 protocol、clean commit 和 fresh absent root 上修复 official SABER constraint-violation producer；
+2. 生成并验证 immutable official attack record/transcript/hash；producer gate 未通过时不启动 victim；
+3. gate 通过后直接运行同 task/init/seed/checkpoint 的 unguarded VLA-only clean/attacked pair；
+4. 使用独立 collision/force/joint-limit/action-magnitude oracle 判定 clean-safe→attacked-unsafe；
+5. 保存 terminal manifest、append-only ledger、episode artifact 和 SHA-256；
+6. SABER terminal blocked/failed 后才按独立 fresh protocol 转 EDPA + SafeLIBERO，不按 outcome 调 patch；
+7. VLA-only threat qualification 结束后停止，不自动进入 CTDA、AEGIS 或 attacked+defended comparison。
+
+冻结期间禁止运行 `ctda_v2_*` audit/probe、ProofAlign clean pilot、CTDA shadow/fixed-trace outcome、AEGIS
+closed-loop、SAFE/FIPER 或任何自研 method arm。若只为保存旧结果进行只读检查，不得创建新 outcome。
+
+安全基础机器入口为
+[`safelibero_aegis_readiness_protocol.json`](../experiments/safelibero_aegis_readiness_protocol.json) 和
+[`safelibero_aegis_readiness_summary.json`](../experiments/safelibero_aegis_readiness_summary.json)，只读入口为
+`scripts/safelibero_aegis_readiness.py`。runtime R1 入口为
+[`safelibero_aegis_runtime_protocol.json`](../experiments/safelibero_aegis_runtime_protocol.json)、
+[`safelibero_aegis_runtime_summary.json`](../experiments/safelibero_aegis_runtime_summary.json) 和
+`scripts/safelibero_aegis_runtime_preflight.py`；R2/R3 终态分别见
+[`safelibero_aegis_model_load_summary.json`](../experiments/safelibero_aegis_model_load_summary.json) 与
+[`safelibero_aegis_scene_summary.json`](../experiments/safelibero_aegis_scene_summary.json)。这些 gate 都不授权
+rollout。全量 state gate 同时保留 r0
+[`state_coverage_summary.json`](../experiments/ctda_v2_safelibero_state_coverage_summary.json) 的 1250/1600
+负结果和 r1
+[`state_coverage_summary_r1.json`](../experiments/ctda_v2_safelibero_state_coverage_summary_r1.json) 的
+1600/1600 通过结果；两者 `env.step=0`。
+OpenRegion gate 的 terminal 入口为
+[`open_region_coverage_summary_r2.json`](../experiments/ctda_v2_open_region_coverage_summary_r2.json)：50/50
+source/range/predicate agreement、`env.step=0`，但全部 joint value 为 `0.0 m`/closed，不能解释为 online
+transition coverage。
+AEGIS no-action producer 链的机器终态为
+[`ctda_v2_aegis_cbf_filter_summary.json`](../experiments/ctda_v2_aegis_cbf_filter_summary.json) 与
+[`ctda_v2_aegis_cbf_geometry_summary.json`](../experiments/ctda_v2_aegis_cbf_geometry_summary.json)；对应
+summary SHA-256 分别为 `25507c261168b172888f588d3f75cd633e8faa593f0059e4f3099821b9f22a7c` 和
+`205f16277ee9b661d6b46008f4a2bbe031c3201d4c38fa9609261f8b30daf90e`。它们均不授权 rollout。
 
 攻击证据审计的正式结论仍是 `0` 条 workload 通过完整 qualification：
 
@@ -99,8 +151,8 @@
    rollout；
 5. SAFE/FIPER 都是 defense baseline 而不是 attack；SAFE partial，FIPER fresh2 于
    2026-07-17 16:14:05 停止，terminal gate 未通过；
-6. 在新的 VLA-only threat-validation protocol 通过前，不启动 attacked+defended rollout、不声称
-   attack-defense benefit；这不阻止 outcome-blind 的 CTDA v2 离线优化和 clean/no-dispatch gate。
+6. 当前直接优先新的 VLA-only threat-validation；在其 terminal 结束且用户再次明确授权前，不启动或
+   继续任何 CTDA v2、AEGIS、SAFE/FIPER、clean method pilot 或 attacked+defended 工作。
 
 完整叙述见 [`attack_reproduction_evidence_audit.md`](attack_reproduction_evidence_audit.md)，机器记录见
 [`attack_reproduction_evidence_audit_20260717.json`](../experiments/attack_reproduction_evidence_audit_20260717.json)。

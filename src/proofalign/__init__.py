@@ -4,6 +4,8 @@ __all__ = [
     "CTDAChecker",
     "CTDARuntimeSession",
     "CTDASupervisor",
+    "CTDAV2ReferenceChecker",
+    "CTDAV2LeanKernelEvaluator",
     "DualAlignmentChecker",
     "SafetyExecutor",
 ]
@@ -26,4 +28,12 @@ def __getattr__(name: str):
         from proofalign.ctda_runtime import CTDARuntimeSession
 
         return CTDARuntimeSession
+    if name == "CTDAV2ReferenceChecker":
+        from proofalign.ctda_v2 import CTDAV2ReferenceChecker
+
+        return CTDAV2ReferenceChecker
+    if name == "CTDAV2LeanKernelEvaluator":
+        from proofalign.ctda_v2_evaluator import CTDAV2LeanKernelEvaluator
+
+        return CTDAV2LeanKernelEvaluator
     raise AttributeError(name)

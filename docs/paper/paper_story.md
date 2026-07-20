@@ -1,16 +1,16 @@
 # 论文故事：双层 VLA 执行完整性
 
-更新日期：2026-07-10
+更新日期：2026-07-20
 
 ## 一句话定位
 
-> ProofAlign preserves a trusted frozen mission across untrusted VLA prompts and
-> carries its obligations across raw action prefixes: no command is dispatched
-> without mission refinement and fresh prefix conformance, and no task phase
-> advances without checked cumulative completion.
+> ProofAlign defends VLA execution against two attack-induced shifts: an
+> intent-to-plan shift, where the model plans an action inconsistent with the
+> trusted task intent, and a plan-to-execution shift, where the applied or
+> observed action diverges from the accepted plan.
 
-中文：ProofAlign 把安全关键 VLA 执行定义为两个同时必要的完整性问题——合同必须忠实于
-trusted, locally frozen mission；实际 raw prefix 和累计 trace 必须持续实现该合同。
+中文：ProofAlign 只解决两层对齐——可信任务意图与 VLA 规划动作的对齐，以及已接受规划动作与实际
+执行/观测动作的对齐。
 
 ## 1. 问题
 
@@ -26,16 +26,17 @@ trusted, locally frozen mission；实际 raw prefix 和累计 trace 必须持续
 
 ## 2. 两层方法
 
-### Layer 1: Mission refinement
+### Layer 1: Intent–Plan Alignment
 
-合同只能来自 frozen benchmark mission、active phase 和 residual obligations。policy-facing
-prompt 与 policy symbolic metadata 都是不可信输入，不能改写任务根。
+从 frozen benchmark task 得到 trusted intent/phase/residual obligations；把 VLA raw action proposal 视为
+planned action，通过 mission-rooted contract 与 independent proposal binder 判断它是否仍实现该意图。
+policy-facing prompt、RGB 和 symbolic metadata 都是不可信输入，攻击后的自洽计划不能改写任务根。
 
-### Layer 2: Proposal/effect trace conformance
+### Layer 2: Plan–Execution Alignment
 
-raw proposal 通过独立 binder 绑定 active contract；每次只授权 fresh bounded prefix；dispatch
-之后的 receipt 和 observed trace 继续绑定同一 transaction；persistent monitor 跨 policy calls
-累积时序义务。
+第一层接受的 exact planned prefix 被短时、单次授权；dispatch、actuator-applied command、receipt 与
+observed effect 必须继续绑定该 exact plan。任何 substitution、stale/replay、未授权 filter rewrite、执行
+偏差或伪 completion 都由这一层拒绝；persistent monitor 跨 policy calls 累积未完成义务。
 
 两个核心不变量：
 
@@ -44,8 +45,8 @@ raw proposal 通过独立 binder 绑定 active contract；每次只授权 fresh 
 
 ## 3. 论文只保留三个贡献
 
-1. **问题与安全属性**：把 VLA 安全执行拆成 mission authorization integrity 和 execution
-   realization integrity，并说明两者的 failure surface 互补。
+1. **问题与安全属性**：把攻击下 VLA 安全执行拆成 intent–plan alignment 和 plan–execution
+   alignment，并说明两种 shift 的 failure surface 互补。
 2. **方法与形式化协议**：提出 mission-rooted persistent dual monitor，给出 typed staged
    judgments、fresh transaction 和 cumulative completion semantics；Lean 只证明离散协议中
    真正接通的部分。
@@ -54,6 +55,9 @@ raw proposal 通过独立 binder 绑定 active contract；每次只授权 fresh 
    收益、false block 和 verifier tax。
 
 攻击复现不是方法贡献。攻击只负责产生独立、版本化、可配对的 workload。
+
+signature、source hash、provenance audit 和 AEGIS CBF 也不是方法贡献。它们只保证实验中参与比较的
+intent/plan/execution 对象没有被测试脚手架混淆，或提供一个可选低层 intervention baseline。
 
 ## 4. 关键差异
 
@@ -96,10 +100,9 @@ runtime；只有真实接通的 stage 才能写 Lean-kernel-checked online judgm
 ```text
 two integrity failures
   -> why semantic-only and physical-only are insufficient
-  -> trusted frozen mission
-  -> persistent mission-rooted contract
-  -> independent raw-prefix binding
-  -> cumulative completion monitor
+  -> Layer 1: trusted intent vs planned action
+  -> Layer 2: accepted plan vs applied/observed action
+  -> contracts/binders/receipts as implementation machinery
   -> two protocol invariants and TCB
   -> published attack workloads
   -> paired utility/safety/overhead evaluation

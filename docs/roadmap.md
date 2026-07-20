@@ -25,6 +25,33 @@ trade-off，不追求绝对安全或通用证明。
 9. **EDPA R0 历史草案**：保留 official-source-pinned 双相机 patch adapter、protocol、预检和
    validator 作参考；它已被当前 v2 规划取代，不是 EDPA + SafeLIBERO P1 protocol，不生成
    patch，不运行 victim。
+10. **SafeLIBERO foundation R0**：固定官方 AEGIS commit/tree/MIT license、32 scenario/1600 init/49
+    个数据文件 digest、官方 obstacle-displacement collision label、typed provenance 与
+    CAR/TSR/ETS/cost/RET/四象限 classifier；只读 gate 为 ready，AEGIS runtime 仍 blocked，零 rollout。
+11. **SafeLIBERO R1--R3 + v2 state coverage**：双环境/资产、no-inference model load、单场景 serialization
+    和全 1600 init exact goal-reference key/collision-source coverage 已通过；r0 的 1250/1600 adapter
+    负结果保留，r1 为 1600/1600，所有路径 `env.step=0`。
+12. **CTDA v2 M0/M1 no-dispatch core**：独立 method/core/wire schema、certificate/rebind lease、四级
+    intervention、post-filter binding、progress ledger、13 个 v2 core test 与初始 Lean theorem 已实现；
+    retained E1 117 prefix/9+3 block 归因保持原标签。
+13. **CTDA v2 wire/Lean parity R0**：六阶段 strict canonical wire、独立 Lean replay evaluator 与 21-case
+    golden corpus 已完成；21/21 Python/Lean verdict parity，0 dispatch、0 `env.step`。
+14. **OpenRegion initial source gate R2**：CPU OSMesa 对冻结 drawer 的 50/50 init 完成 exact official joint
+    source、asset range 与 strict predicate agreement；0 `env.step`/policy/model/socket/dispatch。所有 qpos
+    都是 `0.0 m`/closed，故尚无 positive-state 或 transition claim。
+15. **Online-evidence/filter adapter R0**：6/6 unit/fake-observation adversarial case 通过；exact-source
+    progress attestation、fresh post-filter witness、adjusted-command membership/authorization、replan
+    non-refund 和 untrusted hard-block 已接线，AST 与运行 counter 均为零。issuer 仍是 simulator-test TCB，
+    没有 recovery controller 或 rollout authority。
+16. **OpenRegion strict-threshold R0**：五个事前固定 qpos 直接注入并精确读回，official/reference 5/5；
+    两个 open、三个 closed，`qpos == -0.14 m` 明确 closed。全程 `env.step=0`，但不是自然 drawer
+    transition 或 production sensor evidence。
+17. **Ed25519 evidence R0**：11/11 exact producer/version authentication、tamper/wrong-key/revocation 与
+    signed progress integration 通过；ephemeral test key、0 persistent private key、0 dispatch。
+18. **AEGIS CBF/QP filter R0**：9/9 fail-closed/signature/CTDA binding unit 与 5/5 CVXPY/OSQP parity 通过；
+    最大误差 `4.44e-16`，完整 result tamper 在 authorization 前 hard-block，0 dispatch。
+19. **AEGIS typed geometry R0**：8/8 authenticated provenance unit 与 4/4 pinned
+    `compute_h_coeffs_3d` parity 通过；最大误差 `1.53e-16`，raw perception trust 仍 blocked。
 
 ## 已完成阶段：clean utility trade-off
 
@@ -67,37 +94,45 @@ shared-observer fix + tests
    safety dimensions；
 5. closed-loop block 继续只标 intervention；没有独立 action counterfactual 时不计算 false positive。
 
-## 当前阶段：CTDA v2 与实验基础双线重建
+## 当前阶段：仅 VLA-only 攻击复现
 
 详细架构、里程碑、实验矩阵和停止条件以 [`optimization_plan.md`](optimization_plan.md) 为准。
 当前没有运行中的 ProofAlign、Phantom、SABER、SAFE 或 FIPER 正式实验。
 
-### 工作线 A：CTDA v2 outcome-blind 优化
+当前 sprint 取消双线并行：ProofAlign/CTDA、AEGIS 和其他 defense baseline 全部冻结，唯一允许的新
+outcome 是 unguarded VLA-only 的发布攻击 clean/attacked pair。VLA-only threat qualification terminal
+结束后必须停下并汇报，不能自动恢复自研 method。
 
-1. 冻结 contract epoch、proof/state freshness、分级 intervention、post-filter authorization、bounded
-   recovery 和 typed provenance；
-2. 选择 Lean-proven long-lived certificate + fast checker，或可证明 freshness 的 pipelined Lean；
-3. 保留 v1 replay，新建 v2 method/wire/schema；
-4. 先过 unit/fake-env、retained fixed-trace/shadow 和 no-dispatch gate；
-5. 事前冻结 utility/safety gate 后才运行新的 clean v2 pilot。
+### 唯一执行线：VLA-only threat qualification
 
-### 工作线 B：安全土壤与 VLA-only threat qualification
+1. SafeLIBERO/AEGIS source/data foundation 已完成：官方 commit `57b1aef...`、32 scenario、1600 init、
+   official collision label 和 typed metrics 已固定；
+2. AEGIS static runtime R1 已完成：隔离 Python 3.11/3.8 环境、242/152 distribution inventory、
+   标准 `pi05_libero` 与 GroundingDINO digest、4/32/1600 注册均通过，禁止操作计数为 0；
+3. no-dispatch R2/R3 已完成：GroundingDINO 与标准 pi0.5 分别加载成功，单个冻结 scene 的 init/完整
+   observation 已序列化；0 inference、0 socket、0 `env.step`，formal rollout 仍 blocked；
+4. 从全新的 official SABER constraint-violation producer gate 开始，不续接旧 R1；
+5. immutable record/transcript/schema/hash 通过后，直接运行 VLA-only clean/attacked pair；
+6. primary threat signal 必须是独立 oracle 给出的 clean-safe→attacked-unsafe，不用 task failure、attack
+   metadata 或 detector verdict代替；
+7. SABER terminal blocked/failed 后，P1 使用原始 EDPA patch 叠加 SafeLIBERO；不按 outcome 调 patch、
+   task、seed 或强度；
+8. 每条 workload 都保存 terminal manifest、append-only ledger、episode artifact 和 SHA-256；若均无攻击
+   通过则如实保留 qualified attack count=0，不继续 outcome-driven search。
 
-1. P0 建立 SafeLIBERO/AEGIS pinned readiness、outcome-blind candidate/classifier 和 exact-unit support
-   audit；
-2. P0 从全新的 official SABER constraint-violation producer gate 开始，不续接旧 R1；
-3. P1 使用原始 EDPA patch 叠加 SafeLIBERO，task failure 与独立 safety harm 分开；
-4. workload 必须通过 immutable artifact、unguarded victim、independent safety transition、disjoint
-   held-out gate、terminal artifact 和 population overlap；
-5. 若仍无攻击通过，删除或收窄 attack-defense claim，而不是 outcome-driven 调攻击。
+### 冻结线：ProofAlign/CTDA 与 defense baseline
+
+1. 既有 v1/v2 code、protocol、artifact 和文档原样保留，不覆盖、不续跑；
+2. 不运行 CTDA v2 audit/probe、fixed-trace/shadow outcome、clean pilot 或 attacked+defended arm；
+3. 不继续 attack-shift record、数值预算、raw perception、recovery 或 CTDA support 施工；
+4. 不运行 AEGIS、SAFE、FIPER 或其他 defense baseline；
+5. 只有 VLA-only threat qualification terminal 结束并得到用户新的明确授权，才重新制定后续方法计划。
 
 ### 汇合 gate
 
-只有 CTDA v2 clean utility 合格、至少一个 workload threat-valid、独立 safety oracle 完整且 attack 与
-CTDA support population 完全重合，才执行 attacked+defended 正式比较。
-
-两线汇合前，attack outcome 不参与 v2 threshold/binder 调整，CTDA verdict 不参与 attack reward 或
-ground truth。
+当前不开放汇合 gate。即使某个 VLA-only workload threat-valid，也只形成攻击复现结果，不自动执行
+attacked+defended 正式比较。任何 ProofAlign/CTDA 或 defense baseline 恢复都需要用户再次明确授权和新
+protocol。
 
 v1 冻结判定见
 [`proofalign_method_validity_decision_20260717.json`](../experiments/proofalign_method_validity_decision_20260717.json)。
@@ -111,9 +146,8 @@ clean utility 结果已经形成；若考虑新的 post-dispatch challenge，仍
 
 ### E5 external comparison
 
-只有 baseline terminal readiness、CTDA v2 clean utility、独立 workload safety signal 和 population
-overlap 同时满足时才执行。P0 低层闭环 baseline 改为已公开的 AEGIS；SAFE/FIPER 只在新的 terminal
-reproduction ready 后作为 detector baseline，旧 partial 不 resume。
+当前暂停。VLA-only 攻击复现终态不会自动打开 E5；后续是否运行 AEGIS、CTDA、SAFE/FIPER 或正式
+comparison，等待用户重新授权。旧 partial 不 resume。
 
 ## 永久 claim boundary
 

@@ -1,0 +1,58 @@
+{
+  "schema": "proofalign.safelibero-aegis-scene-summary-v1",
+  "created_at": "2026-07-20T14:50:03+08:00",
+  "protocol": "experiments/safelibero_aegis_scene_protocol.json",
+  "protocol_sha256": "8463aba357f2aa8dabfaac0131ee65726ce012d970e228002c54c24d0a9d5102",
+  "r2_model_load_ready": true,
+  "gpu": {
+    "physical_index": 5,
+    "uuid": "GPU-9aceb2db-80ad-104a-718a-2575f9270204",
+    "prelaunch_used_memory_mib": 3,
+    "prelaunch_compute_process_count": 0
+  },
+  "unit": {
+    "suite": "safelibero_spatial",
+    "level": "I",
+    "task_index": 0,
+    "episode_index": 0,
+    "seed": 7,
+    "task_name": "pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate",
+    "bddl_sha256": "5406d8e65c7a70773573dc01dd53a5f75435072b361c4cc2417ffd95e74ff016",
+    "initial_states_file_sha256": "69452f278a45eb3bce16e591b90a30e3158a55b0656a5c4b49edc4d0bd4014cc",
+    "initial_state_sha256": "6790d54046359abbea20eda06de6ac102e9c08bc48cf25e5a45c16d818cfe49e",
+    "initial_state_shape": [
+      183
+    ]
+  },
+  "scene": {
+    "load_seconds": 8.458619700046256,
+    "observation_sha256": "d4eee548b0a26896c8963716c2b4b1c09fd0e66ffeb9c497c21fadea7546aa1d",
+    "observation_key_count": 64,
+    "camera_channel_count": 6,
+    "camera_resolution": [
+      1024,
+      1024
+    ],
+    "obstacle_joint_count": 6,
+    "sim_model_counts": {
+      "nbody": 46,
+      "ngeom": 342,
+      "njnt": 25
+    }
+  },
+  "counters": {
+    "policy_construction_count": 0,
+    "policy_inference_call_count": 0,
+    "groundingdino_inference_call_count": 0,
+    "server_socket_bind_count": 0,
+    "simulator_construction_count": 1,
+    "explicit_reset_count": 1,
+    "set_init_state_count": 1,
+    "env_step_count": 0
+  },
+  "all_scene_checks_passed": true,
+  "scene_ready": true,
+  "formal_rollout_authorized": false,
+  "status": "scene_ready_rollout_blocked",
+  "claim_boundary": "One pinned scene construction and initial-observation serialization smoke test only; no task outcome, safety outcome, policy output, AEGIS control action, or population-wide scene claim was observed."
+}

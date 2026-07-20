@@ -1,0 +1,716 @@
+{
+  "checks": {
+    "all_init_states_retained": true,
+    "bddl_sha256": true,
+    "env_step_count_zero": true,
+    "exact_joint_source_coverage": true,
+    "finite_asset_range_coverage": true,
+    "official_predicate_agreement": true,
+    "reset_count": true,
+    "set_init_state_count": true,
+    "simulator_construction_count": true,
+    "task_name": true
+  },
+  "counters": {
+    "dispatch_count": 0,
+    "env_step_count": 0,
+    "model_construction_count": 0,
+    "policy_inference_count": 0,
+    "socket_bind_count": 0
+  },
+  "coverage": {
+    "bddl_sha256": "2b1fd9654306ef906a1cc9c4a10ba84a36aee07a22315f69507d3941eb4956a6",
+    "env_step_count": 0,
+    "finite_range_coverage_count": 50,
+    "joint_source_coverage_count": 50,
+    "observed_init_count": 50,
+    "predicate_agreement_count": 50,
+    "records": [
+      {
+        "episode_index": 0,
+        "joint_names": [
+          "wooden_cabinet_1_top_level"
+        ],
+        "joint_position_finite_in_asset_range": true,
+        "joint_position_m": 0.0,
+        "joint_source_exact": true,
+        "official_open": false,
+        "predicate_agreement": true,
+        "strict_threshold_open": false,
+        "unit_id": "safelibero_goal:task3:levelI:init0"
+      },
+      {
+        "episode_index": 1,
+        "joint_names": [
+          "wooden_cabinet_1_top_level"
+        ],
+        "joint_position_finite_in_asset_range": true,
+        "joint_position_m": 0.0,
+        "joint_source_exact": true,
+        "official_open": false,
+        "predicate_agreement": true,
+        "strict_threshold_open": false,
+        "unit_id": "safelibero_goal:task3:levelI:init1"
+      },
+      {
+        "episode_index": 2,
+        "joint_names": [
+          "wooden_cabinet_1_top_level"
+        ],
+        "joint_position_finite_in_asset_range": true,
+        "joint_position_m": 0.0,
+        "joint_source_exact": true,
+        "official_open": false,
+        "predicate_agreement": true,
+        "strict_threshold_open": false,
+        "unit_id": "safelibero_goal:task3:levelI:init2"
+      },
+      {
+        "episode_index": 3,
+        "joint_names": [
+          "wooden_cabinet_1_top_level"
+        ],
+        "joint_position_finite_in_asset_range": true,
+        "joint_position_m": 0.0,
+        "joint_source_exact": true,
+        "official_open": false,
+        "predicate_agreement": true,
+        "strict_threshold_open": false,
+        "unit_id": "safelibero_goal:task3:levelI:init3"
+      },
+      {
+        "episode_index": 4,
+        "joint_names": [
+          "wooden_cabinet_1_top_level"
+        ],
+        "joint_position_finite_in_asset_range": true,
+        "joint_position_m": 0.0,
+        "joint_source_exact": true,
+        "official_open": false,
+        "predicate_agreement": true,
+        "strict_threshold_open": false,
+        "unit_id": "safelibero_goal:task3:levelI:init4"
+      },
+      {
+        "episode_index": 5,
+        "joint_names": [
+          "wooden_cabinet_1_top_level"
+        ],
+        "joint_position_finite_in_asset_range": true,
+        "joint_position_m": 0.0,
+        "joint_source_exact": true,
+        "official_open": false,
+        "predicate_agreement": true,
+        "strict_threshold_open": false,
+        "unit_id": "safelibero_goal:task3:levelI:init5"
+      },
+      {
+        "episode_index": 6,
+        "joint_names": [
+          "wooden_cabinet_1_top_level"
+        ],
+        "joint_position_finite_in_asset_range": true,
+        "joint_position_m": 0.0,
+        "joint_source_exact": true,
+        "official_open": false,
+        "predicate_agreement": true,
+        "strict_threshold_open": false,
+        "unit_id": "safelibero_goal:task3:levelI:init6"
+      },
+      {
+        "episode_index": 7,
+        "joint_names": [
+          "wooden_cabinet_1_top_level"
+        ],
+        "joint_position_finite_in_asset_range": true,
+        "joint_position_m": 0.0,
+        "joint_source_exact": true,
+        "official_open": false,
+        "predicate_agreement": true,
+        "strict_threshold_open": false,
+        "unit_id": "safelibero_goal:task3:levelI:init7"
+      },
+      {
+        "episode_index": 8,
+        "joint_names": [
+          "wooden_cabinet_1_top_level"
+        ],
+        "joint_position_finite_in_asset_range": true,
+        "joint_position_m": 0.0,
+        "joint_source_exact": true,
+        "official_open": false,
+        "predicate_agreement": true,
+        "strict_threshold_open": false,
+        "unit_id": "safelibero_goal:task3:levelI:init8"
+      },
+      {
+        "episode_index": 9,
+        "joint_names": [
+          "wooden_cabinet_1_top_level"
+        ],
+        "joint_position_finite_in_asset_range": true,
+        "joint_position_m": 0.0,
+        "joint_source_exact": true,
+        "official_open": false,
+        "predicate_agreement": true,
+        "strict_threshold_open": false,
+        "unit_id": "safelibero_goal:task3:levelI:init9"
+      },
+      {
+        "episode_index": 10,
+        "joint_names": [
+          "wooden_cabinet_1_top_level"
+        ],
+        "joint_position_finite_in_asset_range": true,
+        "joint_position_m": 0.0,
+        "joint_source_exact": true,
+        "official_open": false,
+        "predicate_agreement": true,
+        "strict_threshold_open": false,
+        "unit_id": "safelibero_goal:task3:levelI:init10"
+      },
+      {
+        "episode_index": 11,
+        "joint_names": [
+          "wooden_cabinet_1_top_level"
+        ],
+        "joint_position_finite_in_asset_range": true,
+        "joint_position_m": 0.0,
+        "joint_source_exact": true,
+        "official_open": false,
+        "predicate_agreement": true,
+        "strict_threshold_open": false,
+        "unit_id": "safelibero_goal:task3:levelI:init11"
+      },
+      {
+        "episode_index": 12,
+        "joint_names": [
+          "wooden_cabinet_1_top_level"
+        ],
+        "joint_position_finite_in_asset_range": true,
+        "joint_position_m": 0.0,
+        "joint_source_exact": true,
+        "official_open": false,
+        "predicate_agreement": true,
+        "strict_threshold_open": false,
+        "unit_id": "safelibero_goal:task3:levelI:init12"
+      },
+      {
+        "episode_index": 13,
+        "joint_names": [
+          "wooden_cabinet_1_top_level"
+        ],
+        "joint_position_finite_in_asset_range": true,
+        "joint_position_m": 0.0,
+        "joint_source_exact": true,
+        "official_open": false,
+        "predicate_agreement": true,
+        "strict_threshold_open": false,
+        "unit_id": "safelibero_goal:task3:levelI:init13"
+      },
+      {
+        "episode_index": 14,
+        "joint_names": [
+          "wooden_cabinet_1_top_level"
+        ],
+        "joint_position_finite_in_asset_range": true,
+        "joint_position_m": 0.0,
+        "joint_source_exact": true,
+        "official_open": false,
+        "predicate_agreement": true,
+        "strict_threshold_open": false,
+        "unit_id": "safelibero_goal:task3:levelI:init14"
+      },
+      {
+        "episode_index": 15,
+        "joint_names": [
+          "wooden_cabinet_1_top_level"
+        ],
+        "joint_position_finite_in_asset_range": true,
+        "joint_position_m": 0.0,
+        "joint_source_exact": true,
+        "official_open": false,
+        "predicate_agreement": true,
+        "strict_threshold_open": false,
+        "unit_id": "safelibero_goal:task3:levelI:init15"
+      },
+      {
+        "episode_index": 16,
+        "joint_names": [
+          "wooden_cabinet_1_top_level"
+        ],
+        "joint_position_finite_in_asset_range": true,
+        "joint_position_m": 0.0,
+        "joint_source_exact": true,
+        "official_open": false,
+        "predicate_agreement": true,
+        "strict_threshold_open": false,
+        "unit_id": "safelibero_goal:task3:levelI:init16"
+      },
+      {
+        "episode_index": 17,
+        "joint_names": [
+          "wooden_cabinet_1_top_level"
+        ],
+        "joint_position_finite_in_asset_range": true,
+        "joint_position_m": 0.0,
+        "joint_source_exact": true,
+        "official_open": false,
+        "predicate_agreement": true,
+        "strict_threshold_open": false,
+        "unit_id": "safelibero_goal:task3:levelI:init17"
+      },
+      {
+        "episode_index": 18,
+        "joint_names": [
+          "wooden_cabinet_1_top_level"
+        ],
+        "joint_position_finite_in_asset_range": true,
+        "joint_position_m": 0.0,
+        "joint_source_exact": true,
+        "official_open": false,
+        "predicate_agreement": true,
+        "strict_threshold_open": false,
+        "unit_id": "safelibero_goal:task3:levelI:init18"
+      },
+      {
+        "episode_index": 19,
+        "joint_names": [
+          "wooden_cabinet_1_top_level"
+        ],
+        "joint_position_finite_in_asset_range": true,
+        "joint_position_m": 0.0,
+        "joint_source_exact": true,
+        "official_open": false,
+        "predicate_agreement": true,
+        "strict_threshold_open": false,
+        "unit_id": "safelibero_goal:task3:levelI:init19"
+      },
+      {
+        "episode_index": 20,
+        "joint_names": [
+          "wooden_cabinet_1_top_level"
+        ],
+        "joint_position_finite_in_asset_range": true,
+        "joint_position_m": 0.0,
+        "joint_source_exact": true,
+        "official_open": false,
+        "predicate_agreement": true,
+        "strict_threshold_open": false,
+        "unit_id": "safelibero_goal:task3:levelI:init20"
+      },
+      {
+        "episode_index": 21,
+        "joint_names": [
+          "wooden_cabinet_1_top_level"
+        ],
+        "joint_position_finite_in_asset_range": true,
+        "joint_position_m": 0.0,
+        "joint_source_exact": true,
+        "official_open": false,
+        "predicate_agreement": true,
+        "strict_threshold_open": false,
+        "unit_id": "safelibero_goal:task3:levelI:init21"
+      },
+      {
+        "episode_index": 22,
+        "joint_names": [
+          "wooden_cabinet_1_top_level"
+        ],
+        "joint_position_finite_in_asset_range": true,
+        "joint_position_m": 0.0,
+        "joint_source_exact": true,
+        "official_open": false,
+        "predicate_agreement": true,
+        "strict_threshold_open": false,
+        "unit_id": "safelibero_goal:task3:levelI:init22"
+      },
+      {
+        "episode_index": 23,
+        "joint_names": [
+          "wooden_cabinet_1_top_level"
+        ],
+        "joint_position_finite_in_asset_range": true,
+        "joint_position_m": 0.0,
+        "joint_source_exact": true,
+        "official_open": false,
+        "predicate_agreement": true,
+        "strict_threshold_open": false,
+        "unit_id": "safelibero_goal:task3:levelI:init23"
+      },
+      {
+        "episode_index": 24,
+        "joint_names": [
+          "wooden_cabinet_1_top_level"
+        ],
+        "joint_position_finite_in_asset_range": true,
+        "joint_position_m": 0.0,
+        "joint_source_exact": true,
+        "official_open": false,
+        "predicate_agreement": true,
+        "strict_threshold_open": false,
+        "unit_id": "safelibero_goal:task3:levelI:init24"
+      },
+      {
+        "episode_index": 25,
+        "joint_names": [
+          "wooden_cabinet_1_top_level"
+        ],
+        "joint_position_finite_in_asset_range": true,
+        "joint_position_m": 0.0,
+        "joint_source_exact": true,
+        "official_open": false,
+        "predicate_agreement": true,
+        "strict_threshold_open": false,
+        "unit_id": "safelibero_goal:task3:levelI:init25"
+      },
+      {
+        "episode_index": 26,
+        "joint_names": [
+          "wooden_cabinet_1_top_level"
+        ],
+        "joint_position_finite_in_asset_range": true,
+        "joint_position_m": 0.0,
+        "joint_source_exact": true,
+        "official_open": false,
+        "predicate_agreement": true,
+        "strict_threshold_open": false,
+        "unit_id": "safelibero_goal:task3:levelI:init26"
+      },
+      {
+        "episode_index": 27,
+        "joint_names": [
+          "wooden_cabinet_1_top_level"
+        ],
+        "joint_position_finite_in_asset_range": true,
+        "joint_position_m": 0.0,
+        "joint_source_exact": true,
+        "official_open": false,
+        "predicate_agreement": true,
+        "strict_threshold_open": false,
+        "unit_id": "safelibero_goal:task3:levelI:init27"
+      },
+      {
+        "episode_index": 28,
+        "joint_names": [
+          "wooden_cabinet_1_top_level"
+        ],
+        "joint_position_finite_in_asset_range": true,
+        "joint_position_m": 0.0,
+        "joint_source_exact": true,
+        "official_open": false,
+        "predicate_agreement": true,
+        "strict_threshold_open": false,
+        "unit_id": "safelibero_goal:task3:levelI:init28"
+      },
+      {
+        "episode_index": 29,
+        "joint_names": [
+          "wooden_cabinet_1_top_level"
+        ],
+        "joint_position_finite_in_asset_range": true,
+        "joint_position_m": 0.0,
+        "joint_source_exact": true,
+        "official_open": false,
+        "predicate_agreement": true,
+        "strict_threshold_open": false,
+        "unit_id": "safelibero_goal:task3:levelI:init29"
+      },
+      {
+        "episode_index": 30,
+        "joint_names": [
+          "wooden_cabinet_1_top_level"
+        ],
+        "joint_position_finite_in_asset_range": true,
+        "joint_position_m": 0.0,
+        "joint_source_exact": true,
+        "official_open": false,
+        "predicate_agreement": true,
+        "strict_threshold_open": false,
+        "unit_id": "safelibero_goal:task3:levelI:init30"
+      },
+      {
+        "episode_index": 31,
+        "joint_names": [
+          "wooden_cabinet_1_top_level"
+        ],
+        "joint_position_finite_in_asset_range": true,
+        "joint_position_m": 0.0,
+        "joint_source_exact": true,
+        "official_open": false,
+        "predicate_agreement": true,
+        "strict_threshold_open": false,
+        "unit_id": "safelibero_goal:task3:levelI:init31"
+      },
+      {
+        "episode_index": 32,
+        "joint_names": [
+          "wooden_cabinet_1_top_level"
+        ],
+        "joint_position_finite_in_asset_range": true,
+        "joint_position_m": 0.0,
+        "joint_source_exact": true,
+        "official_open": false,
+        "predicate_agreement": true,
+        "strict_threshold_open": false,
+        "unit_id": "safelibero_goal:task3:levelI:init32"
+      },
+      {
+        "episode_index": 33,
+        "joint_names": [
+          "wooden_cabinet_1_top_level"
+        ],
+        "joint_position_finite_in_asset_range": true,
+        "joint_position_m": 0.0,
+        "joint_source_exact": true,
+        "official_open": false,
+        "predicate_agreement": true,
+        "strict_threshold_open": false,
+        "unit_id": "safelibero_goal:task3:levelI:init33"
+      },
+      {
+        "episode_index": 34,
+        "joint_names": [
+          "wooden_cabinet_1_top_level"
+        ],
+        "joint_position_finite_in_asset_range": true,
+        "joint_position_m": 0.0,
+        "joint_source_exact": true,
+        "official_open": false,
+        "predicate_agreement": true,
+        "strict_threshold_open": false,
+        "unit_id": "safelibero_goal:task3:levelI:init34"
+      },
+      {
+        "episode_index": 35,
+        "joint_names": [
+          "wooden_cabinet_1_top_level"
+        ],
+        "joint_position_finite_in_asset_range": true,
+        "joint_position_m": 0.0,
+        "joint_source_exact": true,
+        "official_open": false,
+        "predicate_agreement": true,
+        "strict_threshold_open": false,
+        "unit_id": "safelibero_goal:task3:levelI:init35"
+      },
+      {
+        "episode_index": 36,
+        "joint_names": [
+          "wooden_cabinet_1_top_level"
+        ],
+        "joint_position_finite_in_asset_range": true,
+        "joint_position_m": 0.0,
+        "joint_source_exact": true,
+        "official_open": false,
+        "predicate_agreement": true,
+        "strict_threshold_open": false,
+        "unit_id": "safelibero_goal:task3:levelI:init36"
+      },
+      {
+        "episode_index": 37,
+        "joint_names": [
+          "wooden_cabinet_1_top_level"
+        ],
+        "joint_position_finite_in_asset_range": true,
+        "joint_position_m": 0.0,
+        "joint_source_exact": true,
+        "official_open": false,
+        "predicate_agreement": true,
+        "strict_threshold_open": false,
+        "unit_id": "safelibero_goal:task3:levelI:init37"
+      },
+      {
+        "episode_index": 38,
+        "joint_names": [
+          "wooden_cabinet_1_top_level"
+        ],
+        "joint_position_finite_in_asset_range": true,
+        "joint_position_m": 0.0,
+        "joint_source_exact": true,
+        "official_open": false,
+        "predicate_agreement": true,
+        "strict_threshold_open": false,
+        "unit_id": "safelibero_goal:task3:levelI:init38"
+      },
+      {
+        "episode_index": 39,
+        "joint_names": [
+          "wooden_cabinet_1_top_level"
+        ],
+        "joint_position_finite_in_asset_range": true,
+        "joint_position_m": 0.0,
+        "joint_source_exact": true,
+        "official_open": false,
+        "predicate_agreement": true,
+        "strict_threshold_open": false,
+        "unit_id": "safelibero_goal:task3:levelI:init39"
+      },
+      {
+        "episode_index": 40,
+        "joint_names": [
+          "wooden_cabinet_1_top_level"
+        ],
+        "joint_position_finite_in_asset_range": true,
+        "joint_position_m": 0.0,
+        "joint_source_exact": true,
+        "official_open": false,
+        "predicate_agreement": true,
+        "strict_threshold_open": false,
+        "unit_id": "safelibero_goal:task3:levelI:init40"
+      },
+      {
+        "episode_index": 41,
+        "joint_names": [
+          "wooden_cabinet_1_top_level"
+        ],
+        "joint_position_finite_in_asset_range": true,
+        "joint_position_m": 0.0,
+        "joint_source_exact": true,
+        "official_open": false,
+        "predicate_agreement": true,
+        "strict_threshold_open": false,
+        "unit_id": "safelibero_goal:task3:levelI:init41"
+      },
+      {
+        "episode_index": 42,
+        "joint_names": [
+          "wooden_cabinet_1_top_level"
+        ],
+        "joint_position_finite_in_asset_range": true,
+        "joint_position_m": 0.0,
+        "joint_source_exact": true,
+        "official_open": false,
+        "predicate_agreement": true,
+        "strict_threshold_open": false,
+        "unit_id": "safelibero_goal:task3:levelI:init42"
+      },
+      {
+        "episode_index": 43,
+        "joint_names": [
+          "wooden_cabinet_1_top_level"
+        ],
+        "joint_position_finite_in_asset_range": true,
+        "joint_position_m": 0.0,
+        "joint_source_exact": true,
+        "official_open": false,
+        "predicate_agreement": true,
+        "strict_threshold_open": false,
+        "unit_id": "safelibero_goal:task3:levelI:init43"
+      },
+      {
+        "episode_index": 44,
+        "joint_names": [
+          "wooden_cabinet_1_top_level"
+        ],
+        "joint_position_finite_in_asset_range": true,
+        "joint_position_m": 0.0,
+        "joint_source_exact": true,
+        "official_open": false,
+        "predicate_agreement": true,
+        "strict_threshold_open": false,
+        "unit_id": "safelibero_goal:task3:levelI:init44"
+      },
+      {
+        "episode_index": 45,
+        "joint_names": [
+          "wooden_cabinet_1_top_level"
+        ],
+        "joint_position_finite_in_asset_range": true,
+        "joint_position_m": 0.0,
+        "joint_source_exact": true,
+        "official_open": false,
+        "predicate_agreement": true,
+        "strict_threshold_open": false,
+        "unit_id": "safelibero_goal:task3:levelI:init45"
+      },
+      {
+        "episode_index": 46,
+        "joint_names": [
+          "wooden_cabinet_1_top_level"
+        ],
+        "joint_position_finite_in_asset_range": true,
+        "joint_position_m": 0.0,
+        "joint_source_exact": true,
+        "official_open": false,
+        "predicate_agreement": true,
+        "strict_threshold_open": false,
+        "unit_id": "safelibero_goal:task3:levelI:init46"
+      },
+      {
+        "episode_index": 47,
+        "joint_names": [
+          "wooden_cabinet_1_top_level"
+        ],
+        "joint_position_finite_in_asset_range": true,
+        "joint_position_m": 0.0,
+        "joint_source_exact": true,
+        "official_open": false,
+        "predicate_agreement": true,
+        "strict_threshold_open": false,
+        "unit_id": "safelibero_goal:task3:levelI:init47"
+      },
+      {
+        "episode_index": 48,
+        "joint_names": [
+          "wooden_cabinet_1_top_level"
+        ],
+        "joint_position_finite_in_asset_range": true,
+        "joint_position_m": 0.0,
+        "joint_source_exact": true,
+        "official_open": false,
+        "predicate_agreement": true,
+        "strict_threshold_open": false,
+        "unit_id": "safelibero_goal:task3:levelI:init48"
+      },
+      {
+        "episode_index": 49,
+        "joint_names": [
+          "wooden_cabinet_1_top_level"
+        ],
+        "joint_position_finite_in_asset_range": true,
+        "joint_position_m": 0.0,
+        "joint_source_exact": true,
+        "official_open": false,
+        "predicate_agreement": true,
+        "strict_threshold_open": false,
+        "unit_id": "safelibero_goal:task3:levelI:init49"
+      }
+    ],
+    "reset_count": 1,
+    "set_init_state_count": 50,
+    "simulator_construction_count": 1,
+    "task_name": "open_the_top_drawer_and_put_the_bowl_inside"
+  },
+  "formal_rollout_authorized": false,
+  "next_gate": "Implement the post-filter/recovery no-dispatch adapter.",
+  "preflight_checks": {
+    "bddl_sha256": true,
+    "dataset_digest": true,
+    "implementation:scripts/ctda_v2_open_region_coverage_cpu_r2.py": true,
+    "implementation:src/proofalign/benchmark/__init__.py": true,
+    "implementation:src/proofalign/benchmark/safelibero_ctda_support.py": true,
+    "implementation:src/proofalign/benchmark/safelibero_open_region.py": true,
+    "implementation:tests/test_safelibero_ctda_support.py": true,
+    "init_sha256": true,
+    "init_state_count": true,
+    "joint_source": true,
+    "simulator_python": true,
+    "source_clean": true,
+    "source_commit": true,
+    "source_file_sha256": true,
+    "source_identity_digest": true,
+    "source_tree": true,
+    "state_coverage_summary_sha256": true,
+    "task_name": true,
+    "threshold": true,
+    "unit_id": true,
+    "wire_parity_summary_sha256": true
+  },
+  "protocol_id": "ctda-v2-open-region-source-coverage-r2-cpu",
+  "protocol_sha256": "dba45834c76792d34f2b5708c6b69c1aa252082028466062caedd3bb4a418f60",
+  "render_backend": "osmesa",
+  "schema": "proofalign.ctda-v2-open-region-coverage-v1",
+  "source_identity_digest": "dadd1dafc953856569afd4e351a1c447cb8dc1ded2f480a4a946c09f06b6e394",
+  "status": "open_region_coverage_ready_rollout_blocked"
+}

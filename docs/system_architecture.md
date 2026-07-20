@@ -31,8 +31,8 @@ dispatch + simulator receipt + trusted observed state
 
 只有两层 alignment：
 
-- mission refinement；
-- proposal/effect trace conformance。
+- **Intent–Plan Alignment**：trusted mission intent/phase/residual 与 VLA planned raw action；
+- **Plan–Execution Alignment**：第一层接受的 exact plan 与 dispatch/applied/receipt/observed effect。
 
 serialization、digest、provenance、uncertainty 和 fallback 是共享机制，不是额外的 alignment
 layer。

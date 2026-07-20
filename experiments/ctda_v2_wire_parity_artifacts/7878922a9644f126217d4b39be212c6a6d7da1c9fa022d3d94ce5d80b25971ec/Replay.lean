@@ -1,0 +1,37 @@
+import ProofAlign.CTDAV2Wire
+
+open ProofAlign.CTDAV2
+open ProofAlign.WireV2
+
+def replayRequest : ProgressUpdatePayload :=
+  {
+    afterEpisodeNonce := (String.mk [Char.ofNat 101, Char.ofNat 112, Char.ofNat 105, Char.ofNat 115, Char.ofNat 111, Char.ofNat 100, Char.ofNat 101, Char.ofNat 45, Char.ofNat 118, Char.ofNat 50, Char.ofNat 45, Char.ofNat 103, Char.ofNat 111, Char.ofNat 108, Char.ofNat 100, Char.ofNat 101, Char.ofNat 110])
+    afterMaxSensorAgeNs := 1000
+    afterObservedAtNs := 110
+    afterStateEpoch := 2
+    afterStateKnown := true
+    beforeSnapshotDigest := (String.mk [Char.ofNat 57, Char.ofNat 56, Char.ofNat 48, Char.ofNat 49, Char.ofNat 101, Char.ofNat 56, Char.ofNat 56, Char.ofNat 101, Char.ofNat 98, Char.ofNat 102, Char.ofNat 52, Char.ofNat 57, Char.ofNat 53, Char.ofNat 52, Char.ofNat 100, Char.ofNat 55, Char.ofNat 54, Char.ofNat 48, Char.ofNat 48, Char.ofNat 50, Char.ofNat 97, Char.ofNat 100, Char.ofNat 50, Char.ofNat 57, Char.ofNat 101, Char.ofNat 102, Char.ofNat 56, Char.ofNat 51, Char.ofNat 51, Char.ofNat 55, Char.ofNat 98, Char.ofNat 98, Char.ofNat 55, Char.ofNat 100, Char.ofNat 57, Char.ofNat 49, Char.ofNat 101, Char.ofNat 100, Char.ofNat 51, Char.ofNat 101, Char.ofNat 54, Char.ofNat 48, Char.ofNat 98, Char.ofNat 52, Char.ofNat 56, Char.ofNat 51, Char.ofNat 97, Char.ofNat 97, Char.ofNat 97, Char.ofNat 100, Char.ofNat 52, Char.ofNat 97, Char.ofNat 54, Char.ofNat 99, Char.ofNat 101, Char.ofNat 54, Char.ofNat 98, Char.ofNat 102, Char.ofNat 53, Char.ofNat 53, Char.ofNat 100, Char.ofNat 99, Char.ofNat 101, Char.ofNat 97])
+    certificateDigest := (String.mk [Char.ofNat 99, Char.ofNat 56, Char.ofNat 97, Char.ofNat 57, Char.ofNat 55, Char.ofNat 100, Char.ofNat 51, Char.ofNat 98, Char.ofNat 51, Char.ofNat 99, Char.ofNat 54, Char.ofNat 98, Char.ofNat 54, Char.ofNat 56, Char.ofNat 48, Char.ofNat 102, Char.ofNat 48, Char.ofNat 55, Char.ofNat 102, Char.ofNat 50, Char.ofNat 100, Char.ofNat 99, Char.ofNat 98, Char.ofNat 57, Char.ofNat 101, Char.ofNat 57, Char.ofNat 97, Char.ofNat 97, Char.ofNat 52, Char.ofNat 49, Char.ofNat 50, Char.ofNat 48, Char.ofNat 102, Char.ofNat 102, Char.ofNat 97, Char.ofNat 101, Char.ofNat 57, Char.ofNat 56, Char.ofNat 100, Char.ofNat 98, Char.ofNat 97, Char.ofNat 54, Char.ofNat 54, Char.ofNat 49, Char.ofNat 51, Char.ofNat 48, Char.ofNat 98, Char.ofNat 49, Char.ofNat 99, Char.ofNat 56, Char.ofNat 49, Char.ofNat 52, Char.ofNat 49, Char.ofNat 57, Char.ofNat 48, Char.ofNat 100, Char.ofNat 51, Char.ofNat 49, Char.ofNat 98, Char.ofNat 55, Char.ofNat 50, Char.ofNat 49, Char.ofNat 98, Char.ofNat 98])
+    consecutiveNonprogressControlEpochs := 0
+    cumulativeMotionUnits := 0
+    cumulativeTranslationUm := 0
+    distanceAfterUm := some 180000
+    distanceBeforeUm := some 200000
+    elapsedControlEpochs := 1
+    lastStateEpoch := 1
+    ledgerCertificateDigest := (String.mk [Char.ofNat 99, Char.ofNat 56, Char.ofNat 97, Char.ofNat 57, Char.ofNat 55, Char.ofNat 100, Char.ofNat 51, Char.ofNat 98, Char.ofNat 51, Char.ofNat 99, Char.ofNat 54, Char.ofNat 98, Char.ofNat 54, Char.ofNat 56, Char.ofNat 48, Char.ofNat 102, Char.ofNat 48, Char.ofNat 55, Char.ofNat 102, Char.ofNat 50, Char.ofNat 100, Char.ofNat 99, Char.ofNat 98, Char.ofNat 57, Char.ofNat 101, Char.ofNat 57, Char.ofNat 97, Char.ofNat 97, Char.ofNat 52, Char.ofNat 49, Char.ofNat 50, Char.ofNat 48, Char.ofNat 102, Char.ofNat 102, Char.ofNat 97, Char.ofNat 101, Char.ofNat 57, Char.ofNat 56, Char.ofNat 100, Char.ofNat 98, Char.ofNat 97, Char.ofNat 54, Char.ofNat 54, Char.ofNat 49, Char.ofNat 51, Char.ofNat 48, Char.ofNat 98, Char.ofNat 49, Char.ofNat 99, Char.ofNat 56, Char.ofNat 49, Char.ofNat 52, Char.ofNat 49, Char.ofNat 57, Char.ofNat 48, Char.ofNat 100, Char.ofNat 51, Char.ofNat 49, Char.ofNat 98, Char.ofNat 55, Char.ofNat 50, Char.ofNat 49, Char.ofNat 98, Char.ofNat 98])
+    ledgerEpisodeNonce := (String.mk [Char.ofNat 101, Char.ofNat 112, Char.ofNat 105, Char.ofNat 115, Char.ofNat 111, Char.ofNat 100, Char.ofNat 101, Char.ofNat 45, Char.ofNat 118, Char.ofNat 50, Char.ofNat 45, Char.ofNat 103, Char.ofNat 111, Char.ofNat 108, Char.ofNat 100, Char.ofNat 101, Char.ofNat 110])
+    ledgerLastSnapshotDigest := (String.mk [Char.ofNat 57, Char.ofNat 56, Char.ofNat 48, Char.ofNat 49, Char.ofNat 101, Char.ofNat 56, Char.ofNat 56, Char.ofNat 101, Char.ofNat 98, Char.ofNat 102, Char.ofNat 52, Char.ofNat 57, Char.ofNat 53, Char.ofNat 52, Char.ofNat 100, Char.ofNat 55, Char.ofNat 54, Char.ofNat 48, Char.ofNat 48, Char.ofNat 50, Char.ofNat 97, Char.ofNat 100, Char.ofNat 50, Char.ofNat 57, Char.ofNat 101, Char.ofNat 102, Char.ofNat 56, Char.ofNat 51, Char.ofNat 51, Char.ofNat 55, Char.ofNat 98, Char.ofNat 98, Char.ofNat 55, Char.ofNat 100, Char.ofNat 57, Char.ofNat 49, Char.ofNat 101, Char.ofNat 100, Char.ofNat 51, Char.ofNat 101, Char.ofNat 54, Char.ofNat 48, Char.ofNat 98, Char.ofNat 52, Char.ofNat 56, Char.ofNat 51, Char.ofNat 97, Char.ofNat 97, Char.ofNat 97, Char.ofNat 100, Char.ofNat 52, Char.ofNat 97, Char.ofNat 54, Char.ofNat 99, Char.ofNat 101, Char.ofNat 54, Char.ofNat 98, Char.ofNat 102, Char.ofNat 53, Char.ofNat 53, Char.ofNat 100, Char.ofNat 99, Char.ofNat 101, Char.ofNat 97])
+    maxNonprogressControlEpochs := 5
+    minimumProgressUm := 10000
+    motionBudgetUnits := 100
+    motionConsumedUnits := 5
+    nowNs := 111
+    progressAttestationSubjectDigest := (String.mk [Char.ofNat 99, Char.ofNat 52, Char.ofNat 56, Char.ofNat 98, Char.ofNat 52, Char.ofNat 50, Char.ofNat 52, Char.ofNat 53, Char.ofNat 101, Char.ofNat 98, Char.ofNat 98, Char.ofNat 57, Char.ofNat 100, Char.ofNat 53, Char.ofNat 52, Char.ofNat 51, Char.ofNat 53, Char.ofNat 57, Char.ofNat 53, Char.ofNat 53, Char.ofNat 52, Char.ofNat 51, Char.ofNat 99, Char.ofNat 97, Char.ofNat 99, Char.ofNat 53, Char.ofNat 48, Char.ofNat 49, Char.ofNat 54, Char.ofNat 53, Char.ofNat 55, Char.ofNat 99, Char.ofNat 57, Char.ofNat 101, Char.ofNat 48, Char.ofNat 48, Char.ofNat 49, Char.ofNat 97, Char.ofNat 97, Char.ofNat 55, Char.ofNat 51, Char.ofNat 100, Char.ofNat 53, Char.ofNat 98, Char.ofNat 98, Char.ofNat 50, Char.ofNat 97, Char.ofNat 100, Char.ofNat 48, Char.ofNat 101, Char.ofNat 55, Char.ofNat 48, Char.ofNat 54, Char.ofNat 54, Char.ofNat 100, Char.ofNat 51, Char.ofNat 56, Char.ofNat 52, Char.ofNat 50, Char.ofNat 54, Char.ofNat 51, Char.ofNat 52, Char.ofNat 97, Char.ofNat 52])
+    progressAuthenticated := true
+    progressClaimDigest := (String.mk [Char.ofNat 99, Char.ofNat 52, Char.ofNat 56, Char.ofNat 98, Char.ofNat 52, Char.ofNat 50, Char.ofNat 52, Char.ofNat 53, Char.ofNat 101, Char.ofNat 98, Char.ofNat 98, Char.ofNat 57, Char.ofNat 100, Char.ofNat 53, Char.ofNat 52, Char.ofNat 51, Char.ofNat 53, Char.ofNat 57, Char.ofNat 53, Char.ofNat 53, Char.ofNat 52, Char.ofNat 51, Char.ofNat 99, Char.ofNat 97, Char.ofNat 99, Char.ofNat 53, Char.ofNat 48, Char.ofNat 49, Char.ofNat 54, Char.ofNat 53, Char.ofNat 55, Char.ofNat 99, Char.ofNat 57, Char.ofNat 101, Char.ofNat 48, Char.ofNat 48, Char.ofNat 49, Char.ofNat 97, Char.ofNat 97, Char.ofNat 55, Char.ofNat 51, Char.ofNat 100, Char.ofNat 53, Char.ofNat 98, Char.ofNat 98, Char.ofNat 50, Char.ofNat 97, Char.ofNat 100, Char.ofNat 48, Char.ofNat 101, Char.ofNat 55, Char.ofNat 48, Char.ofNat 54, Char.ofNat 54, Char.ofNat 100, Char.ofNat 51, Char.ofNat 56, Char.ofNat 52, Char.ofNat 50, Char.ofNat 54, Char.ofNat 51, Char.ofNat 52, Char.ofNat 97, Char.ofNat 52])
+    translationBudgetUm := 4000
+    translationConsumedUm := 5000
+  }
+
+example : checkProgressUpdate replayRequest = V2Result.hardBlock := by decide

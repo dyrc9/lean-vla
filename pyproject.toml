@@ -4,7 +4,9 @@ version = "0.1.0"
 description = "Research prototype for a Lean-backed dual alignment safety wrapper for VLA robots."
 readme = "README.md"
 requires-python = ">=3.10"
-dependencies = []
+dependencies = [
+    "cryptography>=46,<50",
+]
 
 [project.optional-dependencies]
 dev = [

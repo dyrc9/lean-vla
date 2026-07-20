@@ -8,9 +8,9 @@
 
 1. [`project_status.md`](project_status.md)：当前状态、可写/不可写结论和唯一主任务。
 2. [`evaluation_results.md`](evaluation_results.md)：E0--E4 统一结果与机器 artifact 入口。
-3. [`optimization_plan.md`](optimization_plan.md)：CTDA v2、SafeLIBERO/AEGIS、攻击 qualification、远端
-   里程碑与汇合 gate。
-4. [`roadmap.md`](roadmap.md)：当前双线重建优先级与永久边界。
+3. [`optimization_plan.md`](optimization_plan.md)：当前仅 VLA-only 攻击复现的执行顺序、停止条件与
+   冻结项。
+4. [`roadmap.md`](roadmap.md)：当前单线攻击复现优先级与永久边界。
 5. [`method.md`](method.md)：已冻结 normative 方法、威胁模型和 claim boundary。
 6. [`system_architecture.md`](system_architecture.md)：实现模块和信任边界。
 7. [`experiments.md`](experiments.md)：实验冻结、配对、指标和失败规则。

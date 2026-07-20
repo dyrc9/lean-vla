@@ -1,19 +1,21 @@
-# 工作机交接 Prompt：CTDA v2 与安全实验重建
+# 工作机交接 Prompt：仅 VLA-only 攻击复现
 
 更新日期：2026-07-20
 
-> 把下面分隔线之间的整段交给工作机上的下一位 agent。该 prompt 授权其在仓库范围内持续完成设计、
-> 实现、验证和满足 gate 后的远端实验；它不授权覆盖旧结果、跳过冻结/preflight、干扰无关 GPU 进程或
-> 把 partial artifact 当作结论。
+> 把下面分隔线之间的整段交给工作机上的下一位 agent。该 prompt 只授权 official attack producer、
+> unguarded VLA-only clean/attacked pair 和独立 threat qualification；不授权运行任何 ProofAlign/CTDA
+> 自研 method、defense baseline 或 attacked+defended comparison。
 
 ---
 
-你正在工作机 `/home/ldx/lean-vla` 接手 ProofAlign。目标是把 CTDA v1 的有效负结果推进成一个具有
-clean liveness、最小干预和独立安全评估的 CTDA v2，并重建可用于防御评估的安全场景/攻击基础。
+你正在工作机 `/home/ldx/lean-vla` 接手发布攻击复现。当前唯一目标是先在 unguarded VLA-only victim 上
+得到可审计的攻击复现终态。不要运行或继续开发 ProofAlign/CTDA、AEGIS、SAFE、FIPER 或任何 defense
+arm；不要运行 CTDA unit/fixed-trace/no-dispatch/clean pilot；不要进入 attacked+defended comparison。
 
-不要只写计划。先完成设计冻结和 no-rollout 实现；如果工作机环境、协议和全部 gate 允许，继续推进
-到新的 clean v2 pilot、VLA-only threat qualification、正式矩阵、artifact validation、canonical
-文档和提交。任何负结果都原样保留。
+不要只写计划。优先修复全新 official SABER constraint-violation producer，生成并验证 immutable attack
+record，然后直接运行 VLA-only clean/attacked pair。若 SABER 按冻结规则 terminal blocked/failed，再用
+独立 fresh protocol 执行 EDPA + SafeLIBERO。每条 workload 得到 terminal 结果后停止并汇报，等待用户
+重新授权；不得自动恢复自研 method。
 
 ## 1. 首先确认同步状态
 
@@ -67,24 +69,50 @@ git log -1 --oneline
 - qualified attack count 为 `0`。Phantom held-out 为 `1/4`，低于冻结 `2/4` gate；正式 SABER
   exact-task R1 是 `0 record / 0 victim`。
 - SAFE 只有 partial corpus；FIPER fresh2 已停止且 manifest 仍为 `started`。不得 resume、拼接或发布。
+- CTDA v2 M0/no-dispatch core 已冻结并实现：`ctda-v2` / `proofalign.ctda-core-v2` / `ctda-wire-v2`、
+  certificate+fast-checker、proof 后 rebind、四级 intervention、post-filter membership、progress ledger、
+  Python reference、六阶段 Lean replay 和 21/21 golden parity 已存在；下一缺口不是继续增加 provenance，
+  而是把 artifact 明确组织成 intent→plan 与 plan→execution 两个 attack-shift verdict。
+- SafeLIBERO 32/32 source-bound mission template 已编译；全量 state r0 的 1250/1600 负结果和 r1 的
+  exact state-key/collision-source 1600/1600 结果都已封存，两个执行均 `env.step=0`。完整 executable
+  v2 support 仍为 0/1600，不能启动 rollout。
+- drawer OpenRegion initial source gate R2 已封存：50/50 exact `wooden_cabinet_1_top_level`、finite asset
+  range 与官方 `qpos < -0.14 m` agreement，`env.step=0`；50 个初态全部为 `qpos=0.0 m`/closed，因此没有
+  positive-state/transition 或 online progress claim。R0 GPU gate 与 R1 wrapper-path failure 必须保留。
+- no-dispatch adapter R0 已封存：6/6 fake/adversarial test，progress/source/state attestation、fresh
+  post-filter witness、adjusted-command membership/authorization、replan non-refund 和 untrusted hard-block；
+  AST 与运行禁止操作 counter 全零。issuer 仅为 simulator-test exact allowlist TCB。
+- OpenRegion strict-threshold R0 已封存：五个直接注入 qpos requested/read-back exact、official/reference
+  5/5，`-0.16/-0.141` open，精确 `-0.14` 与 `-0.139/0.01` closed；全程 `env.step=0`，不是自然 transition。
+- Ed25519 R0、AEGIS signed CBF/QP R0 与 signed geometry R0 已分别通过 11/11、9/9+5/5 parity、
+  8/8+4/4 parity；它们是支撑性 TCB/实验 plumbing，不是第三层 alignment 或论文主贡献。
 - 当前没有可写的 general attack-defense、hardware safety、verified recovery 或 real-time claim。
 
 ## 4. 总体工作顺序
 
-两条线可以并行开发，但必须隔离 outcome：
-
 ```text
-A. CTDA v2 离线设计 -> v2 core -> fixed-trace/shadow -> no-dispatch preflight -> clean v2 pilot
-B. SafeLIBERO/AEGIS readiness -> official attack producer -> VLA-only held-out safety qualification
+fresh official SABER producer
+  -> immutable artifact validator
+  -> unguarded VLA-only clean/attacked pair
+  -> independent held-out safety qualification
+  -> terminal artifacts
+  -> stop and report
 
-A clean utility gate + B threat gate + exact population overlap
-    -> attacked+defended 正式比较
+SABER terminal blocked/failed
+  -> fresh EDPA + SafeLIBERO
+  -> unguarded VLA-only clean/attacked pair
+  -> terminal artifacts
+  -> stop and report
 ```
 
-在汇合前，禁止让攻击 outcome 参与 CTDA threshold/binder 调整，也禁止让 CTDA verdict 参与攻击 reward
-或 safety ground truth。
+禁止并行运行 CTDA/ProofAlign/AEGIS/SAFE/FIPER。禁止让 CTDA verdict、detector alarm、task failure 或
+attack metadata充当 safety ground truth。
 
-## 5. M0：先冻结 CTDA v2 设计，不运行 rollout
+## 5. M0：CTDA v2 设计已冻结，继续保持 no-rollout
+
+**DEFERRED：不要执行本节。保留内容仅用于历史审计。**
+
+本节在当前 safety-foundation readiness 完成后执行；编号保留方法依赖关系，不表示施工优先级。
 
 先检查现有入口：
 
@@ -116,9 +144,31 @@ Lean authority 优先选择：Lean 证明长期 contract certificate、predicate
 由 Lean 重放。若选择 pipelined/batched Lean，必须显式证明 state snapshot freshness；不得用迟到 proof
 授权已变化的 state。
 
-M0 只允许文档、schema、unit/fake-env design；不得产生正式 task outcome。
+当前冻结事实见 `docs/method.md` 第 9 节和
+`experiments/ctda_v2_no_dispatch_protocol.json`。M0 不得再静默改字段；任何语义变化需要新 protocol
+version。仍不得产生正式 task outcome。
 
 ## 6. M1：实现 v2 core，保持 v1 可重放
+
+**DEFERRED：不要执行本节。不要实现 attack-shift record 或运行任何 CTDA probe/test outcome。**
+
+冻结前第一版 core、strict envelope、unit/reference checker 和 `ProofAlign.CTDAV2` 已完成。以下是延后
+清单，当前不得执行：
+
+1. 定义 frozen `AttackShiftRecordV2`：必须同时绑定 trusted intent、raw planned action、accepted plan、
+   dispatched/applied command、observed effect、attack artifact 与 state/transaction id；
+2. 输出互不混淆的 `intent_plan_verdict`、`plan_execution_verdict` 与 `dual_verdict`，并构造
+   semantic-only、execution-only、dual 三个 ablation；
+3. fixed-trace corpus 至少覆盖 instruction/camera 导致的 wrong-target/wrong-order/wrong-gripper planned
+   shift，以及 command substitution/filter rewrite/stale receipt/false completion execution shift；
+4. 已完成 `ctda-wire-v2` 六阶段 Lean replay与 21/21 Python/Lean golden parity；不得将 normalized
+   payload parity 扩写为 raw signature/hash 或物理安全证明；
+5. initial OpenRegion、signed filter/geometry 与 crypto wiring 已完成；除非阻断双层 record，不再扩张
+   source/provenance 层，也不重复 direct-state probe；
+6. 在 disjoint outcome-blind data 上冻结 numeric progress、non-progress window、translation/motion budget；
+   不从新 rollout outcome 选择阈值；
+7. 使用 r1 的 1600/1600 exact state/site source，不回退到 r0 fixture-base proxy；
+8. 在上述 gate 通过前保持 `formal_rollout_authorized=false`。
 
 ### 6.1 版本策略
 
@@ -172,6 +222,17 @@ nominal proposal
 
 ## 7. M2：SafeLIBERO、AEGIS 和安全指标 readiness
 
+**DEFERRED：不要执行本节。仅可复用已冻结的独立 safety oracle 定义服务 VLA-only qualification。**
+
+本节只保留冻结历史，当前不得执行。已存在的 `safelibero_aegis_readiness_protocol.json`、
+`safelibero_foundation.py` 和 `safelibero_aegis_readiness.py` 固定了 official source/data、32 scenario/
+1600 init、collision classifier 与 typed metrics；`safelibero_aegis_runtime_protocol.json` 和
+`safelibero_aegis_runtime_preflight.py` 已固定双环境、全部 distribution、标准 checkpoint/GroundingDINO
+和 static runtime gate。R2 model-load、R3 single-scene serialization、32/32 mission template 与 r1
+全 1600 init exact state/collision-source coverage 已完成；下一步是 v2 wire/skill/filter executable
+support，不是重复 state audit。
+不得把 `foundation_ready`、`static_runtime_ready` 或 `scene_ready` 误写成 formal rollout readiness。
+
 P0 外部对象：
 
 - AEGIS/SafeLIBERO 论文：`https://arxiv.org/html/2512.11891`
@@ -204,6 +265,8 @@ SAFE/FIPER/RoboGuard 当前不是 M2 blocker：
 - RoboGuard/SafeGate 没有完成连续 VLA adapter 前，只放 related-work/semantic comparison，不进入主闭环。
 
 ## 8. M3：工作机验证与 no-dispatch preflight
+
+**DEFERRED：不要执行 CTDA/AEGIS no-dispatch preflight。只做 VLA-only attack runner 所需 preflight。**
 
 ### 8.1 CPU/Lean
 
@@ -260,7 +323,9 @@ systemctl --user show proofalign-fiper-r0-fresh2.service \
 
 ## 9. M4：新的 clean CTDA v2 pilot
 
-只有 M0--M3 通过后才创建正式 protocol。要求：
+**DEFERRED/UNAUTHORIZED：不得创建 protocol，不得运行。**
+
+本节当前未授权，不得创建正式 protocol。未来若用户重新授权，历史要求包括：
 
 - 新 method id、新 protocol、新 unit/seed 或新 benchmark population、新 fresh absent output root；
 - 不重跑 E1 的 policy-seed 1 unit；
@@ -277,7 +342,7 @@ primary 输出：valid pair、task/safe success、phase completion、CAR/cost/RE
 若 clean utility gate 不通过：停止 main，保留负结果；后续修改必须形成新的 CTDA method/protocol，不能在
 本轮调阈值重跑。
 
-## 10. M5：独立 VLA-only threat qualification
+## 10. M5：独立 VLA-only threat qualification（当前唯一任务）
 
 ### 10.1 P0 SABER constraint-violation
 
@@ -295,7 +360,7 @@ primary 输出：valid pair、task/safe success、phase completion、CAR/cost/RE
 7. 只让 clean-success 且 clean-safe pair 进入 clean-safe→attacked-unsafe transition denominator；
 8. 用 disjoint held-out unit 达到预注册 `attack_transition_min_count/rate`；
 9. 保存 terminal manifest/ledger/hashes；
-10. 再做 exact population CTDA support audit。
+10. 写入 terminal summary 并停止；不得做 CTDA support audit 或进入 defense comparison。
 
 ### 10.2 P1 EDPA + SafeLIBERO
 
@@ -311,7 +376,8 @@ qualification 仍使用独立 safety transition。
 
 ## 11. M6：正式矩阵
 
-只有以下条件同时成立才执行 attacked+defended：
+**DEFERRED/UNAUTHORIZED：当前不得执行 attacked+defended。** 以下条件仅保留为历史设计，不因 M5
+成功自动开放：
 
 1. CTDA v2 clean utility gate 通过；
 2. 至少一个 workload 完成 terminal VLA-only threat qualification；
@@ -358,14 +424,13 @@ external/openpi/.venv/bin/python NEW_RUNNER.py \
 
 ## 13. 完成定义
 
-本交接不是以“代码能 import”或“GPU 进程启动”完成。优先完成到以下可审计状态：
+本交接只以 M5 的可审计终态完成：
 
-- M0--M3：v2 设计冻结、实现、focused tests/Lean build、fixed-trace/shadow、SafeLIBERO/AEGIS readiness、
-  no-dispatch preflight；
-- 若 gate 允许，M4：新的 clean v2 terminal pilot 和 method decision；
-- 若 producer/环境允许，M5：至少一个 terminal VLA-only threat qualification；
-- 只有 M4/M5/overlap 全部通过，才执行 M6；
-- 任何停止都必须留下机器可读 terminal/blocker artifact，而不是只在聊天中说明。
+- 优先形成 SABER official producer + VLA-only clean/attacked terminal pass/fail/blocked artifact；
+- SABER terminal blocked/failed 后才转 fresh EDPA + SafeLIBERO；
+- 保存 protocol、append-only ledger、per-episode artifact、terminal manifest/summary、validator 和 SHA-256；
+- 得到 terminal 结果后立即停止并汇报；
+- 不执行 M0--M4/M6，不运行任何自研 method 或 defense baseline。
 
 最终结论只覆盖指定 simulator、task、model、seed、workload 和 observer assumptions。不得声称绝对安全、
 硬件安全、通用攻击防御、verified recovery 或 real-time control。

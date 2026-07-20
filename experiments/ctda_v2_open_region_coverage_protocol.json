@@ -1,0 +1,114 @@
+{
+  "schema": "proofalign.ctda-v2-open-region-coverage-protocol-v1",
+  "protocol_id": "ctda-v2-open-region-source-coverage-r0",
+  "frozen_at": "2026-07-20",
+  "purpose": "Validate the exact official wooden-cabinet top-drawer joint source and open predicate over all 50 frozen init states without env.step, policy, model, socket, action, or dispatch.",
+  "authorization": "simulator_initialization_only_no_step",
+  "source": {
+    "root": "/home/ldx/lean-vla/external/vlsa-aegis",
+    "commit": "57b1aef306f212aea3574b0a3b64aa1a3d8f5e4b",
+    "git_tree": "1b55f9d97f0ae57b97e68fcb1177e524b096d13b",
+    "clean_required": true
+  },
+  "population": {
+    "dataset_digest": "206f44e0745e3027f62eed83997550f1a721a2f7207d78e314adcfb59c1f1c43",
+    "unit_id": "safelibero_goal:task3:levelI",
+    "suite": "safelibero_goal",
+    "task_index": 3,
+    "safety_level": "I",
+    "task_name": "open_the_top_drawer_and_put_the_bowl_inside",
+    "bddl_path": "safelibero/libero/libero/bddl_files/safelibero_goal/open_the_top_drawer_and_put_the_bowl_inside.bddl",
+    "bddl_sha256": "2b1fd9654306ef906a1cc9c4a10ba84a36aee07a22315f69507d3941eb4956a6",
+    "init_path": "safelibero/libero/libero/init_files/safelibero_goal/open_the_top_drawer_and_put_the_bowl_inside_level_I.pruned_init",
+    "init_sha256": "8a0d2eef748f59985799a8e958082e717166c4554070c2df76bb1d9d592e5dea",
+    "init_state_count": 50,
+    "selection_rule": "the unique frozen SafeLIBERO scenario whose source language requires opening the top drawer before the final In goal"
+  },
+  "open_region_binding": {
+    "parent_id": "wooden_cabinet_1",
+    "region_id": "wooden_cabinet_1_top_region",
+    "joint_source_id": "wooden_cabinet_1_top_level",
+    "joint_axis": [
+      0.0,
+      1.0,
+      0.0
+    ],
+    "joint_range_m": [
+      -0.16,
+      0.01
+    ],
+    "open_when_less_than_m": -0.14,
+    "predicate_is_strict": true,
+    "source_identity_digest": "dadd1dafc953856569afd4e351a1c447cb8dc1ded2f480a4a946c09f06b6e394",
+    "source_file_sha256": {
+      "articulated_object": "f5187b0381d69a2a8736c1dcb646e5fa7c138a42950f92e30c21c2efaed52faa",
+      "asset_xml": "eca251258c7ff6a05fa181a316c767508801812f4ea870921f3ce28fd82ea7af",
+      "site_joint_binding": "61bdc77f90f7c106827603ce78aa51e12b5dc50615761ee93db98868411f75a2",
+      "site_object_state": "ca6f53123336b6487bdb4feb02534ddb3a0627a4b847fe89da4460520ef01366"
+    }
+  },
+  "runtime": {
+    "source_root": "/home/ldx/lean-vla/external/vlsa-aegis",
+    "simulator_python": "/home/ldx/lean-vla/external/vlsa-aegis/main/.venv/bin/python",
+    "simulator_python_version": "3.8.20",
+    "libero_config_dir": "experiments/safelibero_aegis_runtime_config"
+  },
+  "gpu": {
+    "physical_index": 5,
+    "uuid": "GPU-9aceb2db-80ad-104a-718a-2575f9270204",
+    "max_prelaunch_used_memory_mib": 4096,
+    "require_zero_prelaunch_compute_processes": true,
+    "require_zero_post_compute_processes": true
+  },
+  "coverage": {
+    "camera_resolution": 64,
+    "seed": 7,
+    "timeout_seconds": 600,
+    "simulator_construction_count": 1,
+    "reset_count": 1,
+    "set_init_state_count": 50,
+    "joint_source_coverage_count": 50,
+    "finite_asset_range_coverage_count": 50,
+    "official_predicate_agreement_count": 50,
+    "env_step_count": 0,
+    "retain_all_units": true
+  },
+  "prerequisite": {
+    "wire_parity_summary": "experiments/ctda_v2_wire_parity_summary.json",
+    "wire_parity_summary_sha256": "7dc358e02e397aff8923c7b96ea36b3cfd70c92029435b03e8f80f8b94b9cc63",
+    "state_coverage_summary": "experiments/ctda_v2_safelibero_state_coverage_summary_r1.json",
+    "state_coverage_summary_sha256": "0633be9e6a1c388e4b90b0399450486f64b4f0991a17181a17519229f70e788c"
+  },
+  "implementation_hashes": {
+    "src/proofalign/benchmark/safelibero_open_region.py": "e81c055427037752f467ffb49599b5ede229766a6276544206f36df583bd901f",
+    "src/proofalign/benchmark/safelibero_ctda_support.py": "2c368be92b03ff877ccb235cdb477e3fa801a4cdb35b8a1a315df85e30faa50c",
+    "src/proofalign/benchmark/__init__.py": "48d4183bcd9cccd529cdc32fe7e5cd148f52eef8b013e32ce870fb02c19d4298",
+    "scripts/ctda_v2_open_region_coverage.py": "36c1505c3ebae17ed1a4a490b0f43dd97ddc6aa1b79061c1cc45a1fa1411b137",
+    "tests/test_safelibero_ctda_support.py": "bf3cb4d1975283fb88395b71b5ed7e34dd3285e1cac6fcd08069610024af2a6e"
+  },
+  "acceptance": {
+    "all_50_init_states_retained": true,
+    "exact_joint_source_coverage": "50/50",
+    "finite_asset_range_coverage": "50/50",
+    "official_predicate_agreement": "50/50",
+    "strict_threshold_rule": "qpos < -0.14 m; qpos == -0.14 m is not open",
+    "env_step_count": 0,
+    "model_construction_count": 0,
+    "policy_inference_count": 0,
+    "socket_bind_count": 0,
+    "dispatch_count": 0
+  },
+  "stop_conditions": [
+    "source, dataset, prerequisite, or implementation hash mismatch",
+    "selected GPU is absent, busy, or has compute processes",
+    "joint source is not exactly wooden_cabinet_1_top_level",
+    "joint value is non-finite or outside the official asset range",
+    "official SiteObjectState.is_open differs from qpos < -0.14 m",
+    "any env.step, action, dispatch, policy, model, or socket use",
+    "output already exists"
+  ],
+  "output": "experiments/ctda_v2_open_region_coverage_summary.json",
+  "claim_boundary": "Passing establishes exact initial-state availability and predicate agreement for the source-bound OpenRegion joint scalar. It does not execute the skill, validate a policy command, prove collision-free drawer motion, or authorize rollout.",
+  "formal_rollout_authorized": false,
+  "next_gate": "Implement the post-filter/recovery no-dispatch adapter."
+}

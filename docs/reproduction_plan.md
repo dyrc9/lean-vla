@@ -2,25 +2,26 @@
 
 更新日期：2026-07-20
 
-外部 baseline/workload 不阻塞 CTDA v2 的 outcome-blind 离线优化，但会阻塞最终 attack-defense E5。
+当前唯一执行目标是 unguarded VLA-only 发布攻击复现。ProofAlign/CTDA、AEGIS、SAFE、FIPER 和最终
+attack-defense E5 全部暂停；VLA-only terminal 结束后也不得自动恢复。
 
 ## 当前状态
 
 | 线 | 状态 | 处置 |
 |---|---|---|
 | Phantom Menace | held-out signal gate failed | R1 仅 1/4 independent cost/collision transition；不调攻击、不换 pair、不运行 scoped main |
-| SABER | record generation failed closed | 第一个 record 已产生 invalid ledger/transcript；不修复重跑、不运行 victim/main |
+| SABER | old R1 failed closed; fresh P0 current | 旧 ledger/root 不续接；在全新 protocol/root 修复 official producer，artifact gate 通过后直接运行 VLA-only victim |
 | SAFE | not reproduced | 335/500 partial corpus 无 terminal manifest；只保留审计 |
 | FIPER fresh1 | not reproduced | `pretzel/rnd_a` 后无 terminal manifest；partial 保留 |
 | FIPER fresh2 | stopped/not reproduced | 用户于 2026-07-17 要求停止；service inactive/dead，manifest `started`，partial 不计结果 |
-| SafeLIBERO/AEGIS | new P0 readiness | pin 官方 source/data，先做 no-dispatch inventory、独立 safety oracle 与 exact-unit support audit |
+| SafeLIBERO/AEGIS | readiness frozen | 只复用已冻结的独立 safety oracle 定义；不运行 AEGIS 或 CTDA support audit |
 | EDPA + SafeLIBERO | new P1 threat track | 保持原始 patch definition；task failure 与独立 collision/cost transition 分开 |
 
 详细 FIPER 操作见 [`safe_fiper_r0_runbook.md`](safe_fiper_r0_runbook.md)。
 
-## E5 开放条件
+## E5 开放条件（当前冻结）
 
-只有同时满足以下条件才启动最终 comparison：
+当前不启动最终 comparison。以下历史条件即使满足也不能自动开放 E5，必须等待用户重新授权：
 
 1. baseline 官方复现有 terminal manifest、完整 denominator、validator pass 和 output digest；
 2. 发布 workload 在 held-out unit 上产生独立 collision/cost/authorization signal，不只是 task failure；
@@ -35,18 +36,18 @@
 - task failure 与 unsafe event 分开；
 - synthetic prompt/camera mutation 不自动构成 attack efficacy；
 - partial log、active process 和模型成功加载都不是 reproduction pass；
-- external baseline 不能替代 ProofAlign 自身 ablation/utility 评估；
-- 旧外部实验全部保持停止；允许按 [`optimization_plan.md`](optimization_plan.md) 开展新的 read-only
-  readiness 和 producer 修复。任何 GPU 正式执行都需要新 protocol/root、fresh inventory 和全部 gate。
+- external baseline 不能替代 ProofAlign 自身 ablation/utility 评估；当前也不运行这些评估；
+- 旧外部实验全部保持停止；只允许按 [`optimization_plan.md`](optimization_plan.md) 开展 fresh SABER/
+  EDPA producer、unguarded VLA-only victim 和独立 safety qualification。任何 GPU 正式执行都需要新
+  protocol/root、fresh inventory 和全部 gate。
 
 ## 新 P0/P1 顺序
 
-1. SafeLIBERO/AEGIS：只读 inventory -> pinned manifest -> outcome-blind candidate/classifier -> CTDA support
-   overlap -> 新 clean/safety-critical protocol；
-2. SABER P0：全新的 official constraint-violation producer -> immutable record validator -> VLA-only
+1. SABER P0：全新的 official constraint-violation producer -> immutable record validator -> VLA-only
    clean/attack pair -> held-out independent safety gate；
-3. EDPA P1：原始 patch + SafeLIBERO -> VLA-only independent safety gate；
-4. 只有 workload terminal-qualified 且 population overlap，才冻结 attacked+defended matrix。
+2. SABER terminal blocked/failed 后，EDPA P1：原始 patch + SafeLIBERO -> VLA-only independent safety gate；
+3. 保存每条 workload 的 terminal artifact 后停止并汇报；
+4. 不做 CTDA support overlap，不冻结或执行 attacked+defended matrix，等待用户重新授权。
 
 旧 SABER exact-task R1 的 producer failure 只作诊断，不禁止在新 protocol/root/unit 上修复官方 producer；
 但不得续接旧 ledger、record 或 victim run。

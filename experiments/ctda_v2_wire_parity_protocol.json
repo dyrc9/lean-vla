@@ -1,0 +1,100 @@
+{
+  "schema": "proofalign.ctda-v2-wire-parity-protocol-v1",
+  "protocol_id": "ctda-v2-wire-lean-parity-r0",
+  "frozen_at": "2026-07-20",
+  "purpose": "Establish offline, no-dispatch parity between the strict ctda-wire-v2 Python reference verdict and the independent executable Lean kernel replay for all six frozen stages.",
+  "method_id": "ctda-v2",
+  "wire_schema": "ctda-wire-v2",
+  "core_schema": "proofalign.ctda-core-v2",
+  "execution_mode": "offline_no_dispatch",
+  "lean_timeout_seconds": 20,
+  "implementation_hashes": {
+    "src/proofalign/ctda_v2.py": "a670e517d72bbc6a1ad10292e3d4bfaa1f8f4affc85441c61ce376e868998a3b",
+    "src/proofalign/ctda_v2_wire.py": "bb76ba65eb3c99c8902df1614ce6831997e5bbb0d0111bd4ef5bc317c6003b89",
+    "src/proofalign/ctda_v2_evaluator.py": "5e72c0efad6782c337d0c54533714e4b2ec9ac43052f6d341ff5f285b64faa3e",
+    "src/proofalign/ctda_v2_golden.py": "c56d540d1008eb2f3053a49802a87256b4f527bde8bcb7712af6776b2c6281da",
+    "lean/ProofAlign/CTDAV2.lean": "60ab1e2a817c60e29e2592eaf922067037ece2588403d0e3bdca1df3d8f37790",
+    "lean/ProofAlign/CTDAV2Wire.lean": "ca0f95ce528bd17024b0ecf55761f24010eef13a188f5195833c0dbf4f8a8359",
+    "lean/ProofAlign.lean": "f9861cc702c12be8ad9be3b28461bddc39a8be9c7f871d7bd6de969e9d7bffe4",
+    "lean/lean-toolchain": "42779d67b81608af8a12aa4328d2ab47ca201925b3b2bd68369587b5340bb434",
+    "scripts/ctda_v2_wire_parity_audit.py": "0b418dfbcdc289ce34bcc51b8f9ca11c740950c1327be0788102911b5fb32235",
+    "tests/test_ctda_v2.py": "6b47050ed9b0344e1b0926bae684bf6048124b6d1aab172a04572ae65b3caa46",
+    "tests/test_ctda_v2_wire_parity.py": "a973b4109959f2ef376ab990587673e93b8dbf6604af1c636f349ce187136c67"
+  },
+  "stages": [
+    "semantic_certificate",
+    "state_rebind",
+    "prefix_decision",
+    "prefix_authorization",
+    "dispatch_receipt",
+    "progress_update"
+  ],
+  "golden_corpus": {
+    "case_count": 21,
+    "construction": "deterministic source-defined, outcome-blind cases; checker digest is injected before request-id computation",
+    "stage_counts": {
+      "dispatch_receipt": 3,
+      "prefix_authorization": 3,
+      "prefix_decision": 4,
+      "progress_update": 5,
+      "semantic_certificate": 3,
+      "state_rebind": 3
+    },
+    "verdict_counts": {
+      "hard_block": 2,
+      "proven": 7,
+      "refuted": 10,
+      "replan": 2
+    },
+    "required_negative_classes": [
+      "attestation subject tamper",
+      "unknown proof state",
+      "cross-episode rebind",
+      "stale activation state",
+      "unknown safety on pass",
+      "post-filter command binding tamper",
+      "authorization of non-dispatch intervention",
+      "authorization replay",
+      "receipt command tamper",
+      "receipt replay",
+      "unknown progress provenance",
+      "persistent budget exhaustion",
+      "progress ledger binding tamper"
+    ]
+  },
+  "acceptance": {
+    "all_implementation_hashes_match": true,
+    "all_21_python_verdicts_match_expected": true,
+    "all_21_lean_verdicts_match_expected": true,
+    "all_21_lean_replays_compile": true,
+    "python_lean_parity_count": 21,
+    "all_six_stages_covered": true,
+    "env_step_count": 0,
+    "model_construction_count": 0,
+    "policy_inference_count": 0,
+    "socket_bind_count": 0,
+    "dispatch_count": 0
+  },
+  "outputs": {
+    "summary": "experiments/ctda_v2_wire_parity_summary.json",
+    "artifact_root": "experiments/ctda_v2_wire_parity_artifacts",
+    "per_case_files": [
+      "request.json",
+      "Replay.lean",
+      "result.json",
+      "stdout.txt",
+      "stderr.txt"
+    ]
+  },
+  "stop_conditions": [
+    "implementation hash mismatch",
+    "Lean or lake unavailable",
+    "non-fresh output or artifact root",
+    "any expected/Python/Lean verdict mismatch",
+    "any Lean replay proof failure",
+    "any simulator, model, policy, socket, dispatch, or env.step dependency"
+  ],
+  "claim_boundary": "Passing establishes only normalized ctda-wire-v2 Python/Lean decision parity on the frozen 21-case corpus. It does not authenticate raw external evidence, prove SHA-256 inside Lean, validate physical filter dynamics, establish online liveness, or authorize a rollout.",
+  "formal_rollout_authorized": false,
+  "next_gate": "Implement and audit OpenRegion runtime/progress support before post-filter no-dispatch integration."
+}

@@ -1,0 +1,157 @@
+{
+  "schema": "proofalign.ctda-v2-no-dispatch-protocol.v1",
+  "frozen_at": "2026-07-20T00:00:00+08:00",
+  "status": "frozen_no_dispatch",
+  "source_base_commit": "f0c243f8dec39267a4a7378504e6feb4cdaf1547",
+  "scope": "CTDA v2 schema, reference-checker, fake-env/unit, retained-trace attribution, and exact-unit support audit only. No simulator step, policy inference, online authorization, task outcome, or safety-benefit claim is authorized by this protocol.",
+  "version_identity": {
+    "method_id": "ctda-v2",
+    "core_schema": "proofalign.ctda-core-v2",
+    "wire_schema": "ctda-wire-v2",
+    "v1_compatibility": "CTDA v1 remains frozen and is read only through its existing decoder; v1 JSON is never default-filled or reclassified as v2."
+  },
+  "authority_architecture": {
+    "selected_path": "lean_semantic_certificate_plus_deterministic_fast_membership_checker",
+    "certificate_bindings": [
+      "mission_root_digest",
+      "episode_nonce",
+      "active_phase",
+      "residual_obligations",
+      "contract_version",
+      "proof_state_epoch_digest_and_provenance",
+      "action_set_digest",
+      "fast_checker_identity_version_and_digest",
+      "lean_proof_artifact_digest"
+    ],
+    "control_cycle_authority": "authenticated state rebind plus post-filter command membership plus short single-use prefix authorization",
+    "lean_online_status": "initial_no_dispatch_model_and_theorems_exist_but_wire_kernel_replay_not_implemented_or_authorized",
+    "python_reference_status": "executable_schema_and_differential_oracle_only"
+  },
+  "time_semantics": {
+    "semantic_lifetime": "plant_control_epoch",
+    "activation": "after Lean proof completion and a fresh re-observation",
+    "proof_latency_consumes_semantic_lease": false,
+    "wall_clock_retained_for": [
+      "state_sensor_age",
+      "state_rebind_attestation",
+      "command_membership_attestation",
+      "prefix_authorization",
+      "actuator_receipt"
+    ],
+    "invalidators": [
+      "mission_root_change",
+      "episode_nonce_change",
+      "phase_change",
+      "residual_obligation_change",
+      "contract_version_change",
+      "state_change_without_authenticated_rebind",
+      "unknown_or_stale_observation",
+      "checker_identity_or_digest_change"
+    ]
+  },
+  "transaction": {
+    "interventions": [
+      "pass",
+      "project_or_brake",
+      "replan",
+      "hard_block"
+    ],
+    "pass": "adjusted command digest equals nominal command digest exactly",
+    "project_or_brake": "filter/version, nominal/adjusted digests, modification norm, reason, and constraint witness are retained; adjusted command receives a new membership attestation",
+    "replan": "no dispatch, no phase advance, no progress fabrication, and no cumulative-budget refund",
+    "hard_block": "reserved for unauthorized, stale/replay/inconsistent, observed violation, unrecoverable risk, or checker/TCB failure",
+    "dispatch_invariant": "no dispatch without semantic certificate, fresh state lease, post-filter membership, and single-use prefix authorization",
+    "receipt_invariant": "receipt retains nominal command and binds executed command exactly to the post-filter authorized command"
+  },
+  "progress_semantics": {
+    "counter_unit": "authenticated plant/control epochs rather than a fixed prefix count",
+    "progress_source": "typed before/after relevant-state observation with units, threshold, state epochs/digests, and authenticated producer",
+    "progress_refund": "authenticated progress may reset only consecutive non-progress age",
+    "persistent_non_refundable": [
+      "cumulative_translation_m",
+      "cumulative_six_dimensional_motion",
+      "replan_count"
+    ],
+    "unknown_progress": "replan_only",
+    "formal_numeric_thresholds": "not_frozen_in_this_no-dispatch_protocol",
+    "numeric_threshold_gate": "must be frozen from disjoint outcome-blind traces before any v2 rollout"
+  },
+  "safety_provenance": {
+    "required_fields": [
+      "channel",
+      "unit",
+      "producer_id",
+      "producer_version",
+      "source_ids",
+      "observed_at_ns",
+      "state_epoch",
+      "state_digest",
+      "value_and_violation_or_unknown_reason"
+    ],
+    "missing_required_channel": "schema_rejection",
+    "unknown_required_channel": "replan_or_hard_block_only",
+    "default_safe_value_allowed": false
+  },
+  "retained_v1_attribution_population": {
+    "root": "results/proofalign_e1_clean_utility_seed1_20260717",
+    "full_ctda_episode_count": 12,
+    "full_ctda_episode_content_manifest_sha256": "e297c0c15169bb2177aaa019ef816f32d5787ffee62bf49ee23c72745d74366e",
+    "terminal_summary_sha256": "76c1f0e2a7a8808f6afaf65d147ab685832eb9ffa255c5d44b347677ec3c3736",
+    "method_validity_decision_sha256": "fa319babb59b3f03f5e18630280fdc5c7c23af00c458f5a758a5258e225b244d",
+    "allowed_use": "read-only failure attribution and v2 field-support audit",
+    "forbidden_use": "task outcome reclassification, resumed rollout, threshold fitting to new outcome, or v2 effectiveness claim"
+  },
+  "safelibero_foundation_dependencies": {
+    "readiness_protocol_sha256": "3c46c8f632146c0e72146eba6919ea469268b9e6f7ea2cde2e47ac15097e606c",
+    "runtime_protocol_sha256": "2305dd30c70b9e2de3630d4259da14a3ec12c74b0bbbf7a4e799193b45efeedc",
+    "model_load_protocol_sha256": "f89617972ea92878d8e3733f4053b58a278baa9501dc9d17980e4c4ebb036de2",
+    "scene_protocol_sha256": "8463aba357f2aa8dabfaac0131ee65726ce012d970e228002c54c24d0a9d5102",
+    "candidate_population": "32 level scenarios / 1600 init states",
+    "formal_rollout_authorized": false
+  },
+  "safelibero_state_coverage_dependency": {
+    "protocol": "experiments/ctda_v2_safelibero_state_coverage_protocol_r1.json",
+    "protocol_sha256": "fd2850a22a0b761a4dae8c10b6edb8463a5a12f326c3134fcde0a9cfc1de8918",
+    "summary": "experiments/ctda_v2_safelibero_state_coverage_summary_r1.json",
+    "summary_sha256": "0633be9e6a1c388e4b90b0399450486f64b4f0991a17181a17519229f70e788c",
+    "state_key_coverage": "1600/1600",
+    "collision_source_coverage": "1600/1600",
+    "env_step_count": 0,
+    "formal_rollout_authorized": false
+  },
+  "implementation_freeze": {
+    "src/proofalign/ctda_v2.py": "a670e517d72bbc6a1ad10292e3d4bfaa1f8f4affc85441c61ce376e868998a3b",
+    "src/proofalign/ctda_v2_wire.py": "03235e742e9ddc42ff240f9e2a8978f4e0fbb14047d79719ba7187e111220764",
+    "tests/test_ctda_v2.py": "8a522a6e43b6c829e5ff0f823d6ab3c241309694fad9e2c49275dcb1001015ae",
+    "docs/method.md": "0d3dcfaaeeb055daf9b934081352a70666be0754d9252f00db711b1fe617c09f",
+    "lean/ProofAlign/CTDAV2.lean": "60ab1e2a817c60e29e2592eaf922067037ece2588403d0e3bdca1df3d8f37790",
+    "src/proofalign/benchmark/safelibero_ctda_support.py": "93d7d5e21d723fd311c995043ff7b3aca12b53142fee895de19ce18c31489bdd",
+    "scripts/ctda_v2_support_audit.py": "74bc2c3b841a506dd8543b1d2c7e2cdea78e8a1bc0835ef796e5838b4b96e44a",
+    "tests/test_safelibero_ctda_support.py": "506c3008f7008a6cd5c92dda1dfb778ac89b68bd1ad8fefdcb91abb263294bd9",
+    "tests/test_ctda_v2_state_coverage.py": "efa0bf7d3907a33db09204e0f3bbefd2f6962e62d608f73f76bd82d9315f1339"
+  },
+  "mandatory_no_dispatch_gates": [
+    "v1 regression and golden replay remain green",
+    "proof-completion state change requires fresh authenticated rebind",
+    "phase residual mission episode and contract-version change invalidate lease",
+    "pass command digest is unchanged",
+    "adjusted command without post-filter membership is rejected",
+    "receipt binds adjusted command and authorization is single-use",
+    "replan does not advance phase or refund persistent budget",
+    "missing or unknown safety provenance is never treated as safe",
+    "stale replay cross-episode and tamper fail closed",
+    "retained E1 attribution audit performs zero env.step and zero policy inference",
+    "SafeLIBERO exact-unit support audit performs zero env.step and zero policy inference",
+    "Python full test suite Lean build and git diff check pass"
+  ],
+  "rollout_gate": {
+    "authorized": false,
+    "remaining": [
+      "ctda-wire-v2 Lean kernel replay and Python/Lean parity artifact",
+      "disjoint outcome-blind numeric progress protocol",
+      "OpenRegion plus bounded recovery and post-filter transaction adapters",
+      "fresh clean-v2 pilot protocol with absent output root and independent seed/unit"
+    ]
+  },
+  "claim_boundary": "Passing this protocol can establish only schema integrity and no-dispatch transaction behavior. It cannot establish task retention, closed-loop safety, attack defense, verified recovery, real-time enforcement, or hardware safety."
+}

@@ -1,0 +1,102 @@
+{
+  "schema": "proofalign.safelibero-aegis-scene-protocol-v1",
+  "protocol_id": "safelibero-aegis-scene-r3",
+  "created_at": "2026-07-20T14:47:12+08:00",
+  "protocol_status": "frozen_before_scene_construction",
+  "outcomes_observed": false,
+  "authorization": {
+    "single_simulator_construction": true,
+    "single_reset": true,
+    "single_set_init_state": true,
+    "read_and_serialize_initial_observation": true,
+    "env_step": false,
+    "policy_construction": false,
+    "policy_inference": false,
+    "groundingdino_inference": false,
+    "server_socket_bind": false,
+    "formal_rollout": false
+  },
+  "r2_model_gate": {
+    "protocol": "experiments/safelibero_aegis_model_load_protocol.json",
+    "summary": "experiments/safelibero_aegis_model_load_summary.json",
+    "required_status": "model_load_ready_scene_probe_pending"
+  },
+  "runtime": {
+    "source_root": "/home/ldx/lean-vla/external/vlsa-aegis",
+    "simulator_python": "/home/ldx/lean-vla/external/vlsa-aegis/main/.venv/bin/python",
+    "libero_config_dir": "experiments/safelibero_aegis_runtime_config"
+  },
+  "gpu": {
+    "physical_index": 5,
+    "uuid": "GPU-9aceb2db-80ad-104a-718a-2575f9270204",
+    "name": "NVIDIA RTX 6000 Ada Generation",
+    "max_prelaunch_used_memory_mib": 4096,
+    "require_zero_compute_processes": true,
+    "mujoco_gl": "egl",
+    "egl_device_binding": "physical index 5"
+  },
+  "scene": {
+    "suite": "safelibero_spatial",
+    "level": "I",
+    "task_index": 0,
+    "episode_index": 0,
+    "seed": 7,
+    "resolution": 1024,
+    "camera_depths": true,
+    "task_name": "pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate",
+    "candidate_selection": "first unit in the frozen suite/level/task/init lexicographic probe order; no task or safety outcome was observed or used"
+  },
+  "pinned_files": {
+    "r2_protocol": {
+      "path": "experiments/safelibero_aegis_model_load_protocol.json",
+      "sha256": "f89617972ea92878d8e3733f4053b58a278baa9501dc9d17980e4c4ebb036de2"
+    },
+    "r2_summary": {
+      "path": "experiments/safelibero_aegis_model_load_summary.json",
+      "sha256": "addeed45dedc50f2944dfa0e64e81e1dcd6f7c681a0d941ed35118716742e0d5"
+    },
+    "libero_config": {
+      "path": "experiments/safelibero_aegis_runtime_config/config.yaml",
+      "sha256": "95bad15e70566087f96b649664c64dd478c3192344ba72a662187ab87457be90"
+    },
+    "bddl": {
+      "path": "external/vlsa-aegis/safelibero/libero/libero/bddl_files/safelibero_spatial/pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate.bddl",
+      "sha256": "5406d8e65c7a70773573dc01dd53a5f75435072b361c4cc2417ffd95e74ff016"
+    },
+    "initial_states": {
+      "path": "external/vlsa-aegis/safelibero/libero/libero/init_files/safelibero_spatial/pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate_level_I.pruned_init",
+      "sha256": "69452f278a45eb3bce16e591b90a30e3158a55b0656a5c4b49edc4d0bd4014cc"
+    }
+  },
+  "implementation": {
+    "scripts/safelibero_aegis_scene_probe.py": "6d113d0ef6e0257e05c00d285a68d2b5cb1def179b47a2e118252d1ac6f5d50c",
+    "tests/test_aegis_scene_probe.py": "c7d5f84225545f6005ecb9dc32773ad31596258a80e831eaf836e4242f8bfc97"
+  },
+  "instrumentation": {
+    "forbidden_step_guard": "replace robosuite.environments.base.MujocoEnv.step before construction; increment and raise on any call",
+    "initial_state_digest": "SHA-256 over contiguous official init-state bytes",
+    "observation_digest": "sorted key + dtype + shape + contiguous bytes, each length-delimited",
+    "scene_close_required": true
+  },
+  "required_postconditions": {
+    "task_identity_matches": true,
+    "simulator_construction_count": 1,
+    "explicit_reset_count": 1,
+    "set_init_state_count": 1,
+    "env_step_count": 0,
+    "camera_observations_present": true,
+    "obstacle_joint_present": true,
+    "policy_construction_count": 0,
+    "policy_inference_call_count": 0,
+    "server_socket_bind_count": 0
+  },
+  "stop_conditions": [
+    "R2 terminal status or any pinned file/implementation digest differs",
+    "EGL GPU identity changes, used memory is at least 4096 MiB, or a compute process is present",
+    "the pinned task/init identity changes",
+    "any env.step call reaches the instrumented robosuite method",
+    "initial observation, camera channels, or obstacle joints cannot be serialized",
+    "the simulator cannot be closed cleanly"
+  ],
+  "claim_boundary": "A successful R3 establishes one no-action scene construction/serialization smoke test only. It does not establish task success, safety, closed-loop AEGIS behavior, population-wide scene readiness, or rollout authorization."
+}

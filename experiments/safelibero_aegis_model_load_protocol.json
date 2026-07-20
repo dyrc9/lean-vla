@@ -1,0 +1,103 @@
+{
+  "schema": "proofalign.safelibero-aegis-model-load-protocol-v1",
+  "protocol_id": "safelibero-aegis-model-load-r2",
+  "created_at": "2026-07-20T14:34:23+08:00",
+  "protocol_status": "frozen_before_model_load",
+  "outcomes_observed": false,
+  "authorization": {
+    "groundingdino_model_construction": true,
+    "pi05_model_construction": true,
+    "policy_object_construction": true,
+    "policy_inference": false,
+    "groundingdino_inference": false,
+    "server_socket_bind": false,
+    "simulator_construction": false,
+    "env_step": false,
+    "formal_rollout": false
+  },
+  "r1_static_gate": {
+    "protocol": "experiments/safelibero_aegis_runtime_protocol.json",
+    "summary": "experiments/safelibero_aegis_runtime_summary.json",
+    "required_status": "static_runtime_ready_model_probe_pending"
+  },
+  "runtimes": {
+    "source_root": "/home/ldx/lean-vla/external/vlsa-aegis",
+    "policy_python": "/home/ldx/lean-vla/external/vlsa-aegis/.aegis_venv/bin/python",
+    "simulator_python": "/home/ldx/lean-vla/external/vlsa-aegis/main/.venv/bin/python"
+  },
+  "gpu": {
+    "physical_index": 3,
+    "uuid": "GPU-061bb9ea-eff0-d537-2c5c-0d4b99e7c5b0",
+    "name": "NVIDIA RTX 6000 Ada Generation",
+    "max_prelaunch_used_memory_mib": 4096,
+    "require_zero_compute_processes": true,
+    "expected_process_visible_device": 0
+  },
+  "models": {
+    "groundingdino": {
+      "config": "experiments/safelibero_aegis_runtime_config/GroundingDINO_SwinT_OGC_pinned.py",
+      "weight": "/data0/ldx/aegis-assets/GroundingDINO/groundingdino_swint_ogc.pth",
+      "device": "cpu",
+      "bert_repo": "google-bert/bert-base-uncased",
+      "bert_revision": "86b5e0934494bd15c9632b12f734a8a67f723594",
+      "bert_snapshot": "/data0/ldx/aegis-assets/bert-base-uncased@86b5e0934494bd15c9632b12f734a8a67f723594",
+      "offline_only": true
+    },
+    "pi05_libero": {
+      "config": "pi05_libero",
+      "checkpoint": "/data0/ldx/saber-cache/openpi/openpi-assets/checkpoints/pi05_libero",
+      "openpi_data_home": "/data0/ldx/saber-cache/openpi",
+      "paligemma_tokenizer": "/data0/ldx/saber-cache/openpi/big_vision/paligemma_tokenizer.model",
+      "safety_tuned_checkpoint_allowed": false,
+      "jax_preallocate": false
+    }
+  },
+  "sha256": {
+    "experiments/safelibero_aegis_runtime_protocol.json": "2305dd30c70b9e2de3630d4259da14a3ec12c74b0bbbf7a4e799193b45efeedc",
+    "experiments/safelibero_aegis_runtime_summary.json": "95a9924a1ea9f5e9f04bf9394ecc6c405159651ed50c8141f9df0e45d355b2ba",
+    "experiments/safelibero_aegis_runtime_config/GroundingDINO_SwinT_OGC_pinned.py": "0ebad76aa8725817eecacab1bb946c42286c26d18c733710bae11839c83ee25c",
+    "/data0/ldx/aegis-assets/GroundingDINO/groundingdino_swint_ogc.pth": "3b3ca2563c77c69f651d7bd133e97139c186df06231157a64c507099c52bc799",
+    "/data0/ldx/aegis-assets/bert-base-uncased@86b5e0934494bd15c9632b12f734a8a67f723594/config.json": "7160e1553ad2ca51d8c1cb066be533db31826e12d173824c1bb0cb1a4f187d20",
+    "/data0/ldx/aegis-assets/bert-base-uncased@86b5e0934494bd15c9632b12f734a8a67f723594/tokenizer.json": "ce64fce797c24f68df90b40a3f74f579b336a493db14bd583fd520ea0d8c9a98",
+    "/data0/ldx/aegis-assets/bert-base-uncased@86b5e0934494bd15c9632b12f734a8a67f723594/tokenizer_config.json": "a025160ef0431f1a392f6f050c1310f4c5d9fb6f275932dbccba73c4d214bf10",
+    "/data0/ldx/aegis-assets/bert-base-uncased@86b5e0934494bd15c9632b12f734a8a67f723594/vocab.txt": "07eced375cec144d27c900241f3e339478dec958f92fddbc551f295c992038a3",
+    "/data0/ldx/aegis-assets/bert-base-uncased@86b5e0934494bd15c9632b12f734a8a67f723594/pytorch_model.bin": "097417381d6c7230bd9e3557456d726de6e83245ec8b24f529f60198a67b203a",
+    "/data0/ldx/aegis-assets/bert-base-uncased@86b5e0934494bd15c9632b12f734a8a67f723594/LICENSE": "43070e2d4e532684de521b885f385d0841030efa2b1a20bafb76133a5e1379c1",
+    "/data0/ldx/saber-cache/openpi/big_vision/paligemma_tokenizer.model": "8986bb4f423f07f8c7f70d0dbe3526fb2316056c17bae71b1ea975e77a168fc6",
+    "/data0/ldx/saber-cache/openpi/openpi-assets/checkpoints/pi05_libero/params/_METADATA": "303a4e354814928e1d29b75e310f2c1ac7e7e29b62f48395b631045ca1cffc73",
+    "/data0/ldx/saber-cache/openpi/openpi-assets/checkpoints/pi05_libero/params/manifest.ocdbt": "65246951e69bd2b5118e609646bc9e8c439229bccbc1325643833aeb74f77104",
+    "/data0/ldx/saber-cache/openpi/openpi-assets/checkpoints/pi05_libero/assets/physical-intelligence/libero/norm_stats.json": "b3a44bb2810436fb62917decaea58bd4d9110255df527dea21e8fd40c960bd84"
+  },
+  "implementation": {
+    "scripts/safelibero_aegis_model_load_probe.py": "8dd0bdd73fecffd6a83754fba761efe1aa19ae4a73e40ca8552d14c1005a21b7",
+    "tests/test_aegis_model_load_probe.py": "edbb10bb65282ed93fa61bb8b9b63c6b51c2d2ff91cce63479b6d57f02d2d92c"
+  },
+  "execution_order": [
+    "rerun R1 static gate and verify every R2 digest",
+    "verify selected physical GPU identity, memory threshold, and zero compute processes",
+    "load GroundingDINO and pinned BERT on CPU in offline mode, inspect state only, then exit process",
+    "load pi05_libero on the selected GPU, inspect state/metadata only, then exit process",
+    "verify forbidden counters remain zero and record the post-exit GPU inventory"
+  ],
+  "required_postconditions": {
+    "groundingdino_eval_mode": true,
+    "groundingdino_device": "cpu",
+    "groundingdino_state_tensor_count": ">0",
+    "pi05_state_leaf_count": ">0",
+    "pi05_parameter_count": ">0",
+    "pi05_jax_gpu_visible": true,
+    "policy_inference_call_count": 0,
+    "groundingdino_inference_call_count": 0,
+    "server_socket_bind_count": 0,
+    "simulator_construction_count": 0,
+    "env_step_count": 0
+  },
+  "stop_conditions": [
+    "R1 static gate or any R2 digest fails",
+    "selected GPU identity changes, prelaunch used memory is at least 4096 MiB, or any compute process is present",
+    "either model fails to load from the pinned local assets",
+    "JAX exposes no GPU for pi05_libero",
+    "any inference, socket, simulator, or env.step counter becomes non-zero"
+  ],
+  "next_gate": "Only a successful terminal R2 report may authorize a separately frozen single-scene construction/serialization probe with env.step_count=0."
+}

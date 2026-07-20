@@ -1,0 +1,110 @@
+{
+  "schema": "proofalign.ctda-v2-open-region-threshold-protocol-v1",
+  "protocol_id": "ctda-v2-open-region-threshold-r0-cpu",
+  "frozen_at": "2026-07-20",
+  "purpose": "Validate both classes and the strict boundary of the official wooden-cabinet top-drawer OpenRegion predicate using direct simulator state injection and no env.step, policy, model, socket, action, or dispatch.",
+  "authorization": "simulator_state_injection_only_no_step",
+  "source": {
+    "root": "/home/ldx/lean-vla/external/vlsa-aegis",
+    "commit": "57b1aef306f212aea3574b0a3b64aa1a3d8f5e4b",
+    "git_tree": "1b55f9d97f0ae57b97e68fcb1177e524b096d13b",
+    "clean_required": true
+  },
+  "population": {
+    "dataset_digest": "206f44e0745e3027f62eed83997550f1a721a2f7207d78e314adcfb59c1f1c43",
+    "unit_id": "safelibero_goal:task3:levelI",
+    "suite": "safelibero_goal",
+    "task_index": 3,
+    "safety_level": "I",
+    "task_name": "open_the_top_drawer_and_put_the_bowl_inside",
+    "bddl_sha256": "2b1fd9654306ef906a1cc9c4a10ba84a36aee07a22315f69507d3941eb4956a6",
+    "init_sha256": "8a0d2eef748f59985799a8e958082e717166c4554070c2df76bb1d9d592e5dea",
+    "init_state_index": 0
+  },
+  "open_region_binding": {
+    "parent_id": "wooden_cabinet_1",
+    "region_id": "wooden_cabinet_1_top_region",
+    "joint_source_id": "wooden_cabinet_1_top_level",
+    "joint_range_m": [
+      -0.16,
+      0.01
+    ],
+    "open_when_less_than_m": -0.14,
+    "predicate_is_strict": true,
+    "source_identity_digest": "dadd1dafc953856569afd4e351a1c447cb8dc1ded2f480a4a946c09f06b6e394"
+  },
+  "runtime": {
+    "source_root": "/home/ldx/lean-vla/external/vlsa-aegis",
+    "simulator_python": "/home/ldx/lean-vla/external/vlsa-aegis/main/.venv/bin/python",
+    "simulator_python_version": "3.8.20",
+    "libero_config_dir": "experiments/safelibero_aegis_runtime_config",
+    "render_backend": "osmesa",
+    "render_device_id": -1,
+    "gpu_required": false
+  },
+  "probe": {
+    "joint_positions_m": [
+      -0.16,
+      -0.141,
+      -0.14,
+      -0.139,
+      0.01
+    ],
+    "expected_open": [
+      true,
+      true,
+      false,
+      false,
+      false
+    ],
+    "selection_rule": "asset endpoints, exact strict boundary, and one millimeter on each side; values frozen before execution",
+    "camera_resolution": 64,
+    "seed": 7,
+    "timeout_seconds": 600,
+    "simulator_construction_count": 1,
+    "reset_count": 1,
+    "set_init_state_count": 1,
+    "state_injection_count": 5,
+    "env_step_count": 0
+  },
+  "implementation_hashes": {
+    "scripts/ctda_v2_open_region_threshold_probe.py": "1e04d2261329a8b1bb2e77f8f287cba25418550f6451f590b015477819cf36a1",
+    "src/proofalign/benchmark/safelibero_open_region.py": "e81c055427037752f467ffb49599b5ede229766a6276544206f36df583bd901f"
+  },
+  "prerequisites": {
+    "open_region_initial_coverage": {
+      "path": "experiments/ctda_v2_open_region_coverage_summary_r2.json",
+      "sha256": "9890535654ad583d76e5e2f3a2420efe2ce3b39a54cae745aeab2fd4f1a2c31b"
+    },
+    "no_dispatch_adapter": {
+      "path": "experiments/ctda_v2_no_dispatch_adapter_summary.json",
+      "sha256": "3f32a6ac20f2b45662aa80467fc0426ff98258fb4d29490d3f863fec55c6267a"
+    }
+  },
+  "acceptance": {
+    "exact_joint_source": true,
+    "requested_and_observed_values_exact": true,
+    "official_expected_classes": "5/5",
+    "reference_predicate_agreement": "5/5",
+    "strict_boundary_qpos_equal_minus_0_14_is_closed": true,
+    "env_step_count": 0,
+    "model_construction_count": 0,
+    "policy_inference_count": 0,
+    "socket_bind_count": 0,
+    "dispatch_count": 0
+  },
+  "stop_conditions": [
+    "source, prerequisite, dataset, or implementation hash mismatch",
+    "CPU OSMesa simulator construction failure",
+    "joint source is not exactly wooden_cabinet_1_top_level",
+    "requested joint scalar is not recovered exactly after sim.forward",
+    "official predicate differs from qpos < -0.14 m",
+    "qpos == -0.14 m is classified open",
+    "any env.step, policy, model, socket, action, dispatch, or GPU use",
+    "output already exists"
+  ],
+  "output": "experiments/ctda_v2_open_region_threshold_summary.json",
+  "claim_boundary": "Passing establishes strict official predicate agreement at five directly injected simulator states, including both classes and the exact boundary. It does not execute drawer motion, validate transition dynamics, authenticate a production sensor, validate a policy/filter command, prove collision-free motion, or authorize rollout.",
+  "formal_rollout_authorized": false,
+  "next_gate": "Bind a real no-action source/filter producer and authenticated verifier, then freeze disjoint numeric progress and recovery budgets before any clean pilot."
+}
