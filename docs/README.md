@@ -1,6 +1,6 @@
 # ProofAlign 文档入口
 
-更新日期：2026-07-17
+更新日期：2026-07-20
 
 ## 当前事实来源
 
@@ -19,7 +19,7 @@
 
 外部线：
 
-- [`reproduction_plan.md`](reproduction_plan.md)：Phantom/SABER/SAFE/FIPER 状态与 E5 gate。
+- [`reproduction_plan.md`](reproduction_plan.md)：Phantom/SABER/SAFE/FIPER 状态、EDPA R0 asset gate 与 E5 gate。
 - [`safe_fiper_r0_runbook.md`](safe_fiper_r0_runbook.md)：已停止 SAFE/FIPER partial 的审计与历史 runbook。
 
 [`next_experiment_prompt.md`](next_experiment_prompt.md) 已完成并 superseded，不是当前执行授权。

@@ -1,6 +1,6 @@
 # External Reproduction Plan
 
-更新日期：2026-07-17
+更新日期：2026-07-20
 
 外部 baseline/workload 是 E5，当前不阻塞 ProofAlign 自身 clean utility pilot。
 
@@ -13,6 +13,7 @@
 | SAFE | not reproduced | 335/500 partial corpus 无 terminal manifest；只保留审计 |
 | FIPER fresh1 | not reproduced | `pretzel/rnd_a` 后无 terminal manifest；partial 保留 |
 | FIPER fresh2 | stopped/not reproduced | 用户于 2026-07-17 要求停止；service inactive/dead，manifest `started`，partial 不计结果 |
+| EDPA R0 | draft/asset-gated | official source 已 pin，adapter/protocol/preflight/validator 已就绪；训练数据 manifest 和双相机 patch 缺失，victim rollout 未授权 |
 
 详细 FIPER 操作见 [`safe_fiper_r0_runbook.md`](safe_fiper_r0_runbook.md)。
 
@@ -33,7 +34,14 @@
 - synthetic prompt/camera mutation 不自动构成 attack efficacy；
 - partial log、active process 和模型成功加载都不是 reproduction pass；
 - external baseline 不能替代 ProofAlign 自身 ablation/utility 评估；
-- 当前所有外部实验暂停；任何 GPU 重新执行都需要新授权、fresh protocol/root 和 fresh inventory。
+- 当前所有外部 victim 实验暂停；EDPA 只允许离线 asset gate 准备。任何 GPU 重新执行都需要
+  资产冻结后的新 execution amendment/授权、fresh root 和 fresh inventory。
+
+## EDPA R0 asset gate
+
+EDPA 是新 published-workload attempt，不是对 Phantom/SABER 的结果驱动重跑。当前预检预期 fail closed，
+直到 `/data0/ldx/proofalign-edpa-r0/attack_assets/` 下的 training-data manifest、primary patch 和 wrist
+patch 都存在且 digest 被冻结。资产生成后不得查看 victim outcome 再调整 patch、task 或位置。
 
 ## FIPER terminal 检查
 

@@ -1,6 +1,6 @@
 # Project Status
 
-更新日期：2026-07-17
+更新日期：2026-07-20
 
 ## 当前状态
 
@@ -12,7 +12,7 @@
 | E3 safety | scoped evidence complete | clean 12/12 preserved；post-dispatch 行为 fail closed，但正式 primary 12 unknown | 不改写旧分类；新的独立 challenge 才能增加 containment 证据 |
 | E4 robustness | complete | 35/35 frozen fault case fail closed | 只保留 scoped component claim |
 | timing | negative/deferred | Lean 0.9--1.3 s/stage，不满足实时控制 | 不优化，不恢复 real-time claim |
-| attack foundation | not established | Phantom held-out 仅 1/4 independent safety transition；正式 SABER exact-task R1 为 0 record/0 victim episode | 所有实验暂停；先重新冻结 VLA-only threat-validity protocol |
+| attack foundation | draft asset gate | Phantom held-out 仅 1/4，正式 SABER 为 0 record/0 victim episode；新 EDPA R0 只完成 outcome-blind protocol/adapter/validator 草案 | 先生成并固定 official EDPA 双相机 patch 资产，再单独审批 victim rollout |
 | external baselines | stopped/not reproduced | Phantom/SABER gates 已关闭；SAFE partial；FIPER fresh2 已按用户要求停止且 manifest 仍为 `started` | partial 只作审计，不 resume、不发布指标 |
 
 完整数字见 [`evaluation_results.md`](evaluation_results.md)。
@@ -92,8 +92,16 @@
    rollout；
 5. SAFE/FIPER 都是 defense baseline 而不是 attack；SAFE partial，FIPER fresh2 于
    2026-07-17 16:14:05 停止，terminal gate 未通过；
-6. 在新的 VLA-only threat-validation protocol 通过前，不修改 CTDA、不启动新 rollout、不声称
-   attack-defense benefit。
+6. EDPA R0 已形成可执行前审计的草案：固定 official default 生成参数、新的 12 个
+   clean-screening candidate、每 suite 首个 clean-safe unit、official 224-sampler-domain 固定 patch 位置与 2/4 independent
+   collision/cost transition gate；任务失败单独不计 threat-valid。
+7. 当前 EDPA 训练数据 manifest 和双相机 patch 不存在，SHA-256 未冻结，protocol 仍为
+   `draft_asset_gate_not_frozen` 且 `victim_execution_authorized_after_commit=false`；因此不启动 GPU
+   victim rollout，不修改 CTDA，不声称 attack-defense benefit。
+
+草案入口为
+[`edpa_threat_validation_r0_protocol.json`](../experiments/edpa_threat_validation_r0_protocol.json)，离线预检/终态验证器为
+[`run_edpa_threat_validation_r0.py`](../scripts/run_edpa_threat_validation_r0.py)。该脚本故意不提供 execute 模式。
 
 完整叙述见 [`attack_reproduction_evidence_audit.md`](attack_reproduction_evidence_audit.md)，机器记录见
 [`attack_reproduction_evidence_audit_20260717.json`](../experiments/attack_reproduction_evidence_audit_20260717.json)。

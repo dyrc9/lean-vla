@@ -68,6 +68,41 @@ def test_attacked_policy_input_preserves_pre_attack_digest() -> None:
     assert np.array_equal(replay, element["observation/image"])
 
 
+def test_multi_camera_attack_audit_binds_both_policy_inputs() -> None:
+    def transform(camera: str):
+        def apply(clean: np.ndarray):
+            attacked = np.full_like(clean, 127 if camera == "agentview" else 63)
+            return attacked, {
+                "schema": "fixture",
+                "attack_type": "edpa_fixed_patch",
+                "camera": camera,
+                "clean_frame_sha256": frame_digest(clean),
+                "attacked_frame_sha256": frame_digest(attacked),
+                "changed": True,
+            }
+
+        return apply
+
+    element, replay, audit = prepare_openpi_element(
+        observation(),
+        "pick up the mug",
+        IMAGE_TOOLS,
+        224,
+        observation_transform=transform("agentview"),
+        wrist_observation_transform=transform("robot0_eye_in_hand"),
+    )
+
+    assert audit["schema"] == "proofalign.multi-camera-observation-frame-audit.v1"
+    assert audit["changed"] is True
+    assert [item["camera"] for item in audit["camera_audits"]] == [
+        "agentview",
+        "robot0_eye_in_hand",
+    ]
+    assert np.all(element["observation/image"] == 127)
+    assert np.all(element["observation/wrist_image"] == 63)
+    assert np.array_equal(replay, element["observation/image"])
+
+
 def test_trace_record_embeds_policy_call_audit_only_on_replan_step() -> None:
     audit = {"policy_call_index": 0, "changed": True}
     record = make_trace_record(10, "policy", [0.0] * 7, 0.0, False, {}, 0.5, 0.1, audit)

@@ -57,7 +57,7 @@ def main() -> None:
     )
     tasks = build_task_plan(args)
     attack_records = load_attack_record_index(args.attack_record)
-    observation_transform = make_observation_transform(args)
+    observation_transform, wrist_observation_transform = make_observation_transforms(args)
     write_run_config(output_dir, args, tasks)
 
     episodes: list[dict[str, Any]] = []
@@ -76,6 +76,7 @@ def main() -> None:
                 attack_records=attack_records,
                 output_dir=output_dir,
                 observation_transform=observation_transform,
+                wrist_observation_transform=wrist_observation_transform,
             )
             episodes.append(episode)
         except Exception as exc:
@@ -125,7 +126,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--attack-record", type=Path, help="JSON/JSONL file with SABER-style instruction overrides.")
     parser.add_argument(
         "--observation-attack-type",
-        choices=("none", "laser_blinding", "em_truncation", "ultrasound_blur"),
+        choices=("none", "laser_blinding", "em_truncation", "ultrasound_blur", "edpa_fixed_patch"),
         default="none",
     )
     parser.add_argument(
@@ -137,6 +138,17 @@ def parse_args() -> argparse.Namespace:
         "--phantom-menace-root",
         type=Path,
         default=REPO_ROOT / "external" / "Phantom-Menace",
+    )
+    parser.add_argument("--edpa-primary-patch", type=Path)
+    parser.add_argument("--edpa-primary-patch-sha256")
+    parser.add_argument("--edpa-wrist-patch", type=Path)
+    parser.add_argument("--edpa-wrist-patch-sha256")
+    parser.add_argument("--edpa-primary-position", help="Frozen raw-frame top,left position")
+    parser.add_argument("--edpa-wrist-position", help="Frozen raw-frame top,left position")
+    parser.add_argument(
+        "--edpa-root",
+        type=Path,
+        default=REPO_ROOT / "external" / "EDPA_attack_defense",
     )
     return parser.parse_args()
 
@@ -209,6 +221,7 @@ def run_episode(
     attack_records: dict[tuple[str, int, int], dict[str, Any]],
     output_dir: Path,
     observation_transform: Callable[[np.ndarray], tuple[np.ndarray, dict[str, Any]]] | None = None,
+    wrist_observation_transform: Callable[[np.ndarray], tuple[np.ndarray, dict[str, Any]]] | None = None,
 ) -> dict[str, Any]:
     set_policy_seed(policy, jax, policy_seed)
     runtime = load_libero_task_runtime(
@@ -264,6 +277,7 @@ def run_episode(
                     image_tools,
                     args.resize_size,
                     observation_transform=observation_transform,
+                    wrist_observation_transform=wrist_observation_transform,
                 )
                 replay_images.append(replay_image)
                 frame_audit = {**frame_audit, "policy_call_index": len(frame_audits)}
@@ -328,7 +342,8 @@ def run_episode(
                 "observation_attack_type": getattr(args, "observation_attack_type", "none"),
                 "observation_attack_strength": (
                     getattr(args, "observation_attack_strength", None)
-                    if getattr(args, "observation_attack_type", "none") != "none"
+                    if getattr(args, "observation_attack_type", "none")
+                    not in {"none", "edpa_fixed_patch"}
                     else None
                 ),
             },
@@ -374,6 +389,7 @@ def prepare_openpi_element(
     resize_size: int,
     *,
     observation_transform: Callable[[np.ndarray], tuple[np.ndarray, dict[str, Any]]] | None = None,
+    wrist_observation_transform: Callable[[np.ndarray], tuple[np.ndarray, dict[str, Any]]] | None = None,
 ) -> tuple[dict[str, Any], np.ndarray, dict[str, Any]]:
     base_image = np.ascontiguousarray(obs["agentview_image"][::-1, ::-1])
     wrist_image = np.ascontiguousarray(obs["robot0_eye_in_hand_image"][::-1, ::-1])
@@ -397,6 +413,14 @@ def prepare_openpi_element(
         }
     else:
         base_image, frame_audit = observation_transform(clean_image)
+    if wrist_observation_transform is not None:
+        wrist_image, wrist_audit = wrist_observation_transform(wrist_image)
+        frame_audit = {
+            "schema": "proofalign.multi-camera-observation-frame-audit.v1",
+            "attack_type": "edpa_fixed_patch",
+            "changed": bool(frame_audit.get("changed")) and bool(wrist_audit.get("changed")),
+            "camera_audits": [frame_audit, wrist_audit],
+        }
     base_image = image_tools.convert_to_uint8(image_tools.resize_with_pad(base_image, resize_size, resize_size))
     wrist_image = image_tools.convert_to_uint8(image_tools.resize_with_pad(wrist_image, resize_size, resize_size))
     replay_image = base_image
@@ -418,21 +442,79 @@ def prepare_openpi_element(
 def make_observation_transform(
     args: argparse.Namespace,
 ) -> Callable[[np.ndarray], tuple[np.ndarray, dict[str, Any]]] | None:
+    return make_observation_transforms(args)[0]
+
+
+def make_observation_transforms(
+    args: argparse.Namespace,
+) -> tuple[
+    Callable[[np.ndarray], tuple[np.ndarray, dict[str, Any]]] | None,
+    Callable[[np.ndarray], tuple[np.ndarray, dict[str, Any]]] | None,
+]:
     attack_type = getattr(args, "observation_attack_type", "none")
     if attack_type == "none":
-        return None
+        return None, None
+    if attack_type == "edpa_fixed_patch":
+        from experiments.edpa_patch_plugin import EDPAPatchConfig, EDPAPatchTransform
+
+        required = {
+            "edpa_primary_patch": getattr(args, "edpa_primary_patch", None),
+            "edpa_primary_patch_sha256": getattr(args, "edpa_primary_patch_sha256", None),
+            "edpa_wrist_patch": getattr(args, "edpa_wrist_patch", None),
+            "edpa_wrist_patch_sha256": getattr(args, "edpa_wrist_patch_sha256", None),
+            "edpa_primary_position": getattr(args, "edpa_primary_position", None),
+            "edpa_wrist_position": getattr(args, "edpa_wrist_position", None),
+        }
+        missing = sorted(key for key, value in required.items() if value in (None, ""))
+        if missing:
+            raise RuntimeError("EDPA fixed-patch arguments are missing: " + ", ".join(missing))
+        primary = EDPAPatchTransform(
+            EDPAPatchConfig(
+                patch_path=Path(required["edpa_primary_patch"]),
+                patch_sha256=str(required["edpa_primary_patch_sha256"]),
+                camera="agentview",
+                position=parse_patch_position(str(required["edpa_primary_position"])),
+                edpa_root=Path(getattr(args, "edpa_root")),
+            )
+        )
+        wrist = EDPAPatchTransform(
+            EDPAPatchConfig(
+                patch_path=Path(required["edpa_wrist_patch"]),
+                patch_sha256=str(required["edpa_wrist_patch_sha256"]),
+                camera="robot0_eye_in_hand",
+                position=parse_patch_position(str(required["edpa_wrist_position"])),
+                edpa_root=Path(getattr(args, "edpa_root")),
+            )
+        )
+        return primary, wrist
     from experiments.phantom_menace_plugin import (
         PhantomMenaceConfig,
         PhantomMenaceObservationTransform,
     )
 
-    return PhantomMenaceObservationTransform(
-        PhantomMenaceConfig(
-            attack_type=attack_type,
-            attack_strength=args.observation_attack_strength,
-            repo_root=args.phantom_menace_root,
-        )
+    return (
+        PhantomMenaceObservationTransform(
+            PhantomMenaceConfig(
+                attack_type=attack_type,
+                attack_strength=args.observation_attack_strength,
+                repo_root=args.phantom_menace_root,
+            )
+        ),
+        None,
     )
+
+
+def parse_patch_position(value: str) -> tuple[int, int]:
+    parts = value.split(",")
+    if len(parts) != 2:
+        raise RuntimeError("EDPA patch position must be top,left")
+    try:
+        position = int(parts[0].strip()), int(parts[1].strip())
+    except ValueError as exc:
+        raise RuntimeError("EDPA patch position must contain integers") from exc
+    if min(position) < 0:
+        raise RuntimeError("EDPA patch position must be non-negative")
+    return position
 
 
 def array_digest(value: Any) -> str | None:
