@@ -100,6 +100,10 @@ unit 不 resume、不覆盖、不重跑。
 
 ## 4. EDPA R0 threat-validation draft
 
+该草案早于当前 [`optimization_plan.md`](optimization_plan.md) 整合到 `master`，现仅作未执行的
+参考实现保留，不是当前实验入口，也不构成 M5 的 EDPA + SafeLIBERO P1 protocol。不得
+为它生成 patch 或启动 victim rollout；后续顺序以 optimization plan 为准。
+
 该草案只验证 unguarded VLA-only victim 上的 published workload safety signal，不运行 CTDA，不计算
 defense benefit，不复用已关闭的 Phantom/SABER unit。关键冻结规则是：
 
@@ -133,10 +137,31 @@ manifest、两个 patch 和它们的 SHA-256 尚缺，victim execution 明确未
 - FIPER `proofalign-fiper-r0-fresh2.service` 未被停止或干扰；
 - output root 不存在。
 
-EDPA R0 还必须先通过自己的 source/asset/checkpoint/protocol/fresh-root preflight，并在资产冻结后
-另行提交 execution amendment 与获得新的 GPU rollout 授权。
+EDPA R0 不进入当前 execution gate。未来若按 optimization plan 重新定义 EDPA + SafeLIBERO
+P1，必须使用新 protocol/root，不续接本草案。
 
 ## 6. 结果解释
 
 新 paired pilot 能回答固定 simulator slice 上的正常 task utility/safety trade-off。它不能回答物理安全、
 通用攻击 defense、verified recovery、availability 或 real-time enforcement。
+
+## 6. CTDA v2 规划期规则
+
+CTDA v2 尚未形成正式 protocol 或结果。其工作顺序和实验矩阵见
+[`optimization_plan.md`](optimization_plan.md)，当前先执行设计、fixed-trace/shadow、typed provenance、
+SafeLIBERO/AEGIS readiness 和 no-dispatch gate。
+
+新增规则：
+
+1. v2 使用新 method/wire/schema id，v1 protocol/result 保持可重放；
+2. candidate population 先按 manifest、source hash、model compatibility、support 和 safety-oracle
+   coverage outcome-blind 冻结，不能先看正式 clean/attack outcome 再挑 pair；
+3. clean-success/clean-safe 是预定义 classifier 产生的分析标签。只有它们进入条件式 attack-transition
+   denominator，但失败/不安全 pair 仍保留在 valid/task/safety 汇总中，不替换；
+4. 若需要 discovery 筛选，discovery 与 formal held-out task/seed 必须不相交，held-out population 在
+   outcome 前冻结；
+5. attacked+defended comparison 只有在 clean utility、VLA-only threat qualification 和 exact
+   population overlap 全部通过后才允许；
+6. AEGIS 是低层 closed-loop baseline；SAFE/FIPER 是 detector baseline，转为 stop/replan 时必须与其他
+   方法共用同一 fallback；
+7. task failure、detector alarm、CTDA block 和 attack metadata 都不能代替 independent unsafe label。
