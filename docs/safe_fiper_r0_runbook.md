@@ -119,15 +119,16 @@ git -C external/fiper status --short
 ```
 
 在当前中断状态下，全局 `ready` 必然为 false，`gpu_execution_authorized` 也固定为 false；这是
-fail-closed 设计，不是环境安装失败。判断某条线的输入是否齐全时读取
-`input_readiness.safe_rollout`、`input_readiness.safe_detector` 或 `input_readiness.fiper`，并单独完成
-新的 GPU inventory 和事前执行授权。
+fail-closed 设计，不是环境安装失败。`external/fiper/data` 的审计 symlink 会让 generic
+`source_ready` 以及当前三个 `input_readiness` 值保持 false。若未来另开新协议，必须由该协议只绑定
+实际依赖的 source/input，并单独完成新的 GPU inventory 和事前执行授权。
 
 主仓库预检会按 launcher 的真实 import 上下文检查现有环境：SAFE detector 使用 `external/SAFE`
 作为工作目录，OpenPI server 使用 `external/SAFE-openpi/src`，LIBERO client 同时使用 frozen LIBERO
 submodule 与 `packages/openpi-client/src`。在源码、环境、checkpoint 和 FIPER 数据均保持当前冻结状态
-时，预期为 `safe_rollout=true`、`safe_detector=false`、`fiper=true`；其中 detector 只因缺少一套新的
-500-episode terminal rollout 而保持 false。预检不得为修复 import 检查而新建或重建环境。
+时，各环境 import 检查应通过，SAFE checkpoint 与 FIPER 数据检查也应通过；但 retained symlink 仍使
+通用 source-clean/readiness 汇总为 false。预检不得为改变这个审计状态而删除 binding、新建环境或
+重建环境。
 
 每次 GPU run 都重新记录：
 

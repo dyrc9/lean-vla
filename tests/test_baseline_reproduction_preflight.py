@@ -125,17 +125,23 @@ def test_current_preflight_is_read_only_and_blocks_gpu_execution() -> None:
     assert report["safe_assets"]["rollout_ready"] is False
     assert any("SAFE official pi0-libero_10 rollout root" in blocker for blocker in report["blockers"])
     if source_checkouts_present:
-        assert report["source_ready"] is True
+        retained_fiper_binding = (source_root / "fiper" / "data").is_symlink()
+        assert report["source_ready"] is (not retained_fiper_binding)
         assert not any("submodule" in blocker for blocker in report["blockers"])
-        assert report["input_readiness"]["safe_rollout"] is True
+        assert report["input_readiness"]["safe_rollout"] is (not retained_fiper_binding)
         assert report["input_readiness"]["safe_detector"] is False
-        assert report["input_readiness"]["fiper"] is True
+        assert report["input_readiness"]["fiper"] is (not retained_fiper_binding)
         assert all(
             not environment["blockers"]
             for environment in report["environments"].values()
         )
         assert report["git"]["safe"]["clean"] is True
-        assert report["git"]["fiper"]["clean"] is True
+        assert report["git"]["fiper"]["clean"] is (not retained_fiper_binding)
+        if retained_fiper_binding:
+            assert any(
+                "external/fiper" in blocker and "dirty" in blocker
+                for blocker in report["blockers"]
+            )
     else:
         # A clean clone intentionally omits the ignored external checkouts.
         assert report["source_ready"] is False

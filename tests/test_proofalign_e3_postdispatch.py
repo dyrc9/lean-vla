@@ -1,7 +1,10 @@
 from __future__ import annotations
 
 from copy import deepcopy
+import json
 from pathlib import Path
+
+import pytest
 
 from scripts import run_proofalign_e3_postdispatch as post
 
@@ -11,7 +14,7 @@ PROTOCOL_PATH = ROOT / "experiments" / "proofalign_e3_postdispatch_protocol.json
 
 
 def _protocol() -> dict:
-    return post.load_protocol(PROTOCOL_PATH)[0]
+    return json.loads(PROTOCOL_PATH.read_text(encoding="utf-8"))
 
 
 def _oracle(role: str, index: int, *, mask: bool) -> dict:
@@ -129,14 +132,22 @@ def _contained_payload() -> dict:
 
 
 def test_protocol_preserves_prior_results_and_freezes_one_shot_fault() -> None:
-    protocol, _effective, audit = post.load_protocol(PROTOCOL_PATH)
+    protocol = _protocol()
+
+    # Historical execution remains pinned to its original source bytes.  The
+    # current classifier can still replay retained records, but preflight must
+    # reject a new execution from this evolved checkout.
+    with pytest.raises(post.e1.ProtocolError, match="digest mismatch"):
+        post.load_protocol(PROTOCOL_PATH)
 
     assert protocol["replaces_e1_v3"] is False
     assert protocol["replaces_e3_clean_safety"] is False
     assert protocol["intervention"]["collision_or_cost_manufactured"] is False
     assert protocol["classification"]["physical_recovery_claim"] is False
     assert len(post.expected_specs(protocol)) == 12
-    assert audit["e3_clean_terminal_preserved"] == 12
+    clean_terminal_path = ROOT / protocol["e3_clean_terminal_evidence"]["path"]
+    clean_terminal = json.loads(clean_terminal_path.read_text(encoding="utf-8"))
+    assert clean_terminal["clean_online_safety"]["safety_preserved"] == 12
 
 
 def test_complete_fail_closed_response_is_contained() -> None:

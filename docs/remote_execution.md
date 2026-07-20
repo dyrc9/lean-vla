@@ -153,6 +153,7 @@ external/openpi/.venv/bin/python NEW_RUNNER.py \
 - `external/fiper/data` 是后台复现所需的用户 symlink，会使 generic source-clean preflight
   `source_ready=false`；不要删除它。新的 ProofAlign 自身 runner 应 pin 自己实际依赖的 source，而不是
   把该无关 symlink 当成 GPU execution blocker。
-- 全量 pytest 当前预期为 `345 passed / 1 failed / 1 skipped`；唯一失败是上述 generic baseline
-  preflight 的 source-ready 断言。相关 CTDA/E4 focused suite 为通过状态。
+- 全量 pytest 会把上述 `source_ready=false` 作为预期的 fail-closed 状态验证，而不是要求删除 symlink。
+  历史 E0/E1/E3 protocol 继续绑定原始 source blob；当前 checkout 不得直接执行它们，离线测试只读取
+  保留 protocol/result 验证分类语义。
 - Lean timing 很慢；保留诊断，不把 deadline 作为下一 clean utility pilot 的 gate。

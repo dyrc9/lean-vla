@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+from hashlib import sha256
 import json
 from pathlib import Path
 import subprocess
@@ -48,6 +49,43 @@ def _is_ancestor(path: Path, ancestor: str, descendant: str) -> bool:
     return completed.returncode == 0
 
 
+def _git_blob_sha256(path: Path, commit: str, relative: str) -> str | None:
+    completed = subprocess.run(
+        ["git", "-C", str(path), "show", f"{commit}:{relative}"],
+        check=False,
+        capture_output=True,
+        timeout=5,
+    )
+    if completed.returncode != 0:
+        return None
+    return sha256(completed.stdout).hexdigest()
+
+
+def _protocol_freeze_commit(path: Path, protocol_path: Path) -> str | None:
+    try:
+        relative = protocol_path.resolve().relative_to(path.resolve())
+    except ValueError:
+        return None
+    completed = subprocess.run(
+        [
+            "git",
+            "-C",
+            str(path),
+            "log",
+            "--diff-filter=A",
+            "--format=%H",
+            "--",
+            str(relative),
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+        timeout=5,
+    )
+    commits = completed.stdout.splitlines() if completed.returncode == 0 else []
+    return commits[-1] if commits else None
+
+
 def audit(protocol_path: Path) -> dict[str, Any]:
     """Audit a frozen E0 v2 snapshot from a committed descendant checkout.
 
@@ -70,18 +108,44 @@ def audit(protocol_path: Path) -> dict[str, Any]:
     if not _is_ancestor(REPO_ROOT, base_commit, current_head):
         raise E0V2FreezeError("E0 v2 method base is not an ancestor of current HEAD")
 
+    freeze_commit = _protocol_freeze_commit(REPO_ROOT, protocol_path)
+    if freeze_commit is None or not _is_ancestor(REPO_ROOT, freeze_commit, current_head):
+        raise E0V2FreezeError("E0 v2 protocol freeze commit is unavailable")
+
+    method_files = method.get("files") or {}
+    if not isinstance(method_files, dict) or not method_files:
+        raise E0V2FreezeError("E0 v2 method file pins are empty")
+
     original_git_commit = frozen_audit._git_commit
+    original_require_bound_file = frozen_audit._require_bound_file
 
     def _committed_snapshot_git_commit(path: Path) -> str | None:
         if path.resolve() == REPO_ROOT.resolve():
             return base_commit
         return original_git_commit(path)
 
+    def _committed_snapshot_require_bound_file(
+        path_value: Any, digest_value: Any, label: str
+    ) -> Path:
+        relative = str(path_value)
+        if relative in method_files:
+            path = REPO_ROOT / relative
+            if not path.is_file():
+                raise E0V2FreezeError(f"{label} is missing: {path}")
+            if _git_blob_sha256(REPO_ROOT, freeze_commit, relative) != digest_value:
+                raise E0V2FreezeError(
+                    f"{label} digest differs from the committed E0 v2 snapshot"
+                )
+            return path
+        return original_require_bound_file(path_value, digest_value, label)
+
     frozen_audit._git_commit = _committed_snapshot_git_commit
+    frozen_audit._require_bound_file = _committed_snapshot_require_bound_file
     try:
         report = frozen_audit.audit(protocol_path)
     finally:
         frozen_audit._git_commit = original_git_commit
+        frozen_audit._require_bound_file = original_require_bound_file
 
     report = dict(report)
     report.update(
@@ -89,6 +153,7 @@ def audit(protocol_path: Path) -> dict[str, Any]:
             "schema": "proofalign.e0.protocol-v2-committed-audit.v1",
             "frozen_audit_schema": "proofalign.e0.protocol-v2-audit.v1",
             "method_base_commit": base_commit,
+            "protocol_freeze_commit": freeze_commit,
             "current_head": current_head,
             "method_base_is_ancestor": True,
         }

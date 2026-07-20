@@ -21,6 +21,8 @@ def test_reproduction_targets_are_unique_versioned_and_fail_closed() -> None:
         "adapter_ready",
         "main_evaluated",
         "blocked_upstream",
+        "not_reproduced_partial_stopped",
+        "stopped_partial_not_reproduced",
     }
 
     assert payload["schema"] == "proofalign.reproduction-targets.v1"

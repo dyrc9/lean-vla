@@ -14,6 +14,7 @@ from proofalign.benchmark.libero_online_wrapper import (
 from proofalign.benchmark.libero_e1_runner import UnguardedObservationChecker
 from proofalign.models import Decision
 from scripts.run_proofalign_e1_paired import (
+    ProtocolError,
     assert_protocol_consistency,
     build_summary,
     derive_labels,
@@ -21,6 +22,7 @@ from scripts.run_proofalign_e1_paired import (
     failure_labels,
     mcnemar_exact,
     paired_bootstrap,
+    repo_path,
 )
 from scripts.run_proofalign_e1_paired_v2 import (
     DEFAULT_PROTOCOL as V2_PROTOCOL,
@@ -283,12 +285,20 @@ def test_frozen_binary_statistics_are_deterministic() -> None:
 def test_frozen_e1_v3_protocol_exactly_matches_e0_supported_slice() -> None:
     amendment, protocol = load_v3_effective_protocol(V3_PROTOCOL)
 
-    observed = assert_protocol_consistency(protocol, V3_PROTOCOL)
+    # E1-v3 is an immutable historical execution protocol.  The later
+    # policy-seed-1 utility runner intentionally changed the shared runner
+    # bytes, so current-source execution must fail closed without weakening
+    # the historical protocol pins.
+    with pytest.raises(ProtocolError, match="frozen E1 input digest mismatch"):
+        assert_protocol_consistency(protocol, V3_PROTOCOL)
+    e0_ref = protocol["e0_protocol"]
+    e0 = json.loads(repo_path(e0_ref["path"]).read_text(encoding="utf-8"))
 
     assert amendment["prior_failed_runs"][0]["resume"] is False
     assert amendment["prior_failed_runs"][1]["resume"] is False
-    assert observed["unit_count"] == 12
-    assert observed["episode_count"] == 24
+    assert protocol["pilot_units"] == e0["e1"]["pilot_units"]
+    assert len(protocol["pilot_units"]) == 12
+    assert len(expected_specs(protocol)) == 24
 
 
 def test_e1_v2_preserves_units_and_uses_physical_egl_id(

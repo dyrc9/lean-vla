@@ -12,15 +12,18 @@ The target is auditable simulator execution integrity, not an end-to-end or abso
 ## Current result
 
 - E0 freezes 12 non-real-time supported LIBERO-Safety affordance/init0 units.
-- E1 clean utility is still `not_evaluated`: all three historical paired pilots were terminal-invalid.
+- E1 clean utility is complete on the frozen policy-seed-1 slice: 12/12 pairs are valid, VLA-only succeeds on
+  8/12 tasks, Full CTDA succeeds on 0/12, and task/safe-success retention is 0.
 - E3 clean safety is 12/12 preserved with 117/117 complete negative collision/cost observations.
 - E3 post-dispatch behavior failed closed in all 12 episodes, but the frozen primary classifier remains
   `0 contained / 0 failed / 12 unknown` because of a receipt-schema mismatch.
 - E4 passes 1/1 real-Lean control and 35/35 frozen fault cases.
 - Lean evaluation remains too slow for real-time enforcement; the system is a slow-interlock/offline prototype.
 
-The next experiment is a new valid clean paired utility pilot with a shared contact-enriched observer and a fresh
-policy seed. It will quantify normal task-completion trade-off rather than pursue absolute safety.
+CTDA v1 therefore requires revision before any expanded runtime claim. The immediate upstream blocker is attack
+validity: no retained Phantom Menace or SABER workload passed the complete held-out independent-safety
+qualification chain. All GPU experiments are paused until a new VLA-only threat-validation-only protocol is
+frozen and explicitly authorized.
 
 ## Start here
 
@@ -53,8 +56,9 @@ export PYTHONPATH=/home/ldx/lean-vla/src:/home/ldx/lean-vla
 (cd lean && lake build ProofAlign)
 ```
 
-The full suite currently retains one known failure in the generic external-baseline preflight because the stopped
-FIPER partial run left its audited `data` symlink binding; do not delete that binding merely to make the test green.
+The stopped FIPER partial run intentionally retains its audited `data` symlink binding. The generic external-
+baseline preflight must report `source_ready=false` in that state; the test suite asserts that fail-closed result.
+Do not delete or alter the binding merely to make the preflight ready.
 
 GPU/OpenPI execution requires the additional environment and isolation rules in
 [docs/remote_execution.md](docs/remote_execution.md). All project experiments are currently paused; no GPU rollout

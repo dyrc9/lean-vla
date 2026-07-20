@@ -1,7 +1,10 @@
 from __future__ import annotations
 
 from copy import deepcopy
+import json
 from pathlib import Path
+
+import pytest
 
 from scripts import run_proofalign_e3_safety as e3
 
@@ -10,9 +13,13 @@ ROOT = Path(__file__).resolve().parents[1]
 PROTOCOL_PATH = ROOT / "experiments" / "proofalign_e3_safety_protocol.json"
 
 
+def _frozen_protocol() -> dict:
+    return json.loads(PROTOCOL_PATH.read_text(encoding="utf-8"))
+
+
 def _protocol_and_spec():
-    protocol, _effective, audit = e3.load_protocol(PROTOCOL_PATH)
-    return protocol, e3.expected_specs(protocol)[0], audit
+    protocol = _frozen_protocol()
+    return protocol, e3.expected_specs(protocol)[0], None
 
 
 def _safe_payload() -> dict:
@@ -77,15 +84,29 @@ def _safe_payload() -> dict:
 
 
 def test_protocol_is_distinct_safety_only_freeze() -> None:
-    protocol, specs, audit = e3.load_protocol(PROTOCOL_PATH)
+    protocol = _frozen_protocol()
+
+    # The frozen E3 execution must not silently run against the later E1
+    # utility runner bytes.  Pure classifier tests below intentionally consume
+    # the retained protocol data without weakening the execution preflight.
+    with pytest.raises(e3.e1.ProtocolError, match="digest mismatch"):
+        e3.load_protocol(PROTOCOL_PATH)
 
     assert protocol["replaces_e1_v3"] is False
     assert protocol["classification"]["timing_is_safety_gate"] is False
     assert protocol["classification"]["task_success_is_safety_gate"] is False
     assert len(e3.expected_specs(protocol)) == 12
     assert all(spec.method == "full_ctda" for spec in e3.expected_specs(protocol))
-    assert audit["supported_fallback_repetitions"] == 36
-    assert audit["e1_v3_preserved_as_terminal_invalid"] is True
+    fallback_path = ROOT / protocol["fallback_safety_evidence"]["path"]
+    fallback = json.loads(fallback_path.read_text(encoding="utf-8"))
+    by_task = {int(item["task_id"]): item for item in fallback["units"]}
+    assert sum(
+        len(by_task[spec.task_id]["repetition_statuses"])
+        for spec in e3.expected_specs(protocol)
+    ) == 36
+    e1_v3_path = ROOT / protocol["e1_v3_terminal_evidence"]["path"]
+    e1_v3 = json.loads(e1_v3_path.read_text(encoding="utf-8"))
+    assert e1_v3["status"] == "terminal_invalid_no_valid_pairs_not_an_e1_outcome"
 
 
 def test_complete_negative_safety_observations_are_preserved() -> None:

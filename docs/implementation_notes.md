@@ -70,8 +70,10 @@ export PYTHONPATH=/home/ldx/lean-vla/src:/home/ldx/lean-vla
 git diff --check
 ```
 
-全量 suite 的一个既有失败来自 `external/fiper/data` symlink 使 generic baseline preflight
-`source_ready=false`；不要为得到绿色测试而删除或改动 FIPER 数据绑定。
+`external/fiper/data` symlink 会使 generic baseline preflight 正确输出 `source_ready=false`；全量测试把
+该状态作为预期 fail-closed 结果。不要为得到 ready preflight 而删除或改动 FIPER 数据绑定。历史
+E0/E1/E3 execution protocol 的 source hash 仍不可变；当前源码只做 retained-artifact 离线分类验证，
+不得用当前 runner 重新执行旧 protocol。
 
 ## Artifact 纪律
 
