@@ -71,8 +71,9 @@ git log -1 --oneline
 - SAFE 只有 partial corpus；FIPER fresh2 已停止且 manifest 仍为 `started`。不得 resume、拼接或发布。
 - CTDA v2 M0/no-dispatch core 已冻结并实现：`ctda-v2` / `proofalign.ctda-core-v2` / `ctda-wire-v2`、
   certificate+fast-checker、proof 后 rebind、四级 intervention、post-filter membership、progress ledger、
-  Python reference、六阶段 Lean replay 和 21/21 golden parity 已存在；下一缺口不是继续增加 provenance，
-  而是把 artifact 明确组织成 intent→plan 与 plan→execution 两个 attack-shift verdict。
+  Python reference、六阶段 Lean replay 和 21/21 golden parity 已存在。它们现在只作为历史
+  implementation/regression assets；下一方法版本不默认继承这套六阶段架构，若恢复工作必须先按
+  `method.md`/`system_architecture.md` 重冻两关系、两不变量、三 transaction 与四臂消融。
 - SafeLIBERO 32/32 source-bound mission template 已编译；全量 state r0 的 1250/1600 负结果和 r1 的
   exact state-key/collision-source 1600/1600 结果都已封存，两个执行均 `env.step=0`。完整 executable
   v2 support 仍为 0/1600，不能启动 rollout。
@@ -106,11 +107,11 @@ SABER terminal blocked/failed
 ```
 
 禁止并行运行 CTDA/ProofAlign/AEGIS/SAFE/FIPER。禁止让 CTDA verdict、detector alarm、task failure 或
-attack metadata充当 safety ground truth。
+attack metadata 充当 safety ground truth。
 
-## 5. M0：CTDA v2 设计已冻结，继续保持 no-rollout
+## 5. 历史 M0：CTDA v2 设计资产，继续保持 no-rollout
 
-**DEFERRED：不要执行本节。保留内容仅用于历史审计。**
+**DEFERRED：不要执行本节。保留内容仅用于历史审计，不是下一版架构指令。**
 
 本节在当前 safety-foundation readiness 完成后执行；编号保留方法依赖关系，不表示施工优先级。
 
@@ -127,7 +128,7 @@ attack metadata充当 safety ground truth。
 - `lean/ProofAlign/CTDAWire.lean`
 - 相关 tests 和 retained E1 artifacts。
 
-然后在 `docs/method.md` 增加明确标识的 CTDA v2 设计章节，保留 v1 原文和 validity 判定。必须冻结：
+以下列表记录旧 v2 当时冻结的设计，不再是恢复施工 checklist：
 
 1. contract epoch：mission/root、phase、residual、contract version、relevant-state epoch/digest、observer
    provenance/timestamp/age、checker/proof digest；
@@ -144,21 +145,20 @@ Lean authority 优先选择：Lean 证明长期 contract certificate、predicate
 由 Lean 重放。若选择 pipelined/batched Lean，必须显式证明 state snapshot freshness；不得用迟到 proof
 授权已变化的 state。
 
-当前冻结事实见 `docs/method.md` 第 9 节和
-`experiments/ctda_v2_no_dispatch_protocol.json`。M0 不得再静默改字段；任何语义变化需要新 protocol
-version。仍不得产生正式 task outcome。
+当前冻结 artifact 见 `experiments/ctda_v2_no_dispatch_protocol.json`。历史 schema 不得静默改字段；未来
+若重新授权，先按新的最小架构创建全新 method/protocol version。仍不得产生正式 task outcome。
 
-## 6. M1：实现 v2 core，保持 v1 可重放
+## 6. 历史 M1：v2 core 资产，保持 v1/v2 可重放
 
 **DEFERRED：不要执行本节。不要实现 attack-shift record 或运行任何 CTDA probe/test outcome。**
 
-冻结前第一版 core、strict envelope、unit/reference checker 和 `ProofAlign.CTDAV2` 已完成。以下是延后
-清单，当前不得执行：
+冻结前第一版 core、strict envelope、unit/reference checker 和 `ProofAlign.CTDAV2` 已完成。以下是历史
+清单，不得继续施工；未来设计以四臂 method switch 和三个 transaction 为准：
 
 1. 定义 frozen `AttackShiftRecordV2`：必须同时绑定 trusted intent、raw planned action、accepted plan、
    dispatched/applied command、observed effect、attack artifact 与 state/transaction id；
 2. 输出互不混淆的 `intent_plan_verdict`、`plan_execution_verdict` 与 `dual_verdict`，并构造
-   semantic-only、execution-only、dual 三个 ablation；
+   Intent-only、Execution-only、Dual 三个 ablation；
 3. fixed-trace corpus 至少覆盖 instruction/camera 导致的 wrong-target/wrong-order/wrong-gripper planned
    shift，以及 command substitution/filter rewrite/stale receipt/false completion execution shift；
 4. 已完成 `ctda-wire-v2` 六阶段 Lean replay与 21/21 Python/Lean golden parity；不得将 normalized
@@ -321,7 +321,7 @@ systemctl --user show proofalign-fiper-r0-fresh2.service \
   source/checkpoint/data hash 和 `env.step_count=0`；
 - runner 默认只读，只有显式 `--execute --gpu PHYSICAL_ID` 才允许 dispatch。
 
-## 9. M4：新的 clean CTDA v2 pilot
+## 9. Deferred：新的四臂 clean pilot
 
 **DEFERRED/UNAUTHORIZED：不得创建 protocol，不得运行。**
 
@@ -332,14 +332,15 @@ systemctl --user show proofalign-fiper-r0-fresh2.service \
 - protocol 在 outcome 前固定 task/init/env seed/policy seed、arm order、checkpoint/config/camera/horizon、
   safety channels、utility gate、stop conditions、source/data/model hashes；
 - `utility_retention_min`、`safe_success_noninferiority_margin` 和 statistical method 必须有冻结值，不能留空；
-- arms 至少包括 VLA-only、CTDA v2；SafeLIBERO 上还包括 AEGIS 和 CTDA v2+filter；
+- 核心 arms 必须包括 VLA-only、Intent-only、Execution-only、Dual；AEGIS/filter 只进入独立 secondary
+  matrix；
 - 先做事前固定的小型 pilot；已进入 episode 后的异常保留 invalid/unknown，不替换 unit；
 - terminal 后独立验证 ledger/manifest/episode hashes。
 
 primary 输出：valid pair、task/safe success、phase completion、CAR/cost/RET、四象限、四种 intervention、
 修改范数、blocked time、deadlock/recovery、safety-channel coverage、proof/fast-checker/filter latency。
 
-若 clean utility gate 不通过：停止 main，保留负结果；后续修改必须形成新的 CTDA method/protocol，不能在
+若 Dual clean utility gate 不通过：停止 main，保留负结果；后续修改必须形成新的 method/protocol，不能在
 本轮调阈值重跑。
 
 ## 10. M5：独立 VLA-only threat qualification（当前唯一任务）
@@ -379,18 +380,19 @@ qualification 仍使用独立 safety transition。
 **DEFERRED/UNAUTHORIZED：当前不得执行 attacked+defended。** 以下条件仅保留为历史设计，不因 M5
 成功自动开放：
 
-1. CTDA v2 clean utility gate 通过；
+1. 四臂 fixed-trace gate 与 Dual clean utility gate 通过；
 2. 至少一个 workload 完成 terminal VLA-only threat qualification；
 3. attack、baseline、AEGIS、CTDA 使用完全相同的 task/init/seed/checkpoint/camera/horizon；
-4. attack population 与 CTDA support population 完全重合；
+4. attack population 与新 method support population 完全重合；
 5. independent safety oracle coverage/provenance 完整；
 6. protocol 已提交且 worktree clean；
 7. selected GPU/EGL/source/hash/output-root preflight ready。
 
-矩阵：VLA-only、AEGIS、CTDA v2、CTDA v2+physical filter，各自运行 clean 和 qualified attacked
-workload。SAFE/FIPER 只有 terminal-ready 才追加，且使用相同 fallback。
+核心矩阵：VLA-only、Intent-only、Execution-only、Dual，各自运行 clean 和 qualified attacked
+workload。AEGIS/physical filter、SAFE/FIPER、RoboGuard/SafeGate 只有 terminal-ready 才进入独立
+secondary matrix，并共享公平的 observer/dispatch/intervention 配置。
 
-不得把 task failure、detector alarm、CTDA block 或 attack metadata当作 unsafe ground truth。
+不得把 task failure、detector alarm、CTDA block 或 attack metadata 当作 unsafe ground truth。
 
 ## 12. 正式执行与 artifact 纪律
 
@@ -418,7 +420,7 @@ external/openpi/.venv/bin/python NEW_RUNNER.py \
 2. 独立重算 append-only ledger、manifest、episode/artifact SHA-256；
 3. 写新的 `experiments/*_terminal_summary.json`；
 4. 更新 `docs/evaluation_results.md`、`docs/project_status.md`、`docs/roadmap.md`；
-5. 需要改变 normative v2 方法时先形成新 method version，不后验修改本轮；
+5. 需要恢复或改变方法时，按最小架构形成新的 method/protocol version，不后验修改本轮或直接续接旧 v2；
 6. 提交 terminal artifacts 和 canonical 文档；
 7. 报告实际 commit、测试、run root、validator 和仍然存在的 unknown/blocker。
 
@@ -430,7 +432,7 @@ external/openpi/.venv/bin/python NEW_RUNNER.py \
 - SABER terminal blocked/failed 后才转 fresh EDPA + SafeLIBERO；
 - 保存 protocol、append-only ledger、per-episode artifact、terminal manifest/summary、validator 和 SHA-256；
 - 得到 terminal 结果后立即停止并汇报；
-- 不执行 M0--M4/M6，不运行任何自研 method 或 defense baseline。
+- 不执行历史 M0--M4/M6 或 deferred D0--D4，不运行任何自研 method 或 defense baseline。
 
 最终结论只覆盖指定 simulator、task、model、seed、workload 和 observer assumptions。不得声称绝对安全、
 硬件安全、通用攻击防御、verified recovery 或 real-time control。

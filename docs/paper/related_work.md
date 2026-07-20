@@ -1,185 +1,246 @@
-# Related Work：双层执行完整性的定位
+# Related Work：VLA 任务授权与执行完整性
 
-> 本文只用于研究定位，不是实现状态、CLI 或执行计划的事实来源。当前方法和 claim 以
-> [`method.md`](../method.md) 为准。
+更新日期：2026-07-20
 
-## 定位原则
+> 本文用于研究定位、baseline 选择和 novelty 审计，不是运行状态或执行授权来源。方法定义以
+> [`method.md`](../method.md) 为准；当前唯一执行线仍是 VLA-only 发布攻击复现。
 
-ProofAlign 不以“首次将形式化方法用于机器人”“首次做运行时监控”或“首次用 Lean 检查
-VLA”为新意。已有工作分别覆盖了安全任务 gate、时序 monitor、proof-carrying planning、
-runtime assurance、连续 safety filter、软件/轨迹 attestation 和 VLA attack。
+## 0. 定位结论
 
-CTDA 的候选新意是把这些问题收束成 VLA 控制链上的两个不可互相推出的完整性关系：
+ProofAlign 不以以下任何单点为新意：
+
+- 首次给机器人任务建立 formal contract；
+- 首次在执行前设置 semantic/safety gate；
+- 首次使用 temporal/runtime monitor；
+- 首次验证 planner 或让 plan 携带 proof；
+- 首次使用 runtime assurance、CBF、brake 或 fallback；
+- 首次检查 mission、data、command 或 trajectory integrity；
+- 首次用 Lean 检查机器人控制协议。
+
+这些方向都有直接先例。ProofAlign 只保留一个更窄、需要实验证明的候选空隙：
 
 ```text
-Mission Authorization Integrity:
-  trusted, locally frozen mission + active phase
-    -> persistent semantic macro-contract
-
-Execution / Effect Realization Integrity:
-  contract -> proposal -> authorized command -> executed command -> observed trace
+trusted mission authority
+  -> persistent task contract
+  -> dynamically generated VLA proposal
+  -> exact final-command authorization
+  -> applied command / receipt / observed effect
+  -> checked completion
 ```
 
-它关注的是从自然语言授权根到连续动作前缀的端到端绑定、complete mediation 和跨 action
-chunk 的时序连续性。Lean 是实现离散 checker 的手段，不单独构成 novelty。
+也就是把两个已有但通常分开的完整性关系连接起来：
 
-## 1. VLA safety benchmark 与攻击
+1. **Intent–Plan Integrity**：accepted plan 必须继续由独立 trusted mission 授权；
+2. **Plan–Execution Integrity**：executed/observed prefix 必须继续绑定 accepted exact plan。
 
-LIBERO-Safety、HazardArena、ForesightSafety-VLA 等工作说明 task success 无法覆盖碰撞、危险
-affordance、语义约束和过程级风险。SABER 进一步把 instruction channel 作为攻击面，目标包括
-task failure、action inflation 和 constraint violation。
+这是组合型候选贡献，不是“组件更多”的贡献。若单层方法已经覆盖相同 failure surface，或 Dual 没有
+unique catch / clean utility，novelty 就不成立。
 
-当前可执行复现对象进一步收缩为：
+## 1. VLA 安全、benchmark 与攻击
 
-- [SABER](https://github.com/wuxiyang1996/SABER)：官方支持 π0.5/OpenPI、standard LIBERO、
-  released LoRA attacker 和 record/replay，作为 instruction P0；
-- [Phantom Menace](https://github.com/ZJUshine/Phantom-Menace)：官方支持 OpenPI 与 standard
-  LIBERO 的 camera/microphone sensor transforms，作为 camera P0；
-- [EDPA](https://github.com/trustmlyoungscientist/EDPA_attack_defense)：支持 π0/OpenVLA 的 patch
-  generation 与 OpenVLA adversarial fine-tuning，作为 P1 cross-model/training track。
+VLA safety benchmark 和攻击工作已经表明，task success 不能代替安全或授权正确性：模型可以完成任务
+却发生碰撞、危险 affordance、约束违反、action inflation，或在 attacked instruction/observation 下执行
+错误目标。
 
-这些工作为 CTDA 提供 threat workload，但不自动给出 runtime authorization mechanism。
-ProofAlign 的攻击线独立生成并保存 attack artifact；防御线使用同一 task/init/seed/proposal
-做 paired replay 和 online evaluation。攻击成功率是威胁证据，不等于防御效果。
+本项目当前使用的发布 workload 入口是：
 
-CTDA 与 training-time safety alignment 的区别是：它不要求重新训练或验证 VLA，而把 VLA
-视为非可信 proposal producer。即使攻击后的 prompt 和 proposal 内部一致，它们仍必须对齐
-冻结的 mission root。
+- [SABER](https://github.com/wuxiyang1996/SABER)：instruction-channel attack，提供 π0.5/OpenPI、
+  LIBERO、released attacker 和 record/replay 路径；
+- [Phantom Menace](https://github.com/ZJUshine/Phantom-Menace)：camera/microphone sensor transforms；
+- [EDPA](https://github.com/trustmlyoungscientist/EDPA_attack_defense)：adversarial patch 与 VLA attack/
+  defense 路径；
+- [VLSA/AEGIS 与 SafeLIBERO](https://arxiv.org/abs/2512.11891)：提供物理 safety benchmark 和
+  plug-and-play constraint layer。
 
-## 1.1 直接防御基线
+这些工作提供 threat workload 或 safety scenario，不自动证明 ProofAlign 有效。攻击必须先在 unguarded
+VLA-only 上形成独立、held-out、clean-safe→attacked-unsafe 的 terminal evidence；attack metadata、task
+failure 或 defense checker verdict 不能代替 harm oracle。
 
-[SAFE](https://github.com/vla-safe/SAFE)从 VLA 内部 feature 学习 multitask failure score，并用
-functional conformal prediction 冻结阈值；官方覆盖 OpenVLA、π0、π0-FAST 和 LIBERO。
-[FIPER](https://github.com/learnsyslab/fiper)面向 diffusion/flow generative policy，用
-observation-embedding RND 与 action-chunk entropy 做 clean-only calibrated failure prediction。
-两者都只给 alarm，不天然解决 mission authorization，因此是 CTDA trace/runtime 层的强直接基线。
+## 2. 直接 VLA failure detection 与 defense
 
-[RoboGuard](https://github.com/KumarRobotics/RoboGuard)使用 trusted LLM、semantic graph、temporal
-specification 与 control synthesis，是 semantic/plan 层的强基线；但其官方接口不是连续 VLA raw
-prefix，只有独立 LIBERO plan adapter 完成后才能公平进入 closed loop。
+[SAFE](https://github.com/vla-safe/SAFE)从 VLA 内部 feature 学习 failure score，并使用 calibrated/
+conformal threshold；[FIPER](https://github.com/learnsyslab/fiper)使用 observation representation 与
+action-chunk uncertainty/entropy 进行 generative-policy failure prediction。它们是重要的 direct VLA
+baseline，但其典型输出是 alarm 或 risk score：
 
-SafeVLA 是 training-time safe RL alignment，但其官方 Safety-CHORES 平台是 AI2-THOR/ProcTHOR；
-SafeGate 与 Code-as-Monitor 当前也没有可直接复用的 LIBERO/VLA runner。因此这些工作用于定位或
-secondary reproduction，不能直接拿论文数字与 ProofAlign 主表比较。
+- alarm 不等于任务授权；
+- OOD/uncertainty 不一定识别“高置信但做错对象”的动作；
+- detector 若触发 stop/replan，其闭环效果依赖独立 intervention policy。
 
-## 2. Semantic gate、task contract 与 temporal monitor
+因此 SAFE/FIPER 与 ProofAlign 公平比较时应先报告 detector metrics；若转成 closed-loop arm，必须共享
+同一 stop/replan/recovery policy，避免把 fallback 差异误算成 detector 或 integrity 方法收益。
 
-[SafeGate / Task Safety Contracts](https://arxiv.org/abs/2604.05427) 在 LLM-controlled robot
-systems 中结合 pre-execution gate、invariants、guards、abort conditions 和运行时 contract。
-RoboGuard、SafePlan、Plug in the Safety Chip、Code-as-Monitor、VASO 和 SafeManip 等方向分别
-探索了神经/符号 guard、formal task planning、LTL/时序约束、generated monitor 和 skill
-contract。
+[RoboGuard](https://arxiv.org/abs/2503.07885)使用 trusted rule grounding、semantic graph、temporal
+specification 与 control synthesis 来修正不安全计划，是 Intent–Plan 层最强的近邻之一。它已经否定了
+“trusted semantic rules + temporal plan guard”本身是 ProofAlign novelty。ProofAlign 只能进一步检验：
+在连续 VLA raw chunks 下，独立 mission authority 是否能持续绑定 exact command、receipt 和 effect。
 
-这些工作使以下主张不再成立：
+## 3. Semantic gate、task safety contract 与 temporal monitor
 
-- “首次在机器人任务执行前做语义安全检查”；
-- “首次在执行中和完成时使用 temporal monitor”；
-- “首次把任务表示成 formal contract”。
+[SafeGate / Task Safety Contracts](https://arxiv.org/abs/2604.05427)把 pre-execution safety gate、
+invariants、guards、abort conditions、solver checks 和 continuous monitoring组合到 LLM-controlled robot
+systems 中。它与 ProofAlign 的 mission contract、pre-dispatch gate 和 runtime monitoring 高度重叠。
 
-CTDA 必须通过更窄的区别成立：
+[Code-as-Monitor](https://arxiv.org/abs/2412.04455)把视觉语言模型生成的程序作为时空约束 monitor，进行
+reactive/proactive failure detection；[SafeManip](https://arxiv.org/abs/2605.12386)用 LTLf finite-trace
+properties 和 symbolic traces 评估 robotic manipulation/VLA 的 temporal safety。这些工作说明：
 
-1. policy-facing prompt 与 trusted mission root 分离；
-2. semantic contract 跨多个 VLA action chunks 持续存在；
-3. 第一层只决定合同是否被任务授权，不把物理可行性偷渡成语义结论；
-4. 第二层绑定 proposal、filter 后命令、actuator receipt 和 trace；
-5. 未取得 completion witness 时不得推进 task phase。
+- execution/completion temporal monitoring 不是新意；
+- 把自然语言约束编译成 monitor 不是新意；
+- finite-trace、LTL/LTLf、abort condition 或 completion check 不能单独列贡献。
 
-因此 SafeGate/semantic monitor 是第一层和共享 monitor substrate 的强 baseline，而不是应被
-弱化的 strawman。
+ProofAlign 相对这一组只能保留更窄的区别：
 
-## 3. Runtime assurance 与连续控制安全
+1. policy-facing prompt 与 mission authority 显式分离；
+2. contract 跨多个 policy calls/action chunks 持续存在；
+3. monitor 不能自己成为任务信任根；
+4. `pending`、局部安全和 policy 自报 success 不能推进 phase；
+5. observed effect 必须绑定此前获授权的 exact final command。
 
-[SOTER](https://doi.org/10.1109/DSN.2019.00027) 将 uncertified advanced controller、
-certified baseline controller 和 safety specification 组成 runtime-assurance module，并研究
-安全切换与模块组合。Simplex/RTA、ModelPlex、VeriPhy、CBF、predictive safety filter 和
-reachability 方法进一步覆盖 dynamics model、reachable set、barrier condition、sampling 与
-fallback。
+SafeGate/RoboGuard 应视为 Intent–Plan 与 shared monitor substrate 的强 baseline，而不是 strawman。
 
-这些工作比当前 CTDA prototype 的 simulator zero-hold 和 Boolean tube 声明提供更强的连续
-安全基础。CTDA 不应声称替代它们；第二层应把它们的 consumer-checkable witness 作为
-`PrefixPreCertified` 和 observed-prefix conformance 的证据。
+## 4. Proof-carrying planning 与形式化 plan verification
 
-CTDA 的区别是把 continuous/RTA evidence 绑定到 VLA 的 semantic macro-contract 和任务阶段。
-即使一条 trajectory 对局部 dynamics 是安全的，如果它没有被 frozen mission 授权，第一层
-仍应拒绝；即使合同语义合法，如果 tube、command 或 trace 不一致，第二层仍应拒绝。
+[Proof-Carrying Plans](https://arxiv.org/abs/2008.04165)使用 resource logic、pre/post conditions 和 Agda
+formalization，使 AI planner 产生的计划可以被独立检查。这说明“plan 携带 machine-checkable proof”已有
+明确先例。
 
-## 4. Proof-carrying plan 与 machine-checkable contract
+ProofAlign 的候选差异不是换用 Lean，而是验证对象不同：
 
-Proof-Carrying Plans、formal planning、resource logic 和 proof-producing solver 已经说明 plan
-可以携带 pre/post-condition proof，而不是只携带动作序列。CTDA 将对象从离散完整 plan 扩展
-为闭环 VLA proposal 与短 action prefix，并增加实际执行回执和 observed-trace audit。
+| Proof-carrying planning | ProofAlign 候选对象 |
+|---|---|
+| 离散、相对完整的 plan | 闭环、动态产生的短 action prefix |
+| planner state/pre/post proof | mission authorization + fresh state + monitor history |
+| 计划正确性 | proposal、final command、receipt、effect 的持续绑定 |
+| plan completion | partial/pending 与 checked completion 的区分 |
 
-这里必须区分三种 evidence：
+即便如此，只有 core theorem 真正连接实际 runtime checker/wire 时，才能写 proof-backed runtime。把 Python
+计算出的 verdict 放进 `by decide`、或只证明 normalized payload parity，不能扩大成 raw continuous
+execution 已被证明。
 
-- `binding metadata`：digest、id、version、timestamp，只证明对象身份和关联；
-- `trusted attestation`：由声明 TCB/密钥/隔离边界保证 producer 身份与软件状态；
-- `consumer-checkable witness`：checker 可以独立复核的 proof、tube、barrier 或 trace artifact。
+## 5. Runtime assurance、continuous safety filter 与 recovery
 
-当前不少 CTDA evidence 仍属于前两类，不能统一写成 physical proof。更准确的当前表述是
-contract/evidence-carrying runtime；只有可复核 witness 覆盖相应 claim 后，才使用更强的
-proof-carrying 表述。
+[SOTER](https://arxiv.org/abs/1808.07921)把 uncertified advanced controller、certified safe controller 和
+safety specification 组合成 runtime-assurance modules，并处理监督切换。Simplex/RTA、ModelPlex、
+VeriPhy、CBF、predictive safety filtering 和 reachability 进一步覆盖 safe set、dynamics、switching、
+fallback 与 recoverability。
 
-## 5. Autonomous-system execution integrity 与 attestation
+[VLSA/AEGIS](https://arxiv.org/abs/2512.11891)为 VLA 增加 plug-and-play CBF constraint layer；
+[PACS](https://arxiv.org/abs/2511.06385)利用 action chunk/path 的一致性进行 braking 和 safety filtering，
+直接触及 chunk-level physical safety 与 utility preservation。
 
-安全领域已有与 CTDA 非常接近的执行完整性工作：
+这些工作对 ProofAlign 有三个约束：
+
+1. Boolean tube、zero-hold 或简单 hard block 不能声称优于成熟 RTA/filter；
+2. CBF、projection、brake、replan 和 recovery 应是可替换 intervention，不是第三个 integrity layer；
+3. filter 后的 adjusted command 必须重新接受任务授权与 execution binding，但 filter witness 本身不能证明
+   mission authorization。
+
+局部物理安全和任务授权是正交关系：一个 command 可以满足 barrier condition，却移动错误对象；也可以
+语义正确，却因 dynamics/obstacle constraint 不可执行。因此物理 filter 是强 baseline/consumer，而不是
+ProofAlign 核心的替代或天然组成部分。
+
+## 6. Mission、data 与 trajectory execution integrity
+
+安全领域已有与 ProofAlign 第二层非常接近的工作：
 
 - [ARI, USENIX Security 2023](https://www.usenix.org/conference/usenixsecurity23/presentation/wang-jinwen)
-  定义 Real-time Mission Execution Integrity，关注自主 CPS 任务的正确、及时执行及其 attestation；
+  定义 Real-time Mission Execution Integrity，关注自主 CPS mission 是否被正确、及时执行及其
+  attestation；
 - [DIAT, NDSS 2019](https://www.ndss-symposium.org/ndss-paper/diat-data-integrity-attestation-for-resilient-collaboration-of-autonomous-systems/)
-  关注自主系统中数据生成、处理和传输链的完整性证明；
-- [TAT, USENIX Security 2026](https://www.usenix.org/conference/usenixsecurity26/presentation/yao)
-  定义工业机械臂 trajectory integrity，并对实际运动轨迹做 attestation。
+  关注自主系统协作中的数据生成、处理和传输完整性；
+- [TAT, USENIX Security 2026](https://www.usenix.org/conference/usenixsecurity26/presentation/yao-chengtao)
+  定义 robotic-arm trajectory integrity，并用 motion events 与 joint measurements检查真实运动是否符合
+  intended path。
 
-这些工作要求 ProofAlign 不能只把 digest equality 写成 security mechanism。若 threat model
-包含恶意 host、IPC、observer 或 actuator，必须引入签名/密钥、可信计数器、隔离 reference
-monitor 和 sensor/actuator attestation。
+因此 proposal→authorization→execution→observation binding 也不能笼统声称为首次。更窄的候选差异是：
+VLA 的 plan 不是事先固定程序或轨迹，而是受不可信语言/视觉驱动、在闭环中不断产生；ProofAlign 试图让
+独立任务语义持续约束这些动态 prefixes。
 
-CTDA 相对这一方向最有潜力的区别是：现有 mission/trajectory attestation 主要从程序或预定
-轨迹出发，而 VLA 的授权根来自自然语言任务，proposal 在闭环中不断变化。CTDA 试图连接：
+如果 threat model 包含恶意 host、IPC、observer 或 actuator，仅有普通 hash、`authenticated=true` 或
+软件内 receipt 不足以建立 security claim；需要签名/密钥、隔离 reference monitor、可信 counter、
+sensor/actuator attestation 和清晰的 remote verifier。当前 prototype 明确信任 host-side monitor 与
+simulator adapter，所以不能借用 ARI/TAT 的安全结论。
 
-```text
-authenticated natural-language/BDDL mission semantics
-  -> semantic phase authorization
-  -> exact low-level prefix authorization
-  -> executed command and observed effect integrity
-```
+## 7. Evidence 类型不能混用
 
-要使这一差异成为安全贡献，论文必须明确定义攻击者、认证机制、TCB 和端到端安全属性，不能
-只依赖 `authenticated = true` 或可由攻击者重算的普通 hash。
+相关工作比较要求区分：
 
-## 6. 最接近工作的差异矩阵
-
-| 方向 | 已有能力 | CTDA 需要证明的增量 |
+| Evidence | 能证明什么 | 不能证明什么 |
 |---|---|---|
-| SafeGate / semantic guard | unsafe command gate、task contracts、runtime constraints | prompt 与 frozen authority 分离；VLA prefix 与任务 phase 的持续绑定 |
-| RoboGuard | trusted semantic graph、temporal specification、plan synthesis | 连续 raw prefix/receipt/trace 接口与无循环依赖的 plan adapter |
-| Code-as-Monitor / SafeManip | execution/completion temporal monitoring | monitor artifact 不直接成为信任根；跨 proposal 的 persistent residual state |
-| SAFE | VLA latent-feature failure detection、conformal calibration | failure alarm 不等于 mission authorization 或 exact execution binding |
-| FIPER | clean-only RND/ACE failure prediction | OOD/uncertainty alarm 不区分未授权但高置信的动作 |
-| VASO / formal skill contract | formal/planner-facing skill abstraction | proposal、authorized、executed、observed 四对象绑定 |
-| SOTER / Simplex RTA | uncertified/verified controller 切换与安全保证 | RTA witness 与 semantic contract、任务 phase 组合 |
-| CBF / predictive filter / reachability | 连续 prefix safety 或 recoverability | 局部物理安全不能替代 mission authorization |
-| ARI / DIAT / TAT | mission、data 或 trajectory integrity attestation | 从认证自然语言语义到动态 VLA proposal/effect 的端到端连接 |
-| Proof-carrying planning | plan 的 machine-checkable pre/post proof | 闭环 prefix、实际 receipt、observed trace 和 partial completion |
+| binding metadata | id/version/digest/timestamp 对象一致性 | producer 诚实、物理量真实 |
+| trusted attestation | 在声明密钥/隔离假设下的 producer 身份与软件状态 | 感知模型正确、世界状态真实 |
+| consumer-checkable witness | 独立复核 proof/barrier/tube/trace proposition | 超出模型/abstraction 的物理结论 |
+| observed outcome | 指定 episode 的 task/safety 结果 | protocol theorem、总体分布保证 |
 
-## 7. Novelty 与 claim 边界
+当前更准确的名称是 mission-rooted evidence-carrying runtime，而不是无条件 proof-carrying physical
+execution。
 
-当前最稳健的 novelty statement 是：
+## 8. 最接近工作的差异矩阵
 
-> CTDA formulates VLA execution as two coupled integrity relations: every
-> persistent semantic contract must refine a trusted, locally frozen mission, and
-> every proposed, authorized, executed, and observed action prefix must remain
-> bound to that contract until a checked completion witness advances the task.
+| 方向 | 已有能力 | ProofAlign 不能声称 | 仍需证明的可能增量 |
+|---|---|---|---|
+| SafeGate | pre-execution gate、task contract、runtime monitor | formal contract/gate 是首次 | attacked prompt 与独立 mission authority 分离后的持续 prefix binding |
+| RoboGuard | trusted semantic rules、temporal plan synthesis | trusted plan guard 是首次 | 连续 raw chunk、exact final command、receipt/effect 接口 |
+| Code-as-Monitor / SafeManip | spatio-temporal/LTLf monitoring、completion/failure properties | temporal monitor 是首次 | monitor state 与 prior authorization 的 transaction binding |
+| SAFE / FIPER | VLA failure/OOD/uncertainty detection | detector 等于任务授权 | 高置信未授权动作与执行替换的结构化区分 |
+| Proof-Carrying Plans | machine-checkable plan pre/post proof | proof-carrying plan 是首次 | 动态 prefix、partial completion 与 physical receipt/effect |
+| SOTER / Simplex | controller supervision、switching、safe fallback | runtime assurance/fallback 是首次 | RTA decision 始终受 mission contract 约束 |
+| AEGIS / PACS | CBF、path-consistent filtering/braking | chunk filter/physical safety 是首次 | adjusted command 的 post-filter mission reauthorization |
+| ARI / DIAT / TAT | mission/data/trajectory integrity attestation | execution/trajectory binding 是首次 | trusted task semantics 到动态 VLA prefix/effect 的连接 |
 
-论文不能把以下单独列为新意：双 checker、使用 Lean、执行前 gate、执行后 monitor、temporal
-logic 或 fallback。新意必须来自双层安全属性、端到端对象绑定、跨 chunk complete mediation，
-以及它们在攻击 workload 下的可验证增益。
+## 9. Baseline 与消融含义
 
-最终保证分三层报告：
+核心方法必须先做四臂因果消融：
 
-1. **协议保证**：没有两层授权不 dispatch，没有 completion witness 不推进 phase；
-2. **离散形式保证**：checker 的 `proven` 推出 typed proposition；
-3. **条件物理保证**：仅在 observer、dynamics、timing、actuator、abstraction 和 fallback
-   assumptions 成立时推出 prefix invariant preservation。
+| arm | 回答的问题 |
+|---|---|
+| VLA-only | 无监控时的 task/safety/cost 基准 |
+| Intent-only | semantic authorization 单独抓到什么、误阻断多少 |
+| Execution-only | exact binding/receipt/effect monitoring 单独抓到什么、误阻断多少 |
+| Dual | 两个关系组合是否产生不可由单层解释的增量 |
 
-三者不能在摘要或实验表中合并成无条件“robot safety proof”。
+外部工作按角色加入，而不是混成一个 Full CTDA：
+
+- SafeGate/RoboGuard：semantic/plan baseline；
+- SAFE/FIPER：failure detector baseline；
+- AEGIS/PACS-style filter：physical intervention baseline；
+- ARI/TAT：security property 与 attestation 设计参照，除非有公平可运行 adapter，否则不做数字对比。
+
+## 10. Novelty falsification tests
+
+候选 novelty 只有在以下测试同时通过时才成立：
+
+1. **Layer necessity**：Intent-only 与 Execution-only 各有预先定义的 unique catch；
+2. **Composition gain**：Dual 的覆盖不是任一单层或普通 filter 已经达到；
+3. **Clean viability**：Dual 达到预注册 clean retention、phase completion、deadlock 和 availability gate；
+4. **End-to-end binding**：proposal、final authorization、dispatch/receipt 和 observed effect 来自同一事务；
+5. **Assumption honesty**：形式 theorem、TCB attestation 与 simulator outcome 分开报告；
+6. **Attack independence**：defense 不参与 attack tuning，且 workload 先在 VLA-only 上独立 qualification。
+
+任一关键条件失败，都应缩小贡献：
+
+- 无 Layer 1 unique catch：收缩为 execution-integrity monitor；
+- 无 Layer 2 unique catch：收缩为 mission/semantic guard；
+- clean utility 不合格：收缩为 offline audit/slow interlock；
+- attack qualification 为 0：不报告 attack-defense efficacy；
+- 依赖 CBF 才有效：把结果写成 integrity + physical filter composition，而不是纯 CTDA 收益。
+
+## 11. 最终 claim 边界
+
+最稳健的候选表述是：
+
+> ProofAlign formulates VLA control as two coupled integrity relations: accepted
+> prefixes must remain authorized by a trusted mission, and applied/observed
+> prefixes must remain bound to the accepted exact action until checked
+> completion.
+
+论文不能把双 checker、Lean、pre-gate、post-monitor、temporal logic、certificate、signature、provenance、
+CBF 或 fallback 单独列为 novelty。最终保证必须分开报告：
+
+1. **协议保证**：两个不变量；
+2. **离散形式保证**：实际 checker 对 typed proposition 的 soundness/refinement；
+3. **条件物理保证**：只在 observer、dynamics、timing、actuation、abstraction 和 fallback assumptions
+   成立时讨论安全结果。
+
+三者不能合并成无条件的“robot safety proof”。

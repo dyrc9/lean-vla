@@ -10,7 +10,8 @@
 当前只运行 fresh official SABER/EDPA producer、immutable artifact validator 和 unguarded VLA-only
 clean/attacked threat qualification。所有 ProofAlign/CTDA no-dispatch probe、clean pilot、method arm、AEGIS/
 SAFE/FIPER baseline 和 attacked+defended comparison 均暂停。本文后续 CTDA protocol 章节只保留历史与
-未来 gate 定义，不构成当前执行授权；VLA-only workload terminal 后必须停止并汇报。
+兼容性事实，不再定义下一版目标架构，也不构成当前执行授权；VLA-only workload terminal 后必须停止并
+汇报。未来实验顺序以 [`optimization_plan.md`](optimization_plan.md) 的最小架构与四臂消融为准。
 
 ## 1. 通用原则
 
@@ -156,19 +157,21 @@ P1，必须使用新 protocol/root，不续接本草案。
 
 CTDA v2 已形成仅授权离线/schema/fixed-trace/support 的
 [`ctda_v2_no_dispatch_protocol.json`](../experiments/ctda_v2_no_dispatch_protocol.json)，不授权 rollout。
-完整工作顺序和实验矩阵仍见 [`optimization_plan.md`](optimization_plan.md)。
+本节及第 8--16 节只记录冻结的 implementation/regression assets；certificate/rebind、六阶段 wire、crypto、
+geometry 和 AEGIS plumbing 不再被视为下一方法版本必须延续的公开架构。完整后续顺序和
+VLA-only/Intent-only/Execution-only/Dual 矩阵见 [`optimization_plan.md`](optimization_plan.md)。
 
 新增规则：
 
-1. v2 使用新 method/wire/schema id，v1 protocol/result 保持可重放；
+1. v1/v2 protocol/result 保持可重放；任何后续重冻使用新的 method/wire/schema id；
 2. candidate population 先按 manifest、source hash、model compatibility、support 和 safety-oracle
    coverage outcome-blind 冻结，不能先看正式 clean/attack outcome 再挑 pair；
 3. clean-success/clean-safe 是预定义 classifier 产生的分析标签。只有它们进入条件式 attack-transition
    denominator，但失败/不安全 pair 仍保留在 valid/task/safety 汇总中，不替换；
 4. 若需要 discovery 筛选，discovery 与 formal held-out task/seed 必须不相交，held-out population 在
    outcome 前冻结；
-5. attacked+defended comparison 只有在 clean utility、VLA-only threat qualification 和 exact
-   population overlap 全部通过后才允许；
+5. attacked+defended comparison 只有在四臂 fixed-trace、Dual clean utility、VLA-only threat
+   qualification 和 exact population overlap 全部通过后才允许；
 6. AEGIS 是低层 closed-loop baseline；SAFE/FIPER 是 detector baseline，转为 stop/replan 时必须与其他
    方法共用同一 fallback；
 7. task failure、detector alarm、CTDA block 和 attack metadata 都不能代替 independent unsafe label。

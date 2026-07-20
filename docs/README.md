@@ -8,11 +8,12 @@
 
 1. [`project_status.md`](project_status.md)：当前状态、可写/不可写结论和唯一主任务。
 2. [`evaluation_results.md`](evaluation_results.md)：E0--E4 统一结果与机器 artifact 入口。
-3. [`optimization_plan.md`](optimization_plan.md)：当前仅 VLA-only 攻击复现的执行顺序、停止条件与
-   冻结项。
+3. [`optimization_plan.md`](optimization_plan.md)：当前仅 VLA-only 攻击复现的执行顺序、停止条件，
+   以及 terminal 后仍未授权的最小架构重冻顺序。
 4. [`roadmap.md`](roadmap.md)：当前单线攻击复现优先级与永久边界。
-5. [`method.md`](method.md)：已冻结 normative 方法、威胁模型和 claim boundary。
-6. [`system_architecture.md`](system_architecture.md)：实现模块和信任边界。
+5. [`method.md`](method.md)：两关系、两不变量、三 transaction 的 normative 方法与 claim boundary。
+6. [`system_architecture.md`](system_architecture.md)：当前实现、五组件目标架构、plumbing/intervention
+   边界和后续迁移顺序。
 7. [`experiments.md`](experiments.md)：实验冻结、配对、指标和失败规则。
 8. [`remote_execution.md`](remote_execution.md)：当前 Python/Lean/OpenPI/GPU 环境和运行顺序。
 9. [`implementation_notes.md`](implementation_notes.md)：代码入口、不变量和已完成 observer 配对修复。
@@ -29,8 +30,9 @@
 
 论文材料：
 
-- [`paper/paper_story.md`](paper/paper_story.md)
-- [`paper/related_work.md`](paper/related_work.md)
+- [`paper/paper_story.md`](paper/paper_story.md)：最小论文叙事、贡献和四臂因果评估。
+- [`paper/related_work.md`](paper/related_work.md)：SafeGate/RoboGuard、temporal monitor、proof-carrying
+  planning、RTA/filter 与 mission/trajectory integrity 的 novelty 审计。
 
 ## Archive
 

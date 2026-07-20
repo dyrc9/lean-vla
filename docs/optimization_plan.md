@@ -59,7 +59,7 @@ fresh EDPA + SafeLIBERO protocol/root
 - 不实现或验证 attack-shift record、数值 budget、recovery、raw perception 或新 CTDA support；
 - 不运行 AEGIS、SAFE、FIPER 或其他 defense baseline；
 - 不执行 attacked+defended comparison；
-- 不让 CTDA verdict、detector alarm、task failure 或 attack metadata充当 safety ground truth；
+- 不让 CTDA verdict、detector alarm、task failure 或 attack metadata 充当 safety ground truth；
 - 不恢复或拼接任何已关闭/partial run；新工作必须使用 fresh protocol/root/unit。
 
 截至 2026-07-20，工作线 B 已完成安全基础重建：官方 source commit/tree/license、32 个
@@ -73,114 +73,80 @@ GroundingDINO 通过 no-inference load，单个 frozen scene 通过 `env.step_co
 
 ## 2. 阶段目标与非目标
 
-本节后续保存的 CTDA v2 架构与正式矩阵是延后设计，不是当前授权。当前目标只有第 4 节的 VLA-only
-threat qualification；第 3、5 节及 M0--M4/M6 均不得执行。
+当前目标只有第 4 节的 VLA-only threat qualification。第 3、5、6 节均是 terminal 后、重新获得用户
+授权才可启动的 deferred 设计；它们不自动继承现有 CTDA v2 六阶段架构。
 
 ### 2.1 延后目标（当前不执行）
 
-1. 直接测量 Layer 1 的 intent→plan attack shift 和 Layer 2 的 plan→execution attack shift，并报告
-   semantic-only、execution-only、dual 三种 checker 的 unique catch。
-2. 保留两个协议不变量：无两层授权不 dispatch；无 checked completion witness 不推进 phase。
-3. 把正常、已授权且物理可接受的 nominal action 原样放行；只有必要时才最小修改、制动、重规划或
-   hard block。
-4. 将慢速语义证明与快速控制检查解耦，不再让单次 Lean latency 自动耗尽整个 semantic contract。
-5. 为 intervention 后的最终 command、dispatch、receipt 和 observed effect 保持完整绑定。
-6. 在 SafeLIBERO 上建立安全场景土壤，用独立 collision/cost/constraint oracle 评估，而不是用 task
-   failure 代替安全伤害。
-7. 先完成 VLA-only threat qualification，再计算 attack-defense efficacy。
-8. 增加真正的低层闭环基线 AEGIS；SAFE/FIPER 只作为 detector，RoboGuard/SafeGate 只作为高层
-   semantic baseline。
+1. 把方法收缩为两个关系、两个不变量和三个 transaction；
+2. 用 VLA-only、Intent-only、Execution-only、Dual 四臂直接测两层 unique catch；
+3. 先通过 clean retention、phase completion、deadlock 和 evidence coverage gate，再进入攻击比较；
+4. 将 Lean 用于核心不变量与 fast-checker refinement，不再逐 action 暴露完整 proof pipeline；
+5. 将 digest/signature/provenance/wire 降级为 assurance plumbing；
+6. 将 AEGIS/CBF、projection/brake、replan/recovery 作为可替换 intervention 或 baseline；
+7. 只使用先在 unguarded VLA-only 上独立 qualification 的发布攻击；
+8. 若双层没有组合增益或 clean utility 不合格，收缩为单层或 offline audit，不增加 stage。
 
 ### 2.2 非目标
 
 - 不声称硬件安全、连续动力学已被 Lean 证明或 real-time enforcement；
-- 不把 zero-hold、CBF 或 replan 自动写成 verified recovery；
+- 不把 zero-hold、CBF、signature、provenance 或 replan 写成方法 novelty；
+- 不把现有 v2 certificate/rebind/六阶段 wire 视为下一架构必须保留的公开 API；
 - 不为得到正结果后验更换 task/init/seed、阈值、攻击强度或 horizon；
 - 不把 SAFE/FIPER partial artifact 拼成论文结果；
 - 不复用已关闭的 Phantom/SABER unit 或 output root；
 - 不在本机创建替代实验环境。
 
-## 3. CTDA v2 架构冻结项（deferred）
+## 3. 后续最小架构重冻（deferred）
 
-本节是待实现目标，不是已经成立的方法结论。M0 设计冻结必须把最终选择写入 `method.md` 的独立
-CTDA v2 章节和版本化 schema；在此之前不得将 v2 写成正式结果。
+现有 CTDA v2 no-dispatch core、wire、crypto 与 AEGIS plumbing 作为历史资产保持 replayable，但不再作为
+后续 architecture freeze 的默认答案。恢复方法工作时先冻结问题与接口，再决定复用哪些实现。
 
-### 3.1 Contract epoch 与 state freshness
-
-CTDA v2 应把“合同仍被 mission 授权”和“当前传感器状态仍新鲜”分开表达。一个 contract epoch 至少
-绑定：
-
-- mission/root digest、episode nonce；
-- active phase、residual obligations、contract version；
-- 生成证明所用 relevant-state digest/epoch；
-- observer provenance、observation timestamp、允许的 sensor age；
-- checker/version digest 和 Lean proof artifact digest；
-- 可执行 action/trajectory set 的版本化定义。
-
-语义合同可以跨多个 action chunks 保持有效，直到 mission、phase、residual obligation 或合同依赖的
-relevant state 改变。proof latency 不能通过延长 stale-state 权限被掩盖：若证明期间 plant 或相关状态
-可能变化，dispatch 前必须 re-observe 并完成显式 rebind；rebind 失败则进入 `replan` 或 `hard_block`。
-
-M0 必须在以下两种实现中冻结一种，推荐第一种：
-
-1. **Lean-proven contract certificate + 快速 membership checker（推荐）**：Lean 验证长期合同、离散
-   predicate 和 checker/version binding；控制周期只运行确定性 consumer-side membership/freshness
-   checker，完整 request 在 shadow/offline 路径重放给 Lean。
-2. **pipelined/batched Lean**：仍逐 prefix 使用 Lean authority，但必须证明 proof pipeline 与状态快照
-   的 freshness/rebind，不得用未来 proof 授权过去或已经变化的 state。
-
-若两种方案都无法在 fixed-trace/no-dispatch gate 上保留 nominal liveness，则停止 v2 online claim，
-只保留 offline audit。
-
-### 3.2 从二元阻断改为分级 intervention
-
-运行时 decision 必须显式区分：
+### 3.1 两个关系、两个不变量、三个 transaction
 
 ```text
-pass              nominal command 原样执行
-project_or_brake  在已授权集合内最小修改、沿 intended path 减速或停止
-replan            不推进 phase，刷新 observation/contract 或请求新 proposal
-hard_block        未授权、证据不一致、不可恢复危险或 TCB/evaluator failure
+Intent–Plan Integrity
+Plan–Execution Integrity
+
+No dispatch without dual authorization
+No phase advance without checked completion
+
+certify contract -> authorize exact prefix -> check effect/update monitor
 ```
 
-约束：
+对外核心对象限定为 `MissionRoot`、`ActiveContract`、`ActionProposal`、`PrefixAuthorization` 和
+`ExecutionEvidence`。freshness/rebind 折叠进 prefix authorization；progress/completion 折叠进 persistent
+monitor update；内部 stage 数量不得成为方法贡献。
 
-1. `pass` 的最终 command digest 必须等于 nominal command digest；
-2. `project_or_brake` 必须保存 nominal、adjusted、intervention reason、filter/version、修改范数、
-   constraint witness，并对 **adjusted command** 重新做 mission/contract 检查；
-3. `replan` 不能退款 cumulative obligation/budget，不能伪造 progress，也不能推进 phase；
-4. `hard_block` 才进入安全停止；停止后必须有 bounded recovery policy，不能把 absorbing zero-hold 当作
-   正常任务终态；
-5. 无论哪条路径，receipt 和 observed trace 都绑定实际 dispatch 的 command，而不是 nominal command。
+### 3.2 五个组件边界
 
-### 3.3 最小干预物理层
+1. Mission Adapter：只从 trusted benchmark artifact 建立有限 `MissionRoot`；
+2. Persistent Contract Monitor：保存 contract、phase、history 和 residual obligations；
+3. Exact Prefix Authorizer：在 fresh state 下绑定 proposal 与最终 command；
+4. Single Dispatch Boundary：只执行 fresh、单次 authorization；
+5. Effect Observer/Updater：检查 receipt/effect 并原子更新 pending/completion/violation。
 
-近期实现和比较优先使用已经公开的 AEGIS/SafeLIBERO：
+四个核心实验 arm 必须共用同一 runner、observer、dispatch 和 intervention，通过 method switch 控制
+Intent/Execution judgment，不能复制代码路径造成不可比较的系统差异。
 
-- 论文：<https://arxiv.org/html/2512.11891>
-- 官方代码：<https://github.com/THU-RCSCT/vlsa-aegis>
+### 3.3 Lean 与 fast checker
 
-AEGIS 作为独立 baseline，不直接成为 CTDA 证据根。若将其安全 filter 接入 CTDA v2，必须在 filter
-之后检查 adjusted command，并明确其保证依赖 obstacle perception、geometry enclosure 和 end-effector
-模型。不得把其 CBF 结果概括成完整 mission authorization。
+默认目标是：Lean 定义两个不变量和最小 state transition，online 使用版本固定的 deterministic fast
+checker，full request 只在 shadow/offline replay。进入 online 前必须建立 core theorem 到实际 checker/
+wire 的 refinement/equivalence，而不是只报告 Python/Lean fixture parity。
 
-PACS 的 path-consistent braking 用作 action-chunk 设计参考：
-<https://arxiv.org/html/2511.06385>。在官方代码可用或本项目有独立、可审计的等价实现前，不把 PACS
-列为立即可跑的 mandatory baseline。
+若 fixed-trace 或 clean gate 无法同时满足 liveness、freshness 和 verifier latency，则停止 online claim，
+只保留 offline audit/slow interlock。
 
-### 3.4 Typed observation provenance
+### 3.4 Optional intervention 与 evidence
 
-每个安全 observation 必须保存：
+`pass/project_or_brake/replan/hard_block` 是 intervention decision，不是逻辑层。filter 修改 command 后必须
+重新授权 adjusted command；receipt/effect 绑定实际 dispatch。AEGIS 与 PACS-style braking 作为独立物理
+baseline/扩展，不能成为双层 integrity 的默认组成。
 
-- quantity 名称、单位和 schema version；
-- producer 类型（simulator state、contact buffer、depth/geometry estimator 等）；
-- source object/geom/camera id；
-- observation timestamp 与 state epoch；
-- validity/coverage/unknown reason；
-- 与 episode、task/init、command、receipt 的 digest binding。
-
-若某个 suite 没有可复核的 human-hand/obstacle distance producer，则 protocol 必须把该维度从 primary
-claim 中移除，而不是记录一个没有 provenance 的默认值。
+每个 primary safety observation仍必须保存 quantity/unit、producer/version、source ids、timestamp、state
+epoch、coverage/unknown reason 及 episode/command/receipt binding。缺少可信 producer 时收窄 claim，不填
+默认 safe 值。
 
 ## 4. 安全场景与攻击工作线
 
@@ -240,147 +206,66 @@ ForesightSafety-VLA 的指标定义用于补充 protocol，但当前不依赖其
 
 未完成第 7 项不是 partial pass；未完成第 8 项不得开始 defense comparison。
 
-## 5. 基线与正式实验矩阵（deferred）
+## 5. 后续基线与实验矩阵（deferred）
 
-### 5.1 基线角色
+### 5.1 核心因果消融
+
+| arm | Intent–Plan | Plan–Execution | 主要问题 |
+|---|---:|---:|---|
+| VLA-only | 否 | 否 | unguarded task/safety/cost 基准 |
+| Intent-only | 是 | 否 | mission authorization 的 unique catch 与误阻断 |
+| Execution-only | 否 | 是 | exact command/receipt/effect binding 的 unique catch 与误阻断 |
+| Dual | 是 | 是 | 两层组合是否必要、是否保留 clean utility |
+
+四臂必须共用相同 victim、proposal、observer、dispatch、horizon、seed 和 intervention policy。否则不能把
+差异归因到两个 integrity relation。
+
+### 5.2 外部 baseline 的独立角色
 
 | 方法 | 角色 | 公平比较范围 |
 |---|---|---|
-| VLA-only | unguarded victim | task/safety/cost 基准 |
-| AEGIS | 低层最小干预安全 filter | CAR、safe success、TSR、ETS、intervention/latency |
-| SAFE/FIPER | failure detector | detector metric；若转为 stop/replan，必须共用同一 fallback |
-| RoboGuard/SafeGate | 高层 semantic/plan gate | 只有完成独立 VLA/LIBERO adapter 后才进入 closed loop |
-| CTDA v2 | mission authorization + execution binding | utility、安全、完整性、deadlock、proof/verifier tax |
-| CTDA v2 + physical filter | 主方法候选 | post-filter authorization 与闭环安全/utility |
+| AEGIS / PACS-style filter | 低层物理 intervention | collision/cost、safe success、修改范数、latency |
+| SAFE / FIPER | failure detector | detector metric；closed loop 时共用同一 stop/replan policy |
+| RoboGuard / SafeGate | semantic/plan gate | adapter 完成后与 Intent-only 对比 |
+| Dual + physical filter | 组合扩展 | post-filter reauthorization 与 physical safety/utility |
 
-SAFE/FIPER 旧 partial 不 resume；新的 baseline run 必须是新的 protocol/root。P0 主表不等待它们，除非
-官方 reproduction 能在 outcome 前 terminal-ready。
+外部 baseline 不混进核心 Dual arm。SAFE/FIPER 旧 partial 不 resume；任何新 baseline 使用新
+protocol/root。
 
-### 5.2 两阶段正式矩阵
+### 5.3 三阶段矩阵
 
-**阶段 I：clean / safety-critical deployment**
+**阶段 I：fixed-trace/shadow**
 
-| arm | 原始 clean slice | SafeLIBERO |
-|---|---:|---:|
-| VLA-only | required | required |
-| AEGIS | optional | required |
-| CTDA v2 | required | required |
-| CTDA v2 + AEGIS-compatible filter | required | required |
+VLA-only、Intent-only、Execution-only、Dual 面对同一 candidate/trace，测 unique catch、nominal allow、
+unknown/block、parity 和 latency。
 
-**阶段 II：attack-defense**
+**阶段 II：clean closed loop**
 
-只对通过 qualification 的 workload 执行：
+四个核心 arm 都 required。只有 Dual 达到事前冻结的 utility retention、phase completion、deadlock 和
+evidence coverage gate，才允许进入攻击比较。
 
-| arm | clean workload | attacked workload |
-|---|---:|---:|
-| VLA-only | required | required |
-| AEGIS | required | required |
-| CTDA v2 | required | required |
-| CTDA v2 + physical filter | required | required |
+**阶段 III：qualified attack**
 
-### 5.3 Primary metrics
+只对第 4 节 terminal pass 的 workload 运行四个核心 arm。AEGIS、detector、semantic baseline 和
+Dual+filter 根据独立 readiness 加入 secondary matrix，不阻塞核心因果消融。
+
+### 5.4 Primary metrics
 
 必须分组报告，不能合并成一个“安全成功率”：
 
 - **实验有效性**：valid/invalid pair、initial digest、first chunk、checkpoint/config/camera/seed binding；
-- **任务能力**：task success、phase completion、episode length/ETS；
-- **安全结果**：collision avoidance、constraint violation、cumulative cost、risk exposure time、
-  safe/unsafe success/failure；
-- **防御干扰**：pass/project/brake/replan/hard-block count、修改范数、blocked time、deadlock、recovery；
-- **完整性**：mission mismatch、proposal/adjusted/dispatch/receipt mismatch、stale/replay、completion witness；
-- **开销**：VLA、semantic proof、fast checker、filter、observed/monitor 各阶段 latency。
+- **任务能力**：task success、safe success、phase completion、episode length/ETS、retention；
+- **安全结果**：collision、constraint violation、cumulative cost、risk exposure time、四象限；
+- **层级诊断**：Intent-only catch、Execution-only catch、overlap、Dual unique gain；
+- **干扰/liveness**：allow/project/brake/replan/block/unknown、blocked time、deadlock、recovery；
+- **完整性**：mission、proposal/final command、dispatch/receipt/effect、stale/replay、completion witness；
+- **开销**：fast checker、proof/shadow、filter、observer/monitor latency。
 
-protocol schema 必须在 outcome 前填写而不是留空：`utility_retention_min`、
-`safe_success_noninferiority_margin`、`attack_transition_min_count/rate`、`confidence_method`、
-`primary_safety_channels` 和 `stop_conditions`。具体数值必须来自 outcome-blind calibration/design
-decision，不能从正式结果反推。
+protocol 必须在 outcome 前填写 `utility_retention_min`、`phase_completion_min`、
+`safe_success_noninferiority_margin`、`attack_transition_min_count/rate`、`layer_unique_catch_definition`、
+`confidence_method`、`primary_safety_channels` 和 `stop_conditions`。
 
-## 6. 里程碑、交付物与 gate
-
-里程碑编号仅保留历史依赖关系。当前唯一 active milestone 是 M5；M0--M4 和 M6 全部冻结，不得运行、
-不得并行施工，也不得因为 M5 成功而自动恢复。
-
-### M0：设计冻结，不运行 rollout
-
-**状态：deferred。当前不执行。**
-
-交付物：
-
-- `method.md` 中独立 CTDA v2 版本/TCB/claim；
-- contract epoch、decision、intervention witness、provenance schema；
-- 选择 Lean certificate+fast checker 或 pipelined Lean；
-- v2 wire/schema version 与 v1 compatibility policy；
-- fake-env/fixed-trace test plan。
-
-退出条件：安全不变量、liveness transition、proof/state freshness、post-filter authorization 都有明确
-typed 语义；v1 artifact replay 不受影响。
-
-### M1：v2 core 与 fixed-trace/shadow
-
-**状态：deferred。当前不执行。**
-
-交付物：
-
-- versioned v2 runtime/wire/evaluator path；
-- `pass/project_or_brake/replan/hard_block` transaction；
-- contract epoch/rebind 与 bounded recovery；
-- v1 regression、v2 unit、tamper、stale/replay、post-filter mismatch、no-phase-advance tests；
-- retained E1 trace 的 outcome-blind replay 和 shadow report。
-
-退出条件：nominal fixed trace 不再因 proof wall-clock 自身耗尽合同；攻击/错误目标/错误 gripper 和
-证据 tamper 仍 fail closed；没有 Python fallback 冒充 Lean-authorized path。
-
-### M2：provenance、SafeLIBERO 与 AEGIS readiness
-
-**状态：deferred。当前不执行。**
-
-交付物：
-
-- typed safety-channel producers/validators；
-- pinned SafeLIBERO/AEGIS source/data manifest；
-- no-dispatch task/model/scene candidate inventory 和预定义 clean/safety classifier；
-- exact-unit CTDA support audit；
-- CAR/cost/RET/four-quadrant classifier。
-
-当前进度：source/data/inventory/classifier 已由 R0 固定；双环境、全部 distribution inventory、标准
-pi0.5/GroundingDINO 资产与 SafeLIBERO 注册已由
-`experiments/safelibero_aegis_runtime_protocol.json` 的 static R1 固定；后续 model-load/scene
-no-dispatch R2/R3 也已完成。CTDA v2 已 source-compile 32/32 mission template；full-population state r1
-已在 32/1600 unit 上得到 exact state-key 与 collision-source 1600/1600、`env.step=0`。完整 executable
-support 仍 blocked。wire parity R0 已以 6 stage/21 case、21/21 Python/Lean parity 完成；drawer
-OpenRegion initial source gate R2 也已得到 exact joint/range/predicate 50/50、`env.step=0`。由于 50 个
-初态全部是 `qpos=0.0 m`/closed，R0 进一步完成 6/6 fake-observation progress/post-filter/recovery-ledger
-no-dispatch adapter；Ed25519、source-bound CBF/QP 与 typed geometry 也已完成 no-action audit。它们至此
-冻结为支撑基础。当前 method blocker 是把同一事务的 trusted intent、raw plan、accepted plan、applied
-command 与 observed effect 组成双层 attack-shift record/ablation，以及 disjoint numeric budget、natural
-transition evidence 和 clean liveness；direct-state 5/5 不能替代这些 blocker。
-
-退出条件：candidate population、support、classifier 和 safety-oracle coverage outcome-blind 冻结且完全
-可复核；尚未运行的 clean outcome 不得在 readiness 阶段被假定为成功。
-
-### M3：远端 no-dispatch preflight
-
-**状态：deferred。当前不执行。**
-
-交付物：
-
-- clean commit 上的 v2 runner/protocol candidate；
-- CPU/Lean focused tests 与 build；
-- OpenPI model load/serialization、initial digest、first chunk、GPU/EGL binding 的 `env.step_count=0`
-  probe；
-- absent fresh output roots。
-
-退出条件：所有 preflight `ready=true`。任何 blocker 只修代码/环境或重冻 protocol，不创建正式 outcome。
-
-### M4：新的 clean v2 pilot
-
-**状态：deferred。当前不执行。**
-
-使用新 method id、protocol、unit/seed 和 fresh root；不得重跑 E1 policy-seed 1。先运行小型、事前固定
-pilot，验证 clean retention、phase completion、deadlock 和 observation coverage。
-
-退出条件：达到预注册 utility gate。未达到则停止 v2 main，保留负结果并返回 M0/M1 形成新版本；不得
-在同一 protocol 内调阈值重跑。
+## 6. 当前里程碑与 terminal 后恢复 gate
 
 ### M5：VLA-only threat qualification
 
@@ -388,15 +273,49 @@ pilot，验证 clean retention、phase completion、deadlock 和 observation cov
 只运行 unguarded VLA-only clean/attacked pair。workload 达到或未达到 held-out independent-safety gate
 都必须形成 terminal artifact，然后停止并汇报；不得转入 attack-defense main。
 
-### M6：正式矩阵与 E5
+以下阶段全部 deferred/unauthorized。M5 成功或失败都不会自动启动它们。
 
-**状态：deferred/unauthorized。** 即使 M5 通过也不得执行。恢复需要用户新的明确授权、新 protocol 和
-重新冻结的 gate。
+### D0：最小方法与架构重冻
+
+- 冻结两个关系、两个不变量、三个 transaction、五个组件和四个核心 arm；
+- 冻结 TCB、threat model、unknown/fail-closed 与 liveness semantics；
+- 决定哪些 v1/v2资产复用、只读兼容或淘汰；
+- 不在此阶段增加 AEGIS、crypto、recovery 或新 provenance producer。
+
+退出条件：方法图、API、形式属性和消融矩阵能在一页内对应，历史 artifact 保持 replayable。
+
+### D1：core formalization 与 fixed-trace
+
+- 只实现三个 transaction 和四臂 method switch；
+- Lean 只覆盖两个不变量、最小 state transition 与 fast-checker refinement；
+- 运行 fake-env/fixed-trace/shadow，不运行真实 defense rollout；
+- 报告 nominal allow、layer unique catch、parity、unknown/block 和 latency。
+
+退出条件：两单层各有事前定义的 unique catch，Dual 不因 proof wall time 或协议 bookkeeping 破坏
+nominal liveness。否则缩小方法。
+
+### D2：新的 clean pilot
+
+使用新 method id、protocol、disjoint unit/seed 和 fresh root，不重跑旧 E1 unit。四个核心 arm 共享完整
+runner/observer/dispatch 配置。
+
+退出条件：Dual 达到预注册 clean retention、phase completion、deadlock 和 evidence coverage gate。失败则
+保留负结果并停止，不进入攻击比较，也不在同一 protocol 调阈值。
+
+### D3：qualified attack comparison
+
+只使用 M5 terminal pass 且 population 与 method support 完全重合的 workload。运行 VLA-only、
+Intent-only、Execution-only、Dual，回答 layer necessity 与 composition gain。
+
+### D4：外部 baseline 与 optional intervention
+
+在核心结论之后再加入 AEGIS/PACS-style filter、SAFE/FIPER、RoboGuard/SafeGate 或 verified recovery
+候选。任何 adjusted command 都重新授权，且组合收益与核心 integrity 收益分开报告。
 
 ## 7. 代码与 artifact 纪律
 
-1. CTDA v1 code path、wire、protocol、results 保持 replayable；v2 使用新 method/schema id。
-2. 不在旧 JSON 上补字段后冒充 v2；需要 migration 时写显式 read-only adapter。
+1. CTDA v1/v2 code path、wire、protocol、results 保持 replayable；后续重冻使用新的 method/schema id。
+2. 不在旧 JSON 上补字段后冒充新版本；需要 migration 时写显式 read-only adapter。
 3. external code 使用 pinned commit/digest，不把临时 patch 混入上游目录且不记录来源。
 4. runner 默认 read-only；只有显式 `--execute --gpu PHYSICAL_ID` 才能 dispatch。
 5. 正式执行前 protocol 必须先提交，worktree clean，output root absent。
@@ -407,11 +326,11 @@ pilot，验证 clean retention、phase completion、deadlock 和 observation cov
 
 - 任一 workload 得到 terminal pass/fail/blocked 结果：保存完整 artifact 后停止并汇报，不进入自研方法；
 - 所有 ProofAlign/CTDA/AEGIS/SAFE/FIPER method 或 baseline execution 当前均未授权；
-- v2 clean pilot 未达到预注册 utility gate：不进入 attacked+defended main；
+- D2 clean pilot 未达到预注册 utility gate：不进入 attacked+defended main；
 - qualified attack count 仍为 0：不报告 attack-defense efficacy；
 - attack population 与 support population 不重合：不做 defense comparison；
 - independent safety oracle 缺 coverage/provenance：该 pair 不进入 safety denominator；
-- adjusted command 未经过 mission/contract post-filter check：不得 dispatch；
+- adjusted command 未经过 exact prefix reauthorization：不得 dispatch；
 - protocol/source/checkpoint/hash/GPU/EGL/output-root 任一不一致：不得正式执行；
 - 任何结果都只支持指定 simulator/task/model/workload 上的结论，不推广到硬件或总体分布。
 

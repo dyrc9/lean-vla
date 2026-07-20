@@ -9,9 +9,11 @@ Vision-Language-Action execution. Its scoped method, Contract-Carrying Temporal 
 
 The target is auditable simulator execution integrity, not an end-to-end or absolute physical safety proof.
 
-The method has exactly two alignment layers: **trusted intent → planned action** and **accepted planned action →
-applied/observed action**. Contracts, binders, receipts, signatures, provenance checks, and optional CBF filtering are
-supporting mechanisms; they are not additional alignment layers or separate method contributions.
+The method has exactly two alignment relations: **trusted intent → planned action** and **accepted planned action →
+applied/observed action**. It exposes only three transactions—certify a persistent contract, authorize one exact
+final command, and check execution/effect before updating the monitor. Contracts and receipts are core protocol
+objects; signatures, provenance, wire formats, Lean replay, and optional CBF filtering are supporting mechanisms,
+not additional alignment layers or separate method contributions.
 
 ## Current result
 
@@ -24,23 +26,13 @@ supporting mechanisms; they are not additional alignment layers or separate meth
 - E4 passes 1/1 real-Lean control and 35/35 frozen fault cases.
 - Lean evaluation remains too slow for real-time enforcement; the system is a slow-interlock/offline prototype.
 
-CTDA v1 therefore requires revision before any expanded runtime claim. The safety-experiment foundation is now
-rebuilt through the full-population no-step state gate: official SafeLIBERO/AEGIS source and all 32 scenarios/1,600
-init states are pinned; R1 runtime, R2 model load, R3 scene serialization, and CTDA v2 exact state/collision-source
-coverage pass with zero policy inference and zero `env.step`. CTDA v2 now has an independent core/wire schema,
-reference checker, six-stage executable Lean wire replay, 21/21 Python/Lean golden parity, source-bound
-SafeLIBERO mission templates, retained-trace support audit, and 50/50 no-step source-bound drawer `OpenRegion`
-initial-state coverage. A pure no-dispatch adapter now passes 6/6 fake-observation/adversarial cases for authenticated
-progress, consumer-derived command digests, adjusted-command membership, and non-refundable recovery-ledger wiring.
-The drawer joint is `0.0 m` in all 50 frozen initial states, and the adapter uses a simulator-test allowlist issuer;
-an additional direct-state no-step probe passes 5/5 official/reference checks across both classes and the exact
-strict boundary. The authentication gap is now narrowed by an Ed25519 evidence layer (11/11), a source-bound signed
-AEGIS single-halfspace CBF/QP producer (9/9 plus 5/5 CVXPY/OSQP parity), and an authenticated typed
-geometry-to-coefficient producer (8/8 plus 4/4 parity with the pinned `compute_h_coeffs_3d`). All three remain
-no-action/no-dispatch. Protected raw perception/ellipsoid-fit provenance, natural transition evidence, disjoint
-numeric budget freeze, a recovery controller, and rollout remain blocked. No retained Phantom Menace
-or SABER workload passed the complete held-out
-independent-safety qualification chain, and no GPU rollout is currently authorized.
+CTDA v1 therefore requires revision before any expanded runtime claim. A separate CTDA v2 no-dispatch prototype
+preserves a six-stage wire, 21/21 Python/Lean parity, typed evidence, Ed25519, and source-bound AEGIS geometry/CBF
+assets. These are frozen implementation and regression assets—not the required architecture of the next method
+version—and they establish no clean utility, online liveness, recovery, or defense-efficacy result. The next method
+design, if later authorized, will refreeze a smaller five-component/three-transaction architecture and first compare
+VLA-only, Intent-only, Execution-only, and Dual. No retained Phantom Menace or SABER workload has yet passed the
+complete held-out independent-safety qualification chain, and no defense rollout is currently authorized.
 
 Current execution priority is VLA-only attack reproduction only: all ProofAlign/CTDA method runs,
 AEGIS/SAFE/FIPER defense baselines, clean method pilots, and attacked+defended comparisons are frozen. A fresh
@@ -52,6 +44,9 @@ fallback track. Each workload stops at a terminal threat-qualification result pe
 - [Project status](docs/project_status.md)
 - [Unified evaluation results](docs/evaluation_results.md)
 - [Method and claim boundary](docs/method.md)
+- [Current and target architecture](docs/system_architecture.md)
+- [Paper story](docs/paper/paper_story.md)
+- [Related work and novelty audit](docs/paper/related_work.md)
 - [Roadmap](docs/roadmap.md)
 - [Experiment rules](docs/experiments.md)
 - [Current execution environment](docs/remote_execution.md)
@@ -63,9 +58,9 @@ Detailed phase reports and old handoffs are retained under [docs/archive](docs/a
 ## Main code
 
 - `src/proofalign/ctda*.py`: typed CTDA semantics, runtime, wire, evaluator, and replay.
-- `src/proofalign/ctda_v2.py` / `ctda_v2_wire.py` / `ctda_v2_evaluator.py`: version-isolated
-  certificate/rebind/intervention/progress core, strict v2 envelope, and offline Lean parity evaluator; none is an
-  online rollout path.
+- `src/proofalign/ctda_v2.py` / `ctda_v2_wire.py` / `ctda_v2_evaluator.py`: frozen, version-isolated
+  certificate/rebind/intervention/progress prototype and offline Lean parity evaluator; it remains replayable but
+  does not define the next target architecture and is not an online rollout path.
 - `src/proofalign/benchmark/`: LIBERO task manifests, state observation, online transaction, and E1 baseline.
 - `src/proofalign/benchmark/safelibero_foundation.py`: outcome-blind SafeLIBERO inventory, typed independent
   safety provenance, official collision labeling, and CAR/TSR/ETS/cost/RET classification.
