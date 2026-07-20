@@ -52,6 +52,9 @@ trade-off，不追求绝对安全或通用证明。
     最大误差 `4.44e-16`，完整 result tamper 在 authorization 前 hard-block，0 dispatch。
 19. **AEGIS typed geometry R0**：8/8 authenticated provenance unit 与 4/4 pinned
     `compute_h_coeffs_3d` parity 通过；最大误差 `1.53e-16`，raw perception trust 仍 blocked。
+20. **Minimal integrity prototype**：独立 `proofalign-integrity-v1` 已实现五组件、三 transaction、四臂
+    method switch、one-use exact authorization 与 checked completion；28 个 focused unit 和
+    `ProofAlign.IntegrityCore` build 通过。当前只有 in-memory no-action sink，无实验 outcome。
 
 ## 已完成阶段：clean utility trade-off
 
@@ -94,16 +97,16 @@ shared-observer fix + tests
    safety dimensions；
 5. closed-loop block 继续只标 intervention；没有独立 action counterfactual 时不计算 false positive。
 
-## 当前阶段：仅 VLA-only 攻击复现
+## 当前阶段：实验暂停；下一实验为 VLA-only 攻击复现
 
 详细架构、里程碑、实验矩阵和停止条件以 [`optimization_plan.md`](optimization_plan.md) 为准。
 当前没有运行中的 ProofAlign、Phantom、SABER、SAFE 或 FIPER 正式实验。
 
-当前 sprint 取消双线并行：ProofAlign/CTDA、AEGIS 和其他 defense baseline 全部冻结，唯一允许的新
-outcome 是 unguarded VLA-only 的发布攻击 clean/attacked pair。VLA-only threat qualification terminal
-结束后必须停下并汇报，不能自动恢复自研 method。
+当前不允许产生任何新实验 outcome。已授权的工作仅限本地 minimal prototype、unit regression 与 Lean
+build。恢复实验后，唯一允许的新 outcome 仍是 unguarded VLA-only 的发布攻击 clean/attacked pair；
+VLA-only threat qualification terminal 后必须停下并汇报，不能自动进入 defense comparison。
 
-### 唯一执行线：VLA-only threat qualification
+### 下一实验线：VLA-only threat qualification（当前暂停）
 
 1. SafeLIBERO/AEGIS source/data foundation 已完成：官方 commit `57b1aef...`、32 scenario、1600 init、
    official collision label 和 typed metrics 已固定；
@@ -114,7 +117,7 @@ outcome 是 unguarded VLA-only 的发布攻击 clean/attacked pair。VLA-only th
 4. 从全新的 official SABER constraint-violation producer gate 开始，不续接旧 R1；
 5. immutable record/transcript/schema/hash 通过后，直接运行 VLA-only clean/attacked pair；
 6. primary threat signal 必须是独立 oracle 给出的 clean-safe→attacked-unsafe，不用 task failure、attack
-   metadata 或 detector verdict代替；
+   metadata 或 detector verdict 代替；
 7. SABER terminal blocked/failed 后，P1 使用原始 EDPA patch 叠加 SafeLIBERO；不按 outcome 调 patch、
    task、seed 或强度；
 8. 每条 workload 都保存 terminal manifest、append-only ledger、episode artifact 和 SHA-256；若均无攻击
@@ -122,11 +125,11 @@ outcome 是 unguarded VLA-only 的发布攻击 clean/attacked pair。VLA-only th
 
 ### 冻结线：ProofAlign/CTDA 与 defense baseline
 
-1. 既有 v1/v2 code、protocol、artifact 和文档原样保留，不覆盖、不续跑；
+1. 既有 v1/v2 code、protocol、artifact 原样保留，不覆盖、不续跑；
 2. 不运行 CTDA v2 audit/probe、fixed-trace/shadow outcome、clean pilot 或 attacked+defended arm；
-3. 不继续 attack-shift record、数值预算、raw perception、recovery 或 CTDA support 施工；
-4. 不运行 AEGIS、SAFE、FIPER 或其他 defense baseline；
-5. 只有 VLA-only threat qualification terminal 结束并得到用户新的明确授权，才重新制定后续方法计划。
+3. minimal integrity prototype 可以做本地 unit/Lean build，但不接 simulator、GPU、online wire outcome；
+4. 不继续数值预算、raw perception、recovery 或 CTDA support 施工；
+5. 不运行 AEGIS、SAFE、FIPER 或其他 defense baseline。
 
 ### 汇合 gate
 

@@ -34,10 +34,16 @@ design, if later authorized, will refreeze a smaller five-component/three-transa
 VLA-only, Intent-only, Execution-only, and Dual. No retained Phantom Menace or SABER workload has yet passed the
 complete held-out independent-safety qualification chain, and no defense rollout is currently authorized.
 
-Current execution priority is VLA-only attack reproduction only: all ProofAlign/CTDA method runs,
-AEGIS/SAFE/FIPER defense baselines, clean method pilots, and attacked+defended comparisons are frozen. A fresh
-official SABER producer/record gate precedes unguarded VLA-only clean/attacked pairs; EDPA + SafeLIBERO is the
-fallback track. Each workload stops at a terminal threat-qualification result pending explicit user authorization.
+The refrozen architecture now has a separate `proofalign-integrity-v1` local prototype: five components, three public
+transactions, one shared four-arm method switch, exact final-command authorization, one-use dispatch receipts, and
+checked completion/atomic monitor updates. `ProofAlign.IntegrityCore` formalizes the two invariants and arm semantics;
+there is not yet a machine-checked refinement from the Python fast checker to that Lean model. The only command sink
+is in-memory and has no simulator, socket, GPU, or hardware capability.
+
+All experiments are currently paused. VLA-only attack reproduction remains the first experiment when execution is
+resumed: a fresh official SABER producer/record gate precedes unguarded clean/attacked pairs, with EDPA + SafeLIBERO
+as the fallback track. No fixed-trace outcome, clean method pilot, defense baseline, or attacked+defended comparison
+is authorized.
 
 ## Start here
 
@@ -57,6 +63,12 @@ Detailed phase reports and old handoffs are retained under [docs/archive](docs/a
 
 ## Main code
 
+- `src/proofalign/integrity_models.py`: version-isolated minimal domain model and four causal arms.
+- `src/proofalign/integrity_checker.py`: deterministic fast checker and exact-prefix authorizer.
+- `src/proofalign/integrity_runtime.py`: five components, three transactions, one-use in-memory dispatch boundary,
+  and checked effect/monitor update.
+- `src/proofalign/integrity_intervention.py`: optional pass/project/replan/block policies whose final command returns
+  to the authorizer.
 - `src/proofalign/ctda*.py`: typed CTDA semantics, runtime, wire, evaluator, and replay.
 - `src/proofalign/ctda_v2.py` / `ctda_v2_wire.py` / `ctda_v2_evaluator.py`: frozen, version-isolated
   certificate/rebind/intervention/progress prototype and offline Lean parity evaluator; it remains replayable but
@@ -78,7 +90,9 @@ Detailed phase reports and old handoffs are retained under [docs/archive](docs/a
   witness, and fail-closed CTDA post-filter adapter with no action capability.
 - `src/proofalign/benchmark/aegis_cbf_geometry.py`: signed typed ellipsoid geometry boundary and source-equivalent
   `compute_h_coeffs_3d` coefficient derivation; raw camera/perception trust remains external.
-- `lean/ProofAlign/`: Lean definitions and staged wire checker.
+- `lean/ProofAlign/IntegrityCore.lean`: minimal two-invariant/four-arm Lean model; not yet refined to the Python
+  checker.
+- `lean/ProofAlign/`: historical CTDA definitions and staged wire checkers.
 - `scripts/`: frozen experiment runners, validators, and preflight tools.
 - `experiments/`: machine protocols, registries, and terminal summaries.
 
@@ -97,5 +111,5 @@ baseline preflight must report `source_ready=false` in that state; the test suit
 Do not delete or alter the binding merely to make the preflight ready.
 
 GPU/OpenPI execution requires the additional environment and isolation rules in
-[docs/remote_execution.md](docs/remote_execution.md). Only fresh official attack producer work and unguarded
-VLA-only threat qualification are authorized; no ProofAlign/CTDA or defense-baseline rollout is authorized.
+[docs/remote_execution.md](docs/remote_execution.md). All experiments are currently paused; local unit tests and Lean
+builds do not authorize ProofAlign/CTDA, attack, or defense-baseline rollout.

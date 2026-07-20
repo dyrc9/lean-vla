@@ -2,8 +2,9 @@
 
 更新日期：2026-07-20
 
-当前唯一执行目标是 unguarded VLA-only 发布攻击复现。ProofAlign/CTDA、AEGIS、SAFE、FIPER 和最终
-attack-defense E5 全部暂停；VLA-only terminal 结束后也不得自动恢复。
+当前所有实验执行暂停。unguarded VLA-only 发布攻击复现仍是恢复后的第一实验目标；ProofAlign/CTDA、
+AEGIS、SAFE、FIPER 和最终 attack-defense E5 均未授权。当前本地 minimal prototype unit/Lean 工作不
+改变这一实验顺序，也不产生 reproduction evidence。
 
 ## 当前状态
 

@@ -2,8 +2,9 @@
 
 更新日期：2026-07-20
 
-> 本文描述候选论文叙事，不代表当前已获得 defense efficacy。当前唯一执行线仍是 VLA-only 发布攻击
-> 复现；方法实验保持冻结。
+> 本文描述候选论文叙事，不代表当前已获得 defense efficacy。当前所有实验暂停；本地 minimal
+> integrity prototype 已实现，但没有 fixed-trace、clean、attack 或 defense outcome。VLA-only 发布攻击
+> 复现仍是恢复实验后的第一优先级。
 
 ## 一句话定位
 

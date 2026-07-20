@@ -5,6 +5,10 @@
 本文是当前机器运行 CPU/Lean、OpenPI/LIBERO-Safety 和 GPU 实验的唯一环境入口。CLI 具体参数仍以
 代码 `--help` 为准。
 
+> **实验暂停。** 当前只允许 repo `.venv` 下的 local unit tests、静态检查和 Lean build；本文中的
+> OpenPI、MuJoCo、producer、victim、GPU、AEGIS 和任何 `--execute` 命令均不得运行，直到用户明确恢复
+> 实验。VLA-only 攻击复现仍是恢复后的第一执行线。
+
 ## 1. 固定路径
 
 ```text

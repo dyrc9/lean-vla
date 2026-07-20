@@ -4,24 +4,25 @@
 
 ## 当前状态
 
-当前唯一执行主线改为 **VLA-only 发布攻击复现与 threat qualification**。所有 ProofAlign/CTDA 自研
-method 的实现性实验、no-dispatch probe、clean pilot、attacked+defended rollout 和 baseline comparison
-全部暂停；在 VLA-only 攻击得到 terminal 结果且用户再次明确授权前，不恢复这些工作。既有 CTDA、
-Ed25519、typed geometry 和 AEGIS CBF/QP 结果只作为冻结历史保留，不构成当前施工任务。
+当前所有实验、simulator/GPU rollout 和外部 baseline execution 均暂停。用户已授权并完成
+`proofalign-integrity-v1` 本地最小原型施工；它只有 in-memory no-action sink、unit tests 和 Lean build，
+不产生实验 outcome。VLA-only 发布攻击复现与 threat qualification 仍是恢复实验后的第一优先级。
+既有 CTDA、Ed25519、typed geometry 和 AEGIS CBF/QP 结果继续作为冻结历史保留。
 
-后续方法方向已经收缩为“两关系、两不变量、三 transaction”和 VLA-only/Intent-only/
-Execution-only/Dual 四臂消融。现有 CTDA v2 certificate/rebind/六阶段 wire 是可 replay 的历史原型，
-不再预设为下一版公开架构；该方向同样处于 deferred/unauthorized 状态。
+方法方向已经收缩为“两关系、两不变量、三 transaction”和 VLA-only/Intent-only/Execution-only/Dual
+四臂消融。现有 CTDA v2 certificate/rebind/六阶段 wire 是可 replay 的历史原型，不再预设为下一版公开
+架构。最小 core 已实现，但 fixed-trace、clean/attack runner 与实验矩阵仍 deferred/unauthorized。
 
 | 工作线 | 状态 | 当前结论 | 下一步 |
 |---|---|---|---|
-| CTDA 方法 | frozen/deferred | v1 clean utility 不合格；v2 core/wire 与 no-action 基础结果已保存但不再定义下一架构 | 不运行、不扩展；等待攻击复现终态与新授权后先重冻最小架构和四臂消融 |
+| minimal integrity prototype | local implementation complete | 五组件、三 transaction、四臂 switch、28 个 focused unit、Lean core 已接通；无 online wire/refinement/simulator | 保持 no-action；只做本地测试与代码审计，不产生 outcome |
+| CTDA v1/v2 | frozen/history | v1 clean utility 不合格；v2 core/wire 与 no-action 基础结果已保存但不再定义下一架构 | 不运行、不扩展、不接入新 prototype |
 | E0 support | complete | 12 个 affordance/init0 non-real-time supported unit | 新实验不得越过支持范围，除非先做新 support audit |
 | E1 utility | scoped pilot complete | policy-seed 1 的新 pilot 为 12/12 valid pair；VLA-only 8/12、Full CTDA 0/12 task/safe success，retention 0 | 负结果和归因已保存；不扩写总体结论或重跑旧 unit |
 | E3 safety | scoped evidence complete | clean 12/12 preserved；post-dispatch 行为 fail closed，但正式 primary 12 unknown | 不改写旧分类；新的独立 challenge 才能增加 containment 证据 |
 | E4 robustness | complete | 35/35 frozen fault case fail closed | 只保留 scoped component claim |
 | timing | negative/deferred | Lean 0.9--1.3 s/stage，不满足实时控制 | 不优化，不恢复 real-time claim |
-| attack foundation | **current sole execution track** | Phantom held-out 仅 1/4；旧 SABER exact-task R1 为 0 record/0 victim，qualified attack count 为 0 | 从 fresh protocol/root 修复 official SABER producer，验证 immutable artifact 后直接运行 VLA-only clean/attacked pair；随后才考虑 EDPA |
+| attack foundation | paused / next experiment | Phantom held-out 仅 1/4；旧 SABER exact-task R1 为 0 record/0 victim，qualified attack count 为 0 | 当前不执行；恢复后从 fresh SABER protocol/root 和 immutable producer gate 继续 |
 | safety foundation | frozen/deferred | R0--R3、state r1、OpenRegion、signed geometry/CBF 均通过；所有新增 gate 的 `env.step/dispatch=0` | 不继续 perception、budget、recovery 或 CTDA support 工作 |
 | external baselines | frozen/deferred | AEGIS 只有 no-action core；SAFE partial、FIPER stopped | 不运行 AEGIS/SAFE/FIPER；当前只运行 unguarded VLA-only victim |
 
@@ -65,6 +66,8 @@ Execution-only/Dual 四臂消融。现有 CTDA v2 certificate/rebind/六阶段 w
 - Lean unavailable/timeout、关键 binding tamper 和 typed fallback evidence 不足时，当前实现不会静默
   回退到 Python 授权；
 - 当前系统是 slow-interlock/offline prototype。
+- `proofalign-integrity-v1` 已实现独立 Python minimal core 和 `ProofAlign.IntegrityCore` Lean model；二者
+  尚无 machine-checked refinement，且只有 in-memory no-action sink。
 - 在固定 12-task/init0/env7/policy-seed1 simulator slice 上，VLA-only 为 8/12 task/safe
   success，Full CTDA 为 0/12，task/safe-success retention 都是 0；两臂 collision/cost
   coverage 为 100%、observed unsafe 为 0。
@@ -104,10 +107,10 @@ Execution-only/Dual 四臂消融。现有 CTDA v2 certificate/rebind/六阶段 w
 [`proofalign_e1_clean_utility_terminal_summary.json`](../experiments/proofalign_e1_clean_utility_terminal_summary.json)，
 后续边界见 [`roadmap.md`](roadmap.md)。
 
-## 当前唯一主任务：VLA-only 攻击复现
+## 实验暂停；下一实验仍为 VLA-only 攻击复现
 
-完整执行规划见 [`optimization_plan.md`](optimization_plan.md)。当前不再并行推进 CTDA v2 或 AEGIS，
-只允许下面这条执行链：
+完整执行规划见 [`optimization_plan.md`](optimization_plan.md)。下面的执行链当前暂停，不运行；恢复
+实验时仍从该链开始，不跳到 CTDA、AEGIS 或 attacked+defended：
 
 1. 在新 protocol、clean commit 和 fresh absent root 上修复 official SABER constraint-violation producer；
 2. 生成并验证 immutable official attack record/transcript/hash；producer gate 未通过时不启动 victim；
@@ -117,8 +120,10 @@ Execution-only/Dual 四臂消融。现有 CTDA v2 certificate/rebind/六阶段 w
 6. SABER terminal blocked/failed 后才按独立 fresh protocol 转 EDPA + SafeLIBERO，不按 outcome 调 patch；
 7. VLA-only threat qualification 结束后停止，不自动进入 CTDA、AEGIS 或 attacked+defended comparison。
 
-冻结期间禁止运行 `ctda_v2_*` audit/probe、ProofAlign clean pilot、CTDA shadow/fixed-trace outcome、AEGIS
-closed-loop、SAFE/FIPER 或任何自研 method arm。若只为保存旧结果进行只读检查，不得创建新 outcome。
+实验暂停期间禁止运行 `ctda_v2_*` audit/probe、ProofAlign clean pilot、CTDA shadow/fixed-trace outcome、
+AEGIS closed-loop、SAFE/FIPER 或任何自研 method arm。允许
+`tests/test_integrity_prototype.py`、其他本地 unit regression 和 `lake build ProofAlign`；它们不得连接
+simulator/GPU 或创建 outcome root。
 
 安全基础机器入口为
 [`safelibero_aegis_readiness_protocol.json`](../experiments/safelibero_aegis_readiness_protocol.json) 和

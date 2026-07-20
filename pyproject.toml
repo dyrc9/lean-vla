@@ -1,7 +1,7 @@
 [project]
 name = "proofalign"
 version = "0.1.0"
-description = "Research prototype for a Lean-backed dual alignment safety wrapper for VLA robots."
+description = "Research prototype for mission-rooted VLA task authorization and execution integrity."
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [

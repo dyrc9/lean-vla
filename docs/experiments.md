@@ -7,11 +7,11 @@
 
 ## 当前执行覆盖规则
 
-当前只运行 fresh official SABER/EDPA producer、immutable artifact validator 和 unguarded VLA-only
-clean/attacked threat qualification。所有 ProofAlign/CTDA no-dispatch probe、clean pilot、method arm、AEGIS/
-SAFE/FIPER baseline 和 attacked+defended comparison 均暂停。本文后续 CTDA protocol 章节只保留历史与
-兼容性事实，不再定义下一版目标架构，也不构成当前执行授权；VLA-only workload terminal 后必须停止并
-汇报。未来实验顺序以 [`optimization_plan.md`](optimization_plan.md) 的最小架构与四臂消融为准。
+当前所有实验均暂停，不运行 SABER/EDPA producer、VLA-only victim、ProofAlign/CTDA outcome、AEGIS/
+SAFE/FIPER baseline 或 attacked+defended comparison。允许的 `proofalign-integrity-v1` 工作仅限本地
+in-memory unit tests 和 Lean build，不创建 experiment protocol/root/outcome。恢复实验后，仍先执行 fresh
+official SABER/EDPA producer 与 unguarded VLA-only threat qualification。本文后续 CTDA protocol 章节只
+保留历史与兼容性事实，不构成当前执行授权。
 
 ## 1. 通用原则
 

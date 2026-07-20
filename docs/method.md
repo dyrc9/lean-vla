@@ -2,9 +2,9 @@
 
 更新日期：2026-07-20
 
-本文是 ProofAlign/CTDA 的方法、威胁模型与 claim boundary 的规范性来源。当前唯一允许的执行工作仍是
-VLA-only 发布攻击复现；本次方法重构只修改后续设计，不授权任何 CTDA、AEGIS 或 defense rollout。
-当前执行顺序见 [`optimization_plan.md`](optimization_plan.md)，历史结果见
+本文是 ProofAlign/CTDA 的方法、威胁模型与 claim boundary 的规范性来源。当前所有实验与 rollout 均
+暂停；用户已单独授权本地、无 simulator/action capability 的最小原型实现。VLA-only 发布攻击复现仍是
+恢复实验后的第一优先级，但当前不执行。执行边界见 [`optimization_plan.md`](optimization_plan.md)，历史结果见
 [`evaluation_results.md`](evaluation_results.md)。
 
 ## 0. 方法状态
@@ -34,6 +34,11 @@ digest、nonce、signature、provenance、Lean replay、certificate、lease、CB
 - **CTDA v2 no-dispatch prototype**：已保存独立 core/wire、certificate/rebind、六阶段 replay、21/21
   Python/Lean parity、typed evidence 和 AEGIS/crypto no-action 资产。它们证明局部协议和实现性质，不证明
   clean utility、安全收益或 online liveness。
+- **ProofAlign minimal integrity prototype**：新 method/schema id 为 `proofalign-integrity-v1` /
+  `proofalign.integrity-core-v1`。Python 已实现五组件、三个 transaction、四臂 method switch、单次
+  authorization、post-filter final-command reauthorization、receipt/effect binding 与原子 monitor update；
+  `ProofAlign.IntegrityCore` 在 Lean 中形式化两个不变量和 arm semantics。当前只有 in-memory no-action
+  sink 和 unit tests，没有 simulator adapter、online wire、checker-refinement artifact 或实验 outcome。
 
 v1 结果不得后验改写。v2 资产保持 replayable，但不再把其六阶段 wire 或全部 plumbing 当作下一版方法
 的预设架构。后续设计只在它们确实支持核心不变量、独立消融或必要 TCB 时复用。
@@ -222,6 +227,10 @@ Lean 是 assurance mechanism，不是独立 novelty，也不应该成为每个 c
 - online control path 使用版本固定、确定性、可审计的 fast checker；
 - full request 可在 shadow/offline 路径重放给 Lean，但 shadow 结果不授权历史 dispatch。
 
+当前 minimal prototype 的 `DeterministicFastChecker` 是 Python reference checker；
+`ProofAlign.IntegrityCore` 是独立 Lean model。两者尚未建立 machine-checked refinement/equivalence，因而
+不能写成 Lean-backed online authority。
+
 只有在建立 core theorem 与实际 wire/fast checker 的明确 refinement/equivalence 后，才能写“Lean-backed
 online judgment”。若 online authority 仍来自 Python，只能写“Lean specification + Python reference
 runtime”。当前逐 request 编译的 v1 Lean evaluator约 0.65--1.95 秒 p99，不支持 real-time claim。
@@ -231,7 +240,7 @@ runtime”。当前逐 request 编译的 v1 Lean evaluator约 0.65--1.95 秒 p99
 
 ## 8. 后续评估的最小证据
 
-当前攻击复现 terminal 前不执行本节。恢复方法工作时，首先比较：
+当前所有实验暂停，不执行本节。恢复实验时，首先比较：
 
 | arm | Intent–Plan | Plan–Execution | 目的 |
 |---|---:|---:|---|
@@ -259,6 +268,8 @@ execution-integrity protocol，而不是继续增加 stage。
 - 两类 integrity relation 与两个协议不变量已经明确定义；
 - v1 的离散实现/parity 通过冻结测试，但 clean operational utility 在 evaluated slice/seed 上失败；
 - v2 no-dispatch 资产建立若干局部 binding、parity、authentication 与 filter plumbing 性质；
+- minimal integrity prototype 已把五组件、三 transaction 和四臂 method switch 接通到本地 no-action
+  transaction tests；
 - 当前系统是 simulator-scoped、slow-interlock/offline research prototype。
 
 当前不允许写：
@@ -274,7 +285,8 @@ execution-integrity protocol，而不是继续增加 stage。
 
 - CTDA v1 code、wire、protocol 和结果保持 immutable/replayable；
 - CTDA v2 no-dispatch schema 和 artifact 作为历史实现资产保留，不给旧 JSON 补默认字段冒充新版本；
-- 下一次方法恢复必须使用新的 method id、protocol、disjoint unit/seed 或明确的新实验单位和 fresh root；
+- minimal prototype 使用独立 `proofalign-integrity-v1` method id，不修改或反序列化 v1/v2 artifact；
+- 下一次实验恢复必须使用新的 protocol、disjoint unit/seed 或明确的新实验单位和 fresh root；
 - 新架构优先复用语义与测试，不承诺复用旧 stage 拆分、class hierarchy 或 runtime orchestration；
-- 当前 VLA-only threat qualification terminal 后仍必须停止，等待用户明确授权，不能自动进入方法重构、
-  clean pilot 或 attacked+defended comparison。
+- 当前不运行 VLA-only threat qualification、clean pilot 或 attacked+defended comparison；本地原型测试不
+  自动授权 simulator/GPU integration、fixed-trace outcome 或任何实验。

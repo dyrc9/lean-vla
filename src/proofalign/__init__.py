@@ -1,4 +1,8 @@
-"""ProofAlign: a Lean-backed dual alignment safety wrapper prototype."""
+"""ProofAlign mission-rooted integrity research prototypes.
+
+The minimal Python fast checker and Lean core are currently separate artifacts;
+the package does not claim a machine-checked refinement between them.
+"""
 
 __all__ = [
     "CTDAChecker",
@@ -7,6 +11,8 @@ __all__ = [
     "CTDAV2ReferenceChecker",
     "CTDAV2LeanKernelEvaluator",
     "DualAlignmentChecker",
+    "ProofAlignPrototype",
+    "MethodArm",
     "SafetyExecutor",
 ]
 
@@ -36,4 +42,12 @@ def __getattr__(name: str):
         from proofalign.ctda_v2_evaluator import CTDAV2LeanKernelEvaluator
 
         return CTDAV2LeanKernelEvaluator
+    if name == "ProofAlignPrototype":
+        from proofalign.integrity_runtime import ProofAlignPrototype
+
+        return ProofAlignPrototype
+    if name == "MethodArm":
+        from proofalign.integrity_models import MethodArm
+
+        return MethodArm
     raise AttributeError(name)

@@ -2,13 +2,14 @@
 
 更新日期：2026-07-20
 
-> 把下面分隔线之间的整段交给工作机上的下一位 agent。该 prompt 只授权 official attack producer、
-> unguarded VLA-only clean/attacked pair 和独立 threat qualification；不授权运行任何 ProofAlign/CTDA
-> 自研 method、defense baseline 或 attacked+defended comparison。
+> **PAUSED：当前不要执行本 prompt。** 它只保存恢复实验后的第一条工作线；恢复仍需用户新的明确
+> 授权。当前仅允许本地 `proofalign-integrity-v1` unit tests、代码审计和 Lean build，不允许 official
+> attack producer、VLA-only rollout、ProofAlign/CTDA outcome、defense baseline 或 attacked+defended
+> comparison。
 
 ---
 
-你正在工作机 `/home/ldx/lean-vla` 接手发布攻击复现。当前唯一目标是先在 unguarded VLA-only victim 上
+以下内容只在用户明确恢复实验后生效。届时目标是先在 unguarded VLA-only victim 上
 得到可审计的攻击复现终态。不要运行或继续开发 ProofAlign/CTDA、AEGIS、SAFE、FIPER 或任何 defense
 arm；不要运行 CTDA unit/fixed-trace/no-dispatch/clean pilot；不要进入 attacked+defended comparison。
 
@@ -343,7 +344,7 @@ primary 输出：valid pair、task/safe success、phase completion、CAR/cost/RE
 若 Dual clean utility gate 不通过：停止 main，保留负结果；后续修改必须形成新的 method/protocol，不能在
 本轮调阈值重跑。
 
-## 10. M5：独立 VLA-only threat qualification（当前唯一任务）
+## 10. M5：独立 VLA-only threat qualification（恢复实验后的第一任务）
 
 ### 10.1 P0 SABER constraint-violation
 

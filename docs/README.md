@@ -6,17 +6,17 @@
 
 建议按顺序阅读：
 
-1. [`project_status.md`](project_status.md)：当前状态、可写/不可写结论和唯一主任务。
+1. [`project_status.md`](project_status.md)：实验暂停状态、minimal prototype 和下一实验优先级。
 2. [`evaluation_results.md`](evaluation_results.md)：E0--E4 统一结果与机器 artifact 入口。
-3. [`optimization_plan.md`](optimization_plan.md)：当前仅 VLA-only 攻击复现的执行顺序、停止条件，
-   以及 terminal 后仍未授权的最小架构重冻顺序。
-4. [`roadmap.md`](roadmap.md)：当前单线攻击复现优先级与永久边界。
+3. [`optimization_plan.md`](optimization_plan.md)：本地 no-action prototype 状态、实验暂停边界，以及
+   恢复后的 VLA-only 攻击复现顺序。
+4. [`roadmap.md`](roadmap.md)：minimal prototype checkpoint、下一实验优先级与永久边界。
 5. [`method.md`](method.md)：两关系、两不变量、三 transaction 的 normative 方法与 claim boundary。
 6. [`system_architecture.md`](system_architecture.md)：当前实现、五组件目标架构、plumbing/intervention
    边界和后续迁移顺序。
 7. [`experiments.md`](experiments.md)：实验冻结、配对、指标和失败规则。
 8. [`remote_execution.md`](remote_execution.md)：当前 Python/Lean/OpenPI/GPU 环境和运行顺序。
-9. [`implementation_notes.md`](implementation_notes.md)：代码入口、不变量和已完成 observer 配对修复。
+9. [`implementation_notes.md`](implementation_notes.md)：minimal/v1/v2 代码入口、不变量和验证命令。
 10. [`attack_reproduction_evidence_audit.md`](attack_reproduction_evidence_audit.md)：Phantom/SABER/SAFE/FIPER
    证据审计与“0 qualified attack”判定。
 
@@ -26,7 +26,7 @@
   SafeLIBERO/AEGIS、SABER constraint-violation、EDPA 与 E5 gate。
 - [`safe_fiper_r0_runbook.md`](safe_fiper_r0_runbook.md)：已停止 SAFE/FIPER partial 的审计与历史 runbook。
 
-[`next_experiment_prompt.md`](next_experiment_prompt.md) 是同步到工作机后的当前完整交接 prompt。
+[`next_experiment_prompt.md`](next_experiment_prompt.md) 是暂停中的下一实验交接 prompt；当前不得执行。
 
 论文材料：
 
