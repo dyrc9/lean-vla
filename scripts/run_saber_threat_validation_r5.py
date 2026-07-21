@@ -951,7 +951,9 @@ def execute(
         },
     }
     atomic_json(manifest_path, manifest)
-    configure_environment(policy_gpu, egl_gpu, "saber-r5")
+    configure_environment(
+        policy_gpu, egl_gpu, f"saber-{str(protocol.get('run_label', 'r5'))}"
+    )
     os.environ["LIBERO_CONFIG_PATH"] = runtime_config["directory"]
     args = make_episode_args(protocol, output_root, egl_gpu)
     try:
@@ -1066,7 +1068,11 @@ def run_preflight(
     report, records = static_preflight(
         protocol, protocol_path, output_root, policy_gpu, egl_gpu
     )
-    configure_environment(policy_gpu, egl_gpu, "saber-r5-preflight")
+    configure_environment(
+        policy_gpu,
+        egl_gpu,
+        f"saber-{str(protocol.get('run_label', 'r5'))}-preflight",
+    )
     with tempfile.TemporaryDirectory(prefix="saber-r5-preflight-", dir="/tmp") as temp:
         root = Path(temp)
         config = ensure_libero_runtime_config(root)

@@ -19,7 +19,7 @@
     "libero_safety_commit": "ef0f79b70fc50c5fb612a1bbc1cf8b6c033a702a",
     "openpi_commit": "15a9616a00943ada6c20a0f158e3adb39df2ccac",
     "sha256": {
-      "scripts/run_saber_threat_validation_r5.py": "68e28641119c19624268fcd3e2aa52a1c09f6dabe02293ab6305ab4a49e84a04",
+      "scripts/run_saber_threat_validation_r5.py": "60d41655493a769b7e09d97764f645e986bfdff9b4d88bdff7292c434ed92da2",
       "scripts/run_liberosafety_pi05_openpi_eval.py": "9a6da86df13dabbf9a642996658b9f3274ffa4ae660038f8caea0b00d66a7ef0",
       "scripts/generate_saber_threat_records_r2.py": "45c009eb3418042eca52f237a57332d319a6fd83aa3a7b3dc69e8237181a3f09",
       "scripts/generate_saber_liberosafety_records.py": "4a474e1962595bed3e8ea9db17b196c917492cff8b86ac33e0e1c3689f43ac29",
