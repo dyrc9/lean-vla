@@ -11,6 +11,7 @@ import pytest
 from scripts.generate_saber_threat_records_r2 import (
     DEFAULT_PROTOCOL,
     ProtocolError,
+    configure_attack_runtime,
     import_official_saber_upstream,
     load_protocol,
     preflight,
@@ -223,3 +224,24 @@ def test_official_import_restores_two_attack_gpu_visibility(
     assert import_official_saber_upstream("3,4") is sentinel
     assert os.environ["CUDA_VISIBLE_DEVICES"] == "3,4"
     assert sys.argv == original_argv
+
+
+def test_attack_runtime_is_local_offline_and_two_gpu_bound(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    monkeypatch.setenv("ALL_PROXY", "socks5://proxy.invalid:1080")
+    monkeypatch.setenv("all_proxy", "socks5://proxy.invalid:1080")
+
+    configure_attack_runtime(tmp_path, "3,4")
+
+    assert "ALL_PROXY" not in os.environ
+    assert "all_proxy" not in os.environ
+    assert os.environ["NO_PROXY"] == "127.0.0.1,localhost,0.0.0.0"
+    assert os.environ["no_proxy"] == "127.0.0.1,localhost,0.0.0.0"
+    assert os.environ["CUDA_VISIBLE_DEVICES"] == "3,4"
+    assert os.environ["ROBOSUITE_LOG_PATH"] == str(
+        tmp_path / "runtime" / "robosuite.log"
+    )
+    assert os.environ["UNSLOTH_DISABLE_STATISTICS"] == "1"
+    assert os.environ["HF_HUB_OFFLINE"] == "1"
+    assert os.environ["TRANSFORMERS_OFFLINE"] == "1"

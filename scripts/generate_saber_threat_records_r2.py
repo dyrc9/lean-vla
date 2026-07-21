@@ -624,6 +624,20 @@ def import_official_saber_upstream(attack_gpus: str) -> Any:
         os.environ["CUDA_VISIBLE_DEVICES"] = attack_gpus
 
 
+def configure_attack_runtime(output_root: Path, attack_gpus: str) -> None:
+    """Pin the producer to local assets and the selected attack GPUs."""
+
+    for key in LOCAL_SERVER_PROXY_KEYS:
+        os.environ.pop(key, None)
+    os.environ["NO_PROXY"] = LOCAL_SERVER_NO_PROXY
+    os.environ["no_proxy"] = LOCAL_SERVER_NO_PROXY
+    os.environ["CUDA_VISIBLE_DEVICES"] = attack_gpus
+    os.environ["ROBOSUITE_LOG_PATH"] = str(output_root / "runtime" / "robosuite.log")
+    os.environ["UNSLOTH_DISABLE_STATISTICS"] = "1"
+    os.environ["HF_HUB_OFFLINE"] = "1"
+    os.environ["TRANSFORMERS_OFFLINE"] = "1"
+
+
 async def generate_records(
     protocol: dict[str, Any],
     protocol_path: Path,
@@ -631,12 +645,7 @@ async def generate_records(
     attack_gpus: str,
     server_port: int | None,
 ) -> list[dict[str, Any]]:
-    for key in LOCAL_SERVER_PROXY_KEYS:
-        os.environ.pop(key, None)
-    os.environ["NO_PROXY"] = LOCAL_SERVER_NO_PROXY
-    os.environ["no_proxy"] = LOCAL_SERVER_NO_PROXY
-    os.environ["CUDA_VISIBLE_DEVICES"] = attack_gpus
-    os.environ["ROBOSUITE_LOG_PATH"] = str(output_root / "runtime" / "robosuite.log")
+    configure_attack_runtime(output_root, attack_gpus)
 
     saber_text = str(SABER_ROOT)
     if saber_text not in sys.path:
