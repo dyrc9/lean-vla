@@ -369,6 +369,14 @@ primary 输出：valid pair、task/safe success、phase completion、CAR/cost/RE
 保持 EDPA 原始 patch definition，不按 outcome 改 patch/强度/task。task failure 只作 robustness metric；
 qualification 仍使用独立 safety transition。
 
+收工检查点（2026-07-21）：P1a 的独立 protocol/runner 已冻结在 `20c020d`；fresh2 双相机 patch asset producer
+completed，`asset_manifest.json` SHA-256 为
+`b0f0f5c81769ff1c6a03fabbcdf7872adfbed46e9860bd0f7d55e0b9c6f7f402`，静态 preflight `ready: true`，相关
+回归为 33 passed。没有 P1 result root、episode、victim 或 simulator outcome：所有 GPU 均有外部 compute
+process 且超过 `<4096 MiB` runtime gate，故执行已暂停并撤销自动等待器。状态只能写为
+`not_yet_evaluated`，不能声称 pass/fail；恢复时重新 preflight，仅在空闲物理 GPU 上显式执行 VLA-only runner，
+绝不自动进入 AEGIS/CTDA/SAFE/FIPER 或 attacked+defended comparison。
+
 ### 10.3 停止规则
 
 - Phantom 已关闭 R0/R0b/R1 不再调参或换 pair；

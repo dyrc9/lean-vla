@@ -274,10 +274,13 @@ protocol 必须在 outcome 前填写 `utility_retention_min`、`phase_completion
 
 ### M5：VLA-only threat qualification
 
-**状态：SABER P0 terminal nonpass；EDPA P1 未冻结。** R7 已使用独立 fresh protocol/root 完成 unguarded
-VLA-only clean/attacked pair，但未达到 held-out gate。EDPA P1 必须先拥有独立 protocol、runner、资产 gate
-与 fresh root；不得把历史 EDPA R0 当作入口。任一 workload 达到或未达到 gate 都必须形成 terminal
-artifact，然后停止并汇报；不得转入 attack-defense main。
+**状态：SABER P0 terminal nonpass；EDPA P1a 已冻结但未评估。** R7 已使用独立 fresh protocol/root 完成
+unguarded VLA-only clean/attacked pair，但未达到 held-out gate。P1a 已拥有独立 protocol、runner 与
+content-addressed dual-camera patch asset gate；fresh2 producer completed、静态 preflight `ready: true`，但运行前
+GPU `<4096 MiB`/无 compute-process gate 未满足，故没有 result root、episode 或 victim outcome。P1a 必须保持
+`not_yet_evaluated`，不得把历史 EDPA R0 当作入口，也不得把资源等待误写为 attack pass/fail。恢复只可从冻结
+protocol 在空闲 GPU 的显式 VLA-only execute 开始；任一 workload 得到 terminal artifact 后必须停止并汇报，
+不得转入 attack-defense main。
 
 M5 成功或失败都不会自动启动实验 D2--D4。
 
