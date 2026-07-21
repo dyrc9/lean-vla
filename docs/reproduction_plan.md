@@ -1,17 +1,17 @@
 # External Reproduction Plan
 
-更新日期：2026-07-20
+更新日期：2026-07-21
 
-当前所有实验执行暂停。unguarded VLA-only 发布攻击复现仍是恢复后的第一实验目标；ProofAlign/CTDA、
-AEGIS、SAFE、FIPER 和最终 attack-defense E5 均未授权。当前本地 minimal prototype unit/Lean 工作不
-改变这一实验顺序，也不产生 reproduction evidence。
+SABER P0 已以 unguarded VLA-only victim 完成 terminal qualification，但未通过 held-out independent
+safety gate。ProofAlign/CTDA、AEGIS、SAFE、FIPER 和最终 attack-defense E5 仍未授权；当前本地 minimal
+prototype unit/Lean 工作不改变这些结论，也不产生 reproduction evidence。
 
 ## 当前状态
 
 | 线 | 状态 | 处置 |
 |---|---|---|
 | Phantom Menace | held-out signal gate failed | R1 仅 1/4 independent cost/collision transition；不调攻击、不换 pair、不运行 scoped main |
-| SABER | old R1 failed closed; fresh P0 current | 旧 ledger/root 不续接；在全新 protocol/root 修复 official producer，artifact gate 通过后直接运行 VLA-only victim |
+| SABER | P0 R7 terminal nonpass | 4 条 official record immutable；8/8 episode valid、1/4 typed transition，低于 `>=2` 且 `>=0.5` gate；停止 P0，不调攻击、不换 pair、不运行 defense |
 | SAFE | not reproduced | 335/500 partial corpus 无 terminal manifest；只保留审计 |
 | FIPER fresh1 | not reproduced | `pretzel/rnd_a` 后无 terminal manifest；partial 保留 |
 | FIPER fresh2 | stopped/not reproduced | 用户于 2026-07-17 要求停止；service inactive/dead，manifest `started`，partial 不计结果 |
@@ -45,10 +45,11 @@ AEGIS、SAFE、FIPER 和最终 attack-defense E5 均未授权。当前本地 min
 
 ## 新 P0/P1 顺序
 
-1. SABER P0：全新的 official constraint-violation producer -> immutable record validator -> VLA-only
-   clean/attack pair -> held-out independent safety gate；
-2. SABER terminal blocked/failed 后，EDPA P1：原始 patch + SafeLIBERO -> VLA-only independent safety gate；
-3. 保存每条 workload 的 terminal artifact 后停止并汇报；
+1. SABER P0：official constraint-violation producer -> immutable record validator -> VLA-only clean/attack
+   pair -> held-out independent safety gate，已完成；R7 为 `1/4 = 0.25` typed transition，未通过 gate；
+2. P0 的 R4--R7 root 和 record/pair/seed/checkpoint 均冻结，不得续接、调攻击或以 outcome 替换 pair；
+3. EDPA P1 只能在独立冻结的 protocol、fresh root 和明确授权下使用原始 patch + SafeLIBERO 运行
+   VLA-only independent safety gate；
 4. 不做 CTDA support overlap，不冻结或执行 attacked+defended matrix，等待用户重新授权。
 
 旧 SABER exact-task R1 的 producer failure 只作诊断，不禁止在新 protocol/root/unit 上修复官方 producer；
