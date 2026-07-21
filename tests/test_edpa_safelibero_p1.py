@@ -73,16 +73,17 @@ def all_records(protocol: dict, transitions: set[str]) -> list[dict]:
     return records
 
 
-def test_draft_protocol_is_asset_generation_only() -> None:
+def test_frozen_protocol_preserves_original_edpa_settings() -> None:
     protocol = assets.load_json(PROTOCOL_PATH)
     assets.validate_protocol(protocol, PROTOCOL_PATH)
+    runner.validate_protocol(protocol)
+    assert protocol["protocol_status"] == "frozen_execution_authorized"
+    assert protocol["victim_execution_authorized"] is True
     assert protocol["victim"]["max_steps_by_suite"]["safelibero_long"] == 550
     assert all(
         protocol["victim"]["max_steps_by_suite"][suite] == 300
         for suite in ("safelibero_spatial", "safelibero_object", "safelibero_goal")
     )
-    with pytest.raises(runner.ProtocolError, match="not frozen"):
-        runner.validate_protocol(protocol)
 
 
 def test_original_edpa_definition_is_rejected_when_changed() -> None:

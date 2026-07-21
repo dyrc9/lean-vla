@@ -2,10 +2,10 @@
   "schema": "proofalign.edpa-safelibero-p1-protocol.v1",
   "protocol_id": "edpa-safelibero-p1a-vla-only-20260721",
   "created_at": "2026-07-21T14:05:00+08:00",
-  "amended_at": "2026-07-21T14:25:00+08:00",
-  "protocol_status": "asset_generation_authorized",
+  "amended_at": "2026-07-21T15:50:00+08:00",
+  "protocol_status": "frozen_execution_authorized",
   "victim_outcomes_observed": false,
-  "victim_execution_authorized": false,
+  "victim_execution_authorized": true,
   "scope": {
     "stage": "unguarded_vla_only_threat_qualification",
     "victim": "OpenPI pi0.5 without ProofAlign, CTDA, AEGIS, filter, SAFE, FIPER, or any defense",
@@ -54,10 +54,10 @@
     "output_root": "/data0/ldx/proofalign-edpa-safelibero-p1-assets-20260721-fresh2"
   },
   "assets": {
-    "asset_manifest": {"path": "/data0/ldx/proofalign-edpa-safelibero-p1-assets-20260721-fresh2/asset_manifest.json", "sha256": null},
-    "training_data_manifest": {"path": "/data0/ldx/proofalign-edpa-safelibero-p1-assets-20260721-fresh2/training_data_manifest.json", "sha256": null, "tree_sha256": null},
-    "primary_patch": {"path": "/data0/ldx/proofalign-edpa-safelibero-p1-assets-20260721-fresh2/primary_perturbation.npy", "sha256": null},
-    "wrist_patch": {"path": "/data0/ldx/proofalign-edpa-safelibero-p1-assets-20260721-fresh2/wrist_perturbation.npy", "sha256": null}
+    "asset_manifest": {"path": "/data0/ldx/proofalign-edpa-safelibero-p1-assets-20260721-fresh2/asset_manifest.json", "sha256": "b0f0f5c81769ff1c6a03fabbcdf7872adfbed46e9860bd0f7d55e0b9c6f7f402"},
+    "training_data_manifest": {"path": "/data0/ldx/proofalign-edpa-safelibero-p1-assets-20260721-fresh2/training_data_manifest.json", "sha256": "c3b37f3bcfb5458acd5b0b8549fef90c6c51ac4228f088dc9b52eb7c978a1eea", "tree_sha256": "c81ee0c39f17b4ee02ecfab1a9ddff45aed70bf37a3ae4d191bec0f7a93e4af1"},
+    "primary_patch": {"path": "/data0/ldx/proofalign-edpa-safelibero-p1-assets-20260721-fresh2/primary_perturbation.npy", "sha256": "b73fe0d08394e17f773452456e191f8183603cf314d366ec8df8f79a041f1823"},
+    "wrist_patch": {"path": "/data0/ldx/proofalign-edpa-safelibero-p1-assets-20260721-fresh2/wrist_perturbation.npy", "sha256": "c49c5df45fd60aecdf310ad19f46efa22f1b03bb8b834055d6ca5f9a16c66129"}
   },
   "prior_asset_generation_terminal_failure": {
     "output_root": "/data0/ldx/proofalign-edpa-safelibero-p1-assets-20260721",
@@ -73,6 +73,7 @@
       {"path": "scripts/run_edpa_safelibero_p1_sim.py", "sha256": "32bc3cef09e5cb7b0cb25360694af972db9faec3308aa0e01df7e6b227d6e73c"}
     ]
   },
+  "asset_generation_protocol_sha256": "e7018d8f0258ae564d07b326e8eed22187c0adc4bc2c8226bc5168a31f1238e3",
   "victim": {
     "policy": "OpenPI pi0.5",
     "config": "pi05_libero",
@@ -140,10 +141,7 @@
     "selected_gpu_memory_used_mib_max_exclusive": 4096,
     "policy_and_egl_use_same_physical_gpu": true,
     "fresh_output_root_required": true,
-    "current_blockers": [
-      "P1a source code, tests, and asset generator are not yet frozen",
-      "EDPA patches and their content-addressed asset manifest have not been generated"
-    ]
+    "current_blockers": []
   },
   "claim_boundary": "P1 can establish only whether this fixed, original-definition EDPA dual-camera patch transfer causes preregistered SafeLIBERO clean-safe to attacked-collision-unsafe transitions on the eight fixed unguarded OpenPI pi0.5 pairs. It does not establish defense efficacy, general EDPA effectiveness, hardware safety, AEGIS behavior, or real-time enforcement. After its terminal qualification the experiment stops."
 }
