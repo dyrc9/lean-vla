@@ -12,6 +12,7 @@ from __future__ import annotations
 import argparse
 import asyncio
 from datetime import datetime, timezone
+import importlib
 import json
 import logging
 import os
@@ -601,6 +602,28 @@ def _jsonable(value: Any) -> Any:
     return repr(value)
 
 
+def import_official_saber_upstream(attack_gpus: str) -> Any:
+    """Import SABER helpers without retaining its victim-side GPU mask."""
+
+    original_argv = sys.argv[:]
+    sys.argv = [
+        original_argv[0],
+        "--victim",
+        "openpi_pi05",
+        "--vla_gpu",
+        attack_gpus.split(",", 1)[0],
+        "--attack_gpus",
+        attack_gpus,
+    ]
+    try:
+        return importlib.import_module("eval_attack_vla")
+    finally:
+        sys.argv = original_argv
+        # The official module narrows this to the victim GPU during import. This
+        # producer never loads a victim, so ART must inherit both attack GPUs.
+        os.environ["CUDA_VISIBLE_DEVICES"] = attack_gpus
+
+
 async def generate_records(
     protocol: dict[str, Any],
     protocol_path: Path,
@@ -615,23 +638,10 @@ async def generate_records(
     os.environ["CUDA_VISIBLE_DEVICES"] = attack_gpus
     os.environ["ROBOSUITE_LOG_PATH"] = str(output_root / "runtime" / "robosuite.log")
 
-    original_argv = sys.argv[:]
-    sys.argv = [
-        original_argv[0],
-        "--victim",
-        "openpi_pi05",
-        "--vla_gpu",
-        attack_gpus.split(",", 1)[0],
-        "--attack_gpus",
-        attack_gpus,
-    ]
     saber_text = str(SABER_ROOT)
     if saber_text not in sys.path:
         sys.path.insert(0, saber_text)
-    try:
-        import eval_attack_vla as upstream
-    finally:
-        sys.argv = original_argv
+    upstream = import_official_saber_upstream(attack_gpus)
 
     import art
     from art.langgraph import init_chat_model, wrap_rollout
@@ -657,6 +667,12 @@ async def generate_records(
     try:
         import torch
 
+        visible_devices = torch.cuda.device_count()
+        if visible_devices != 2:
+            raise ProtocolError(
+                "SABER R2 ART runtime requires two visible attack GPUs; "
+                f"torch observed {visible_devices}"
+            )
         torch.manual_seed(agent["producer_seed"])
     except ImportError:
         pass
@@ -840,7 +856,7 @@ def execute(
                 protocol, protocol_path, output_root, attack_gpus, server_port
             )
         )
-    except Exception as exc:
+    except BaseException as exc:
         manifest["status"] = "record_generation_failed"
         manifest["terminal_error"] = f"{type(exc).__name__}: {exc}"
         manifest["terminal_at"] = utc_now()

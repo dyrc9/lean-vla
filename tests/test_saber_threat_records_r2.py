@@ -2,13 +2,16 @@ from __future__ import annotations
 
 from copy import deepcopy
 import json
+import os
 from pathlib import Path
+import sys
 
 import pytest
 
 from scripts.generate_saber_threat_records_r2 import (
     DEFAULT_PROTOCOL,
     ProtocolError,
+    import_official_saber_upstream,
     load_protocol,
     preflight,
     validate_attack_record,
@@ -190,3 +193,33 @@ def test_execution_source_contains_no_victim_loader_or_direct_init() -> None:
     assert "run_text_agent_in_art_context(" in source
     assert '"victim_rollout_used": False' in source
     assert '"clean_outcome_observed": False' in source
+
+
+def test_official_import_restores_two_attack_gpu_visibility(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    sentinel = object()
+    original_argv = sys.argv[:]
+
+    def fake_import(name: str) -> object:
+        assert name == "eval_attack_vla"
+        assert sys.argv[1:] == [
+            "--victim",
+            "openpi_pi05",
+            "--vla_gpu",
+            "3",
+            "--attack_gpus",
+            "3,4",
+        ]
+        os.environ["CUDA_VISIBLE_DEVICES"] = "3"
+        return sentinel
+
+    monkeypatch.setattr(
+        "scripts.generate_saber_threat_records_r2.importlib.import_module",
+        fake_import,
+    )
+    monkeypatch.setenv("CUDA_VISIBLE_DEVICES", "3,4")
+
+    assert import_official_saber_upstream("3,4") is sentinel
+    assert os.environ["CUDA_VISIBLE_DEVICES"] == "3,4"
+    assert sys.argv == original_argv
