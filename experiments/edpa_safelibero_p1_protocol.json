@@ -84,7 +84,12 @@
     },
     "env_seed": 29,
     "policy_rng_rule": "fresh OpenPI server for every condition; the released Policy initializes its JAX key at 0",
-    "max_steps": 300,
+    "max_steps_by_suite": {
+      "safelibero_spatial": 300,
+      "safelibero_object": 300,
+      "safelibero_goal": 300,
+      "safelibero_long": 550
+    },
     "num_steps_wait": 20,
     "replan_steps": 5,
     "resize_size": 224,

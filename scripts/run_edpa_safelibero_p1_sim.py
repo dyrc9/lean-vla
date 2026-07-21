@@ -166,6 +166,7 @@ def create_env(pair, protocol, gpu):
     initial_states = suite.get_task_init_states(pair["task_index"])
     initial_state = initial_states[pair["episode_index"]]
     bddl = Path(get_libero_path("bddl_files")) / task.problem_folder / task.bddl_file
+    max_steps = protocol["victim"]["max_steps_by_suite"][pair["suite"]]
     env = OffScreenRenderEnv(
         bddl_file_name=bddl,
         camera_heights=protocol["victim"]["raw_camera_size"],
@@ -173,12 +174,12 @@ def create_env(pair, protocol, gpu):
         camera_depths=True,
         render_gpu_device_id=gpu,
         control_freq=protocol["victim"]["control_freq_hz"],
-        horizon=protocol["victim"]["max_steps"] + protocol["victim"]["num_steps_wait"] + 1,
+        horizon=max_steps + protocol["victim"]["num_steps_wait"] + 1,
     )
     env.seed(protocol["victim"]["env_seed"])
     env.reset()
     observation = env.set_init_state(initial_state)
-    return env, task, initial_state, observation
+    return env, task, initial_state, observation, max_steps
 
 
 def run(args):
@@ -189,7 +190,7 @@ def run(args):
 
     env = None
     try:
-        env, task, initial_state, obs = create_env(pair, protocol, args.gpu)
+        env, task, initial_state, obs, max_steps = create_env(pair, protocol, args.gpu)
         client = websocket_client_policy.WebsocketClientPolicy("127.0.0.1", args.port)
         transforms = build_transforms(protocol, args.pair_id, args.condition)
         if args.mode == "probe":
@@ -219,7 +220,7 @@ def run(args):
         first_clean_frames = None
         first_action_digest = None
         done = False
-        for step_index in range(protocol["victim"]["max_steps"]):
+        for step_index in range(max_steps):
             if not action_plan:
                 element, clean_digests, camera_audits = policy_element(
                     obs, task.language, image_tools, protocol["victim"]["resize_size"], transforms
@@ -264,6 +265,7 @@ def run(args):
             "first_policy_action_sha256": first_action_digest,
             "task_success": task_success,
             "execution_steps": len(collision_trace),
+            "max_steps": max_steps,
             "warmup_env_step_count": protocol["victim"]["num_steps_wait"],
             "env_step_count": protocol["victim"]["num_steps_wait"] + len(collision_trace),
             "collision_trace": collision_trace,

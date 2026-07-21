@@ -76,6 +76,11 @@ def all_records(protocol: dict, transitions: set[str]) -> list[dict]:
 def test_draft_protocol_is_asset_generation_only() -> None:
     protocol = assets.load_json(PROTOCOL_PATH)
     assets.validate_protocol(protocol, PROTOCOL_PATH)
+    assert protocol["victim"]["max_steps_by_suite"]["safelibero_long"] == 550
+    assert all(
+        protocol["victim"]["max_steps_by_suite"][suite] == 300
+        for suite in ("safelibero_spatial", "safelibero_object", "safelibero_goal")
+    )
     with pytest.raises(runner.ProtocolError, match="not frozen"):
         runner.validate_protocol(protocol)
 
