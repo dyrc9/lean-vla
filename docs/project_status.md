@@ -6,8 +6,9 @@
 
 SABER P0 R7 已 terminal 完成且不得续接。用户因 R7 只有 4 个 pair，已明确授权新的独立大样本
 SABER P0b replication；48-pair outcome-blind producer protocol、通用 runner、victim protocol freezer 和
-统计回归已经准备完成。当前 6 张 GPU 均高于冻结的 `<4096 MiB` prelaunch gate，因此尚未启动 producer，
-P0b record/victim outcome 均为 0。用户此前已授权并完成
+统计回归已经准备完成。2026-07-21 的 static preflight 已核对源码、模型和三处外部 checkout；当前唯一
+阻塞是 6 张 GPU 均高于冻结的 `<4096 MiB` prelaunch gate，因此尚未启动 producer，P0b record/victim
+outcome 均为 0。用户此前已授权并完成
 `proofalign-integrity-v1` 本地最小原型施工；它只有 in-memory no-action sink、unit tests 和 Lean build，
 不产生实验 outcome。当前唯一授权的实验 outcome 是 P0b unguarded VLA-only threat qualification。
 既有 CTDA、Ed25519、typed geometry 和 AEGIS CBF/QP 结果继续作为冻结历史保留。
@@ -140,8 +141,9 @@ simulator/GPU 或创建 outcome root。
   Wilson 95% interval；在 26 个 eligible、真实 rate 0.6 时通过概率为 0.891812；
 - producer 完成后由 `scripts/freeze_saber_large_victim_protocol.py` 从 immutable record bundle 冻结新的
   victim protocol；随后 `scripts/run_saber_threat_validation_r5.py` 执行 96 个 pair-major episode；
-- 当前 GPU 0--5 显存使用为 27--46 GiB，全部违反 `<4096 MiB` gate；未创建 P0b output root，不能写成
-  pass、fail 或 evaluated。
+- 2026-07-21 static preflight 已逐项验证 source hash、模型 SHA-256、SABER/LIBERO-Safety/OpenPI 的
+  clean pinned checkout 和 fresh absent root；结果为 `ready: false` 的唯一原因是攻击 GPU 3/4 分别已用
+  36,873/36,869 MiB（门槛 `<4096 MiB`）。因此未创建 P0b output root，不能写成 pass、fail 或 evaluated。
 
 ### EDPA + SafeLIBERO P1a 收工检查点（2026-07-21）
 

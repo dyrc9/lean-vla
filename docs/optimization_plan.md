@@ -271,7 +271,8 @@ protocol 必须在 outcome 前填写 `utility_retention_min`、`phase_completion
 **状态：SABER R7 terminal nonpass；P0b prepared/GPU-blocked；EDPA P1a frozen/unevaluated。** R7 已使用
 独立 fresh protocol/root 完成 4 pair，但未达到 held-out gate。P0b 新增独立 48-pair outcome-blind
 population、one-shot producer、至少 26 eligible/rate 0.5 gate、Wilson 95% CI 和 96-episode victim 路径；
-当前 GPU 全部违反 `<4096 MiB` gate，故 record/episode/outcome 均为 0。P1a 已拥有独立 protocol、runner 与
+P0b static preflight 已验证 source/model/checkouts；当前 GPU 全部违反 `<4096 MiB` gate，故
+record/episode/outcome 均为 0。P1a 已拥有独立 protocol、runner 与
 content-addressed dual-camera patch asset gate；fresh2 producer completed、静态 preflight `ready: true`，但运行前
 GPU `<4096 MiB`/无 compute-process gate 未满足，故没有 result root、episode 或 victim outcome。P1a 必须保持
 `not_yet_evaluated`。GPU 空闲后只从 P0b producer 开始；P0b terminal 后必须停止并汇报，不得转入 EDPA 或

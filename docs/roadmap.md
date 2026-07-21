@@ -102,8 +102,9 @@ shared-observer fix + tests
 ## 当前阶段：SABER P0b 大样本 VLA-only 攻击复现
 
 详细架构、里程碑、实验矩阵和停止条件以 [`optimization_plan.md`](optimization_plan.md) 为准。
-当前没有运行中的 ProofAlign、Phantom、SAFE、FIPER 或 defense 实验。用户已授权独立 SABER P0b，
-但 6 张 GPU 当前均违反 `<4096 MiB` prelaunch gate，因此尚无运行中的 producer/victim process。
+当前没有运行中的 ProofAlign、Phantom、SAFE、FIPER 或 defense 实验。用户已授权独立 SABER P0b；
+2026-07-21 static preflight 已验证源码、模型和三处 pinned external checkout，但 6 张 GPU 当前均违反
+`<4096 MiB` prelaunch gate，因此尚无运行中的 producer/victim process。
 
 当前唯一允许的新实验 outcome 是 P0b 的 official one-shot attack records 和随后 unguarded VLA-only
 clean/attacked pairs。minimal prototype、unit regression 与 Lean build 继续允许；P0b terminal 后必须
