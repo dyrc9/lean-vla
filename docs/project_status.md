@@ -1,10 +1,11 @@
 # Project Status
 
-更新日期：2026-07-20
+更新日期：2026-07-21
 
 ## 当前状态
 
-当前所有实验、simulator/GPU rollout 和外部 baseline execution 均暂停。用户已授权并完成
+SABER P0 R7 已 terminal 完成；当前没有运行中的实验、simulator/GPU rollout 或外部 baseline execution。
+R7 未达到 held-out independent-safety gate，已停止且不得续接。用户已授权并完成
 `proofalign-integrity-v1` 本地最小原型施工；它只有 in-memory no-action sink、unit tests 和 Lean build，
 不产生实验 outcome。VLA-only 发布攻击复现与 threat qualification 仍是恢复实验后的第一优先级。
 既有 CTDA、Ed25519、typed geometry 和 AEGIS CBF/QP 结果继续作为冻结历史保留。
@@ -22,7 +23,7 @@
 | E3 safety | scoped evidence complete | clean 12/12 preserved；post-dispatch 行为 fail closed，但正式 primary 12 unknown | 不改写旧分类；新的独立 challenge 才能增加 containment 证据 |
 | E4 robustness | complete | 35/35 frozen fault case fail closed | 只保留 scoped component claim |
 | timing | negative/deferred | Lean 0.9--1.3 s/stage，不满足实时控制 | 不优化，不恢复 real-time claim |
-| attack foundation | paused / next experiment | Phantom held-out 仅 1/4；旧 SABER exact-task R1 为 0 record/0 victim，qualified attack count 为 0 | 当前不执行；恢复后从 fresh SABER protocol/root 和 immutable producer gate 继续 |
+| attack foundation | SABER P0 terminal nonpass | Phantom held-out 1/4；SABER R7 为 8/8 valid episode、1/4 typed transition，均未达到 2/4 gate；qualified attack count 为 0 | P0 root/record/pair 冻结；EDPA + SafeLIBERO P1 需独立 protocol、runner、fresh root 与资产 gate，旧 EDPA R0 不可执行 |
 | safety foundation | frozen/deferred | R0--R3、state r1、OpenRegion、signed geometry/CBF 均通过；所有新增 gate 的 `env.step/dispatch=0` | 不继续 perception、budget、recovery 或 CTDA support 工作 |
 | external baselines | frozen/deferred | AEGIS 只有 no-action core；SAFE partial、FIPER stopped | 不运行 AEGIS/SAFE/FIPER；当前只运行 unguarded VLA-only victim |
 
@@ -157,11 +158,12 @@ summary SHA-256 分别为 `25507c261168b172888f588d3f75cd633e8faa593f0059e4f3099
 3. 早期 SABER-style 记录是 `saber_style_manual`；clean 7/12、attacked 8/12 task success，只有 1/12
    attacked unsafe，不能当作官方 SABER attack efficacy；
 4. 正式 SABER exact-task R1 在第一条 record 的 chat-model 初始化阶段失败，0 valid record、0 victim
-   rollout；
+   rollout；后续 R4--R7 已以 4 条 immutable official record 完成新 VLA-only qualification，R7 得到
+   8/8 valid episode、1/4 typed transition，低于 count 2/rate 0.5 gate；
 5. SAFE/FIPER 都是 defense baseline 而不是 attack；SAFE partial，FIPER fresh2 于
    2026-07-17 16:14:05 停止，terminal gate 未通过；
-6. 当前直接优先新的 VLA-only threat-validation；在其 terminal 结束且用户再次明确授权前，不启动或
-   继续任何 CTDA v2、AEGIS、SAFE/FIPER、clean method pilot 或 attacked+defended 工作。
+6. SABER P0 已 terminal；任何后续 EDPA P1 必须是独立 unguarded VLA-only threat protocol。不得启动或
+   继续 CTDA v2、AEGIS、SAFE/FIPER、clean method pilot 或 attacked+defended 工作。
 
 完整叙述见 [`attack_reproduction_evidence_audit.md`](attack_reproduction_evidence_audit.md)，机器记录见
 [`attack_reproduction_evidence_audit_20260717.json`](../experiments/attack_reproduction_evidence_audit_20260717.json)。

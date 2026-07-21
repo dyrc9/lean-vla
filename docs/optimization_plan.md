@@ -1,6 +1,6 @@
 # VLA-only 攻击复现优先规划
 
-更新日期：2026-07-20
+更新日期：2026-07-21
 
 ## 0. 文档地位
 
@@ -29,8 +29,8 @@ MuJoCo 或正式 rollout。
    liveness transition。
 4. human-hand/obstacle distance 在 24/24 episode 缺 typed provenance；collision/cost coverage 完整
    不能替代这两个维度。
-5. qualified attack count 为 `0`：Phantom held-out 独立 safety transition 为 `1/4`，正式 SABER
-   exact-task R1 为 `0 record / 0 victim`。
+5. qualified attack count 为 `0`：Phantom held-out independent transition 为 `1/4`；SABER P0 R7 的
+   4 个 clean-eligible pair 中有 `1/4 = 0.25` typed transition，低于冻结的 count `2`/rate `0.5` gate。
 
 ### 1.2 新顺序
 
@@ -173,14 +173,13 @@ ForesightSafety-VLA 的指标定义用于补充 protocol，但当前不依赖其
 
 ### 4.2 攻击优先级
 
-**P0：SABER constraint-violation 官方路径**
+**P0：SABER constraint-violation 官方路径（已 terminal nonpass）**
 
-- 使用官方代码、released attacker 和官方支持 victim/config；
-- 先修复 producer readiness，生成 immutable official-agent record；
-- record gate 通过后才运行 VLA-only victim；
-- primary harm 必须是 clean-safe → attacked-unsafe，来自独立 collision/force/joint-limit/action-magnitude
-  oracle；
-- 不复用旧 `saber_liberosafety_r1` record/root/unit。
+- 使用官方代码、released attacker 和官方支持 victim/config，生成并冻结 4 条 immutable official-agent
+  record；
+- R7 的 8/8 episode 有效，4 个 clean-eligible pair 中 1 个出现 robot-contact/action-magnitude typed
+  transition；该结果未达到预注册 gate，不授权 defense，也不调攻击、record、pair 或 seed；
+- 不复用旧 `saber_liberosafety_r1` record/root/unit，R4--R7 root 均不 resume。
 
 **P1：EDPA 原始 patch + SafeLIBERO**
 
@@ -273,9 +272,10 @@ protocol 必须在 outcome 前填写 `utility_retention_min`、`phase_completion
 
 ### M5：VLA-only threat qualification
 
-**状态：paused / next experiment milestone。** 当前不执行。恢复后 SABER P0、EDPA P1 各自使用独立
-fresh protocol/root，只运行 unguarded VLA-only clean/attacked pair。workload 达到或未达到 held-out
-independent-safety gate 都必须形成 terminal artifact，然后停止并汇报；不得转入 attack-defense main。
+**状态：SABER P0 terminal nonpass；EDPA P1 未冻结。** R7 已使用独立 fresh protocol/root 完成 unguarded
+VLA-only clean/attacked pair，但未达到 held-out gate。EDPA P1 必须先拥有独立 protocol、runner、资产 gate
+与 fresh root；不得把历史 EDPA R0 当作入口。任一 workload 达到或未达到 gate 都必须形成 terminal
+artifact，然后停止并汇报；不得转入 attack-defense main。
 
 M5 成功或失败都不会自动启动实验 D2--D4。
 
