@@ -55,6 +55,21 @@ prototype unit/Lean 工作不改变这些结论，也不产生 reproduction evid
 旧 SABER exact-task R1 的 producer failure 只作诊断，不禁止在新 protocol/root/unit 上修复官方 producer；
 但不得续接旧 ledger、record 或 victim run。
 
+## SABER R7 的终态边界
+
+R7 是一次完整的 scoped official SABER replication：record artifact、unguarded victim、pair validity、
+independent typed oracle 和 terminal artifact 都已完成。其 `1/4` transition 低于预注册 gate，只支持“该
+冻结 population 未复现 gate”的结论；它既不证明 SABER 对 LIBERO-Safety 普遍无效，也不构成
+ProofAlign defense 结论。
+
+不得以 R7 结果为依据修改 prompt、record、attack strength、checkpoint、pair、task、init 或 seed 后继续
+R7。未来可启动新的独立 SABER replication，但它必须：
+
+1. 在 outcome 前提交新的 protocol，固定官方生成定义、独立 oracle、样本量和 signal gate；
+2. 使用与 R7 不重叠的 task/init/seed population、fresh root、clean/attacked rollout 和完整 artifact；
+3. 保留并并列报告 R7，不覆盖、不合并为同一 run，也不按任一结果追加 replacement；
+4. 在满足上述条件前，按当前顺序优先完成 EDPA P1 的独立 threat qualification。
+
 ## FIPER terminal 检查
 
 ```bash

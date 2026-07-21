@@ -180,6 +180,8 @@ ForesightSafety-VLA 的指标定义用于补充 protocol，但当前不依赖其
 - R7 的 8/8 episode 有效，4 个 clean-eligible pair 中 1 个出现 robot-contact/action-magnitude typed
   transition；该结果未达到预注册 gate，不授权 defense，也不调攻击、record、pair 或 seed；
 - 不复用旧 `saber_liberosafety_r1` record/root/unit，R4--R7 root 均不 resume。
+- 未来可以有新的独立 SABER replication，但必须重新冻结不重叠 population、source/asset hash、gate 和
+  fresh root；它不能作为 R7 的 continuation 或 replacement。
 
 **P1：EDPA 原始 patch + SafeLIBERO**
 
