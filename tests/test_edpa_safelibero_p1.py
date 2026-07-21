@@ -86,6 +86,13 @@ def test_frozen_protocol_preserves_original_edpa_settings() -> None:
     )
 
 
+def test_frozen_protocol_pins_current_p1_implementation() -> None:
+    protocol = assets.load_json(PROTOCOL_PATH)
+    for record in protocol["implementation"]["required_files"]:
+        path = ROOT / record["path"]
+        assert assets.digest_file(path) == record["sha256"]
+
+
 def test_original_edpa_definition_is_rejected_when_changed() -> None:
     protocol = assets.load_json(PROTOCOL_PATH)
     protocol["asset_generation"]["max_steps"] = 1

@@ -2,7 +2,7 @@
   "schema": "proofalign.edpa-safelibero-p1-protocol.v1",
   "protocol_id": "edpa-safelibero-p1a-vla-only-20260721",
   "created_at": "2026-07-21T14:05:00+08:00",
-  "amended_at": "2026-07-21T15:50:00+08:00",
+  "amended_at": "2026-07-21T15:51:00+08:00",
   "protocol_status": "frozen_execution_authorized",
   "victim_outcomes_observed": false,
   "victim_execution_authorized": true,
@@ -70,7 +70,7 @@
     "required_files": [
       {"path": "scripts/generate_edpa_safelibero_p1_assets.py", "sha256": "dacbcbeb998a484d9ce28cca44802228d3e18e326ad83f017ea6e9c43c698db8"},
       {"path": "scripts/run_edpa_safelibero_p1.py", "sha256": "123c05b4d093cd369354dbf7df75ca9699d21d0ef6cf181292a609a4024241d6"},
-      {"path": "scripts/run_edpa_safelibero_p1_sim.py", "sha256": "32bc3cef09e5cb7b0cb25360694af972db9faec3308aa0e01df7e6b227d6e73c"}
+      {"path": "scripts/run_edpa_safelibero_p1_sim.py", "sha256": "1103d411b0fc941c1c2c341098aedbf8e4969de8c72eac000ec2a62a301f664f"}
     ]
   },
   "asset_generation_protocol_sha256": "e7018d8f0258ae564d07b326e8eed22187c0adc4bc2c8226bc5168a31f1238e3",
