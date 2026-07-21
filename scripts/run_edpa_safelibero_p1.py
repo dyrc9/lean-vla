@@ -94,6 +94,9 @@ def validate_protocol(protocol: dict[str, Any]) -> None:
         item = (protocol.get("assets") or {}).get(name) or {}
         if not item.get("path") or not item.get("sha256"):
             raise ProtocolError(f"P1 frozen asset is incomplete: {name}")
+    asset_protocol = protocol.get("asset_generation_protocol_sha256")
+    if not isinstance(asset_protocol, str) or len(asset_protocol) != 64:
+        raise ProtocolError("P1 lacks a frozen asset-generation protocol digest")
 
 
 def _check_digest_records(records: Iterable[dict[str, Any]]) -> tuple[dict[str, Any], list[str]]:
@@ -164,8 +167,15 @@ def _asset_report(protocol: dict[str, Any]) -> tuple[dict[str, Any], list[str]]:
             blockers.append(f"cannot load patch {name}: {exc}")
     if not isinstance(manifest_value, dict) or manifest_value.get("status") != "completed":
         blockers.append("asset manifest is not a completed terminal producer artifact")
-    elif manifest_value.get("victim_or_simulator_outcomes_observed") is not False:
-        blockers.append("asset manifest is contaminated by victim or simulator outcomes")
+    else:
+        if manifest_value.get("victim_or_simulator_outcomes_observed") is not False:
+            blockers.append("asset manifest is contaminated by victim or simulator outcomes")
+        if manifest_value.get("protocol_sha256") != protocol.get("asset_generation_protocol_sha256"):
+            blockers.append("asset manifest was not produced from the frozen asset-generation protocol")
+        generated = manifest_value.get("patches") or {}
+        for name, generated_name in (("primary_patch", "primary"), ("wrist_patch", "wrist")):
+            if (generated.get(generated_name) or {}).get("sha256") != assets[name]["sha256"]:
+                blockers.append(f"asset manifest patch provenance mismatch: {name}")
     return report, blockers
 
 
@@ -363,7 +373,9 @@ def run_sim(protocol_path: Path, pair_id: str, condition: str, port: int, gpu: i
             "PYOPENGL_PLATFORM": "egl",
             "PYTHONDONTWRITEBYTECODE": "1",
             "LIBERO_CONFIG_PATH": str(ROOT / "experiments" / "safelibero_aegis_runtime_config"),
-            "PYTHONPATH": str(ROOT),
+            "PYTHONPATH": os.pathsep.join(
+                (str(ROOT / "external" / "vlsa-aegis" / "safelibero"), str(ROOT))
+            ),
         }
     )
     result = subprocess.run(

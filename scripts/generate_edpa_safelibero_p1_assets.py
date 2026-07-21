@@ -367,10 +367,13 @@ def generate(protocol: dict[str, Any], protocol_path: Path, output_root: Path, g
             model_module.restore_params(checkpoint / "params", dtype=jnp.bfloat16)
         )
         tokenizer = tokenizer_module.PaligemmaTokenizer()
-        attacker = EDPA(cfg)
-        batches = _batches(Path(generation["training_data_root"]), generation["batch_size"])
         patches: dict[str, dict[str, Any]] = {}
         for camera, batch_key in (("primary", "image"), ("wrist", "wrist_image")):
+            # The released CLI creates one EDPA instance per invocation.  The
+            # primary and wrist assets therefore need independent EMA state and
+            # an independent deterministic traversal of the same source tree.
+            attacker = EDPA(cfg)
+            batches = _batches(Path(generation["training_data_root"]), generation["batch_size"])
             np.random.seed(int(generation["numpy_seed"]))
             patch_size = int(
                 np.sqrt(generation["image_size"] ** 2 * generation["perturbation_ratio"])
