@@ -40,10 +40,12 @@ checked completion/atomic monitor updates. `ProofAlign.IntegrityCore` formalizes
 there is not yet a machine-checked refinement from the Python fast checker to that Lean model. The only command sink
 is in-memory and has no simulator, socket, GPU, or hardware capability.
 
-All experiments are currently paused. VLA-only attack reproduction remains the first experiment when execution is
-resumed: a fresh official SABER producer/record gate precedes unguarded clean/attacked pairs, with EDPA + SafeLIBERO
-as the fallback track. No fixed-trace outcome, clean method pilot, defense baseline, or attacked+defended comparison
-is authorized.
+The user has authorized a new independent large-sample SABER replication after the four-pair R7 result. P0b freezes
+48 outcome-blind pairs (12 per safety suite), requires at least 26 clean-eligible pairs, and keeps official one-shot
+record generation separate from 96 unguarded clean/attacked victim episodes. It is not an R7 continuation or
+replacement. Execution is waiting for GPUs to satisfy the frozen `<4096 MiB` prelaunch gate; no P0b record or victim
+outcome exists yet. EDPA P1a remains frozen and unevaluated. No fixed-trace method outcome, defense baseline, or
+attacked+defended comparison is authorized.
 
 ## Start here
 
@@ -111,5 +113,6 @@ baseline preflight must report `source_ready=false` in that state; the test suit
 Do not delete or alter the binding merely to make the preflight ready.
 
 GPU/OpenPI execution requires the additional environment and isolation rules in
-[docs/remote_execution.md](docs/remote_execution.md). All experiments are currently paused; local unit tests and Lean
-builds do not authorize ProofAlign/CTDA, attack, or defense-baseline rollout.
+[docs/remote_execution.md](docs/remote_execution.md). P0b is the sole authorized GPU exception and remains gated by
+its committed protocol, clean worktree, fresh root, and `<4096 MiB` GPU checks. Local unit tests and Lean builds do
+not authorize ProofAlign/CTDA or defense-baseline rollout.

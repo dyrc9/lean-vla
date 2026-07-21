@@ -245,7 +245,7 @@ protocol。
 
 ## 11. 当前执行边界
 
-- [`roadmap.md`](roadmap.md) 中 VLA-only 攻击复现仍是下一实验优先级，但当前实验暂停；
+- [`roadmap.md`](roadmap.md) 中 P0b VLA-only 攻击复现是唯一 GPU-gated 例外；
 - 允许本地 minimal prototype、unit test 和 Lean build，不允许 simulator/GPU/action outcome；
 - 不运行或扩展 CTDA v1/v2、AEGIS、SAFE/FIPER 或其他 defense arm；
 - 不启动 fixed-trace outcome、clean pilot 或 attacked+defended matrix；

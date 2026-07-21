@@ -2,9 +2,8 @@
 
 更新日期：2026-07-20
 
-> 本文描述候选论文叙事，不代表当前已获得 defense efficacy。当前所有实验暂停；本地 minimal
-> integrity prototype 已实现，但没有 fixed-trace、clean、attack 或 defense outcome。VLA-only 发布攻击
-> 复现仍是恢复实验后的第一优先级。
+> 本文描述候选论文叙事，不代表当前已获得 defense efficacy。P0b 是唯一授权且尚未产生 outcome 的攻击
+> replication；本地 minimal integrity prototype 已实现，但没有 fixed-trace、clean 或 defense outcome。
 
 ## 一句话定位
 

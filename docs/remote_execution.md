@@ -1,13 +1,14 @@
 # Current Execution Environment
 
-更新日期：2026-07-20
+更新日期：2026-07-21
 
 本文是当前机器运行 CPU/Lean、OpenPI/LIBERO-Safety 和 GPU 实验的唯一环境入口。CLI 具体参数仍以
 代码 `--help` 为准。
 
-> **实验暂停。** 当前只允许 repo `.venv` 下的 local unit tests、静态检查和 Lean build；本文中的
-> OpenPI、MuJoCo、producer、victim、GPU、AEGIS 和任何 `--execute` 命令均不得运行，直到用户明确恢复
-> 实验。VLA-only 攻击复现仍是恢复后的第一执行线。
+> **P0b 是唯一例外。** 用户已授权 `saber_threat_replication_p0b_producer_protocol.json` 的 official
+> producer，以及其 immutable record gate 通过后新冻结的 P0b victim protocol。两阶段都必须满足 committed
+> protocol、clean worktree、fresh absent root 和各自 `<4096 MiB` GPU gate；当前 6 张 GPU 均不满足，所以
+> 不执行。其余 OpenPI、MuJoCo、AEGIS 和任何 `--execute` 命令仍暂停。
 
 ## 1. 固定路径
 

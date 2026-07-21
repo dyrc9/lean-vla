@@ -2,16 +2,16 @@
 
 更新日期：2026-07-21
 
-SABER P0 已以 unguarded VLA-only victim 完成 terminal qualification，但未通过 held-out independent
-safety gate。ProofAlign/CTDA、AEGIS、SAFE、FIPER 和最终 attack-defense E5 仍未授权；当前本地 minimal
-prototype unit/Lean 工作不改变这些结论，也不产生 reproduction evidence。
+SABER P0 R7 已完成 terminal qualification，但 4-pair sample 未通过 held-out independent safety gate。
+用户已授权新的独立 P0b 大样本 replication；它不续接或覆盖 R7。ProofAlign/CTDA、AEGIS、SAFE、FIPER
+和最终 attack-defense E5 仍未授权。
 
 ## 当前状态
 
 | 线 | 状态 | 处置 |
 |---|---|---|
 | Phantom Menace | held-out signal gate failed | R1 仅 1/4 independent cost/collision transition；不调攻击、不换 pair、不运行 scoped main |
-| SABER | P0 R7 terminal nonpass | 4 条 official record immutable；8/8 episode valid、1/4 typed transition，低于 `>=2` 且 `>=0.5` gate；停止 P0，不调攻击、不换 pair、不运行 defense |
+| SABER | R7 terminal nonpass；P0b prepared/GPU-blocked | R7 保持 1/4；P0b 预注册 48 pair、至少 26 eligible、rate gate 0.5 和 Wilson 95% CI；尚无 record/victim outcome，不运行 defense |
 | SAFE | not reproduced | 335/500 partial corpus 无 terminal manifest；只保留审计 |
 | FIPER fresh1 | not reproduced | `pretzel/rnd_a` 后无 terminal manifest；partial 保留 |
 | FIPER fresh2 | stopped/not reproduced | 用户于 2026-07-17 要求停止；service inactive/dead，manifest `started`，partial 不计结果 |
@@ -45,11 +45,10 @@ prototype unit/Lean 工作不改变这些结论，也不产生 reproduction evid
 
 ## 新 P0/P1 顺序
 
-1. SABER P0：official constraint-violation producer -> immutable record validator -> VLA-only clean/attack
-   pair -> held-out independent safety gate，已完成；R7 为 `1/4 = 0.25` typed transition，未通过 gate；
+1. SABER R7 已完成并冻结为 `1/4 = 0.25`；新的 P0b 独立执行 official producer -> 48 immutable record
+   validator -> 96 VLA-only clean/attack episode -> 至少 26 eligible 的 independent safety gate；
 2. P0 的 R4--R7 root 和 record/pair/seed/checkpoint 均冻结，不得续接、调攻击或以 outcome 替换 pair；
-3. EDPA P1 只能在独立冻结的 protocol、fresh root 和明确授权下使用原始 patch + SafeLIBERO 运行
-   VLA-only independent safety gate；
+3. P0b terminal 后必须停止汇报；不得自动转入 EDPA P1。EDPA 仍保留独立 frozen protocol 与资产；
 4. 不做 CTDA support overlap，不冻结或执行 attacked+defended matrix，等待用户重新授权。
 
 旧 SABER exact-task R1 的 producer failure 只作诊断，不禁止在新 protocol/root/unit 上修复官方 producer；
@@ -68,7 +67,7 @@ R7。未来可启动新的独立 SABER replication，但它必须：
 1. 在 outcome 前提交新的 protocol，固定官方生成定义、独立 oracle、样本量和 signal gate；
 2. 使用与 R7 不重叠的 task/init/seed population、fresh root、clean/attacked rollout 和完整 artifact；
 3. 保留并并列报告 R7，不覆盖、不合并为同一 run，也不按任一结果追加 replacement；
-4. 在满足上述条件前，按当前顺序优先完成 EDPA P1 的独立 threat qualification。
+4. 当前已按上述条件冻结 P0b；它必须在 fresh producer/victim root 完成，且与 R7 并列报告。
 
 ## FIPER terminal 检查
 

@@ -240,7 +240,7 @@ runtime”。当前逐 request 编译的 v1 Lean evaluator约 0.65--1.95 秒 p99
 
 ## 8. 后续评估的最小证据
 
-当前所有实验暂停，不执行本节。恢复实验时，首先比较：
+除已冻结的 P0b unguarded VLA-only threat qualification 外，其余实验暂停，不执行本节。后续方法实验恢复时，首先比较：
 
 | arm | Intent–Plan | Plan–Execution | 目的 |
 |---|---:|---:|---|

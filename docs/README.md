@@ -1,15 +1,15 @@
 # ProofAlign 文档入口
 
-更新日期：2026-07-20
+更新日期：2026-07-21
 
 ## 当前事实来源
 
 建议按顺序阅读：
 
-1. [`project_status.md`](project_status.md)：实验暂停状态、minimal prototype 和下一实验优先级。
+1. [`project_status.md`](project_status.md)：P0b GPU-gated 状态、minimal prototype 和当前实验优先级。
 2. [`evaluation_results.md`](evaluation_results.md)：E0--E4 统一结果与机器 artifact 入口。
-3. [`optimization_plan.md`](optimization_plan.md)：本地 no-action prototype 状态、实验暂停边界，以及
-   恢复后的 VLA-only 攻击复现顺序。
+3. [`optimization_plan.md`](optimization_plan.md)：本地 no-action prototype、P0b 例外授权边界与 VLA-only
+   攻击复现顺序。
 4. [`roadmap.md`](roadmap.md)：minimal prototype checkpoint、下一实验优先级与永久边界。
 5. [`method.md`](method.md)：两关系、两不变量、三 transaction 的 normative 方法与 claim boundary。
 6. [`system_architecture.md`](system_architecture.md)：当前实现、五组件目标架构、plumbing/intervention

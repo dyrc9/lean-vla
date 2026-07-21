@@ -182,6 +182,10 @@ v2 正式结果：
   transition；其余 3 个 pair 无 typed transition。task failure 不单独计入信号，因此结果为 `1/4 = 0.25`，
   低于预注册的 count `>=2` 和 rate `>=0.5`。该结果不支持 SABER 在该 population 无效的泛化结论，也不授权
   ProofAlign defense experiment；
+- 用户随后授权了独立 P0b 大样本 replication；它在任何新 outcome 前冻结 48 pair（4 suite 各 12，
+  L0/L1/L2 各 4 task）、init 10--49、env/policy seed 31/5、至少 26 clean-eligible pair、13 transition、
+  rate 0.5 和 Wilson 95% CI。当前 GPU gate 未满足，record/episode/outcome 均为 0，因此本节没有新增
+  efficacy 数字，R7 仍单独保留；
 - SAFE partial run 无 terminal manifest，未复现，也未训练 detector；
 - FIPER fresh1 无 terminal manifest；fresh2 于 2026-07-17 按用户要求停止。service 为
   `inactive/dead`，run manifest 仍为 `started`，最后观察到 seed 42 `push_chair/rnd_oe` training；30 个

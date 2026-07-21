@@ -1,22 +1,21 @@
 # 工作机交接 Prompt：仅 VLA-only 攻击复现
 
-更新日期：2026-07-20
+更新日期：2026-07-21
 
-> **PAUSED：当前不要执行本 prompt。** 它只保存恢复实验后的第一条工作线；恢复仍需用户新的明确
-> 授权。当前仅允许本地 `proofalign-integrity-v1` unit tests、代码审计和 Lean build，不允许 official
-> attack producer、VLA-only rollout、ProofAlign/CTDA outcome、defense baseline 或 attacked+defended
-> comparison。
+> **ACTIVE BUT GPU-GATED：** 用户已明确授权新的独立 SABER P0b 大样本 replication。当前先完成并冻结
+> 48-pair producer protocol/runner/tests；只有当两张物理 GPU 同时满足 `<4096 MiB` prelaunch gate 时才执行
+> official producer。P0b 以外的 ProofAlign/CTDA outcome、defense baseline、EDPA rollout 和
+> attacked+defended comparison 均未授权。
 
 ---
 
-以下内容只在用户明确恢复实验后生效。届时目标是先在 unguarded VLA-only victim 上
-得到可审计的攻击复现终态。不要运行或继续开发 ProofAlign/CTDA、AEGIS、SAFE、FIPER 或任何 defense
+当前目标是在 unguarded VLA-only victim 上得到可审计的大样本攻击复现终态。不要运行或继续开发
+ProofAlign/CTDA、AEGIS、SAFE、FIPER 或任何 defense
 arm；不要运行 CTDA unit/fixed-trace/no-dispatch/clean pilot；不要进入 attacked+defended comparison。
 
-不要只写计划。优先修复全新 official SABER constraint-violation producer，生成并验证 immutable attack
-record，然后直接运行 VLA-only clean/attacked pair。若 SABER 按冻结规则 terminal blocked/failed，再用
-独立 fresh protocol 执行 EDPA + SafeLIBERO。每条 workload 得到 terminal 结果后停止并汇报，等待用户
-重新授权；不得自动恢复自研 method。
+先运行 `saber_threat_replication_p0b_producer_protocol.json` 的 48 个 one-shot official SABER record，
+验证 immutable bundle 后用 freezer 生成并提交 victim protocol，再执行 96 个 VLA-only clean/attacked
+episode。P0b terminal 后停止并汇报，等待用户重新授权；不得自动转 EDPA 或恢复自研 method。
 
 ## 1. 首先确认同步状态
 
