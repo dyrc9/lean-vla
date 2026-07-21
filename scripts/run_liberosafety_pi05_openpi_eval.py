@@ -222,6 +222,7 @@ def run_episode(
     output_dir: Path,
     observation_transform: Callable[[np.ndarray], tuple[np.ndarray, dict[str, Any]]] | None = None,
     wrist_observation_transform: Callable[[np.ndarray], tuple[np.ndarray, dict[str, Any]]] | None = None,
+    constraint_signal_extractor: Callable[[Any, np.ndarray, np.ndarray], dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     set_policy_seed(policy, jax, policy_seed)
     runtime = load_libero_task_runtime(
@@ -283,22 +284,32 @@ def run_episode(
                 frame_audit = {**frame_audit, "policy_call_index": len(frame_audits)}
                 frame_audits.append(frame_audit)
                 policy_start = perf_counter()
-                action_chunk = policy.infer(element)["actions"]
+                action_chunk = np.asarray(policy.infer(element)["actions"])
                 policy_time = perf_counter() - policy_start
                 if len(action_chunk) < args.replan_steps:
                     raise RuntimeError(
                         f"Policy returned {len(action_chunk)} actions, fewer than replan_steps={args.replan_steps}."
                     )
+                frame_audits[-1] = {
+                    **frame_audits[-1],
+                    "policy_action_chunk_sha256": array_digest(action_chunk),
+                    "policy_action_chunk_shape": list(action_chunk.shape),
+                    "policy_action_chunk_dtype": str(action_chunk.dtype),
+                }
                 action_plan.extend(action_chunk[: args.replan_steps])
             else:
                 policy_time = 0.0
 
-            action = np.clip(
-                np.asarray(action_plan.popleft(), dtype=np.float32), -1.0, 1.0
-            )
+            raw_action = np.asarray(action_plan.popleft(), dtype=np.float32)
+            action = np.clip(raw_action, -1.0, 1.0)
             env_start = perf_counter()
             obs, reward, done, info = normalize_env_step(env.step(action.tolist()))
             env_time = perf_counter() - env_start
+            constraint_signals = (
+                constraint_signal_extractor(env, raw_action, action)
+                if constraint_signal_extractor is not None
+                else None
+            )
             trace.append(
                 make_trace_record(
                     step_id,
@@ -310,6 +321,8 @@ def run_episode(
                     policy_time,
                     env_time,
                     policy_call=(frame_audits[-1] if started_policy_call else None),
+                    raw_action=raw_action,
+                    constraint_signals=constraint_signals,
                 )
             )
             if done:
@@ -567,6 +580,8 @@ def make_trace_record(
     policy_time: float,
     env_time: float,
     policy_call: dict[str, Any] | None = None,
+    raw_action: Any | None = None,
+    constraint_signals: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     record = {
         "step_id": step_id,
@@ -579,6 +594,10 @@ def make_trace_record(
     }
     if policy_call is not None:
         record["policy_call"] = policy_call
+    if raw_action is not None:
+        record["raw_action"] = np.asarray(raw_action).tolist()
+    if constraint_signals is not None:
+        record["saber_constraint_signals"] = constraint_signals
     return record
 
 

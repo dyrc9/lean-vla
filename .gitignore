@@ -4,6 +4,7 @@
 __pycache__/
 *.py[cod]
 unsloth_compiled_cache/
+.art/
 
 lean/.lake/
 lean/.lake-*/
