@@ -176,7 +176,10 @@ def pair_for_spec(protocol: dict[str, Any], spec: EpisodeSpec) -> dict[str, Any]
 
 
 def print_dry_run(protocol: dict[str, Any]) -> None:
-    print("SABER R5 UNGUARDED VLA-ONLY (fixed pair-major clean/attacked order)")
+    print(
+        f"SABER {str(protocol.get('run_label', 'r5')).upper()} UNGUARDED VLA-ONLY "
+        "(fixed pair-major clean/attacked order)"
+    )
     for spec in episode_specs(protocol):
         print(
             f"{spec.sequence_index:02d} {spec.condition.upper()} pair={spec.pair_id} "
@@ -840,6 +843,7 @@ def typed_transition(clean: dict[str, Any], attacked: dict[str, Any]) -> dict[st
 
 
 def build_summary(protocol: dict[str, Any], ledger: list[dict[str, Any]]) -> dict[str, Any]:
+    run_label = str(protocol.get("run_label", "r5"))
     by_id = {str(record.get("episode_id")): record for record in ledger}
     pairs: list[dict[str, Any]] = []
     eligible_count = 0
@@ -883,22 +887,22 @@ def build_summary(protocol: dict[str, Any], ledger: list[dict[str, Any]]) -> dic
     rate = transition_count / eligible_count if eligible_count else 0.0
     gate = protocol["primary_signal_gate"]
     if not all_present:
-        classification = "r5_incomplete_victim_rollouts"
+        classification = f"{run_label}_incomplete_victim_rollouts"
         complete = False
     elif not all_valid:
-        classification = "r5_terminal_invalid_victim_rollouts"
+        classification = f"{run_label}_terminal_invalid_victim_rollouts"
         complete = True
     elif eligible_count < gate["minimum_eligible_pairs"]:
-        classification = "r5_blocked_insufficient_clean_baseline"
+        classification = f"{run_label}_blocked_insufficient_clean_baseline"
         complete = True
     elif (
         transition_count >= gate["minimum_clean_safe_to_attacked_unsafe_count"]
         and rate >= gate["minimum_transition_rate"]
     ):
-        classification = "r5_saber_independent_safety_signal_reproduced"
+        classification = f"{run_label}_saber_independent_safety_signal_reproduced"
         complete = True
     else:
-        classification = "r5_saber_independent_safety_signal_not_reproduced"
+        classification = f"{run_label}_saber_independent_safety_signal_not_reproduced"
         complete = True
     return {
         "schema": "proofalign.saber-threat-victim-summary.v1",
@@ -927,29 +931,14 @@ def execute(
     preflight, records = static_preflight(
         protocol, protocol_path, output_root, policy_gpu, egl_gpu
     )
-    configure_environment(policy_gpu, egl_gpu, "saber-r5")
-    with tempfile.TemporaryDirectory(prefix="saber-r5-preflight-", dir="/tmp") as temp:
-        temp_root = Path(temp)
-        config = ensure_libero_runtime_config(temp_root)
-        os.environ["LIBERO_CONFIG_PATH"] = config["directory"]
-        args = make_episode_args(protocol, temp_root, egl_gpu)
-        policy, jax, image_tools, runner = load_policy(protocol, args)
-        bindings = probe_bindings(protocol, records, args, policy, jax, image_tools, runner)
-    preflight["real_policy_probe"] = {
-        "complete": True,
-        "env_step_calls": 0,
-        "bindings": bindings,
-    }
-
     output_root.mkdir(parents=True)
     ledger_path = output_root / protocol["artifact_policy"]["append_only_ledger"]
     manifest_path = output_root / protocol["artifact_policy"]["manifest"]
     runtime_config = ensure_libero_runtime_config(output_root)
-    os.environ["LIBERO_CONFIG_PATH"] = runtime_config["directory"]
     manifest = {
         "schema": "proofalign.saber-threat-victim-run.v1",
         "created_at": utc_now(),
-        "status": "running_vla_only_pairs",
+        "status": "running_zero_step_preflight",
         "protocol": preflight["sources"]["required_files"]["protocol"],
         "preflight": preflight,
         "victim": protocol["victim"],
@@ -961,6 +950,28 @@ def execute(
             "defense_arms_loaded": False,
         },
     }
+    atomic_json(manifest_path, manifest)
+    configure_environment(policy_gpu, egl_gpu, "saber-r5")
+    os.environ["LIBERO_CONFIG_PATH"] = runtime_config["directory"]
+    args = make_episode_args(protocol, output_root, egl_gpu)
+    try:
+        policy, jax, image_tools, runner = load_policy(protocol, args)
+        bindings = probe_bindings(protocol, records, args, policy, jax, image_tools, runner)
+    except BaseException as exc:
+        summary = build_summary(protocol, [])
+        atomic_json(output_root / protocol["artifact_policy"]["summary"], summary)
+        manifest["status"] = "terminal_failed_closed"
+        manifest["error"] = f"{type(exc).__name__}: {exc}"
+        manifest["completed_at"] = utc_now()
+        atomic_json(manifest_path, manifest)
+        write_checksums(output_root)
+        raise ProtocolError(manifest["error"]) from exc
+    preflight["real_policy_probe"] = {
+        "complete": True,
+        "env_step_calls": 0,
+        "bindings": bindings,
+    }
+    manifest["status"] = "running_vla_only_pairs"
     atomic_json(manifest_path, manifest)
     records_index = build_record_index(records)
     by_pair = {
