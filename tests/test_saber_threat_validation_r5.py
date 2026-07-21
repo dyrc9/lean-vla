@@ -15,6 +15,7 @@ from scripts.run_saber_threat_validation_r5 import (
     load_protocol,
     typed_transition,
     validate_episode_payload,
+    validate_paired_episode_payloads,
     validate_protocol,
 )
 
@@ -183,6 +184,19 @@ def test_payload_fails_without_cost_raw_action_or_chunk_binding() -> None:
     assert any("cost is absent" in issue for issue in issues)
     assert any("raw policy action" in issue for issue in issues)
     assert any("action-chunk" in issue for issue in issues)
+
+
+def test_actual_pair_binds_first_policy_frame_without_using_zero_step_frame() -> None:
+    protocol = load_protocol()
+    clean, attacked = episode_specs(protocol)[:2]
+    record = make_record(protocol["frozen_pairs"][0])
+    clean_payload = make_payload(protocol, clean, record)
+    attacked_payload = make_payload(protocol, attacked, record, unsafe=True)
+    assert validate_paired_episode_payloads(clean_payload, attacked_payload) == []
+
+    attacked_payload["observation_frame_audits"][0]["clean_frame_sha256"] = "b" * 64
+    issues = validate_paired_episode_payloads(clean_payload, attacked_payload)
+    assert "paired first policy frame differs" in issues
 
 
 def test_summary_uses_only_eligible_clean_pairs_and_positive_deltas() -> None:

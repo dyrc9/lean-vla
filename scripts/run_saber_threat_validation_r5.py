@@ -694,10 +694,6 @@ def validate_episode_payload(
             issues.append(f"frame audit {index} lacks action-chunk binding")
     first_frame = audits[0].get("clean_frame_sha256") if audits else None
     first_chunk = audits[0].get("policy_action_chunk_sha256") if audits else None
-    if first_frame != binding["first_clean_frame_sha256"]:
-        issues.append("first clean frame differs from preflight binding")
-    if first_chunk != binding["first_policy_action_chunk_sha256"]:
-        issues.append("first policy action chunk differs from preflight binding")
 
     details = {
         "task_success": bool(payload.get("task_success")),
@@ -709,11 +705,39 @@ def validate_episode_payload(
         "initial_state_sha256": metadata.get("initial_state_sha256"),
         "first_clean_frame_sha256": first_frame,
         "first_policy_action_chunk_sha256": first_chunk,
+        "zero_step_initial_state_sha256": binding["initial_state_sha256"],
         "frame_audit_manifest_sha256": canonical_digest(audits),
         "attack_record_digest": canonical_digest(record) if spec.condition == "attacked" else None,
         "constraint_metrics": metrics,
     }
     return issues, details
+
+
+def validate_paired_episode_payloads(
+    clean_payload: dict[str, Any], attacked_payload: dict[str, Any]
+) -> list[str]:
+    issues: list[str] = []
+    clean_metadata = clean_payload.get("metadata")
+    attacked_metadata = attacked_payload.get("metadata")
+    if not isinstance(clean_metadata, dict) or not isinstance(attacked_metadata, dict):
+        return ["paired episode metadata is missing"]
+    if clean_metadata.get("initial_state_sha256") != attacked_metadata.get("initial_state_sha256"):
+        issues.append("paired initial-state digest differs")
+    clean_audits = clean_payload.get("observation_frame_audits")
+    attacked_audits = attacked_payload.get("observation_frame_audits")
+    if not isinstance(clean_audits, list) or not clean_audits:
+        issues.append("paired clean frame audit is missing")
+        return issues
+    if not isinstance(attacked_audits, list) or not attacked_audits:
+        issues.append("paired attacked frame audit is missing")
+        return issues
+    if clean_audits[0].get("clean_frame_sha256") != attacked_audits[0].get("clean_frame_sha256"):
+        issues.append("paired first policy frame differs")
+    if not clean_audits[0].get("policy_action_chunk_sha256"):
+        issues.append("paired clean first action-chunk binding is missing")
+    if not attacked_audits[0].get("policy_action_chunk_sha256"):
+        issues.append("paired attacked first action-chunk binding is missing")
+    return issues
 
 
 def episode_json_path(output_root: Path, spec: EpisodeSpec) -> Path:
@@ -790,6 +814,25 @@ def execute_episode(
         details: dict[str, Any] = {}
     else:
         issues, details = validate_episode_payload(protocol, spec, payload, record, binding)
+        if spec.condition == "attacked":
+            clean_spec = EpisodeSpec(
+                pair_id=spec.pair_id,
+                suite=spec.suite,
+                task_id=spec.task_id,
+                init_state_id=spec.init_state_id,
+                condition="clean",
+                sequence_index=spec.sequence_index - 1,
+            )
+            clean_artifact = episode_json_path(output_root, clean_spec)
+            try:
+                clean_payload = load_json(clean_artifact)
+            except ProtocolError as exc:
+                issues.append(f"paired clean artifact is unavailable: {exc}")
+            else:
+                if not isinstance(clean_payload, dict):
+                    issues.append("paired clean artifact is not an object")
+                else:
+                    issues.extend(validate_paired_episode_payloads(clean_payload, payload))
         if error:
             issues.insert(0, error)
         if not artifact.is_file():
@@ -1046,6 +1089,20 @@ def validate_existing(
         issues, details = validate_episode_payload(
             protocol, spec, payload, by_pair[spec.pair_id], bindings[spec.episode_id]
         )
+        if spec.condition == "attacked":
+            clean_spec = EpisodeSpec(
+                pair_id=spec.pair_id,
+                suite=spec.suite,
+                task_id=spec.task_id,
+                init_state_id=spec.init_state_id,
+                condition="clean",
+                sequence_index=spec.sequence_index - 1,
+            )
+            clean_payload = load_json(episode_json_path(output_root, clean_spec))
+            if not isinstance(clean_payload, dict):
+                issues.append("paired clean artifact is not an object")
+            else:
+                issues.extend(validate_paired_episode_payloads(clean_payload, payload))
         if ledger_record.get("episode_json_sha256") != file_digest(artifact):
             issues.append("episode JSON digest differs from ledger")
         for key, value in details.items():
