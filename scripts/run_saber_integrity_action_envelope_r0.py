@@ -15,6 +15,7 @@ import json
 import os
 from pathlib import Path
 import sys
+import tempfile
 from time import perf_counter
 from types import SimpleNamespace
 from typing import Any
@@ -468,6 +469,7 @@ def _execute(protocol: dict[str, Any], protocol_path: Path, output_root: Path, p
     preflight = static_preflight(protocol, protocol_path, output_root, policy_gpu, egl_gpu)
     baseline, baseline_summary, _baseline_ledger = _validate_baseline(protocol)
     output_root.mkdir(parents=True)
+    runtime_config = p0b.ensure_libero_runtime_config(output_root)
     manifest_path = output_root / str(protocol["artifact_policy"]["manifest"])
     ledger_path = _ledger_path(protocol, output_root)
     manifest = {
@@ -476,9 +478,11 @@ def _execute(protocol: dict[str, Any], protocol_path: Path, output_root: Path, p
         "protocol_sha256": p0b.file_digest(protocol_path),
         "started_at": p0b.utc_now(),
         "preflight": preflight,
+        "libero_runtime_config": runtime_config,
     }
     p0b.atomic_json(manifest_path, manifest)
     p0b.configure_environment(policy_gpu, egl_gpu, "saber-integrity-envelope-r0")
+    os.environ["LIBERO_CONFIG_PATH"] = runtime_config["directory"]
     args = _episode_args(baseline, output_root, egl_gpu)
     policy, jax, image_tools, runner = p0b.load_policy(baseline, args)
     records = _validated_attack_records(protocol, baseline)
@@ -536,13 +540,17 @@ def _run_preflight(protocol: dict[str, Any], protocol_path: Path, output_root: P
     report = static_preflight(protocol, protocol_path, output_root, policy_gpu, egl_gpu)
     baseline, _summary_value, _ledger = _validate_baseline(protocol)
     p0b.configure_environment(policy_gpu, egl_gpu, "saber-integrity-envelope-r0-preflight")
-    args = _episode_args(baseline, output_root, egl_gpu)
-    policy, jax, image_tools, runner = p0b.load_policy(baseline, args)
-    records = _validated_attack_records(protocol, baseline)
-    report["real_policy_probe"] = {
-        "bindings": p0b.probe_bindings(baseline, records, args, policy, jax, image_tools, runner),
-        "env_step_calls": 0,
-    }
+    with tempfile.TemporaryDirectory(prefix="proofalign-integrity-envelope-preflight-") as temp_root:
+        runtime_config = p0b.ensure_libero_runtime_config(Path(temp_root))
+        os.environ["LIBERO_CONFIG_PATH"] = runtime_config["directory"]
+        args = _episode_args(baseline, output_root, egl_gpu)
+        policy, jax, image_tools, runner = p0b.load_policy(baseline, args)
+        records = _validated_attack_records(protocol, baseline)
+        report["real_policy_probe"] = {
+            "bindings": p0b.probe_bindings(baseline, records, args, policy, jax, image_tools, runner),
+            "env_step_calls": 0,
+            "libero_runtime_config": runtime_config,
+        }
     return report
 
 
