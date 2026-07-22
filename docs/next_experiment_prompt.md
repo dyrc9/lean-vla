@@ -1,21 +1,24 @@
-# 工作机交接 Prompt：仅 VLA-only 攻击复现
+# 工作机交接 Prompt：P0b terminal，停止所有实验 outcome
 
-更新日期：2026-07-21
+更新日期：2026-07-22
 
-> **ACTIVE BUT GPU-GATED：** 用户已明确授权新的独立 SABER P0b 大样本 replication。当前先完成并冻结
-> 48-pair producer protocol/runner/tests；只有当两张物理 GPU 同时满足 `<4096 MiB` prelaunch gate 时才执行
-> official producer。P0b 以外的 ProofAlign/CTDA outcome、defense baseline、EDPA rollout 和
-> attacked+defended comparison 均未授权。
+> **TERMINAL STOP：** P0b 于 2026-07-22 通过 GPU 2/3 与全部静态预检后启动，但在攻击代理初始化前因
+> 错误使用仓库根 `.venv`，而非包含 `art`/`vllm` 的 `external/SABER/.venv`，故以
+> `ModuleNotFoundError: No module named 'art'` 和 `record_generation_failed` 结束。manifest 记录 0 attack
+> record、0 victim episode、0 safety outcome，且 victim 从未加载。该 frozen protocol/root 不得重试、修补或
+> 覆盖；P0b 以外的 ProofAlign/CTDA outcome、defense baseline、EDPA rollout 和 attacked+defended comparison
+> 同样未授权。
 
 ---
 
-当前目标是在 unguarded VLA-only victim 上得到可审计的大样本攻击复现终态。不要运行或继续开发
-ProofAlign/CTDA、AEGIS、SAFE、FIPER 或任何 defense
-arm；不要运行 CTDA unit/fixed-trace/no-dispatch/clean pilot；不要进入 attacked+defended comparison。
+当前没有授权实验 outcome。不要运行或继续开发 ProofAlign/CTDA、AEGIS、SAFE、FIPER、EDPA 或任何 defense
+arm；不要运行 CTDA unit/fixed-trace/no-dispatch/clean pilot；不要进入 attacked+defended comparison。仅可进行
+本地 unit regression、Lean build 和代码审计，且不得连接 simulator/GPU 或创建 outcome root。
 
-先运行 `saber_threat_replication_p0b_producer_protocol.json` 的 48 个 one-shot official SABER record，
-验证 immutable bundle 后用 freezer 生成并提交 victim protocol，再执行 96 个 VLA-only clean/attacked
-episode。P0b terminal 后停止并汇报，等待用户重新授权；不得自动转 EDPA 或恢复自研 method。
+P0b 的终态机器记录为
+[`saber_threat_replication_p0b_status.json`](../experiments/saber_threat_replication_p0b_status.json)。本文后续
+保留的原执行命令仅作审计快照，**不得执行**；任何新的 producer 尝试都需要用户重新授权、独立冻结协议和
+fresh absent root。
 
 ## 1. 首先确认同步状态
 

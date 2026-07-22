@@ -1,11 +1,13 @@
 # VLA-only 攻击复现优先规划
 
-更新日期：2026-07-21
+更新日期：2026-07-22
 
 ## 0. 文档地位
 
-用户已授权新的独立 SABER P0b 大样本 replication。当前只有该 unguarded VLA-only producer/victim 线
-可以产生新 outcome；它因 GPU `<4096 MiB` gate 未满足而尚未启动。`proofalign-integrity-v1` 本地原型、
+独立 SABER P0b 大样本 replication 已在通过 GPU 2/3、source、model、checkpoint 与 clean-worktree 预检后
+于 2026-07-22 启动；本次错误使用根 `.venv`，未使用含 `art`/`vllm` 的 SABER `.venv`，producer 在攻击代理
+初始化前 terminal，0 record/0 victim/0 outcome。
+该 frozen protocol/root 不得重试，当前没有可产生新 outcome 的授权实验线。`proofalign-integrity-v1` 本地原型、
 unit tests 和 Lean build 继续允许；fixed-trace method outcome、AEGIS/SAFE/FIPER 和 attacked+defended
 comparison 仍未授权。
 当前方法语义仍以 [`method.md`](method.md) 为准，历史结果仍以
@@ -68,8 +70,8 @@ P0b producer/victim 是唯一允许创建实验 output 的路径。只有阻断 
 
 ## 2. 阶段目标与非目标
 
-当前代码目标包括审计第 3 节的 no-action minimal prototype 和执行已冻结的 P0b。第 4 节的 P0b producer/
-victim 是唯一实验线；第 5 节实验矩阵和 D2--D4 继续 deferred；新原型不继承现有 CTDA v2 六阶段架构。
+当前代码目标仅包括审计第 3 节的 no-action minimal prototype。第 4 节的 P0b 已 terminal，不能再执行；
+第 5 节实验矩阵和 D2--D4 继续 deferred；新原型不继承现有 CTDA v2 六阶段架构。
 
 ### 2.1 架构目标与状态
 
@@ -268,15 +270,15 @@ protocol 必须在 outcome 前填写 `utility_retention_min`、`phase_completion
 
 ### M5：VLA-only threat qualification
 
-**状态：SABER R7 terminal nonpass；P0b prepared/GPU-blocked；EDPA P1a frozen/unevaluated。** R7 已使用
-独立 fresh protocol/root 完成 4 pair，但未达到 held-out gate。P0b 新增独立 48-pair outcome-blind
-population、one-shot producer、至少 26 eligible/rate 0.5 gate、Wilson 95% CI 和 96-episode victim 路径；
-P0b static preflight 已验证 source/model/checkouts；当前 GPU 全部违反 `<4096 MiB` gate，故
-record/episode/outcome 均为 0。P1a 已拥有独立 protocol、runner 与
+**状态：SABER R7 terminal nonpass；P0b producer terminal failure；EDPA P1a frozen/unevaluated。** R7 已使用
+独立 fresh protocol/root 完成 4 pair，但未达到 held-out gate。P0b 的 48-pair outcome-blind population、
+one-shot producer、至少 26 eligible/rate 0.5 gate、Wilson 95% CI 和 96-episode victim 路径均已冻结；
+2026-07-22 formal preflight 通过 source/model/checkouts/GPU 2/3，但 producer 在 attack-agent initialization
+前错误使用根 `.venv`（正确 SABER `.venv` 包含 `art`/`vllm`）而终止，故 record/episode/outcome 均为 0，且 root
+不得重试。P1a 已拥有独立 protocol、runner 与
 content-addressed dual-camera patch asset gate；fresh2 producer completed、静态 preflight `ready: true`，但运行前
 GPU `<4096 MiB`/无 compute-process gate 未满足，故没有 result root、episode 或 victim outcome。P1a 必须保持
-`not_yet_evaluated`。GPU 空闲后只从 P0b producer 开始；P0b terminal 后必须停止并汇报，不得转入 EDPA 或
-attack-defense main。
+`not_yet_evaluated`。P0b terminal 后必须停止并汇报，不得转入 EDPA 或 attack-defense main。
 
 M5 成功或失败都不会自动启动实验 D2--D4。
 

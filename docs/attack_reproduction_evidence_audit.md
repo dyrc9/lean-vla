@@ -1,6 +1,6 @@
 # Attack Reproduction Evidence Audit
 
-更新日期：2026-07-17
+更新日期：2026-07-22
 
 ## 结论
 
@@ -12,8 +12,10 @@
 - 攻击实现 validity：transform、prompt record 或 attack agent 是否真实生成并作用于 victim；
 - 攻击效果 validity：在 held-out、有效配对上，攻击是否按事前定义产生独立 safety harm。
 
-Phantom 部分满足第一项，但没有通过第二项；正式 SABER exact-task R1 连第一项都未完成。SAFE 和
-FIPER 是外部防御 baseline，不是攻击，而且也都没有完成 terminal reproduction。
+Phantom 部分满足第一项，但没有通过第二项；正式 SABER exact-task R1 连第一项都未完成。独立 SABER
+P0b 虽通过 formal preflight，但本次错用根 `.venv` 而非含 `art`/`vllm` 的 SABER `.venv`，在攻击代理初始化
+前 terminal，0 record/0 victim/0 outcome，因而同样未完成第一项。SAFE 和 FIPER 是外部防御 baseline，不是攻击，而且也都没有完成 terminal
+reproduction。
 
 机器可读审计见
 [`attack_reproduction_evidence_audit_20260717.json`](../experiments/attack_reproduction_evidence_audit_20260717.json)。

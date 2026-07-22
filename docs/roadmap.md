@@ -99,18 +99,16 @@ shared-observer fix + tests
    safety dimensions；
 5. closed-loop block 继续只标 intervention；没有独立 action counterfactual 时不计算 false positive。
 
-## 当前阶段：SABER P0b 大样本 VLA-only 攻击复现
+## 当前阶段：SABER P0b producer 已 terminal，实验线停止
 
 详细架构、里程碑、实验矩阵和停止条件以 [`optimization_plan.md`](optimization_plan.md) 为准。
-当前没有运行中的 ProofAlign、Phantom、SAFE、FIPER 或 defense 实验。用户已授权独立 SABER P0b；
-2026-07-21 static preflight 已验证源码、模型和三处 pinned external checkout，但 6 张 GPU 当前均违反
-`<4096 MiB` prelaunch gate，因此尚无运行中的 producer/victim process。
+当前没有运行中的 ProofAlign、Phantom、SAFE、FIPER 或 defense 实验。P0b 于 2026-07-22 在 GPU 2/3
+通过正式 preflight 后启动，但本次错误使用根 `.venv`，而非包含 `art`/`vllm` 的 SABER `.venv`，因而在攻击
+代理初始化前以 `record_generation_failed` terminal。没有 record、victim process、episode 或 safety outcome；最小 prototype、
+unit regression 与 Lean build 继续允许。P0b terminal 后必须停下并汇报，不能自动进入 EDPA 或 defense
+comparison。
 
-当前唯一允许的新实验 outcome 是 P0b 的 official one-shot attack records 和随后 unguarded VLA-only
-clean/attacked pairs。minimal prototype、unit regression 与 Lean build 继续允许；P0b terminal 后必须
-停下并汇报，不能自动进入 EDPA 或 defense comparison。
-
-### 当前实验线：SABER P0b threat qualification（GPU-gated）
+### 已停止实验线：SABER P0b threat qualification
 
 1. SafeLIBERO/AEGIS source/data foundation 已完成：官方 commit `57b1aef...`、32 scenario、1600 init、
    official collision label 和 typed metrics 已固定；
@@ -125,7 +123,8 @@ clean/attacked pairs。minimal prototype、unit regression 与 Lean build 继续
    metadata 或 detector verdict 代替；
 7. P0b 已冻结新的 48-pair outcome-blind population：每个 safety suite 12 pair，L0/L1/L2 各 4 task，
    init 10--49、env/policy 31/5；至少要求 26 clean-eligible pair、13 transition、rate 0.5，并报告
-   Wilson 95% CI；producer/victim output 仍不存在；
+   Wilson 95% CI。其 formal producer 已在 agent initialization 前因错误调用根 `.venv`（正确 SABER `.venv`
+   包含 `art`/`vllm`）terminal，故 record/victim/outcome 均为 0，且不得从原 root 重试；
 8. P1a 已在 `20c020d` 冻结 protocol/runner，fresh2 dual-camera asset producer 完成且静态 preflight
    `ready: true`（33 tests passed）。没有生成任何 victim/simulator outcome；因 GPU runtime gate 没有空闲
    物理设备而暂停，状态为 `not_yet_evaluated`，不自动重试或启动 defense arm；

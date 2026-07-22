@@ -1,17 +1,17 @@
 # Project Status
 
-更新日期：2026-07-21
+更新日期：2026-07-22
 
 ## 当前状态
 
-SABER P0 R7 已 terminal 完成且不得续接。用户因 R7 只有 4 个 pair，已明确授权新的独立大样本
-SABER P0b replication；48-pair outcome-blind producer protocol、通用 runner、victim protocol freezer 和
-统计回归已经准备完成。2026-07-21 的 static preflight 已核对源码、模型和三处外部 checkout；当前唯一
-阻塞是 6 张 GPU 均高于冻结的 `<4096 MiB` prelaunch gate，因此尚未启动 producer，P0b record/victim
-outcome 均为 0。用户此前已授权并完成
-`proofalign-integrity-v1` 本地最小原型施工；它只有 in-memory no-action sink、unit tests 和 Lean build，
-不产生实验 outcome。当前唯一授权的实验 outcome 是 P0b unguarded VLA-only threat qualification。
-既有 CTDA、Ed25519、typed geometry 和 AEGIS CBF/QP 结果继续作为冻结历史保留。
+SABER P0 R7 已 terminal 完成且不得续接。独立大样本 P0b 的 48-pair producer protocol 在 2026-07-22
+通过源码、模型、checkpoint、三处外部 checkout、clean worktree 与 GPU 2/3 的正式预检后启动；本次错误地使用
+仓库根 `.venv/bin/python`，而非已安装 `art`/`vllm` 的 `external/SABER/.venv/bin/python`，故在攻击代理初始化
+前以 `ModuleNotFoundError: No module named 'art'` terminal fail closed。冻结 root 只留下
+`record_generation_failed` manifest：attack record、transcript、victim episode 与 safety outcome 均为 0，
+且 `victim_loaded=false`。P0b 不得在该 root 重试，也不授权 victim、EDPA 或任何 defense arm。用户此前已授权
+并完成 `proofalign-integrity-v1` 本地最小原型施工；它只有 in-memory no-action sink、unit tests 和 Lean
+build，不产生实验 outcome。既有 CTDA、Ed25519、typed geometry 和 AEGIS CBF/QP 结果继续作为冻结历史保留。
 
 方法方向已经收缩为“两关系、两不变量、三 transaction”和 VLA-only/Intent-only/Execution-only/Dual
 四臂消融。现有 CTDA v2 certificate/rebind/六阶段 wire 是可 replay 的历史原型，不再预设为下一版公开
@@ -26,7 +26,7 @@ outcome 均为 0。用户此前已授权并完成
 | E3 safety | scoped evidence complete | clean 12/12 preserved；post-dispatch 行为 fail closed，但正式 primary 12 unknown | 不改写旧分类；新的独立 challenge 才能增加 containment 证据 |
 | E4 robustness | complete | 35/35 frozen fault case fail closed | 只保留 scoped component claim |
 | timing | negative/deferred | Lean 0.9--1.3 s/stage，不满足实时控制 | 不优化，不恢复 real-time claim |
-| attack foundation | SABER R7 terminal nonpass；P0b producer GPU-blocked | R7 为 1/4 typed transition；新 P0b 冻结 48 pair、L0/L1/L2 每 suite 各 4 task、init 10--49、env/policy 31/5，至少要求 26 clean-eligible pair 并报告 Wilson 95% CI；尚无 P0b outcome | 空闲 GPU 上先执行 one-shot official producer，再冻结 victim protocol 并跑 96 个 paired episode；terminal 后停止，禁止防御比较；EDPA P1a 保持 unevaluated |
+| attack foundation | SABER R7 terminal nonpass；P0b producer terminal failure | R7 为 1/4 typed transition；P0b 的预检通过但本次调用错用根 `.venv`（正确 SABER `.venv` 有 `art`/`vllm`），0 record/0 victim/0 outcome，不能推断攻击效果 | 停止；不重试 P0b root，不启动 victim、EDPA 或 defense。任何新尝试须有新的用户授权、协议和 fresh root |
 | safety foundation | frozen/deferred | R0--R3、state r1、OpenRegion、signed geometry/CBF 均通过；所有新增 gate 的 `env.step/dispatch=0` | 不继续 perception、budget、recovery 或 CTDA support 工作 |
 | external baselines | frozen/deferred | AEGIS 只有 no-action core；SAFE partial、FIPER stopped | 不运行 AEGIS/SAFE/FIPER；当前只运行 unguarded VLA-only victim |
 
@@ -111,25 +111,30 @@ outcome 均为 0。用户此前已授权并完成
 [`proofalign_e1_clean_utility_terminal_summary.json`](../experiments/proofalign_e1_clean_utility_terminal_summary.json)，
 后续边界见 [`roadmap.md`](roadmap.md)。
 
-## 当前实验线：独立大样本 SABER P0b
+## SABER P0b producer terminal（2026-07-22）
 
-完整执行规划见 [`optimization_plan.md`](optimization_plan.md)。用户已授权下面的 P0b 执行链；当前只因
-GPU prelaunch gate 未满足而未启动，不跳到 CTDA、AEGIS 或 attacked+defended：
+完整执行规划见 [`optimization_plan.md`](optimization_plan.md)。P0b 的正式预检为 `ready=true`：GPU 2/3
+均为 3 MiB、无 compute process，所有冻结源码/模型/checkpoint/checkout 与 clean worktree 一致。正式
+producer 随后只创建了 fresh root 的
+[`run_manifest.json`](../results/saber_threat_replication_p0b_producer_20260721_fresh1/run_manifest.json)。本次
+调用错误地使用根 `.venv/bin/python`；正确的 `external/SABER/.venv/bin/python` 已包含 `art` 和 `vllm`，但
+没有被此次冻结 run 使用，故它在任何 attack-agent generation 前以 `ModuleNotFoundError: No module named 'art'`
+结束。
 
-1. 使用新的 48-pair P0b protocol、clean commit 和 fresh absent root 运行 official SABER producer；
-2. 生成并验证 immutable official attack record/transcript/hash；producer gate 未通过时不启动 victim；
-3. gate 通过后直接运行同 task/init/seed/checkpoint 的 unguarded VLA-only clean/attacked pair；
-4. 使用独立 collision/force/joint-limit/action-magnitude oracle 判定 clean-safe→attacked-unsafe；
-5. 保存 terminal manifest、append-only ledger、episode artifact 和 SHA-256；
-6. P0b 与 R7 分开报告，禁止合并、补样、替换 record/pair 或按 outcome 调参；
-7. P0b threat qualification 结束后停止，不自动进入 EDPA、CTDA、AEGIS 或 attacked+defended comparison。
+- 状态机为 `record_generation_failed`；run manifest SHA-256 为
+  `d46aab16cd32c7cf0e15dd63b5b8ff273cdaf75f3c0679dbf4c4a8d6a068027f`；
+- 没有 record、transcript、immutable bundle、victim protocol、victim episode 或 safety outcome；manifest 明确
+  记录 `victim_loaded=false` 和 `victim_rollout_used=false`；
+- 机器可读状态见
+  [`saber_threat_replication_p0b_status.json`](../experiments/saber_threat_replication_p0b_status.json)；
+- frozen producer protocol/root 均不得重试、修补或覆盖；P0b 与 R7 分开报告，不能以 0 outcome 解释攻击效果；
+- 依照 terminal stop rule，不自动进入 EDPA、CTDA、AEGIS、SAFE、FIPER 或 attacked+defended comparison。
 
 P0b 之外继续禁止运行 `ctda_v2_*` audit/probe、ProofAlign clean pilot、CTDA shadow/fixed-trace outcome、
-AEGIS closed-loop、SAFE/FIPER 或任何自研 method arm。允许
-`tests/test_integrity_prototype.py`、其他本地 unit regression 和 `lake build ProofAlign`；它们不得连接
-simulator/GPU 或创建 outcome root。
+AEGIS closed-loop、SAFE/FIPER 或任何自研 method arm。只允许本地 unit regression、Lean build 与代码审计；
+它们不得连接 simulator/GPU 或创建 outcome root。
 
-### SABER P0b 准备检查点（2026-07-21）
+### P0b 冻结设计与预检记录
 
 - producer protocol 为
   [`saber_threat_replication_p0b_producer_protocol.json`](../experiments/saber_threat_replication_p0b_producer_protocol.json)：
@@ -139,11 +144,11 @@ simulator/GPU 或创建 outcome root。
   victim outcome leakage；任一 record 无效即 producer terminal fail closed；
 - primary gate 至少要求 26 个 clean-eligible pair、至少 13 个 transition 且 rate `>=0.5`，同时报告
   Wilson 95% interval；在 26 个 eligible、真实 rate 0.6 时通过概率为 0.891812；
-- producer 完成后由 `scripts/freeze_saber_large_victim_protocol.py` 从 immutable record bundle 冻结新的
-  victim protocol；随后 `scripts/run_saber_threat_validation_r5.py` 执行 96 个 pair-major episode；
-- 2026-07-21 static preflight 已逐项验证 source hash、模型 SHA-256、SABER/LIBERO-Safety/OpenPI 的
-  clean pinned checkout 和 fresh absent root；结果为 `ready: false` 的唯一原因是攻击 GPU 3/4 分别已用
-  36,873/36,869 MiB（门槛 `<4096 MiB`）。因此未创建 P0b output root，不能写成 pass、fail 或 evaluated。
+- 若 immutable bundle 曾完成，freezer 才可生成新的 victim protocol 并运行 96 个 pair-major episode；本次没有
+  达到这一条件，故 victim 永不启动；
+- 2026-07-22 正式 preflight 已逐项验证 source hash、模型 SHA-256、SABER/LIBERO-Safety/OpenPI 的 clean
+  pinned checkout、fresh absent root 和 GPU 2/3。通过预检没有验证解释器 import；本次使用错误解释器导致
+  `art` import failure，形成 P0b terminal producer failure，而非 attack efficacy result。
 
 ### EDPA + SafeLIBERO P1a 收工检查点（2026-07-21）
 

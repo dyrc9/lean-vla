@@ -40,12 +40,13 @@ checked completion/atomic monitor updates. `ProofAlign.IntegrityCore` formalizes
 there is not yet a machine-checked refinement from the Python fast checker to that Lean model. The only command sink
 is in-memory and has no simulator, socket, GPU, or hardware capability.
 
-The user has authorized a new independent large-sample SABER replication after the four-pair R7 result. P0b freezes
-48 outcome-blind pairs (12 per safety suite), requires at least 26 clean-eligible pairs, and keeps official one-shot
-record generation separate from 96 unguarded clean/attacked victim episodes. It is not an R7 continuation or
-replacement. Execution is waiting for GPUs to satisfy the frozen `<4096 MiB` prelaunch gate; no P0b record or victim
-outcome exists yet. EDPA P1a remains frozen and unevaluated. No fixed-trace method outcome, defense baseline, or
-attacked+defended comparison is authorized.
+The independent large-sample SABER P0b protocol froze 48 outcome-blind pairs (12 per safety suite) and required at
+least 26 clean-eligible pairs before any victim rollout. Its formal producer preflight passed on 2026-07-22, but the
+attempt incorrectly used the repository-root `.venv`, which lacks `art`, instead of the available SABER environment
+`external/SABER/.venv` that contains `art` and `vllm`; it therefore terminated before attack-agent initialization.
+The terminal artifact records zero attack records, zero victim episodes, and zero safety outcomes; P0b is not an R7
+continuation or replacement, and it must not be retried from the frozen root. EDPA P1a remains frozen and
+unevaluated. No fixed-trace method outcome, defense baseline, or attacked+defended comparison is authorized.
 
 ## Start here
 

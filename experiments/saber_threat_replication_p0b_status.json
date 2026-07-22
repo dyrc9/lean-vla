@@ -1,0 +1,54 @@
+{
+  "schema": "proofalign.saber-threat-validation-p0b-status.v1",
+  "updated_at": "2026-07-22T10:17:03.714273+08:00",
+  "protocol_id": "saber-constraint-violation-vla-only-p0b-producer-20260721",
+  "protocol_sha256": "493e54275314a29b0dd38d8719b5c4b829737076ea42a3c5785f674666a0bb13",
+  "classification": "p0b_producer_terminal_wrong_interpreter_before_record_generation",
+  "complete": true,
+  "attack_results_observed": false,
+  "producer_preflight": {
+    "ready": true,
+    "selected_gpu_ids": [2, 3],
+    "source_model_checkpoint_and_clean_worktree_verified": true,
+    "runtime_interpreter_imports_verified": false
+  },
+  "record_generation": {
+    "status": "record_generation_failed",
+    "record_count": 0,
+    "immutable_record_bundle_complete": false,
+    "transcript_count": 0,
+    "terminal_error": "ModuleNotFoundError: No module named 'art'",
+    "invoked_interpreter": "/home/ldx/lean-vla/.venv/bin/python",
+    "required_saber_interpreter": "/home/ldx/lean-vla/external/SABER/.venv/bin/python",
+    "required_saber_interpreter_has_art_and_vllm": true,
+    "producer_root": "results/saber_threat_replication_p0b_producer_20260721_fresh1"
+  },
+  "victim_execution": {
+    "authorized": false,
+    "victim_loaded": false,
+    "victim_rollout_used": false,
+    "episode_count": 0,
+    "safety_transition_count": 0
+  },
+  "artifact": {
+    "local_root": "results/saber_threat_replication_p0b_producer_20260721_fresh1",
+    "tracked_by_git": false,
+    "sha256": {
+      "run_manifest.json": "d46aab16cd32c7cf0e15dd63b5b8ff273cdaf75f3c0679dbf4c4a8d6a068027f"
+    }
+  },
+  "defense_decision": {
+    "authorized": false,
+    "reason": "The producer terminated before creating an immutable record bundle; the frozen P0b protocol authorizes neither victim nor defense execution."
+  },
+  "interpretation": {
+    "allowed_claim": "The frozen P0b producer preflight passed, but the formal attempt used the repository-root interpreter, which lacks art, rather than the available SABER interpreter that contains art and vllm. It therefore terminated before attack-agent initialization. No attack record, victim episode, or safety outcome was observed.",
+    "forbidden_claims": [
+      "SABER is effective or ineffective on the P0b population",
+      "ProofAlign does or does not defend SABER",
+      "The missing dependency is an attack or victim result",
+      "EDPA, CTDA, AEGIS, SAFE, FIPER, or any attacked-plus-defended arm is authorized"
+    ]
+  },
+  "next_step": "Stop. Do not retry or repair the frozen P0b producer root. Any new producer attempt requires a newly authorized, independently frozen protocol and fresh absent root."
+}
