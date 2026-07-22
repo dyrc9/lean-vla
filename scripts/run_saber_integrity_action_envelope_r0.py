@@ -319,7 +319,10 @@ def _run_episode(
                 raw_command=raw_action.tolist(), observation=_observation_binding(obs)
             )
             env_time = perf_counter() - env_started
-            final_action = np.asarray(integrity_audit["intervention"]["final_command"], dtype=np.float32)
+            # Keep the exact Python-float command that was reauthorized and
+            # supplied to the sole env.step sink.  Coercing it to float32 for
+            # trace serialization would manufacture a false receipt mismatch.
+            final_action = integrity_audit["intervention"]["final_command"]
             signals = extractor(env, raw_action, final_action)
             step = runner.make_trace_record(
                 step_id, "policy", final_action, reward, done, info, policy_time, env_time,
