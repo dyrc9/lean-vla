@@ -257,6 +257,17 @@ def print_dry_run(protocol: dict[str, Any]) -> None:
     print("Victim rollout/outcome, regeneration, replacement, and best-of-N: forbidden")
 
 
+def write_checksums(output_root: Path) -> None:
+    """Bind every producer artifact after its terminal summary is written."""
+
+    lines = [
+        f"{legacy.file_digest(path)}  {path.relative_to(output_root)}"
+        for path in sorted(item for item in output_root.rglob("*") if item.is_file())
+        if path.name != "SHA256SUMS"
+    ]
+    (output_root / "SHA256SUMS").write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
 def assert_digest(path: Path, expected: str, label: str) -> None:
     if not path.is_file():
         raise ProtocolError(f"missing {label}: {path}")
@@ -1012,6 +1023,7 @@ def execute(
     }
     summary_path = output_root / protocol["artifact_policy"]["summary"]
     legacy.atomic_json(summary_path, summary)
+    write_checksums(output_root)
     return summary
 
 

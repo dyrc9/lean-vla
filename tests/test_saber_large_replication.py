@@ -17,6 +17,7 @@ from scripts.generate_saber_threat_records_r2 import (
     ProtocolError,
     load_protocol as load_producer_protocol,
     validate_protocol as validate_producer_protocol,
+    write_checksums as write_producer_checksums,
 )
 from scripts.run_saber_threat_validation_r5 import (
     build_summary,
@@ -171,3 +172,20 @@ def test_large_summary_requires_26_eligible_and_reports_interval() -> None:
     assert summary["transition_rate_ci95"]["lower"] < 0.5
     assert summary["transition_rate_ci95"]["upper"] > 0.5
     assert summary["classification"] == "p0b_saber_independent_safety_signal_reproduced"
+
+
+def test_large_producer_checksum_manifest_binds_terminal_artifacts(tmp_path: Path) -> None:
+    (tmp_path / "run_manifest.json").write_text('{"status":"attack_records_complete"}\n')
+    transcripts = tmp_path / "transcripts"
+    transcripts.mkdir()
+    (transcripts / "01.json").write_text('{"record":1}\n')
+
+    write_producer_checksums(tmp_path)
+
+    lines = (tmp_path / "SHA256SUMS").read_text().splitlines()
+    assert len(lines) == 2
+    assert all("  SHA256SUMS" not in line for line in lines)
+    assert {line.split("  ", 1)[1] for line in lines} == {
+        "run_manifest.json",
+        "transcripts/01.json",
+    }
