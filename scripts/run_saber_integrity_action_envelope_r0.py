@@ -182,6 +182,14 @@ def _validate_baseline(protocol: dict[str, Any]) -> tuple[dict[str, Any], dict[s
     return baseline, summary, p0b.read_ledger(output_root / baseline["artifact_policy"]["append_only_ledger"])
 
 
+def _validated_attack_records(protocol: dict[str, Any], baseline: dict[str, Any]) -> list[dict[str, Any]]:
+    """Reuse P0b's producer-bundle validator rather than parsing its JSON ad hoc."""
+
+    protocol_path, _output_root, _producer_root = _baseline_paths(protocol)
+    _sources, records = p0b.assert_frozen_sources(baseline, protocol_path)
+    return records
+
+
 def _gpu_report(protocol: dict[str, Any], policy_gpu: int, egl_gpu: int) -> dict[str, Any]:
     if policy_gpu == egl_gpu:
         raise ProtocolError("policy and EGL GPU must be distinct")
@@ -473,9 +481,7 @@ def _execute(protocol: dict[str, Any], protocol_path: Path, output_root: Path, p
     p0b.configure_environment(policy_gpu, egl_gpu, "saber-integrity-envelope-r0")
     args = _episode_args(baseline, output_root, egl_gpu)
     policy, jax, image_tools, runner = p0b.load_policy(baseline, args)
-    records = load_json(_baseline_paths(protocol)[2] / "attack_records.json")
-    if not isinstance(records, list):
-        raise ProtocolError("P0b attack record bundle is malformed")
+    records = _validated_attack_records(protocol, baseline)
     bindings = p0b.probe_bindings(baseline, records, args, policy, jax, image_tools, runner)
     manifest["preflight"]["real_policy_probe"] = {"bindings": bindings, "env_step_calls": 0}
     p0b.atomic_json(manifest_path, manifest)
@@ -532,9 +538,7 @@ def _run_preflight(protocol: dict[str, Any], protocol_path: Path, output_root: P
     p0b.configure_environment(policy_gpu, egl_gpu, "saber-integrity-envelope-r0-preflight")
     args = _episode_args(baseline, output_root, egl_gpu)
     policy, jax, image_tools, runner = p0b.load_policy(baseline, args)
-    records = load_json(_baseline_paths(protocol)[2] / "attack_records.json")
-    if not isinstance(records, list):
-        raise ProtocolError("P0b attack record bundle is malformed")
+    records = _validated_attack_records(protocol, baseline)
     report["real_policy_probe"] = {
         "bindings": p0b.probe_bindings(baseline, records, args, policy, jax, image_tools, runner),
         "env_step_calls": 0,
