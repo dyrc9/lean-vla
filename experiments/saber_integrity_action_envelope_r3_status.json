@@ -1,0 +1,65 @@
+{
+  "schema": "proofalign.saber-integrity-action-envelope-r3-status.v1",
+  "updated_at": "2026-07-23T14:54:38+08:00",
+  "protocol_id": "saber-p0b-integrity-action-envelope-attacked-r3-nonfinite-brake-20260722",
+  "protocol_sha256": "26772f69932984e66d0d9502e959e4dcb8d6876a493b737282390379918fbf94",
+  "classification": "terminal_stopped_runtime_resource_contention_before_probe",
+  "complete": true,
+  "attacked_defended_outcomes_observed": false,
+  "execution": {
+    "output_root": "results/saber_integrity_action_envelope_r3_20260722_fresh1",
+    "started_at": "2026-07-23T03:33:44.283216+00:00",
+    "terminalized_at": "2026-07-23T06:54:38+00:00",
+    "static_preflight_ready": true,
+    "real_policy_probe_completed": false,
+    "persisted_binding_count": 0,
+    "episode_count": 0,
+    "ledger_present": false,
+    "summary_present": false,
+    "process_pid": 2978322,
+    "termination": "SIGTERM requested by user after the run made no persisted progress for more than three hours"
+  },
+  "resource_observation": {
+    "requested_policy_gpu": 3,
+    "requested_egl_gpu": 5,
+    "launch_memory_used_mib": {
+      "gpu_3": 1649,
+      "gpu_5": 3
+    },
+    "stalled_observation": {
+      "elapsed": "03:11:09",
+      "process_cpu_percent": 100,
+      "process_rss_kib": 10874484,
+      "process_io_kib_per_second": 0,
+      "experiment_gpu_memory_mib": {
+        "gpu_3": 8650,
+        "gpu_5": 8644
+      },
+      "gpu_5_total_memory_used_mib": 39051,
+      "gpu_5_external_process_memory_used_mib": 30256,
+      "gpu_5_utilization_percent": 99,
+      "unexpected_graphics_context_gpu": 4
+    },
+    "after_stop_memory_used_mib": {
+      "gpu_3": 3,
+      "gpu_5": 30395
+    }
+  },
+  "artifact": {
+    "tracked_by_git": false,
+    "run_manifest_sha256": "8836a00b5f8daf367f0fd4d6899afab479e6e357eeca76f6204523d43956955c"
+  },
+  "interpretation": {
+    "allowed_claim": "R3 passed its static preflight but was stopped before the all-or-nothing real-policy binding probe completed. It produced no attacked-plus-defended episode or efficacy outcome.",
+    "forbidden_claims": [
+      "The R3 action-envelope defense passed or failed an efficacy gate",
+      "Any partially completed in-memory binding probe is a retained result",
+      "The stopped R3 root may be resumed or overwritten",
+      "The resource failure establishes or refutes general defense efficacy"
+    ]
+  },
+  "priority_decision": {
+    "user_authorization": "2026-07-23: user designated this attacked-plus-defended action-envelope experiment as the current work priority and authorized a rerun after resources are stable",
+    "next_step": "Prepare a resource-isolated successor protocol and fresh absent root. Execute only after two distinct physical GPUs remain below 4096 MiB with no compute process and the observed JAX/EGL device mapping matches the frozen roles."
+  }
+}

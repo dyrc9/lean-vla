@@ -1,13 +1,12 @@
 # ProofAlign 当前实现与后续目标架构
 
-更新日期：2026-07-20
+更新日期：2026-07-23
 
 本文区分三件事：当前可审计实现、后续最小目标架构、以及不属于方法核心的支撑组件。方法语义以
 [`method.md`](method.md) 为准，当前执行授权以 [`optimization_plan.md`](optimization_plan.md) 为准。
 
-> 当前所有实验与 rollout 暂停。最小架构已获授权并实现为本地 no-action prototype；VLA-only 发布攻击
-> 复现仍是恢复实验后的第一优先级，但本文不授权 CTDA、AEGIS、baseline、clean pilot 或
-> attacked+defended rollout。
+> 当前唯一 rollout 优先级是 resource-isolated Execution-only action-envelope successor。它是 optional
+> intervention/integrity-boundary 的探索性评估，不开放 Full CTDA、AEGIS、baseline 或完整四臂矩阵。
 
 ## 1. 架构原则
 
@@ -245,8 +244,8 @@ protocol。
 
 ## 11. 当前执行边界
 
-- [`roadmap.md`](roadmap.md) 中 P0b VLA-only 攻击复现是唯一 GPU-gated 例外；
-- 允许本地 minimal prototype、unit test 和 Lean build，不允许 simulator/GPU/action outcome；
-- 不运行或扩展 CTDA v1/v2、AEGIS、SAFE/FIPER 或其他 defense arm；
-- 不启动 fixed-trace outcome、clean pilot 或 attacked+defended matrix；
+- [`current_experiment.md`](current_experiment.md) 中的 action-envelope successor 是唯一 GPU-gated 例外；
+- 允许本地 minimal prototype、unit test、Lean build和该 successor 的隔离修复/执行；
+- 不运行或扩展 CTDA v1/v2、AEGIS、SAFE/FIPER、EDPA 或其他 defense arm；
+- 不启动 fixed-trace outcome、新 clean pilot 或完整 attacked+defended matrix；
 - 恢复任何实验前必须重新确认授权、protocol、worktree 和 fresh output root。

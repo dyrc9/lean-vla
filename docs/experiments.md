@@ -1,17 +1,16 @@
 # Experiment Rules
 
-更新日期：2026-07-20
+更新日期：2026-07-23
 
 本文只定义当前实验规则。已完成结果见 [`evaluation_results.md`](evaluation_results.md)，环境命令见
 [`remote_execution.md`](remote_execution.md)。
 
 ## 当前执行覆盖规则
 
-当前所有实验均暂停，不运行 SABER/EDPA producer、VLA-only victim、ProofAlign/CTDA outcome、AEGIS/
-SAFE/FIPER baseline 或 attacked+defended comparison。允许的 `proofalign-integrity-v1` 工作仅限本地
-in-memory unit tests 和 Lean build，不创建 experiment protocol/root/outcome。恢复实验后，仍先执行 fresh
-official SABER/EDPA producer 与 unguarded VLA-only threat qualification。本文后续 CTDA protocol 章节只
-保留历史与兼容性事实，不构成当前执行授权。
+当前唯一实验例外是 [`current_experiment.md`](current_experiment.md) 定义的 resource-isolated
+Execution-only action-envelope successor。它必须使用新的冻结 protocol、fresh absent root、稳定双 GPU 与
+launch 后实际 JAX/EGL mapping gate。SABER/EDPA producer、Full CTDA outcome、AEGIS、SAFE/FIPER baseline
+和其他 attacked+defended arm 均暂停。本文后续 CTDA protocol 章节只保留历史与兼容性事实，不构成额外授权。
 
 ## 1. 通用原则
 

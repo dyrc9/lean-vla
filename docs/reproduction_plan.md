@@ -1,23 +1,23 @@
 # External Reproduction Plan
 
-更新日期：2026-07-22
+更新日期：2026-07-23
 
-SABER P0 R7 已完成 terminal qualification，但 4-pair sample 未通过 held-out independent safety gate。
-独立 P0b 大样本 producer 已于 2026-07-22 在预检通过后 terminal：本次错用根 `.venv` 而非包含 `art`/`vllm`
-的 SABER `.venv`，0 record/0 victim/0 outcome；它不续接或覆盖 R7，也不得从原 root 重试。ProofAlign/CTDA、AEGIS、SAFE、FIPER 和最终
-attack-defense E5 仍未授权。
+SABER P0 R7 未通过 4-pair held-out gate。P0b fresh2 随后完成 48 record 与 96/96 valid episode，但
+clean-eligible `23 < 26`，保持 `p0b_blocked_insufficient_clean_baseline`。当前唯一优先级是 exploratory
+Execution-only action-envelope successor；Full CTDA、AEGIS、SAFE、FIPER、EDPA 和最终 E5 仍冻结。
 
 ## 当前状态
 
 | 线 | 状态 | 处置 |
 |---|---|---|
 | Phantom Menace | held-out signal gate failed | R1 仅 1/4 independent cost/collision transition；不调攻击、不换 pair、不运行 scoped main |
-| SABER | R7 terminal nonpass；P0b producer terminal failure | R7 保持 1/4；P0b 预注册 48 pair、至少 26 eligible、rate gate 0.5 和 Wilson 95% CI，但本次 producer 错用根 `.venv` 而非含 `art`/`vllm` 的 SABER `.venv`，0 record/victim/outcome，不运行 defense |
+| SABER | R7 nonpass；P0b complete/nonqualified | P0b 48 record、96 episode、23 eligible `<26`、15/23 transition；不改写 qualification |
+| action-envelope | current priority | clean R1 22/23；R2 invalid；R3 resource-stopped，准备 resource-isolated successor |
 | SAFE | not reproduced | 335/500 partial corpus 无 terminal manifest；只保留审计 |
 | FIPER fresh1 | not reproduced | `pretzel/rnd_a` 后无 terminal manifest；partial 保留 |
 | FIPER fresh2 | stopped/not reproduced | 用户于 2026-07-17 要求停止；service inactive/dead，manifest `started`，partial 不计结果 |
 | SafeLIBERO/AEGIS | readiness frozen | 只复用已冻结的独立 safety oracle 定义；不运行 AEGIS 或 CTDA support audit |
-| EDPA + SafeLIBERO | new P1 threat track | 保持原始 patch definition；task failure 与独立 collision/cost transition 分开 |
+| EDPA + SafeLIBERO | terminal before probe | OpenPI CLI contract failure，0 policy/simulator/episode；次要冻结 |
 
 详细 FIPER 操作见 [`safe_fiper_r0_runbook.md`](safe_fiper_r0_runbook.md)。
 
@@ -40,17 +40,17 @@ attack-defense E5 仍未授权。
 - synthetic prompt/camera mutation 不自动构成 attack efficacy；
 - partial log、active process 和模型成功加载都不是 reproduction pass；
 - external baseline 不能替代 ProofAlign 自身 ablation/utility 评估；当前也不运行这些评估；
-- 旧外部实验全部保持停止；只允许按 [`optimization_plan.md`](optimization_plan.md) 开展 fresh SABER/
-  EDPA producer、unguarded VLA-only victim 和独立 safety qualification。任何 GPU 正式执行都需要新
-  protocol/root、fresh inventory 和全部 gate。
+- 旧外部实验全部保持停止；只允许按 [`optimization_plan.md`](optimization_plan.md) 开展 resource-isolated
+  action-envelope successor。任何 GPU 正式执行都需要新 protocol/root、fresh inventory、稳定双 GPU 和
+  runtime device mapping gate。
 
 ## 新 P0/P1 顺序
 
-1. SABER R7 已完成并冻结为 `1/4 = 0.25`；P0b 已在 official producer 的 agent initialization 前 terminal，
-   未形成 immutable record 或 VLA-only episode，不能进行其后续 96 episode safety gate；
+1. SABER R7 已冻结为 `1/4 = 0.25`；P0b fresh2 完成 48 record 与 96 episode，但只有 23 eligible，
+   未达到 26-pair gate；
 2. P0 的 R4--R7 root 和 record/pair/seed/checkpoint 均冻结，不得续接、调攻击或以 outcome 替换 pair；
-3. P0b terminal 后必须停止汇报；不得自动转入 EDPA P1。EDPA 仍保留独立 frozen protocol 与资产；
-4. 不做 CTDA support overlap，不冻结或执行 attacked+defended matrix，等待用户重新授权。
+3. 用户已独立授权 exploratory action-envelope successor；EDPA 保持 terminal/secondary；
+4. 不做 CTDA support overlap或完整四臂 matrix；只运行 resource-isolated Execution-only successor。
 
 旧 SABER exact-task R1 的 producer failure 只作诊断，不禁止在新 protocol/root/unit 上修复官方 producer；
 但不得续接旧 ledger、record 或 victim run。

@@ -1,17 +1,25 @@
 # Project Status
 
-更新日期：2026-07-22
+更新日期：2026-07-23
 
 ## 当前状态
 
-SABER P0 R7 已 terminal 完成且不得续接。独立大样本 P0b 的 48-pair producer protocol 在 2026-07-22
-通过源码、模型、checkpoint、三处外部 checkout、clean worktree 与 GPU 2/3 的正式预检后启动；本次错误地使用
-仓库根 `.venv/bin/python`，而非已安装 `art`/`vllm` 的 `external/SABER/.venv/bin/python`，故在攻击代理初始化
-前以 `ModuleNotFoundError: No module named 'art'` terminal fail closed。冻结 root 只留下
-`record_generation_failed` manifest：attack record、transcript、victim episode 与 safety outcome 均为 0，
-且 `victim_loaded=false`。P0b 不得在该 root 重试，也不授权 victim、EDPA 或任何 defense arm。用户此前已授权
-并完成 `proofalign-integrity-v1` 本地最小原型施工；它只有 in-memory no-action sink、unit tests 和 Lean
-build，不产生实验 outcome。既有 CTDA、Ed25519、typed geometry 和 AEGIS CBF/QP 结果继续作为冻结历史保留。
+SABER P0 R7 已 terminal nonpass。P0b fresh1 因错用根 `.venv` 在 record generation 前失败；随后经用户
+独立授权的 fresh2 producer/victim 生成 48 条 immutable record 并完成 96/96 valid clean/attacked episode。
+clean-eligible 只有 23，低于冻结的 26-pair gate，因此正式分类仍是
+`p0b_blocked_insufficient_clean_baseline`；15/23 typed transition 不能后验升级为 qualification pass。
+
+当前唯一实验优先级是 exploratory Execution-only action-envelope attacked+defended successor。clean R1 在
+23 个 baseline-eligible pair 上保留 22 个 strict success，retention `0.9565`，通过冻结的 `0.8` gate；
+attacked R2 因 non-finite policy command 在任何新 `env.step` 前 terminal。R3 增加 deterministic zero brake，
+但在 2026-07-23 static preflight 后遭遇 GPU 5 外部 compute contention 和实际 JAX/EGL device mapping
+不一致；超过三小时仍未完成 all-or-nothing binding probe，用户已要求停止。R3 为 0 retained binding、
+0 episode、0 ledger/summary/outcome，旧 root 不得续跑。下一步是 resource-isolated successor protocol 与
+fresh root，详见 [`current_experiment.md`](current_experiment.md)。
+
+EDPA P1a 已在 OpenPI CLI parsing 阶段、policy/simulator/episode 前 terminal，当前保持次要冻结线。用户此前
+授权并完成的 `proofalign-integrity-v1` 本地最小原型仍只有 in-memory no-action sink、unit tests 和 Lean
+build。CTDA、Ed25519、typed geometry 和 AEGIS CBF/QP 结果继续作为冻结历史保留。
 
 方法方向已经收缩为“两关系、两不变量、三 transaction”和 VLA-only/Intent-only/Execution-only/Dual
 四臂消融。现有 CTDA v2 certificate/rebind/六阶段 wire 是可 replay 的历史原型，不再预设为下一版公开
@@ -26,9 +34,10 @@ build，不产生实验 outcome。既有 CTDA、Ed25519、typed geometry 和 AEG
 | E3 safety | scoped evidence complete | clean 12/12 preserved；post-dispatch 行为 fail closed，但正式 primary 12 unknown | 不改写旧分类；新的独立 challenge 才能增加 containment 证据 |
 | E4 robustness | complete | 35/35 frozen fault case fail closed | 只保留 scoped component claim |
 | timing | negative/deferred | Lean 0.9--1.3 s/stage，不满足实时控制 | 不优化，不恢复 real-time claim |
-| attack foundation | SABER R7 terminal nonpass；P0b producer terminal failure | R7 为 1/4 typed transition；P0b 的预检通过但本次调用错用根 `.venv`（正确 SABER `.venv` 有 `art`/`vllm`），0 record/0 victim/0 outcome，不能推断攻击效果 | 停止；不重试 P0b root，不启动 victim、EDPA 或 defense。任何新尝试须有新的用户授权、协议和 fresh root |
+| attack foundation | P0b fresh2 complete but denominator gate failed | 48 record、96/96 valid episode、23 clean-eligible `<26`；15/23 typed transition 只作 exploratory substrate | 不改写 P0b qualification；保留完整 baseline artifact |
+| action-envelope priority | R1 clean pass；R2 invalid；R3 resource-stopped | R1 retention 22/23；R2/R3 均为 0 attacked+defended outcome | 修复实际 JAX/EGL 隔离，冻结 successor protocol/fresh root，资源稳定后重跑 |
 | safety foundation | frozen/deferred | R0--R3、state r1、OpenRegion、signed geometry/CBF 均通过；所有新增 gate 的 `env.step/dispatch=0` | 不继续 perception、budget、recovery 或 CTDA support 工作 |
-| external baselines | frozen/deferred | AEGIS 只有 no-action core；SAFE partial、FIPER stopped | 不运行 AEGIS/SAFE/FIPER；当前只运行 unguarded VLA-only victim |
+| external baselines | frozen/deferred | AEGIS 只有 no-action core；SAFE partial、FIPER stopped；EDPA P1a pre-probe terminal | 不与 action-envelope priority 并行 |
 
 完整数字见 [`evaluation_results.md`](evaluation_results.md)。
 
@@ -111,7 +120,22 @@ build，不产生实验 outcome。既有 CTDA、Ed25519、typed geometry 和 AEG
 [`proofalign_e1_clean_utility_terminal_summary.json`](../experiments/proofalign_e1_clean_utility_terminal_summary.json)，
 后续边界见 [`roadmap.md`](roadmap.md)。
 
-## SABER P0b producer terminal（2026-07-22）
+## 当前 action-envelope checkpoint（2026-07-23）
+
+- P0b fresh2：48 immutable record、96/96 valid episode、23 clean-eligible、15 typed transition，
+  `p0b_blocked_insufficient_clean_baseline`；
+- clean R1：48/48 valid episode，baseline-eligible strict success `22/23`，retention `0.9565`；
+- attacked R2：首个 episode 在新 `env.step` 前因 non-finite policy command terminal invalid；
+- attacked R3：zero-brake source/protocol 冻结，static preflight ready，但 binding probe 未完成；GPU 5
+  后发外部进程占约 30 GiB，实验实际同时占用 GPU 3/5，另观察到 GPU 4 graphics context。运行超过三小时后
+  按用户要求停止，0 episode/outcome；
+- 当前最高优先级：修复实际 device isolation、增加 launch 后 runtime device gate、冻结 successor
+  protocol 和 fresh root，等待两张不同物理 GPU 稳定满足 `<4096 MiB` 且无 compute process 后重跑。
+
+机器终态见
+[`saber_integrity_action_envelope_r3_status.json`](../experiments/saber_integrity_action_envelope_r3_status.json)。
+
+## SABER P0b fresh1 producer terminal（历史，2026-07-22）
 
 完整执行规划见 [`optimization_plan.md`](optimization_plan.md)。P0b 的正式预检为 `ready=true`：GPU 2/3
 均为 3 MiB、无 compute process，所有冻结源码/模型/checkpoint/checkout 与 clean worktree 一致。正式
@@ -128,11 +152,11 @@ producer 随后只创建了 fresh root 的
 - 机器可读状态见
   [`saber_threat_replication_p0b_status.json`](../experiments/saber_threat_replication_p0b_status.json)；
 - frozen producer protocol/root 均不得重试、修补或覆盖；P0b 与 R7 分开报告，不能以 0 outcome 解释攻击效果；
-- 依照 terminal stop rule，不自动进入 EDPA、CTDA、AEGIS、SAFE、FIPER 或 attacked+defended comparison。
+- 该 fresh1 root 本身不授权后续执行；fresh2 与 action-envelope 均来自后续独立用户授权和 fresh root，
+  不覆盖 fresh1。
 
-P0b 之外继续禁止运行 `ctda_v2_*` audit/probe、ProofAlign clean pilot、CTDA shadow/fixed-trace outcome、
-AEGIS closed-loop、SAFE/FIPER 或任何自研 method arm。只允许本地 unit regression、Lean build 与代码审计；
-它们不得连接 simulator/GPU 或创建 outcome root。
+当前除 resource-isolated action-envelope successor 外，继续禁止运行 `ctda_v2_*` audit/probe、
+ProofAlign clean pilot、CTDA shadow/fixed-trace outcome、AEGIS closed-loop、SAFE/FIPER 或其他 method arm。
 
 ### P0b 冻结设计与预检记录
 
@@ -144,13 +168,13 @@ AEGIS closed-loop、SAFE/FIPER 或任何自研 method arm。只允许本地 unit
   victim outcome leakage；任一 record 无效即 producer terminal fail closed；
 - primary gate 至少要求 26 个 clean-eligible pair、至少 13 个 transition 且 rate `>=0.5`，同时报告
   Wilson 95% interval；在 26 个 eligible、真实 rate 0.6 时通过概率为 0.891812；
-- 若 immutable bundle 曾完成，freezer 才可生成新的 victim protocol 并运行 96 个 pair-major episode；本次没有
-  达到这一条件，故 victim 永不启动；
+- fresh1 没有达到 immutable bundle gate；后续独立授权的 fresh2 使用正确 SABER environment 和 fresh root
+  完成 48-record bundle 与 96 个 pair-major episode，不能回写或覆盖 fresh1；
 - 2026-07-22 正式 preflight 已逐项验证 source hash、模型 SHA-256、SABER/LIBERO-Safety/OpenPI 的 clean
   pinned checkout、fresh absent root 和 GPU 2/3。通过预检没有验证解释器 import；本次使用错误解释器导致
   `art` import failure，形成 P0b terminal producer failure，而非 attack efficacy result。
 
-### EDPA + SafeLIBERO P1a 收工检查点（2026-07-21）
+### EDPA + SafeLIBERO P1a terminal 检查点（2026-07-23）
 
 - 独立 protocol 为 [`edpa_safelibero_p1_protocol.json`](../experiments/edpa_safelibero_p1_protocol.json)，
   已在 commit `20c020d` 冻结为 `frozen_execution_authorized`；它只允许 unguarded OpenPI pi0.5 的 clean/
@@ -160,12 +184,11 @@ AEGIS closed-loop、SAFE/FIPER 或任何自研 method arm。只允许本地 unit
   primary/wrist patch SHA-256 分别为 `b73fe0d08394e17f773452456e191f8183603cf314d366ec8df8f79a041f1823` 和
   `c49c5df45fd60aecdf310ad19f46efa22f1b03bb8b834055d6ca5f9a16c66129`；训练数据 tree digest 仍为
   `c81ee0c39f17b4ee02ecfab1a9ddff45aed70bf37a3ae4d191bec0f7a93e4af1`。
-- P1 runner 的静态 preflight 已 `ready: true`，相关回归为 33 passed；随后因所有 GPU 均有外部 compute
-  process 且显存高于 `<4096 MiB` 运行前 gate，未调用 runner `--execute`，未创建
-  `results/edpa_safelibero_p1_20260721_fresh1`，episode/rollout 为 0。
-- 因而 P1a 的唯一正确状态是 `not_yet_evaluated`，不是 pass、fail 或 terminal result。已停止自动等待器；恢复时
-  先重新运行静态 preflight，并仅在同一物理 GPU 同时满足空闲显存和无 compute process 条件时显式执行。任何
-  terminal P1 结果仍必须停止，不能自动进入防御比较。
+- P1 runner 的静态 preflight 为 `ready: true`。GPU 3 空闲 gate 通过后，冻结 runner 因漏传 OpenPI
+  `policy:checkpoint` 子命令，在 policy load、simulator construction、`env.step` 和 episode 前 terminal。
+- P1a 是 `terminal_failed_before_probe`，不是 EDPA efficacy pass/nonpass；其机器状态见
+  [`edpa_safelibero_p1_status.json`](../experiments/edpa_safelibero_p1_status.json)。当前保持次要冻结线，不与
+  action-envelope priority 并行。
 
 安全基础机器入口为
 [`safelibero_aegis_readiness_protocol.json`](../experiments/safelibero_aegis_readiness_protocol.json) 和
@@ -203,8 +226,9 @@ summary SHA-256 分别为 `25507c261168b172888f588d3f75cd633e8faa593f0059e4f3099
    8/8 valid episode、1/4 typed transition，低于 count 2/rate 0.5 gate；
 5. SAFE/FIPER 都是 defense baseline 而不是 attack；SAFE partial，FIPER fresh2 于
    2026-07-17 16:14:05 停止，terminal gate 未通过；
-6. SABER P0 已 terminal；任何后续 EDPA P1 必须是独立 unguarded VLA-only threat protocol。不得启动或
-   继续 CTDA v2、AEGIS、SAFE/FIPER、clean method pilot 或 attacked+defended 工作。
+6. P0b fresh2 虽完成 producer/victim，但 23 个 clean-eligible pair 未达到 26-pair gate；当前获授权的
+   action-envelope successor 仅是 exploratory attacked+defended measurement，不把 P0b 改写为 qualified；
+   EDPA、CTDA v2、AEGIS、SAFE/FIPER 和其他 method arm 保持冻结。
 
 完整叙述见 [`attack_reproduction_evidence_audit.md`](attack_reproduction_evidence_audit.md)，机器记录见
 [`attack_reproduction_evidence_audit_20260717.json`](../experiments/attack_reproduction_evidence_audit_20260717.json)。

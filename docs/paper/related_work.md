@@ -1,9 +1,10 @@
 # Related Work：VLA 任务授权与执行完整性
 
-更新日期：2026-07-20
+更新日期：2026-07-23
 
 > 本文用于研究定位、baseline 选择和 novelty 审计，不是运行状态或执行授权来源。方法定义以
-> [`method.md`](../method.md) 为准；P0b 是唯一授权的 VLA-only 攻击复现线，其余实验暂停。
+> [`method.md`](../method.md) 为准；当前执行优先级是 resource-isolated Execution-only
+> action-envelope successor，其余实验暂停。
 
 ## 0. 定位结论
 

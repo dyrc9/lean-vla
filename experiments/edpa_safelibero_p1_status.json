@@ -1,0 +1,44 @@
+{
+  "schema": "proofalign.edpa-safelibero-p1-status.v1",
+  "updated_at": "2026-07-23T10:34:30+08:00",
+  "protocol_id": "edpa-safelibero-p1a-vla-only-20260721",
+  "protocol_sha256": "81c2fde4eaab706095134585acb6e211214ace0f4c82941c00a8003f547d5c49",
+  "classification": "edpa_safelibero_p1a_terminal_policy_server_cli_contract_failure_before_probe",
+  "complete": true,
+  "victim_outcomes_observed": false,
+  "preflight": {
+    "ready": true,
+    "source_implementation_assets_checkpoint_and_pinned_checkouts_verified": true,
+    "selected_gpu": {
+      "physical_id": 3,
+      "memory_used_mib": 3,
+      "compute_process_count": 0
+    }
+  },
+  "no_dispatch_probe": {
+    "status": "policy_server_startup_failed_before_model_or_simulator_use",
+    "policy_loaded": false,
+    "simulator_constructed": false,
+    "env_step_count": 0,
+    "episode_count": 0,
+    "terminal_error": "OpenPI Tyro CLI rejected --policy.config because the frozen runner omitted the required policy:checkpoint subcommand.",
+    "expected_command_shape": "serve_policy.py --port PORT policy:checkpoint --policy.config pi05_libero --policy.dir CHECKPOINT"
+  },
+  "artifact": {
+    "local_root": "results/edpa_safelibero_p1_20260721_fresh1",
+    "tracked_by_git": false,
+    "sha256": {
+      "run_manifest.json": "74b50d2f6a5a51e6d0db0ff31f2b4d6a94ec52e61aecc5e7d2049badc17e233f",
+      "policy_server_logs/no_dispatch_probe.log": "dcff8276831338cc670a880eb725640debed3a3e76b043f8b2936c997366a1ea"
+    }
+  },
+  "interpretation": {
+    "allowed_claim": "The frozen P1a static preflight and GPU gate passed, but the formal run terminated during CLI parsing before policy loading, simulator construction, env.step(), or any clean/attacked VLA-only episode. It provides no EDPA efficacy result.",
+    "forbidden_claims": [
+      "EDPA is effective or ineffective on the P1a population",
+      "The P1a independent safety gate passed or failed",
+      "The P1a result authorizes an EDPA or defense continuation"
+    ]
+  },
+  "next_step": "Keep P1a terminal and secondary to the current SABER action-envelope priority. Any corrected EDPA attempt requires a new authorization, successor protocol, and fresh absent root."
+}

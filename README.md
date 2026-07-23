@@ -32,7 +32,8 @@ assets. These are frozen implementation and regression assets—not the required
 version—and they establish no clean utility, online liveness, recovery, or defense-efficacy result. The next method
 design, if later authorized, will refreeze a smaller five-component/three-transaction architecture and first compare
 VLA-only, Intent-only, Execution-only, and Dual. No retained Phantom Menace or SABER workload has yet passed the
-complete held-out independent-safety qualification chain, and no defense rollout is currently authorized.
+complete held-out independent-safety qualification chain. The only current rollout exception is the explicitly
+exploratory Execution-only action-envelope successor; it cannot establish confirmatory defense efficacy.
 
 The refrozen architecture now has a separate `proofalign-integrity-v1` local prototype: five components, three public
 transactions, one shared four-arm method switch, exact final-command authorization, one-use dispatch receipts, and
@@ -40,17 +41,23 @@ checked completion/atomic monitor updates. `ProofAlign.IntegrityCore` formalizes
 there is not yet a machine-checked refinement from the Python fast checker to that Lean model. The only command sink
 is in-memory and has no simulator, socket, GPU, or hardware capability.
 
-The independent large-sample SABER P0b protocol froze 48 outcome-blind pairs (12 per safety suite) and required at
-least 26 clean-eligible pairs before any victim rollout. Its formal producer preflight passed on 2026-07-22, but the
-attempt incorrectly used the repository-root `.venv`, which lacks `art`, instead of the available SABER environment
-`external/SABER/.venv` that contains `art` and `vllm`; it therefore terminated before attack-agent initialization.
-The terminal artifact records zero attack records, zero victim episodes, and zero safety outcomes; P0b is not an R7
-continuation or replacement, and it must not be retried from the frozen root. EDPA P1a remains frozen and
-unevaluated. No fixed-trace method outcome, defense baseline, or attacked+defended comparison is authorized.
+The first large-sample SABER P0b producer root terminated before record generation because it used the wrong Python
+environment. A separately authorized fresh2 producer/victim run then retained 48 immutable records and 96/96 valid
+clean/attacked episodes. It observed 23 clean-eligible pairs—below the frozen minimum of 26—and therefore remains
+`p0b_blocked_insufficient_clean_baseline`, even though 15/23 eligible pairs had a typed transition. This is not a
+confirmed attack qualification.
+
+The current experiment priority is the exploratory Execution-only action-envelope attacked+defended successor.
+Its clean R1 retained 22/23 baseline-eligible strict successes; attacked R2 failed before a new environment action on
+a non-finite policy command. R3 added a deterministic zero brake but was stopped before its all-or-nothing binding
+probe completed after runtime GPU contention and device-isolation mismatch. R3 produced zero episodes and no
+efficacy outcome. The next run requires a resource-isolated successor protocol and fresh root; see
+[Current experiment priority](docs/current_experiment.md).
 
 ## Start here
 
 - [Project status](docs/project_status.md)
+- [Current experiment priority](docs/current_experiment.md)
 - [Unified evaluation results](docs/evaluation_results.md)
 - [Method and claim boundary](docs/method.md)
 - [Current and target architecture](docs/system_architecture.md)
@@ -114,6 +121,7 @@ baseline preflight must report `source_ready=false` in that state; the test suit
 Do not delete or alter the binding merely to make the preflight ready.
 
 GPU/OpenPI execution requires the additional environment and isolation rules in
-[docs/remote_execution.md](docs/remote_execution.md). P0b is the sole authorized GPU exception and remains gated by
-its committed protocol, clean worktree, fresh root, and `<4096 MiB` GPU checks. Local unit tests and Lean builds do
-not authorize ProofAlign/CTDA or defense-baseline rollout.
+[docs/remote_execution.md](docs/remote_execution.md). The only current GPU priority is a fresh, resource-isolated
+successor to the stopped R3 action-envelope experiment. It requires a newly frozen protocol, clean worktree, fresh
+root, two stable `<4096 MiB` GPUs with no compute process, and verified runtime JAX/EGL device mapping. Local unit
+tests and Lean builds do not authorize any broader ProofAlign/CTDA or defense-baseline rollout.

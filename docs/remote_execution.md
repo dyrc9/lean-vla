@@ -1,14 +1,14 @@
 # Current Execution Environment
 
-更新日期：2026-07-21
+更新日期：2026-07-23
 
 本文是当前机器运行 CPU/Lean、OpenPI/LIBERO-Safety 和 GPU 实验的唯一环境入口。CLI 具体参数仍以
 代码 `--help` 为准。
 
-> **P0b 是唯一例外。** 用户已授权 `saber_threat_replication_p0b_producer_protocol.json` 的 official
-> producer，以及其 immutable record gate 通过后新冻结的 P0b victim protocol。两阶段都必须满足 committed
-> protocol、clean worktree、fresh absent root 和各自 `<4096 MiB` GPU gate；当前 6 张 GPU 均不满足，所以
-> 不执行。其余 OpenPI、MuJoCo、AEGIS 和任何 `--execute` 命令仍暂停。
+> **当前唯一 GPU 优先级是 action-envelope successor。** R3 在 static preflight 后因 runtime GPU
+> contention 与实际 JAX/EGL device mapping 异常停止。下一次必须使用新 protocol、clean worktree、fresh
+> root、两张稳定空闲 GPU，以及 launch 后实际 device mapping gate。其余 OpenPI/MuJoCo/AEGIS execution
+> 仍暂停。详见 [`current_experiment.md`](current_experiment.md)。
 
 ## 1. 固定路径
 
@@ -146,6 +146,12 @@ nvidia-smi --query-compute-apps=gpu_uuid,pid,process_name,used_memory --format=c
 - VLA-only 正式 GPU execution 仍必须先有新 protocol、clean commit、fresh root 和全部 preflight gate；
 - 若新 protocol 与交接授权满足全部 gate，必须重新查询 inventory，并选择 prelaunch used memory
   `<4096 MiB` 的 physical GPU；不得沿用历史 GPU 编号；
+- action-envelope successor 使用两张不同 physical GPU；两张卡都必须无 compute process并连续稳定至少
+  五分钟，不能只采样一次；
+- launch 后必须重新读取 per-process GPU allocation 与 compute/graphics context；JAX policy 或 EGL
+  context 落到非冻结角色时，在 binding probe 前 fail closed；
+- binding probe 期间持续监控外部 compute process；任何新进程破坏资源 gate 时 terminal stop，不进入
+  episode；
 - E1 runner 的 CUDA、MuJoCo EGL 和 render device 都绑定同一 physical id；
 - JAX 在 `CUDA_VISIBLE_DEVICES=<physical id>` 的进程内通常看到 logical device 0，这是正常的；
 - 不把无关 GPU process 当成 ProofAlign 任务停止或修改。
@@ -161,22 +167,24 @@ systemctl --user show proofalign-fiper-r0-fresh2.service \
 快照见
 [`fiper_r0_stop_20260717.json`](../experiments/fiper_r0_stop_20260717.json)。
 
-## 6. 正式实验顺序：仅 VLA-only 攻击复现
+## 6. 正式实验顺序：仅 action-envelope successor
 
-本节当前只授权 official attack producer 与 unguarded VLA-only victim。旧 CTDA no-dispatch 命令和结果
-继续保留，但不得执行或覆盖。
+P0b producer/victim 已完成并冻结。当前只授权 resource-isolated action-envelope attacked+defended
+successor；旧 R3 root、CTDA no-dispatch 命令和其他结果继续保留，不得执行、续跑或覆盖。
 
-### A. 攻击 producer 与 runner 验证
+### A. Successor source、资源与 runner 验证
 
 ```bash
 git status --short
-ATTACK_ENV_PYTHON ATTACK_PRODUCER_OR_RUNNER.py --help
-ATTACK_ENV_PYTHON ATTACK_PRODUCER_OR_RUNNER.py --protocol NEW_PROTOCOL.json --preflight
+external/openpi/.venv/bin/python ACTION_ENVELOPE_SUCCESSOR_RUNNER.py --help
+external/openpi/.venv/bin/python ACTION_ENVELOPE_SUCCESSOR_RUNNER.py \
+  --protocol NEW_SUCCESSOR_PROTOCOL.json --preflight
 git diff --check
 ```
 
-具体命令必须取自当前 official SABER/EDPA runner 的 `--help`，不得凭本文猜参数。禁止运行任何
-`ctda_v2_*` audit/probe、Lean method evaluator、AEGIS/SAFE/FIPER runner 或 ProofAlign clean pilot。
+successor protocol 必须固定实际 JAX/EGL device isolation、runtime recheck、fresh root 和 stop rule。
+禁止运行任何 `ctda_v2_*` audit/probe、Lean method evaluator、AEGIS/SAFE/FIPER/EDPA runner 或新的
+ProofAlign clean pilot。
 
 ### B. 冻结
 

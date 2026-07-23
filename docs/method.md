@@ -1,11 +1,11 @@
 # ProofAlign / CTDA 方法定义
 
-更新日期：2026-07-20
+更新日期：2026-07-23
 
-本文是 ProofAlign/CTDA 的方法、威胁模型与 claim boundary 的规范性来源。当前所有实验与 rollout 均
-暂停；用户已单独授权本地、无 simulator/action capability 的最小原型实现。VLA-only 发布攻击复现仍是
-恢复实验后的第一优先级，但当前不执行。执行边界见 [`optimization_plan.md`](optimization_plan.md)，历史结果见
-[`evaluation_results.md`](evaluation_results.md)。
+本文是 ProofAlign/CTDA 的方法、威胁模型与 claim boundary 的规范性来源。当前唯一实验优先级是明确
+标注为 exploratory 的 Execution-only action-envelope successor；它不等于 Full CTDA 或 Dual method
+evaluation。执行边界见 [`current_experiment.md`](current_experiment.md) 和
+[`optimization_plan.md`](optimization_plan.md)，历史结果见 [`evaluation_results.md`](evaluation_results.md)。
 
 ## 0. 方法状态
 
@@ -240,7 +240,8 @@ runtime”。当前逐 request 编译的 v1 Lean evaluator约 0.65--1.95 秒 p99
 
 ## 8. 后续评估的最小证据
 
-除已冻结的 P0b unguarded VLA-only threat qualification 外，其余实验暂停，不执行本节。后续方法实验恢复时，首先比较：
+当前 action-envelope successor 只评估 Execution-only optional intervention，不开放本节的完整方法矩阵。
+后续方法实验恢复时，首先比较：
 
 | arm | Intent–Plan | Plan–Execution | 目的 |
 |---|---:|---:|---|

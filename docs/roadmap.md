@@ -1,6 +1,6 @@
 # ProofAlign Roadmap
 
-更新日期：2026-07-21
+更新日期：2026-07-23
 
 ## 目标
 
@@ -99,16 +99,17 @@ shared-observer fix + tests
    safety dimensions；
 5. closed-loop block 继续只标 intervention；没有独立 action counterfactual 时不计算 false positive。
 
-## 当前阶段：SABER P0b producer 已 terminal，实验线停止
+## 当前阶段：resource-isolated action-envelope successor
 
 详细架构、里程碑、实验矩阵和停止条件以 [`optimization_plan.md`](optimization_plan.md) 为准。
-当前没有运行中的 ProofAlign、Phantom、SAFE、FIPER 或 defense 实验。P0b 于 2026-07-22 在 GPU 2/3
-通过正式 preflight 后启动，但本次错误使用根 `.venv`，而非包含 `art`/`vllm` 的 SABER `.venv`，因而在攻击
-代理初始化前以 `record_generation_failed` terminal。没有 record、victim process、episode 或 safety outcome；最小 prototype、
-unit regression 与 Lean build 继续允许。P0b terminal 后必须停下并汇报，不能自动进入 EDPA 或 defense
-comparison。
+P0b fresh2 已完成 48 record 和 96/96 valid clean/attacked episode，但只有 23 个 clean-eligible pair，
+低于冻结的 26-pair gate。当前用户明确指定的唯一实验优先级是 exploratory Execution-only action-envelope
+attacked+defended successor。clean R1 retention 为 `22/23 = 0.9565`；R2 在新 `env.step` 前因 non-finite
+command terminal；R3 zero-brake attempt 因 runtime GPU contention/device mapping mismatch 在 binding probe
+完成前停止，0 episode/outcome。当前等待修复隔离、冻结 successor protocol 和 fresh root，并等待稳定双 GPU。
+完整 checkpoint 见 [`current_experiment.md`](current_experiment.md)。
 
-### 已停止实验线：SABER P0b threat qualification
+### P0b 与 R1--R3 checkpoint
 
 1. SafeLIBERO/AEGIS source/data foundation 已完成：官方 commit `57b1aef...`、32 scenario、1600 init、
    official collision label 和 typed metrics 已固定；
@@ -121,29 +122,25 @@ comparison。
    primary safety gate 未通过；
 6. primary threat signal 必须是独立 oracle 给出的 clean-safe→attacked-unsafe，不用 task failure、attack
    metadata 或 detector verdict 代替；
-7. P0b 已冻结新的 48-pair outcome-blind population：每个 safety suite 12 pair，L0/L1/L2 各 4 task，
-   init 10--49、env/policy 31/5；至少要求 26 clean-eligible pair、13 transition、rate 0.5，并报告
-   Wilson 95% CI。其 formal producer 已在 agent initialization 前因错误调用根 `.venv`（正确 SABER `.venv`
-   包含 `art`/`vllm`）terminal，故 record/victim/outcome 均为 0，且不得从原 root 重试；
-8. P1a 已在 `20c020d` 冻结 protocol/runner，fresh2 dual-camera asset producer 完成且静态 preflight
-   `ready: true`（33 tests passed）。没有生成任何 victim/simulator outcome；因 GPU runtime gate 没有空闲
-   物理设备而暂停，状态为 `not_yet_evaluated`，不自动重试或启动 defense arm；
-9. P0b 保存 terminal manifest、append-only ledger、episode artifact 和 SHA-256；结果形成后停止，不继续
-   outcome-driven search，也不自动启动 P1a。
+7. P0b fresh2 保留 48 record、96/96 valid episode、23 clean-eligible、15 transition；denominator gate
+   不通过，正式分类为 `p0b_blocked_insufficient_clean_baseline`；
+8. action-envelope clean R1 完成 48/48 valid episode，baseline-eligible strict success `22/23`；attacked
+   R2/R3 都没有产生可解释的 attacked+defended outcome；
+9. EDPA P1a 在 OpenPI CLI parsing、policy/simulator/episode 前 terminal，保持次要冻结线。
 
 ### 冻结线：ProofAlign/CTDA 与 defense baseline
 
 1. 既有 v1/v2 code、protocol、artifact 原样保留，不覆盖、不续跑；
-2. 不运行 CTDA v2 audit/probe、fixed-trace/shadow outcome、clean pilot 或 attacked+defended arm；
+2. 不运行 CTDA v2 audit/probe、fixed-trace/shadow outcome或新的 clean pilot；仅当前 action-envelope
+   successor attacked+defended arm例外；
 3. minimal integrity prototype 可以做本地 unit/Lean build，但不接 simulator、GPU、online wire outcome；
 4. 不继续数值预算、raw perception、recovery 或 CTDA support 施工；
 5. 不运行 AEGIS、SAFE、FIPER 或其他 defense baseline。
 
 ### 汇合 gate
 
-当前不开放汇合 gate。即使某个 VLA-only workload threat-valid，也只形成攻击复现结果，不自动执行
-attacked+defended 正式比较。任何 ProofAlign/CTDA 或 defense baseline 恢复都需要用户再次明确授权和新
-protocol。
+当前不开放 Full CTDA/四臂汇合 gate。action-envelope successor 是已明确授权的探索性 Execution-only
+measurement，不能把 P0b 改写为 qualified attack，也不自动开放其他 ProofAlign/CTDA 或 baseline。
 
 v1 冻结判定见
 [`proofalign_method_validity_decision_20260717.json`](../experiments/proofalign_method_validity_decision_20260717.json)。

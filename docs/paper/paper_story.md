@@ -1,9 +1,10 @@
 # 论文故事：VLA 的任务授权与执行完整性
 
-更新日期：2026-07-20
+更新日期：2026-07-23
 
-> 本文描述候选论文叙事，不代表当前已获得 defense efficacy。P0b 是唯一授权且尚未产生 outcome 的攻击
-> replication；本地 minimal integrity prototype 已实现，但没有 fixed-trace、clean 或 defense outcome。
+> 本文描述候选论文叙事，不代表当前已获得 defense efficacy。P0b fresh2 完成但 denominator gate 未通过；
+> action-envelope clean R1 通过 scoped utility gate，R2/R3 没有 attacked+defended outcome。当前 successor
+> 仍是 exploratory Execution-only measurement，不是 Full CTDA 结果。
 
 ## 一句话定位
 

@@ -1,6 +1,6 @@
 # Attack Reproduction Evidence Audit
 
-更新日期：2026-07-22
+更新日期：2026-07-23
 
 ## 结论
 
@@ -13,9 +13,8 @@
 - 攻击效果 validity：在 held-out、有效配对上，攻击是否按事前定义产生独立 safety harm。
 
 Phantom 部分满足第一项，但没有通过第二项；正式 SABER exact-task R1 连第一项都未完成。独立 SABER
-P0b 虽通过 formal preflight，但本次错用根 `.venv` 而非含 `art`/`vllm` 的 SABER `.venv`，在攻击代理初始化
-前 terminal，0 record/0 victim/0 outcome，因而同样未完成第一项。SAFE 和 FIPER 是外部防御 baseline，不是攻击，而且也都没有完成 terminal
-reproduction。
+P0b fresh2 已完成攻击实现与 victim execution，但 clean-eligible denominator 为 `23 < 26`，未通过冻结的
+qualification chain。SAFE 和 FIPER 是外部防御 baseline，不是攻击，而且也都没有完成 terminal reproduction。
 
 机器可读审计见
 [`attack_reproduction_evidence_audit_20260717.json`](../experiments/attack_reproduction_evidence_audit_20260717.json)。
@@ -107,6 +106,34 @@ defense efficacy。
 
 所以不能从该结果推断 SABER 在 LIBERO-Safety 上有效或无效，也不能推断 ProofAlign 能否防御它。
 
+### P0b fresh2 完成，但 denominator gate 未通过
+
+P0b fresh1 因错用 Python environment 在 record generation 前 terminal。后续独立授权的 fresh2 使用 fresh
+producer/victim roots，生成 48 条 immutable official-agent record，并完成 96/96 valid clean/attacked
+episode：
+
+- clean-eligible pair：`23`，冻结要求至少 `26`；
+- typed transition：`15/23 = 0.6522`；
+- transition count/rate 达到数值门槛，但 denominator gate 未达到；
+- 正式 classification：`p0b_blocked_insufficient_clean_baseline`。
+
+因此 P0b 是完整但未 qualification 的 exploratory substrate，不能后验删除 25 个 ineligible pair、降低
+denominator 或改写为 confirmed attack。
+
+### Action-envelope R1--R3
+
+用户在明确保留 P0b nonqualified classification 的条件下授权 exploratory Execution-only action-envelope：
+
+- clean R1：48/48 valid episode，在 23 个 baseline-eligible pair 上 strict success `22/23`，通过 `0.8`
+  clean utility gate；
+- attacked R2：首个 episode 的 policy output 出现 non-finite command，在任何新 `env.step` 前 terminal；
+- attacked R3：加入 deterministic zero brake，但 static preflight 后实际 JAX/EGL device mapping 与冻结角色
+  不一致，GPU 5 又出现约 30 GiB 外部 compute process；binding probe 超过三小时未完成，随后按用户要求停止；
+- R2/R3 attacked+defended episode/outcome 都为 0。
+
+当前优先级是修复资源隔离并冻结 fresh successor。即使 successor 完成，也只能作为该 P0b setting 的
+exploratory measurement，不会把 P0b 升级为 qualified attack。
+
 ## SAFE / FIPER
 
 SAFE 与 FIPER 是 runtime defense baseline，不提供攻击基础。它们自身也没有通过 reproduction gate：
@@ -136,9 +163,8 @@ attack harm reduced by ProofAlign: not evaluated
 因此当前最大的上游 blocker 是 threat validity，而不只是 CTDA v1 的 liveness/retention。E3 clean
 safety preservation、E4 injected faults 和 Lean parity 都不能替代有效攻击复现。
 
-所有实验现已暂停。下一步若继续，必须先冻结一个 **VLA-only threat-validation-only** protocol：使用
-disjoint held-out task/seed、独立 safety endpoint 和 outcome-blind gate。只有攻击先通过，才讨论新的
-defense method/version。若仍没有攻击通过，应删除或改变 attack-defense claim，而不是按结果继续调攻击。
+当前唯一实验优先级是 resource-isolated action-envelope successor。它来自显式用户授权，但必须保持
+exploratory/nonconfirmatory claim boundary。Full CTDA、AEGIS、SAFE、FIPER、EDPA 和其他 arm 不并行。
 
 ## Claim boundary
 
