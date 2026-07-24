@@ -46,6 +46,8 @@ contact/joint proxy 仍然存在。因此当前分类保持
 详细解释和后续 gate 见
 [项目进展与实施规划](docs/progress_and_plan.md)；机器结果见
 [terminal summary](experiments/saber_integrity_action_envelope_terminal_summary.json)。
+历史失败的根因和防复发检查见
+[失败实验与踩坑记录](docs/failure_lessons.md)。
 
 ## 下一实验
 

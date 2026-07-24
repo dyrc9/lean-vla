@@ -5,16 +5,17 @@
 当前文档已经收敛为一个主线：
 
 1. [`progress_and_plan.md`](progress_and_plan.md)：当前结果、证据边界、下一实验和 M0–M6 规划；
-2. [`method.md`](method.md)：两层关系、两个不变量、三个 transaction 和四臂语义；
-3. [`experiments.md`](experiments.md)：实验冻结、gate、统计和停止规则；
-4. [`remote_execution.md`](remote_execution.md)：本地/远程环境、资源隔离和执行前检查；
-5. [`paper/action_envelope_results.md`](paper/action_envelope_results.md)：由 R9 terminal evidence
+2. [`failure_lessons.md`](failure_lessons.md)：历史失败、根因、防复发规则和新实验启动检查清单；
+3. [`method.md`](method.md)：两层关系、两个不变量、三个 transaction 和四臂语义；
+4. [`experiments.md`](experiments.md)：实验冻结、gate、统计和停止规则；
+5. [`remote_execution.md`](remote_execution.md)：本地/远程环境、资源隔离和执行前检查；
+6. [`paper/action_envelope_results.md`](paper/action_envelope_results.md)：由 R9 terminal evidence
    生成的论文表、projection 分布和 failure taxonomy；
-6. [`paper/confirmatory_preregistration.md`](paper/confirmatory_preregistration.md)：独立确认性
+7. [`paper/confirmatory_preregistration.md`](paper/confirmatory_preregistration.md)：独立确认性
    attack foundation 与后续四臂设计；
-7. [`paper/paper_story.md`](paper/paper_story.md)：论文叙事；
-8. [`paper/progress_assessment.md`](paper/progress_assessment.md)：论文就绪度和缺口；
-9. [`paper/related_work.md`](paper/related_work.md)：相关工作与 novelty 边界。
+8. [`paper/paper_story.md`](paper/paper_story.md)：论文叙事；
+9. [`paper/progress_assessment.md`](paper/progress_assessment.md)：论文就绪度和缺口；
+10. [`paper/related_work.md`](paper/related_work.md)：相关工作与 novelty 边界。
 
 结果数字以机器 JSON 为准：
 

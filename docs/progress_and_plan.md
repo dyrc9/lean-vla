@@ -78,6 +78,8 @@ exploratory_attacked_defended_complete_not_confirmatory
 
 CTDA v1/v2、AEGIS、EDPA、Phantom、SAFE/FIPER、旧 LIBERO runner、toy example、旧 handoff、重复状态文档
 和不参与当前结论的结果已从工作树删除，可从 Git 历史恢复。
+这些方向的失败根因与防复发规则集中保留在
+[`failure_lessons.md`](failure_lessons.md)，不再用多份旧状态文档维护。
 
 完整 R9 raw episode bundle 约 71 MiB，只在实验机本地保留。远端只保存代码和 compact result；缺少
 raw bundle 的远端 clone 会明确 skip raw-derived consistency check。
