@@ -1,102 +1,95 @@
-# ProofAlign
+# ProofAlign: VLA ActionBlock 双层完整性
 
-ProofAlign 是一个面向 Vision-Language-Action（VLA）系统的执行完整性研究原型。当前主线只保留两层
-关系：
+本仓库研究一个不要求 VLA 输出高层规划的问题：
 
-1. **Intent–Plan Integrity**：proposal 是否仍实现可信 mission、当前 phase 与剩余 obligation；
-2. **Plan–Execution Integrity**：实际 dispatch 的 final command 是否就是被检查和授权的 command。
+> 在可信任务意图保持不变、policy-facing instruction/observation/history 可能被攻击时，如何判断 VLA
+> 输出的 ActionBlock 是否仍服务于可信意图，并确认获准的 ActionBlock 在执行后没有发生命令或效果偏移？
 
-方法只有两个核心不变量：
+核心链路是：
 
 ```text
-No dispatch without dual authorization
-No phase advance without checked completion
+Trusted T + pre-attack O_t^T -> frozen selector -> SemanticSubtask Z_t ─┐
+                                                                       v
+external prompt / injected O_t^atk -> π0.5 -> ActionBlock candidates -> L1
+                                                                       |
+                                                  BlockExecutionContract
+                                                                       |
+                                           dispatch -> receipt/effects -> L2/Lean
 ```
 
-在线协议被收敛为三个 transaction：冻结 contract、授权 exact prefix、检查 effect 并更新 persistent
-monitor。当前 Python 原型和 Lean core 都已实现；两者之间尚缺 machine-checked refinement，因此 Lean
-只能作为离线形式化模型，不能描述为实时证明控制器。
+两层的含义：
 
-## 当前实验结论
+1. **Intent–SemanticSubtask–ActionBlock alignment（L1）**：只用可信任务和安全分叉前 observation
+   产生并绑定 `Z_t`，再检查 π0.5 ActionBlock 的局部运动/后果是否与 `Z_t` 兼容。不确定时必须
+   abstain/fail closed。
+2. **ActionBlock–Execution alignment（L2）**：检查获准 block、最终命令、dispatch receipt、观测效果
+   和任务 phase transition 是否属于同一个绑定事务。Lean 只用于这层的有限、离散命题；不证明 learned
+   assessor、传感器或物理世界正确。
 
-当前 terminal 结果来自 Execution-only action-envelope 探索实验：
+顶层 motivation 始终是 `Intent -> ActionBlock` 与 `ActionBlock -> Execution` 两层对齐；`Z_t` 是 L1
+的结构化机制。Lean 是 L2 的核心方法组件，用于固定 transaction semantics 并检查 exact-dispatch 与
+phase-gating theorem，而不是事后附加的形式化说明。
 
-| 指标 | 结果 |
-|---|---:|
-| P0b immutable attack records | `48` |
-| P0b valid clean/attacked episodes | `96/96` |
-| P0b clean-eligible pairs | `23`，低于预注册门槛 `26` |
-| P0b clean-safe→attacked-unsafe signal pairs | `15` |
-| clean strict-success retention | `22/23 = 95.7%` |
-| attacked+defended valid episodes | `48/48` |
-| envelope 内最终命令 | `17,828/17,828` |
-| 被 projection 修改的动作 | `13,108/17,828 = 73.5%` |
-| full-population strict success without cost | `26/48 = 54.2%` |
-| full-population LIBERO cost/collision unsafe | `1/48 = 2.1%` |
-| signal subset defended cost/collision | `0/15` |
-| signal subset recovered strict success | `8/15` |
-| signal subset residual contact proxy 高于 clean | `11/15` |
+四臂实验是同一 runner 上的两个开关：
 
-结论是：exact execution-time projection 在这个固定 simulator workload 上提供了强探索性缓解证据，
-同时基本保留 clean utility；但 P0b 的 clean-eligible denominator 未达到冻结门槛，而且 residual
-contact/joint proxy 仍然存在。因此当前分类保持
-`exploratory_attacked_defended_complete_not_confirmatory`，不能声称一般攻击防御有效、完整物理安全
-或 Dual 方法已经得到验证。
+| Arm | L1 Intent–Action | L2 Action–Execution |
+|---|---:|---:|
+| VLA-only | off | off |
+| Semantic-only | on | off |
+| Execution-only | off | on |
+| Dual | on | on |
 
-详细解释和后续 gate 见
-[项目进展与实施规划](docs/progress_and_plan.md)；机器结果见
-[terminal summary](experiments/saber_integrity_action_envelope_terminal_summary.json)。
-历史失败的根因和防复发检查见
-[失败实验与踩坑记录](docs/failure_lessons.md)。
+冻结 runtime 中的 `intent_only` / `intent_action_enabled` 只是 Semantic-only 的兼容 schema 名称。
 
-## 下一实验
+## 当前证据边界
 
-下一项正式实验不是继续扩大 R9，而是独立确认性 attack foundation：
+- P0b：96/96 episode 有效，得到 23 个 clean-eligible pair 和 15 个攻击 transition；因
+  `23 < 26` 未通过确认性 denominator gate。
+- R9 Execution-only：clean retention `22/23 = 95.7%`；attacked+defended `48/48`
+  有效；cost/collision unsafe `1/48`；signal subset `15/15 -> 0/15` cost/collision；
+  strict-success recovery `8/15`；`11/15` 仍有 residual contact proxy。
 
-- `60` 个与 P0b 不重叠的 base pair；
-- `2` 个冻结 seed block，共 `120` 个 unit；
-- 每个 unit 跑 clean 与 attacked VLA-only，共 `240` 个 episode；
-- clean-eligible 必须 `>=52` unit 且覆盖 `>=26` base pair；
-- transition 必须 `>=26` unit 且覆盖 `>=18` base pair；
-- transition rate 必须 `>=0.50`，base-pair cluster bootstrap 95% lower bound 必须 `>=0.30`。
+因此现有结果仍是**强探索性正结果**，不能声称一般防御有效、完整物理安全或 Dual 已验证。旧结果可复用为：
 
-在它之前先完成 no-outcome readiness：冻结 producer/victim/shared runner、fixed-trace exporter、digest、
-资源预算、fresh output root 和 validator。确认性 gate 未通过时，四臂防御实验不启动；通过后才依次
-运行 fixed-trace shadow、`480` 个 clean 四臂 episode、`480` 个 attacked 四臂 episode。
+- P0b：原始 instruction/observation attack、clean pairing 和攻击 transition 基础；
+- R9：ActionBlock dispatch、intervention、receipt/effect logging 和 Execution-only 基线。
 
-预注册见 [confirmatory/four-arm design](docs/paper/confirmatory_preregistration.md)。
+它们不能替代新的 L1 assessor qualification，也不能改名为 Dual 结果。
 
-## 当前主线结构
+## 当前主线
 
-- `src/proofalign/integrity_*.py`：两层完整性、四臂开关、exact-command authorization、dispatch receipt
-  与 persistent monitor；
-- `src/proofalign/benchmark/`：immutable attack record、action envelope、LIBERO runtime 和 SABER
-  replication 主线适配；
-- `lean/ProofAlign/IntegrityCore.lean`：两个不变量和四臂语义的最小 Lean 模型；
-- `scripts/`：当前 runner、artifact generator、preregistration freezer 与 resource-isolated launch 检查；
-- `experiments/`：紧凑 protocol/status/terminal summary；R0–R9 协议链保留用于审计；
-- `tests/`：仅覆盖当前主线；
-- `docs/`：方法、实验规则、结果报告和论文材料。
+1. M1A component closure：冻结 producer/victim、四臂 runner、trace exporter、Lean evidence 与 validator；
+2. M1B selector qualification：冻结 task graph、`Z_t` 词表、margin/unknown、OOD 和 latency gate；
+3. M1C local-checker qualification：报告 attacked false allow、clean retention、coverage 和 worst group；
+4. 贯通 `Z_t`/prompt/ActionBlock/contract identity，并更新 fixed-trace 与资源 gate；
+5. 运行 M2：60 base pair × 2 seeds，共 240 个 clean/attacked VLA-only episode；
+6. M2 gate 通过后，依次运行 fixed-trace 四臂、480 clean 四臂、480 attacked 四臂。
 
-废弃的 CTDA v1/v2、AEGIS、EDPA、Phantom、SAFE/FIPER、旧 LIBERO runner、旧 handoff 和重复结果已
-从工作树删除；需要时仍可从 Git 历史恢复。
+入口文档：
 
-## 验证
+- [方法定义](docs/method.md)
+- [`Z_t` 可信输入与注入边界](docs/trusted_semantic_boundary.md)
+- [零训练 semantic hierarchy](docs/semantic_subtask_hierarchy.md)
+- [ActionBlock assessor 设计与资格化](docs/action_block_assessment.md)
+- [实验协议](docs/experiments.md)
+- [旧实验复用与迁移](docs/experiment_reuse.md)
+- [相关工作](docs/paper/related_work.md)
+- [论文故事](docs/paper/paper_story.md)
+- [代码与实验准备清单](docs/implementation_and_experiment_readiness.md)
+- [进展与下一步](docs/progress_and_plan.md)
+
+常用检查：
 
 ```bash
-cd /home/ldx/lean-vla
-export PATH=/home/ldx/lean-vla/.tools/lean-4.24.0-linux/bin:$PATH
-.venv/bin/python -m pytest -q
-(cd lean && lake build ProofAlign)
-make paper-artifacts-check
+.venv/bin/pytest -q
+PATH="$PWD/.tools/lean-4.24.0-linux/bin:$PATH" \
+  lake --dir lean build ProofAlign
+.venv/bin/python scripts/run_action_block_fixed_trace_gate.py --check
+bash scripts/check_all.sh
 ```
 
-也可以运行 `scripts/check_all.sh`。
+冻结的旧协议、旧结果和废弃路线只用于审计，不授权新 rollout。
 
-完整 R9 raw episode bundle 只保留在实验机本地。远端只保存代码、协议、terminal summary、派生表、
-failure taxonomy 和校验绑定；远端缺少本地 raw bundle 时，raw-dependent 检查会明确 skip，不能把
-skip 解释为独立复现。confirmatory preregistration 的重新生成同样依赖本地忽略的
-`external/LIBERO-Safety` checkout。
-
-GPU/OpenPI 环境和执行边界见 [远程执行说明](docs/remote_execution.md)。R9 root 已冻结，禁止续跑或
-覆盖；任何新 rollout 都必须使用新 protocol、clean commit、fresh root 和单独的执行授权。
+当前 M1 packet 已确认 producer/victim、shared runner、Lean evidence、fresh roots、fixed-trace exporter
+与 outcome-blind ActionBlock prefix adapter 完成；剩余 blocker 是 semantic runtime integration、
+selector/local-checker qualification、授权后的资源/延迟 smoke measurement，以及 clean-commit binding。

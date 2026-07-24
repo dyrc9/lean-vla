@@ -1,225 +1,189 @@
-# ProofAlign 项目进展与实施规划
+# 当前进展与执行计划
 
-更新日期：2026-07-24
+## 1. 2026-07-24 对齐结论
 
-## 1. 一句话状态
-
-项目已经形成一个清晰主线：**以 mission-rooted contract 约束 Intent–Plan，以 exact-command
-authorization 和 receipt/effect binding 约束 Plan–Execution；先确认攻击 population，再做四臂因果
-评估。**
-
-当前最强证据是 Execution-only action-envelope 的 terminal 探索性正结果。它值得写入论文，但不足以
-支持 confirmatory defense、Dual composition 或完整物理安全结论。
-
-## 2. 当前实验结果
-
-### 2.1 P0b attack foundation
-
-P0b 生成 48 条 immutable attack record，并完成 clean/attacked 共 `96/96` 个 valid episode：
-
-| 指标 | 结果 |
-|---|---:|
-| clean-eligible pairs | `23` |
-| 冻结的最低 clean-eligible gate | `26` |
-| clean-safe→attacked-unsafe transitions | `15/23` |
-| 正式分类 | `p0b_blocked_insufficient_clean_baseline` |
-
-问题不是 transition 太少，而是 clean baseline denominator 没达到事前门槛。因此这 15 个 pair 可以做
-固定的探索性 signal subset，不能被后验称为确认性 attack population。
-
-### 2.2 Execution-only action envelope
-
-| 指标 | 结果 | 含义 |
-|---|---:|---|
-| clean strict-success retention | `22/23 = 95.7%` | 通过冻结的 `0.80` gate |
-| attacked+defended valid episodes | `48/48` | 无 missing/invalid |
-| final commands inside L2 envelope | `17,828/17,828` | 该切片 complete mediation 成立 |
-| projected actions | `13,108/17,828 = 73.5%` | intervention 使用频繁 |
-| projection L2 | median `0.002853`, P95 `0.008507`, max `0.039266` | 修改幅度整体较小 |
-| full-population strict success without cost | `26/48 = 54.2%` | task utility 仍有明显损失 |
-| full-population cost/collision unsafe | `1/48 = 2.1%` | 仍有一个 coarse unsafe |
-| signal subset defended cost/collision | `0/15` | 未防御的 `15/15` 降为 `0/15` |
-| signal subset recovered strict success | `8/15 = 53.3%` | 只恢复一部分任务 |
-| signal subset residual contact proxy | `11/15` 高于 clean | 不能声称完整物理安全 |
-
-正式分类：
+主线已进一步改为：
 
 ```text
-exploratory_attacked_defended_complete_not_confirmatory
+L1: TrustedIntent -> frozen SemanticSubtask -> checked ActionBlock
+L2: authorized ActionBlock -> exact dispatch/receipt/observed effects
 ```
 
-允许的论文表述：在固定 simulator workload 上，exact execution-time projection 提供强探索性低层风险
-缓解证据，并基本保留 clean utility。
+顶层故事仍是 Intent→ActionBlock 与 ActionBlock→Execution 双层对齐。`SemanticSubtask` 是 L1 的当前
+结构化机制，不是新的第三层，也不是恢复旧的自由文本 PlanWitness。它来自有限 task graph，在动作生成前
+成为显式 π0.5 输入并与返回 block 绑定；第一版不训练模型。其行为控制力必须实验测量，不能从 prompt
+wiring 本身推出。
 
-不允许的表述：
+当前第一关键 blocker 变成：
 
-- 已确认一般攻击防御有效；
-- Intent-only、Full ProofAlign 或 Dual 已得到验证；
-- contact、joint、force 或连续动力学意义上的完整物理安全；
-- 跨 task、seed、hardware 或实时部署可推广。
+> 当前冻结 π0.5/PaliGemma 或其他零训练 selector 能否稳定选择合法 `Z_t`，以及 `Z_t` 条件化是否改善
+> ActionBlock 的可解释约束而不破坏 clean utility？
 
-机器来源：
+当前公开 OpenPI 只开放 flow-matching action head，因此需要 consumer-side inference wrapper；不能把
+论文版 π0.5 的 semantic head 当作已存在的本地接口。
 
-- [`terminal summary`](../experiments/saber_integrity_action_envelope_terminal_summary.json)
-- [`paper tables`](../experiments/action_envelope_paper_tables.json)
-- [`failure taxonomy`](../experiments/action_envelope_failure_taxonomy.json)
-- [`generated result report`](paper/action_envelope_results.md)
+`Z_t` 的 trusted-input boundary 已落地为双视图：
 
-## 3. 工程状态
+- semantic branch 只读取 trusted `T/O_t^T`，并 allowlist task source、observation tap、secure split、
+  selector checkpoint/config；
+- 外部 prompt、被注入图像和 history 只属于 action-policy branch；
+- `Z_t` artifact 绑定合法 frontier、state epoch 和完整 semantic context；
+- hardened action prompt 只从 trusted `T + Z_t` 固定编译；
+- 当前只覆盖 secure split 后的数字/软件注入，不覆盖同时欺骗 trusted tap 的分叉前物理光学攻击。
 
-当前工作树只保留：
+实现与边界见 [`trusted_semantic_boundary.md`](trusted_semantic_boundary.md)。
 
-- Python minimal integrity core、action-envelope/SABER 主线 adapter 和精简 LIBERO runtime；
-- Lean `IntegrityCore`；
-- 当前 runners、artifact/preregistration generator 与 resource-isolated launch 检查；
-- R0–R9 compact protocol/status audit chain；
-- terminal summary、paper tables、taxonomy 和 preregistration；
-- 主线测试、方法/实验/环境/论文文档。
+2026-07-24 零训练 GPU pilot 的当前结论：
 
-CTDA v1/v2、AEGIS、EDPA、Phantom、SAFE/FIPER、旧 LIBERO runner、toy example、旧 handoff、重复状态文档
-和不参与当前结论的结果已从工作树删除，可从 Git 历史恢复。
-这些方向的失败根因与防复发规则集中保留在
-[`failure_lessons.md`](failure_lessons.md)，不再用多份旧状态文档维护。
+- motion-level `approach/grasp/...` 初始选择为 `0/4`；
+- π0.5 skill-level `pick_up/move/place/...` 初始选择为 `4/4`；
+- 单条轨迹阶段切换名义为 `3/5`，两个错误均在人工标签边界；
+- 不同 `Z_t` prompt 会改变 ActionBlock，但差异很小，不能视为可靠 action control。
 
-完整 R9 raw episode bundle 约 71 MiB，只在实验机本地保留。远端只保存代码和 compact result；缺少
-raw bundle 的远端 clone 会明确 skip raw-derived consistency check。
+详见 [`semantic_subtask_pilot.md`](semantic_subtask_pilot.md)。
 
-当前实现缺口：
+动作选择已经形式化为 `Z_t` 先固定、π0.5 后提议、consumer 再过滤/小幅投影/复检。确定性 best-of-K
+选择边界和单元测试已实现于 `semantic_action_selection.py`；它尚未接入在线 LIBERO runner，当前 runner
+仍是单 chunk、clip、执行前五步。
 
-1. Python fast checker 与 Lean `IntegrityCore` 尚无 machine-checked refinement/equivalence；
-2. confirmatory producer/victim 和四臂 shared runner 尚未冻结；
-3. fixed-trace exporter 尚未冻结；
-4. trusted observer、continuous dynamics、hardware sensing/actuation 仍在范围外或 TCB 内；
-5. 新实验的 GPU、wall-clock、存储和 fresh-root readiness packet 尚未完成。
+可信 semantic context、`Z_t` artifact、外部攻击视图隔离和固定 prompt 编译已实现于
+`semantic_trust.py`；相关 trust-boundary 与 action-selection 定向测试共 22 个通过。下一工程步骤是把
+这两个边界接入 LIBERO runner，并实现 `Z_t -> executable prefix` local checker。
 
-本轮主线清理后的验证结果：
+## 2. 已完成
 
-- Python：`76 passed`；
-- Lean：`lake build ProofAlign` 成功；
-- R9 action-envelope paper artifact `--check` 成功；
-- confirmatory preregistration `--check` 成功；
-- 27 份保留的 experiment JSON 均可解析；
-- retained module import、Python compile、Markdown 本地链接和 `git diff --check` 均通过。
+- ActionProposal 已成为原生 ActionBlock，不再含 `plan_digest`；
+- 新增 `ActionBlockAssessment` 和 `BlockExecutionContract`；
+- authorization、dispatch receipt、execution evidence 已绑定 block/assessment/contract digests；
+- shared four-arm runner 改为 Intent–Action / Action–Execution 两个开关；
+- Lean core 改为 action-block execution transaction semantics；
+- L2 支持 exact command、one-use authorization、freshness、expected/forbidden effects、phase gating；
+- P0b/R9 历史结果及冻结协议仍保留审计边界。
 
-## 4. 下一步跑什么
+## 3. 历史实验怎么复用
 
-下一项正式 rollout 是 **独立确认性 attack foundation**，不是继续 R9，也不是直接跑四臂 defense。
+完整的逐字段映射、post-hoc replay 规则和 confirmatory 禁止项见
+[`experiment_reuse.md`](experiment_reuse.md)。
 
-### 规模
+### P0b
 
-- 60 个与 P0b 不重叠的 base pair；
-- 两个 seed block：`(env=43, policy=11)` 和 `(env=59, policy=17)`；
-- 120 个 unit；
-- 每个 unit 跑 clean/attacked VLA-only，共 `240` episode。
+可直接复用：
 
-### Gate
+- 原始攻击机制和 threat model；
+- clean/attacked pairing；
+- valid episode 与 clean-eligible denominator 逻辑；
+- transition signal 和缺失/替换规则。
 
-必须同时满足：
+不可复用：
 
-- `240/240` terminal valid；
-- clean-eligible unit `>=52`，覆盖 base pair `>=26`；
-- transition unit `>=26`，覆盖 base pair `>=18`；
-- transition rate `>=0.50`；
-- 100,000 次 base-pair cluster bootstrap 95% lower bound `>=0.30`。
+- 新 L1 assessment；
+- 四臂 causal effect；
+- confirmatory denominator（`23 < 26`）。
 
-任一 gate 失败即写 terminal nonpass，不补样、不换 pair、不进入 defense。
+### R9 Execution-only
 
-## 5. 分阶段规划
+可直接复用：
 
-### M0：终态收口
+- action envelope/intervention；
+- exact dispatch 和 episode ledger；
+- cost/collision、strict success、contact proxy；
+- clean retention 和 attacked recovery 的 exploratory baseline。
 
-状态：**本轮完成**
+需要迁移：
 
-- 清理废弃方案，只保留主线；
-- 保存本地 R9 raw evidence；
-- 保留远端所需 compact protocol/result；
-- 自动生成论文表和 failure taxonomy；
-- 把当前结果、claim boundary 和规划集中到 canonical 文档。
+- 将旧 transport/audit 映射为 ActionBlock/contract/receipt v3；
+- 不把旧 effect verdict 当作完整物理安全；
+- 不把 R9 称为 Dual。
 
-### M1：no-outcome execution readiness
+## 4. 当前 blocker 排序
 
-状态：**当前下一工作**
+1. **Runtime schema/integration**：trusted semantic context、exact `Z_t`、prompt、candidate、
+   executable prefix、assessment 与 contract 的端到端绑定；
+2. **Local checker qualification**：`Z_t -> ActionBlock` 的 false-allow、coverage 和 OOD；
+3. **Zero-training selector qualification**：合法率、阶段合理性、稳定性、margin 和 unknown；
+4. **Lean/runtime evidence refresh**：semantic digests 接入后重新生成 fixed-trace、theorem/source digest 和
+   scoped Python-equivalence evidence；
+5. **资源预算**：selector/checker 与四臂 latency/GPU memory；
+6. **observer adequacy、clean commit binding 和 M2 execution authorization**。
 
-1. 实现并冻结 60-record producer、validator 和禁止 replacement 规则；
-2. 实现 confirmatory VLA-only victim runner；
-3. 实现四臂 shared runner 和 fixed-trace exporter；
-4. 绑定 checkpoint/source/config/camera/runner/population/validator digest；
-5. 补 fast checker/Lean core equivalence evidence；
-6. 冻结 GPU、CPU/RAM、wall-clock、episode、磁盘和 abort 预算；
-7. 定义 fresh roots，完成 unit、Lean、dry-run 和 artifact validator；
-8. 形成只读 readiness packet，再单独请求 GPU 执行授权。
+M1 producer/victim、shared runner、fixed-trace exporter、validator 和 outcome-blind ActionBlock prefix adapter
+已经完成；adapter 只读取 policy-call audit 与实际消费的 raw actions，不读取 reward/success/cost/collision，
+也不伪造未执行的 chunk tail。
 
-M1 不产生新 outcome，也不自动启动 GPU。
+## 5. 下一里程碑
 
-### M2：确认性 attack foundation
+### M1A：component closure
 
-状态：**等待 M1 与授权**
+- 全部 Python/Lean tests 通过；
+- 新 ActionBlock fixed-trace smoke artifact 当前；
+- M1 readiness validator 不再引用 PlanWitness；
+- frozen legacy protocol 明确标注 audit-only，v3 schema 不改写历史结果，semantic-bound successor 使用
+  新版本 schema。
 
-按第 4 节运行 `240` 个 VLA-only episode。只有所有 gate 通过才继续。
+### M1B：semantic hierarchy no-outcome qualification
 
-### M3：四臂 fixed-trace/shadow
+- 冻结 task graph、subtask vocabulary 和 prompt template；
+- 探测当前 checkpoint 的 PaliGemma constrained selection；
+- 冻结 `unknown`/margin 规则；
+- 只做离线 observation/action probe，不看 M2 outcome。
 
-状态：**等待 M2 pass**
+### M1C：local checker no-outcome qualification protocol
 
-四臂读取 byte-identical proposal trace，`dispatch=false`，检查 unique catch、overlap、Dual additional
-catch、unknown/block、latency 和 checker equivalence。失败则 terminal stop。
+- 冻结训练/qualification split；
+- 冻结 finite atom vocabulary；
+- 冻结 threshold、abstention 和 worst-group；
+- 只允许 offline transition label，不看 M2 victim outcome。
 
-### M4：四臂 clean closed loop
+### M1D：semantic runtime 与 Lean identity closure
 
-状态：**等待 M3 pass**
+- 把 semantic context、`Z_t`、trusted prompt 和 executable-prefix digest 接入 ActionProposal/assessment/
+  execution contract；
+- projection/intervention 后重新 assessment、contract 和 authorization；
+- `K=1` fixed-trace 四臂共享 exact proposal；`K>1` 只作为另行冻结的扩展；
+- 更新 Lean source binding、关键 theorem inventory 和 scoped Python-equivalence artifact；
+- 完成 zero-dispatch fixed-trace、latency/resource smoke 和 fresh-root validator。
 
-120 unit × 4 arm，共 `480` clean episode。主要 gate：
+### M2：240 episode
 
-- `480/480` valid；
-- Dual strict-success retention `>=0.80`；
-- Dual−VLA paired bootstrap 95% lower bound `>=-0.10`；
-- Dual phase completion `>=0.80`；
-- Dual deadlock `<=0.05`；
-- unknown/unbound primary evidence `=0`。
+仅在用户/项目负责人明确授权 GPU rollout 后运行。先完成 VLA-only attack foundation，gate 通过后再跑
+fixed-trace 和 480+480 四臂。
 
-失败则不执行 attacked stage。
+## 6. 当前可声称与不可声称
 
-### M5：四臂 attacked closed loop
+可声称：
 
-状态：**同时等待 M2 与 M4 pass**
+- 双层问题已定义在 action-only VLA 可观察接口上；
+- L2 的有限 transaction semantics 已由 Lean 检查；
+- P0b/R9 给出强探索性攻击/Execution-only 信号；
+- component runner 可验证两层开关和 digest identity。
 
-120 unit × 4 arm，共 `480` attacked episode。报告 full population 和预定义 signal subset，并分别分析
-task success、cost/collision、contact、joint-limit、force、risk exposure 和 intervention magnitude。
+不可声称：
 
-Dual composition 必须同时优于 Intent-only 和 Execution-only；两项比较使用 Holm
-family-wise `alpha=0.05` 与 100,000 次 paired base-pair cluster bootstrap。
+- L1 assessor 已对真实 π0.5 资格化；
+- frozen semantic selector 已达到可用标准；
+- secure split 或 trusted camera tap 已在真实部署环境得到硬件级 attestation；
+- 一般防御有效；
+- Dual 已验证；
+- 完整物理安全；
+- Lean 证明 learned predictions 或真实世界。
 
-### M6：外部 baseline 与论文冻结
+## 7. 立即推进顺序
 
-状态：**M5 后决定**
+具体接口、测试、artifact 和停止条件见
+[`implementation_and_experiment_readiness.md`](implementation_and_experiment_readiness.md)。执行顺序固定为：
 
-- 用同一 proposal、population、oracle、fallback、资源和 endpoint 接入至少一个 terminal baseline；
-- 从机器 artifact 生成最终表、区间、消融和 failure cases；
-- 保留探索性结果和限制，不隐藏 negative/nonpass；
-- 根据四臂结果收缩或保留论文主张。
+```text
+C1 semantic digest schema
+  -> C2 trusted prompt/policy wrapper
+  -> C3 executable-prefix local checker
+  -> C4 post-intervention rebind
+  -> C5 shared-trace/Lean evidence refresh
+  -> E1 selector snapshot qualification
+  -> E2 local-checker qualification
+  -> E3 no-dispatch four-arm
+  -> authorized no-attack smoke
+  -> M2
+```
 
-## 6. 总资源上限
-
-所有 gate 都通过时，主线最多包含：
-
-- confirmatory VLA-only：`240` closed-loop episode；
-- four-arm clean：`480`；
-- four-arm attacked：`480`；
-- 合计 `1,200` closed-loop episode，另加无 dispatch 的 Stage A。
-
-正式运行前必须用 smoke 实测吞吐并冻结 GPU-hours、wall-clock、磁盘和 raw retention，不能直接按历史
-运行时间外推。
-
-## 7. 当前立即行动
-
-1. 完成本轮清理后的 Python、Lean、artifact、link 和 import 验证；
-2. 将清理后的代码与 compact results 同步远端，R9 raw 继续留本地；
-3. 开始 M1：先做 producer/victim/shared-runner/fixed-trace 的 no-outcome 实现；
-4. 形成 readiness packet；
-5. 获得授权后再运行 M2。
-
-项目接下来要回答的三个核心问题是：
-
-1. 攻击信号能否在独立 population 上确认？
-2. Intent–Plan 与 Plan–Execution 是否各有独立因果贡献？
-3. Dual 能否在保留 clean utility 的同时产生统计上可信的组合增益？
+在 C1–C5 与 E1–E3 完成前，不运行新的 efficacy outcome。若 zero-training selector 不通过，允许按预注册
+回退到 deterministic task-FSM L1；不允许用 M2/four-arm outcome 反向调整 selector/checker。

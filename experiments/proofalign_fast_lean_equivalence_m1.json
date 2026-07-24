@@ -1,0 +1,155 @@
+{
+  "all_scoped_cases_match": true,
+  "bindings": {
+    "lean_source": {
+      "path": "lean/ProofAlign/IntegrityCore.lean",
+      "sha256": "3602ef7ff24bd5f31336a43dd389f77fd28e2b9e9b0e36b503028d4bf5f961ff",
+      "theorems": [
+        "intent_switch_truth_table",
+        "execution_switch_truth_table",
+        "dual_dispatch_requires_intent_authorization",
+        "dual_dispatch_requires_execution_authorization",
+        "execution_arm_dispatches_exact_command",
+        "no_phase_advance_without_checked_completion",
+        "execution_enabled_phase_advance_requires_alignment",
+        "phase_advance_requires_contract_completion"
+      ]
+    },
+    "python_sources": {
+      "src/proofalign/integrity_checker.py": "0a8233f595ff09dbe7a12206c430f7cce98138e29ba57c8df0ab332342f6793f",
+      "src/proofalign/integrity_models.py": "d2535a81c642b8cb8f6fe374272ed606d494852cef24a128084e113297ac2e2f",
+      "src/proofalign/integrity_runtime.py": "0197141adb5233b3b5b85a8c66a9e765aacce219fec8e187d2a29e6c8c66ad46"
+    }
+  },
+  "evidence_id": "proofalign-fast-lean-core-switch-evidence-m1-20260724",
+  "lean_build_required": true,
+  "outcomes_observed": false,
+  "schema": "proofalign.fast-lean-equivalence-evidence.v1",
+  "scope": {
+    "covered": [
+      "four MethodArm treatment switches",
+      "disabled/proven/refuted/unknown layer truth-table cases",
+      "named Lean invariants for dual authorization, exact execution command, and checked phase advance",
+      "typed action-block/receipt/effect predicates and separate execution-alignment/contract-completion theorems"
+    ],
+    "machine_checked_refinement_complete": false,
+    "not_covered": [
+      "Python-to-Lean serialization refinement",
+      "simulator observer or proposal-adapter correctness",
+      "floating-point intervention equivalence",
+      "compiled online Lean execution",
+      "physical safety"
+    ]
+  },
+  "truth_table_case_count": 12,
+  "truth_table_cases": [
+    {
+      "arm": "vla_only",
+      "case": "nominal",
+      "core_verdict": "allow",
+      "execution_enabled": false,
+      "execution_verdict": "disabled",
+      "intent_enabled": false,
+      "intent_verdict": "disabled"
+    },
+    {
+      "arm": "vla_only",
+      "case": "wrong_target",
+      "core_verdict": "allow",
+      "execution_enabled": false,
+      "execution_verdict": "disabled",
+      "intent_enabled": false,
+      "intent_verdict": "disabled"
+    },
+    {
+      "arm": "vla_only",
+      "case": "stale_state",
+      "core_verdict": "allow",
+      "execution_enabled": false,
+      "execution_verdict": "disabled",
+      "intent_enabled": false,
+      "intent_verdict": "disabled"
+    },
+    {
+      "arm": "intent_only",
+      "case": "nominal",
+      "core_verdict": "allow",
+      "execution_enabled": false,
+      "execution_verdict": "disabled",
+      "intent_enabled": true,
+      "intent_verdict": "proven"
+    },
+    {
+      "arm": "intent_only",
+      "case": "wrong_target",
+      "core_verdict": "reject",
+      "execution_enabled": false,
+      "execution_verdict": "disabled",
+      "intent_enabled": true,
+      "intent_verdict": "refuted"
+    },
+    {
+      "arm": "intent_only",
+      "case": "stale_state",
+      "core_verdict": "allow",
+      "execution_enabled": false,
+      "execution_verdict": "disabled",
+      "intent_enabled": true,
+      "intent_verdict": "proven"
+    },
+    {
+      "arm": "execution_only",
+      "case": "nominal",
+      "core_verdict": "allow",
+      "execution_enabled": true,
+      "execution_verdict": "proven",
+      "intent_enabled": false,
+      "intent_verdict": "disabled"
+    },
+    {
+      "arm": "execution_only",
+      "case": "wrong_target",
+      "core_verdict": "allow",
+      "execution_enabled": true,
+      "execution_verdict": "proven",
+      "intent_enabled": false,
+      "intent_verdict": "disabled"
+    },
+    {
+      "arm": "execution_only",
+      "case": "stale_state",
+      "core_verdict": "unknown",
+      "execution_enabled": true,
+      "execution_verdict": "unknown",
+      "intent_enabled": false,
+      "intent_verdict": "disabled"
+    },
+    {
+      "arm": "dual",
+      "case": "nominal",
+      "core_verdict": "allow",
+      "execution_enabled": true,
+      "execution_verdict": "proven",
+      "intent_enabled": true,
+      "intent_verdict": "proven"
+    },
+    {
+      "arm": "dual",
+      "case": "wrong_target",
+      "core_verdict": "reject",
+      "execution_enabled": true,
+      "execution_verdict": "proven",
+      "intent_enabled": true,
+      "intent_verdict": "refuted"
+    },
+    {
+      "arm": "dual",
+      "case": "stale_state",
+      "core_verdict": "unknown",
+      "execution_enabled": true,
+      "execution_verdict": "unknown",
+      "intent_enabled": true,
+      "intent_verdict": "proven"
+    }
+  ]
+}

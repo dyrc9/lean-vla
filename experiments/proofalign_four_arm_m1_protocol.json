@@ -1,0 +1,113 @@
+{
+  "schema": "proofalign.four-arm-execution-protocol.v1",
+  "protocol_id": "proofalign-four-arm-p1-m1-readiness-20260724",
+  "protocol_status": "m1_implementation_frozen_execution_not_authorized",
+  "created_at": "2026-07-24T00:00:00+08:00",
+  "outcomes_observed": false,
+  "implementation_commit": "2b4903920c1968e930aa5ef1808e55872859cc7b",
+  "preregistrations": {
+    "confirmatory": {
+      "path": "experiments/saber_confirmatory_preregistration_v1.json",
+      "protocol_id": "saber-confirmatory-independent-p1-design-20260723",
+      "sha256": "169b08b673cc4b8684ea0dab069649cff09ad07193bfd4cd1b25486ecbfbb21a"
+    },
+    "four_arm": {
+      "path": "experiments/proofalign_four_arm_preregistration_v1.json",
+      "protocol_id": "proofalign-four-arm-causal-p1-design-20260723",
+      "sha256": "147b3d29376ad802f0f20f74c5f86d314dbe5675b46d5cf5e44a4c3d62b81508"
+    }
+  },
+  "dependencies": {
+    "confirmatory_gate_pass_bound": false,
+    "confirmatory_terminal_summary_path": null,
+    "confirmatory_terminal_summary_sha256": null,
+    "clean_gate_required_before_attacked_stage": true
+  },
+  "factorial_arms": [
+    {
+      "arm": "vla_only",
+      "intent_action_enabled": false,
+      "action_execution_enabled": false
+    },
+    {
+      "arm": "intent_only",
+      "intent_action_enabled": true,
+      "action_execution_enabled": false
+    },
+    {
+      "arm": "execution_only",
+      "intent_action_enabled": false,
+      "action_execution_enabled": true
+    },
+    {
+      "arm": "dual",
+      "intent_action_enabled": true,
+      "action_execution_enabled": true
+    }
+  ],
+  "dispatch": false,
+  "trace_source_condition": "attacked",
+  "trace_source_rationale": "Stage A uses the terminal-valid M2 attacked VLA-only proposal traces so unique Intent/Execution catches and overlap are observable without dispatch; clean utility is gated separately in Stage B.",
+  "proposal_adapter": {
+    "id": "proofalign-executed-action-block-prefix-adapter-v1",
+    "path": "src/proofalign/benchmark/action_block_trace_adapter.py",
+    "sha256": "1731f6398bbeb702374dc8c1de03671a98db7561c3efdcad2c762f56b9de5978",
+    "required_semantics": "native VLA ActionBlock bytes plus a separately frozen consumer-side action assessment and execution contract; assessor labels are not VLA-declared plans and may not be copied from victim outcomes"
+  },
+  "intent_action_assessor": {
+    "id": null,
+    "implementation_path": null,
+    "implementation_sha256": null,
+    "checkpoint_or_rules_digest": null,
+    "qualification_protocol_path": null,
+    "qualification_protocol_sha256": null,
+    "thresholds_frozen": false,
+    "victim_outcome_visible_during_qualification": false
+  },
+  "source": {
+    "sha256": {
+      "scripts/export_proofalign_fixed_trace.py": "23cb53b5b90029c947e59a8293fa160a3aba03ef241f2c433950fd52e2211153",
+      "src/proofalign/benchmark/action_block_trace_adapter.py": "1731f6398bbeb702374dc8c1de03671a98db7561c3efdcad2c762f56b9de5978",
+      "src/proofalign/benchmark/confirmatory.py": "08ad92480e1a8459bcdd9dc834ebe6e8cae850ae86e17d4b0c70546590df77c5",
+      "src/proofalign/benchmark/four_arm_runner.py": "44bb0255887465c623b9859146475315807d0b178d66414790c486bc34517d94",
+      "src/proofalign/integrity_models.py": "d2535a81c642b8cb8f6fe374272ed606d494852cef24a128084e113297ac2e2f",
+      "src/proofalign/integrity_checker.py": "0a8233f595ff09dbe7a12206c430f7cce98138e29ba57c8df0ab332342f6793f",
+      "src/proofalign/integrity_runtime.py": "0197141adb5233b3b5b85a8c66a9e765aacce219fec8e187d2a29e6c8c66ad46",
+      "lean/ProofAlign/IntegrityCore.lean": "3602ef7ff24bd5f31336a43dd389f77fd28e2b9e9b0e36b503028d4bf5f961ff",
+      "experiments/proofalign_fast_lean_equivalence_m1.json": "67510a22583df8f7efaabdbcf7badb9d622112efa37d7e49e37fd6b76c01f164"
+    }
+  },
+  "fixed_trace_artifacts": {
+    "typed_source_schema": "proofalign.typed-action-assessment-traces.v3",
+    "bundle_schema": "proofalign.four-arm-fixed-trace-bundle.v3",
+    "result_schema": "proofalign.four-arm-fixed-trace-result.v3",
+    "fresh_output": "results/proofalign_fixed_trace_p1_20260724_fresh1.json",
+    "all_120_units_required": true,
+    "byte_identical_action_block_assessment_contract_across_arms": true,
+    "dispatch_attempt_count_required": 0
+  },
+  "closed_loop_fresh_roots": {
+    "clean": "results/proofalign_four_arm_clean_p1_20260724_fresh1",
+    "attacked": "results/proofalign_four_arm_attacked_p1_20260724_fresh1"
+  },
+  "resource_budget": {
+    "stage_a_dispatch_episode_cap": 0,
+    "stage_b_clean_episode_cap": 480,
+    "stage_c_attacked_episode_cap": 480,
+    "output_disk_cap_gib_per_closed_loop_stage": 4,
+    "minimum_free_disk_gib_at_launch": 20,
+    "invalid_episode_abort_cap": 1,
+    "authorized_smoke_measurement_bound": false,
+    "checker_latency_cap_ns": null,
+    "gpu_hours_cap_per_closed_loop_stage": null,
+    "wall_clock_hours_cap_per_closed_loop_stage": null,
+    "cpu_core_cap": 32,
+    "ram_gib_cap": 128
+  },
+  "execution_authorization": {
+    "fixed_trace_export_authorized": false,
+    "stage_a_shadow_authorized": false,
+    "stage_b_clean_rollout_authorized": false,
+    "stage_c_attacked_rollout_authorized": false
+  }
+}

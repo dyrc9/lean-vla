@@ -38,7 +38,7 @@ FOUR_ARM_OUTPUT = (
     REPO_ROOT / "experiments" / "proofalign_four_arm_preregistration_v1.json"
 )
 MARKDOWN_OUTPUT = (
-    REPO_ROOT / "docs" / "paper" / "confirmatory_preregistration.md"
+    REPO_ROOT / "docs" / "paper" / "confirmatory_preregistration_legacy_v1.md"
 )
 
 CONFIRMATORY_PROTOCOL_ID = "saber-confirmatory-independent-p1-design-20260723"
@@ -664,10 +664,12 @@ def render_markdown(
         [
             "# 独立确认性实验与四臂因果消融预注册",
             "",
-            "更新日期：2026-07-23",
+            "更新日期：2026-07-24",
             "",
-            "> 状态：`preregistered_design_frozen_execution_not_authorized`。本文和两个 JSON "
-            "只冻结 population、endpoint、统计与停止条件；不授权 GPU rollout。",
+            "> 状态：`superseded_before_execution_by_action_block_v3_architecture`。本文和两个 v1 JSON "
+            "没有产生 outcome，保留用于审计和复用 population/cluster-bootstrap 设计；不得按 v1 "
+            "启动且不授权 GPU rollout。新 v3 必须在 ActionBlock assessor qualification、Lean effect "
+            "与 clean smoke gate 后冻结。",
             "",
             "## 1. 独立确认性 attack foundation",
             "",
@@ -704,14 +706,14 @@ def render_markdown(
             "",
             "## 2. 四臂 shared-runner 因果设计",
             "",
-            "| Arm | Intent–Plan | Plan–Execution |",
+            "| Arm | legacy L1 | legacy L2 |",
             "|---|---:|---:|",
             "| VLA-only | 否 | 否 |",
             "| Intent-only | 是 | 否 |",
             "| Execution-only | 否 | 是 |",
             "| Dual | 是 | 是 |",
             "",
-            "四臂共享 victim、task/init/seed、horizon、proposal serialization、observer、"
+            "以下是已废止 v1 的历史设计。四臂原计划共享 victim、task/init/seed、horizon、proposal serialization、observer、"
             "dispatch、effect update、intervention implementation、阈值、schema 与 validator；"
             "唯一 treatment switch 是两层 enabled flag。fixed trace 的 proposal byte-identical；"
             "closed loop 只保证初态、first chunk 与 RNG pairing，干预后的后续 proposal 允许自然分叉。",
@@ -738,8 +740,7 @@ def render_markdown(
             "停止后续阶段，不在同一 protocol 调阈值；",
             "- external physical filter、detector、semantic gate 与 Dual+filter 仍属独立后续 "
             "protocol，不混入核心四臂；",
-            "- 当前 blocker 包括新 attack records、共享 runner、refinement/equivalence、资源预算、"
-            "fresh root 和显式用户执行授权。",
+            "- v1 已被 ActionBlock v3 架构 supersede；其 blocker 不再通过修改 v1 protocol 解除。",
             "",
             "Machine-readable freeze：",
             "",

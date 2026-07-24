@@ -15,7 +15,10 @@ from typing import Any, Callable, Iterable
 from proofalign.digests import digest_payload, digest_text
 from proofalign.integrity_checker import DeterministicFastChecker, ExactPrefixAuthorizer
 from proofalign.integrity_models import (
+    ActionAssessmentKind,
+    ActionBlockAssessment,
     ActionProposal,
+    BlockExecutionContract,
     CoreVerdict,
     ExecutionEvidence,
     MethodArm,
@@ -138,22 +141,56 @@ class IntegrityExecutionAdapter:
         """Dispatch a single raw policy command through the exact boundary."""
 
         now_ns = (self._proposal_index + 1) * self.tick_ns
+        observation_digest = snapshot_digest(observation)
         proposal = ActionProposal(
             episode_nonce=self.prototype.mission.episode_nonce,
             proposal_index=self._proposal_index,
             proposed_at_ns=now_ns,
-            skill="vla_action_prefix",
+            observation_digest=observation_digest,
+            state_epoch=self._proposal_index,
             command=tuple(raw_command),
+        )
+        assessment = ActionBlockAssessment(
+            assessor_id="proofalign-action-envelope-analytic-assessor",
+            assessor_version="1",
+            assessor_kind=ActionAssessmentKind.ANALYTIC,
+            episode_nonce=self.prototype.mission.episode_nonce,
+            proposal_index=self._proposal_index,
+            generated_at_ns=now_ns,
+            action_block_digest=proposal.action_block_digest,
+            observation_digest=observation_digest,
+            state_epoch=self._proposal_index,
+            known=True,
+            predicted_skill="vla_action_prefix",
+            predicted_effect_atoms=("command_applied",),
+            predicted_violation_atoms=(),
+            precondition_atoms=(),
+        )
+        execution_contract = BlockExecutionContract(
+            issuer_id="proofalign-action-envelope-contract-compiler",
+            issuer_version="1",
+            episode_nonce=self.prototype.mission.episode_nonce,
+            proposal_index=self._proposal_index,
+            issued_at_ns=now_ns,
+            action_block_digest=proposal.action_block_digest,
+            assessment_digest=assessment.assessment_digest,
+            observation_digest=observation_digest,
+            state_epoch=self._proposal_index,
+            expected_effect_atoms=("command_applied",),
+            forbidden_effect_atoms=(),
+            observation_window_steps=1,
         )
         state = StateSnapshot(
             episode_nonce=self.prototype.mission.episode_nonce,
             state_epoch=self._proposal_index,
             observed_at_ns=now_ns,
             max_age_ns=1,
-            state_digest=snapshot_digest(observation),
+            state_digest=observation_digest,
             known=True,
         )
         authorization = self.prototype.authorize_exact_prefix(
+            assessment=assessment,
+            execution_contract=execution_contract,
             proposal=proposal,
             state=state,
             now_ns=now_ns,
@@ -177,12 +214,15 @@ class IntegrityExecutionAdapter:
         evidence = ExecutionEvidence(
             authorization_digest=authorization.authorization_digest,
             receipt_digest=dispatched.receipt.receipt_digest,
+            action_block_digest=proposal.action_block_digest,
+            execution_contract_digest=execution_contract.execution_contract_digest,
             episode_nonce=authorization.episode_nonce,
             proposal_index=authorization.proposal_index,
             observed_at_ns=now_ns,
             observed_command_digest=dispatched.receipt.applied_command_digest,
-            observed_atoms=(),
+            observed_atoms=("command_applied",),
             known=True,
+            observation_window_complete=True,
             violation=(
                 bool(info.get("collision"))
                 or (
@@ -193,15 +233,20 @@ class IntegrityExecutionAdapter:
             ),
         )
         effect = self.prototype.check_effect_update(
+            execution_contract=execution_contract,
             authorization=authorization,
             receipt=dispatched.receipt,
             evidence=evidence,
         )
         audit = {
-            "schema": "proofalign.integrity-execution-dispatch-audit.v1",
+            "schema": "proofalign.integrity-execution-dispatch-audit.v2",
             "method_id": self.prototype.mission.method_id,
             "method_arm": self.prototype.arm.value,
             "proposal_index": proposal.proposal_index,
+            "action_assessor_kind": assessment.assessor_kind.value,
+            "action_block_digest": proposal.action_block_digest,
+            "assessment_digest": assessment.assessment_digest,
+            "execution_contract_digest": execution_contract.execution_contract_digest,
             "proposal_digest": proposal.proposal_digest,
             "state_snapshot_digest": state.snapshot_digest,
             "authorization_digest": authorization.authorization_digest,

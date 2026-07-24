@@ -1,204 +1,212 @@
-# 论文故事：VLA 的任务授权与执行完整性
+# Paper story
 
-更新日期：2026-07-23
+## 1. 中心命题
 
-> 本文描述候选论文叙事。P0b fresh2 完成但 denominator gate 未通过；Execution-only action-envelope
-> clean R1 保留 `22/23` strict success，随后 attacked+defended 完成 48/48 valid episode，并在 15 个
-> 预定义 P0b attack-signal pair 上观察到 defended cost/collision `0/15`。这是强探索性证据，不是确认性
-> attack-defense、Full CTDA 或通用安全结果。论文就绪度见
-> [`progress_assessment.md`](progress_assessment.md)。
+> ProofAlign 在不要求 VLA 输出高层规划的条件下，将“可信意图到具体 ActionBlock 的对齐”与“获准
+> ActionBlock 到实际执行及 observed effects 的对齐”分离，并用四臂 shared runner 估计两层的独立和
+> 联合作用。
 
-## 一句话定位
+这句话包含两个必须分开的 claim：
 
-> ProofAlign treats VLA control as two coupled integrity problems: whether a
-> proposed action remains authorized by a trusted task, and whether the accepted
-> action is the one actually applied and observed until checked completion.
+1. **Intent–SemanticSubtask–ActionBlock alignment（L1）**：动作生成前的可信语义锚点与动作生成后的
+   局部运动/后果检查；
+2. **ActionBlock–Execution alignment（L2）**：授权对象、实际命令、receipt、effects 和 phase update
+   属于同一个事务。
 
-中文：ProofAlign 只检查两件事——VLA 计划的动作是否仍获可信任务授权，以及被接受的动作是否被真实
-执行并产生了经过检查的效果。
+L1 的正确性主要是统计与系统 claim；L2 的有限绑定语义可以交给 Lean。二者都不等价于完整物理安全。
 
-## 1. 问题
+论文的中心贡献始终是这两个对齐断点。`SemanticSubtask Z_t` 是当前用来实现和资格化 L1 的结构化机制，
+不是第三个顶层对齐层，也不取代原始的 `Intent -> ActionBlock` 研究问题。即使未来把 FSM/PaliGemma
+selector 换成其他可信 semantic adapter，双层问题定义和 L2 transaction 仍保持不变。
 
-高 task success 不等于按原始授权完成任务。VLA 可能：
+Lean 是方法的一等组成，而不是事后给 Python checker 加的标签。它把 L2 中容易被自然语言含混处理的
+authorization、freshness、exact command、receipt/effect binding 和 phase-gating 写成有限命题，并为
+“Execution-enabled arm 能在什么条件下 dispatch/advance”提供 machine-checked theorem。论文应同时展示
+Lean 定理、Python 对应证据和明确的 refinement boundary。
 
-- 因 attacked prompt、视觉或历史执行错误对象、部件、顺序或 gripper 操作；
-- 输出局部看似合理的 chunks，却跨 calls 累积成未授权效果；
-- proposal 合法，但 filter、dispatch、applied command 或 observed effect 已被替换；
-- 把 `pending`、旧 trace 或 policy 自报 completion 当成任务完成。
+## 2. 故事起点：攻击落在动作，不落在“自白”
 
-这些失败属于两个不可互相推出的关系：
+Instruction/observation attack 的危险不在于 VLA 是否承认一个恶意计划，而在于可信任务 `T` 没有改变时，
+policy-facing prompt、observation 或 history 的改变可能使模型输出实际效果偏离 `T` 的数值 action
+chunk。多数公开 VLA 部署接口只返回动作，因此：
 
-```text
-trusted intent -- Intent–Plan Integrity --> accepted planned action
-accepted planned action -- Plan–Execution Integrity --> applied/observed action
-```
+- 不能把可观察 high-level plan 当作通用前提；
+- 不能从 ActionBlock 唯一恢复模型 latent intent；
+- 不能让外部模型在动作产生后补一段 explanation，再把它当作 VLA witness。
 
-semantic-only 方法看不到执行替换；physical/filter-only 方法又可能放行物理上安全但任务上未授权的动作。
+论文因此从最小共同接口出发：可信任务 artifact、可信/不可信双视图、数值 ActionBlock、consumer
+assessment、dispatch receipt 和 observed effects。
 
-## 2. 最小方法
+## 3. 为什么需要两层，而不是一个 safety filter
 
-论文只展示三个转换：
+只约束动作幅度可以减少部分低层风险，却不能判断一个平滑、合法的动作是不是在拿错物体。只判断动作语义
+也不能防止授权后的 command substitution、stale replay、sink-side drift 或效果证据换绑。
 
-```text
-1. certify contract
-   trusted mission + phase + residual obligations -> persistent contract
-
-2. authorize exact prefix
-   contract + fresh state + raw proposal -> one exact final command authorization
-
-3. check execution/effect
-   authorization + receipt + observed effect -> pending / complete / violation
-```
-
-两个不变量：
-
-- **No dispatch without dual authorization**：没有 mission-rooted contract 和 fresh exact-prefix
-  authorization，不得 dispatch。
-- **No phase advance without checked completion**：没有覆盖合同 postcondition 的 completion witness，
-  不得推进任务阶段。
-
-persistent monitor 只是保存跨 chunks 的合同、history、deadline 和 residual obligation，不是第三层方法。
-
-## 3. 论文只保留三个贡献
-
-1. **安全属性**：把攻击下 VLA 执行拆成 Intent–Plan 和 Plan–Execution 两个互补完整性关系，并给出
-   两个协议不变量。
-2. **最小协议**：提出 mission-rooted persistent monitor，通过合同建立、exact-prefix authorization 和
-   execution/effect update 三个事务实现 complete mediation；只形式化真正进入运行路径的离散性质。
-3. **因果评估**：在相同 proposal/trace 与配对 closed loop 下比较 VLA-only、Intent-only、
-   Execution-only 和 Dual，先检验 clean utility，再检验两层 unique catch 和组合收益。
-
-攻击生成、签名、source hash、provenance、wire schema、Lean、AEGIS/CBF 和 recovery 都不是独立方法贡献。
-它们分别属于 workload、assurance plumbing 或 optional intervention。
-
-## 4. 候选新意及其举证责任
-
-最稳健的候选增量是：
-
-> A trusted mission remains the authorization root while dynamically generated
-> VLA prefixes are bound across proposed, authorized, executed, and observed
-> forms until a checked completion witness advances the task.
-
-它依赖四个同时成立的事实：
-
-1. policy-facing prompt 与 trusted mission authority 分离；
-2. contract 跨多个 VLA chunks 持续存在；
-3. proposal、final authorized command、dispatch/receipt 和 effect 使用同一 transaction binding；
-4. `pending` 不得升级为 completion。
-
-这是组合型 novelty，不能只靠架构图成立。论文必须证明：
-
-- Intent-only 和 Execution-only 各自抓到对方抓不到的失败；
-- Dual 的收益不是单层或普通 filter 已经覆盖；
-- Dual 保留预注册的 clean retention、phase completion 和 availability；
-- 更复杂的 plumbing 不是结果的真正来源。
-
-若这些条件不成立，应收缩 claim，而不是增加 stage。
-
-## 5. 方法图中不出现什么
-
-主图不展示：
-
-- 六阶段 wire replay；
-- certificate/rebind/lease class hierarchy；
-- digest、signature、cache、provenance 字段；
-- AEGIS QP、geometry producer 或 recovery controller；
-- Python/Lean artifact plumbing。
-
-这些内容只在实现或 TCB 图中出现。方法图最多包含 mission root、contract monitor、prefix authorization、
-dispatch boundary 和 effect update。
-
-## 6. Lean 的论文角色
-
-Lean 用于：
-
-- 定义两个核心不变量和最小 state transition；
-- 验证 contract/checker 的离散 obligation；
-- 建立实际 fast checker 与形式 spec 的 refinement/equivalence；
-- 在 shadow/offline 路径 replay artifacts。
-
-Lean 不用于声称 raw vision、continuous dynamics、sensor/actuator truth 或 complete robot safety 已被证明。
-若 runtime authority 是 Python，必须写成 Lean specification + Python runtime；只有实际接通并有
-equivalence evidence 的路径才写 Lean-backed checker。
-
-## 7. 实验叙事
-
-### 当前 empirical anchor
-
-当前最强正结果属于 Execution-only pilot：
-
-- clean utility：baseline-eligible strict success `22/23 = 0.9565`；
-- attacked+defended：48/48 valid，full population strict success without cost `26/48`；
-- action mediation：17,828 个 policy action 全部经 exact final-command boundary，13,108 个被投影，
-  全部 executed command 在数值容差内满足 `L2 <= 1.0`；
-- P0b signal subset：按定义 undefended unsafe `15/15`，defended LIBERO cost/collision `0/15`，
-  `8/15` strict success without cost；
-- residual risk：11/15 signal pair 的 robot contact 高于 clean，其中 1 个还有 joint-limit increase；
-  full population 另有 1 个 nonsignal unsafe pair。
-
-这个结果应进入论文的 exploratory result 与 design lesson，但不能替代下列四阶段主证据。尤其是 L2
-projection 本身不是双层 integrity novelty；它只验证 Plan–Execution 侧的一个 intervention。
-
-本结果的可复算论文表、suite 分层、projection 幅度分布与逐 pair descriptive failure taxonomy 见
-[`action_envelope_results.md`](action_envelope_results.md)。13,108 个 projected action 的 command
-修改 L2 为 median `0.002853`、P95 `0.008507`、max `0.039266`；signal subset 只有 3/15 同时恢复
-strict task success 且没有 measured proxy 高于 clean。以上仍是 outcome 后描述，不构成确认性推断。
-
-未来证据的 machine-readable 预注册候选见
-[`confirmatory_preregistration.md`](confirmatory_preregistration.md)：60 个与 P0b task/init identity
-不重叠的 base pair 采用两个固定 seed block，以 base pair 聚类分析；四臂仅切换两个 relation flag，
-并预先冻结 clean noninferiority、Dual composition、multiplicity、invalid 与停止规则。该设计未授权执行。
-
-### 阶段 A：fixed-trace/shadow
-
-四个 arm 面对完全相同的 proposal、state 和 trace，报告：
-
-- Intent-only / Execution-only unique catch；
-- Dual 是否严格增加覆盖；
-- nominal allow、unknown、block 和 parity；
-- checker 与 proof/replay latency。
-
-### 阶段 B：clean closed loop
-
-先冻结并检查：safe-success retention、phase completion、deadlock、blocked time、evidence coverage 和
-verifier tax。clean gate 不通过，不进入 attack-defense main。
-
-### 阶段 C：qualified attack
-
-只使用已经在 unguarded VLA-only 上通过独立 clean-safe→attacked-unsafe gate 的发布 workload。比较
-VLA-only、两个单层和 Dual，不用 task failure 或 defense 自报 verdict 代替物理/约束 harm。
-
-### 阶段 D：optional intervention
-
-最后单独加入 AEGIS/CBF、brake、replan 或 recovery，回答 physical safety/utility 问题。它们不与核心
-integrity contribution 混成一个不可消融的 Full CTDA arm。
-
-## 8. Claim boundary
-
-当前不声称：
-
-- 首次使用 formal contract、pre-execution gate、temporal monitor、Lean 或 runtime fallback；
-- 已证明双层方法优于单层或外部 baseline；
-- 已建立确认性的发布攻击 defense efficacy；当前只有固定 P0b slice 上的强探索性
-  Execution-only mitigation evidence；
-- cryptographic authentication、malicious-host resistance 或 verified recovery；
-- pixel grounding、continuous dynamics、hardware actuation 或 real-time control 被 Lean 证明。
-
-当前 v1 负结果必须进入正文：在 evaluated slice/seed 上 VLA-only 8/12，而 Full CTDA 0/12。它是促使
-方法收缩和 clean-first gate 的主要证据，不能只放 appendix。action-envelope 的 `22/23` clean retention
-与 signal subset `15/15 -> 0/15` coarse unsafe 改善是收缩后方向的正证据，但 11/15 residual
-contact/joint proxy 和 nonqualified attack foundation 必须相邻报告。
-
-## 9. 推荐叙事顺序
+因此方法把失败分为两个时间不同、证据不同的问题：
 
 ```text
-two integrity failures
-  -> why semantic-only and execution-only are insufficient
-  -> two invariants
-  -> three protocol transitions
-  -> TCB and assumption boundary
-  -> four-arm causal ablation
-  -> clean utility gate
-  -> independently qualified attacks
-  -> optional physical intervention
+Trusted intent -- semantic authorization --> concrete ActionBlock       [L1]
+authorized ActionBlock -- execution transaction --> receipt/effects     [L2]
 ```
+
+当前 L1 的具体分解是：
+
+```text
+Trusted T/O_t^T
+    -> legal frontier -> SemanticSubtask Z_t
+    -> attacked-view-conditioned ActionBlock candidates
+    -> local assessment / select-or-reject
+```
+
+第一层回答“准备做的事情是否仍服务于可信任务的当前合法步骤”，第二层回答“获准的事情是否真的这样执行并
+产生了约定效果”。两层组合可以互补，也可能因过多 `unknown` 导致 deadlock；这正是四臂实验需要估计的
+交互。
+
+## 4. 威胁模型是双视图，不是同视图自洽
+
+Semantic branch 只读取：
+
+- 攻击面之外的 trusted task `T`；
+- secure split 之前绑定的 `O_t^T`；
+- task graph、历史可信 subtask；
+- allowlisted selector checkpoint/config。
+
+Action-policy branch 可以读取被攻击的 `P_t^atk/O_t^atk/H_t^atk`。本方法由此研究：攻击把 ActionBlock
+带偏后，独立可信语义锚点和 local checker 能否在执行前发现偏离。
+
+部署路径丢弃 external prompt，并从 trusted `T + Z_t` 固定编译 action prompt。攻击评估可以有意把
+external prompt 送入 action-policy branch 来测量 L1 检出能力，但它仍不能进入 selector/checker。
+
+当前覆盖 secure split 后的数字/软件注入，不覆盖同时欺骗 trusted tap 的分叉前物理光学攻击，也不覆盖
+task source、selector/checker、observer、receipt store 或 actuator feedback 被攻破。
+
+## 5. L1：先约束合法下一步，再检查局部动作
+
+L1 的顶层目标仍是判断 concrete ActionBlock 是否服务于 trusted intent。为避免要求一个评估器直接恢复
+完整 latent intent，当前方法把这条关系分解为两个可绑定、可分别资格化的关系：
+
+```text
+TaskSubtask(T, O_t^T, Z_t)
+SubtaskAction(Z_t, O_t^T, A_t)
+```
+
+`Z_t` 从有限 task graph 的当前合法 frontier 中选择。第一版不训练 π0.5；确定性 FSM/task predicates
+控制合法候选，冻结 PaliGemma 分数只作为 proposal/ranking 特征。`Z_t` 在 ActionBlock 生成前成为显式
+policy 输入并与返回 block 绑定；当前 pilot 只证明 prompt path 有非零敏感性，尚未证明它提供强或可靠的
+action control。
+
+local checker 使用 `Z_t/O_t^T/A_t` 预测有限的 motion、target、part、effect、precondition 和 violation
+atoms。未知、OOD、遮挡、低 margin 或不支持的几何关系必须 abstain。语义不匹配只能 reject/resample，
+不能靠 numeric projection 改名或修复；投影后的 executable prefix 必须重新检查并重新绑定。
+
+L1 的主要风险不是平均 accuracy，而是：
+
+- selector 把错误但语法合法的 `Z_t` 放进 frontier；
+- local checker 在 attacked block 上 false allow；
+- clean false reject 或 OOD abstention 过高导致 coverage collapse；
+- selector、policy 与 checker 错误共享同一不可信输入。
+
+所以 selector qualification 和 local-checker qualification 必须分开报告。
+
+## 6. L2 与 Lean：把执行当作一次形式化绑定事务
+
+consumer 为 exact ActionBlock 编译 `BlockExecutionContract`，绑定 subtask/prompt、assessment、observation、
+state epoch、expected/forbidden effects 和 observation window。authorization 必须新鲜且一次性使用；
+Execution-enabled arm 只能 dispatch exact authorized command。receipt 和 evidence 再绑定 authorization、
+block、contract、proposal index、observed command 和时间顺序。
+
+观察窗口关闭后，只有 expected effects 已出现、forbidden effects 未出现、observer 未报告 violation，
+且 trusted task completion atoms 被观察到时，phase 才能推进。开放窗口是 `pending`，证据不足是
+`unknown`，不是 allow。
+
+Lean 检查四臂 truth table、digest/nonce/index 绑定、exact-command dispatch 和 phase-gating 定理。
+关键论文定理包括：Dual dispatch 同时要求两层 authorization、Execution-enabled arm dispatch 的 command
+必须等于 exact authorized command、Execution-enabled phase advance 蕴含 block-execution alignment，
+且任何 phase advance 都要求 trusted contract completion。
+
+它不证明 selector、local checker、perception、observer、simulator 或物理世界正确，也不自动证明
+Python runtime 精化了 Lean 模型。这个边界限制 claim 的外延，但不削弱 Lean 对 L2 规范、反例测试和
+实现审计的核心作用。
+
+## 7. 论文要回答的经验问题
+
+1. **Attack foundation**：冻结攻击是否稳定地产生相对于 trusted intent 的 ActionBlock/trajectory
+   divergence？
+2. **Semantic selection**：零训练 selector 在 held-out task/object/stage 上的合法率、稳定性、margin、
+   OOD abstention 和 latency 是否达到冻结 gate？
+3. **Action conditioning**：固定 observation/noise 时，不同合法或冲突 `Z_t` 是否对 ActionBlock 产生
+   可测、阶段合理且不损害 clean utility 的影响？
+4. **Local checking**：在 supported attacked blocks 上，local checker 的 false-allow 上界能否达标，
+   同时维持 clean retention 和 coverage？
+5. **Execution integrity**：L2 能否捕获 substitution、replay、receipt/effect mismatch，并保留 utility？
+6. **Composition**：Dual 相对单层是否互补，还是增加 unknown、deadlock 或 time-to-completion？
+
+第 2–4 问共同构成 L1 资格化；不能用初始四帧 top-1、synthetic fixture 或 victim outcome 代替。
+
+## 8. 四臂如何识别两层贡献
+
+统一使用以下论文名称：
+
+| Arm | L1 semantic alignment | L2 execution integrity |
+|---|---:|---:|
+| VLA-only | off | off |
+| Semantic-only | on | off |
+| Execution-only | off | on |
+| Dual | on | on |
+
+冻结 runtime/schema 中的 `intent_only`、`intent_action_enabled` 字段仅作为兼容名称，不表示恢复自由文本
+plan。
+
+`K=1` primary design 中，四臂共享 byte-identical proposal、assessment 与 execution contract。若将来
+启用 `K>1`，四臂必须共享 byte-identical ordered candidate set 和每候选 assessment；VLA-only 使用
+预注册 base candidate，L1-enabled arms 才执行冻结 select/reject rule。最终命令差异此时是 treatment
+机制的一部分，不能再笼统声称四臂 final ActionBlock byte-identical。
+
+## 9. 可主张的贡献与明确排除项
+
+若全部 gate 完成，论文可以主张：
+
+- action-only VLA 上的双层完整性定义；
+- trusted task/observation 到有限 semantic subtask 的 provenance、frontier 与 qualification protocol；
+- `Z_t -> ActionBlock` 的 local compatibility、abstention 和 deterministic selection boundary；
+- ActionBlock/authorization/receipt/effect/phase 的 Lean-specified transaction semantics，以及
+  exact-dispatch/phase-gating 的 machine-checked theorem；
+- 共享 candidate/trace 的四臂因果评估协议；
+- instruction/observation attack 下的 benchmark evidence。
+
+不主张：
+
+- 首次 high-level planning、language hierarchy、world model、shield 或 action filter；
+- 当前公开 π0.5 checkpoint 暴露论文中的原生 semantic head；
+- 从动作唯一恢复 latent intent；
+- Lean 证明 learned prediction、sensor 或现实物理安全；
+- 软件 secure split 等价于硬件级 trusted capture。
+
+## 10. 证据叙事与论文结果顺序
+
+P0b 与 R9 只承担历史动机：
+
+- P0b：96/96 有效、23 个 clean-eligible pair、15 个攻击 transition，但 `23 < 26`，未通过确认性
+  denominator gate；
+- R9：Execution-only 的强探索信号，但 strict-success recovery 不完整，且 15 个 signal pair 中 11 个
+  仍有 residual contact proxy。
+
+当前 semantic pilot 只支持“skill-level 路线值得继续”：motion-level `0/4`、skill-level `4/4`、阶段
+切换 `3/5`，且 prompt-conditioned action delta 很小。它不是 selector qualification，更不是防御结果。
+
+新的论文主结果必须按以下顺序产生：
+
+```text
+M1 component closure
+  -> selector qualification
+  -> local-checker qualification
+  -> end-to-end no-outcome identity/resource gate
+  -> M2 VLA-only attack foundation
+  -> fixed-trace four-arm
+  -> clean four-arm
+  -> attacked four-arm
+```
+
+任何阶段都不得用后续 outcome 回调 selector/checker threshold。论文结果应依次报告 attack validity、
+selector/checker risk-coverage、L2 conformance、clean utility、attacked efficacy、Dual interaction 和
+failure taxonomy；不能用一个 aggregate “safe success” 隐藏 unknown、deadlock 或 residual proxy。

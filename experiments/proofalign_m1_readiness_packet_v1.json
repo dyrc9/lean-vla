@@ -1,0 +1,106 @@
+{
+  "claim_boundary": "This packet audits implementation readiness only. It contains no new victim or defense outcome and does not authorize attack-record generation, M2 victim rollout, or any four-arm stage.",
+  "components": {
+    "clean_commit": {
+      "all_bound_sources_match_commit": true,
+      "commit_exists": true,
+      "complete": true,
+      "implementation_commit": "2b4903920c1968e930aa5ef1808e55872859cc7b",
+      "source_digest_count": 23
+    },
+    "confirmatory_producer_and_record_validator": {
+      "complete": true,
+      "generation_authorized": false,
+      "source_digest_count": 10
+    },
+    "confirmatory_vla_only_victim_and_artifact_validator": {
+      "complete": true,
+      "producer_bundle_bound": false,
+      "source_digest_count": 9
+    },
+    "fast_checker_lean_scoped_evidence": {
+      "complete": true,
+      "machine_checked_full_refinement_complete": false,
+      "path": "experiments/proofalign_fast_lean_equivalence_m1.json",
+      "sha256": "67510a22583df8f7efaabdbcf7badb9d622112efa37d7e49e37fd6b76c01f164"
+    },
+    "fixed_trace_exporter": {
+      "complete": true,
+      "proposal_adapter_frozen": true,
+      "trace_source_condition_frozen": true
+    },
+    "fresh_roots": {
+      "complete": true,
+      "roots": {
+        "confirmatory_victim": {
+          "absent": true,
+          "absolute_path": "/home/ldx/lean-vla/results/saber_confirmatory_victim_p1_20260724_fresh1",
+          "path": "results/saber_confirmatory_victim_p1_20260724_fresh1"
+        },
+        "fixed_trace": {
+          "absent": true,
+          "absolute_path": "/home/ldx/lean-vla/results/proofalign_fixed_trace_p1_20260724_fresh1.json",
+          "path": "results/proofalign_fixed_trace_p1_20260724_fresh1.json"
+        },
+        "four_arm_attacked": {
+          "absent": true,
+          "absolute_path": "/home/ldx/lean-vla/results/proofalign_four_arm_attacked_p1_20260724_fresh1",
+          "path": "results/proofalign_four_arm_attacked_p1_20260724_fresh1"
+        },
+        "four_arm_clean": {
+          "absent": true,
+          "absolute_path": "/home/ldx/lean-vla/results/proofalign_four_arm_clean_p1_20260724_fresh1",
+          "path": "results/proofalign_four_arm_clean_p1_20260724_fresh1"
+        },
+        "producer": {
+          "absent": true,
+          "absolute_path": "/home/ldx/lean-vla/results/saber_confirmatory_producer_p1_20260724_fresh1",
+          "path": "results/saber_confirmatory_producer_p1_20260724_fresh1"
+        }
+      }
+    },
+    "intent_action_assessor": {
+      "complete": false,
+      "implementation_and_checkpoint_frozen": false,
+      "thresholds_frozen": false,
+      "victim_outcome_visible_during_qualification": false
+    },
+    "population_and_order_contract": {
+      "base_pair_count": 60,
+      "complete": true,
+      "unit_count": 120,
+      "victim_episode_count": 240
+    },
+    "resource_budget": {
+      "authorized_smoke_measurement_bound": false,
+      "complete": false,
+      "cpu_and_ram_caps_frozen": true,
+      "episode_and_disk_caps_frozen": true
+    },
+    "shared_four_arm_shadow_runner": {
+      "complete": true,
+      "dispatch_in_stage_a": false,
+      "source_digest_count": 9
+    }
+  },
+  "current_blockers": [
+    "Intent-ActionBlock assessor and outcome-blind qualification thresholds are not designed and frozen",
+    "GPU/CPU/RAM/wall-clock/storage throughput and checker-latency budgets lack an authorized smoke measurement"
+  ],
+  "gpu_runtime_queried": false,
+  "implementation_readiness_complete": false,
+  "m2_rollout_authorized": false,
+  "m2_rollout_ready": false,
+  "outcomes_observed_or_generated": false,
+  "packet_id": "proofalign-m1-readiness-20260724-v1",
+  "policy_or_attacker_loaded": false,
+  "protocol_bindings": {
+    "experiments/proofalign_four_arm_m1_protocol.json": "813b3acd97d0d136dcb27e68b422aaa31d9f4a4df4ffd1f3cbf3156bf3fcb546",
+    "experiments/proofalign_four_arm_preregistration_v1.json": "147b3d29376ad802f0f20f74c5f86d314dbe5675b46d5cf5e44a4c3d62b81508",
+    "experiments/saber_confirmatory_preregistration_v1.json": "169b08b673cc4b8684ea0dab069649cff09ad07193bfd4cd1b25486ecbfbb21a",
+    "experiments/saber_confirmatory_producer_m1_protocol.json": "d2d8d2161f95bf0c24e6699646e338f1def27e8cf88bf86ca9caea73d55ae9fd",
+    "experiments/saber_confirmatory_victim_m1_protocol.json": "49daeabc70c60d81277bf984c78d51b3ffb4382b1c4a4accaad1d9e478b24a03"
+  },
+  "schema": "proofalign.m1-no-outcome-readiness.v1",
+  "simulator_steps": 0
+}

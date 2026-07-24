@@ -1,32 +1,34 @@
-# ProofAlign 文档入口
+# 文档导航
 
-更新日期：2026-07-24
+主线阅读顺序：
 
-当前文档已经收敛为一个主线：
+1. [`method.md`](method.md)：两层定义、threat model、四臂和 Lean claim boundary；
+2. [`trusted_semantic_boundary.md`](trusted_semantic_boundary.md)：可信 `Z_t` 的 TCB、双视图和注入覆盖边界；
+3. [`semantic_subtask_hierarchy.md`](semantic_subtask_hierarchy.md)：零训练 `Z_t`、task graph、绑定和 probe；
+4. [`semantic_subtask_pilot.md`](semantic_subtask_pilot.md)：冻结 checkpoint 的首轮 GPU probe 与限制；
+5. [`action_block_assessment.md`](action_block_assessment.md)：`Z_t -> ActionBlock` 局部评估和资格化；
+6. [`experiments.md`](experiments.md)：M1/M2/fixed-trace/closed-loop gate；
+7. [`implementation_and_experiment_readiness.md`](implementation_and_experiment_readiness.md)：下一批代码接口、
+   测试、artifact 与实验停止条件；
+8. [`paper/paper_story.md`](paper/paper_story.md)：以双层对齐为主线的完整论文叙事；
+9. [`paper/related_work.md`](paper/related_work.md)：与 VLA hierarchy、world model、shielding、benchmark 和
+   formal methods 的逐层关系；
+10. [`experiment_reuse.md`](experiment_reuse.md)：P0b/R9 的逐项复用、迁移步骤与禁止边界；
+11. [`progress_and_plan.md`](progress_and_plan.md)：当前 blocker、历史复用和下一步；
+12. [`remote_execution.md`](remote_execution.md)：执行授权与远程运行规则。
 
-1. [`progress_and_plan.md`](progress_and_plan.md)：当前结果、证据边界、下一实验和 M0–M6 规划；
-2. [`failure_lessons.md`](failure_lessons.md)：历史失败、根因、防复发规则和新实验启动检查清单；
-3. [`method.md`](method.md)：两层关系、两个不变量、三个 transaction 和四臂语义；
-4. [`experiments.md`](experiments.md)：实验冻结、gate、统计和停止规则；
-5. [`remote_execution.md`](remote_execution.md)：本地/远程环境、资源隔离和执行前检查；
-6. [`paper/action_envelope_results.md`](paper/action_envelope_results.md)：由 R9 terminal evidence
-   生成的论文表、projection 分布和 failure taxonomy；
-7. [`paper/confirmatory_preregistration.md`](paper/confirmatory_preregistration.md)：独立确认性
-   attack foundation 与后续四臂设计；
-8. [`paper/paper_story.md`](paper/paper_story.md)：论文叙事；
-9. [`paper/progress_assessment.md`](paper/progress_assessment.md)：论文就绪度和缺口；
-10. [`paper/related_work.md`](paper/related_work.md)：相关工作与 novelty 边界。
+论文组织：
 
-结果数字以机器 JSON 为准：
+- [`paper/paper_story.md`](paper/paper_story.md)
+- [`paper/progress_assessment.md`](paper/progress_assessment.md)
+- [`paper/confirmatory_preregistration.md`](paper/confirmatory_preregistration.md)
 
-- [`saber_integrity_action_envelope_terminal_summary.json`](../experiments/saber_integrity_action_envelope_terminal_summary.json)
-- [`action_envelope_paper_tables.json`](../experiments/action_envelope_paper_tables.json)
-- [`action_envelope_failure_taxonomy.json`](../experiments/action_envelope_failure_taxonomy.json)
-- [`saber_confirmatory_preregistration_v1.json`](../experiments/saber_confirmatory_preregistration_v1.json)
-- [`proofalign_four_arm_preregistration_v1.json`](../experiments/proofalign_four_arm_preregistration_v1.json)
+审计原则：
 
-旧架构、失败方案、阶段 handoff 和重复状态文档已从工作树删除，通过 Git 历史追溯。冻结的 R0–R9
-协议/状态链仍留在 `experiments/`，因为 terminal R9 的审计绑定需要它们；它们不是可继续执行的并行
-方案。
-
-完整 R9 raw episode 只保留在实验机本地，不上传远端。
+- 旧 CTDA/PlanWitness/P0b/R9 文件不等于当前方法证据；
+- frozen legacy protocol 和现有 v3 runtime 可以保留 `intent_only` / `intent_action_enabled` 兼容值；
+  论文名称统一为 `Semantic-only` 和 `Intent–SemanticSubtask–ActionBlock`，semantic-bound successor
+  推荐使用新 v4 schema，不静默改变 v3 digest；
+- 顶层贡献始终是 Intent→ActionBlock 与 ActionBlock→Execution 双层对齐；`Z_t` 是 L1 机制，Lean 是
+  L2 的核心形式化方法组件；
+- 没有用户明确授权时，任何 protocol 都不授权新 outcome rollout。

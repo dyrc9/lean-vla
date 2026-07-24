@@ -1,7 +1,8 @@
-.PHONY: sync test lean paper-artifacts paper-artifacts-check check
+.PHONY: sync test lean paper-artifacts paper-artifacts-check action-block-check m1-readiness-check check
 
 PYTHON ?= .venv/bin/python
 UV ?= uv
+LEAN_BIN ?= $(CURDIR)/.tools/lean-4.24.0-linux/bin
 
 sync:
 	$(UV) sync --dev
@@ -10,7 +11,7 @@ test:
 	$(PYTHON) -m pytest
 
 lean:
-	cd lean && lake build ProofAlign
+	cd lean && PATH="$(LEAN_BIN):$$PATH" lake build ProofAlign
 
 paper-artifacts:
 	@if [ -f results/saber_integrity_action_envelope_r9_20260723_fresh1/episodes_ledger.jsonl ]; then \
@@ -38,4 +39,14 @@ paper-artifacts-check:
 		echo "Skipping confirmatory source check: local-only LIBERO-Safety checkout is absent"; \
 	fi
 
-check: test lean paper-artifacts-check
+action-block-check:
+	$(PYTHON) scripts/run_action_block_fixed_trace_gate.py --check
+
+m1-readiness-check:
+	$(PYTHON) scripts/generate_checker_equivalence_evidence.py --check
+	$(PYTHON) scripts/validate_m1_readiness.py --check
+	$(PYTHON) scripts/generate_saber_confirmatory_records.py --dry-run >/dev/null
+	$(PYTHON) scripts/run_saber_confirmatory_victim.py --dry-run >/dev/null
+	$(PYTHON) scripts/export_proofalign_fixed_trace.py --dry-run >/dev/null
+
+check: test lean paper-artifacts-check action-block-check m1-readiness-check
