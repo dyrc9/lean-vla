@@ -10,14 +10,14 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from enum import Enum
-from math import isfinite
+from math import isfinite, prod
 from typing import Any, Iterable
 
 from proofalign.digests import digest_payload
 
 
-METHOD_ID = "proofalign-integrity-v1"
-CORE_SCHEMA_VERSION = "proofalign.integrity-core-v1"
+METHOD_ID = "proofalign-integrity-v3"
+CORE_SCHEMA_VERSION = "proofalign.integrity-core-v3"
 
 
 def _require_text(name: str, value: str) -> None:
@@ -93,6 +93,24 @@ class InterventionKind(str, Enum):
     PROJECT_OR_BRAKE = "project_or_brake"
     REPLAN = "replan"
     HARD_BLOCK = "hard_block"
+
+
+class ActionAssessmentKind(str, Enum):
+    """Provenance class for a consumer-side action-block assessor."""
+
+    FROZEN_MODEL = "frozen_model"
+    ANALYTIC = "analytic"
+    SHADOW_ROLLOUT = "shadow_rollout"
+    ORACLE_TEST = "oracle_test"
+    EXPLANATION = "explanation"
+
+    @property
+    def efficacy_eligible(self) -> bool:
+        return self in (
+            ActionAssessmentKind.FROZEN_MODEL,
+            ActionAssessmentKind.ANALYTIC,
+            ActionAssessmentKind.SHADOW_ROLLOUT,
+        )
 
 
 @dataclass(frozen=True)
@@ -349,27 +367,136 @@ class StateSnapshot:
 
 
 @dataclass(frozen=True)
-class ActionProposal:
+class ActionBlockAssessment:
+    """Consumer-side semantic assessment of an already emitted action block."""
+
+    assessor_id: str
+    assessor_version: str
+    assessor_kind: ActionAssessmentKind
     episode_nonce: str
     proposal_index: int
-    proposed_at_ns: int
-    skill: str
-    command: tuple[float, ...]
+    generated_at_ns: int
+    action_block_digest: str
+    observation_digest: str
+    state_epoch: int
+    known: bool
+    predicted_skill: str | None
+    predicted_effect_atoms: tuple[str, ...]
+    predicted_violation_atoms: tuple[str, ...]
+    precondition_atoms: tuple[str, ...]
     target: str | None = None
     part: str | None = None
     region: str | None = None
-    proposal_digest: str = field(init=False)
+    unknown_reason: str | None = None
+    assessment_digest: str = field(init=False)
 
     def __post_init__(self) -> None:
-        _require_text("episode_nonce", self.episode_nonce)
-        _require_text("skill", self.skill)
+        for name in ("assessor_id", "assessor_version", "episode_nonce"):
+            _require_text(name, getattr(self, name))
+        if not isinstance(self.assessor_kind, ActionAssessmentKind):
+            raise TypeError("assessor_kind must be ActionAssessmentKind")
         _require_nonnegative("proposal_index", self.proposal_index)
-        _require_nonnegative("proposed_at_ns", self.proposed_at_ns)
-        object.__setattr__(self, "command", freeze_command(self.command))
+        _require_nonnegative("generated_at_ns", self.generated_at_ns)
+        _require_nonnegative("state_epoch", self.state_epoch)
+        _require_digest("action_block_digest", self.action_block_digest)
+        _require_digest("observation_digest", self.observation_digest)
+        if type(self.known) is not bool:
+            raise TypeError("known must be bool")
+        object.__setattr__(
+            self,
+            "precondition_atoms",
+            _freeze_text(self.precondition_atoms),
+        )
+        object.__setattr__(
+            self,
+            "predicted_effect_atoms",
+            _freeze_text(self.predicted_effect_atoms),
+        )
+        object.__setattr__(
+            self,
+            "predicted_violation_atoms",
+            _freeze_text(self.predicted_violation_atoms),
+        )
+        if self.known:
+            _require_text("predicted_skill", self.predicted_skill or "")
+            if self.unknown_reason is not None:
+                raise ValueError("known action assessment cannot carry unknown_reason")
+        else:
+            if (
+                self.predicted_skill is not None
+                or self.predicted_effect_atoms
+                or self.predicted_violation_atoms
+                or any(
+                    value is not None
+                    for value in (self.target, self.part, self.region)
+                )
+            ):
+                raise ValueError("unknown action assessment cannot carry predictions")
+            _require_text("unknown_reason", self.unknown_reason or "")
         for name in ("target", "part", "region"):
             value = getattr(self, name)
             if value is not None:
                 _require_text(name, value)
+        object.__setattr__(
+            self,
+            "assessment_digest",
+            digest_payload(self.payload()),
+        )
+
+    def payload(self) -> dict[str, Any]:
+        return {
+            "assessor_id": self.assessor_id,
+            "assessor_version": self.assessor_version,
+            "assessor_kind": self.assessor_kind.value,
+            "episode_nonce": self.episode_nonce,
+            "proposal_index": self.proposal_index,
+            "generated_at_ns": self.generated_at_ns,
+            "action_block_digest": self.action_block_digest,
+            "observation_digest": self.observation_digest,
+            "state_epoch": self.state_epoch,
+            "known": self.known,
+            "predicted_skill": self.predicted_skill,
+            "target": self.target,
+            "part": self.part,
+            "region": self.region,
+            "precondition_atoms": self.precondition_atoms,
+            "predicted_effect_atoms": self.predicted_effect_atoms,
+            "predicted_violation_atoms": self.predicted_violation_atoms,
+            "unknown_reason": self.unknown_reason,
+        }
+
+
+@dataclass(frozen=True)
+class ActionProposal:
+    """VLA-emitted numeric action block or exact dispatchable prefix."""
+
+    episode_nonce: str
+    proposal_index: int
+    proposed_at_ns: int
+    observation_digest: str
+    state_epoch: int
+    command: tuple[float, ...]
+    command_shape: tuple[int, ...] = ()
+    proposal_digest: str = field(init=False)
+
+    def __post_init__(self) -> None:
+        _require_text("episode_nonce", self.episode_nonce)
+        _require_nonnegative("proposal_index", self.proposal_index)
+        _require_nonnegative("proposed_at_ns", self.proposed_at_ns)
+        _require_nonnegative("state_epoch", self.state_epoch)
+        _require_digest("observation_digest", self.observation_digest)
+        frozen_command = freeze_command(self.command)
+        shape = tuple(self.command_shape) or (len(frozen_command),)
+        if (
+            any(type(dimension) is not int or dimension <= 0 for dimension in shape)
+            or prod(shape) != len(frozen_command)
+        ):
+            raise ValueError(
+                "command_shape must contain positive dimensions whose product "
+                "equals the flattened command length"
+            )
+        object.__setattr__(self, "command", frozen_command)
+        object.__setattr__(self, "command_shape", shape)
         object.__setattr__(self, "proposal_digest", digest_payload(self.payload()))
 
     def payload(self) -> dict[str, Any]:
@@ -377,11 +504,87 @@ class ActionProposal:
             "episode_nonce": self.episode_nonce,
             "proposal_index": self.proposal_index,
             "proposed_at_ns": self.proposed_at_ns,
-            "skill": self.skill,
-            "target": self.target,
-            "part": self.part,
-            "region": self.region,
+            "observation_digest": self.observation_digest,
+            "state_epoch": self.state_epoch,
             "command": self.command,
+            "command_shape": self.command_shape,
+        }
+
+    @property
+    def action_block_digest(self) -> str:
+        return self.proposal_digest
+
+
+@dataclass(frozen=True)
+class BlockExecutionContract:
+    """Consumer-generated effect obligation for one concrete action block."""
+
+    issuer_id: str
+    issuer_version: str
+    episode_nonce: str
+    proposal_index: int
+    issued_at_ns: int
+    action_block_digest: str
+    assessment_digest: str
+    observation_digest: str
+    state_epoch: int
+    expected_effect_atoms: tuple[str, ...]
+    forbidden_effect_atoms: tuple[str, ...]
+    observation_window_steps: int
+    execution_contract_digest: str = field(init=False)
+
+    def __post_init__(self) -> None:
+        for name in ("issuer_id", "issuer_version", "episode_nonce"):
+            _require_text(name, getattr(self, name))
+        _require_nonnegative("proposal_index", self.proposal_index)
+        _require_nonnegative("issued_at_ns", self.issued_at_ns)
+        _require_nonnegative("state_epoch", self.state_epoch)
+        _require_digest("action_block_digest", self.action_block_digest)
+        _require_digest("assessment_digest", self.assessment_digest)
+        _require_digest("observation_digest", self.observation_digest)
+        if (
+            type(self.observation_window_steps) is not int
+            or self.observation_window_steps <= 0
+        ):
+            raise ValueError("observation_window_steps must be a positive integer")
+        object.__setattr__(
+            self,
+            "expected_effect_atoms",
+            _freeze_text(self.expected_effect_atoms, require_nonempty=True),
+        )
+        object.__setattr__(
+            self,
+            "forbidden_effect_atoms",
+            _freeze_text(self.forbidden_effect_atoms),
+        )
+        overlap = set(self.expected_effect_atoms).intersection(
+            self.forbidden_effect_atoms
+        )
+        if overlap:
+            raise ValueError(
+                "expected and forbidden effect atoms overlap: "
+                + ", ".join(sorted(overlap))
+            )
+        object.__setattr__(
+            self,
+            "execution_contract_digest",
+            digest_payload(self.payload()),
+        )
+
+    def payload(self) -> dict[str, Any]:
+        return {
+            "issuer_id": self.issuer_id,
+            "issuer_version": self.issuer_version,
+            "episode_nonce": self.episode_nonce,
+            "proposal_index": self.proposal_index,
+            "issued_at_ns": self.issued_at_ns,
+            "action_block_digest": self.action_block_digest,
+            "assessment_digest": self.assessment_digest,
+            "observation_digest": self.observation_digest,
+            "state_epoch": self.state_epoch,
+            "expected_effect_atoms": self.expected_effect_atoms,
+            "forbidden_effect_atoms": self.forbidden_effect_atoms,
+            "observation_window_steps": self.observation_window_steps,
         }
 
 
@@ -519,6 +722,9 @@ class PrefixAuthorization:
     state_snapshot_digest: str
     monitor_state_digest: str
     proposal_index: int
+    action_block_digest: str
+    assessment_digest: str
+    execution_contract_digest: str
     proposal_digest: str
     nominal_command_digest: str
     final_command: tuple[float, ...] | None
@@ -540,6 +746,9 @@ class PrefixAuthorization:
             "contract_digest",
             "state_snapshot_digest",
             "monitor_state_digest",
+            "action_block_digest",
+            "assessment_digest",
+            "execution_contract_digest",
             "proposal_digest",
             "nominal_command_digest",
         ):
@@ -589,6 +798,9 @@ class PrefixAuthorization:
             "state_snapshot_digest": self.state_snapshot_digest,
             "monitor_state_digest": self.monitor_state_digest,
             "proposal_index": self.proposal_index,
+            "action_block_digest": self.action_block_digest,
+            "assessment_digest": self.assessment_digest,
+            "execution_contract_digest": self.execution_contract_digest,
             "proposal_digest": self.proposal_digest,
             "nominal_command_digest": self.nominal_command_digest,
             "final_command": self.final_command,
@@ -621,6 +833,8 @@ class PrefixAuthorization:
 @dataclass(frozen=True)
 class DispatchReceipt:
     authorization_digest: str
+    action_block_digest: str
+    execution_contract_digest: str
     episode_nonce: str
     proposal_index: int
     authorized_command_digest: str
@@ -632,6 +846,8 @@ class DispatchReceipt:
     def __post_init__(self) -> None:
         for name in (
             "authorization_digest",
+            "action_block_digest",
+            "execution_contract_digest",
             "authorized_command_digest",
             "applied_command_digest",
         ):
@@ -646,6 +862,8 @@ class DispatchReceipt:
             digest_payload(
                 {
                     "authorization_digest": self.authorization_digest,
+                    "action_block_digest": self.action_block_digest,
+                    "execution_contract_digest": self.execution_contract_digest,
                     "episode_nonce": self.episode_nonce,
                     "proposal_index": self.proposal_index,
                     "authorized_command_digest": self.authorized_command_digest,
@@ -668,12 +886,15 @@ class DispatchResult:
 class ExecutionEvidence:
     authorization_digest: str
     receipt_digest: str
+    action_block_digest: str
+    execution_contract_digest: str
     episode_nonce: str
     proposal_index: int
     observed_at_ns: int
     observed_command_digest: str | None
     observed_atoms: tuple[str, ...]
     known: bool
+    observation_window_complete: bool
     violation: bool = False
     unknown_reason: str | None = None
     evidence_digest: str = field(init=False)
@@ -681,11 +902,22 @@ class ExecutionEvidence:
     def __post_init__(self) -> None:
         _require_digest("authorization_digest", self.authorization_digest)
         _require_digest("receipt_digest", self.receipt_digest)
+        _require_digest("action_block_digest", self.action_block_digest)
+        _require_digest(
+            "execution_contract_digest",
+            self.execution_contract_digest,
+        )
         _require_text("episode_nonce", self.episode_nonce)
         _require_nonnegative("proposal_index", self.proposal_index)
         _require_nonnegative("observed_at_ns", self.observed_at_ns)
-        if type(self.known) is not bool or type(self.violation) is not bool:
-            raise TypeError("known and violation must be bool")
+        if (
+            type(self.known) is not bool
+            or type(self.observation_window_complete) is not bool
+            or type(self.violation) is not bool
+        ):
+            raise TypeError(
+                "known, observation_window_complete, and violation must be bool"
+            )
         atoms = _freeze_text(self.observed_atoms)
         if self.known:
             if self.observed_command_digest is None:
@@ -696,6 +928,8 @@ class ExecutionEvidence:
         else:
             if self.observed_command_digest is not None or atoms or self.violation:
                 raise ValueError("unknown execution evidence cannot carry observations")
+            if self.observation_window_complete:
+                raise ValueError("unknown execution evidence cannot close the window")
             _require_text("unknown_reason", self.unknown_reason or "")
         object.__setattr__(self, "observed_atoms", atoms)
         object.__setattr__(
@@ -705,12 +939,15 @@ class ExecutionEvidence:
                 {
                     "authorization_digest": self.authorization_digest,
                     "receipt_digest": self.receipt_digest,
+                    "action_block_digest": self.action_block_digest,
+                    "execution_contract_digest": self.execution_contract_digest,
                     "episode_nonce": self.episode_nonce,
                     "proposal_index": self.proposal_index,
                     "observed_at_ns": self.observed_at_ns,
                     "observed_command_digest": self.observed_command_digest,
                     "observed_atoms": atoms,
                     "known": self.known,
+                    "observation_window_complete": self.observation_window_complete,
                     "violation": self.violation,
                     "unknown_reason": self.unknown_reason,
                 }
@@ -741,7 +978,10 @@ __all__ = [
     "CORE_SCHEMA_VERSION",
     "METHOD_ID",
     "ActionProposal",
+    "ActionAssessmentKind",
+    "ActionBlockAssessment",
     "ActiveContract",
+    "BlockExecutionContract",
     "ContractTransaction",
     "CoreVerdict",
     "DispatchReceipt",

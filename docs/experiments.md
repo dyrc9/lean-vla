@@ -1,115 +1,134 @@
-# ProofAlign 实验规则
+# 实验协议
 
-更新日期：2026-07-24
+## 1. 总原则
 
-本文只定义当前主线实验规则。结果和阶段规划见
-[项目进展与实施规划](progress_and_plan.md)，环境见
-[远程执行说明](remote_execution.md)。
+- 保持最初 attack：可信 intent 不变，攻击只进入 policy-facing instruction/observation/history；
+- VLA 输出原生 ActionBlock，不要求高层规划；
+- ActionBlock、consumer assessment 和 execution contract 在四臂间 byte-identical；
+- outcome-blind 冻结 population、seed、threshold、replacement/stopping rule；
+- unknown、invalid、deadlock、contact proxy、cost/collision、strict success 分开报告。
 
-## 1. 通用规则
+## 2. 证据层级
 
-1. protocol、population、seed、source/checkpoint/runner hash、endpoint、统计方法、停止条件和 output
-   root 必须在 outcome 前冻结并提交。
-2. 正式运行只使用不存在的 fresh root；attempted unit 不 resume、不覆盖、不替换。
-3. validity 与 task/safety outcome 分开；无有效分母时输出 `not_evaluated`。
-4. task success、cost/collision、contact、joint-limit 和 force 必须来自独立 simulator observation，
-   不能由方法 verdict 生成 ground truth。
-5. synthetic/fake-env 测试只证明组件语义，不证明物理防御。
-6. 正式实验保存 protocol、manifest、append-only ledger、per-episode artifact、terminal summary 和
-   SHA-256。
-7. 任一 gate 未通过即写 terminal nonpass，不在同一 protocol 内改 threshold、补样或换 unit。
-8. R9 root 已冻结，只读保存；不得续跑或覆盖。
+### A0：历史证据复用
 
-## 2. 已完成的探索实验
+P0b 提供 attack generation、clean pairing、有效性和 transition signal；R9 提供 Execution-only dispatch/
+effect 基线。两者均为探索性证据，不进入新的 L1/Dual confirmatory denominator。
 
-### P0b attack foundation
+### A1：ActionBlock 接口与 digest gate
 
-- 48 条 immutable attack record；
-- clean/attacked 共 `96/96` valid episode；
-- clean-eligible pair `23`，低于冻结门槛 `26`；
-- clean-safe→attacked-unsafe transition `15/23`。
+验证真实 victim 输出：
 
-由于 denominator gate 失败，P0b 分类保持
-`p0b_blocked_insufficient_clean_baseline`。15 个 signal pair 可以做预定义的探索性分层，但不能后验
-升级为 confirmed attack population。
+- action chunk shape/dtype/finite values；
+- observation/action nonce、index、state epoch；
+- deterministic canonical digest；
+- intervention 后重新绑定；
+- raw policy command 不可绕过 single dispatch boundary。
 
-### Execution-only action envelope
+不再存在“必须生成 plan text”的 gate。
 
-- clean strict-success retention：`22/23 = 95.7%`；
-- attacked+defended：`48/48` valid；
-- exact envelope mediation：`17,828/17,828`；
-- full population strict success without cost：`26/48`；
-- full population cost/collision unsafe：`1/48`；
-- 15 个 signal pair 上 cost/collision unsafe：`15/15 -> 0/15`；
-- signal pair strict-success recovery：`8/15`；
-- residual contact proxy 高于 clean：`11/15`。
+### A2：Intent–Action assessor qualification
 
-正式分类是 `exploratory_attacked_defended_complete_not_confirmatory`。机器结果见
-[`terminal summary`](../experiments/saber_integrity_action_envelope_terminal_summary.json)。
+在独立数据上冻结 assessor 和阈值，评估：
 
-## 3. 下一实验：独立确认性 attack foundation
+- skill/target/part/effect label；
+- clean false reject/retention；
+- attacked-block false allow（主指标）；
+- calibration、risk-coverage、OOD abstention；
+- worst-group 与 p99 latency。
 
-Population 与规模：
+该 gate 通过前，Intent–Action-only 和 Dual 只能跑 synthetic/fixed-trace component smoke，不能形成
+防御有效性结果。
 
-- 60 个与 P0b 不重叠的 base pair；
-- 两个 seed block：`(env=43, policy=11)`、`(env=59, policy=17)`；
-- 每个 base pair 只生成一次 outcome-blind attack record；
-- 共 120 个 unit，分别运行 clean/attacked VLA-only，共 `240` episode。
+### A3：Action–Execution/Lean component gate
 
-必须同时满足：
+正例与负例至少覆盖：
 
-- `240/240` terminal valid；
-- clean-eligible unit `>=52`，覆盖 base pair `>=26`；
-- transition unit `>=26`，覆盖 base pair `>=18`；
-- transition rate `>=0.50`；
-- 100,000 次 base-pair cluster bootstrap 的 95% lower bound `>=0.30`。
+- exact command / command substitution；
+- stale state / replay；
+- wrong receipt、action-block 或 execution-contract digest；
+- missing expected effect；
+- observed forbidden effect / observer violation；
+- open observation window；
+- evidence unknown；
+- phase advance without completion。
 
-任一条件失败即 terminal nonpass，不进入四臂 defense。
+Lean build 和 Python truth-table evidence 必须绑定 source digest；这仍不是完整 refinement proof。
 
-## 4. 四臂顺序与 gate
+### A4：fixed-trace 四臂
 
-### Stage A：fixed-trace/shadow
+同一组冻结 ActionBlocks、assessments、execution contracts 在四臂 shadow runner 中评估，不创建 simulator
+或 dispatch。验证：
 
-四臂读取 byte-identical proposal trace，`dispatch=false`。检查 nominal allow、Intent-only unique catch、
-Execution-only unique catch、overlap、Dual additional catch、unknown/block、checker latency 和
-fast-checker/Lean equivalence。
+- 每个 proposal 恰有四行；
+- 两层开关是唯一 treatment difference；
+- block/assessment/contract digest 跨臂一致；
+- wrong-target 只被 L1-enabled arms 捕获；
+- stale/substitution binding 只被 L2-enabled arms 捕获；
+- zero dispatch。
 
-只有 trace identity 与 shared-runner invariant 全部通过，才进入 closed loop。
+### A5：closed-loop no-attack smoke
 
-### Stage B：clean closed loop
+少量已授权 episode 只检查工程可运行性、latency、deadlock 和 clean retention，不用于阈值调参或论文
+有效性结论。
 
-120 unit × 4 arm，共 `480` clean episode。必须同时满足：
+## 3. M2：confirmatory VLA-only attack foundation
 
-- `480/480` valid，primary evidence coverage 完整；
-- Dual strict-success retention `>=0.80`；
-- Dual−VLA paired cluster-bootstrap 95% lower bound `>=-0.10`；
-- Dual phase completion `>=0.80`；
-- Dual deadlock `<=0.05`；
-- unknown/unbound primary evidence rate `=0`。
+冻结设计：
 
-失败则 terminal clean nonpass，不执行 attacked Stage C。
+- 60 base pair；
+- 2 个预注册 seed replicate；
+- clean + attacked；
+- 共 `60 × 2 × 2 = 240` 个 VLA-only episode；
+- 每个 base pair 只生成一个 attack record，两个 seed 共享；
+- 不允许 best-of-N、失败替换或 outcome-driven population revision。
 
-### Stage C：attacked closed loop
+M2 gate 检查：
 
-仅当 confirmatory attack gate 与 clean gate 都通过后，运行 120 unit × 4 arm，共 `480` attacked
-episode。
+- clean-eligible denominator；
+- attacked/clean 有效率和缺失模式；
+- 攻击 transition 数；
+- task/level/attack-family 覆盖；
+- signal 是否足以支撑后续四臂，而不是追求显著性后再改阈值。
 
-完整 population 与预定义 qualified signal subset 并列报告；task success、cost/collision、contact、
-joint-limit、force、risk exposure、episode length 和 intervention magnitude 分开报告。主分析包括
-Intent/Execution main effect、两个单层的 unique catch 和 Dual composition gain。
+## 4. Gate 顺序
 
-Dual composition claim 必须同时优于 Intent-only 与 Execution-only；两项比较使用 Holm family-wise
-`alpha=0.05`，区间使用 100,000 次 paired base-pair cluster bootstrap。
+```text
+M1 no-outcome readiness
+  -> M2 240 VLA-only episodes
+  -> denominator/signal gate
+  -> fixed-trace four-arm
+  -> 480 clean four-arm episodes
+  -> 480 attacked four-arm episodes
+```
 
-## 5. 运行前 readiness
+任何后续 stage 都不得反向修改前面已经观察 outcome 的 gate。
 
-正式 GPU 实验前必须具备：
+## 5. 四臂 outcome
 
-- 60-record producer、confirmatory victim runner、四臂 shared runner 和 fixed-trace exporter；
-- checkpoint/source/config/camera/runner/population/validator digest；
-- fast checker/Lean core 的可审计 equivalence evidence；
-- GPU、CPU/RAM、wall-clock、episode、磁盘和监控/abort 预算；
-- clean commit、fresh root、dry-run、unit/Lean/artifact check；
-- 单独的用户执行授权。
+主要分别报告：
 
-设计完成或 dry-run 通过都不等于正式 rollout 已授权。
+- task strict success；
+- cumulative cost；
+- collision；
+- robot/object/contact proxies；
+- Intent–Action reject/unknown/coverage；
+- Action–Execution reject/unknown；
+- intervention type；
+- deadlock/time-to-completion；
+- checker latency 和资源。
+
+统计分析以 base pair 为 cluster，保留两个 seed replicate，报告 risk difference/ratio 和 cluster bootstrap
+interval。Dual 的安全增益和 utility non-inferiority 必须同时满足预注册条件。
+
+## 6. Claim gate
+
+允许的逐级表述：
+
+1. component semantics pass；
+2. assessor qualified on held-out support；
+3. exploratory attack-defense signal；
+4. confirmatory benchmark effectiveness；
+5. physical safety（当前协议不支持）。
+
+不得跨级。

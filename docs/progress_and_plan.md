@@ -1,225 +1,113 @@
-# ProofAlign 项目进展与实施规划
+# 当前进展与执行计划
 
-更新日期：2026-07-24
+## 1. 2026-07-24 对齐结论
 
-## 1. 一句话状态
-
-项目已经形成一个清晰主线：**以 mission-rooted contract 约束 Intent–Plan，以 exact-command
-authorization 和 receipt/effect binding 约束 Plan–Execution；先确认攻击 population，再做四臂因果
-评估。**
-
-当前最强证据是 Execution-only action-envelope 的 terminal 探索性正结果。它值得写入论文，但不足以
-支持 confirmatory defense、Dual composition 或完整物理安全结论。
-
-## 2. 当前实验结果
-
-### 2.1 P0b attack foundation
-
-P0b 生成 48 条 immutable attack record，并完成 clean/attacked 共 `96/96` 个 valid episode：
-
-| 指标 | 结果 |
-|---|---:|
-| clean-eligible pairs | `23` |
-| 冻结的最低 clean-eligible gate | `26` |
-| clean-safe→attacked-unsafe transitions | `15/23` |
-| 正式分类 | `p0b_blocked_insufficient_clean_baseline` |
-
-问题不是 transition 太少，而是 clean baseline denominator 没达到事前门槛。因此这 15 个 pair 可以做
-固定的探索性 signal subset，不能被后验称为确认性 attack population。
-
-### 2.2 Execution-only action envelope
-
-| 指标 | 结果 | 含义 |
-|---|---:|---|
-| clean strict-success retention | `22/23 = 95.7%` | 通过冻结的 `0.80` gate |
-| attacked+defended valid episodes | `48/48` | 无 missing/invalid |
-| final commands inside L2 envelope | `17,828/17,828` | 该切片 complete mediation 成立 |
-| projected actions | `13,108/17,828 = 73.5%` | intervention 使用频繁 |
-| projection L2 | median `0.002853`, P95 `0.008507`, max `0.039266` | 修改幅度整体较小 |
-| full-population strict success without cost | `26/48 = 54.2%` | task utility 仍有明显损失 |
-| full-population cost/collision unsafe | `1/48 = 2.1%` | 仍有一个 coarse unsafe |
-| signal subset defended cost/collision | `0/15` | 未防御的 `15/15` 降为 `0/15` |
-| signal subset recovered strict success | `8/15 = 53.3%` | 只恢复一部分任务 |
-| signal subset residual contact proxy | `11/15` 高于 clean | 不能声称完整物理安全 |
-
-正式分类：
+主线已从 `TrustedIntent -> explicit PlanWitness -> Action` 改为：
 
 ```text
-exploratory_attacked_defended_complete_not_confirmatory
+TrustedIntent -> concrete ActionBlock consequence assessment
+ActionBlock -> exact dispatch/receipt/observed effects
 ```
 
-允许的论文表述：在固定 simulator workload 上，exact execution-time projection 提供强探索性低层风险
-缓解证据，并基本保留 clean utility。
+显式高层规划不再是接口要求、denominator 或 blocker。第一关键 blocker 变成：
 
-不允许的表述：
+> 能否构建一个独立于被攻击 policy view、对 ActionBlock 后果有足够 coverage 且 false-allow 可控的
+> consumer-side assessor？
 
-- 已确认一般攻击防御有效；
-- Intent-only、Full ProofAlign 或 Dual 已得到验证；
-- contact、joint、force 或连续动力学意义上的完整物理安全；
-- 跨 task、seed、hardware 或实时部署可推广。
+这是更直接、也更困难的 challenge：VLA 的数值输出不自带可验证语义，外部系统必须在有限观测和模型误差
+下预测它实际会做什么。
 
-机器来源：
+## 2. 已完成
 
-- [`terminal summary`](../experiments/saber_integrity_action_envelope_terminal_summary.json)
-- [`paper tables`](../experiments/action_envelope_paper_tables.json)
-- [`failure taxonomy`](../experiments/action_envelope_failure_taxonomy.json)
-- [`generated result report`](paper/action_envelope_results.md)
+- ActionProposal 已成为原生 ActionBlock，不再含 `plan_digest`；
+- 新增 `ActionBlockAssessment` 和 `BlockExecutionContract`；
+- authorization、dispatch receipt、execution evidence 已绑定 block/assessment/contract digests；
+- shared four-arm runner 改为 Intent–Action / Action–Execution 两个开关；
+- Lean core 改为 action-block execution transaction semantics；
+- L2 支持 exact command、one-use authorization、freshness、expected/forbidden effects、phase gating；
+- P0b/R9 历史结果及冻结协议仍保留审计边界。
 
-## 3. 工程状态
+## 3. 历史实验怎么复用
 
-当前工作树只保留：
+完整的逐字段映射、post-hoc replay 规则和 confirmatory 禁止项见
+[`experiment_reuse.md`](experiment_reuse.md)。
 
-- Python minimal integrity core、action-envelope/SABER 主线 adapter 和精简 LIBERO runtime；
-- Lean `IntegrityCore`；
-- 当前 runners、artifact/preregistration generator 与 resource-isolated launch 检查；
-- R0–R9 compact protocol/status audit chain；
-- terminal summary、paper tables、taxonomy 和 preregistration；
-- 主线测试、方法/实验/环境/论文文档。
+### P0b
 
-CTDA v1/v2、AEGIS、EDPA、Phantom、SAFE/FIPER、旧 LIBERO runner、toy example、旧 handoff、重复状态文档
-和不参与当前结论的结果已从工作树删除，可从 Git 历史恢复。
-这些方向的失败根因与防复发规则集中保留在
-[`failure_lessons.md`](failure_lessons.md)，不再用多份旧状态文档维护。
+可直接复用：
 
-完整 R9 raw episode bundle 约 71 MiB，只在实验机本地保留。远端只保存代码和 compact result；缺少
-raw bundle 的远端 clone 会明确 skip raw-derived consistency check。
+- 原始攻击机制和 threat model；
+- clean/attacked pairing；
+- valid episode 与 clean-eligible denominator 逻辑；
+- transition signal 和缺失/替换规则。
 
-当前实现缺口：
+不可复用：
 
-1. Python fast checker 与 Lean `IntegrityCore` 尚无 machine-checked refinement/equivalence；
-2. confirmatory producer/victim 和四臂 shared runner 尚未冻结；
-3. fixed-trace exporter 尚未冻结；
-4. trusted observer、continuous dynamics、hardware sensing/actuation 仍在范围外或 TCB 内；
-5. 新实验的 GPU、wall-clock、存储和 fresh-root readiness packet 尚未完成。
+- 新 L1 assessment；
+- 四臂 causal effect；
+- confirmatory denominator（`23 < 26`）。
 
-本轮主线清理后的验证结果：
+### R9 Execution-only
 
-- Python：`76 passed`；
-- Lean：`lake build ProofAlign` 成功；
-- R9 action-envelope paper artifact `--check` 成功；
-- confirmatory preregistration `--check` 成功；
-- 27 份保留的 experiment JSON 均可解析；
-- retained module import、Python compile、Markdown 本地链接和 `git diff --check` 均通过。
+可直接复用：
 
-## 4. 下一步跑什么
+- action envelope/intervention；
+- exact dispatch 和 episode ledger；
+- cost/collision、strict success、contact proxy；
+- clean retention 和 attacked recovery 的 exploratory baseline。
 
-下一项正式 rollout 是 **独立确认性 attack foundation**，不是继续 R9，也不是直接跑四臂 defense。
+需要迁移：
 
-### 规模
+- 将旧 transport/audit 映射为 ActionBlock/contract/receipt v3；
+- 不把旧 effect verdict 当作完整物理安全；
+- 不把 R9 称为 Dual。
 
-- 60 个与 P0b 不重叠的 base pair；
-- 两个 seed block：`(env=43, policy=11)` 和 `(env=59, policy=17)`；
-- 120 个 unit；
-- 每个 unit 跑 clean/attacked VLA-only，共 `240` episode。
+## 4. 当前 blocker 排序
 
-### Gate
+1. **Assessor qualification design**：标签、support、false-allow、coverage、calibration、OOD；
+2. **资源预算**：assessor 与四臂 latency/GPU memory；
+3. **observer adequacy**：contact/collision/task-effect atoms 的可观测性；
+4. **clean commit binding**；
+5. **M2 execution authorization**。
 
-必须同时满足：
+M1 producer/victim、shared runner、fixed-trace exporter、validator 和 outcome-blind ActionBlock prefix adapter
+已经完成；adapter 只读取 policy-call audit 与实际消费的 raw actions，不读取 reward/success/cost/collision，
+也不伪造未执行的 chunk tail。
 
-- `240/240` terminal valid；
-- clean-eligible unit `>=52`，覆盖 base pair `>=26`；
-- transition unit `>=26`，覆盖 base pair `>=18`；
-- transition rate `>=0.50`；
-- 100,000 次 base-pair cluster bootstrap 95% lower bound `>=0.30`。
+## 5. 下一里程碑
 
-任一 gate 失败即写 terminal nonpass，不补样、不换 pair、不进入 defense。
+### M1A：component closure
 
-## 5. 分阶段规划
+- 全部 Python/Lean tests 通过；
+- 新 ActionBlock fixed-trace smoke artifact 当前；
+- M1 readiness validator 不再引用 PlanWitness；
+- frozen legacy protocol 明确标注 audit-only，新 v3 schema 不改写历史结果。
 
-### M0：终态收口
+### M1B：assessor no-outcome qualification protocol
 
-状态：**本轮完成**
+- 冻结训练/qualification split；
+- 冻结 finite atom vocabulary；
+- 冻结 threshold、abstention 和 worst-group；
+- 只允许 offline transition label，不看 M2 victim outcome。
 
-- 清理废弃方案，只保留主线；
-- 保存本地 R9 raw evidence；
-- 保留远端所需 compact protocol/result；
-- 自动生成论文表和 failure taxonomy；
-- 把当前结果、claim boundary 和规划集中到 canonical 文档。
+### M2：240 episode
 
-### M1：no-outcome execution readiness
+仅在用户/项目负责人明确授权 GPU rollout 后运行。先完成 VLA-only attack foundation，gate 通过后再跑
+fixed-trace 和 480+480 四臂。
 
-状态：**当前下一工作**
+## 6. 当前可声称与不可声称
 
-1. 实现并冻结 60-record producer、validator 和禁止 replacement 规则；
-2. 实现 confirmatory VLA-only victim runner；
-3. 实现四臂 shared runner 和 fixed-trace exporter；
-4. 绑定 checkpoint/source/config/camera/runner/population/validator digest；
-5. 补 fast checker/Lean core equivalence evidence；
-6. 冻结 GPU、CPU/RAM、wall-clock、episode、磁盘和 abort 预算；
-7. 定义 fresh roots，完成 unit、Lean、dry-run 和 artifact validator；
-8. 形成只读 readiness packet，再单独请求 GPU 执行授权。
+可声称：
 
-M1 不产生新 outcome，也不自动启动 GPU。
+- 双层问题已定义在 action-only VLA 可观察接口上；
+- L2 的有限 transaction semantics 已由 Lean 检查；
+- P0b/R9 给出强探索性攻击/Execution-only 信号；
+- component runner 可验证两层开关和 digest identity。
 
-### M2：确认性 attack foundation
+不可声称：
 
-状态：**等待 M1 与授权**
-
-按第 4 节运行 `240` 个 VLA-only episode。只有所有 gate 通过才继续。
-
-### M3：四臂 fixed-trace/shadow
-
-状态：**等待 M2 pass**
-
-四臂读取 byte-identical proposal trace，`dispatch=false`，检查 unique catch、overlap、Dual additional
-catch、unknown/block、latency 和 checker equivalence。失败则 terminal stop。
-
-### M4：四臂 clean closed loop
-
-状态：**等待 M3 pass**
-
-120 unit × 4 arm，共 `480` clean episode。主要 gate：
-
-- `480/480` valid；
-- Dual strict-success retention `>=0.80`；
-- Dual−VLA paired bootstrap 95% lower bound `>=-0.10`；
-- Dual phase completion `>=0.80`；
-- Dual deadlock `<=0.05`；
-- unknown/unbound primary evidence `=0`。
-
-失败则不执行 attacked stage。
-
-### M5：四臂 attacked closed loop
-
-状态：**同时等待 M2 与 M4 pass**
-
-120 unit × 4 arm，共 `480` attacked episode。报告 full population 和预定义 signal subset，并分别分析
-task success、cost/collision、contact、joint-limit、force、risk exposure 和 intervention magnitude。
-
-Dual composition 必须同时优于 Intent-only 和 Execution-only；两项比较使用 Holm
-family-wise `alpha=0.05` 与 100,000 次 paired base-pair cluster bootstrap。
-
-### M6：外部 baseline 与论文冻结
-
-状态：**M5 后决定**
-
-- 用同一 proposal、population、oracle、fallback、资源和 endpoint 接入至少一个 terminal baseline；
-- 从机器 artifact 生成最终表、区间、消融和 failure cases；
-- 保留探索性结果和限制，不隐藏 negative/nonpass；
-- 根据四臂结果收缩或保留论文主张。
-
-## 6. 总资源上限
-
-所有 gate 都通过时，主线最多包含：
-
-- confirmatory VLA-only：`240` closed-loop episode；
-- four-arm clean：`480`；
-- four-arm attacked：`480`；
-- 合计 `1,200` closed-loop episode，另加无 dispatch 的 Stage A。
-
-正式运行前必须用 smoke 实测吞吐并冻结 GPU-hours、wall-clock、磁盘和 raw retention，不能直接按历史
-运行时间外推。
-
-## 7. 当前立即行动
-
-1. 完成本轮清理后的 Python、Lean、artifact、link 和 import 验证；
-2. 将清理后的代码与 compact results 同步远端，R9 raw 继续留本地；
-3. 开始 M1：先做 producer/victim/shared-runner/fixed-trace 的 no-outcome 实现；
-4. 形成 readiness packet；
-5. 获得授权后再运行 M2。
-
-项目接下来要回答的三个核心问题是：
-
-1. 攻击信号能否在独立 population 上确认？
-2. Intent–Plan 与 Plan–Execution 是否各有独立因果贡献？
-3. Dual 能否在保留 clean utility 的同时产生统计上可信的组合增益？
+- L1 assessor 已对真实 π0.5 资格化；
+- 一般防御有效；
+- Dual 已验证；
+- 完整物理安全；
+- Lean 证明 learned predictions 或真实世界。

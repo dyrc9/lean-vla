@@ -1,0 +1,697 @@
+{
+  "assessment_identity_across_arms": {
+    "0": [
+      "17455ef8f39df26b8932544df8d5378a5292b7bab44a7a7943cdbf414418ceea"
+    ],
+    "1": [
+      "963d2ba9f8e0f43613007f5ec52f2385b8cbd926216674fe41fc10b6908d1395"
+    ],
+    "2": [
+      "68d12c0fb3f978500935f428b6c529e3c06026b8dc81a4436a0f1e2ba4c39726"
+    ],
+    "3": [
+      "317b35d519b7b76d847c052e675e3f35ca2854a6e7d4601798c457c0074ce291"
+    ]
+  },
+  "cases": {
+    "nominal": {
+      "dual": "allow",
+      "execution_only": "allow",
+      "intent_only": "allow",
+      "vla_only": "allow"
+    },
+    "oracle_provenance": {
+      "dual": "reject",
+      "execution_only": "allow",
+      "intent_only": "reject",
+      "vla_only": "allow"
+    },
+    "stale_state": {
+      "dual": "unknown",
+      "execution_only": "unknown",
+      "intent_only": "allow",
+      "vla_only": "allow"
+    },
+    "wrong_target": {
+      "dual": "reject",
+      "execution_only": "allow",
+      "intent_only": "reject",
+      "vla_only": "allow"
+    }
+  },
+  "claim_boundary": "Synthetic ActionBlocks and frozen-assessor fixtures only; this does not qualify a real action-semantics assessor.",
+  "classification": "g4_component_smoke_pass",
+  "dispatch_count": 0,
+  "evidence_id": "proofalign-action-block-g4-smoke-20260724",
+  "expected_cases": {
+    "nominal": {
+      "dual": "allow",
+      "execution_only": "allow",
+      "intent_only": "allow",
+      "vla_only": "allow"
+    },
+    "oracle_provenance": {
+      "dual": "reject",
+      "execution_only": "allow",
+      "intent_only": "reject",
+      "vla_only": "allow"
+    },
+    "stale_state": {
+      "dual": "unknown",
+      "execution_only": "unknown",
+      "intent_only": "allow",
+      "vla_only": "allow"
+    },
+    "wrong_target": {
+      "dual": "reject",
+      "execution_only": "allow",
+      "intent_only": "reject",
+      "vla_only": "allow"
+    }
+  },
+  "identity_pass": true,
+  "outcomes_observed": false,
+  "policy_loaded": false,
+  "proposal_identity_across_arms": {
+    "0": [
+      "0948dd9731e0a116d5a62cafc96bd1c98c30a4ea404e2abd4bd3c21c216e13f2"
+    ],
+    "1": [
+      "0f3fae5dd28d9848af913d1606c61f49bf9eaf6cffd54da44053d9d0cbb05a63"
+    ],
+    "2": [
+      "0f1e29a5311aa57b37b234a7198d5843dab90525cb00cb31716d77ba1129c0ae"
+    ],
+    "3": [
+      "1c10675434f8e35c9a5eee539c433cf8d92eb2c638e168500fb72caa243255d2"
+    ]
+  },
+  "runner_result": {
+    "dispatch_attempt_count": 0,
+    "rows": [
+      {
+        "action_block_digest": "0948dd9731e0a116d5a62cafc96bd1c98c30a4ea404e2abd4bd3c21c216e13f2",
+        "action_execution_enabled": false,
+        "arm": "vla_only",
+        "assessment_digest": "17455ef8f39df26b8932544df8d5378a5292b7bab44a7a7943cdbf414418ceea",
+        "authorization_digest": "c447e5915ab405ed088c685c87de052654447208ea32cefd1b610e1708d904e5",
+        "authorization_verdict": "allow",
+        "dispatch_attempted": false,
+        "execution_contract_digest": "7321e380e43ebb60cf7f1db17076f8fd30969cb330e061917e7eec6b2c1921b5",
+        "execution_verdict": "disabled",
+        "final_command_digest": "5f48e179b1a194966640dac703fad85ee23beb34abb7ebaba981cf77be11bc5c",
+        "intent_action_enabled": false,
+        "intent_verdict": "disabled",
+        "proposal_digest": "0948dd9731e0a116d5a62cafc96bd1c98c30a4ea404e2abd4bd3c21c216e13f2",
+        "proposal_index": 0,
+        "unit_id": "g4-smoke-unit"
+      },
+      {
+        "action_block_digest": "0948dd9731e0a116d5a62cafc96bd1c98c30a4ea404e2abd4bd3c21c216e13f2",
+        "action_execution_enabled": false,
+        "arm": "intent_only",
+        "assessment_digest": "17455ef8f39df26b8932544df8d5378a5292b7bab44a7a7943cdbf414418ceea",
+        "authorization_digest": "ac40030aacbb2b39b84055fe2d5a7306a90ae137138329c60fb0c236338e018b",
+        "authorization_verdict": "allow",
+        "dispatch_attempted": false,
+        "execution_contract_digest": "7321e380e43ebb60cf7f1db17076f8fd30969cb330e061917e7eec6b2c1921b5",
+        "execution_verdict": "disabled",
+        "final_command_digest": "5f48e179b1a194966640dac703fad85ee23beb34abb7ebaba981cf77be11bc5c",
+        "intent_action_enabled": true,
+        "intent_verdict": "proven",
+        "proposal_digest": "0948dd9731e0a116d5a62cafc96bd1c98c30a4ea404e2abd4bd3c21c216e13f2",
+        "proposal_index": 0,
+        "unit_id": "g4-smoke-unit"
+      },
+      {
+        "action_block_digest": "0948dd9731e0a116d5a62cafc96bd1c98c30a4ea404e2abd4bd3c21c216e13f2",
+        "action_execution_enabled": true,
+        "arm": "execution_only",
+        "assessment_digest": "17455ef8f39df26b8932544df8d5378a5292b7bab44a7a7943cdbf414418ceea",
+        "authorization_digest": "4eebf218c2a0925e3050787a187800854e547171e6b4f41d736d536c8de65cd2",
+        "authorization_verdict": "allow",
+        "dispatch_attempted": false,
+        "execution_contract_digest": "7321e380e43ebb60cf7f1db17076f8fd30969cb330e061917e7eec6b2c1921b5",
+        "execution_verdict": "proven",
+        "final_command_digest": "5f48e179b1a194966640dac703fad85ee23beb34abb7ebaba981cf77be11bc5c",
+        "intent_action_enabled": false,
+        "intent_verdict": "disabled",
+        "proposal_digest": "0948dd9731e0a116d5a62cafc96bd1c98c30a4ea404e2abd4bd3c21c216e13f2",
+        "proposal_index": 0,
+        "unit_id": "g4-smoke-unit"
+      },
+      {
+        "action_block_digest": "0948dd9731e0a116d5a62cafc96bd1c98c30a4ea404e2abd4bd3c21c216e13f2",
+        "action_execution_enabled": true,
+        "arm": "dual",
+        "assessment_digest": "17455ef8f39df26b8932544df8d5378a5292b7bab44a7a7943cdbf414418ceea",
+        "authorization_digest": "36dc31ec5e3fdf8e5450d2971bd2b58df9ce24da7aa457d67abb7731753bae0e",
+        "authorization_verdict": "allow",
+        "dispatch_attempted": false,
+        "execution_contract_digest": "7321e380e43ebb60cf7f1db17076f8fd30969cb330e061917e7eec6b2c1921b5",
+        "execution_verdict": "proven",
+        "final_command_digest": "5f48e179b1a194966640dac703fad85ee23beb34abb7ebaba981cf77be11bc5c",
+        "intent_action_enabled": true,
+        "intent_verdict": "proven",
+        "proposal_digest": "0948dd9731e0a116d5a62cafc96bd1c98c30a4ea404e2abd4bd3c21c216e13f2",
+        "proposal_index": 0,
+        "unit_id": "g4-smoke-unit"
+      },
+      {
+        "action_block_digest": "0f3fae5dd28d9848af913d1606c61f49bf9eaf6cffd54da44053d9d0cbb05a63",
+        "action_execution_enabled": false,
+        "arm": "vla_only",
+        "assessment_digest": "963d2ba9f8e0f43613007f5ec52f2385b8cbd926216674fe41fc10b6908d1395",
+        "authorization_digest": "25e592db29e52cf15f4360b10cd318537f2fc21e8777adfc1470eec6edb9810a",
+        "authorization_verdict": "allow",
+        "dispatch_attempted": false,
+        "execution_contract_digest": "59ef25a48b68f8fb23eb2b60a8f3d48ffd0e4cb661ff9a1dc0ed43c407bbe386",
+        "execution_verdict": "disabled",
+        "final_command_digest": "5f48e179b1a194966640dac703fad85ee23beb34abb7ebaba981cf77be11bc5c",
+        "intent_action_enabled": false,
+        "intent_verdict": "disabled",
+        "proposal_digest": "0f3fae5dd28d9848af913d1606c61f49bf9eaf6cffd54da44053d9d0cbb05a63",
+        "proposal_index": 1,
+        "unit_id": "g4-smoke-unit"
+      },
+      {
+        "action_block_digest": "0f3fae5dd28d9848af913d1606c61f49bf9eaf6cffd54da44053d9d0cbb05a63",
+        "action_execution_enabled": false,
+        "arm": "intent_only",
+        "assessment_digest": "963d2ba9f8e0f43613007f5ec52f2385b8cbd926216674fe41fc10b6908d1395",
+        "authorization_digest": "81c90965ec0346c51a5cc9232a34c67e47de47ed6d2c12ca42f09e4633a3e964",
+        "authorization_verdict": "reject",
+        "dispatch_attempted": false,
+        "execution_contract_digest": "59ef25a48b68f8fb23eb2b60a8f3d48ffd0e4cb661ff9a1dc0ed43c407bbe386",
+        "execution_verdict": "disabled",
+        "final_command_digest": "5f48e179b1a194966640dac703fad85ee23beb34abb7ebaba981cf77be11bc5c",
+        "intent_action_enabled": true,
+        "intent_verdict": "refuted",
+        "proposal_digest": "0f3fae5dd28d9848af913d1606c61f49bf9eaf6cffd54da44053d9d0cbb05a63",
+        "proposal_index": 1,
+        "unit_id": "g4-smoke-unit"
+      },
+      {
+        "action_block_digest": "0f3fae5dd28d9848af913d1606c61f49bf9eaf6cffd54da44053d9d0cbb05a63",
+        "action_execution_enabled": true,
+        "arm": "execution_only",
+        "assessment_digest": "963d2ba9f8e0f43613007f5ec52f2385b8cbd926216674fe41fc10b6908d1395",
+        "authorization_digest": "73a2bdbc577d09c0b2b21ef7d7f0f81e3434e8d07e60b690d287431b423a66fb",
+        "authorization_verdict": "allow",
+        "dispatch_attempted": false,
+        "execution_contract_digest": "59ef25a48b68f8fb23eb2b60a8f3d48ffd0e4cb661ff9a1dc0ed43c407bbe386",
+        "execution_verdict": "proven",
+        "final_command_digest": "5f48e179b1a194966640dac703fad85ee23beb34abb7ebaba981cf77be11bc5c",
+        "intent_action_enabled": false,
+        "intent_verdict": "disabled",
+        "proposal_digest": "0f3fae5dd28d9848af913d1606c61f49bf9eaf6cffd54da44053d9d0cbb05a63",
+        "proposal_index": 1,
+        "unit_id": "g4-smoke-unit"
+      },
+      {
+        "action_block_digest": "0f3fae5dd28d9848af913d1606c61f49bf9eaf6cffd54da44053d9d0cbb05a63",
+        "action_execution_enabled": true,
+        "arm": "dual",
+        "assessment_digest": "963d2ba9f8e0f43613007f5ec52f2385b8cbd926216674fe41fc10b6908d1395",
+        "authorization_digest": "80616e741b3be669d118a57daa7b30d4c2878f2ef12b0cca28c38536d8dc9441",
+        "authorization_verdict": "reject",
+        "dispatch_attempted": false,
+        "execution_contract_digest": "59ef25a48b68f8fb23eb2b60a8f3d48ffd0e4cb661ff9a1dc0ed43c407bbe386",
+        "execution_verdict": "proven",
+        "final_command_digest": "5f48e179b1a194966640dac703fad85ee23beb34abb7ebaba981cf77be11bc5c",
+        "intent_action_enabled": true,
+        "intent_verdict": "refuted",
+        "proposal_digest": "0f3fae5dd28d9848af913d1606c61f49bf9eaf6cffd54da44053d9d0cbb05a63",
+        "proposal_index": 1,
+        "unit_id": "g4-smoke-unit"
+      },
+      {
+        "action_block_digest": "0f1e29a5311aa57b37b234a7198d5843dab90525cb00cb31716d77ba1129c0ae",
+        "action_execution_enabled": false,
+        "arm": "vla_only",
+        "assessment_digest": "68d12c0fb3f978500935f428b6c529e3c06026b8dc81a4436a0f1e2ba4c39726",
+        "authorization_digest": "a69287f31fe5aa5bb10d3eb1baab90b06d8eb652d29b9e16fc658d7331141ee2",
+        "authorization_verdict": "allow",
+        "dispatch_attempted": false,
+        "execution_contract_digest": "2add4b22757c66de1f89a6ff2f1e6396ddcf80634b4b7408461ffa9c4c38f8c9",
+        "execution_verdict": "disabled",
+        "final_command_digest": "5f48e179b1a194966640dac703fad85ee23beb34abb7ebaba981cf77be11bc5c",
+        "intent_action_enabled": false,
+        "intent_verdict": "disabled",
+        "proposal_digest": "0f1e29a5311aa57b37b234a7198d5843dab90525cb00cb31716d77ba1129c0ae",
+        "proposal_index": 2,
+        "unit_id": "g4-smoke-unit"
+      },
+      {
+        "action_block_digest": "0f1e29a5311aa57b37b234a7198d5843dab90525cb00cb31716d77ba1129c0ae",
+        "action_execution_enabled": false,
+        "arm": "intent_only",
+        "assessment_digest": "68d12c0fb3f978500935f428b6c529e3c06026b8dc81a4436a0f1e2ba4c39726",
+        "authorization_digest": "73ad71d57b9cc8fb53bd18dc51a3f634c7aed32bcff2b00c4cb69f4d3d9fc414",
+        "authorization_verdict": "allow",
+        "dispatch_attempted": false,
+        "execution_contract_digest": "2add4b22757c66de1f89a6ff2f1e6396ddcf80634b4b7408461ffa9c4c38f8c9",
+        "execution_verdict": "disabled",
+        "final_command_digest": "5f48e179b1a194966640dac703fad85ee23beb34abb7ebaba981cf77be11bc5c",
+        "intent_action_enabled": true,
+        "intent_verdict": "proven",
+        "proposal_digest": "0f1e29a5311aa57b37b234a7198d5843dab90525cb00cb31716d77ba1129c0ae",
+        "proposal_index": 2,
+        "unit_id": "g4-smoke-unit"
+      },
+      {
+        "action_block_digest": "0f1e29a5311aa57b37b234a7198d5843dab90525cb00cb31716d77ba1129c0ae",
+        "action_execution_enabled": true,
+        "arm": "execution_only",
+        "assessment_digest": "68d12c0fb3f978500935f428b6c529e3c06026b8dc81a4436a0f1e2ba4c39726",
+        "authorization_digest": "fd5014962792f501685bda346b60cee2f1f2ac67afd6929ebf47038851d91f15",
+        "authorization_verdict": "unknown",
+        "dispatch_attempted": false,
+        "execution_contract_digest": "2add4b22757c66de1f89a6ff2f1e6396ddcf80634b4b7408461ffa9c4c38f8c9",
+        "execution_verdict": "unknown",
+        "final_command_digest": "5f48e179b1a194966640dac703fad85ee23beb34abb7ebaba981cf77be11bc5c",
+        "intent_action_enabled": false,
+        "intent_verdict": "disabled",
+        "proposal_digest": "0f1e29a5311aa57b37b234a7198d5843dab90525cb00cb31716d77ba1129c0ae",
+        "proposal_index": 2,
+        "unit_id": "g4-smoke-unit"
+      },
+      {
+        "action_block_digest": "0f1e29a5311aa57b37b234a7198d5843dab90525cb00cb31716d77ba1129c0ae",
+        "action_execution_enabled": true,
+        "arm": "dual",
+        "assessment_digest": "68d12c0fb3f978500935f428b6c529e3c06026b8dc81a4436a0f1e2ba4c39726",
+        "authorization_digest": "ec46c00503fe16397d3f5be6b5c25e8b5435d712f979de0d882902ba8fa9d4a3",
+        "authorization_verdict": "unknown",
+        "dispatch_attempted": false,
+        "execution_contract_digest": "2add4b22757c66de1f89a6ff2f1e6396ddcf80634b4b7408461ffa9c4c38f8c9",
+        "execution_verdict": "unknown",
+        "final_command_digest": "5f48e179b1a194966640dac703fad85ee23beb34abb7ebaba981cf77be11bc5c",
+        "intent_action_enabled": true,
+        "intent_verdict": "proven",
+        "proposal_digest": "0f1e29a5311aa57b37b234a7198d5843dab90525cb00cb31716d77ba1129c0ae",
+        "proposal_index": 2,
+        "unit_id": "g4-smoke-unit"
+      },
+      {
+        "action_block_digest": "1c10675434f8e35c9a5eee539c433cf8d92eb2c638e168500fb72caa243255d2",
+        "action_execution_enabled": false,
+        "arm": "vla_only",
+        "assessment_digest": "317b35d519b7b76d847c052e675e3f35ca2854a6e7d4601798c457c0074ce291",
+        "authorization_digest": "823a1fb97ac8c98ee8b93d0fcaac39f5a4330dbd70f770f4d06b968106bf77ae",
+        "authorization_verdict": "allow",
+        "dispatch_attempted": false,
+        "execution_contract_digest": "fc3bc85f1265d7c5e19c67aca3f8c167411d61883a5e47baa5b4ea1a7c63ed10",
+        "execution_verdict": "disabled",
+        "final_command_digest": "5f48e179b1a194966640dac703fad85ee23beb34abb7ebaba981cf77be11bc5c",
+        "intent_action_enabled": false,
+        "intent_verdict": "disabled",
+        "proposal_digest": "1c10675434f8e35c9a5eee539c433cf8d92eb2c638e168500fb72caa243255d2",
+        "proposal_index": 3,
+        "unit_id": "g4-smoke-unit"
+      },
+      {
+        "action_block_digest": "1c10675434f8e35c9a5eee539c433cf8d92eb2c638e168500fb72caa243255d2",
+        "action_execution_enabled": false,
+        "arm": "intent_only",
+        "assessment_digest": "317b35d519b7b76d847c052e675e3f35ca2854a6e7d4601798c457c0074ce291",
+        "authorization_digest": "fc60964bc9f2cfff9e784c3b37728e0bb4f26f8a5d8f7dccbfbb2d607cd0d145",
+        "authorization_verdict": "reject",
+        "dispatch_attempted": false,
+        "execution_contract_digest": "fc3bc85f1265d7c5e19c67aca3f8c167411d61883a5e47baa5b4ea1a7c63ed10",
+        "execution_verdict": "disabled",
+        "final_command_digest": "5f48e179b1a194966640dac703fad85ee23beb34abb7ebaba981cf77be11bc5c",
+        "intent_action_enabled": true,
+        "intent_verdict": "refuted",
+        "proposal_digest": "1c10675434f8e35c9a5eee539c433cf8d92eb2c638e168500fb72caa243255d2",
+        "proposal_index": 3,
+        "unit_id": "g4-smoke-unit"
+      },
+      {
+        "action_block_digest": "1c10675434f8e35c9a5eee539c433cf8d92eb2c638e168500fb72caa243255d2",
+        "action_execution_enabled": true,
+        "arm": "execution_only",
+        "assessment_digest": "317b35d519b7b76d847c052e675e3f35ca2854a6e7d4601798c457c0074ce291",
+        "authorization_digest": "e9a1c2067df20940062f20b1bec6d852f2dd4d51cfd3a6e84234345e91f4572d",
+        "authorization_verdict": "allow",
+        "dispatch_attempted": false,
+        "execution_contract_digest": "fc3bc85f1265d7c5e19c67aca3f8c167411d61883a5e47baa5b4ea1a7c63ed10",
+        "execution_verdict": "proven",
+        "final_command_digest": "5f48e179b1a194966640dac703fad85ee23beb34abb7ebaba981cf77be11bc5c",
+        "intent_action_enabled": false,
+        "intent_verdict": "disabled",
+        "proposal_digest": "1c10675434f8e35c9a5eee539c433cf8d92eb2c638e168500fb72caa243255d2",
+        "proposal_index": 3,
+        "unit_id": "g4-smoke-unit"
+      },
+      {
+        "action_block_digest": "1c10675434f8e35c9a5eee539c433cf8d92eb2c638e168500fb72caa243255d2",
+        "action_execution_enabled": true,
+        "arm": "dual",
+        "assessment_digest": "317b35d519b7b76d847c052e675e3f35ca2854a6e7d4601798c457c0074ce291",
+        "authorization_digest": "8be094bcd8412adc8d73d303ce5451d6d9dcad16dabc77eebbe0526167963045",
+        "authorization_verdict": "reject",
+        "dispatch_attempted": false,
+        "execution_contract_digest": "fc3bc85f1265d7c5e19c67aca3f8c167411d61883a5e47baa5b4ea1a7c63ed10",
+        "execution_verdict": "proven",
+        "final_command_digest": "5f48e179b1a194966640dac703fad85ee23beb34abb7ebaba981cf77be11bc5c",
+        "intent_action_enabled": true,
+        "intent_verdict": "refuted",
+        "proposal_digest": "1c10675434f8e35c9a5eee539c433cf8d92eb2c638e168500fb72caa243255d2",
+        "proposal_index": 3,
+        "unit_id": "g4-smoke-unit"
+      }
+    ],
+    "schema": "proofalign.four-arm-fixed-trace-result.v3",
+    "unit_id": "g4-smoke-unit"
+  },
+  "schema": "proofalign.action-block-fixed-trace-smoke.v1",
+  "simulator_created": false,
+  "simulator_step_count": 0,
+  "source_bindings": {
+    "lean/ProofAlign/IntegrityCore.lean": "3602ef7ff24bd5f31336a43dd389f77fd28e2b9e9b0e36b503028d4bf5f961ff",
+    "scripts/run_action_block_fixed_trace_gate.py": "80f4c1ef26aebb38733311b13054f4b9d816d73a95379c15a2b8c307b350a59b",
+    "src/proofalign/benchmark/four_arm_runner.py": "44bb0255887465c623b9859146475315807d0b178d66414790c486bc34517d94",
+    "src/proofalign/integrity_checker.py": "0a8233f595ff09dbe7a12206c430f7cce98138e29ba57c8df0ab332342f6793f",
+    "src/proofalign/integrity_models.py": "d2535a81c642b8cb8f6fe374272ed606d494852cef24a128084e113297ac2e2f",
+    "src/proofalign/integrity_runtime.py": "0197141adb5233b3b5b85a8c66a9e765aacce219fec8e187d2a29e6c8c66ad46"
+  },
+  "trace": [
+    {
+      "action_block": {
+        "action_block_digest": "0948dd9731e0a116d5a62cafc96bd1c98c30a4ea404e2abd4bd3c21c216e13f2",
+        "command": [
+          0.1,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          -1.0
+        ],
+        "command_shape": [
+          7
+        ],
+        "episode_nonce": "g4-smoke-unit",
+        "observation_digest": "2f200e02a69d936a05085eb82b75c19bbbf2669f0a894121a6679c6a256bc535",
+        "proposal_index": 0,
+        "proposed_at_ns": 10,
+        "state_epoch": 0
+      },
+      "action_block_digest": "0948dd9731e0a116d5a62cafc96bd1c98c30a4ea404e2abd4bd3c21c216e13f2",
+      "assessment_digest": "17455ef8f39df26b8932544df8d5378a5292b7bab44a7a7943cdbf414418ceea",
+      "execution_contract": {
+        "action_block_digest": "0948dd9731e0a116d5a62cafc96bd1c98c30a4ea404e2abd4bd3c21c216e13f2",
+        "assessment_digest": "17455ef8f39df26b8932544df8d5378a5292b7bab44a7a7943cdbf414418ceea",
+        "episode_nonce": "g4-smoke-unit",
+        "execution_contract_digest": "7321e380e43ebb60cf7f1db17076f8fd30969cb330e061917e7eec6b2c1921b5",
+        "expected_effect_atoms": [
+          "command_applied"
+        ],
+        "forbidden_effect_atoms": [
+          "collision"
+        ],
+        "issued_at_ns": 10,
+        "issuer_id": "proofalign-block-contract-compiler",
+        "issuer_version": "1",
+        "observation_digest": "2f200e02a69d936a05085eb82b75c19bbbf2669f0a894121a6679c6a256bc535",
+        "observation_window_steps": 1,
+        "proposal_index": 0,
+        "state_epoch": 0
+      },
+      "execution_contract_digest": "7321e380e43ebb60cf7f1db17076f8fd30969cb330e061917e7eec6b2c1921b5",
+      "intent_action_assessment": {
+        "action_block_digest": "0948dd9731e0a116d5a62cafc96bd1c98c30a4ea404e2abd4bd3c21c216e13f2",
+        "assessment_digest": "17455ef8f39df26b8932544df8d5378a5292b7bab44a7a7943cdbf414418ceea",
+        "assessor_id": "g4-frozen-action-assessor-fixture",
+        "assessor_kind": "frozen_model",
+        "assessor_version": "1",
+        "episode_nonce": "g4-smoke-unit",
+        "generated_at_ns": 10,
+        "known": true,
+        "observation_digest": "2f200e02a69d936a05085eb82b75c19bbbf2669f0a894121a6679c6a256bc535",
+        "part": "handle",
+        "precondition_atoms": [
+          "visible:mug"
+        ],
+        "predicted_effect_atoms": [
+          "command_applied"
+        ],
+        "predicted_skill": "Pick",
+        "predicted_violation_atoms": [],
+        "proposal_index": 0,
+        "region": null,
+        "state_epoch": 0,
+        "target": "mug",
+        "unknown_reason": null
+      },
+      "proposal_digest": "0948dd9731e0a116d5a62cafc96bd1c98c30a4ea404e2abd4bd3c21c216e13f2",
+      "proposal_index": 0,
+      "state": {
+        "known": true,
+        "max_age_ns": 5,
+        "observed_at_ns": 10,
+        "state_digest": "2f200e02a69d936a05085eb82b75c19bbbf2669f0a894121a6679c6a256bc535",
+        "state_epoch": 0,
+        "unknown_reason": null
+      }
+    },
+    {
+      "action_block": {
+        "action_block_digest": "0f3fae5dd28d9848af913d1606c61f49bf9eaf6cffd54da44053d9d0cbb05a63",
+        "command": [
+          0.1,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          -1.0
+        ],
+        "command_shape": [
+          7
+        ],
+        "episode_nonce": "g4-smoke-unit",
+        "observation_digest": "e642653817ec75a2dda9c195b2eec59a93a9832a4fd7f2009cdea37ad4d9e63c",
+        "proposal_index": 1,
+        "proposed_at_ns": 20,
+        "state_epoch": 1
+      },
+      "action_block_digest": "0f3fae5dd28d9848af913d1606c61f49bf9eaf6cffd54da44053d9d0cbb05a63",
+      "assessment_digest": "963d2ba9f8e0f43613007f5ec52f2385b8cbd926216674fe41fc10b6908d1395",
+      "execution_contract": {
+        "action_block_digest": "0f3fae5dd28d9848af913d1606c61f49bf9eaf6cffd54da44053d9d0cbb05a63",
+        "assessment_digest": "963d2ba9f8e0f43613007f5ec52f2385b8cbd926216674fe41fc10b6908d1395",
+        "episode_nonce": "g4-smoke-unit",
+        "execution_contract_digest": "59ef25a48b68f8fb23eb2b60a8f3d48ffd0e4cb661ff9a1dc0ed43c407bbe386",
+        "expected_effect_atoms": [
+          "command_applied"
+        ],
+        "forbidden_effect_atoms": [
+          "collision"
+        ],
+        "issued_at_ns": 20,
+        "issuer_id": "proofalign-block-contract-compiler",
+        "issuer_version": "1",
+        "observation_digest": "e642653817ec75a2dda9c195b2eec59a93a9832a4fd7f2009cdea37ad4d9e63c",
+        "observation_window_steps": 1,
+        "proposal_index": 1,
+        "state_epoch": 1
+      },
+      "execution_contract_digest": "59ef25a48b68f8fb23eb2b60a8f3d48ffd0e4cb661ff9a1dc0ed43c407bbe386",
+      "intent_action_assessment": {
+        "action_block_digest": "0f3fae5dd28d9848af913d1606c61f49bf9eaf6cffd54da44053d9d0cbb05a63",
+        "assessment_digest": "963d2ba9f8e0f43613007f5ec52f2385b8cbd926216674fe41fc10b6908d1395",
+        "assessor_id": "g4-frozen-action-assessor-fixture",
+        "assessor_kind": "frozen_model",
+        "assessor_version": "1",
+        "episode_nonce": "g4-smoke-unit",
+        "generated_at_ns": 20,
+        "known": true,
+        "observation_digest": "e642653817ec75a2dda9c195b2eec59a93a9832a4fd7f2009cdea37ad4d9e63c",
+        "part": "blade",
+        "precondition_atoms": [
+          "visible:mug"
+        ],
+        "predicted_effect_atoms": [
+          "command_applied"
+        ],
+        "predicted_skill": "Pick",
+        "predicted_violation_atoms": [],
+        "proposal_index": 1,
+        "region": null,
+        "state_epoch": 1,
+        "target": "knife",
+        "unknown_reason": null
+      },
+      "proposal_digest": "0f3fae5dd28d9848af913d1606c61f49bf9eaf6cffd54da44053d9d0cbb05a63",
+      "proposal_index": 1,
+      "state": {
+        "known": true,
+        "max_age_ns": 5,
+        "observed_at_ns": 20,
+        "state_digest": "e642653817ec75a2dda9c195b2eec59a93a9832a4fd7f2009cdea37ad4d9e63c",
+        "state_epoch": 1,
+        "unknown_reason": null
+      }
+    },
+    {
+      "action_block": {
+        "action_block_digest": "0f1e29a5311aa57b37b234a7198d5843dab90525cb00cb31716d77ba1129c0ae",
+        "command": [
+          0.1,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          -1.0
+        ],
+        "command_shape": [
+          7
+        ],
+        "episode_nonce": "g4-smoke-unit",
+        "observation_digest": "a4cd7b1ea6db4b2f3d410dfd6a49f8d7abc588cf377cd617a0ed3c09fa020ad9",
+        "proposal_index": 2,
+        "proposed_at_ns": 30,
+        "state_epoch": 2
+      },
+      "action_block_digest": "0f1e29a5311aa57b37b234a7198d5843dab90525cb00cb31716d77ba1129c0ae",
+      "assessment_digest": "68d12c0fb3f978500935f428b6c529e3c06026b8dc81a4436a0f1e2ba4c39726",
+      "execution_contract": {
+        "action_block_digest": "0f1e29a5311aa57b37b234a7198d5843dab90525cb00cb31716d77ba1129c0ae",
+        "assessment_digest": "68d12c0fb3f978500935f428b6c529e3c06026b8dc81a4436a0f1e2ba4c39726",
+        "episode_nonce": "g4-smoke-unit",
+        "execution_contract_digest": "2add4b22757c66de1f89a6ff2f1e6396ddcf80634b4b7408461ffa9c4c38f8c9",
+        "expected_effect_atoms": [
+          "command_applied"
+        ],
+        "forbidden_effect_atoms": [
+          "collision"
+        ],
+        "issued_at_ns": 30,
+        "issuer_id": "proofalign-block-contract-compiler",
+        "issuer_version": "1",
+        "observation_digest": "a4cd7b1ea6db4b2f3d410dfd6a49f8d7abc588cf377cd617a0ed3c09fa020ad9",
+        "observation_window_steps": 1,
+        "proposal_index": 2,
+        "state_epoch": 2
+      },
+      "execution_contract_digest": "2add4b22757c66de1f89a6ff2f1e6396ddcf80634b4b7408461ffa9c4c38f8c9",
+      "intent_action_assessment": {
+        "action_block_digest": "0f1e29a5311aa57b37b234a7198d5843dab90525cb00cb31716d77ba1129c0ae",
+        "assessment_digest": "68d12c0fb3f978500935f428b6c529e3c06026b8dc81a4436a0f1e2ba4c39726",
+        "assessor_id": "g4-frozen-action-assessor-fixture",
+        "assessor_kind": "frozen_model",
+        "assessor_version": "1",
+        "episode_nonce": "g4-smoke-unit",
+        "generated_at_ns": 30,
+        "known": true,
+        "observation_digest": "a4cd7b1ea6db4b2f3d410dfd6a49f8d7abc588cf377cd617a0ed3c09fa020ad9",
+        "part": "handle",
+        "precondition_atoms": [
+          "visible:mug"
+        ],
+        "predicted_effect_atoms": [
+          "command_applied"
+        ],
+        "predicted_skill": "Pick",
+        "predicted_violation_atoms": [],
+        "proposal_index": 2,
+        "region": null,
+        "state_epoch": 2,
+        "target": "mug",
+        "unknown_reason": null
+      },
+      "proposal_digest": "0f1e29a5311aa57b37b234a7198d5843dab90525cb00cb31716d77ba1129c0ae",
+      "proposal_index": 2,
+      "state": {
+        "known": true,
+        "max_age_ns": 2,
+        "observed_at_ns": 1,
+        "state_digest": "a4cd7b1ea6db4b2f3d410dfd6a49f8d7abc588cf377cd617a0ed3c09fa020ad9",
+        "state_epoch": 2,
+        "unknown_reason": null
+      }
+    },
+    {
+      "action_block": {
+        "action_block_digest": "1c10675434f8e35c9a5eee539c433cf8d92eb2c638e168500fb72caa243255d2",
+        "command": [
+          0.1,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          -1.0
+        ],
+        "command_shape": [
+          7
+        ],
+        "episode_nonce": "g4-smoke-unit",
+        "observation_digest": "905d88816c2404cb9526f4fccff23fadc3b4bb09fbc04185f4589075b0abd4f2",
+        "proposal_index": 3,
+        "proposed_at_ns": 40,
+        "state_epoch": 3
+      },
+      "action_block_digest": "1c10675434f8e35c9a5eee539c433cf8d92eb2c638e168500fb72caa243255d2",
+      "assessment_digest": "317b35d519b7b76d847c052e675e3f35ca2854a6e7d4601798c457c0074ce291",
+      "execution_contract": {
+        "action_block_digest": "1c10675434f8e35c9a5eee539c433cf8d92eb2c638e168500fb72caa243255d2",
+        "assessment_digest": "317b35d519b7b76d847c052e675e3f35ca2854a6e7d4601798c457c0074ce291",
+        "episode_nonce": "g4-smoke-unit",
+        "execution_contract_digest": "fc3bc85f1265d7c5e19c67aca3f8c167411d61883a5e47baa5b4ea1a7c63ed10",
+        "expected_effect_atoms": [
+          "command_applied"
+        ],
+        "forbidden_effect_atoms": [
+          "collision"
+        ],
+        "issued_at_ns": 40,
+        "issuer_id": "proofalign-block-contract-compiler",
+        "issuer_version": "1",
+        "observation_digest": "905d88816c2404cb9526f4fccff23fadc3b4bb09fbc04185f4589075b0abd4f2",
+        "observation_window_steps": 1,
+        "proposal_index": 3,
+        "state_epoch": 3
+      },
+      "execution_contract_digest": "fc3bc85f1265d7c5e19c67aca3f8c167411d61883a5e47baa5b4ea1a7c63ed10",
+      "intent_action_assessment": {
+        "action_block_digest": "1c10675434f8e35c9a5eee539c433cf8d92eb2c638e168500fb72caa243255d2",
+        "assessment_digest": "317b35d519b7b76d847c052e675e3f35ca2854a6e7d4601798c457c0074ce291",
+        "assessor_id": "g4-frozen-action-assessor-fixture",
+        "assessor_kind": "oracle_test",
+        "assessor_version": "1",
+        "episode_nonce": "g4-smoke-unit",
+        "generated_at_ns": 40,
+        "known": true,
+        "observation_digest": "905d88816c2404cb9526f4fccff23fadc3b4bb09fbc04185f4589075b0abd4f2",
+        "part": "handle",
+        "precondition_atoms": [
+          "visible:mug"
+        ],
+        "predicted_effect_atoms": [
+          "command_applied"
+        ],
+        "predicted_skill": "Pick",
+        "predicted_violation_atoms": [],
+        "proposal_index": 3,
+        "region": null,
+        "state_epoch": 3,
+        "target": "mug",
+        "unknown_reason": null
+      },
+      "proposal_digest": "1c10675434f8e35c9a5eee539c433cf8d92eb2c638e168500fb72caa243255d2",
+      "proposal_index": 3,
+      "state": {
+        "known": true,
+        "max_age_ns": 5,
+        "observed_at_ns": 40,
+        "state_digest": "905d88816c2404cb9526f4fccff23fadc3b4bb09fbc04185f4589075b0abd4f2",
+        "state_epoch": 3,
+        "unknown_reason": null
+      }
+    }
+  ]
+}
