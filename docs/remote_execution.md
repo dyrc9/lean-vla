@@ -5,7 +5,8 @@
 仓库中的 M1/M2 protocol 默认不授权 GPU rollout、simulator step 或真实 dispatch。`--dry-run`、
 validator、fixed-trace shadow 和 Lean build 是 no-outcome 操作。
 
-不再需要运行 high-level plan text probe。真实 victim 只需导出原生 ActionBlock。
+不再需要运行 high-level plan text probe。真实 victim 导出原生 ActionBlock；进入 L1/四臂前还必须导出
+trusted semantic context、`Z_t`、exact prompt、trusted/policy observation 和 executable-prefix binding。
 
 ## 2. 本地 no-outcome 检查
 
@@ -31,23 +32,27 @@ M1 runner dry-runs：
 - repository commit/tree digest；
 - OpenPI/LIBERO-Safety checkout；
 - policy checkpoint/config；
+- trusted task source、observation tap、secure split allowlist；
+- task graph、`Z_t` vocabulary、selector/config、prompt template；
 - CUDA/device/dtype；
 - 60 base pairs 和两个 seed blocks；
 - attack record bundle；
 - ActionBlock adapter；
-- assessor checkpoint/config/threshold；
+- local-checker implementation/config/threshold；
+- Lean source/theorem/equivalence evidence digest；
 - observer schema；
 - resource budget；
 - fresh output directory。
 
 ## 4. M2 执行顺序
 
-1. 先运行 producer：每个 base pair 一条 attack record，不看 victim outcome；
-2. 校验 record bundle 数量、顺序、source/digest；
-3. 运行 240 个 VLA-only clean/attacked episode；
-4. 关闭输出并运行 denominator/signal gate；
-5. gate 未通过则停止，不运行四臂；
-6. gate 通过后才生成 fixed ActionBlock traces 并运行四臂。
+1. 先通过 selector、local-checker、semantic identity、Lean evidence 和资源 no-outcome gate；
+2. 运行 producer：每个 base pair 一条 attack record，不看 victim outcome；
+3. 校验 record bundle 数量、顺序、source/digest；
+4. 运行 240 个 VLA-only clean/attacked episode；
+5. 关闭输出并运行 denominator/signal gate；
+6. gate 未通过则停止，不运行四臂；
+7. gate 通过后才生成 fixed ActionBlock traces 并运行四臂。
 
 ## 5. 四臂运行顺序
 
@@ -57,8 +62,10 @@ fixed-trace shadow (zero dispatch)
   -> 480 attacked closed-loop
 ```
 
-每个 unit 的四臂顺序按冻结 Latin-square/hash rule；同一 unit/condition 必须共享 VLA seed、ActionBlock
-source、assessor 和 observer。若在线 arm 各自产生不同 ActionBlock，则该实验不再识别两个层开关。
+每个 unit 的四臂顺序按冻结 Latin-square/hash rule；同一 unit/condition 必须共享 VLA seed、candidate
+generation rule、assessor、observer 和初始状态。`K=1` fixed-trace 必须共享 exact proposal bytes；
+`K>1` 必须共享 ordered candidate set。closed-loop 在 treatment 首次介入后允许轨迹自然分叉，但不能在
+不同 arm 中重新定义 selector、阈值、candidate seed 或 observer。
 
 ## 6. 故障处理
 
