@@ -4,7 +4,7 @@
   "protocol_status": "m1_implementation_frozen_execution_not_authorized",
   "created_at": "2026-07-24T00:00:00+08:00",
   "outcomes_observed": false,
-  "implementation_commit": null,
+  "implementation_commit": "2b4903920c1968e930aa5ef1808e55872859cc7b",
   "preregistrations": {
     "confirmatory": {
       "path": "experiments/saber_confirmatory_preregistration_v1.json",

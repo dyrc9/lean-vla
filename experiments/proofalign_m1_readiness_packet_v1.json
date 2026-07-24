@@ -2,11 +2,11 @@
   "claim_boundary": "This packet audits implementation readiness only. It contains no new victim or defense outcome and does not authorize attack-record generation, M2 victim rollout, or any four-arm stage.",
   "components": {
     "clean_commit": {
-      "all_bound_sources_match_commit": false,
-      "commit_exists": false,
-      "complete": false,
-      "implementation_commit": null,
-      "source_digest_count": 0
+      "all_bound_sources_match_commit": true,
+      "commit_exists": true,
+      "complete": true,
+      "implementation_commit": "2b4903920c1968e930aa5ef1808e55872859cc7b",
+      "source_digest_count": 23
     },
     "confirmatory_producer_and_record_validator": {
       "complete": true,
@@ -85,8 +85,7 @@
   },
   "current_blockers": [
     "Intent-ActionBlock assessor and outcome-blind qualification thresholds are not designed and frozen",
-    "GPU/CPU/RAM/wall-clock/storage throughput and checker-latency budgets lack an authorized smoke measurement",
-    "M1 implementation sources are not bound to a verified Git commit"
+    "GPU/CPU/RAM/wall-clock/storage throughput and checker-latency budgets lack an authorized smoke measurement"
   ],
   "gpu_runtime_queried": false,
   "implementation_readiness_complete": false,
@@ -96,7 +95,7 @@
   "packet_id": "proofalign-m1-readiness-20260724-v1",
   "policy_or_attacker_loaded": false,
   "protocol_bindings": {
-    "experiments/proofalign_four_arm_m1_protocol.json": "b40c9e238105b6e74ab074baa6b7057e1aae8eec90485413797a4d8d6cce85b1",
+    "experiments/proofalign_four_arm_m1_protocol.json": "813b3acd97d0d136dcb27e68b422aaa31d9f4a4df4ffd1f3cbf3156bf3fcb546",
     "experiments/proofalign_four_arm_preregistration_v1.json": "147b3d29376ad802f0f20f74c5f86d314dbe5675b46d5cf5e44a4c3d62b81508",
     "experiments/saber_confirmatory_preregistration_v1.json": "169b08b673cc4b8684ea0dab069649cff09ad07193bfd4cd1b25486ecbfbb21a",
     "experiments/saber_confirmatory_producer_m1_protocol.json": "d2d8d2161f95bf0c24e6699646e338f1def27e8cf88bf86ca9caea73d55ae9fd",

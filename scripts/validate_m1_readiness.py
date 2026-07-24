@@ -141,10 +141,20 @@ def _committed_source_report(
             if observed.returncode == 0
             else None
         )
+        binding_kind = "git_commit"
+        if digest is None and relative.startswith("external/"):
+            dependency_path = REPO_ROOT / relative
+            digest = (
+                file_sha256(dependency_path)
+                if dependency_path.is_file()
+                else None
+            )
+            binding_kind = "external_content_sha256"
         files[relative] = {
             "expected_sha256": expected,
             "observed_sha256": digest,
             "matches": digest == expected,
+            "binding_kind": binding_kind,
         }
     return {
         "complete": bool(files)
