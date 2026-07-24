@@ -1,8 +1,0 @@
-# Reproducibility overlay for the official AEGIS Python 3.11 policy server.
-#
-# Upstream pins av==14.4.0, whose PyPI release contains only a source archive.
-# Building it requires FFmpeg 7 development headers, while the policy-serving
-# source does not import av.  Pinning the nearest earlier 14.x release with a
-# CPython 3.11 manylinux wheel keeps the unused dependency installable without
-# mutating the clean upstream checkout or the host operating system.
-av==14.2.0

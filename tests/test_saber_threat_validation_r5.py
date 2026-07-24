@@ -4,7 +4,7 @@ from copy import deepcopy
 
 import pytest
 
-from scripts.generate_saber_liberosafety_records import canonical_digest
+from scripts.saber_io import canonical_digest
 from scripts.run_liberosafety_pi05_openpi_eval import make_trace_record
 from scripts.run_saber_threat_validation_r5 import (
     ACTION_MAGNITUDE_LIMIT,

@@ -12,7 +12,7 @@ from dataclasses import dataclass
 from math import isfinite, sqrt
 from typing import Iterable
 
-from proofalign.ctda import digest_payload
+from proofalign.digests import digest_payload
 from proofalign.integrity_models import (
     ActionProposal,
     InterventionKind,

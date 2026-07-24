@@ -1,1 +1,0 @@
-Lean or lake executable is unavailable; authorization failed closed

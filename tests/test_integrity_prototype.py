@@ -5,7 +5,7 @@ from dataclasses import replace
 import pytest
 
 from proofalign import MethodArm, ProofAlignPrototype
-from proofalign.ctda import digest_text
+from proofalign.digests import digest_text
 from proofalign.integrity_checker import DeterministicFastChecker, ExactPrefixAuthorizer
 from proofalign.integrity_intervention import (
     ProjectCommandIntervention,

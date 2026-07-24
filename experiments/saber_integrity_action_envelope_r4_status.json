@@ -1,0 +1,33 @@
+{
+  "schema": "proofalign.saber-integrity-action-envelope-r4-status.v1",
+  "updated_at": "2026-07-23T15:50:00+08:00",
+  "protocol_id": "saber-p0b-integrity-action-envelope-attacked-r4-resource-isolated-20260723",
+  "protocol_sha256": "bdb0d1eac94a06aea51dc6dd913190af21f2fc2077f73602b1094647e41499ce",
+  "classification": "terminal_failed_clean_worktree_gate_before_policy_load",
+  "complete": true,
+  "attacked_defended_outcomes_observed": false,
+  "execution": {
+    "output_root": "results/saber_integrity_action_envelope_r4_20260723_fresh1",
+    "started_at": "2026-07-23T07:49:28.060476+00:00",
+    "failed_at": "2026-07-23T07:49:43.593558+00:00",
+    "manifest_sha256": "d7deaa92c26070e7fa0259c86f9eedf1af5fd40bb4080863e588e79e00fd36d3",
+    "summary_sha256": "bbd2aeee607de85e0703cd85102691eeb3a2288969824799345d889216d3bdfd",
+    "checksums_sha256": "d8e204f820e4e8a1a14c78e6d3449098e9ba18fb40a5d60c432455f45ca88481",
+    "runtime_device_observation_completed": false,
+    "real_policy_probe_completed": false,
+    "episode_count": 0,
+    "env_step_count": 0
+  },
+  "resource_gate": {
+    "policy_gpu": 1,
+    "egl_gpu": 3,
+    "required_stable_seconds": 300,
+    "observed_stable_seconds": 300.215,
+    "sample_count": 11,
+    "all_samples_below_4096_mib": true,
+    "all_samples_without_compute_process": true
+  },
+  "terminal_reason": "The formal OpenPI runner rejected the untracked R4 launcher and protocol through its clean-worktree gate before policy loading. No model inference, EGL runtime-role probe, binding probe, episode, or environment step occurred.",
+  "reuse_or_resume_allowed": false,
+  "next_step": "Commit the frozen resource-isolated runner, R4 terminal record, and a fresh R5 protocol. Launch R5 only from a clean worktree and a fresh absent output root."
+}

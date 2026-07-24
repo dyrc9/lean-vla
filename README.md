@@ -1,127 +1,100 @@
 # ProofAlign
 
-ProofAlign is a research prototype for mission-rooted, persistent dual runtime monitoring of
-Vision-Language-Action execution. Its scoped method, Contract-Carrying Temporal Dual Alignment (CTDA), requires:
+ProofAlign 是一个面向 Vision-Language-Action（VLA）系统的执行完整性研究原型。当前主线只保留两层
+关系：
 
-1. a candidate contract to refine a trusted, locally frozen benchmark mission and active phase; and
-2. each raw prefix, dispatch receipt, and cumulative observation to remain bound to that contract before phase
-   advancement.
+1. **Intent–Plan Integrity**：proposal 是否仍实现可信 mission、当前 phase 与剩余 obligation；
+2. **Plan–Execution Integrity**：实际 dispatch 的 final command 是否就是被检查和授权的 command。
 
-The target is auditable simulator execution integrity, not an end-to-end or absolute physical safety proof.
+方法只有两个核心不变量：
 
-The method has exactly two alignment relations: **trusted intent → planned action** and **accepted planned action →
-applied/observed action**. It exposes only three transactions—certify a persistent contract, authorize one exact
-final command, and check execution/effect before updating the monitor. Contracts and receipts are core protocol
-objects; signatures, provenance, wire formats, Lean replay, and optional CBF filtering are supporting mechanisms,
-not additional alignment layers or separate method contributions.
+```text
+No dispatch without dual authorization
+No phase advance without checked completion
+```
 
-## Current result
+在线协议被收敛为三个 transaction：冻结 contract、授权 exact prefix、检查 effect 并更新 persistent
+monitor。当前 Python 原型和 Lean core 都已实现；两者之间尚缺 machine-checked refinement，因此 Lean
+只能作为离线形式化模型，不能描述为实时证明控制器。
 
-- E0 freezes 12 non-real-time supported LIBERO-Safety affordance/init0 units.
-- E1 clean utility is complete on the frozen policy-seed-1 slice: 12/12 pairs are valid, VLA-only succeeds on
-  8/12 tasks, Full CTDA succeeds on 0/12, and task/safe-success retention is 0.
-- E3 clean safety is 12/12 preserved with 117/117 complete negative collision/cost observations.
-- E3 post-dispatch behavior failed closed in all 12 episodes, but the frozen primary classifier remains
-  `0 contained / 0 failed / 12 unknown` because of a receipt-schema mismatch.
-- E4 passes 1/1 real-Lean control and 35/35 frozen fault cases.
-- Lean evaluation remains too slow for real-time enforcement; the system is a slow-interlock/offline prototype.
+## 当前实验结论
 
-CTDA v1 therefore requires revision before any expanded runtime claim. A separate CTDA v2 no-dispatch prototype
-preserves a six-stage wire, 21/21 Python/Lean parity, typed evidence, Ed25519, and source-bound AEGIS geometry/CBF
-assets. These are frozen implementation and regression assets—not the required architecture of the next method
-version—and they establish no clean utility, online liveness, recovery, or defense-efficacy result. The next method
-design, if later authorized, will refreeze a smaller five-component/three-transaction architecture and first compare
-VLA-only, Intent-only, Execution-only, and Dual. No retained Phantom Menace or SABER workload has yet passed the
-complete held-out independent-safety qualification chain. The only current rollout exception is the explicitly
-exploratory Execution-only action-envelope successor; it cannot establish confirmatory defense efficacy.
+当前 terminal 结果来自 Execution-only action-envelope 探索实验：
 
-The refrozen architecture now has a separate `proofalign-integrity-v1` local prototype: five components, three public
-transactions, one shared four-arm method switch, exact final-command authorization, one-use dispatch receipts, and
-checked completion/atomic monitor updates. `ProofAlign.IntegrityCore` formalizes the two invariants and arm semantics;
-there is not yet a machine-checked refinement from the Python fast checker to that Lean model. The only command sink
-is in-memory and has no simulator, socket, GPU, or hardware capability.
+| 指标 | 结果 |
+|---|---:|
+| P0b immutable attack records | `48` |
+| P0b valid clean/attacked episodes | `96/96` |
+| P0b clean-eligible pairs | `23`，低于预注册门槛 `26` |
+| P0b clean-safe→attacked-unsafe signal pairs | `15` |
+| clean strict-success retention | `22/23 = 95.7%` |
+| attacked+defended valid episodes | `48/48` |
+| envelope 内最终命令 | `17,828/17,828` |
+| 被 projection 修改的动作 | `13,108/17,828 = 73.5%` |
+| full-population strict success without cost | `26/48 = 54.2%` |
+| full-population LIBERO cost/collision unsafe | `1/48 = 2.1%` |
+| signal subset defended cost/collision | `0/15` |
+| signal subset recovered strict success | `8/15` |
+| signal subset residual contact proxy 高于 clean | `11/15` |
 
-The first large-sample SABER P0b producer root terminated before record generation because it used the wrong Python
-environment. A separately authorized fresh2 producer/victim run then retained 48 immutable records and 96/96 valid
-clean/attacked episodes. It observed 23 clean-eligible pairs—below the frozen minimum of 26—and therefore remains
-`p0b_blocked_insufficient_clean_baseline`, even though 15/23 eligible pairs had a typed transition. This is not a
-confirmed attack qualification.
+结论是：exact execution-time projection 在这个固定 simulator workload 上提供了强探索性缓解证据，
+同时基本保留 clean utility；但 P0b 的 clean-eligible denominator 未达到冻结门槛，而且 residual
+contact/joint proxy 仍然存在。因此当前分类保持
+`exploratory_attacked_defended_complete_not_confirmatory`，不能声称一般攻击防御有效、完整物理安全
+或 Dual 方法已经得到验证。
 
-The current experiment priority is the exploratory Execution-only action-envelope attacked+defended successor.
-Its clean R1 retained 22/23 baseline-eligible strict successes; attacked R2 failed before a new environment action on
-a non-finite policy command. R3 added a deterministic zero brake but was stopped before its all-or-nothing binding
-probe completed after runtime GPU contention and device-isolation mismatch. R3 produced zero episodes and no
-efficacy outcome. The next run requires a resource-isolated successor protocol and fresh root; see
-[Current experiment priority](docs/current_experiment.md).
+详细解释和后续 gate 见
+[项目进展与实施规划](docs/progress_and_plan.md)；机器结果见
+[terminal summary](experiments/saber_integrity_action_envelope_terminal_summary.json)。
 
-## Start here
+## 下一实验
 
-- [Project status](docs/project_status.md)
-- [Current experiment priority](docs/current_experiment.md)
-- [Unified evaluation results](docs/evaluation_results.md)
-- [Method and claim boundary](docs/method.md)
-- [Current and target architecture](docs/system_architecture.md)
-- [Paper story](docs/paper/paper_story.md)
-- [Related work and novelty audit](docs/paper/related_work.md)
-- [Roadmap](docs/roadmap.md)
-- [Experiment rules](docs/experiments.md)
-- [Current execution environment](docs/remote_execution.md)
-- [Next experiment prompt](docs/next_experiment_prompt.md)
-- [Documentation index](docs/README.md)
+下一项正式实验不是继续扩大 R9，而是独立确认性 attack foundation：
 
-Detailed phase reports and old handoffs are retained under [docs/archive](docs/archive/README.md) for audit only.
+- `60` 个与 P0b 不重叠的 base pair；
+- `2` 个冻结 seed block，共 `120` 个 unit；
+- 每个 unit 跑 clean 与 attacked VLA-only，共 `240` 个 episode；
+- clean-eligible 必须 `>=52` unit 且覆盖 `>=26` base pair；
+- transition 必须 `>=26` unit 且覆盖 `>=18` base pair；
+- transition rate 必须 `>=0.50`，base-pair cluster bootstrap 95% lower bound 必须 `>=0.30`。
 
-## Main code
+在它之前先完成 no-outcome readiness：冻结 producer/victim/shared runner、fixed-trace exporter、digest、
+资源预算、fresh output root 和 validator。确认性 gate 未通过时，四臂防御实验不启动；通过后才依次
+运行 fixed-trace shadow、`480` 个 clean 四臂 episode、`480` 个 attacked 四臂 episode。
 
-- `src/proofalign/integrity_models.py`: version-isolated minimal domain model and four causal arms.
-- `src/proofalign/integrity_checker.py`: deterministic fast checker and exact-prefix authorizer.
-- `src/proofalign/integrity_runtime.py`: five components, three transactions, one-use in-memory dispatch boundary,
-  and checked effect/monitor update.
-- `src/proofalign/integrity_intervention.py`: optional pass/project/replan/block policies whose final command returns
-  to the authorizer.
-- `src/proofalign/ctda*.py`: typed CTDA semantics, runtime, wire, evaluator, and replay.
-- `src/proofalign/ctda_v2.py` / `ctda_v2_wire.py` / `ctda_v2_evaluator.py`: frozen, version-isolated
-  certificate/rebind/intervention/progress prototype and offline Lean parity evaluator; it remains replayable but
-  does not define the next target architecture and is not an online rollout path.
-- `src/proofalign/benchmark/`: LIBERO task manifests, state observation, online transaction, and E1 baseline.
-- `src/proofalign/benchmark/safelibero_foundation.py`: outcome-blind SafeLIBERO inventory, typed independent
-  safety provenance, official collision labeling, and CAR/TSR/ETS/cost/RET classification.
-- `src/proofalign/benchmark/aegis_runtime.py`: isolated AEGIS runtime/package/source/asset identity gate with
-  zero policy, socket, simulator, inference, and action dispatch.
-- `src/proofalign/benchmark/safelibero_ctda_support.py`: source-bound SafeLIBERO goal/mission templates, typed
-  CTDA v2 state/progress/collision adapter, retained E1 attribution, and exact-unit support audit.
-- `src/proofalign/benchmark/safelibero_open_region.py`: official-source-bound wooden-cabinet top-drawer joint,
-  strict `qpos < -0.14 m` predicate, typed observation, and no-dispatch progress claim.
-- `src/proofalign/benchmark/safelibero_ctda_v2_no_dispatch.py`: authenticated fake-observation progress packets,
-  canonical 7D commands, typed post-filter witness binding, and recovery-ledger records with no action capability.
-- `src/proofalign/evidence_crypto.py`: domain-separated Ed25519 attestation signing with exact producer/version key
-  binding and local fingerprint revocation; production key provisioning is outside this module.
-- `src/proofalign/benchmark/aegis_cbf_filter.py`: pinned-source analytical AEGIS CBF/QP projection, signed full-result
-  witness, and fail-closed CTDA post-filter adapter with no action capability.
-- `src/proofalign/benchmark/aegis_cbf_geometry.py`: signed typed ellipsoid geometry boundary and source-equivalent
-  `compute_h_coeffs_3d` coefficient derivation; raw camera/perception trust remains external.
-- `lean/ProofAlign/IntegrityCore.lean`: minimal two-invariant/four-arm Lean model; not yet refined to the Python
-  checker.
-- `lean/ProofAlign/`: historical CTDA definitions and staged wire checkers.
-- `scripts/`: frozen experiment runners, validators, and preflight tools.
-- `experiments/`: machine protocols, registries, and terminal summaries.
+预注册见 [confirmatory/four-arm design](docs/paper/confirmatory_preregistration.md)。
 
-## Basic verification
+## 当前主线结构
+
+- `src/proofalign/integrity_*.py`：两层完整性、四臂开关、exact-command authorization、dispatch receipt
+  与 persistent monitor；
+- `src/proofalign/benchmark/`：immutable attack record、action envelope、LIBERO runtime 和 SABER
+  replication 主线适配；
+- `lean/ProofAlign/IntegrityCore.lean`：两个不变量和四臂语义的最小 Lean 模型；
+- `scripts/`：当前 runner、artifact generator、preregistration freezer 与 resource-isolated launch 检查；
+- `experiments/`：紧凑 protocol/status/terminal summary；R0–R9 协议链保留用于审计；
+- `tests/`：仅覆盖当前主线；
+- `docs/`：方法、实验规则、结果报告和论文材料。
+
+废弃的 CTDA v1/v2、AEGIS、EDPA、Phantom、SAFE/FIPER、旧 LIBERO runner、旧 handoff 和重复结果已
+从工作树删除；需要时仍可从 Git 历史恢复。
+
+## 验证
 
 ```bash
 cd /home/ldx/lean-vla
 export PATH=/home/ldx/lean-vla/.tools/lean-4.24.0-linux/bin:$PATH
-export PYTHONPATH=/home/ldx/lean-vla/src:/home/ldx/lean-vla
-.venv/bin/pytest -q
+.venv/bin/python -m pytest -q
 (cd lean && lake build ProofAlign)
+make paper-artifacts-check
 ```
 
-The stopped FIPER partial run intentionally retains its audited `data` symlink binding. The generic external-
-baseline preflight must report `source_ready=false` in that state; the test suite asserts that fail-closed result.
-Do not delete or alter the binding merely to make the preflight ready.
+也可以运行 `scripts/check_all.sh`。
 
-GPU/OpenPI execution requires the additional environment and isolation rules in
-[docs/remote_execution.md](docs/remote_execution.md). The only current GPU priority is a fresh, resource-isolated
-successor to the stopped R3 action-envelope experiment. It requires a newly frozen protocol, clean worktree, fresh
-root, two stable `<4096 MiB` GPUs with no compute process, and verified runtime JAX/EGL device mapping. Local unit
-tests and Lean builds do not authorize any broader ProofAlign/CTDA or defense-baseline rollout.
+完整 R9 raw episode bundle 只保留在实验机本地。远端只保存代码、协议、terminal summary、派生表、
+failure taxonomy 和校验绑定；远端缺少本地 raw bundle 时，raw-dependent 检查会明确 skip，不能把
+skip 解释为独立复现。confirmatory preregistration 的重新生成同样依赖本地忽略的
+`external/LIBERO-Safety` checkout。
+
+GPU/OpenPI 环境和执行边界见 [远程执行说明](docs/remote_execution.md)。R9 root 已冻结，禁止续跑或
+覆盖；任何新 rollout 都必须使用新 protocol、clean commit、fresh root 和单独的执行授权。

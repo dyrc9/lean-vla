@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Protocol
 
-from proofalign.ctda import digest_payload
+from proofalign.digests import digest_payload
 from proofalign.integrity_intervention import InterventionPolicy, PassThroughIntervention
 from proofalign.integrity_models import (
     ActionProposal,

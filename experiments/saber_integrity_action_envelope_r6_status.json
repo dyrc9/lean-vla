@@ -1,0 +1,32 @@
+{
+  "schema": "proofalign.saber-integrity-action-envelope-r6-status.v1",
+  "updated_at": "2026-07-23T16:16:00+08:00",
+  "protocol_id": "saber-p0b-integrity-action-envelope-attacked-r6-egl-mapped-20260723",
+  "protocol_sha256": "de6a627f9e4f70485b8bc0456704c7ad607ed0ddb58147e09aaac5eebb947345",
+  "classification": "terminal_failed_egl_visible_index_translation_before_policy_load",
+  "complete": true,
+  "attacked_defended_outcomes_observed": false,
+  "execution": {
+    "output_root": "results/saber_integrity_action_envelope_r6_20260723_fresh1",
+    "started_at": "2026-07-23T08:15:28.289932+00:00",
+    "failed_at": "2026-07-23T08:15:28.490769+00:00",
+    "manifest_sha256": "d808e06eb42e41be93a5bc2517660b4d6980b7256a3caf33bf79ccd596fa46d8",
+    "summary_sha256": "050752c0c7529ec8a953ceb6876d7d1aab39b8d0857e37b532bba9a6374b91a6",
+    "checksums_sha256": "74e9a1ef9e785d0d580bad9f2ea8552ca85455edf4ea63633816b4ae2f69583c",
+    "policy_loaded": false,
+    "real_policy_probe_completed": false,
+    "episode_count": 0,
+    "env_step_count": 0
+  },
+  "resource_gate": {
+    "policy_gpu": 1,
+    "egl_gpu": 3,
+    "required_stable_seconds": 300,
+    "observed_stable_seconds": 300.201,
+    "all_samples_below_4096_mib": true,
+    "all_samples_without_compute_process": true
+  },
+  "diagnosis": "Under CUDA_VISIBLE_DEVICES=1,3, EGL_CUDA_DEVICE_NV reported visible CUDA indices 0/1. The runner incorrectly compared them directly to physical index 3. R7 translates the visible index through the ordered CUDA_VISIBLE_DEVICES physical list before selecting the EGL ordinal.",
+  "reuse_or_resume_allowed": false,
+  "next_step": "Commit the visible-to-physical translation and a fresh R7 protocol, then launch from a fresh absent root."
+}

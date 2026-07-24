@@ -1,14 +1,9 @@
-# Current Execution Environment
+# ProofAlign 执行环境
 
-更新日期：2026-07-23
+更新日期：2026-07-24
 
-本文是当前机器运行 CPU/Lean、OpenPI/LIBERO-Safety 和 GPU 实验的唯一环境入口。CLI 具体参数仍以
-代码 `--help` 为准。
-
-> **当前唯一 GPU 优先级是 action-envelope successor。** R3 在 static preflight 后因 runtime GPU
-> contention 与实际 JAX/EGL device mapping 异常停止。下一次必须使用新 protocol、clean worktree、fresh
-> root、两张稳定空闲 GPU，以及 launch 后实际 device mapping gate。其余 OpenPI/MuJoCo/AEGIS execution
-> 仍暂停。详见 [`current_experiment.md`](current_experiment.md)。
+当前没有新 GPU rollout 授权。R9 已 terminal complete，现有 root 只读保存。确认性或四臂实验必须使用
+新 protocol、clean commit、fresh root 和单独授权。
 
 ## 1. 固定路径
 
@@ -19,98 +14,36 @@ OpenPI Python    /home/ldx/lean-vla/external/openpi/.venv/bin/python
 Lean toolchain   /home/ldx/lean-vla/.tools/lean-4.24.0-linux/bin
 LIBERO-Safety    /home/ldx/lean-vla/external/LIBERO-Safety
 OpenPI source    /home/ldx/lean-vla/external/openpi
-AEGIS source     /home/ldx/lean-vla/external/vlsa-aegis
-AEGIS server py  /home/ldx/lean-vla/external/vlsa-aegis/.aegis_venv/bin/python
-AEGIS sim py     /home/ldx/lean-vla/external/vlsa-aegis/main/.venv/bin/python
 pi0.5 checkpoint /data0/ldx/libero_safety_models/pi05_libero_safety
-AEGIS pi0.5      /data0/ldx/saber-cache/openpi/openpi-assets/checkpoints/pi05_libero
-AEGIS G-DINO     /data0/ldx/aegis-assets/GroundingDINO
-shared uv        /home/ldx/.conda/envs/proofalign-libero/bin/uv
 ```
 
-不要重新下载模型或创建新环境。优先复用现有 checkout、checkpoint、`.venv` 和 cache。
+外部 checkout、模型和 raw results 都是本机资产，不上传远端。不要重新下载模型或混用 repo `.venv`
+与 OpenPI `.venv`。
 
-AEGIS 使用独立环境：官方 source pin 到 commit `57b1aef...`，根目录 Python 3.11 `.aegis_venv` 与
-`main/.venv` Python 3.8 已按官方 requirements 建立；标准 `pi05_libero` 与 GroundingDINO 资产位于上列
-隔离路径。不得把仓库 OpenPI `.venv` 混作 AEGIS runtime，也不得把 safety-tuned
-`pi05_libero_safety` 当作 AEGIS 标准 checkpoint。
-
-## 2. SafeLIBERO/AEGIS 只读 readiness
-
-该检查不构造 simulator、不加载 policy、不调用 `env.step()`，也没有 `--execute`：
-
-```bash
-cd /home/ldx/lean-vla
-.venv/bin/python scripts/safelibero_aegis_readiness.py \
-  --protocol experiments/safelibero_aegis_readiness_protocol.json \
-  --source-root external/vlsa-aegis
-```
-
-当前预期：`foundation_ready=true`、`aegis_runtime_ready=false`、
-`formal_rollout_authorized=false`、`env_step_count=0`。source/data ready 只说明官方 commit/tree/license、
-32 scenario、1600 init 和数据 digest 匹配，不说明模型、GPU、场景构造或 AEGIS closed loop 可运行。
-
-static runtime R1 继续核验双环境全部 distribution、源码导入路径、标准 pi0.5/GroundingDINO 身份和
-SafeLIBERO 注册；仍不构造 policy/simulator，不监听 socket，也不调用推理或 `env.step()`：
-
-```bash
-cd /home/ldx/lean-vla
-.venv/bin/python scripts/safelibero_aegis_runtime_preflight.py \
-  --protocol experiments/safelibero_aegis_runtime_protocol.json
-```
-
-当前预期：`static_runtime_ready=true`、`model_load_probe_authorized=true`、五个 counter 全为 0、
-`formal_rollout_authorized=false`。R1 记录了 policy-server 未使用的 `av 14.4.0 -> 14.2.0` 安装兼容覆盖；
-不得隐藏或扩大该偏差。
-
-R2/R3 已执行并封存；复核默认 dry-run 不会重新加载模型或构造 scene：
-
-```bash
-.venv/bin/python scripts/safelibero_aegis_model_load_probe.py
-.venv/bin/python scripts/safelibero_aegis_scene_probe.py
-```
-
-终态为 `model_load_ready=true`、`scene_ready=true`、`env_step_count=0`、
-`formal_rollout_authorized=false`。执行模式需要各自的冻结 protocol、fresh GPU gate 和显式 `--execute`；
-不得仅为复核而重跑。
-
-CTDA v2 full-population state gate 已执行并封存。日常只运行 dry-run（无 simulator）：
-
-```bash
-.venv/bin/python scripts/ctda_v2_support_audit.py
-.venv/bin/python scripts/ctda_v2_safelibero_state_coverage.py \
-  --protocol experiments/ctda_v2_safelibero_state_coverage_protocol_r1.json
-```
-
-r1 终态为 32 scenario/1600 init、state key 1600/1600、collision source 1600/1600、`env.step=0`，且
-`formal_rollout_authorized=false`。没有新的 protocol/fresh output/GPU 空闲检查时不得加 `--execute`；
-r0 的 1250/1600 region-anchor 负结果是保留 artifact，不得覆盖。
-
-## 3. CPU/Lean 开发环境
+## 2. CPU/Lean 验证
 
 ```bash
 cd /home/ldx/lean-vla
 export PATH=/home/ldx/lean-vla/.tools/lean-4.24.0-linux/bin:$PATH
 export PYTHONPATH=/home/ldx/lean-vla/src:/home/ldx/lean-vla
 
-.venv/bin/python --version
-lean --version
-lake --version
-.venv/bin/pytest -q
+.venv/bin/python -m pytest -q
 (cd lean && lake build ProofAlign)
+make paper-artifacts-check
 git diff --check
 ```
 
-如果 shell 没有仓库 Lean PATH，测试会因 `lean`/`lake` not found 失败；这不是 evaluator verdict。
+`make paper-artifacts-check` 在本地 R9 raw bundle 或 LIBERO-Safety checkout 缺失时明确 skip 对应的
+source-derived 检查。skip 只表示环境缺少本地资产，不代表结果已独立复现。
 
-## 4. OpenPI/LIBERO 环境
+## 3. OpenPI/LIBERO 环境
 
 ```bash
 cd /home/ldx/lean-vla
 source scripts/env_vla.sh
 unset VIRTUAL_ENV
 export PATH=/home/ldx/lean-vla/.tools/lean-4.24.0-linux/bin:$PATH
-export PYTHONPATH="$PWD/src:$PWD:$PWD/experiments/libero_safety_import_overlay:$PWD/external/LIBERO-Safety:$PWD/external/openpi/src:$PWD/external/openpi/packages/openpi-client/src"
+export PYTHONPATH="$PWD/src:$PWD:$PWD/external/LIBERO-Safety:$PWD/external/openpi/src:$PWD/external/openpi/packages/openpi-client/src"
 
 external/openpi/.venv/bin/python --version
 test -d external/LIBERO-Safety
@@ -118,17 +51,20 @@ test -d external/openpi
 test -d /data0/ldx/libero_safety_models/pi05_libero_safety
 ```
 
-E1-style paired runner 使用 `external/openpi/.venv/bin/python`。通用 OpenPI runner 需要 uv project 时使用：
+保留 runner：
 
-```bash
-"$PROOFALIGN_UV" --project external/openpi run python SCRIPT.py --help
-```
+- `run_liberosafety_pi05_openpi_eval.py`：VLA-only clean/attacked victim；
+- `run_saber_threat_validation_r5.py`：P0b threat validation；
+- `run_saber_integrity_action_envelope_r0.py`–`r3.py`：冻结的 action-envelope 审计链；
+- `generate_saber_threat_records_r2.py`：outcome-blind attack records；
+- `saber_io.py`：SABER 主线共用的 artifact、Git 与 GPU gate 工具。
 
-不要混用仓库 `.venv`、OpenPI `.venv` 和历史裸 conda 命令。
+R0–R3 launcher 和 R0–R9 protocol/status 是 terminal R9 的历史审计链，不得把默认 output path 当成可
+继续使用的 root。新实验必须复制语义到新版本并重新冻结所有 hash。
 
-## 5. GPU 规则
+## 4. GPU 规则
 
-GPU 分配是动态的，每次正式启动前都要重新检查：
+每次正式启动前重新检查：
 
 ```bash
 nvidia-smi --query-gpu=index,name,memory.total,memory.used,utilization.gpu --format=csv,noheader
@@ -137,110 +73,42 @@ nvidia-smi --query-compute-apps=gpu_uuid,pid,process_name,used_memory --format=c
 
 永久约束：
 
-- 2026-07-17 16:14 起没有运行中的 ProofAlign/FIPER service；FIPER fresh2 已按用户要求停止；
-- 2026-07-17 的旧 ProofAlign/FIPER/Phantom/SABER/SAFE protocol 全部保持暂停，不得 resume；
-- 2026-07-20 起只允许按 [`optimization_plan.md`](optimization_plan.md) 和
-  [`next_experiment_prompt.md`](next_experiment_prompt.md) 推进 fresh SABER/EDPA producer、unguarded
-  VLA-only clean/attacked pair和独立 safety qualification；禁止运行 CTDA/ProofAlign/AEGIS/SAFE/FIPER
-  method 或 baseline；
-- VLA-only 正式 GPU execution 仍必须先有新 protocol、clean commit、fresh root 和全部 preflight gate；
-- 若新 protocol 与交接授权满足全部 gate，必须重新查询 inventory，并选择 prelaunch used memory
-  `<4096 MiB` 的 physical GPU；不得沿用历史 GPU 编号；
-- action-envelope successor 使用两张不同 physical GPU；两张卡都必须无 compute process并连续稳定至少
-  五分钟，不能只采样一次；
-- launch 后必须重新读取 per-process GPU allocation 与 compute/graphics context；JAX policy 或 EGL
-  context 落到非冻结角色时，在 binding probe 前 fail closed；
-- binding probe 期间持续监控外部 compute process；任何新进程破坏资源 gate 时 terminal stop，不进入
-  episode；
-- E1 runner 的 CUDA、MuJoCo EGL 和 render device 都绑定同一 physical id；
-- JAX 在 `CUDA_VISIBLE_DEVICES=<physical id>` 的进程内通常看到 logical device 0，这是正常的；
-- 不把无关 GPU process 当成 ProofAlign 任务停止或修改。
+- 不沿用历史 GPU 编号或空闲判断；
+- 在 protocol 中事前冻结 policy GPU、EGL GPU、稳定窗口和最大显存；
+- launch 后核验实际 JAX compute 与 EGL graphics context；
+- binding probe 和 episode 期间监控外部 compute process，资源 gate 被破坏时 fail closed；
+- 不停止、迁移或修改无关用户进程；
+- 不 resume/覆盖任何已有 root；
+- 未经授权不运行 `--execute`。
 
-只读检查已停止的 FIPER service：
+## 5. R9 artifact 复核
+
+完整本地 bundle：
 
 ```bash
-systemctl --user show proofalign-fiper-r0-fresh2.service \
-  --property=ActiveState,SubState,ExecMainStatus,ExecMainStartTimestamp,ExecMainExitTimestamp
+cd /home/ldx/lean-vla/results/saber_integrity_action_envelope_r9_20260723_fresh1
+sha256sum -c SHA256SUMS
 ```
 
-预期为 `inactive/dead`。run manifest 仍为 `started`，partial artifact 不能作为结果或 resume 来源；停止
-快照见
-[`fiper_r0_stop_20260717.json`](../experiments/fiper_r0_stop_20260717.json)。
-
-## 6. 正式实验顺序：仅 action-envelope successor
-
-P0b producer/victim 已完成并冻结。当前只授权 resource-isolated action-envelope attacked+defended
-successor；旧 R3 root、CTDA no-dispatch 命令和其他结果继续保留，不得执行、续跑或覆盖。
-
-### A. Successor source、资源与 runner 验证
+不得修改 raw root、ledger、manifest、episode JSON 或 checksums。可复算论文表：
 
 ```bash
-git status --short
-external/openpi/.venv/bin/python ACTION_ENVELOPE_SUCCESSOR_RUNNER.py --help
-external/openpi/.venv/bin/python ACTION_ENVELOPE_SUCCESSOR_RUNNER.py \
-  --protocol NEW_SUCCESSOR_PROTOCOL.json --preflight
-git diff --check
+cd /home/ldx/lean-vla
+uv run python scripts/generate_action_envelope_paper_artifacts.py --check
+uv run python scripts/freeze_confirmatory_preregistration.py --check
 ```
 
-successor protocol 必须固定实际 JAX/EGL device isolation、runtime recheck、fresh root 和 stop rule。
-禁止运行任何 `ctda_v2_*` audit/probe、Lean method evaluator、AEGIS/SAFE/FIPER/EDPA runner 或新的
-ProofAlign clean pilot。
+远端仓库只保留 compact terminal summary、derived tables、taxonomy、protocol 和代码。
 
-### B. 冻结
+## 6. 新实验执行顺序
 
-1. 写 protocol 和 runner；
-2. protocol pin runner/source/external commit/checkpoint/file hashes；
-3. 只运行 attack producer/record validator/VLA-only runner 的 focused preflight；
-4. 提交冻结 commit；
-5. 确认 worktree clean。
+1. 完成 no-outcome producer/victim/shared-runner/fixed-trace readiness；
+2. 冻结 population、endpoint、统计、停止条件、资源预算和所有 digest；
+3. clean commit，验证 fresh output root 不存在；
+4. 运行 unit、Lean、dry-run、artifact validator；
+5. 提交 readiness packet 并获得单独授权；
+6. 当次重新选择 GPU、运行 binding probe；
+7. 正式运行后写 append-only ledger、terminal summary 和 checksums；
+8. 独立重算结果并更新 canonical 文档。
 
-### C. GPU preflight
-
-新 runner 必须默认只读 preflight，只有显式 `--execute --gpu PHYSICAL_ID` 才能运行。preflight 至少检查：
-
-- selected GPU inventory/memory；
-- CUDA/EGL physical-id binding；
-- OpenPI real-policy output 可加载和严格序列化；
-- `env.step()` 调用次数为 0；
-- task/init/manifest/fallback/checkpoint/source hash；
-- VLA-only clean/attacked pair 的 shared initial digest 与 first policy chunk binding；
-- output root 尚不存在。
-
-### D. 正式运行
-
-命令形态应为：
-
-```bash
-external/openpi/.venv/bin/python NEW_RUNNER.py \
-  --protocol NEW_PROTOCOL.json \
-  --output-root results/NEW_FRESH_ROOT \
-  --gpu 3 \
-  --execute
-```
-
-不要照抄 `3`；以当次 preflight 选出的可用 physical id 为准。runner 必须是 unguarded VLA-only attack
-runner，不得包含 CTDA/ProofAlign/AEGIS/SAFE/FIPER arm。运行必须在提交冻结 protocol 的 clean commit
-上启动。
-
-### E. 终态验证
-
-```bash
-external/openpi/.venv/bin/python NEW_RUNNER.py \
-  --protocol NEW_PROTOCOL.json \
-  --output-root results/NEW_FRESH_ROOT \
-  --validate-results
-```
-
-随后独立重算 ledger/manifest/episode hashes，写 `experiments/*_terminal_summary.json`，同步
-`evaluation_results.md` 和 `project_status.md`，再提交 artifacts。正式结果不能只存在于日志或聊天中。
-每个 workload terminal 后停止并汇报，不自动进入自研 method 或 attacked+defended comparison。
-
-## 7. 已知环境问题
-
-- `external/fiper/data` 是后台复现所需的用户 symlink，会使 generic source-clean preflight
-  `source_ready=false`；不要删除它。新的 ProofAlign 自身 runner 应 pin 自己实际依赖的 source，而不是
-  把该无关 symlink 当成 GPU execution blocker。
-- 全量 pytest 会把上述 `source_ready=false` 作为预期的 fail-closed 状态验证，而不是要求删除 symlink。
-  历史 E0/E1/E3 protocol 继续绑定原始 source blob；当前 checkout 不得直接执行它们，离线测试只读取
-  保留 protocol/result 验证分类语义。
-- Lean timing 很慢；保留诊断，不把 deadline 作为下一 clean utility pilot 的 gate。
+详细 gate 见 [实验规则](experiments.md)。

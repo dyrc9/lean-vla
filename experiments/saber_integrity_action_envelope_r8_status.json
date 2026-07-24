@@ -1,0 +1,39 @@
+{
+  "schema": "proofalign.saber-integrity-action-envelope-r8-status.v1",
+  "updated_at": "2026-07-23T17:03:00+08:00",
+  "protocol_id": "saber-p0b-integrity-action-envelope-attacked-r8-validator-bound-20260723",
+  "protocol_sha256": "42a2a99483307a6f7fd73faddbc3cd1b822c137fc28a90a0d41e68e306bbac39",
+  "classification": "terminal_stopped_external_compute_during_binding_probe",
+  "complete": true,
+  "valid_attacked_defended_outcomes_observed": false,
+  "execution": {
+    "output_root": "results/saber_integrity_action_envelope_r8_20260723_fresh1",
+    "started_at": "2026-07-23T08:52:44.773944+00:00",
+    "failed_at": "2026-07-23T09:02:10.622438+00:00",
+    "manifest_sha256": "29ce304bd46ee6982ce9ec4b5013cf10af116f17dab4bed07b4004ef0e704488",
+    "summary_sha256": "f19785982eb8bd570923cbd0f49c8eeb9f82f0101eaa35bb5abacafbea590eb7",
+    "checksums_sha256": "6114127b659dc86891aed55cf7867d4a9836103ae23bf7d9a53b099b758a19b7",
+    "binding_progress_sha256": "2b945e5dcff6c6bf24f711db6aeae4f53cb86cceeead358260d8106919f69792",
+    "binding_count": 95,
+    "required_binding_count": 96,
+    "ledger_episode_count": 0,
+    "episode_artifact_count": 0
+  },
+  "resource_isolation": {
+    "policy_gpu_verified": 1,
+    "egl_gpu_verified": 3,
+    "jax_devices": [
+      "cuda:0"
+    ],
+    "selected_egl_device_ordinal": 4,
+    "external_process": {
+      "gpu_index": 3,
+      "pid": 680725,
+      "process_name": "python",
+      "used_memory_mib": 734
+    }
+  },
+  "terminal_reason": "An external compute process appeared on physical EGL GPU 3 immediately before the final binding. The resource monitor failed closed, so the all-or-nothing 96-binding probe was not retained in the manifest and no episode began.",
+  "reuse_or_resume_allowed": false,
+  "next_step": "Freeze and commit a fresh R9 protocol, then rerun the full 96-binding probe and all 48 episodes only after policy GPU 1 and EGL GPU 3 remain free for the required five-minute window."
+}

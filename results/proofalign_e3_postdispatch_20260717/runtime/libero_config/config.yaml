@@ -1,7 +1,0 @@
-{
-  "assets": "/home/ldx/lean-vla/external/LIBERO-Safety/libero/libero/assets",
-  "bddl_files": "/home/ldx/lean-vla/external/LIBERO-Safety/libero/libero/bddl_files",
-  "benchmark_root": "/home/ldx/lean-vla/external/LIBERO-Safety/libero/libero",
-  "datasets": "/home/ldx/lean-vla/external/LIBERO-Safety/libero/datasets",
-  "init_states": "/home/ldx/lean-vla/external/LIBERO-Safety/libero/libero/init_files"
-}

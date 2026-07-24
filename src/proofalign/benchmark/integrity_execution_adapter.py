@@ -12,7 +12,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any, Callable, Iterable
 
-from proofalign.ctda import digest_payload, digest_text
+from proofalign.digests import digest_payload, digest_text
 from proofalign.integrity_checker import DeterministicFastChecker, ExactPrefixAuthorizer
 from proofalign.integrity_models import (
     ActionProposal,

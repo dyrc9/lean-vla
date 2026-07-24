@@ -3,8 +3,8 @@
 更新日期：2026-07-23
 
 > 本文用于研究定位、baseline 选择和 novelty 审计，不是运行状态或执行授权来源。方法定义以
-> [`method.md`](../method.md) 为准；当前执行优先级是 resource-isolated Execution-only
-> action-envelope successor，其余实验暂停。
+> [`method.md`](../method.md) 为准；Execution-only action-envelope 已 terminal complete，当前没有新
+> rollout 授权，其余实验继续暂停。
 
 ## 0. 定位结论
 

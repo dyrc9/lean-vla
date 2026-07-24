@@ -13,7 +13,7 @@ from enum import Enum
 from math import isfinite
 from typing import Any, Iterable
 
-from proofalign.ctda import digest_payload
+from proofalign.digests import digest_payload
 
 
 METHOD_ID = "proofalign-integrity-v1"

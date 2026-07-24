@@ -1,5 +1,0 @@
-assets: /home/ldx/lean-vla/external/vlsa-aegis/safelibero/libero/libero/assets
-bddl_files: /home/ldx/lean-vla/external/vlsa-aegis/safelibero/libero/libero/bddl_files
-benchmark_root: /home/ldx/lean-vla/external/vlsa-aegis/safelibero/libero/libero
-datasets: /home/ldx/lean-vla/experiments/safelibero_aegis_runtime_config/datasets
-init_states: /home/ldx/lean-vla/external/vlsa-aegis/safelibero/libero/libero/init_files

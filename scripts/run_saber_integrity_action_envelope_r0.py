@@ -36,7 +36,7 @@ from proofalign.benchmark.integrity_execution_adapter import (  # noqa: E402
     IntegrityExecutionAdapter,
     action_envelope_artifact,
 )
-from proofalign.benchmark.libero_online_runner import load_libero_task_runtime  # noqa: E402
+from proofalign.benchmark.libero_runtime import load_libero_task_runtime  # noqa: E402
 
 
 SCHEMA = "proofalign.saber-integrity-action-envelope-clean-protocol.v1"

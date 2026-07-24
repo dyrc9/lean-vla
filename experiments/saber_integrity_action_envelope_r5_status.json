@@ -1,0 +1,46 @@
+{
+  "schema": "proofalign.saber-integrity-action-envelope-r5-status.v1",
+  "updated_at": "2026-07-23T16:05:00+08:00",
+  "protocol_id": "saber-p0b-integrity-action-envelope-attacked-r5-resource-isolated-20260723",
+  "protocol_sha256": "43275c4021d380c78a069732016153746f071203c60da1bce65470a31210dc19",
+  "classification": "terminal_failed_egl_ordinal_physical_mismatch_before_binding_probe",
+  "complete": true,
+  "attacked_defended_outcomes_observed": false,
+  "execution": {
+    "output_root": "results/saber_integrity_action_envelope_r5_20260723_fresh1",
+    "started_at": "2026-07-23T08:03:52.433119+00:00",
+    "failed_at": "2026-07-23T08:04:13.663396+00:00",
+    "manifest_sha256": "a1e10e7c7e5a349894d7d5f43d2e4fa6f78b7306bfaccbe149e5dfea4b39d1da",
+    "summary_sha256": "c83e132586ca43e4eaba916b16267402104fe84cdb77355ae5070867a59d7516",
+    "checksums_sha256": "09ea4ad82f73115f006402c82c9ab8a996d293f1d2ee61a18ffee385b9b59976",
+    "jax_compute_physical_gpu_observed": 1,
+    "requested_egl_physical_gpu": 3,
+    "egl_graphics_physical_gpu_observed": 5,
+    "real_policy_probe_completed": false,
+    "episode_count": 0,
+    "env_step_count": 0
+  },
+  "resource_gate": {
+    "policy_gpu": 1,
+    "egl_gpu": 3,
+    "required_stable_seconds": 300,
+    "observed_stable_seconds": 300.198,
+    "all_samples_below_4096_mib": true,
+    "all_samples_without_compute_process": true
+  },
+  "diagnosis": {
+    "jax_isolation_passed": true,
+    "egl_isolation_passed": false,
+    "cause": "Vendored robosuite treats MUJOCO_EGL_DEVICE_ID as an EGL device ordinal, but prior launchers supplied an nvidia-smi physical index. On this host EGL ordinal 3 maps to CUDA physical GPU 5; CUDA physical GPU 3 is EGL ordinal 4.",
+    "observed_egl_cuda_mapping": {
+      "0": 2,
+      "1": 0,
+      "2": 1,
+      "3": 5,
+      "4": 3,
+      "5": 4
+    }
+  },
+  "reuse_or_resume_allowed": false,
+  "next_step": "Freeze a fresh R6 protocol. Resolve the EGL ordinal from EGL_NV_device_cuda, preserve JAX local-device zero isolation, and require PID-level compute/graphics contexts to match physical policy GPU 1 and physical EGL GPU 3 before binding."
+}

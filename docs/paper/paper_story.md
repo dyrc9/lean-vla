@@ -2,9 +2,11 @@
 
 更新日期：2026-07-23
 
-> 本文描述候选论文叙事，不代表当前已获得 defense efficacy。P0b fresh2 完成但 denominator gate 未通过；
-> action-envelope clean R1 通过 scoped utility gate，R2/R3 没有 attacked+defended outcome。当前 successor
-> 仍是 exploratory Execution-only measurement，不是 Full CTDA 结果。
+> 本文描述候选论文叙事。P0b fresh2 完成但 denominator gate 未通过；Execution-only action-envelope
+> clean R1 保留 `22/23` strict success，随后 attacked+defended 完成 48/48 valid episode，并在 15 个
+> 预定义 P0b attack-signal pair 上观察到 defended cost/collision `0/15`。这是强探索性证据，不是确认性
+> attack-defense、Full CTDA 或通用安全结果。论文就绪度见
+> [`progress_assessment.md`](progress_assessment.md)。
 
 ## 一句话定位
 
@@ -121,6 +123,32 @@ equivalence evidence 的路径才写 Lean-backed checker。
 
 ## 7. 实验叙事
 
+### 当前 empirical anchor
+
+当前最强正结果属于 Execution-only pilot：
+
+- clean utility：baseline-eligible strict success `22/23 = 0.9565`；
+- attacked+defended：48/48 valid，full population strict success without cost `26/48`；
+- action mediation：17,828 个 policy action 全部经 exact final-command boundary，13,108 个被投影，
+  全部 executed command 在数值容差内满足 `L2 <= 1.0`；
+- P0b signal subset：按定义 undefended unsafe `15/15`，defended LIBERO cost/collision `0/15`，
+  `8/15` strict success without cost；
+- residual risk：11/15 signal pair 的 robot contact 高于 clean，其中 1 个还有 joint-limit increase；
+  full population 另有 1 个 nonsignal unsafe pair。
+
+这个结果应进入论文的 exploratory result 与 design lesson，但不能替代下列四阶段主证据。尤其是 L2
+projection 本身不是双层 integrity novelty；它只验证 Plan–Execution 侧的一个 intervention。
+
+本结果的可复算论文表、suite 分层、projection 幅度分布与逐 pair descriptive failure taxonomy 见
+[`action_envelope_results.md`](action_envelope_results.md)。13,108 个 projected action 的 command
+修改 L2 为 median `0.002853`、P95 `0.008507`、max `0.039266`；signal subset 只有 3/15 同时恢复
+strict task success 且没有 measured proxy 高于 clean。以上仍是 outcome 后描述，不构成确认性推断。
+
+未来证据的 machine-readable 预注册候选见
+[`confirmatory_preregistration.md`](confirmatory_preregistration.md)：60 个与 P0b task/init identity
+不重叠的 base pair 采用两个固定 seed block，以 base pair 聚类分析；四臂仅切换两个 relation flag，
+并预先冻结 clean noninferiority、Dual composition、multiplicity、invalid 与停止规则。该设计未授权执行。
+
 ### 阶段 A：fixed-trace/shadow
 
 四个 arm 面对完全相同的 proposal、state 和 trace，报告：
@@ -151,12 +179,15 @@ integrity contribution 混成一个不可消融的 Full CTDA arm。
 
 - 首次使用 formal contract、pre-execution gate、temporal monitor、Lean 或 runtime fallback；
 - 已证明双层方法优于单层或外部 baseline；
-- 已建立发布攻击下的 defense efficacy；
+- 已建立确认性的发布攻击 defense efficacy；当前只有固定 P0b slice 上的强探索性
+  Execution-only mitigation evidence；
 - cryptographic authentication、malicious-host resistance 或 verified recovery；
 - pixel grounding、continuous dynamics、hardware actuation 或 real-time control 被 Lean 证明。
 
 当前 v1 负结果必须进入正文：在 evaluated slice/seed 上 VLA-only 8/12，而 Full CTDA 0/12。它是促使
-方法收缩和 clean-first gate 的主要证据，不能只放 appendix。
+方法收缩和 clean-first gate 的主要证据，不能只放 appendix。action-envelope 的 `22/23` clean retention
+与 signal subset `15/15 -> 0/15` coarse unsafe 改善是收缩后方向的正证据，但 11/15 residual
+contact/joint proxy 和 nonqualified attack foundation 必须相邻报告。
 
 ## 9. 推荐叙事顺序
 

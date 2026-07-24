@@ -20,7 +20,7 @@ from scripts.generate_saber_threat_records_r2 import (
     validate_protocol,
     validate_record_bundle,
 )
-from scripts.generate_saber_liberosafety_records import file_digest
+from scripts.saber_io import file_digest
 
 
 def make_record(protocol: dict, pair: dict) -> dict:
@@ -163,7 +163,7 @@ def test_preflight_reports_gpu_inventory_failure_as_blocker(
 
 
 def generate_legacy_error(message: str) -> Exception:
-    from scripts.generate_saber_liberosafety_records import ProtocolError as LegacyError
+    from scripts.saber_io import ProtocolError as LegacyError
 
     return LegacyError(message)
 

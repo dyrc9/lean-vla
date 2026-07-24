@@ -37,7 +37,7 @@ from proofalign.benchmark.saber_replication import (  # noqa: E402
     population_projection,
     probability_meeting_rate_gate,
 )
-from scripts import generate_saber_liberosafety_records as legacy  # noqa: E402
+from scripts import saber_io as legacy  # noqa: E402
 
 
 DEFAULT_PROTOCOL = REPO_ROOT / "experiments" / "saber_threat_validation_r2_protocol.json"

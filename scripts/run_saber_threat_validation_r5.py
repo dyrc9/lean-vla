@@ -22,7 +22,7 @@ for import_root in (REPO_ROOT / "src", REPO_ROOT):
     if import_text not in sys.path:
         sys.path.insert(0, import_text)
 
-from scripts.generate_saber_liberosafety_records import (  # noqa: E402
+from scripts.saber_io import (  # noqa: E402
     atomic_json,
     canonical_digest,
     checked_output,
@@ -563,7 +563,7 @@ def probe_bindings(
     policy: Any, jax: Any, image_tools: Any, runner: Any
 ) -> dict[str, dict[str, Any]]:
     from proofalign.benchmark.attack_records import apply_attack_record, get_attack_record
-    from proofalign.benchmark.libero_online_runner import load_libero_task_runtime
+    from proofalign.benchmark.libero_runtime import load_libero_task_runtime
 
     record_index = build_record_index(records)
     bindings: dict[str, dict[str, Any]] = {}

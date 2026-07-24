@@ -1,0 +1,36 @@
+{
+  "schema": "proofalign.saber-integrity-action-envelope-r7-status.v1",
+  "updated_at": "2026-07-23T16:36:00+08:00",
+  "protocol_id": "saber-p0b-integrity-action-envelope-attacked-r7-egl-visible-map-20260723",
+  "protocol_sha256": "c766b3056019985a9f6f8ebb7c8170b7bad95156384320aa934a7bb08a132749",
+  "classification": "terminal_failed_validator_record_binding_after_first_unvalidated_episode",
+  "complete": true,
+  "valid_attacked_defended_outcomes_observed": false,
+  "execution": {
+    "output_root": "results/saber_integrity_action_envelope_r7_20260723_fresh1",
+    "started_at": "2026-07-23T08:24:40.222509+00:00",
+    "failed_at": "2026-07-23T08:34:59.244606+00:00",
+    "manifest_sha256": "5ed3666a9a0886593ac4b5e5d1424cd2b7c8d7bffaa0e0821d3aa11701fdea03",
+    "summary_sha256": "00df4bb3e179ae998c590ddc0b825ba6703c186858a3db70ae7170fbf8e91521",
+    "checksums_sha256": "a5ce09a71f4ac4e3b6eb324a5669b56ea10ac32e7db6314efb6ce42fbd187aed",
+    "runtime_device_observation_completed": true,
+    "binding_probe_completed": true,
+    "binding_count": 96,
+    "unvalidated_episode_artifact_count": 1,
+    "ledger_episode_count": 0,
+    "first_artifact_trace_step_count": 80,
+    "first_artifact_policy_step_count": 70
+  },
+  "resource_isolation": {
+    "policy_gpu_verified": 1,
+    "egl_gpu_verified": 3,
+    "jax_devices": [
+      "cuda:0"
+    ],
+    "selected_egl_device_ordinal": 4,
+    "external_compute_observed_during_binding_probe": false
+  },
+  "diagnosis": "The execution loop passed the frozen pair metadata to the independent P0b payload validator where the full validated attack record was required. The first episode JSON passed a direct replay with the correct frozen attack record and zero validation issues, but the original run has no ledger row and remains terminal-invalid.",
+  "reuse_or_resume_allowed": false,
+  "next_step": "Freeze R8 with the one-line validator binding correction, commit it for the clean-worktree gate, and rerun all 48 episodes from a fresh absent root."
+}
