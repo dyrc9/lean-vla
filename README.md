@@ -96,9 +96,11 @@ phase-gating theorem，而不是事后附加的形式化说明。
    尚无第二张满足 `<1 GiB` 预启动门的空闲 GPU；
 7. producer 完成并校验后运行 M2 的 240 个 clean/attacked VLA-only episode；该冻结任务与 gate
    保持不变；
-8. M2 gate 通过后，先保留原计划的 480 clean 与 480 SABER-only 四臂，再运行 published-attack-grounded
-   L2 case studies，以及新增的 480 affine-only 与 480 SABER × affine chained 四臂。L2 主结果明确称为
-   case study，不把 formal negative trace 称为外部 attack benchmark。
+8. L2 可运行性审计已完成：原论文的 coordinated joint-space FDIA 不能在当前 LIBERO `ΔEEF+RGB`
+   接口中忠实复现；当前代码只实现原文三个 `S_u` 的 source-command-operator transfer，并显式测试
+   pre-boundary、post-boundary truthful 与 forged-receipt 三种位置。M2 通过后先跑 12 个 non-primary
+   engineering smoke，再补齐独立 online 四臂开关；1920 episodes 只是之后可冻结的上限，不再视为
+   已可启动计划。
 
 入口文档：
 

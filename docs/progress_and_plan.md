@@ -311,25 +311,30 @@ selector/checker/effect observer。
 M2 gate 关闭前不启动新的 confirmatory L2 或 chained outcome。完整 successor 见
 [《L2 与跨层攻击实验计划》](l2_and_cross_layer_experiments.md)。
 
-M2 通过后的新增主线为：
+可运行性审计后的新增主线为：
 
-1. 保留原计划的 480 clean 与 480 SABER-only 四臂；
-2. 冻结 Ueda–Blevins affine transformation attack 到 LIBERO delta-EEF interface 的 source-parameter
-   mapping，并完成 no-outcome hook qualification；
-3. 运行 affine-only L2 case study，分别覆盖预注册 scaling、reflection、shearing；
-4. 迁移 ROS-Industrial PitM captured-command replay 与 modified replay，作为 freshness/replay case study；
-5. 只有在 feedback/state-estimator interface qualification 通过时运行 stealthy FDIA case；否则记录
-   interface_not_supported，不以 fixture 替代；
-6. 运行 480 个 SABER × affine chained 四臂 episode；
-7. 用独立 raw simulator evaluator 完成 terminal audit 和 base-pair cluster-bootstrap 分析。
+1. 已冻结 Ueda–Blevins 三个原始 `S_u`；当前只将其作用到 LIBERO 前六个 delta-EEF channel，标记为
+   `source_command_operator_transfer`，不声称复现 coordinated joint-space stealth attack；
+2. 先用 mock-online tests 固化 pre-boundary、post-boundary truthful、post-boundary forged 三个位置；
+3. M2 通过后运行 12 个 non-primary engineering episodes，只检查 hook/audit/interface，不比较 efficacy；
+4. 将 online runner 的 L1 semantic alignment 与 L2 execution integrity 拆成两个独立开关，并证明四臂
+   共享相同 source action chunk；
+5. 上述 gate 通过后，才冻结 affine-only 与 SABER × L2 的 population、family assignment、placement、
+   endpoint、stopping rule 和资源规模；1920 episodes 只是可选上限，不是当前已可启动计划；
+6. ROS replay 等 online cross-transaction capture/transport 完成后再运行；没有 ROS graph 时只称
+   adapted captured-prefix replay；
+7. 当前 feedback-linearized FDIA 明确记录 `interface_not_supported`，不以 privileged-state fixture
+   替代；
+8. 最终用独立 raw simulator evaluator 完成 terminal audit 和 base-pair cluster-bootstrap 分析。
 
 Evidence naming 固定为：
 
 - SABER：L1 benchmark；
-- affine、ROS replay、FDIA：externally grounded L2 case studies；
-- SABER × affine：cross-layer composition study；
+- source `S_u` transfer：externally grounded operator-transfer L2 case study；
+- ROS replay：只有 online capture/transport gate 通过后才是 adapted replay case study；
+- feedback FDIA：当前只报告 `interface_not_supported`；
+- SABER × source operator：cross-layer composition study；
 - wrong digest/receipt/effect/phase：formal negative suite。
 
 这项 successor 不授权修改历史 frozen artifact，也不授权把 L2 case-study 结果称为标准化 benchmark、
 一般物理安全或完整硬件 attestation。
-
