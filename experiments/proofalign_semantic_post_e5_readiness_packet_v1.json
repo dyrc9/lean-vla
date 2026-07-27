@@ -1,0 +1,140 @@
+{
+  "actions_executed_during_readiness_audit": false,
+  "benchmark_privileged_geometry_stack_qualified": true,
+  "claim_boundary": "This packet closes only the no-outcome benchmark privileged-geometry stack and the current E6 resource state. It contains no online rollout, task outcome, deployment-perception qualification, efficacy, or physical-safety evidence and authorizes no execution.",
+  "components": {
+    "e4_no_dispatch_gate": {
+      "classification": "e4_no_dispatch_gate_pass",
+      "complete": true,
+      "outcome_rollout_authorized": false,
+      "path": "results/proofalign_semantic_four_arm_e4_20260725_fresh1.json",
+      "sha256": "f503dd6a58d84de5c744647d1040a1b31306e91305eb6fbd718abddf5e59ce71"
+    },
+    "e5_effect_observer_qualification": {
+      "attack_false_allow_count": 0,
+      "case_count": 2100,
+      "classification": "analytic_semantic_effect_observer_qualified",
+      "clean_retention": 1.0,
+      "complete": true,
+      "ood_abstention_rate": 1.0,
+      "p99_latency_ns": 21571,
+      "path": "results/proofalign_semantic_effect_observer_e5_v2_20260727_fresh1/qualification.json",
+      "sha256": "2cfcc985486d411f76aed3fe8347f8bbbfdf6af6df8a5da7fc911f37852baff9"
+    },
+    "e6_resource_smoke_preregistration": {
+      "authorized_successor_output_root_absent": false,
+      "authorized_successor_protocol_absent": false,
+      "classification": "semantic_resource_smoke_qualified",
+      "complete": true,
+      "execution_authorized": true,
+      "executor_ready": true,
+      "fresh_output_root_absent": true,
+      "measurement_complete": true,
+      "measurement_qualified": true,
+      "path": "experiments/proofalign_semantic_resource_smoke_e6_v2_protocol.json",
+      "result_path": "results/proofalign_semantic_resource_smoke_e6_v2_20260727_fresh2/measurement.json",
+      "result_sha256": "c3ed8574769f491183dcc6ab063c7edb292d7eaa21f1cff2b80222161e6c00e4",
+      "sha256": "9ed2c7cc78a2f1e33a39a738ac86182511a64c01892362c35ac8ad6af66eab1f"
+    },
+    "e7_deployment_perception_data_audit": {
+      "classification": "deployment_perception_data_inadequate",
+      "complete": true,
+      "dataset_qualification_runner_ready": true,
+      "missing_requirement_ids": [
+        "camera_intrinsics",
+        "camera_extrinsics",
+        "target_identity_localization",
+        "destination_geometry",
+        "visibility_occlusion",
+        "held_contact_state",
+        "independent_qualification_split"
+      ],
+      "path": "experiments/proofalign_deployment_perception_e7_preflight.json",
+      "qualification_ready": false,
+      "sha256": "db1ad114d2e7aa980306a3288ce7783b09ce2a3ca1e88ec3ab07161c4bdb55e8",
+      "supervision_contract_current": true,
+      "supervision_contract_path": "experiments/proofalign_deployment_perception_supervision_schema_e7.json",
+      "supervision_contract_sha256": "c69b8df37a9523c1369c55fd3a3e546d12f5c9550b01a7abf4da942c6c0b0747"
+    },
+    "e8_source_binding_audit": {
+      "classification": "semantic_source_binding_clean",
+      "clean_commit_bound": true,
+      "commit_scope_complete": true,
+      "complete": true,
+      "evidence_inventory_complete": true,
+      "not_bound_path_count": 0,
+      "openpi_head_commit": "15a9616a00943ada6c20a0f158e3adb39df2ccac",
+      "openpi_tracked_worktree_clean": true,
+      "path": "experiments/proofalign_semantic_source_binding_e8_audit.json",
+      "repository_head_commit": "34d7afebb4351e40d057d3f8e3dd19dfa434894d",
+      "sha256": "bfb63fe8b328894db1d78b08150c893a171b4764afa432d1cc76c1cae55f3a22"
+    },
+    "qualified_observer_online_wiring": {
+      "complete": true,
+      "fragments": {
+        "SemanticPrefixEffectObserver": true,
+        "effects_known=effects_known": true,
+        "initial_local_observation": true,
+        "latest_local_observation": true,
+        "observer_id=EFFECT_OBSERVER_ID": true
+      }
+    },
+    "top_level_check_wiring": {
+      "check_all_fragments": {
+        "scripts/generate_semantic_source_binding_e8.py --check": true,
+        "scripts/prepare_deployment_perception_dataset_e7.py --check-schema": true,
+        "scripts/prepare_semantic_resource_smoke_e6.py --check": true,
+        "scripts/run_deployment_perception_dataset_qualification_e7.py --check-contract": true,
+        "scripts/run_deployment_perception_preflight_e7.py --check": true,
+        "scripts/run_semantic_effect_observer_qualification_e5.py --check": true,
+        "scripts/run_semantic_no_dispatch_four_arm_e4.py --check": true,
+        "scripts/run_semantic_resource_smoke_e6.py --check-state": true,
+        "scripts/validate_semantic_post_e5_readiness.py --check": true
+      },
+      "complete": true,
+      "makefile_fragments": {
+        "e4-no-dispatch-check:": true,
+        "e5-effect-observer-check:": true,
+        "e6-resource-smoke-preflight-check:": true,
+        "e7-perception-preflight-check:": true,
+        "e8-source-binding-check:": true,
+        "semantic-post-e5-readiness-check:": true
+      }
+    }
+  },
+  "current_blockers": [
+    "deployment perception cannot be qualified from the current RLDS schema; missing: camera_intrinsics,camera_extrinsics,target_identity_localization,destination_geometry,visibility_occlusion,held_contact_state,independent_qualification_split",
+    "M2 producer/victim execution remains outside this no-outcome packet"
+  ],
+  "deployment_stack_qualified": false,
+  "no_outcome_stack_complete": true,
+  "outcome_rollout_authorized": false,
+  "outcome_rollout_ready": false,
+  "outcomes_observed_or_generated": false,
+  "packet_id": "proofalign-semantic-post-e5-readiness-20260725-v1",
+  "policy_loaded_during_readiness_audit": false,
+  "reward_success_read_during_readiness_audit": false,
+  "schema": "proofalign.semantic-post-e5-readiness.v1",
+  "simulator_created_during_readiness_audit": false,
+  "source_bindings": {
+    "Makefile": "f2fc7a35076b8059c208d64b77d1a48ce44b9a314e604ae06466e7fffb3acbb9",
+    "scripts/check_all.sh": "cb691dd33d9c2bd8d12822d0e65a70c6961579d20d9e8d17e5298061b945d4e8",
+    "scripts/generate_semantic_source_binding_e8.py": "27c7b766dd94d711ebf639b2b1de0be900a0c89aba3d76003bc7a2c9f76b2988",
+    "scripts/prepare_deployment_perception_dataset_e7.py": "e64bd9467d3fdfadfde9bda950660f6e38e16bbe2c3a5895b913ab053b9d1035",
+    "scripts/prepare_semantic_resource_smoke_e6.py": "3a7a4cd8a6dbb98c60ade4ea109cd507f55ad417c2450cc4a9d553c766a53ee7",
+    "scripts/run_deployment_perception_dataset_qualification_e7.py": "e92d3f0a9139036e4f775ad0275db93fb53c3d2ec8095331fbf72fab1b736ad1",
+    "scripts/run_deployment_perception_preflight_e7.py": "329e59c66875239ae15146f61fbb8edc2aee753063b11c7766f3342b5e58f951",
+    "scripts/run_liberosafety_pi05_openpi_eval.py": "115a14c05e88e63964aab3c0fdcd9ed79c6ea973f22bf63d10b1a12e52dc4db9",
+    "scripts/run_semantic_effect_observer_qualification_e5.py": "896e100f15def8b959b69a37479a962b4fd503ca38533fc761dbbe60fe34f909",
+    "scripts/run_semantic_resource_smoke_e6.py": "41011e500a42bc09cda7b9ded69fb6c0735c5862787ecf0baf803d23b160476f",
+    "scripts/validate_semantic_post_e5_readiness.py": "01f423d96e501da836f66849203e342ea59556e6619dae9a287915cf2828dae1",
+    "src/proofalign/semantic_effect_observer.py": "57a367cddf58e92500c01d55e51f35d3f678b22d4886ecb6fc2e1a625d0e20f9",
+    "tests/test_deployment_perception_dataset_qualification_e7.py": "0b7f4514c8b52c60e285a3647b4f66bff66147b4a1a57402addd67a11d770a3d",
+    "tests/test_deployment_perception_preflight_e7.py": "3454b4b4faf7c315db4b0327a4b6336f2e4b9725eab06fe8b95d840ad1f4d8d7",
+    "tests/test_semantic_effect_observer.py": "3775fdce344f6e8c2caba0e50aedfb452901576bae02b4c5e348784477abd26f",
+    "tests/test_semantic_effect_observer_qualification_e5.py": "c29ea497d5b5ed1971de488454bb8188dc8f6e12cb6cc1c18164fc58e134ef19",
+    "tests/test_semantic_online_runner.py": "6e6bcba44dbf1ebf98424bda5bd9072afa7856f98ecbcf9231a29c590ed8fa43",
+    "tests/test_semantic_resource_smoke_e6.py": "42d6469f7a23ab85536bfecc90db7642b8642d14a4f8bf5d062d0b3a0db828d9",
+    "tests/test_semantic_source_binding_e8.py": "835a6654cef325357e6fb51d02c4b441eb004b4ab6cd06ac3eeb293c59976702"
+  }
+}

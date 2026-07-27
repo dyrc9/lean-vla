@@ -1,0 +1,91 @@
+{
+  "schema": "proofalign.m2-producer-launch-status.v1",
+  "status_id": "proofalign-m2-producer-waiting-for-second-gpu-20260727",
+  "recorded_at": "2026-07-27T10:45:29+08:00",
+  "classification": "authorized_ready_except_gpu_resource_gate",
+  "source_binding": {
+    "repository_commit": "34d7afebb4351e40d057d3f8e3dd19dfa434894d",
+    "repository_tree": "74bb6ff3d5977d1a4ea6aaf24f33a1964eafe98a",
+    "binding_matches": true,
+    "tracked_worktree_clean": true
+  },
+  "protocol": {
+    "path": "experiments/saber_confirmatory_producer_m2_authorized_protocol.json",
+    "sha256": "776a92ea1cfc33f457b3c8f5a6fab9a0341cdfe7b0a0b99349fcb95c1a8b00e0",
+    "protocol_id": "saber-confirmatory-p1-producer-m2-authorized-20260727",
+    "output_root": "results/saber_confirmatory_producer_m2_20260727_fresh1",
+    "output_root_absent": true
+  },
+  "passed_preflight_components": [
+    "60-base-pair frozen population",
+    "confirmatory preregistration digest",
+    "ProofAlign source commit/tree ancestry",
+    "all protocol source SHA-256 bindings",
+    "SABER checkout commit and tracked cleanliness",
+    "LIBERO-Safety checkout commit and tracked cleanliness",
+    "OpenPI checkout commit and tracked cleanliness",
+    "attack-model file SHA-256 bindings",
+    "explicit outcome-blind producer authorization",
+    "fresh output root"
+  ],
+  "resource_gate": {
+    "required_gpu_count": 2,
+    "maximum_prelaunch_memory_used_mib_exclusive": 1000,
+    "qualified_gpu_indices": [
+      0
+    ],
+    "candidate_gpu_indices": [
+      0,
+      2
+    ],
+    "blockers": [
+      "selected attack GPU violates prelaunch memory gate"
+    ]
+  },
+  "gpu_snapshot": [
+    {
+      "index": 0,
+      "uuid": "GPU-7ad5c3eb-adf0-f70a-e670-8438701a553e",
+      "memory_used_mib": 3,
+      "memory_free_mib": 48517,
+      "utilization_percent": 0
+    },
+    {
+      "index": 1,
+      "uuid": "GPU-9630f0c1-163a-1dc7-564b-8242ac677a1e",
+      "memory_used_mib": 30213,
+      "memory_free_mib": 18308,
+      "utilization_percent": 97
+    },
+    {
+      "index": 2,
+      "uuid": "GPU-177e688f-b5f1-1713-0c2e-29d927a058b3",
+      "memory_used_mib": 2979,
+      "memory_free_mib": 45541,
+      "utilization_percent": 0
+    },
+    {
+      "index": 3,
+      "uuid": "GPU-061bb9ea-eff0-d537-2c5c-0d4b99e7c5b0",
+      "memory_used_mib": 11623,
+      "memory_free_mib": 36898,
+      "utilization_percent": 26
+    },
+    {
+      "index": 4,
+      "uuid": "GPU-952f56b5-261e-aa03-6546-8e690d63c3fe",
+      "memory_used_mib": 9459,
+      "memory_free_mib": 39062,
+      "utilization_percent": 44
+    }
+  ],
+  "monitoring_and_launch_rule": {
+    "poll_interval_seconds": 30,
+    "selection_rule": "Choose the two lowest-index GPUs whose current memory.used is below 1000 MiB.",
+    "launch_rule": "Run the full read-only preflight again; execute only if it reports ready=true and the fresh output root is still absent.",
+    "replacement_allowed": false,
+    "threshold_relaxation_allowed": false,
+    "other_process_termination_allowed": false
+  },
+  "claim_boundary": "This status records launch readiness and a point-in-time GPU snapshot. It contains no generated attack record, victim rollout, victim outcome, defense outcome, or efficacy result."
+}
