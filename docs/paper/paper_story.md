@@ -197,19 +197,25 @@ P0b 与 R9 只承担历史动机：
 当前 semantic pilot 只支持“skill-level 路线值得继续”：motion-level `0/4`、skill-level `4/4`、阶段
 切换 `3/5`，且 prompt-conditioned action delta 很小。它不是 selector qualification，更不是防御结果。
 
-新的论文主结果必须按以下顺序产生：
+M2 的确认性 attack-foundation 结果已经终局：240/240 valid，clean-eligible `86` units，
+transition `39` units，rate `45.35%`，95% base-pair cluster bootstrap CI `[32.93%,57.78%]`。
+它未达到原预注册 `50%` 门槛，必须报告为 confirmatory nonpass。观察该结果后采用的 `40%`
+continuation threshold 只授权探索性四臂证据，不能改变原结论或产生 confirmatory claim。
+
+论文结果顺序必须保留这条时间与证据边界：
 
 ```text
 M1 component closure
   -> selector qualification
   -> local-checker qualification
   -> end-to-end no-outcome identity/resource gate
-  -> M2 VLA-only attack foundation
-  -> fixed-trace four-arm
-  -> clean four-arm
-  -> attacked four-arm
+  -> M2 VLA-only attack foundation（原 50% gate nonpass）
+  -> disclosed post-outcome 40% exploratory continuation
+  -> clean four-arm exploratory stage
+  -> attacked four-arm exploratory stage（仅在 clean pass 后另行授权）
 ```
 
-任何阶段都不得用后续 outcome 回调 selector/checker threshold。论文结果应依次报告 attack validity、
+M2 artifact 不含新 v4 fixed-trace 所需的逐 proposal trusted geometry，因此不得补造该阶段。任何阶段
+都不得用后续 outcome 回调 selector/checker threshold。论文结果应依次报告 attack validity、
 selector/checker risk-coverage、L2 conformance、clean utility、attacked efficacy、Dual interaction 和
 failure taxonomy；不能用一个 aggregate “safe success” 隐藏 unknown、deadlock 或 residual proxy。

@@ -15,9 +15,9 @@
 | Resource readiness | 高（冻结本机 workload） | E6 v2 10 项 gate 通过，policy/pipeline p99 约 97 ms |
 | Source/evidence binding | 已关闭 | E8 clean commit binding 完整，未绑定 semantic scope path 为 0 |
 | Closed-loop no-attack smoke | 工程链路通过、活性风险待量化 | 2 个 effect-allow prefix、10 个 exact receipts；随后 K=1 proposal 被 L1 fail-closed |
-| M2 confirmatory foundation | producer 完成、victim 运行中 | 60 records 已终态完成；240-episode authorized fresh-root victim 已启动，只做 outcome-blind 进度监控 |
-| Four-arm v4 successor | 协议与 CPU 分析就绪、执行未授权 | 三阶段各 120 unit × 4 arms；fresh roots、ledger、clean gate、cluster bootstrap、McNemar/Holm 已冻结 |
-| Closed-loop Semantic-only/Dual | 未开始 | 必须先有 M2 terminal pass；clean 480 pass 后才可运行 attacked 480 |
+| M2 confirmatory foundation | 终局 nonpass | 240/240 valid；39/86 transition=`45.35%`，95% cluster CI `[32.93%,57.78%]`；原 50% gate 未通过 |
+| Four-arm v4 successor | clean 探索性执行已授权 | 40% 决策发生在 M2 outcome 后；复用冻结 schedule/analysis，只授权 480 clean，不能称 confirmatory |
+| Closed-loop Semantic-only/Dual | 等待 GPU | 需要两张不同且各 `<1024 MiB` 的 GPU；clean pass 后才能另行授权 attacked 480 |
 
 论文主故事仍是两层对齐，而不是 SemanticSubtask 本身。当前最重要的科学风险集中在 L1：
 
@@ -33,10 +33,10 @@ control。
 
 当前最短可发表路径：
 
-1. 让已启动的 240-episode M2 victim 自然完成，期间不读取中间 outcome；
-2. 运行 terminal validator，并按预注册 denominator/signal gate 决定是否进入四臂；
-3. gate 通过后执行 fixed-trace shadow，再通过新 successor 授权 480 clean；
-4. clean utility/deadlock/unknown gate 通过后，才授权 480 attacked；
+1. 保留 M2 原 50% terminal nonpass，并在正文/附录披露 40% 是 outcome-informed continuation；
+2. 两张合格 GPU 可用时执行已授权的 480 clean exploratory four-arm；
+3. 不从 M2 artifact 伪造缺失 trusted geometry 的 fixed-trace shadow；
+4. clean utility/deadlock/unknown gate 通过后，才另行授权 480 attacked exploratory stage；
 5. 保持 E7 camera/deployment perception 为独立未关闭 claim，不混入 benchmark 结果；
 6. 分别报告 safety、utility、coverage、unknown 和 deadlock，不扩大到 physical safety。
 

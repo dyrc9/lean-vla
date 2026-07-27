@@ -13,14 +13,14 @@
 | Ueda--Blevins coordinated perfectly-undetectable FDIA | **不支持** | 不得声称复现或反驳其 stealth theorem |
 | ROS captured-prefix replay | **v4 component semantics 已有，online capture/transport 尚缺** | 目前只能报告 component/fixed-trace 结果 |
 | feedback-linearized FDIA | **`interface_not_supported`** | 不进入 LIBERO efficacy |
-| 2×2 防御四臂 online rollout | **四条 live path 已通过 mock；v4 successor 已冻结但未授权** | M2 pass 后先做 clean gate，再做 attacked |
-| SABER × L2 完整 confirmatory | **设计/分析已冻结、outcome 未运行** | 只按 v4 successor 的 480 clean + 480 attacked 主线推进 |
+| 2×2 防御四臂 online rollout | **clean 探索性 Stage B 已授权，等待两张合格 GPU** | 先做 480 clean gate；attacked 仍未授权 |
+| SABER × L2 confirmatory | **原 M2 50% gate 已 terminal nonpass** | 后续 40% continuation 只能作为 post-outcome exploratory evidence |
 
 这里最重要的修正是：当前 runner 能记录的是 `env.step` 的输入，不是低层 actuator 最终执行值。因此
 原计划中的 `A_applied` 改名为 `A_env_input`。没有 controller/actuator telemetry 时，不得把
 `env.step` input 称为硬件 actuation attestation。
 
-## 2. 不改变当前 M2
+## 2. 不改变 M2 原终局
 
 正在执行的顺序保持不变：
 
@@ -38,8 +38,10 @@ L2 代码和 non-outcome 测试不得：
 - 将 P0b/R9 历史 episode 混入新 primary denominator；
 - 把 mock/fixed-trace 结果报告成物理攻击防御 efficacy。
 
-producer 已完成，M2 victim 正在授权 fresh root 中运行。M2 gate 未通过时，不启动跨层 confirmatory
-outcome；仍可完成接口、单测、schedule/ledger/analysis dry-run 和明确标注的 engineering smoke。
+producer 与 victim 均已完成。M2 240/240 valid，39/86 transition=`45.35%`，原 50% gate terminal
+nonpass。观察终局后用户授权 40% continuation；它被单独冻结为 outcome-informed exploratory
+successor，只放行 clean four-arm Stage B。原 M2 artifact、gate 和 classification 均不得覆盖，
+后续结果不得称为跨层 confirmatory outcome。
 
 ## 3. 外部来源与使用方式
 
@@ -182,7 +184,14 @@ transaction 层无法检测；要解决必须加入受信的 controller/actuator
 - `src/proofalign/benchmark/four_arm_v4.py`
   - 冻结 120-unit schedule、append-only ledger、paired identity、保守 missing rule 与 terminal 统计；
 - `experiments/proofalign_four_arm_v4_successor_protocol.json`
-  - supersede legacy 四臂执行语义但不覆盖历史 artifact；当前三个 stage 均未授权；
+  - supersede legacy 四臂执行语义但不覆盖历史 artifact；这是三个 stage 均未授权的原
+    outcome-blind 设计；
+- `experiments/proofalign_four_arm_v4_exploratory40_successor.json`
+  - 绑定 M2 terminal nonpass 和结果后 40% 决策；只授权 clean Stage B；
+- `scripts/run_proofalign_four_arm_v4_clean.py`
+  - 执行/预检/终局验证 480 clean exploratory episodes，并 fail closed；
+- `scripts/monitor_and_launch_four_arm_v4_clean.py`
+  - 等待两张 `<1024 MiB` 的不同 GPU，完整预检后 one-shot 启动，不重试失败 fresh root；
 - `experiments/proofalign_four_arm_v4_orchestration_dry_run.json`
   - 证明每 stage 480 rows、每 arm 120、每 arm 每个 Latin position 30，且 fresh roots 未占用；
 - `experiments/proofalign_four_arm_v4_analysis_contract.json`
@@ -239,10 +248,11 @@ joint-space controller benchmark，再单独建立 reproduction protocol。
 - 固化 interface feasibility artifact；
 - 保持 M2 launcher、population 与 artifacts 不变。
 
-### Gate L2-1：执行节点 engineering smoke
+### Gate L2-1：次要执行节点 engineering smoke
 
-M2 结束后，在任何 confirmatory outcome 前固定一个非 primary task/init/seed，对三个 family 和三个
-placement 各跑一次，再加对应 nominal，共 12 个 engineering episodes。这里只检查：
+该 smoke 已不在 confirmatory 时间线内，也不是当前论文主线的前置任务。若主线 clean 完成后仍需要接口
+诊断，可另行固定一个非 primary task/init/seed，对三个 family 和三个 placement 各跑一次，再加对应
+nominal，共 12 个 engineering episodes。这里只检查：
 
 - runner 能启动且 attack audit 完整；
 - action 恒为 7D finite；
@@ -285,9 +295,9 @@ closed-loop 的正确 identity 不是“强制四臂 replay 同一个 chunk”�
 GPU engineering smoke 仍可检查真实节点上的这些 digest，但不再要求跨 L1 chunk 相同，也不是主线
 confirmatory 的额外 efficacy gate。
 
-### Gate L2-3：v4 primary 已 outcome-blind 冻结
+### Gate L2-3：原 v4 primary 已 outcome-blind 冻结
 
-v4 successor 已在 M2 terminal outcome 与四臂 outcome 均未观察时冻结：
+原 v4 successor 已在 M2 terminal outcome 与四臂 outcome 均未观察时冻结：
 
 - 60 base pairs × 2 seeds = 120 units；
 - fixed-trace、clean closed-loop、attacked closed-loop 各 4 arms；
@@ -295,7 +305,8 @@ v4 successor 已在 M2 terminal outcome 与四臂 outcome 均未观察时冻结�
 - fresh roots、480 episode/stage cap、no replacement、no partial-root resume；
 - missing/invalid 作为 failure + unsafe + deadlock + unknown 的保守规则。
 
-冻结不等于授权。M2 terminal pass 前三个 stage 都不得执行；clean stage pass 前 attacked stage 不得执行。
+原冻结不等于授权。M2 terminal nonpass 后，结果后 40% exploratory successor 只授权 clean Stage B；
+M2 artifact 缺少逐 proposal trusted geometry，因此 Stage A 不补造；clean pass 前 Stage C 仍不得执行。
 P1/P2/P3 保留为次要 trust-boundary stress table：P2 的 after-one-step detection 不能算 prevention，P3
 也不能期待被 exact digest 单独解决。
 

@@ -1,6 +1,31 @@
 # 当前进展与执行计划
 
-## 0. 2026-07-27 qualification 与工程 smoke checkpoint
+## 0. 2026-07-27 M2 终局与 40% 探索性后继
+
+M2 已自然完成并通过 artifact/ledger/terminal validator：240/240 complete、240/240 valid，
+clean-eligible `86` units / `47` base pairs，attack transition `39` units / `26` base pairs，
+transition rate `45.35%`，base-pair cluster bootstrap 95% CI `[32.93%, 57.78%]`。原预注册
+`50%` minimum-transition-rate gate 未通过，因此原结论永久保持
+`confirmatory_attack_foundation_nonpass`；不能重命名为 pass。
+
+在观察上述终局后，用户明确授权将“继续四臂实验”的门槛改为 `40%`。该改动是
+outcome-informed，已单独冻结为
+`proofalign_four_arm_v4_exploratory40_successor.json`，后续只能称为 post-outcome exploratory /
+hypothesis-generating evidence：
+
+- 不覆盖原 50% 预注册和 nonpass；
+- 不把 M2 或后续四臂结果称为 confirmatory；
+- M2 产物缺少重建新 v4 semantic assessment 所需的逐 proposal trusted geometry，因此不伪造
+  fixed-trace Stage A；
+- 当前只授权 480-episode clean four-arm Stage B；
+- attacked Stage C 仍未授权，必须等 clean terminal gate 后另行绑定；
+- fresh root、append-only ledger、首个 invalid 即停止、checkpoint/source/checkout/GPU/disk gate
+  均 fail closed。
+
+当前 GPU 门槛要求 policy/EGL 两张不同卡且启动前各 `<1024 MiB`。现只有一张满足，one-shot
+launcher 已准备在第二张卡满足条件后自动预检并启动。
+
+## 0A. 2026-07-27 qualification 与工程 smoke checkpoint
 
 当前 C5 与 E1–E8 证据链已关闭，并完成两轮单 episode clean/no-attack 工程 smoke：
 
@@ -33,20 +58,21 @@
 - E9 第一轮准确暴露 approach progress 被错误声明为 `near_target`；修复后继任 smoke 完成两个
   effect-allow prefix、10 个 exact receipts、零 effect reject/unknown，随后第三个 K=1 proposal 因
   `1.93mm < 2mm` 在 dispatch 前 fail closed；
-- M2 outcome-blind producer 已终态完成 60/60 records；授权 victim 已由资源监控器自动启动。运行期间
-  只监控进程、ledger 行数与资源，不读取或汇总中间 outcome；
+- M2 outcome-blind producer 已终态完成 60/60 records；victim 已终态完成 240/240，原 50% gate
+  因 `45.35% < 50%` 非通过；
 - 新 v4 四臂 successor 已冻结 120-unit × 4-arm 的 fixed-trace、clean closed-loop 和 attacked
   closed-loop schedule；同时冻结 fresh roots、append-only ledger、clean gate、保守 missing rule、
-  base-pair cluster bootstrap、McNemar 与 Holm 分析。该协议当前不授权任何新 rollout。
+  base-pair cluster bootstrap、McNemar 与 Holm 分析。原 outcome-blind 协议未授权 rollout；结果后
+  40% 探索性后继只授权 clean Stage B。
 
 `experiments/proofalign_semantic_post_e5_readiness_packet_v1.json` 当前判定
 benchmark privileged-geometry no-outcome stack 完整；deployment perception 仍未资格化。
 
 剩余 blocker：
 
-1. M2 victim 必须自然完成 240 episodes 并通过 terminal validator；禁止中途 outcome inspection；
-2. 只有 M2 attack-foundation terminal pass，才可签发四臂执行授权 successor；
-3. 四臂先过 480 clean 的 utility/deadlock/unknown gate，才可运行 480 attacked；
+1. 等待两张 `<1024 MiB` 的不同 GPU，通过完整 preflight 后启动 480 clean exploratory four-arm；
+2. 四臂先过 480 clean 的 utility/deadlock/unknown gate，才可另行授权 480 attacked；
+3. 所有结果保持 exploratory 标签，不得回写原 50% M2 nonpass；
 4. E9 暴露的 K=1 clean availability/deadlock 风险进入报告，不反向修改冻结阈值；
 5. E7 perception 数据仍阻断 camera-only deployment claim，但不阻断明确标注 privileged geometry 的
    benchmark 论文主线。
@@ -307,30 +333,32 @@ C1 semantic digest schema（已实现）
   -> E7 perception supervision collection/qualification（当前数据 gate 未通过）
   -> authorized no-attack smoke（已完成；效果契约修复后 2 prefix allow，随后 L1 fail-closed）
   -> M2 producer（60/60 records，已完成）
-  -> M2 victim 240 episodes（已启动；只做 outcome-blind 进度监控）
-  -> v4 fixed-trace shadow（协议已冻结，未授权执行）
-  -> v4 clean 480 episodes（须 M2 pass + 新授权）
+  -> M2 victim 240 episodes（已完成；45.35%，原 50% gate 非通过）
+  -> outcome-informed 40% exploratory successor（已冻结）
+  -> v4 fixed-trace shadow（因缺少可信逐 proposal geometry 而跳过，不伪造）
+  -> v4 clean 480 episodes（探索性 Stage B 已授权，等待两张合格 GPU）
   -> clean terminal gate
   -> v4 attacked 480 episodes（须 clean pass + 新授权）
 ```
 
-当前已按预注册回退到 deterministic task-FSM L1。不得用 M2/four-arm outcome 反向调整
-selector/checker/effect observer。
+当前继续使用预先资格化的 deterministic task-FSM L1。40% 只改变是否继续收集探索性四臂证据，
+不得用 M2/four-arm outcome 反向调整 selector/checker/effect observer，也不得把原 M2 改判为 pass。
 
 ## 8. M2 后的 published-attack-grounded successor
 
-当前正在推进的 M2 producer/victim 任务、240-episode population 和全部 stopping/gate rule 保持不变。
-M2 gate 关闭前不启动新的 confirmatory L2 或 chained outcome。完整 successor 见
+M2 producer/victim 的 240-episode population、stopping rule、原 50% gate 和终局 artifact 保持不变。
+原 gate 已 terminal nonpass；新的 40% 决策仅开启明确标注的 exploratory clean outcome。完整 successor 见
 [《L2 与跨层攻击实验计划》](l2_and_cross_layer_experiments.md)。
 
 论文主线与次要 stress study 现在明确分开：
 
-1. 主线是 M2 attack foundation → v4 fixed-trace → clean four-arm gate → attacked four-arm；
+1. 论文事实链是 M2 confirmatory nonpass → disclosed 40% post-outcome exploratory continuation →
+   clean four-arm gate →（若 clean pass）separately authorized attacked four-arm；
 2. online runner 已将 L1 semantic alignment 与 L2 execution integrity 拆成独立开关。closed-loop 不要求
    跨 L1 source chunk 相同，只要求 paired initial identity 和 within-L1 L2 pair 的首个 policy input/output
    identity；
-3. 主线 v4 successor 已 outcome-blind 冻结 population、schedule、ledger、endpoint、stopping rule、
-   clean gate 和统计方法，但没有签发执行授权；
+3. 原 v4 successor 已 outcome-blind 冻结 population、schedule、ledger、endpoint、stopping rule、
+   clean gate 和统计方法；结果后 successor 复用这些设计且只签发 clean execution authorization；
 4. Ueda–Blevins `S_u` transfer 的 P1/P2/P3、ROS replay 和 feedback FDIA 均降为次要
    trust-boundary/case-study 证据，不再作为 480+480 主线的前置门；
 5. P1/P2/P3 的 mock-online tests 继续锁定 prevention、after-one-step detection 与 forged-receipt
@@ -338,7 +366,7 @@ M2 gate 关闭前不启动新的 confirmatory L2 或 chained outcome。完整 su
 6. ROS 没有真实 graph 时只称 adapted captured-prefix replay；feedback-linearized FDIA 当前保持
    `interface_not_supported`；
 7. terminal analysis 使用完整 population、保守 missing/invalid、base-pair cluster bootstrap、exact
-   McNemar 和 Holm，不允许 outcome-driven subset 或 threshold 修改。
+   McNemar 和 Holm；40% threshold change 必须始终披露为 outcome-driven exploratory decision。
 
 Evidence naming 固定为：
 
