@@ -9,7 +9,7 @@
       "source_digest_count": 23
     },
     "confirmatory_producer_and_record_validator": {
-      "complete": true,
+      "complete": false,
       "generation_authorized": false,
       "source_digest_count": 10
     },
@@ -84,6 +84,7 @@
     }
   },
   "current_blockers": [
+    "producer source digest bindings are incomplete",
     "victim source digest bindings are incomplete",
     "four-arm source digest bindings are incomplete",
     "Intent-ActionBlock assessor and outcome-blind qualification thresholds are not designed and frozen",
