@@ -95,7 +95,6 @@
         ]
       },
       "blockers": [
-        "m2_terminal_summary_absent",
         "stage_execution_not_authorized"
       ],
       "condition": "attacked",
@@ -148,7 +147,6 @@
         ]
       },
       "blockers": [
-        "m2_terminal_summary_absent",
         "stage_execution_not_authorized"
       ],
       "condition": "clean",
@@ -201,7 +199,6 @@
         ]
       },
       "blockers": [
-        "m2_terminal_summary_absent",
         "stage_execution_not_authorized",
         "clean_gate_terminal_pass_not_bound"
       ],
