@@ -606,7 +606,7 @@
       "exists": true,
       "git_status": "clean",
       "path": "experiments/proofalign_semantic_v4_c5_readiness_packet_v1.json",
-      "sha256": "04f72878aedf56d0e9d50e959b0a8540dbcb98422f49a7fc15979f07c6716456",
+      "sha256": "a3d182dde844f6defff6a8a3ed8c8ff060346a7ae9f263251363325258a72de1",
       "tracked": true
     },
     {
@@ -709,8 +709,8 @@
   "policy_loaded": false,
   "repository_binding_semantics": "latest commit that changed the frozen semantic commit scope; later commits may contain only out-of-scope protocols or audit packets",
   "repository_fully_clean": true,
-  "repository_head_commit": "447c00692e2152095a97928826a786aff9e4d56e",
-  "repository_head_tree": "4f47bcd5be2830711c412a84f41e889c062cd44e",
+  "repository_head_commit": "62e91dbbc8468395e17fb03b73b70b7d67640bb9",
+  "repository_head_tree": "218636a5953e4c749811ee8ca8c9f3607c98f146",
   "repository_status_row_count": 0,
   "schema": "proofalign.semantic-source-binding-e8-audit.v1",
   "simulator_created": false
