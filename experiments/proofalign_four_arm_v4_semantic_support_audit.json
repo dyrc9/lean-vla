@@ -71,12 +71,12 @@
       "path": "results/saber_confirmatory_victim_m2_20260727_fresh1/summary.json",
       "sha256": "bae0dc74814c0182e7cf1f5b92ab098f7317cb5618d7b68183403ad50bfc792e"
     },
-    "repository_commit": "da21fd52af2d55b67ead18173339fc7f7e48c7c1",
-    "repository_tree": "19c30671ddb1064eb66f2aac82f729c3816edcf9",
+    "repository_commit": "a5f7186520f6e31551cde6882b863fd96488724e",
+    "repository_tree": "f797fdf3686661f6d8cab629d5ee8a46b9ada23a",
     "source_sha256": {
       "scripts/audit_four_arm_v4_semantic_support.py": "a017974d13f6d0086eca1a1b41cf59f91e4f89019113c5de747bdfacad226156",
       "src/proofalign/benchmark/four_arm_v4.py": "13673ce509d3fbcdcf1c080dda85e0477317433746a48d437213c6b89f0c307e",
-      "src/proofalign/benchmark/four_arm_v4_support.py": "ce6acf7232e427568c03d48003f19d5eaf15710a9513b650054c839ffaa7e05d",
+      "src/proofalign/benchmark/four_arm_v4_support.py": "f095177e5af0733e63f1ab99be9d160cab0b21e2e11f295541cc9f36ab953661",
       "src/proofalign/semantic_local_checker.py": "142750008de7bef8a8738d77e11b1032002c0d1bc0519fc6d4bd2c307dcaa5f3",
       "src/proofalign/semantic_policy_wrapper.py": "90004b15b6eebe28b177a7e3c73f97a22badbc7a3ce4415cc685c20d2100d047"
     },
