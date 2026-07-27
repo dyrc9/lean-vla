@@ -456,3 +456,47 @@ def test_l2_successor_vla_only_attacks_after_common_clipping(
     assert payload["trace"][0]["execution_attack"][
         "env_input_action"
     ][0] == -0.5
+
+
+def test_l2_successor_vla_only_forged_audit_reports_nominal(
+    monkeypatch, tmp_path
+) -> None:
+    payload, environment, _policy = _run(
+        monkeypatch,
+        tmp_path,
+        first_delta_x=0.1,
+        semantic_runtime=False,
+        episode_runner=l2_runner.run_episode,
+        execution_attack_family="ueda_blevins_scaling",
+        execution_attack_placement="post_boundary_forged",
+    )
+
+    assert np.isclose(environment.applied[0][0], 0.4)
+    attack = payload["trace"][0]["execution_attack"]
+    assert np.isclose(attack["nominal_action"][0], 0.1)
+    assert np.isclose(attack["env_input_action"][0], 0.4)
+    assert np.isclose(attack["reported_action"][0], 0.1)
+
+
+def test_l2_successor_forged_multistep_audit_binds_each_runner_step(
+    monkeypatch, tmp_path
+) -> None:
+    payload, environment, _policy = _run(
+        monkeypatch,
+        tmp_path,
+        first_delta_x=0.1,
+        replan_steps=2,
+        done_after=2,
+        episode_runner=l2_runner.run_episode,
+        execution_attack_family="ueda_blevins_scaling",
+        execution_attack_placement="post_boundary_forged",
+    )
+
+    assert len(environment.applied) == 2
+    records = payload["execution_attack_audit"]["records"]
+    assert [record["runner_step_id"] for record in records] == [0, 1]
+    assert all(record["env_step_reached"] for record in records)
+    assert [
+        row["execution_attack"]["runner_step_id"]
+        for row in payload["trace"]
+    ] == [0, 1]

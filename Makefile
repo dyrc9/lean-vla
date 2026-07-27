@@ -1,4 +1,4 @@
-.PHONY: sync test lean paper-artifacts paper-artifacts-check action-block-check m1-readiness-check semantic-v4-c5-check e1-selector-check e1-fallback-check e2-conditioning-check e3-checker-check e4-no-dispatch-check e5-effect-observer-check e6-resource-smoke-preflight-check e7-perception-preflight-check semantic-post-e5-readiness-check check
+.PHONY: sync test lean paper-artifacts paper-artifacts-check action-block-check m1-readiness-check semantic-v4-c5-check e1-selector-check e1-fallback-check e2-conditioning-check e3-checker-check e4-no-dispatch-check e5-effect-observer-check e6-resource-smoke-preflight-check e7-perception-preflight-check semantic-post-e5-readiness-check l2-interface-check check
 
 PYTHON ?= .venv/bin/python
 UV ?= uv
@@ -86,5 +86,9 @@ e8-source-binding-check:
 
 semantic-post-e5-readiness-check:
 	$(PYTHON) scripts/validate_semantic_post_e5_readiness.py --check
+
+l2-interface-check:
+	$(PYTHON) -m pytest tests/test_execution_attack_relay.py tests/test_l2_interface_feasibility.py tests/test_semantic_online_runner.py
+	$(PYTHON) scripts/run_l2_execution_attack_eval.py --help >/dev/null
 
 check: test lean paper-artifacts-check action-block-check m1-readiness-check semantic-v4-c5-check e1-selector-check e1-fallback-check e2-conditioning-check e3-checker-check e4-no-dispatch-check e5-effect-observer-check e6-resource-smoke-preflight-check e7-perception-preflight-check e8-source-binding-check semantic-post-e5-readiness-check

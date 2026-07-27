@@ -101,6 +101,24 @@ def test_affine_transfer_rejects_non_libero_action_shapes() -> None:
         scenario.apply_control_operator((0.1,) * 6)
 
 
+@pytest.mark.parametrize("runner_step_id", [-1, 1.5, True])
+def test_relay_rejects_invalid_runner_step_ids(runner_step_id) -> None:
+    relay = build_published_affine_relay(
+        family=PublishedAffineFamily.SCALING,
+        placement=AttackPlacement.PRE_BOUNDARY,
+    )
+    assert relay is not None
+
+    with pytest.raises(
+        ExecutionAttackError,
+        match="runner_step_id must be a non-negative integer",
+    ):
+        relay.transform(
+            (0.1, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0),
+            runner_step_id=runner_step_id,
+        )
+
+
 def test_none_builds_no_relay() -> None:
     assert (
         build_published_affine_relay(

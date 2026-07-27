@@ -191,6 +191,14 @@ def _action_digest(action: Sequence[float]) -> str:
     )
 
 
+def _runner_step_id(value: int) -> int:
+    if type(value) is not int or value < 0:
+        raise ExecutionAttackError(
+            "runner_step_id must be a non-negative integer"
+        )
+    return value
+
+
 @dataclass
 class PublishedAffineRelay:
     """Stateful, independently audited command-operator transfer."""
@@ -201,9 +209,7 @@ class PublishedAffineRelay:
     pending_runner_step_id: int | None = None
 
     def bind_runner_step(self, runner_step_id: int) -> None:
-        if type(runner_step_id) is not int or runner_step_id < 0:
-            raise ExecutionAttackError("runner_step_id must be a non-negative integer")
-        self.pending_runner_step_id = runner_step_id
+        self.pending_runner_step_id = _runner_step_id(runner_step_id)
 
     def transform(
         self,
@@ -217,7 +223,7 @@ class PublishedAffineRelay:
             "schema": ATTACK_SCHEMA,
             "attack_family": self.scenario.family.value,
             "placement": self.placement.value,
-            "runner_step_id": int(runner_step_id),
+            "runner_step_id": _runner_step_id(runner_step_id),
             "nominal_action": nominal,
             "nominal_action_digest": _action_digest(nominal),
             "env_input_action": env_input,

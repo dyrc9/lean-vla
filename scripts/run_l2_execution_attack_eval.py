@@ -66,9 +66,15 @@ class _AttackedEnvironmentProxy:
             runner_step_id=runner_step_id,
         )
         transition = self._env.step(list(env_input))
+        reported = (
+            action
+            if self._relay.placement
+            is AttackPlacement.POST_BOUNDARY_FORGED
+            else env_input
+        )
         self._relay.mark_dispatch_result(
             env_step_reached=True,
-            reported_action=env_input,
+            reported_action=reported,
         )
         return transition
 

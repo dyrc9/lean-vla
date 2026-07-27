@@ -175,7 +175,7 @@ transaction 层无法检测；要解决必须加入受信的 controller/actuator
 命令示例：
 
 ```bash
-python scripts/run_liberosafety_pi05_openpi_eval.py \
+python scripts/run_l2_execution_attack_eval.py \
   --semantic-runtime \
   --execution-attack-family ueda_blevins_scaling \
   --execution-attack-placement pre_boundary \
