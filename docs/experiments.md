@@ -179,3 +179,72 @@ interval。Dual 的安全增益和 utility non-inferiority 必须同时满足预
 6. physical safety（当前协议不支持）。
 
 不得跨级。
+
+## 7. Post-M2 successor：externally grounded L2 与跨层实验
+
+M2 及其既有 gate 不因 successor 计划发生变化。M2 通过后，原来的 480 clean 与 480 attacked 四臂分别
+固定解释为：
+
+- Clean：无 semantic attack、无 execution attack；
+- SABER-only：只有已发表的 SABER semantic attack。
+
+随后新增的 L2 与全链路证据不使用按 ProofAlign predicate 取反的自构造 case 作为主攻击。完整协议见
+[《L2 与跨层攻击实验计划》](l2_and_cross_layer_experiments.md)。核心外部来源为：
+
+- L2-A：Ueda–Blevins remote-manipulator affine transformation attack 的 scaling、reflection、shearing；
+- L2-B：ROS-Industrial red-team PitM 下的 captured-command replay 与 modified replay；
+- L2-C：仅在接口 qualification 支持时迁移 robotic-manipulator stealthy FDIA；
+- Full chain：SABER instruction attack 后，对获得授权的 block 施加冻结的 affine execution attack。
+
+wrong digest/receipt、open window、unknown evidence 和 invalid phase advance 继续属于 A3/A4/Lean formal
+negative suite，只支持 component semantics 与 implementation audit，不单独支持现实攻击 efficacy。
+
+## 8. 扩展后的攻击/防御 factorial
+
+攻击侧：
+
+| Attack cell | Semantic attack | Execution attack |
+|---|---:|---:|
+| Clean | off | off |
+| S-only | SABER | off |
+| B-only | off | published affine attack |
+| Chained | SABER | published affine attack |
+
+防御侧仍为 VLA-only、Semantic-only、Execution-only 与 Dual 四臂。完整 primary 继续使用 60 base
+pairs × 2 seeds；四个 attack bundle 各有 60 × 2 × 4 = 480 个 arm-episodes，最多合计 1920。
+同一 base pair 的两个 seed 共享同一个 outcome-blind attack record。Scaling、reflection、shearing 的
+分配由预注册 deterministic mapping 决定，不允许 outcome-driven replacement 或 best-of-N。
+
+主报告必须逐段分解：
+
+- semantic divergence 与 L1 allow；
+- transformed command 到达 sink；
+- altered command 实际施加；
+- missing/forbidden/harmful effect；
+- false phase advance 或 containment；
+- clean retention、unknown、deadlock 和 time-to-completion。
+
+在线 effect observer 不能充当唯一 ground truth；独立 evaluator 必须读取 raw simulator state、实际
+env.step 输入、contact/object/gripper trace。
+
+## 9. 扩展 gate 顺序
+
+~~~text
+current frozen producer/M2 240 episodes
+  -> M2 denominator/signal gate
+  -> existing fixed-trace four-arm identity gate
+  -> 480 clean four-arm episodes
+  -> 480 SABER-only four-arm episodes
+  -> freeze published-attack adaptation/source-parameter mapping
+  -> no-outcome attack-hook qualification
+  -> affine-only L2 case study
+  -> ROS replay/PitM case study
+  -> FDIA case only if interface qualification passes
+  -> 480 chained SABER × affine four-arm episodes
+  -> independent terminal audit and cluster-bootstrap analysis
+~~~
+
+L2 结果统一称为 externally grounded case studies；全链路结果称为 SABER 与 published affine attack
+的 cross-layer composition study。当前协议不支持将它们扩写为通用执行安全、完整硬件 attestation 或
+标准化 L2 benchmark。
+
