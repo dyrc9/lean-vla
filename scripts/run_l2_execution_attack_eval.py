@@ -166,6 +166,12 @@ def _annotate_payload(
             ),
             "perfect_undetectability_claim_eligible": False,
             "measured_execution_value": "env.step input",
+            "l1_semantic_alignment": bool(
+                metadata.get("semantic_runtime_enabled")
+            ),
+            "l2_execution_integrity": bool(
+                metadata.get("semantic_runtime_enabled")
+            ),
         }
     )
     payload["metadata"] = metadata
@@ -278,6 +284,8 @@ def parse_args() -> argparse.Namespace:
             "  --execution-attack-placement "
             "{pre_boundary,post_boundary_truthful,"
             "post_boundary_forged}\n"
+            "  --l1-semantic-alignment {on,off}\n"
+            "  --l2-execution-integrity {on,off}\n"
         )
     parser = argparse.ArgumentParser(add_help=False)
     parser.add_argument(
@@ -290,6 +298,16 @@ def parse_args() -> argparse.Namespace:
         choices=[placement.value for placement in AttackPlacement],
         default=AttackPlacement.PRE_BOUNDARY.value,
     )
+    parser.add_argument(
+        "--l1-semantic-alignment",
+        choices=("on", "off"),
+        default=None,
+    )
+    parser.add_argument(
+        "--l2-execution-integrity",
+        choices=("on", "off"),
+        default=None,
+    )
     l2_args, remaining = parser.parse_known_args()
     original_argv = sys.argv
     try:
@@ -299,6 +317,33 @@ def parse_args() -> argparse.Namespace:
         sys.argv = original_argv
     args.execution_attack_family = l2_args.execution_attack_family
     args.execution_attack_placement = l2_args.execution_attack_placement
+    switches = (
+        l2_args.l1_semantic_alignment,
+        l2_args.l2_execution_integrity,
+    )
+    if (switches[0] is None) != (switches[1] is None):
+        parser.error(
+            "both --l1-semantic-alignment and "
+            "--l2-execution-integrity are required together"
+        )
+    if switches[0] is None:
+        enabled = bool(args.semantic_runtime)
+        args.l1_semantic_alignment = "on" if enabled else "off"
+        args.l2_execution_integrity = "on" if enabled else "off"
+        return args
+    if switches in (("on", "off"), ("off", "on")):
+        parser.error(
+            "mixed live L1/L2 arms are not implemented; run the "
+            "no-dispatch four-arm identity gate first"
+        )
+    requested_semantic_runtime = switches == ("on", "on")
+    if bool(args.semantic_runtime) and not requested_semantic_runtime:
+        parser.error(
+            "--semantic-runtime conflicts with explicit off/off arm switches"
+        )
+    args.semantic_runtime = requested_semantic_runtime
+    args.l1_semantic_alignment = switches[0]
+    args.l2_execution_integrity = switches[1]
     return args
 
 

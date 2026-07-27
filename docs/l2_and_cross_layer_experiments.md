@@ -169,6 +169,14 @@ transaction 层无法检测；要解决必须加入受信的 controller/actuator
   - 锁定原文矩阵和接口约束。
 - `tests/test_semantic_online_runner.py`
   - 锁定 P1/P2/P3 和 VLA-only 实际 dispatch 行为。
+- `src/proofalign/benchmark/l2_four_arm_identity.py`
+  - 从同一个 `(H,7)` source action chunk 计算四臂 routing；
+  - 独立表达 L1 semantic alignment 与 L2 execution integrity 两个 treatment switch；
+  - 对 P1/P2/P3 只生成预期 dispatch/detection truth table，不创建 sink 或 simulator。
+- `scripts/run_l2_four_arm_identity_gate.py`
+  - 固化 12 个 no-outcome component cases × 4 arms；
+  - 检查 shared-source digest、四种 treatment pair、P1/P2/P3 routing 与 zero dispatch；
+  - 输出 `proofalign_l2_four_arm_identity_gate_v1.json`，但不授权 online rollout。
 - `experiments/proofalign_l2_interface_feasibility_v1.json`
   - 冻结当前支持/不支持矩阵和 claim gate。
 
@@ -250,6 +258,16 @@ Semantic-only 与 Execution-only。必须先增加并测试：
 
 四臂还必须在相同 policy seed/base pair 下共享相同 source action chunk；否则不是干净的 2×2
 ablation。该 gate 未通过前，不能启动 1920-episode 计划。
+
+当前 no-dispatch component gate 已完成：四臂共享同一个 source chunk digest，四种开关组合唯一，
+且三个 source family 的 P1/P2/P3 routing truth table 已由单测锁定。这个结果只关闭 component
+identity 子门；live runner 仍缺 Semantic-only、Execution-only 的独立 dispatch 路径，因此
+`four_arm_confirmatory_ready` 继续为 `false`。
+
+successor CLI 已保留上述两个显式开关。当前只允许 `off/off` 和 `on/on`；`on/off`、`off/on`
+会在 policy/model 加载前 fail closed。原因是现有 v4 proposal schema 没有“semantic binding
+disabled、但 raw source ActionBlock 可被 L2 独立授权”的合法记录类型，不能用伪造的 known semantic
+artifact 冒充 Execution-only。
 
 ### Gate L2-3：冻结 primary
 
