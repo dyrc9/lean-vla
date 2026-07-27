@@ -69,6 +69,7 @@ def test_pick_up_accepts_approach_progress() -> None:
     assert result.known
     assert result.semantic_compatible
     assert result.motion_atoms == ("approach",)
+    assert result.predicted_effect_atoms == ("closer_to_target",)
     assert result.progress_margin is not None and result.progress_margin > 0
 
 

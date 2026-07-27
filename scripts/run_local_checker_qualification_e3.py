@@ -32,12 +32,12 @@ from proofalign.semantic_local_checker import (  # noqa: E402
 PROTOCOL_PATH = (
     REPO_ROOT
     / "experiments"
-    / "proofalign_local_checker_e3_protocol.json"
+    / "proofalign_local_checker_e3_v2_protocol.json"
 )
 OUTPUT_ROOT = (
     REPO_ROOT
     / "results"
-    / "proofalign_local_checker_e3_20260725_fresh1"
+    / "proofalign_local_checker_e3_v2_20260727_fresh1"
 )
 RESULT_PATH = OUTPUT_ROOT / "qualification.json"
 CHECKSUMS_PATH = OUTPUT_ROOT / "SHA256SUMS"
@@ -107,11 +107,35 @@ def canonical_text(value: Any) -> str:
 def build_protocol() -> dict[str, Any]:
     return {
         "schema": "proofalign.local-checker-qualification-e3.v1",
-        "protocol_id": "proofalign-local-checker-e3-20260725",
-        "status": "frozen_outcome_blind_analytic_corpus",
-        "created_at": "2026-07-25T00:00:00+08:00",
+        "protocol_id": "proofalign-local-checker-e3-v2-20260727",
+        "status": (
+            "frozen_outcome_blind_analytic_corpus_successor_after_e9_smoke"
+        ),
+        "created_at": "2026-07-27T10:20:00+08:00",
+        "predecessor": {
+            "protocol_path": (
+                "experiments/proofalign_local_checker_e3_protocol.json"
+            ),
+            "protocol_sha256": (
+                "8e2e342e9d4831a56dc11e5183316ed4d92361f34de87a76b517872fa2317fa2"
+            ),
+            "result_path": (
+                "results/proofalign_local_checker_e3_20260725_fresh1/"
+                "qualification.json"
+            ),
+            "result_sha256": (
+                "7b3caed12d812d290162f1ca1d2c82c1ce7b7454e1c66782ca91696023b463ad"
+            ),
+        },
+        "successor_change": (
+            "Version 2 distinguishes predicted approach progress "
+            "(closer_to_target) from terminal neighborhood occupancy "
+            "(near_target). Corpus, thresholds, and labels are otherwise "
+            "unchanged and remain outcome-blind."
+        ),
         "checker": {
             "id": "proofalign-semantic-executable-prefix-checker",
+            "version": "2",
             "config": LocalCheckerConfig().__dict__,
         },
         "corpus": {

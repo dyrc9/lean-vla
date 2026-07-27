@@ -34,12 +34,12 @@ from proofalign.semantic_local_checker import (  # noqa: E402
 PROTOCOL_PATH = (
     REPO_ROOT
     / "experiments"
-    / "proofalign_semantic_effect_observer_e5_protocol.json"
+    / "proofalign_semantic_effect_observer_e5_v2_protocol.json"
 )
 OUTPUT_ROOT = (
     REPO_ROOT
     / "results"
-    / "proofalign_semantic_effect_observer_e5_20260725_fresh1"
+    / "proofalign_semantic_effect_observer_e5_v2_20260727_fresh1"
 )
 RESULT_PATH = OUTPUT_ROOT / "qualification.json"
 CHECKSUMS_PATH = OUTPUT_ROOT / "SHA256SUMS"
@@ -112,12 +112,38 @@ def build_protocol() -> dict[str, Any]:
             "proofalign.semantic-effect-observer-qualification-e5.v1"
         ),
         "protocol_id": (
-            "proofalign-semantic-effect-observer-e5-20260725"
+            "proofalign-semantic-effect-observer-e5-v2-20260727"
         ),
-        "status": "frozen_outcome_blind_analytic_transition_corpus",
-        "created_at": "2026-07-25T00:00:00+08:00",
+        "status": (
+            "frozen_outcome_blind_analytic_transition_corpus_"
+            "successor_after_e9_smoke"
+        ),
+        "created_at": "2026-07-27T10:20:00+08:00",
+        "predecessor": {
+            "protocol_path": (
+                "experiments/"
+                "proofalign_semantic_effect_observer_e5_protocol.json"
+            ),
+            "protocol_sha256": (
+                "647a1349250ae2b4e31213639c7376d54c810d7413e662f37f3b811a23ac081a"
+            ),
+            "result_path": (
+                "results/proofalign_semantic_effect_observer_e5_"
+                "20260725_fresh1/qualification.json"
+            ),
+            "result_sha256": (
+                "affcb1500e4b9cdfc624ed93ba9d3c303bbf3070392a2a015c30ce1391e1a72c"
+            ),
+        },
+        "successor_change": (
+            "Version 2 observes closer_to_target for positive approach "
+            "progress and reserves near_target for actual neighborhood "
+            "occupancy. Corpus size, gates, and numeric thresholds are "
+            "unchanged."
+        ),
         "observer": {
             "id": "proofalign-libero-analytic-effect-observer",
+            "version": "2",
             "config": SemanticEffectObserverConfig().__dict__,
         },
         "corpus": {
@@ -289,7 +315,7 @@ def build_cases(protocol: dict[str, Any]) -> list[Case]:
             prefix_complete = True
             release_destination = None
             violations: tuple[str, ...] = ()
-            required = ("command_applied", "near_target")
+            required = ("command_applied", "closer_to_target")
             before = _observation(
                 epoch=epoch,
                 eef=origin,

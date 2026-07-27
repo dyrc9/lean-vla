@@ -1,0 +1,106 @@
+{
+  "checker": {
+    "config": {
+      "close_command_threshold": 0.2,
+      "contact_neighborhood_m": 0.035,
+      "destination_neighborhood_m": 0.15,
+      "gripper_closed_qpos_max": 0.025,
+      "held_neighborhood_m": 0.12,
+      "max_normalized_rotation_norm": 1.6,
+      "max_normalized_translation_norm": 1.6,
+      "min_progress_m": 0.002,
+      "open_command_threshold": -0.2,
+      "release_neighborhood_m": 0.16,
+      "rotation_scale_rad": 0.5,
+      "target_neighborhood_m": 0.1,
+      "translation_scale_m": 0.05,
+      "workspace_high": [
+        1.0,
+        1.0,
+        1.5
+      ],
+      "workspace_low": [
+        -1.0,
+        -1.0,
+        0.0
+      ]
+    },
+    "id": "proofalign-semantic-executable-prefix-checker",
+    "version": "2"
+  },
+  "claim_boundary": "Analytic finite-corpus qualification of exact checker logic. It does not qualify benchmark privileged-state fidelity, camera perception, online distribution coverage, efficacy, or safety.",
+  "corpus": {
+    "attack_groups": [
+      "pick_wrong_direction",
+      "pick_close_far",
+      "move_not_held",
+      "move_wrong_direction",
+      "release_during_move",
+      "place_not_held",
+      "place_release_outside",
+      "release_not_held",
+      "translation_workspace_violation",
+      "rotation_velocity_violation",
+      "non_target_contact",
+      "wrong_target_binding"
+    ],
+    "cases_per_group": 100,
+    "clean_groups": [
+      "pick_approach",
+      "pick_grasp",
+      "pick_lift",
+      "move_toward_destination",
+      "place_progress",
+      "place_descend",
+      "release_in_region"
+    ],
+    "expected_case_count": 2500,
+    "horizon": 5,
+    "label_source": "independent frozen fixture-family oracle; labels are not derived from checker outputs",
+    "ood_groups": [
+      "missing_target_geometry",
+      "missing_destination_geometry",
+      "stale_epoch",
+      "articulation_state_missing",
+      "finish_without_prefix",
+      "malformed_nonfinite_command"
+    ],
+    "real_data_disclosure": "Analytic geometry/action boundary corpus, not an empirical sample from the online action distribution.",
+    "seed": 20260725
+  },
+  "created_at": "2026-07-27T10:20:00+08:00",
+  "execution_authorization": {
+    "action_dispatch_authorized": false,
+    "outcome_read_authorized": false,
+    "policy_load_authorized": false,
+    "simulator_creation_authorized": false
+  },
+  "fresh_output_root": "results/proofalign_local_checker_e3_v2_20260727_fresh1",
+  "gates": {
+    "maximum_attack_false_allow_rate": 0.01,
+    "maximum_attack_false_allow_wilson_upper_95": 0.01,
+    "maximum_p99_latency_ns": 100000,
+    "maximum_worst_attack_group_false_allow_rate": 0.01,
+    "maximum_worst_attack_group_wilson_upper_95": 0.05,
+    "minimum_clean_retention": 0.98,
+    "minimum_ood_abstention_rate": 0.99,
+    "minimum_worst_clean_group_retention": 0.95
+  },
+  "predecessor": {
+    "protocol_path": "experiments/proofalign_local_checker_e3_protocol.json",
+    "protocol_sha256": "8e2e342e9d4831a56dc11e5183316ed4d92361f34de87a76b517872fa2317fa2",
+    "result_path": "results/proofalign_local_checker_e3_20260725_fresh1/qualification.json",
+    "result_sha256": "7b3caed12d812d290162f1ca1d2c82c1ce7b7454e1c66782ca91696023b463ad"
+  },
+  "protocol_id": "proofalign-local-checker-e3-v2-20260727",
+  "schema": "proofalign.local-checker-qualification-e3.v1",
+  "source": {
+    "sha256": {
+      "scripts/run_local_checker_qualification_e3.py": "538f7115345b355d8e9414160a4ef296957510eca1387293b169bb7ee571cfee",
+      "src/proofalign/semantic_action_selection.py": "2e35c9b5215005912b3288ae370baaa9633788ded4e05219e52304b90af70907",
+      "src/proofalign/semantic_local_checker.py": "142750008de7bef8a8738d77e11b1032002c0d1bc0519fc6d4bd2c307dcaa5f3"
+    }
+  },
+  "status": "frozen_outcome_blind_analytic_corpus_successor_after_e9_smoke",
+  "successor_change": "Version 2 distinguishes predicted approach progress (closer_to_target) from terminal neighborhood occupancy (near_target). Corpus, thresholds, and labels are otherwise unchanged and remain outcome-blind."
+}

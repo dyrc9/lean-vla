@@ -94,9 +94,9 @@
   },
   "preflight_bindings": {
     "evidence_path": "experiments/proofalign_deployment_perception_e7_preflight.json",
-    "evidence_sha256": "eb86c67f47291b3bd40c6b4f0dc236910fda50d1e61f2dc24b7fdad955e92c3f",
+    "evidence_sha256": "db1ad114d2e7aa980306a3288ce7783b09ce2a3ca1e88ec3ab07161c4bdb55e8",
     "protocol_path": "experiments/proofalign_deployment_perception_e7_protocol.json",
-    "protocol_sha256": "0e9451c6b40b555e22023850d3cd512c4c599956529ce222d9d0c935576573a0"
+    "protocol_sha256": "5795dd487f6d748ea518081fb6d33aaee02e0a3815f71c22e5a117acfe77952e"
   },
   "required_snapshot_fields": {
     "calibration": [
@@ -138,7 +138,7 @@
   "snapshot_schema": "proofalign.deployment-perception-snapshot-e7.v1",
   "source_binding": {
     "path": "scripts/prepare_deployment_perception_dataset_e7.py",
-    "sha256": "feaf4d68c49eee9b05d3e040f33cc4fe42ec3fa533ece8fc3fa434d0a962b68c"
+    "sha256": "e64bd9467d3fdfadfde9bda950660f6e38e16bbe2c3a5895b913ab053b9d1035"
   },
   "status": "frozen_before_collection_or_model_selection",
   "visibility_values": [

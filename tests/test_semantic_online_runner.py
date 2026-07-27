@@ -259,6 +259,7 @@ def test_online_runner_seals_qualified_observed_effects(
     assert evidence["unknown_reason"] is None
     assert evidence["observed_effect_atoms"] == (
         "command_applied",
+        "closer_to_target",
         "near_target",
     )
     assert transaction["effect_verdict"] == "allow"

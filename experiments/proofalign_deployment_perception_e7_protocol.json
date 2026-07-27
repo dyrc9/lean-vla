@@ -158,10 +158,10 @@
   ],
   "schema": "proofalign.deployment-perception-preflight-e7.v1",
   "source_sha256": {
-    "scripts/run_deployment_perception_preflight_e7.py": "ecea7fdf6ff93f24f25ed53cfb2d3ea91ab1bbb482fb942d182facc92ec46f2f",
+    "scripts/run_deployment_perception_preflight_e7.py": "329e59c66875239ae15146f61fbb8edc2aee753063b11c7766f3342b5e58f951",
     "scripts/run_pi05_selector_qualification_e1.py": "b4391cc39fd4a745d751bf00ac8ccdd82dfaa825417ace00ea9ee79b5653b0f2",
-    "src/proofalign/semantic_effect_observer.py": "b181ad367f5038025162d227e7e8c287ee3f67fdd7d44d1884f79f584c6f91e5",
-    "src/proofalign/semantic_local_checker.py": "3c7e883a8fd78d50d017203158a285c8d2ee77d83ce64cae1843e85eb88b1dff"
+    "src/proofalign/semantic_effect_observer.py": "57a367cddf58e92500c01d55e51f35d3f678b22d4886ecb6fc2e1a625d0e20f9",
+    "src/proofalign/semantic_local_checker.py": "142750008de7bef8a8738d77e11b1032002c0d1bc0519fc6d4bd2c307dcaa5f3"
   },
   "status": "frozen_data_adequacy_gate_before_model_selection"
 }

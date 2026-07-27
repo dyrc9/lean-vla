@@ -9,9 +9,9 @@
     "simulator_creation_authorized": false
   },
   "input_artifact_sha256": {
-    "experiments/proofalign_deterministic_selector_e1f.json": "5c46c66aa185425036a8b3b99b6c039783727dfe547753732bbf5cad20364de8",
-    "experiments/proofalign_deterministic_selector_e1f_protocol.json": "befd5656f908a118ef6eda112132ee350b2553c1c1de44f9337d62eb4db9e355",
-    "experiments/proofalign_local_checker_e3_protocol.json": "8e2e342e9d4831a56dc11e5183316ed4d92361f34de87a76b517872fa2317fa2",
+    "experiments/proofalign_deterministic_selector_e1f.json": "6adaa32ef5e08e565395e0f8009612dc8726bdb5e4551719d6e14cc0a530ffd7",
+    "experiments/proofalign_deterministic_selector_e1f_protocol.json": "1c7f31619f06b79f6b6506ab54eaf0a7f41d4545e2a0c16f84c491c27dbc32a1",
+    "experiments/proofalign_local_checker_e3_v2_protocol.json": "80434b8b076eaf5cf902f6ddf27eb6b701738b1d17d0d9febb36842256802226",
     "experiments/proofalign_pi05_action_conditioning_e2_protocol.json": "079cf5566f49f44cd7ade70cf9cc5a96ef8d539bf5754ad01ad0d1e31e56be6e",
     "experiments/proofalign_pi05_selector_e1_protocol.json": "9ac6f615a8087b6710bee5c5dc5f542fc73383bf162c6e36ef1a475c9cd09ced",
     "experiments/proofalign_semantic_v4_c5_protocol.json": "c5d5e3758fc7b1faf409409e9bfd66bb607ad0a27f892c2356779954871440c5",
@@ -19,7 +19,7 @@
     "experiments/proofalign_semantic_v4_lean_equivalence_c5.json": "bbdadfab998bfb81e2c9b2b9198b5f264ac2f880cc4c1e067c5ae88a83ab512a",
     "results/proofalign_action_conditioning_e2_20260725_fresh1/SHA256SUMS": "7f2ab6470c30b3c2743ca29abe56a5a993e9d01644ea7a4574782dd97b387dcd",
     "results/proofalign_action_conditioning_e2_20260725_fresh1/qualification.json": "ef0d5b0862dd9c17431d60a8202c2c67f43234001545ef6dbb9ad685065ab4ee",
-    "results/proofalign_local_checker_e3_20260725_fresh1/qualification.json": "7b3caed12d812d290162f1ca1d2c82c1ce7b7454e1c66782ca91696023b463ad",
+    "results/proofalign_local_checker_e3_v2_20260727_fresh1/qualification.json": "ed3242d112db98a4585b7007fdf5a8148f7df6c889eaae18c08b2f27ca11b402",
     "results/proofalign_semantic_selector_e1_20260725_fresh1/SHA256SUMS": "fac445ca0d8b7798a8fd4274b6c709bb3215d6d5572c58f6a1ee62b76c27f215",
     "results/proofalign_semantic_selector_e1_20260725_fresh1/qualification.json": "5f3661bb924d2f306d1449f69041b019179808ce547cb2d4dc898e1745f808c1"
   },

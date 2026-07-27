@@ -65,6 +65,37 @@ def test_observer_reports_transport_progress_and_binding_atoms() -> None:
     assert result.progress_margin > 0
 
 
+def test_observer_distinguishes_approach_progress_from_near_target() -> None:
+    before = _observation(
+        epoch=4,
+        eef=(0.0, 0.0, 0.5),
+        target=(0.3, 0.0, 0.5),
+        destination=None,
+        closed=False,
+    )
+    after = _observation(
+        epoch=5,
+        eef=(0.1, 0.0, 0.5),
+        target=(0.3, 0.0, 0.5),
+        destination=None,
+        closed=False,
+    )
+
+    result = SemanticPrefixEffectObserver().observe(
+        semantic_subtask="pick_up(red_mug_1)",
+        before=before,
+        after=after,
+        prefix_complete=True,
+    )
+
+    assert result.observed_effect_atoms == (
+        "command_applied",
+        "closer_to_target",
+    )
+    assert result.progress_margin is not None
+    assert result.progress_margin > 0
+
+
 def test_observer_does_not_infer_release_without_open_gripper() -> None:
     before = _observation(
         epoch=2,

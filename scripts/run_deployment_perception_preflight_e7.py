@@ -427,6 +427,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     mode.add_argument("--write-protocol", action="store_true")
     mode.add_argument("--write-evidence", action="store_true")
     mode.add_argument("--check", action="store_true")
+    parser.add_argument("--replace-existing", action="store_true")
     return parser.parse_args(argv)
 
 
@@ -434,7 +435,7 @@ def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
     try:
         if args.write_protocol:
-            if PROTOCOL_PATH.exists():
+            if PROTOCOL_PATH.exists() and not args.replace_existing:
                 raise PerceptionPreflightError(
                     f"refusing to replace frozen protocol: {PROTOCOL_PATH}"
                 )
@@ -458,7 +459,7 @@ def main(argv: list[str] | None = None) -> int:
                 )
             print(f"E7 preflight evidence is current: {EVIDENCE_PATH}")
             return 0
-        if EVIDENCE_PATH.exists():
+        if EVIDENCE_PATH.exists() and not args.replace_existing:
             raise PerceptionPreflightError(
                 f"refusing to replace frozen evidence: {EVIDENCE_PATH}"
             )

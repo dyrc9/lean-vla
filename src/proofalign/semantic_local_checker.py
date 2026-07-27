@@ -22,7 +22,7 @@ from proofalign.semantic_action_selection import CheckedActionBlock
 
 
 LOCAL_CHECKER_ID = "proofalign-libero-analytic-local-checker"
-LOCAL_CHECKER_VERSION = "1"
+LOCAL_CHECKER_VERSION = "2"
 LOCAL_OBSERVATION_SCHEMA = "proofalign.libero-trusted-local-observation.v1"
 
 
@@ -608,7 +608,7 @@ class SemanticExecutablePrefixChecker:
         effects = (
             ("holding_target",)
             if closes_near or lifts_held
-            else ("near_target",)
+            else ("closer_to_target",)
         )
         return LocalActionAssessment(
             known=True,

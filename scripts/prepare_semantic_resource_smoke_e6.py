@@ -25,17 +25,17 @@ from probe_pi05_semantic_subtasks import (  # noqa: E402
 PROTOCOL_PATH = (
     REPO_ROOT
     / "experiments"
-    / "proofalign_semantic_resource_smoke_e6_protocol.json"
+    / "proofalign_semantic_resource_smoke_e6_v2_protocol.json"
 )
 OUTPUT_ROOT = (
     REPO_ROOT
     / "results"
-    / "proofalign_semantic_resource_smoke_e6_20260725_fresh1"
+    / "proofalign_semantic_resource_smoke_e6_v2_20260727_fresh1"
 )
 CHECKPOINT = Path("/data0/ldx/libero_safety_models/pi05_libero_safety")
 SELECTED_GPU = {
-    "physical_index": 1,
-    "uuid": "GPU-9630f0c1-163a-1dc7-564b-8242ac677a1e",
+    "physical_index": 0,
+    "uuid": "GPU-7ad5c3eb-adf0-f70a-e670-8438701a553e",
     "name": "NVIDIA RTX 6000 Ada Generation",
 }
 SOURCE_PATHS = (
@@ -56,11 +56,11 @@ INPUT_PATHS = (
     ),
     "experiments/proofalign_deterministic_selector_e1f.json",
     (
-        "results/proofalign_local_checker_e3_20260725_fresh1/"
+        "results/proofalign_local_checker_e3_v2_20260727_fresh1/"
         "qualification.json"
     ),
     (
-        "results/proofalign_semantic_effect_observer_e5_20260725_fresh1/"
+        "results/proofalign_semantic_effect_observer_e5_v2_20260727_fresh1/"
         "qualification.json"
     ),
 )
@@ -93,9 +93,19 @@ def canonical_text(value: Any) -> str:
 def build_protocol() -> dict[str, Any]:
     return {
         "schema": "proofalign.semantic-resource-smoke-e6.v1",
-        "protocol_id": "proofalign-semantic-resource-smoke-e6-20260725",
+        "protocol_id": "proofalign-semantic-resource-smoke-e6-v2-20260727",
         "status": "frozen_waiting_explicit_model_load_authorization",
-        "created_at": "2026-07-25T00:00:00+08:00",
+        "created_at": "2026-07-27T00:00:00+08:00",
+        "predecessor": {
+            "path": (
+                "experiments/"
+                "proofalign_semantic_resource_smoke_e6_protocol.json"
+            ),
+            "scope": (
+                "Preserves the E6 workload and gates while rebinding the "
+                "qualified v2 checker/effect-observer stack and a fresh GPU."
+            ),
+        },
         "checkpoint": checkpoint_identity(CHECKPOINT),
         "selected_gpu": SELECTED_GPU,
         "workload": {

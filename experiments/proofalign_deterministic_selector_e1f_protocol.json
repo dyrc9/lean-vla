@@ -60,7 +60,7 @@
   "source": {
     "sha256": {
       "scripts/run_deterministic_selector_qualification_e1f.py": "2d30d0bc96d4cc16dd74d340270b8bff33ca68ebd7045cb076d2bb6f0a632298",
-      "src/proofalign/semantic_local_checker.py": "3c7e883a8fd78d50d017203158a285c8d2ee77d83ce64cae1843e85eb88b1dff",
+      "src/proofalign/semantic_local_checker.py": "142750008de7bef8a8738d77e11b1032002c0d1bc0519fc6d4bd2c307dcaa5f3",
       "src/proofalign/semantic_policy_wrapper.py": "90004b15b6eebe28b177a7e3c73f97a22badbc7a3ce4415cc685c20d2100d047"
     }
   },

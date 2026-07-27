@@ -406,19 +406,19 @@ def build_report() -> dict[str, Any]:
         all(component["complete"] for component in components.values())
         and wiring_complete
     )
-    blockers = [
-        (
+    blockers = []
+    if e7_evidence["missing_requirement_ids"]:
+        blockers.append(
             "deployment perception cannot be qualified from the current "
             "RLDS schema; missing: "
             + ",".join(e7_evidence["missing_requirement_ids"])
-        ),
-        (
+        )
+    if not e8_report["clean_commit_bound"]:
+        blockers.append(
             "semantic source scope is not bound to a clean commit; "
             f"E8 reports {e8_report['not_bound_path_count']} "
             "unbound paths"
-        ),
-        "explicit outcome rollout authorization has not been received",
-    ]
+        )
     if not e6_measurement_complete:
         blockers.insert(
             1,
@@ -438,6 +438,9 @@ def build_report() -> dict[str, Any]:
             1,
             "E6 resource smoke completed but did not qualify",
         )
+    blockers.append(
+        "an outcome-bearing M2/four-arm protocol has not yet been frozen"
+    )
     return {
         "schema": "proofalign.semantic-post-e5-readiness.v1",
         "packet_id": (

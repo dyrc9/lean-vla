@@ -44,12 +44,12 @@ from prepare_semantic_resource_smoke_e6 import (  # noqa: E402
 AUTHORIZED_PROTOCOL_PATH = (
     REPO_ROOT
     / "experiments"
-    / "proofalign_semantic_resource_smoke_e6_authorized_protocol.json"
+    / "proofalign_semantic_resource_smoke_e6_v2_authorized_protocol.json"
 )
 OUTPUT_ROOT = (
     REPO_ROOT
     / "results"
-    / "proofalign_semantic_resource_smoke_e6_20260725_fresh2"
+    / "proofalign_semantic_resource_smoke_e6_v2_20260727_fresh2"
 )
 RESULT_PATH = OUTPUT_ROOT / "measurement.json"
 CHECKSUMS_PATH = OUTPUT_ROOT / "SHA256SUMS"
@@ -84,7 +84,7 @@ def build_authorized_protocol(
             "proofalign.semantic-resource-smoke-e6-authorized.v1"
         ),
         "protocol_id": (
-            "proofalign-semantic-resource-smoke-e6-authorized-20260725"
+            "proofalign-semantic-resource-smoke-e6-v2-authorized-20260727"
         ),
         "status": "authorized_offline_model_resource_measurement",
         "created_at": authorization_received_at,

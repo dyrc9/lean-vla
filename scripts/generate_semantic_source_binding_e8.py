@@ -47,6 +47,7 @@ COMMIT_SCOPE_PATHS = (
     "scripts/run_pi05_action_conditioning_e2.py",
     "scripts/run_pi05_selector_qualification_e1.py",
     "scripts/run_semantic_effect_observer_qualification_e5.py",
+    "scripts/run_semantic_closed_loop_smoke_e9.py",
     "scripts/run_semantic_no_dispatch_four_arm_e4.py",
     "scripts/run_semantic_resource_smoke_e6.py",
     "scripts/run_semantic_v4_fixed_trace_gate.py",
@@ -88,15 +89,17 @@ COMMIT_SCOPE_PATHS = (
     "experiments/proofalign_deterministic_selector_e1f.json",
     "experiments/proofalign_deterministic_selector_e1f_protocol.json",
     "experiments/proofalign_local_checker_e3_protocol.json",
+    "experiments/proofalign_local_checker_e3_v2_protocol.json",
     "experiments/proofalign_pi05_action_conditioning_e2_protocol.json",
     "experiments/proofalign_pi05_selector_e1_protocol.json",
     "experiments/proofalign_semantic_effect_observer_e5_protocol.json",
+    "experiments/proofalign_semantic_effect_observer_e5_v2_protocol.json",
     "experiments/proofalign_semantic_four_arm_e4_protocol.json",
     (
         "experiments/"
-        "proofalign_semantic_resource_smoke_e6_authorized_protocol.json"
+        "proofalign_semantic_resource_smoke_e6_v2_authorized_protocol.json"
     ),
-    "experiments/proofalign_semantic_resource_smoke_e6_protocol.json",
+    "experiments/proofalign_semantic_resource_smoke_e6_v2_protocol.json",
     "experiments/proofalign_semantic_v4_c5_protocol.json",
     (
         "experiments/"
@@ -124,29 +127,29 @@ EVIDENCE_PATHS = (
         "SHA256SUMS"
     ),
     (
-        "results/proofalign_local_checker_e3_20260725_fresh1/"
+        "results/proofalign_local_checker_e3_v2_20260727_fresh1/"
         "qualification.json"
     ),
     (
-        "results/proofalign_local_checker_e3_20260725_fresh1/"
+        "results/proofalign_local_checker_e3_v2_20260727_fresh1/"
         "SHA256SUMS"
     ),
     "results/proofalign_semantic_four_arm_e4_20260725_fresh1.json",
     (
-        "results/proofalign_semantic_effect_observer_e5_"
-        "20260725_fresh1/qualification.json"
+        "results/proofalign_semantic_effect_observer_e5_v2_"
+        "20260727_fresh1/qualification.json"
     ),
     (
-        "results/proofalign_semantic_effect_observer_e5_"
-        "20260725_fresh1/SHA256SUMS"
+        "results/proofalign_semantic_effect_observer_e5_v2_"
+        "20260727_fresh1/SHA256SUMS"
     ),
     (
-        "results/proofalign_semantic_resource_smoke_e6_"
-        "20260725_fresh2/measurement.json"
+        "results/proofalign_semantic_resource_smoke_e6_v2_"
+        "20260727_fresh2/measurement.json"
     ),
     (
-        "results/proofalign_semantic_resource_smoke_e6_"
-        "20260725_fresh2/SHA256SUMS"
+        "results/proofalign_semantic_resource_smoke_e6_v2_"
+        "20260727_fresh2/SHA256SUMS"
     ),
 )
 

@@ -38,7 +38,7 @@
   "protocol_binding": {
     "path": "experiments/proofalign_deployment_perception_e7_protocol.json",
     "protocol_id": "proofalign-deployment-perception-e7-20260725",
-    "sha256": "0e9451c6b40b555e22023850d3cd512c4c599956529ce222d9d0c935576573a0"
+    "sha256": "5795dd487f6d748ea518081fb6d33aaee02e0a3815f71c22e5a117acfe77952e"
   },
   "qualification_ready": false,
   "required_next_artifact": {

@@ -22,7 +22,7 @@ from proofalign.semantic_local_checker import (
 
 
 EFFECT_OBSERVER_ID = "proofalign-libero-analytic-effect-observer"
-EFFECT_OBSERVER_VERSION = "1"
+EFFECT_OBSERVER_VERSION = "2"
 
 
 def _distance(left: Sequence[float], right: Sequence[float]) -> float:
@@ -224,6 +224,8 @@ class SemanticPrefixEffectObserver:
                 <= self.config.target_neighborhood_m
             )
             held = self._held(after, target_after)
+            if progress >= self.config.min_progress_m:
+                effects.append("closer_to_target")
             if near:
                 effects.append("near_target")
             if held:

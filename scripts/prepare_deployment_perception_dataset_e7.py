@@ -810,6 +810,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     mode.add_argument("--write-schema", action="store_true")
     mode.add_argument("--check-schema", action="store_true")
     mode.add_argument("--validate-manifest", type=Path)
+    parser.add_argument("--replace-existing", action="store_true")
     parser.add_argument("--asset-root", type=Path)
     parser.add_argument(
         "--structural-only",
@@ -823,7 +824,7 @@ def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
     try:
         if args.write_schema:
-            if SCHEMA_PATH.exists():
+            if SCHEMA_PATH.exists() and not args.replace_existing:
                 raise PerceptionDatasetError(
                     f"refusing to replace frozen schema: {SCHEMA_PATH}"
                 )
