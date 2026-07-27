@@ -66,8 +66,8 @@
       "openpi_head_commit": "15a9616a00943ada6c20a0f158e3adb39df2ccac",
       "openpi_tracked_worktree_clean": true,
       "path": "experiments/proofalign_semantic_source_binding_e8_audit.json",
-      "repository_head_commit": "34d7afebb4351e40d057d3f8e3dd19dfa434894d",
-      "sha256": "bfb63fe8b328894db1d78b08150c893a171b4764afa432d1cc76c1cae55f3a22"
+      "repository_head_commit": "447c00692e2152095a97928826a786aff9e4d56e",
+      "sha256": "5cb95a68757dfc4d65586cc8002b190195e7ce42e662a948466119bf13acdb5d"
     },
     "qualified_observer_online_wiring": {
       "complete": true,
@@ -117,7 +117,7 @@
   "schema": "proofalign.semantic-post-e5-readiness.v1",
   "simulator_created_during_readiness_audit": false,
   "source_bindings": {
-    "Makefile": "f2fc7a35076b8059c208d64b77d1a48ce44b9a314e604ae06466e7fffb3acbb9",
+    "Makefile": "c0abb37074a73e12f97baadc5e1844fdc7c474942c4d373ad339eaad2c4d07e3",
     "scripts/check_all.sh": "cb691dd33d9c2bd8d12822d0e65a70c6961579d20d9e8d17e5298061b945d4e8",
     "scripts/generate_semantic_source_binding_e8.py": "27c7b766dd94d711ebf639b2b1de0be900a0c89aba3d76003bc7a2c9f76b2988",
     "scripts/prepare_deployment_perception_dataset_e7.py": "e64bd9467d3fdfadfde9bda950660f6e38e16bbe2c3a5895b913ab053b9d1035",
@@ -133,7 +133,7 @@
     "tests/test_deployment_perception_preflight_e7.py": "3454b4b4faf7c315db4b0327a4b6336f2e4b9725eab06fe8b95d840ad1f4d8d7",
     "tests/test_semantic_effect_observer.py": "3775fdce344f6e8c2caba0e50aedfb452901576bae02b4c5e348784477abd26f",
     "tests/test_semantic_effect_observer_qualification_e5.py": "c29ea497d5b5ed1971de488454bb8188dc8f6e12cb6cc1c18164fc58e134ef19",
-    "tests/test_semantic_online_runner.py": "6e6bcba44dbf1ebf98424bda5bd9072afa7856f98ecbcf9231a29c590ed8fa43",
+    "tests/test_semantic_online_runner.py": "e1e38b61eae945c574996d6a4b998779d837aab163ff5b4a35d0a1f3b66f6877",
     "tests/test_semantic_resource_smoke_e6.py": "42d6469f7a23ab85536bfecc90db7642b8642d14a4f8bf5d062d0b3a0db828d9",
     "tests/test_semantic_source_binding_e8.py": "835a6654cef325357e6fb51d02c4b441eb004b4ab6cd06ac3eeb293c59976702"
   }
