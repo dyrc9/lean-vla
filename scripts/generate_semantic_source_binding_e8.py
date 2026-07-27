@@ -235,6 +235,17 @@ def _repository_state(path: Path) -> dict[str, Any]:
 
 
 def build_report() -> dict[str, Any]:
+    scope_commit = _git(
+        "log",
+        "-1",
+        "--format=%H",
+        "--",
+        *COMMIT_SCOPE_PATHS,
+    )
+    if not scope_commit:
+        raise SourceBindingError(
+            "semantic commit scope has no binding commit"
+        )
     statuses = _status_map(COMMIT_SCOPE_PATHS)
     tracked = _tracked_paths(COMMIT_SCOPE_PATHS)
     source_rows = []
@@ -275,16 +286,10 @@ def build_report() -> dict[str, Any]:
                 ),
             }
         )
-    full_status = _git(
+    tracked_status = _git(
         "status",
         "--porcelain=v1",
-        "--untracked-files=all",
-        "--",
-        ".",
-        (
-            ":(exclude)"
-            + str(DEFAULT_PACKET.relative_to(REPO_ROOT))
-        ),
+        "--untracked-files=no",
     )
     scope_complete = all(row["exists"] for row in source_rows)
     scope_bound = scope_complete and all(
@@ -314,10 +319,19 @@ def build_report() -> dict[str, Any]:
             if clean_commit_bound
             else "semantic_source_binding_not_clean"
         ),
-        "repository_head_commit": _git("rev-parse", "HEAD"),
-        "repository_head_tree": _git("rev-parse", "HEAD^{tree}"),
-        "repository_fully_clean": not bool(full_status),
-        "repository_status_row_count": len(full_status.splitlines()),
+        "repository_head_commit": scope_commit,
+        "repository_head_tree": _git(
+            "rev-parse", f"{scope_commit}^{{tree}}"
+        ),
+        "repository_binding_semantics": (
+            "latest commit that changed the frozen semantic commit scope; "
+            "later commits may contain only out-of-scope protocols or "
+            "audit packets"
+        ),
+        "repository_fully_clean": not bool(tracked_status),
+        "repository_status_row_count": len(
+            tracked_status.splitlines()
+        ),
         "commit_scope_complete": scope_complete,
         "commit_scope_bound_to_head": scope_bound,
         "evidence_inventory_complete": evidence_complete,
@@ -337,7 +351,8 @@ def build_report() -> dict[str, Any]:
         "actions_dispatched": False,
         "claim_boundary": (
             "This read-only audit binds the current semantic source scope, "
-            "local evidence inventory, repository HEAD, and OpenPI checkout. "
+            "local evidence inventory, latest source-scope commit, and "
+            "OpenPI checkout. "
             "A not-clean classification does not modify or commit the "
             "worktree. A clean classification would establish provenance "
             "only, not perception quality, efficacy, outcome, or safety."

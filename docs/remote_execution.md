@@ -94,6 +94,10 @@ M1 runner dry-runs：
 - resource budget；
 - fresh output directory。
 
+执行 successor 的 repository binding 允许当前 HEAD 位于冻结 source commit 之后，但要求冻结 commit/tree
+真实存在且为当前 HEAD 的祖先、所有 protocol source SHA-256 仍完全一致、tracked worktree 干净。这样
+可以把协议和审计包提交到 Git，同时任何受控源码变化仍会 fail closed。
+
 ## 5. M2 执行顺序
 
 1. 先通过 selector、local-checker、semantic identity、Lean evidence 和资源 no-outcome gate；

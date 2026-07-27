@@ -179,28 +179,66 @@ def preflight(
         "expected_tree": source.get("repository_tree"),
     }
     if repository_report["expected_commit"] is not None:
-        head = saber_io.run_command(
+        bound_commit = saber_io.run_command(
+            (
+                "git",
+                "rev-parse",
+                "--verify",
+                f"{repository_report['expected_commit']}^{{commit}}",
+            ),
+            cwd=REPO_ROOT,
+        )
+        bound_tree = saber_io.run_command(
+            (
+                "git",
+                "rev-parse",
+                f"{repository_report['expected_commit']}^{{tree}}",
+            ),
+            cwd=REPO_ROOT,
+        )
+        current_head = saber_io.run_command(
             ("git", "rev-parse", "HEAD"), cwd=REPO_ROOT
         )
-        tree = saber_io.run_command(
+        current_tree = saber_io.run_command(
             ("git", "rev-parse", "HEAD^{tree}"), cwd=REPO_ROOT
+        )
+        ancestor = saber_io.run_command(
+            (
+                "git",
+                "merge-base",
+                "--is-ancestor",
+                str(repository_report["expected_commit"]),
+                "HEAD",
+            ),
+            cwd=REPO_ROOT,
         )
         repository_report.update(
             {
-                "observed_commit": head.stdout.strip(),
-                "observed_tree": tree.stdout.strip(),
+                "bound_commit": bound_commit.stdout.strip(),
+                "bound_tree": bound_tree.stdout.strip(),
+                "current_head": current_head.stdout.strip(),
+                "current_tree": current_tree.stdout.strip(),
+                "bound_commit_is_current_ancestor": (
+                    ancestor.returncode == 0
+                ),
                 "matches": (
-                    head.returncode == 0
-                    and tree.returncode == 0
-                    and head.stdout.strip()
+                    bound_commit.returncode == 0
+                    and bound_tree.returncode == 0
+                    and current_head.returncode == 0
+                    and current_tree.returncode == 0
+                    and ancestor.returncode == 0
+                    and bound_commit.stdout.strip()
                     == repository_report["expected_commit"]
-                    and tree.stdout.strip()
+                    and bound_tree.stdout.strip()
                     == repository_report["expected_tree"]
                 ),
             }
         )
         if not repository_report["matches"]:
-            blockers.append("ProofAlign repository commit/tree mismatch")
+            blockers.append(
+                "ProofAlign bound source commit/tree is invalid or not "
+                "an ancestor of current HEAD"
+            )
     checkout_roots = {
         "saber": REPO_ROOT / "external" / "SABER",
         "libero_safety": REPO_ROOT / "external" / "LIBERO-Safety",

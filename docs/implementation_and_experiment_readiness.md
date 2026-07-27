@@ -395,7 +395,9 @@ geometry/mask、held/contact 或独立 split，不能混作 E7 supervision。
 只读 E8 audit 已绑定主仓库 HEAD、semantic commit scope、本地 E1–E6 evidence inventory 和 OpenPI
 checkout。当前 evidence inventory 完整，OpenPI tracked worktree 干净并绑定
 `15a9616a00943ada6c20a0f158e3adb39df2ccac`；semantic scope 未绑定路径为 `0`，分类为
-`semantic_source_binding_clean`。audit 仍不执行隐式 `git add/commit`。
+`semantic_source_binding_clean`。audit 绑定“最后一个修改 frozen semantic scope 的 commit”；后续只含
+out-of-scope execution protocol/audit packet 的提交不会制造自引用失效，但任何 scoped source 变化仍会
+产生新 binding commit。audit 仍不执行隐式 `git add/commit`。
 
 ## 7. Outcome gate 与停止条件
 
