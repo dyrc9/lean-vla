@@ -22,8 +22,20 @@ hypothesis-generating evidence：
 - fresh root、append-only ledger、首个 invalid 即停止、checkpoint/source/checkout/GPU/disk gate
   均 fail closed。
 
-当前 GPU 门槛要求 policy/EGL 两张不同卡且启动前各 `<1024 MiB`。现只有一张满足，one-shot
-launcher 已准备在第二张卡满足条件后自动预检并启动。
+两张 GPU 满足门槛后 fresh1 已 one-shot 启动，但在首个
+`semantic_only_affordance_task0` episode、任何 dispatch 和 ledger row 之前 fail closed：
+trusted BDDL goal 只有 `Checkgrippercontactpart`，已资格化 semantic wrapper 没有可信物体部位几何，
+不能初始化。fresh1 已封存，禁止 resume/retry/replacement。
+
+随后完成的 60-pair 静态 audit 表明：
+
+- 45/60 base pairs（75%）可初始化，15 个 unsupported pairs 全部来自 affordance suite；
+- 原 full-population clean gate 要求 unknown/unbound rate 为 0，因此 480-episode 设计在结构上不可通过；
+- 不得把 `Checkgrippercontactpart` 偷换成普通 `pick_up`，否则会虚构不存在的 part-level checker 能力；
+- support-conditioned 45-pair population 有 90 units、每 stage 360 episodes；
+- 该支持集上的 post-outcome M2 描述性 transition 为 30/67=`44.78%`，cluster 95% CI
+  `[30.77%,59.09%]`，仍超过披露的 40% exploratory threshold；
+- 新 fresh2 需要明确披露 population change 并单独授权，不能称为 fresh1 重试或 full-population 结果。
 
 ## 0A. 2026-07-27 qualification 与工程 smoke checkpoint
 
@@ -70,14 +82,15 @@ benchmark privileged-geometry no-outcome stack 完整；deployment perception �
 
 剩余 blocker：
 
-1. 等待两张 `<1024 MiB` 的不同 GPU，通过完整 preflight 后启动 480 clean exploratory four-arm；
-2. 四臂先过 480 clean 的 utility/deadlock/unknown gate，才可另行授权 480 attacked；
-3. 所有结果保持 exploratory 标签，不得回写原 50% M2 nonpass；
-4. E9 暴露的 K=1 clean availability/deadlock 风险进入报告，不反向修改冻结阈值；
-5. E7 perception 数据仍阻断 camera-only deployment claim，但不阻断明确标注 privileged geometry 的
+1. 决定是否授权 45-pair/360-episode support-conditioned clean fresh2；
+2. 若授权，先冻结新 population/schedule/analysis/preflight，禁止复用已失败 fresh1；
+3. support-conditioned clean gate 通过后，才可另行授权同一支持集上的 attacked stage；
+4. 所有结果保持 exploratory 标签，不得回写原 50% M2 nonpass；
+5. E9 暴露的 K=1 clean availability/deadlock 风险进入报告，不反向修改冻结阈值；
+6. E7 perception 数据仍阻断 camera-only deployment claim，但不阻断明确标注 privileged geometry 的
    benchmark 论文主线。
 
-## 0A. 2026-07-24 历史收工 checkpoint
+## 0B. 2026-07-24 历史收工 checkpoint
 
 本轮代码和生成 artifact 已保存到当前 worktree，**尚未提交 Git commit**，也没有运行任何新
 efficacy/outcome rollout。
@@ -286,10 +299,10 @@ M1 producer/victim、shared runner、fixed-trace exporter、validator 和 outcom
 
 ### M2：240 episode
 
-用户已授权继续推进。60-record outcome-blind producer 已完成并通过 record bundle 终态校验；M2
-victim successor 已冻结并启动 240 个 VLA-only episode。运行期间只允许资源/进度监控，terminal
-validator 完成前不读取 condition-level outcome。M2 gate 通过后才执行 v4 fixed-trace，并签发 clean
-四臂授权；clean gate 通过后才签发 attacked 四臂授权。
+60-record outcome-blind producer 与 240-episode victim 均已终态完成。M2 rate 为 45.35%，原 50%
+confirmatory gate nonpass；结果后 40% exploratory continuation 的 full-population fresh1 又因
+semantic support coverage 在首单元 dispatch 前 fail closed。当前等待是否授权 45-pair
+support-conditioned fresh2。
 
 ## 6. 当前可声称与不可声称
 
@@ -336,9 +349,11 @@ C1 semantic digest schema（已实现）
   -> M2 victim 240 episodes（已完成；45.35%，原 50% gate 非通过）
   -> outcome-informed 40% exploratory successor（已冻结）
   -> v4 fixed-trace shadow（因缺少可信逐 proposal geometry 而跳过，不伪造）
-  -> v4 clean 480 episodes（探索性 Stage B 已授权，等待两张合格 GPU）
+  -> v4 clean fresh1（首 episode 初始化前 fail closed，0 valid ledger rows）
+  -> semantic-support audit（45/60 supported；full population structurally infeasible）
+  -> support-conditioned clean 360 episodes（待新授权）
   -> clean terminal gate
-  -> v4 attacked 480 episodes（须 clean pass + 新授权）
+  -> support-conditioned attacked 360 episodes（须 clean pass + 新授权）
 ```
 
 当前继续使用预先资格化的 deterministic task-FSM L1。40% 只改变是否继续收集探索性四臂证据，

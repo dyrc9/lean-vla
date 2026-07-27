@@ -219,3 +219,9 @@ M2 artifact 不含新 v4 fixed-trace 所需的逐 proposal trusted geometry，�
 都不得用后续 outcome 回调 selector/checker threshold。论文结果应依次报告 attack validity、
 selector/checker risk-coverage、L2 conformance、clean utility、attacked efficacy、Dual interaction 和
 failure taxonomy；不能用一个 aggregate “safe success” 隐藏 unknown、deadlock 或 residual proxy。
+
+首次 full-population clean 启动又暴露了一个必须进入论文的 coverage failure：15/60 affordance pairs
+只给出 `Checkgrippercontactpart` goal，而当前 trusted observation/checker 没有 part-level geometry；
+fresh1 因此在首单元、dispatch 前 fail closed。静态支持率为 45/60=75%，原 `unknown=0` clean gate
+结构上不可通过。任何后续 45-pair support-conditioned 结果必须与 full-population failure 并列报告，
+不能把它写成原 480 设计完成。

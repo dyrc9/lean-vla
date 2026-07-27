@@ -13,7 +13,7 @@
 | Ueda--Blevins coordinated perfectly-undetectable FDIA | **不支持** | 不得声称复现或反驳其 stealth theorem |
 | ROS captured-prefix replay | **v4 component semantics 已有，online capture/transport 尚缺** | 目前只能报告 component/fixed-trace 结果 |
 | feedback-linearized FDIA | **`interface_not_supported`** | 不进入 LIBERO efficacy |
-| 2×2 防御四臂 online rollout | **clean 探索性 Stage B 已授权，等待两张合格 GPU** | 先做 480 clean gate；attacked 仍未授权 |
+| 2×2 防御四臂 online rollout | **full-population fresh1 已 dispatch 前 fail closed** | 15/60 affordance pairs 缺 part geometry；45-pair support-conditioned fresh2 待授权 |
 | SABER × L2 confirmatory | **原 M2 50% gate 已 terminal nonpass** | 后续 40% continuation 只能作为 post-outcome exploratory evidence |
 
 这里最重要的修正是：当前 runner 能记录的是 `env.step` 的输入，不是低层 actuator 最终执行值。因此
@@ -306,7 +306,10 @@ confirmatory 的额外 efficacy gate。
 - missing/invalid 作为 failure + unsafe + deadlock + unknown 的保守规则。
 
 原冻结不等于授权。M2 terminal nonpass 后，结果后 40% exploratory successor 只授权 clean Stage B；
-M2 artifact 缺少逐 proposal trusted geometry，因此 Stage A 不补造；clean pass 前 Stage C 仍不得执行。
+M2 artifact 缺少逐 proposal trusted geometry，因此 Stage A 不补造。fresh1 又证明 15/60 affordance
+pairs 无法初始化已资格化 wrapper；原 full-population `unknown=0` clean gate 结构上不可通过。支持集
+45 pairs 的 M2 rate 为 44.78%，但任何 360-episode fresh2 都属于再次修改 population 的探索性后继，
+需要单独授权；clean pass 前 Stage C 仍不得执行。
 P1/P2/P3 保留为次要 trust-boundary stress table：P2 的 after-one-step detection 不能算 prevention，P3
 也不能期待被 exact digest 单独解决。
 
