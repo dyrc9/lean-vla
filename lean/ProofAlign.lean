@@ -1,1 +1,2 @@
 import ProofAlign.IntegrityCore
+import ProofAlign.SemanticIntegrityCore

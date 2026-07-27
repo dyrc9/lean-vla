@@ -6,6 +6,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
+from proofalign.integrity_v4_runtime import AppliedAction
+
 
 class LiberoRuntimeError(RuntimeError):
     """Raised when the external LIBERO runtime cannot be loaded or normalized."""
@@ -22,6 +24,24 @@ class LiberoTaskRuntime:
     init_state: Any | None
     init_state_id: int
     metadata: dict[str, Any] = field(default_factory=dict)
+
+
+@dataclass
+class AuthorizedLiberoActionSink:
+    """The sole semantic-runtime owner of the side-effecting ``env.step``."""
+
+    env: Any
+    sink_id: str = "proofalign-v4-authorized-libero-env-step"
+
+    def apply(
+        self, action: tuple[float, ...], *, now_ns: int
+    ) -> AppliedAction:
+        transition = normalize_env_step(self.env.step(list(action)))
+        return AppliedAction(
+            action=action,
+            applied_at_ns=now_ns,
+            transition=transition,
+        )
 
 
 def load_libero_task_runtime(
@@ -180,6 +200,7 @@ def _select_init_state(init_states: Any, init_state_id: int) -> Any:
 
 
 __all__ = [
+    "AuthorizedLiberoActionSink",
     "LiberoRuntimeError",
     "LiberoTaskRuntime",
     "load_libero_task_runtime",

@@ -1,0 +1,115 @@
+{
+  "c5_component_closure_complete": true,
+  "claim_boundary": "This packet proves only semantic v4 C5 no-dispatch component closure and freshness. It contains no selector/checker efficacy result, victim outcome, simulator rollout, or physical-safety evidence, and it authorizes no execution.",
+  "components": {
+    "canonical_protocol": {
+      "complete": true,
+      "path": "experiments/proofalign_semantic_v4_c5_protocol.json",
+      "sha256": "c5d5e3758fc7b1faf409409e9bfd66bb607ad0a27f892c2356779954871440c5"
+    },
+    "fixed_trace_identity": {
+      "case_count": 8,
+      "complete": true,
+      "identity_pass": true,
+      "path": "experiments/proofalign_semantic_v4_fixed_trace_c5.json",
+      "row_count": 32,
+      "sha256": "b0e9bd5c399d6b5d84e50e80878c841edf5e2dc645c59e84847b58afbcd2db7a"
+    },
+    "future_fresh_roots": {
+      "complete": false,
+      "roots": {
+        "action_conditioning": {
+          "absent": false,
+          "absolute_path": "/home/ldx/lean-vla/results/proofalign_action_conditioning_e2_20260725_fresh1",
+          "path": "results/proofalign_action_conditioning_e2_20260725_fresh1"
+        },
+        "local_checker_qualification": {
+          "absent": false,
+          "absolute_path": "/home/ldx/lean-vla/results/proofalign_local_checker_e3_20260725_fresh1",
+          "path": "results/proofalign_local_checker_e3_20260725_fresh1"
+        },
+        "no_attack_smoke": {
+          "absent": true,
+          "absolute_path": "/home/ldx/lean-vla/results/proofalign_semantic_no_attack_smoke_p1_20260725_fresh1",
+          "path": "results/proofalign_semantic_no_attack_smoke_p1_20260725_fresh1"
+        },
+        "no_dispatch_four_arm": {
+          "absent": false,
+          "absolute_path": "/home/ldx/lean-vla/results/proofalign_semantic_four_arm_e4_20260725_fresh1.json",
+          "path": "results/proofalign_semantic_four_arm_e4_20260725_fresh1.json"
+        },
+        "selector_qualification": {
+          "absent": false,
+          "absolute_path": "/home/ldx/lean-vla/results/proofalign_semantic_selector_e1_20260725_fresh1",
+          "path": "results/proofalign_semantic_selector_e1_20260725_fresh1"
+        }
+      }
+    },
+    "legacy_v3_artifacts_unchanged": {
+      "bindings": {
+        "experiments/proofalign_action_block_fixed_trace_g4_smoke.json": "9153e6028bad3d24abc729152134592a74d10aeaa8ea7649dda954eb3566636a",
+        "experiments/proofalign_fast_lean_equivalence_m1.json": "67510a22583df8f7efaabdbcf7badb9d622112efa37d7e49e37fd6b76c01f164"
+      },
+      "complete": true
+    },
+    "semantic_v4_lean_scoped_evidence": {
+      "complete": true,
+      "machine_checked_full_refinement_complete": false,
+      "path": "experiments/proofalign_semantic_v4_lean_equivalence_c5.json",
+      "sha256": "bbdadfab998bfb81e2c9b2b9198b5f264ac2f880cc4c1e067c5ae88a83ab512a",
+      "theorem_anchor_count": 14
+    },
+    "top_level_check_wiring": {
+      "check_all_fragments": {
+        "scripts/generate_semantic_v4_equivalence_evidence.py --check": true,
+        "scripts/run_semantic_v4_fixed_trace_gate.py --check": true,
+        "scripts/validate_semantic_v4_c5_readiness.py --check": true
+      },
+      "complete": true,
+      "makefile_fragments": {
+        "scripts/generate_semantic_v4_equivalence_evidence.py --check": true,
+        "scripts/run_semantic_v4_fixed_trace_gate.py --check": true,
+        "scripts/validate_semantic_v4_c5_readiness.py --check": true,
+        "semantic-v4-c5-check:": true
+      }
+    },
+    "zero_dispatch_boundary": {
+      "complete": true,
+      "dispatch_attempt_count": 0,
+      "outcomes_observed": false,
+      "policy_loaded": false,
+      "simulator_created": false,
+      "sink_created": false
+    }
+  },
+  "current_blockers": [
+    "E1 selector qualification is incomplete",
+    "E2 action-conditioning qualification is incomplete",
+    "E3 local-checker qualification is incomplete",
+    "semantic effect observer is not qualified",
+    "at least one planned semantic qualification output root exists",
+    "authorized latency/resource smoke is incomplete",
+    "semantic v4 implementation is not bound to a clean commit",
+    "efficacy rollout remains explicitly unauthorized"
+  ],
+  "efficacy_rollout_authorized": false,
+  "efficacy_rollout_ready": false,
+  "gpu_runtime_queried": false,
+  "next_qualification_stage_ready": false,
+  "outcomes_observed_or_generated": false,
+  "packet_id": "proofalign-semantic-v4-c5-readiness-20260725-v1",
+  "policy_loaded": false,
+  "protocol_binding": {
+    "path": "experiments/proofalign_semantic_v4_c5_protocol.json",
+    "protocol_id": "proofalign-semantic-v4-c5-20260724",
+    "sha256": "c5d5e3758fc7b1faf409409e9bfd66bb607ad0a27f892c2356779954871440c5"
+  },
+  "readiness_source_bindings": {
+    "Makefile": "f2fc7a35076b8059c208d64b77d1a48ce44b9a314e604ae06466e7fffb3acbb9",
+    "scripts/check_all.sh": "cb691dd33d9c2bd8d12822d0e65a70c6961579d20d9e8d17e5298061b945d4e8",
+    "scripts/validate_semantic_v4_c5_readiness.py": "c69f1d6321d5ac243ff75d812d17523261841212bfb3f596640052d6f9efcfe2",
+    "tests/test_semantic_v4_c5.py": "0bb28f6b7bc824356cb7cde45cc20f6b90009a54383bc0d29b0e57d60b6b18f7"
+  },
+  "schema": "proofalign.semantic-v4-c5-readiness.v1",
+  "simulator_steps": 0
+}

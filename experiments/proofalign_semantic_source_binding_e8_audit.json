@@ -1,0 +1,717 @@
+{
+  "actions_dispatched": false,
+  "audit_id": "proofalign-semantic-source-binding-e8-20260725",
+  "audit_source": {
+    "path": "scripts/generate_semantic_source_binding_e8.py",
+    "sha256": "27c7b766dd94d711ebf639b2b1de0be900a0c89aba3d76003bc7a2c9f76b2988"
+  },
+  "claim_boundary": "This read-only audit binds the current semantic source scope, local evidence inventory, latest source-scope commit, and OpenPI checkout. A not-clean classification does not modify or commit the worktree. A clean classification would establish provenance only, not perception quality, efficacy, outcome, or safety.",
+  "classification": "semantic_source_binding_clean",
+  "clean_commit_bound": true,
+  "commit_scope": [
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "Makefile",
+      "sha256": "f2fc7a35076b8059c208d64b77d1a48ce44b9a314e604ae06466e7fffb3acbb9",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "README.md",
+      "sha256": "560562d4d81817c1301b5b4bdc6dc9fb65ac49301fb9436262a0316dc912e241",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "docs/action_block_assessment.md",
+      "sha256": "ca2d000df064a05b605ffc09647909c2d8220b42e5ee7ab8293727a99c71465f",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "docs/experiments.md",
+      "sha256": "eb30e4d4882b8d15bf9e593a7ed8b17a9f5a64c4a8d10ae2712ee6cbb17e418b",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "docs/implementation_and_experiment_readiness.md",
+      "sha256": "8cfdacbeb95ad4f31a7ac3425fb320ddc9914e44c51ecffbc82dbde9cfd3a6fe",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "docs/method.md",
+      "sha256": "fcfd9d9224bef60c6008ec173124a01466ad19420ed7b611ff4cdf94cfc5d40a",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "docs/progress_and_plan.md",
+      "sha256": "6d667edac11e17ab065fa0ddd927efb833503c8b58fb04ebf2b30dcd194ee430",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "docs/remote_execution.md",
+      "sha256": "341edeb073b4e3cefdbbc773a81974b11af366e95292d08cc1cfbdd04697c3f5",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "docs/semantic_subtask_hierarchy.md",
+      "sha256": "373f355483ea072608e2cc053ffa53656c72cf98be48bc61045ebc3b02ac42c9",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "docs/semantic_subtask_pilot.md",
+      "sha256": "391eb4c118fb700068a7e387ac99aba5bdef03ff38bde2f48fd999634d35b312",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "docs/trusted_semantic_boundary.md",
+      "sha256": "92f159c0b8d66606ba6d40841921d558f9e5a3480a3d6e3f4e776f25fde32b51",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "lean/ProofAlign.lean",
+      "sha256": "92caa58f8c731f46d9439dea80e0a63eab128db55fc4e6695b891ec9ffbd666a",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "lean/ProofAlign/SemanticIntegrityCore.lean",
+      "sha256": "f3eadafc10d63c6037f6c387c1dfcab32dc9b57ef0ccabe798a2d98bd3c45afa",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/check_all.sh",
+      "sha256": "cb691dd33d9c2bd8d12822d0e65a70c6961579d20d9e8d17e5298061b945d4e8",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/generate_semantic_source_binding_e8.py",
+      "sha256": "27c7b766dd94d711ebf639b2b1de0be900a0c89aba3d76003bc7a2c9f76b2988",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/generate_semantic_v4_equivalence_evidence.py",
+      "sha256": "2161a4dac6b26d3601250208affb3634ad9b1e63635652611fc9c8093ffd994c",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/prepare_deployment_perception_dataset_e7.py",
+      "sha256": "e64bd9467d3fdfadfde9bda950660f6e38e16bbe2c3a5895b913ab053b9d1035",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/prepare_semantic_resource_smoke_e6.py",
+      "sha256": "3a7a4cd8a6dbb98c60ade4ea109cd507f55ad417c2450cc4a9d553c766a53ee7",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/run_deployment_perception_dataset_qualification_e7.py",
+      "sha256": "e92d3f0a9139036e4f775ad0275db93fb53c3d2ec8095331fbf72fab1b736ad1",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/run_deployment_perception_preflight_e7.py",
+      "sha256": "329e59c66875239ae15146f61fbb8edc2aee753063b11c7766f3342b5e58f951",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/run_deterministic_selector_qualification_e1f.py",
+      "sha256": "2d30d0bc96d4cc16dd74d340270b8bff33ca68ebd7045cb076d2bb6f0a632298",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/run_liberosafety_pi05_openpi_eval.py",
+      "sha256": "115a14c05e88e63964aab3c0fdcd9ed79c6ea973f22bf63d10b1a12e52dc4db9",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/run_local_checker_qualification_e3.py",
+      "sha256": "538f7115345b355d8e9414160a4ef296957510eca1387293b169bb7ee571cfee",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/run_pi05_action_conditioning_e2.py",
+      "sha256": "535289b2c0dc9b8e6aee0354e9815385a7669b2bf71865b9c93630d45f76ffb3",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/run_pi05_selector_qualification_e1.py",
+      "sha256": "b4391cc39fd4a745d751bf00ac8ccdd82dfaa825417ace00ea9ee79b5653b0f2",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/run_semantic_effect_observer_qualification_e5.py",
+      "sha256": "896e100f15def8b959b69a37479a962b4fd503ca38533fc761dbbe60fe34f909",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/run_semantic_closed_loop_smoke_e9.py",
+      "sha256": "3feefb5d366b99cd14f487039b130a3d40aa504959fbb6588f8fa5ca4420d3ed",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/run_semantic_no_dispatch_four_arm_e4.py",
+      "sha256": "86567d354a5725cc300e18ef80a893ba1eb6f19649a303e986a860c2bef7c175",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/run_semantic_resource_smoke_e6.py",
+      "sha256": "41011e500a42bc09cda7b9ded69fb6c0735c5862787ecf0baf803d23b160476f",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/run_semantic_v4_fixed_trace_gate.py",
+      "sha256": "6bf3bdda03af031bfcc0f9197df2770c74183f7b83b1909f1cd42844c060e3e4",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/validate_deterministic_selector_e1f.py",
+      "sha256": "f3d2d710a8b5d09fc88479e27ab228c22c51aa5da1fb592b10e8655e322a05fe",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/validate_local_checker_qualification_e3.py",
+      "sha256": "91f423fe3661cc2be0da8b58d725cbd690113d44bd776805ecc566348846a082",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/validate_pi05_selector_qualification_e1.py",
+      "sha256": "da38b0e2b6a00fc077bfe97a46117411f3b813af7c79623de724f16f857f55fd",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/validate_semantic_post_e5_readiness.py",
+      "sha256": "01f423d96e501da836f66849203e342ea59556e6619dae9a287915cf2828dae1",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/validate_semantic_v4_c5_readiness.py",
+      "sha256": "c69f1d6321d5ac243ff75d812d17523261841212bfb3f596640052d6f9efcfe2",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "src/proofalign/benchmark/semantic_four_arm_runner.py",
+      "sha256": "a7071aad55ed62d733bd82937864348141e16f35cbe1306536bdc9ce15e8ba68",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "src/proofalign/integrity_v4_models.py",
+      "sha256": "576f6b6f5303e52327d119a277b6523620cbeb047d98748f6d0700f9881ca214",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "src/proofalign/integrity_v4_runtime.py",
+      "sha256": "93fe8c0c4a06780be7f4aeaddc8f6f70178963245b8a2e74647c70441cedea8f",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "src/proofalign/semantic_effect_observer.py",
+      "sha256": "57a367cddf58e92500c01d55e51f35d3f678b22d4886ecb6fc2e1a625d0e20f9",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "src/proofalign/semantic_local_checker.py",
+      "sha256": "142750008de7bef8a8738d77e11b1032002c0d1bc0519fc6d4bd2c307dcaa5f3",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "src/proofalign/semantic_policy_wrapper.py",
+      "sha256": "90004b15b6eebe28b177a7e3c73f97a22badbc7a3ce4415cc685c20d2100d047",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_deployment_perception_dataset_qualification_e7.py",
+      "sha256": "0b7f4514c8b52c60e285a3647b4f66bff66147b4a1a57402addd67a11d770a3d",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_deployment_perception_preflight_e7.py",
+      "sha256": "3454b4b4faf7c315db4b0327a4b6336f2e4b9725eab06fe8b95d840ad1f4d8d7",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_deterministic_selector_qualification.py",
+      "sha256": "6ce793a6f84d6eedf4beff2ad3bdf99f8f05f9acbad696b17fd6c7a25b95b6ed",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_integrity_v4_models.py",
+      "sha256": "9e9f6cc1f84fd5a2211cb06f1326c3fc1b437587a5658394d5d7397239773fe5",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_integrity_v4_runtime.py",
+      "sha256": "18b0f535835ad57260af82a567ed16b69c772dde9fd7acde30d036f91099dd5a",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_local_checker_qualification_e3.py",
+      "sha256": "23c209fd61acdd06d2ba844333a400af03f48ce5aad9b7595fdbed1f41d8c6d1",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_pi05_action_conditioning_e2.py",
+      "sha256": "507c9ff3d6141d6dd712e93654f52dedd3e8c30c02d0a1afeee7b5fce67f71ed",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_pi05_selector_qualification.py",
+      "sha256": "6cac49052cb241b2b91b485a34e13d6da436e918ddf6d7d25a41393626b03c21",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_semantic_effect_observer.py",
+      "sha256": "3775fdce344f6e8c2caba0e50aedfb452901576bae02b4c5e348784477abd26f",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_semantic_effect_observer_qualification_e5.py",
+      "sha256": "c29ea497d5b5ed1971de488454bb8188dc8f6e12cb6cc1c18164fc58e134ef19",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_semantic_local_checker.py",
+      "sha256": "ab4d61815dbefbe808a69cbc1f3695d90c1abf05767ea4336248a61daf80103d",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_semantic_no_dispatch_four_arm_e4.py",
+      "sha256": "e6c7e0b03ac5f836ae8e08e93b1945627e6bede76e1d008b48b39bab4fb81eaf",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_semantic_online_runner.py",
+      "sha256": "6e6bcba44dbf1ebf98424bda5bd9072afa7856f98ecbcf9231a29c590ed8fa43",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_semantic_policy_wrapper.py",
+      "sha256": "545360b49f7e4119a01d6a29a2f5f1b7d9595b70bd10c36d453e753b73e4eecd",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_semantic_post_e5_readiness.py",
+      "sha256": "0cb9e2ba1e915e3ae08dca19755a480d87983397daa11e7ebf7ada8e4a48d8da",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_semantic_resource_smoke_e6.py",
+      "sha256": "42d6469f7a23ab85536bfecc90db7642b8642d14a4f8bf5d062d0b3a0db828d9",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_semantic_source_binding_e8.py",
+      "sha256": "835a6654cef325357e6fb51d02c4b441eb004b4ab6cd06ac3eeb293c59976702",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_semantic_v4_c5.py",
+      "sha256": "0bb28f6b7bc824356cb7cde45cc20f6b90009a54383bc0d29b0e57d60b6b18f7",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_deployment_perception_e7_preflight.json",
+      "sha256": "db1ad114d2e7aa980306a3288ce7783b09ce2a3ca1e88ec3ab07161c4bdb55e8",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_deployment_perception_e7_protocol.json",
+      "sha256": "5795dd487f6d748ea518081fb6d33aaee02e0a3815f71c22e5a117acfe77952e",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_deployment_perception_supervision_schema_e7.json",
+      "sha256": "c69b8df37a9523c1369c55fd3a3e546d12f5c9550b01a7abf4da942c6c0b0747",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_deterministic_selector_e1f.json",
+      "sha256": "6adaa32ef5e08e565395e0f8009612dc8726bdb5e4551719d6e14cc0a530ffd7",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_deterministic_selector_e1f_protocol.json",
+      "sha256": "1c7f31619f06b79f6b6506ab54eaf0a7f41d4545e2a0c16f84c491c27dbc32a1",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_local_checker_e3_protocol.json",
+      "sha256": "8e2e342e9d4831a56dc11e5183316ed4d92361f34de87a76b517872fa2317fa2",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_local_checker_e3_v2_protocol.json",
+      "sha256": "80434b8b076eaf5cf902f6ddf27eb6b701738b1d17d0d9febb36842256802226",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_pi05_action_conditioning_e2_protocol.json",
+      "sha256": "079cf5566f49f44cd7ade70cf9cc5a96ef8d539bf5754ad01ad0d1e31e56be6e",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_pi05_selector_e1_protocol.json",
+      "sha256": "9ac6f615a8087b6710bee5c5dc5f542fc73383bf162c6e36ef1a475c9cd09ced",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_semantic_effect_observer_e5_protocol.json",
+      "sha256": "647a1349250ae2b4e31213639c7376d54c810d7413e662f37f3b811a23ac081a",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_semantic_effect_observer_e5_v2_protocol.json",
+      "sha256": "8d00b06c802ee99df465aea9f519cd8b881d855d723290fc29a9b734eb862b71",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_semantic_four_arm_e4_protocol.json",
+      "sha256": "effb66d224f26dfd8cbd1b479ccc4c71a565e8075c23ef7475feed0ef325401b",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_semantic_resource_smoke_e6_v2_authorized_protocol.json",
+      "sha256": "eda241426256ee2f8ef71faacf55a336e5a9bbb243c0fccc1252d990bd19c1c7",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_semantic_resource_smoke_e6_v2_protocol.json",
+      "sha256": "9ed2c7cc78a2f1e33a39a738ac86182511a64c01892362c35ac8ad6af66eab1f",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_semantic_v4_c5_protocol.json",
+      "sha256": "c5d5e3758fc7b1faf409409e9bfd66bb607ad0a27f892c2356779954871440c5",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_semantic_v4_c5_readiness_packet_v1.json",
+      "sha256": "04f72878aedf56d0e9d50e959b0a8540dbcb98422f49a7fc15979f07c6716456",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_semantic_v4_fixed_trace_c5.json",
+      "sha256": "b0e9bd5c399d6b5d84e50e80878c841edf5e2dc645c59e84847b58afbcd2db7a",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_semantic_v4_lean_equivalence_c5.json",
+      "sha256": "bbdadfab998bfb81e2c9b2b9198b5f264ac2f880cc4c1e067c5ae88a83ab512a",
+      "tracked": true
+    }
+  ],
+  "commit_scope_bound_to_head": true,
+  "commit_scope_complete": true,
+  "evidence_inventory": [
+    {
+      "exists": true,
+      "ignored_by_git": true,
+      "path": "results/proofalign_semantic_selector_e1_20260725_fresh1/qualification.json",
+      "sha256": "5f3661bb924d2f306d1449f69041b019179808ce547cb2d4dc898e1745f808c1"
+    },
+    {
+      "exists": true,
+      "ignored_by_git": true,
+      "path": "results/proofalign_semantic_selector_e1_20260725_fresh1/SHA256SUMS",
+      "sha256": "fac445ca0d8b7798a8fd4274b6c709bb3215d6d5572c58f6a1ee62b76c27f215"
+    },
+    {
+      "exists": true,
+      "ignored_by_git": true,
+      "path": "results/proofalign_action_conditioning_e2_20260725_fresh1/qualification.json",
+      "sha256": "ef0d5b0862dd9c17431d60a8202c2c67f43234001545ef6dbb9ad685065ab4ee"
+    },
+    {
+      "exists": true,
+      "ignored_by_git": true,
+      "path": "results/proofalign_action_conditioning_e2_20260725_fresh1/SHA256SUMS",
+      "sha256": "7f2ab6470c30b3c2743ca29abe56a5a993e9d01644ea7a4574782dd97b387dcd"
+    },
+    {
+      "exists": true,
+      "ignored_by_git": true,
+      "path": "results/proofalign_local_checker_e3_v2_20260727_fresh1/qualification.json",
+      "sha256": "ed3242d112db98a4585b7007fdf5a8148f7df6c889eaae18c08b2f27ca11b402"
+    },
+    {
+      "exists": true,
+      "ignored_by_git": true,
+      "path": "results/proofalign_local_checker_e3_v2_20260727_fresh1/SHA256SUMS",
+      "sha256": "a28ed162f8b15dbc1f310ced7b64793eb1f0ed0c6b54cc92efda6d26f0b0823e"
+    },
+    {
+      "exists": true,
+      "ignored_by_git": true,
+      "path": "results/proofalign_semantic_four_arm_e4_20260725_fresh1.json",
+      "sha256": "f503dd6a58d84de5c744647d1040a1b31306e91305eb6fbd718abddf5e59ce71"
+    },
+    {
+      "exists": true,
+      "ignored_by_git": true,
+      "path": "results/proofalign_semantic_effect_observer_e5_v2_20260727_fresh1/qualification.json",
+      "sha256": "2cfcc985486d411f76aed3fe8347f8bbbfdf6af6df8a5da7fc911f37852baff9"
+    },
+    {
+      "exists": true,
+      "ignored_by_git": true,
+      "path": "results/proofalign_semantic_effect_observer_e5_v2_20260727_fresh1/SHA256SUMS",
+      "sha256": "feda404e12860304d3e9247de9f1a361f6c7a7172e085406b06606361fae280d"
+    },
+    {
+      "exists": true,
+      "ignored_by_git": true,
+      "path": "results/proofalign_semantic_resource_smoke_e6_v2_20260727_fresh2/measurement.json",
+      "sha256": "c3ed8574769f491183dcc6ab063c7edb292d7eaa21f1cff2b80222161e6c00e4"
+    },
+    {
+      "exists": true,
+      "ignored_by_git": true,
+      "path": "results/proofalign_semantic_resource_smoke_e6_v2_20260727_fresh2/SHA256SUMS",
+      "sha256": "9d0ac8a79299f1ee1ce70511c2393ecaaf370044952031b7ab3d1c177393a6a4"
+    }
+  ],
+  "evidence_inventory_complete": true,
+  "not_bound_path_count": 0,
+  "not_bound_paths": [],
+  "openpi_binding": {
+    "head_commit": "15a9616a00943ada6c20a0f158e3adb39df2ccac",
+    "path": "/home/ldx/lean-vla/external/openpi",
+    "tracked_status_rows": [],
+    "tracked_worktree_clean": true
+  },
+  "outcomes_observed_or_generated": false,
+  "policy_loaded": false,
+  "repository_binding_semantics": "latest commit that changed the frozen semantic commit scope; later commits may contain only out-of-scope protocols or audit packets",
+  "repository_fully_clean": true,
+  "repository_head_commit": "34d7afebb4351e40d057d3f8e3dd19dfa434894d",
+  "repository_head_tree": "74bb6ff3d5977d1a4ea6aaf24f33a1964eafe98a",
+  "repository_status_row_count": 0,
+  "schema": "proofalign.semantic-source-binding-e8-audit.v1",
+  "simulator_created": false
+}

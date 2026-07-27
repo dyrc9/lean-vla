@@ -1,0 +1,89 @@
+{
+  "schema": "proofalign.saber-confirmatory-producer-protocol.v1",
+  "protocol_id": "saber-confirmatory-p1-producer-m1-readiness-20260724",
+  "protocol_status": "m1_implementation_frozen_execution_not_authorized",
+  "created_at": "2026-07-24T00:00:00+08:00",
+  "victim_outcomes_observed": false,
+  "confirmatory_preregistration": {
+    "path": "experiments/saber_confirmatory_preregistration_v1.json",
+    "protocol_id": "saber-confirmatory-independent-p1-design-20260723",
+    "sha256": "169b08b673cc4b8684ea0dab069649cff09ad07193bfd4cd1b25486ecbfbb21a"
+  },
+  "record_policy": {
+    "required_record_count": 60,
+    "producer_seed": 83,
+    "one_generation_per_base_pair": true,
+    "one_record_shared_only_across_two_frozen_seed_replicates": true,
+    "best_of_n_selection_allowed": false,
+    "regeneration_or_replacement_allowed": false,
+    "victim_rollout_visible": false,
+    "victim_outcome_visible": false,
+    "failure_action": "terminal_failed_no_replacement"
+  },
+  "attack_agent": {
+    "objective": "constraint_violation",
+    "tool_sets": [
+      "prompt"
+    ],
+    "model_name": "saber-hf-constraint-violation-confirmatory-p1",
+    "project": "saber-hf-eval-constraint-violation-confirmatory-p1",
+    "model_path": "/data0/ldx/saber/outputs/hf_merged_attack_agents/constraint_violation",
+    "model_sha256": {
+      "config.json": "9ab32f0ccf8c2257d5d514b88ae312a2b83dfd22133f8d5e920252777443f085",
+      "model-00001-of-00002.safetensors": "5494a71cd4e0f07483c863b5b8f681f72631edd3327f52d0bfc591b02a7b17dd",
+      "model-00002-of-00002.safetensors": "c5b04b4dc0aad30056eed340ee06542ff8c096ee1c0003539d7d0bf0bca0d506",
+      "model.safetensors.index.json": "446488e522e2869be7ae879c735637a46375f0cc8aadc4e9fe01bbb88f5c87ff",
+      "tokenizer.json": "9c5ae00e602b8860cbd784ba82a8aa14e8feecec692e7076590d014d7b7fdafa"
+    },
+    "max_sequence_length": 8192,
+    "gpu_memory_utilization": 0.45,
+    "max_turns": 8,
+    "max_edit_chars": 200,
+    "record_schema": "proofalign.saber-exact-task-record.v2",
+    "art_context_rule": "init_chat_model_inside_wrap_rollout"
+  },
+  "source": {
+    "saber_commit": "22ad50642a2aec11d00d43b9c0f36d2788bd487f",
+    "saber_local_patch_commit": "22ad50642a2aec11d00d43b9c0f36d2788bd487f",
+    "libero_safety_commit": "ef0f79b70fc50c5fb612a1bbc1cf8b6c033a702a",
+    "openpi_commit": "15a9616a00943ada6c20a0f158e3adb39df2ccac",
+    "sha256": {
+      "scripts/generate_saber_confirmatory_records.py": "dff5468e61d636ba853c6729291c9ba6afdc5daea27353f33f3645d3d0b0c718",
+      "src/proofalign/benchmark/confirmatory.py": "08ad92480e1a8459bcdd9dc834ebe6e8cae850ae86e17d4b0c70546590df77c5",
+      "src/proofalign/benchmark/saber_producer.py": "bf3749758a638bac393b6b5aa4cd9f7445c69505bae41bd6c1c1b75aebe42bf8",
+      "scripts/generate_saber_threat_records_r2.py": "23d9fc430ebf6a57eae9387a485683d90d9b51c8de1f479316027442b41d494b",
+      "scripts/saber_io.py": "ed368a570a7742a2a5cfa74db9da12a8ea6358377cde8a732c7b9c072bc21af4",
+      "external/SABER/eval_attack_vla.py": "ce1cfabe05a01e5b584a813aa0a4b3731e963ea0a8637c3e04e8fe4af85b45b7",
+      "external/SABER/agent/vla_rollout.py": "dbcacd983b84b491fd9922781fdd9bb42394622e8a154dd8a5576d33372bc16f",
+      "external/SABER/tools/prompt_attack.py": "0a0649e5001159600c5698bc34334a4f06bc9a9f95dfc28e574f91241c213215",
+      "external/SABER/rwd_func/rwd.py": "1da8c3a0dc695b1fd0bdde1d295a8c4966a2a625f20d028b6e71ab49aa14ef7e",
+      "external/LIBERO-Safety/libero/libero/benchmark/vla_safety_task_map.py": "ea256e8aa8711615606eb19a713b7e3af2774af4320a23dde8b8b2f13681e006"
+    }
+  },
+  "artifact_policy": {
+    "manifest": "run_manifest.json",
+    "producer_ledger": "producer_ledger.jsonl",
+    "attack_records": "attack_records.json",
+    "summary": "summary.json",
+    "checksums": "SHA256SUMS",
+    "transcripts": "transcripts/"
+  },
+  "resource_budget": {
+    "attack_gpu_count": 2,
+    "selected_gpu_prelaunch_memory_used_mib_max_exclusive": 1000,
+    "generation_attempt_cap": 60,
+    "replacement_attempt_cap": 0,
+    "output_disk_cap_gib": 1,
+    "minimum_free_disk_gib_at_launch": 20,
+    "cpu_core_cap": 32,
+    "ram_gib_cap": 128,
+    "wall_clock_cap_requires_authorized_smoke_measurement": true
+  },
+  "fresh_root": "results/saber_confirmatory_producer_p1_20260724_fresh1",
+  "execution_authorization": {
+    "attack_record_generation_authorized": false,
+    "victim_rollout_authorized": false,
+    "defense_rollout_authorized": false,
+    "authorization_note": "M1 implementation artifact only; a separate clean-commit execution protocol and explicit user authorization are required."
+  }
+}

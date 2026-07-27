@@ -1,0 +1,365 @@
+{
+  "all_scoped_cases_match": true,
+  "bindings": {
+    "fixed_trace_evidence": {
+      "classification": "c5_no_dispatch_identity_pass",
+      "path": "experiments/proofalign_semantic_v4_fixed_trace_c5.json",
+      "sha256": "b0e9bd5c399d6b5d84e50e80878c841edf5e2dc645c59e84847b58afbcd2db7a"
+    },
+    "lean_source": {
+      "path": "lean/ProofAlign/SemanticIntegrityCore.lean",
+      "sha256": "f3eadafc10d63c6037f6c387c1dfcab32dc9b57ef0ccabe798a2d98bd3c45afa",
+      "theorems": [
+        "semantic_switch_truth_table",
+        "execution_switch_truth_table",
+        "four_arm_nominal_truth_table",
+        "semantic_refutation_truth_table",
+        "execution_unknown_truth_table",
+        "authorization_binds_semantic_identity",
+        "authorization_binds_exact_final_command",
+        "consumed_authorization_not_available",
+        "every_bound_receipt_uses_same_authorization",
+        "every_bound_receipt_applies_exact_action",
+        "unknown_effects_block_execution_alignment",
+        "incomplete_prefix_blocks_execution_alignment",
+        "execution_enabled_phase_advance_requires_alignment",
+        "phase_advance_requires_contract_completion"
+      ]
+    },
+    "legacy_v3_artifacts": {
+      "experiments/proofalign_action_block_fixed_trace_g4_smoke.json": "9153e6028bad3d24abc729152134592a74d10aeaa8ea7649dda954eb3566636a",
+      "experiments/proofalign_fast_lean_equivalence_m1.json": "67510a22583df8f7efaabdbcf7badb9d622112efa37d7e49e37fd6b76c01f164"
+    },
+    "protocol": {
+      "path": "experiments/proofalign_semantic_v4_c5_protocol.json",
+      "protocol_id": "proofalign-semantic-v4-c5-20260724",
+      "sha256": "c5d5e3758fc7b1faf409409e9bfd66bb607ad0a27f892c2356779954871440c5"
+    },
+    "python_sources": {
+      "scripts/generate_semantic_v4_equivalence_evidence.py": "2161a4dac6b26d3601250208affb3634ad9b1e63635652611fc9c8093ffd994c",
+      "scripts/run_semantic_v4_fixed_trace_gate.py": "6bf3bdda03af031bfcc0f9197df2770c74183f7b83b1909f1cd42844c060e3e4",
+      "src/proofalign/benchmark/semantic_four_arm_runner.py": "a7071aad55ed62d733bd82937864348141e16f35cbe1306536bdc9ce15e8ba68",
+      "src/proofalign/integrity_v4_models.py": "576f6b6f5303e52327d119a277b6523620cbeb047d98748f6d0700f9881ca214",
+      "src/proofalign/integrity_v4_runtime.py": "93fe8c0c4a06780be7f4aeaddc8f6f70178963245b8a2e74647c70441cedea8f"
+    }
+  },
+  "claim_boundary": "Named Lean theorems and deterministic Python truth-table cases share current source digests. This is scoped equivalence evidence, not a complete refinement proof.",
+  "classification": "c5_scoped_equivalence_pass",
+  "dispatch_attempt_count": 0,
+  "evidence_id": "proofalign-semantic-v4-python-lean-c5-20260724",
+  "lean_build_required": true,
+  "outcomes_observed": false,
+  "schema": "proofalign.semantic-v4-python-lean-equivalence-evidence.v1",
+  "scope": {
+    "covered": [
+      "semantic/execution treatment-switch truth table",
+      "semantic context/subtask/prompt authorization identity",
+      "exact final command binding",
+      "authorization one-use predicate",
+      "same-authorization ordered step receipt binding",
+      "exact applied-action receipt binding",
+      "unknown-effect and incomplete-prefix phase gating"
+    ],
+    "machine_checked_full_refinement_complete": false,
+    "not_covered": [
+      "complete Python-to-Lean serialization refinement",
+      "compiled Lean execution in the online runner",
+      "selector or local-checker statistical correctness",
+      "semantic effect observer correctness",
+      "floating-point or simulator equivalence",
+      "physical safety"
+    ]
+  },
+  "simulator_created": false,
+  "truth_table_case_count": 32,
+  "truth_table_cases": [
+    {
+      "arm": "vla_only",
+      "case": "nominal",
+      "core_verdict": "allow",
+      "execution_enabled": false,
+      "execution_verdict": "disabled",
+      "semantic_enabled": false,
+      "semantic_verdict": "disabled"
+    },
+    {
+      "arm": "semantic_only",
+      "case": "nominal",
+      "core_verdict": "allow",
+      "execution_enabled": false,
+      "execution_verdict": "disabled",
+      "semantic_enabled": true,
+      "semantic_verdict": "proven"
+    },
+    {
+      "arm": "execution_only",
+      "case": "nominal",
+      "core_verdict": "allow",
+      "execution_enabled": true,
+      "execution_verdict": "proven",
+      "semantic_enabled": false,
+      "semantic_verdict": "disabled"
+    },
+    {
+      "arm": "dual",
+      "case": "nominal",
+      "core_verdict": "allow",
+      "execution_enabled": true,
+      "execution_verdict": "proven",
+      "semantic_enabled": true,
+      "semantic_verdict": "proven"
+    },
+    {
+      "arm": "vla_only",
+      "case": "semantic_mismatch",
+      "core_verdict": "allow",
+      "execution_enabled": false,
+      "execution_verdict": "disabled",
+      "semantic_enabled": false,
+      "semantic_verdict": "disabled"
+    },
+    {
+      "arm": "semantic_only",
+      "case": "semantic_mismatch",
+      "core_verdict": "reject",
+      "execution_enabled": false,
+      "execution_verdict": "disabled",
+      "semantic_enabled": true,
+      "semantic_verdict": "refuted"
+    },
+    {
+      "arm": "execution_only",
+      "case": "semantic_mismatch",
+      "core_verdict": "allow",
+      "execution_enabled": true,
+      "execution_verdict": "proven",
+      "semantic_enabled": false,
+      "semantic_verdict": "disabled"
+    },
+    {
+      "arm": "dual",
+      "case": "semantic_mismatch",
+      "core_verdict": "reject",
+      "execution_enabled": true,
+      "execution_verdict": "proven",
+      "semantic_enabled": true,
+      "semantic_verdict": "refuted"
+    },
+    {
+      "arm": "vla_only",
+      "case": "stale_state",
+      "core_verdict": "allow",
+      "execution_enabled": false,
+      "execution_verdict": "disabled",
+      "semantic_enabled": false,
+      "semantic_verdict": "disabled"
+    },
+    {
+      "arm": "semantic_only",
+      "case": "stale_state",
+      "core_verdict": "allow",
+      "execution_enabled": false,
+      "execution_verdict": "disabled",
+      "semantic_enabled": true,
+      "semantic_verdict": "proven"
+    },
+    {
+      "arm": "execution_only",
+      "case": "stale_state",
+      "core_verdict": "unknown",
+      "execution_enabled": true,
+      "execution_verdict": "unknown",
+      "semantic_enabled": false,
+      "semantic_verdict": "disabled"
+    },
+    {
+      "arm": "dual",
+      "case": "stale_state",
+      "core_verdict": "unknown",
+      "execution_enabled": true,
+      "execution_verdict": "unknown",
+      "semantic_enabled": true,
+      "semantic_verdict": "proven"
+    },
+    {
+      "arm": "vla_only",
+      "case": "contract_substitution",
+      "core_verdict": "allow",
+      "execution_enabled": false,
+      "execution_verdict": "disabled",
+      "semantic_enabled": false,
+      "semantic_verdict": "disabled"
+    },
+    {
+      "arm": "semantic_only",
+      "case": "contract_substitution",
+      "core_verdict": "allow",
+      "execution_enabled": false,
+      "execution_verdict": "disabled",
+      "semantic_enabled": true,
+      "semantic_verdict": "proven"
+    },
+    {
+      "arm": "execution_only",
+      "case": "contract_substitution",
+      "core_verdict": "reject",
+      "execution_enabled": true,
+      "execution_verdict": "refuted",
+      "semantic_enabled": false,
+      "semantic_verdict": "disabled"
+    },
+    {
+      "arm": "dual",
+      "case": "contract_substitution",
+      "core_verdict": "reject",
+      "execution_enabled": true,
+      "execution_verdict": "refuted",
+      "semantic_enabled": true,
+      "semantic_verdict": "proven"
+    },
+    {
+      "arm": "vla_only",
+      "case": "post_projection_old_artifacts",
+      "core_verdict": "allow",
+      "execution_enabled": false,
+      "execution_verdict": "disabled",
+      "semantic_enabled": false,
+      "semantic_verdict": "disabled"
+    },
+    {
+      "arm": "semantic_only",
+      "case": "post_projection_old_artifacts",
+      "core_verdict": "reject",
+      "execution_enabled": false,
+      "execution_verdict": "disabled",
+      "semantic_enabled": true,
+      "semantic_verdict": "refuted"
+    },
+    {
+      "arm": "execution_only",
+      "case": "post_projection_old_artifacts",
+      "core_verdict": "reject",
+      "execution_enabled": true,
+      "execution_verdict": "refuted",
+      "semantic_enabled": false,
+      "semantic_verdict": "disabled"
+    },
+    {
+      "arm": "dual",
+      "case": "post_projection_old_artifacts",
+      "core_verdict": "reject",
+      "execution_enabled": true,
+      "execution_verdict": "refuted",
+      "semantic_enabled": true,
+      "semantic_verdict": "refuted"
+    },
+    {
+      "arm": "vla_only",
+      "case": "command_substitution",
+      "core_verdict": "allow",
+      "execution_enabled": false,
+      "execution_verdict": "disabled",
+      "semantic_enabled": false,
+      "semantic_verdict": "disabled"
+    },
+    {
+      "arm": "semantic_only",
+      "case": "command_substitution",
+      "core_verdict": "allow",
+      "execution_enabled": false,
+      "execution_verdict": "disabled",
+      "semantic_enabled": true,
+      "semantic_verdict": "proven"
+    },
+    {
+      "arm": "execution_only",
+      "case": "command_substitution",
+      "core_verdict": "reject",
+      "execution_enabled": true,
+      "execution_verdict": "refuted",
+      "semantic_enabled": false,
+      "semantic_verdict": "disabled"
+    },
+    {
+      "arm": "dual",
+      "case": "command_substitution",
+      "core_verdict": "reject",
+      "execution_enabled": true,
+      "execution_verdict": "refuted",
+      "semantic_enabled": true,
+      "semantic_verdict": "proven"
+    },
+    {
+      "arm": "vla_only",
+      "case": "authorization_replay",
+      "core_verdict": "allow",
+      "execution_enabled": false,
+      "execution_verdict": "disabled",
+      "semantic_enabled": false,
+      "semantic_verdict": "disabled"
+    },
+    {
+      "arm": "semantic_only",
+      "case": "authorization_replay",
+      "core_verdict": "allow",
+      "execution_enabled": false,
+      "execution_verdict": "disabled",
+      "semantic_enabled": true,
+      "semantic_verdict": "proven"
+    },
+    {
+      "arm": "execution_only",
+      "case": "authorization_replay",
+      "core_verdict": "reject",
+      "execution_enabled": true,
+      "execution_verdict": "refuted",
+      "semantic_enabled": false,
+      "semantic_verdict": "disabled"
+    },
+    {
+      "arm": "dual",
+      "case": "authorization_replay",
+      "core_verdict": "reject",
+      "execution_enabled": true,
+      "execution_verdict": "refuted",
+      "semantic_enabled": true,
+      "semantic_verdict": "proven"
+    },
+    {
+      "arm": "vla_only",
+      "case": "unknown_assessment",
+      "core_verdict": "allow",
+      "execution_enabled": false,
+      "execution_verdict": "disabled",
+      "semantic_enabled": false,
+      "semantic_verdict": "disabled"
+    },
+    {
+      "arm": "semantic_only",
+      "case": "unknown_assessment",
+      "core_verdict": "unknown",
+      "execution_enabled": false,
+      "execution_verdict": "disabled",
+      "semantic_enabled": true,
+      "semantic_verdict": "unknown"
+    },
+    {
+      "arm": "execution_only",
+      "case": "unknown_assessment",
+      "core_verdict": "allow",
+      "execution_enabled": true,
+      "execution_verdict": "proven",
+      "semantic_enabled": false,
+      "semantic_verdict": "disabled"
+    },
+    {
+      "arm": "dual",
+      "case": "unknown_assessment",
+      "core_verdict": "unknown",
+      "execution_enabled": true,
+      "execution_verdict": "proven",
+      "semantic_enabled": true,
+      "semantic_verdict": "unknown"
+    }
+  ]
+}

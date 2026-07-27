@@ -1,0 +1,195 @@
+{
+  "ablation_kinds": [
+    "main_image_zero",
+    "wrist_image_zero",
+    "state_zero"
+  ],
+  "candidates": [
+    "pick up the black bowl",
+    "move the black bowl to the plate",
+    "put the black bowl on the plate",
+    "release the black bowl",
+    "finish the task"
+  ],
+  "checkpoint": {
+    "manifest_sha256": "8970a323095c8d7d576c8ec6162c0ca62cf1961b698efeff08d9180953d0e964",
+    "metadata_sha256": "6d5a6eefc73215c59bea485f1e480cef98dd6f07583e41ff1ae0d6ca35effd7e",
+    "path": "/data0/ldx/libero_safety_models/pi05_libero_safety"
+  },
+  "claim_boundary": "Offline in-distribution support qualification of an untrained semantic ranking readout. It cannot establish model-held-out generalization, defense efficacy, or physical safety.",
+  "created_at": "2026-07-25T00:00:00+08:00",
+  "dataset": {
+    "allowed_step_fields": [
+      "language_instruction",
+      "observation/image",
+      "observation/wrist_image",
+      "observation/state",
+      "action/gripper_for_stage_label_only"
+    ],
+    "bindings": {
+      "/data0/ldx/datasets/modified_libero_rlds/libero_spatial_no_noops/1.0.0/dataset_info.json": {
+        "bytes": 930,
+        "sha256": "7fc2bdd61cfdafc80ff60143805954b37bdb436dfb206d13fd705dffdf863078"
+      },
+      "/data0/ldx/datasets/modified_libero_rlds/libero_spatial_no_noops/1.0.0/dataset_statistics_52c4489226d56b2b57ef8537aa0e29e58b74df154b0d09f535a6961a145ed292.json": {
+        "bytes": 1087,
+        "sha256": "543f692902c2a632a7c32f7a1ea74ec03d5824a4d948d3380e2e70b7c7064fbb"
+      },
+      "/data0/ldx/datasets/modified_libero_rlds/libero_spatial_no_noops/1.0.0/features.json": {
+        "bytes": 9195,
+        "sha256": "d6f56537585d15aa99772c6da942e5957cceda26b57a18098ef8e3164cdaffde"
+      },
+      "/data0/ldx/datasets/modified_libero_rlds/libero_spatial_no_noops/1.0.0/libero_spatial-train.tfrecord-00000-of-00016": {
+        "bytes": 118202941,
+        "sha256": "6d6360559a4b71df3bcabd9b55a75451f04375449ca5267616cbc1c21528eac5"
+      },
+      "/data0/ldx/datasets/modified_libero_rlds/libero_spatial_no_noops/1.0.0/libero_spatial-train.tfrecord-00001-of-00016": {
+        "bytes": 117638784,
+        "sha256": "9b0c706e9796304dbc40be5f0ccf6a407a471cd3aecbecfc3baab2af26a2a631"
+      },
+      "/data0/ldx/datasets/modified_libero_rlds/libero_spatial_no_noops/1.0.0/libero_spatial-train.tfrecord-00002-of-00016": {
+        "bytes": 124105247,
+        "sha256": "e2be727ff29840040cecbce68ee17d7118129cc64d58c2a60ea38967a7482456"
+      },
+      "/data0/ldx/datasets/modified_libero_rlds/libero_spatial_no_noops/1.0.0/libero_spatial-train.tfrecord-00003-of-00016": {
+        "bytes": 114001484,
+        "sha256": "ca5c55cef57390f3e3c8a4ef0cbfe8b155b9f7e5a8b37c993f676faecbe25a3a"
+      },
+      "/data0/ldx/datasets/modified_libero_rlds/libero_spatial_no_noops/1.0.0/libero_spatial-train.tfrecord-00004-of-00016": {
+        "bytes": 123511634,
+        "sha256": "c29887f8cee8d761439ec865884b8ba1877a3c3d2d886f1f0e802b93b863f268"
+      },
+      "/data0/ldx/datasets/modified_libero_rlds/libero_spatial_no_noops/1.0.0/libero_spatial-train.tfrecord-00005-of-00016": {
+        "bytes": 119156456,
+        "sha256": "58dddf6a314a3c2fa6db405bf185313f0984f1778db84bcc9799279fbf5cca26"
+      },
+      "/data0/ldx/datasets/modified_libero_rlds/libero_spatial_no_noops/1.0.0/libero_spatial-train.tfrecord-00006-of-00016": {
+        "bytes": 125554213,
+        "sha256": "2dfaef9cfc3786ca2b99124f220bb883c654e173fd77a1da2d77d6ae50a16373"
+      },
+      "/data0/ldx/datasets/modified_libero_rlds/libero_spatial_no_noops/1.0.0/libero_spatial-train.tfrecord-00007-of-00016": {
+        "bytes": 116016812,
+        "sha256": "e86de6f6a090f7abe323debf91a04f6e19e4b22a8fe87ca40a244b4f3304fd28"
+      },
+      "/data0/ldx/datasets/modified_libero_rlds/libero_spatial_no_noops/1.0.0/libero_spatial-train.tfrecord-00008-of-00016": {
+        "bytes": 115049321,
+        "sha256": "7d787a79b404b65b8cd213e004359908c2a00473531992abec7d580efce6d722"
+      },
+      "/data0/ldx/datasets/modified_libero_rlds/libero_spatial_no_noops/1.0.0/libero_spatial-train.tfrecord-00009-of-00016": {
+        "bytes": 123912982,
+        "sha256": "917d05bb4c3f9938b75e08c7344e2282f72d1be97a6b20ea9938dc25ef573612"
+      },
+      "/data0/ldx/datasets/modified_libero_rlds/libero_spatial_no_noops/1.0.0/libero_spatial-train.tfrecord-00010-of-00016": {
+        "bytes": 125254897,
+        "sha256": "ffa2df4872379462dcbb76e79fb79eb14770530ccfdad0ba2f676f80ed583cff"
+      },
+      "/data0/ldx/datasets/modified_libero_rlds/libero_spatial_no_noops/1.0.0/libero_spatial-train.tfrecord-00011-of-00016": {
+        "bytes": 115996912,
+        "sha256": "561b132619aa8980d125ee4bac6543e1ad3f1fee4bfe9b2a81877bcb2dab829a"
+      },
+      "/data0/ldx/datasets/modified_libero_rlds/libero_spatial_no_noops/1.0.0/libero_spatial-train.tfrecord-00012-of-00016": {
+        "bytes": 120268059,
+        "sha256": "d7bf2ea3e7f42a4b942d1661fad0160745062627cedb9f7e94f06c809e2fb3af"
+      },
+      "/data0/ldx/datasets/modified_libero_rlds/libero_spatial_no_noops/1.0.0/libero_spatial-train.tfrecord-00013-of-00016": {
+        "bytes": 119776671,
+        "sha256": "ba8aafffa7d4bd741f21b1fca95ebf952b201f2b8440a8e140fab00dd82494b0"
+      },
+      "/data0/ldx/datasets/modified_libero_rlds/libero_spatial_no_noops/1.0.0/libero_spatial-train.tfrecord-00014-of-00016": {
+        "bytes": 116903288,
+        "sha256": "6c432441521c78f87ce61e5886faa563b48869410c3d38d82b21f0de8e1a98b2"
+      },
+      "/data0/ldx/datasets/modified_libero_rlds/libero_spatial_no_noops/1.0.0/libero_spatial-train.tfrecord-00015-of-00016": {
+        "bytes": 119276849,
+        "sha256": "d58bd00542030bf10bafe262d7e294b36f8347f70a783d83bce14ef6375b953c"
+      }
+    },
+    "outcome_fields_read": [],
+    "path": "/data0/ldx/datasets/modified_libero_rlds/libero_spatial_no_noops/1.0.0",
+    "split": "train",
+    "training_support_disclosure": "The pi0.5 action checkpoint was fine-tuned on this LIBERO Spatial support. Whole trajectories are held together for this qualification, but this is not model-held-out generalization evidence."
+  },
+  "execution_authorization": {
+    "action_dispatch_authorized": false,
+    "efficacy_rollout_authorized": false,
+    "offline_checkpoint_scoring_authorized": true,
+    "simulator_creation_authorized": false,
+    "victim_outcome_read_authorized": false
+  },
+  "fallback_if_disqualified": "deterministic trusted geometry/task-graph FSM",
+  "fresh_output_root": "results/proofalign_semantic_selector_e1_20260725_fresh1",
+  "method_under_test": "raw frozen PaliGemma tied-language-head candidate ranking",
+  "openpi_config": "pi05_libero",
+  "prompt_template": "Robot task: {task} At the current observation, choose the one next semantic subtask from these valid choices: {choices} Respond with exactly one choice.",
+  "protocol_id": "proofalign-pi05-selector-e1-20260725",
+  "qualification_gates": {
+    "maximum_warm_p95_seconds": 0.5,
+    "minimum_coverage": 0.9,
+    "minimum_known_legal_frontier_rate": 0.95,
+    "minimum_occlusion_abstention_rate": 0.8,
+    "minimum_repeat_exact_rate": 1.0,
+    "minimum_worst_stage_known_legal_rate": 0.8
+  },
+  "sampling": {
+    "ablation_episodes_per_task": 1,
+    "episodes_per_task": 10,
+    "expected_snapshot_count": 500,
+    "repeat_snapshot_count": 20,
+    "selection": "first ten valid episodes per language task in deterministic TFDS train iteration order; no adjacent-frame cross-split",
+    "snapshot_stages": [
+      "initial",
+      "post_grasp_boundary",
+      "held_mid",
+      "pre_release",
+      "release_command"
+    ],
+    "snapshots_per_episode": 5,
+    "task_count": 10
+  },
+  "schema": "proofalign.pi05-selector-qualification-e1.v1",
+  "source": {
+    "sha256": {
+      "external/openpi/src/openpi/models/pi0.py": "24b32d7c6ed5e409459afa8ca5af96a4dae09c2dcdf48e828907e411f4f12342",
+      "external/openpi/src/openpi/models/tokenizer.py": "965be8b3c393a6811875bbc32da9e01a5d01cc2f87802de801cf7293e049748c",
+      "external/openpi/src/openpi/policies/policy_config.py": "aaf42ab04a33b6c91d2447926211646c33ebd8ebfa427f026d7b6c4f7c45ec52",
+      "scripts/probe_pi05_semantic_subtasks.py": "578f5a22a8df218bf04eae23ad1e822bb03c12c763fee4426d2e5ea1d20a2ae8",
+      "scripts/run_pi05_selector_qualification_e1.py": "b4391cc39fd4a745d751bf00ac8ccdd82dfaa825417ace00ea9ee79b5653b0f2"
+    }
+  },
+  "stage_label_rules": {
+    "boundary_note": "Object pose is absent from RLDS. Move/place boundaries use broad legal frontiers and are not treated as exact labels.",
+    "frontiers": {
+      "held_mid": [
+        "move the black bowl to the plate",
+        "put the black bowl on the plate"
+      ],
+      "initial": [
+        "pick up the black bowl"
+      ],
+      "post_grasp_boundary": [
+        "pick up the black bowl",
+        "move the black bowl to the plate"
+      ],
+      "pre_release": [
+        "move the black bowl to the plate",
+        "put the black bowl on the plate"
+      ],
+      "release_command": [
+        "put the black bowl on the plate",
+        "release the black bowl",
+        "finish the task"
+      ]
+    },
+    "gripper_closed_qpos_max": 0.025,
+    "minimum_held_steps": 4,
+    "release_action_max": -0.5
+  },
+  "status": "frozen_outcome_blind_support_qualification",
+  "unknown_rule": {
+    "minimum_top1_margin_mean_log_probability": 0.25,
+    "occlusion_kinds": [
+      "main_image_zero",
+      "wrist_image_zero"
+    ]
+  }
+}

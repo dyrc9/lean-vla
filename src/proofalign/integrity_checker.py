@@ -9,7 +9,9 @@ from proofalign.digests import digest_payload
 from proofalign.integrity_intervention import InterventionPolicy, PassThroughIntervention
 from proofalign.integrity_models import (
     ActionProposal,
+    ActionBlockAssessment,
     ActiveContract,
+    BlockExecutionContract,
     CoreVerdict,
     InterventionKind,
     LayerCheck,
@@ -38,7 +40,7 @@ class FastIntegrityChecker(Protocol):
         mission: MissionRoot,
         contract: ActiveContract,
         proposal: ActionProposal,
-        final_command: tuple[float, ...],
+        assessment: ActionBlockAssessment,
     ) -> LayerCheck:
         ...
 
@@ -46,6 +48,8 @@ class FastIntegrityChecker(Protocol):
         self,
         mission: MissionRoot,
         contract: ActiveContract,
+        assessment: ActionBlockAssessment,
+        execution_contract: BlockExecutionContract,
         proposal: ActionProposal,
         final_command: tuple[float, ...],
         state: StateSnapshot,
@@ -59,8 +63,8 @@ class FastIntegrityChecker(Protocol):
 class DeterministicFastChecker:
     """Finite, conservative checker for the minimal exact-task prototype.
 
-    It checks typed skill/target/part/region equality for Intent–Plan integrity
-    and freshness/transaction/final-command bindings for execution pre-checks.
+    It checks consumer-side action semantics against trusted intent and checks
+    action-block/execution-contract/final-command bindings before dispatch.
     It deliberately makes no collision, reachability, perception, or continuous
     dynamics claim.
     """
@@ -93,34 +97,67 @@ class DeterministicFastChecker:
         mission: MissionRoot,
         contract: ActiveContract,
         proposal: ActionProposal,
-        final_command: tuple[float, ...],
+        assessment: ActionBlockAssessment,
     ) -> LayerCheck:
         issues: list[str] = []
         if contract.mission_root_digest != mission.root_digest:
             issues.append("contract is bound to another mission root")
         if contract.episode_nonce != mission.episode_nonce:
             issues.append("contract is bound to another episode")
-        if proposal.episode_nonce != mission.episode_nonce:
-            issues.append("proposal is bound to another episode")
-        if proposal.skill != contract.skill:
-            issues.append(f"skill {proposal.skill!r} is not authorized as {contract.skill!r}")
+        if not assessment.known:
+            issues.append(
+                f"unknown: action assessment is unknown: {assessment.unknown_reason}"
+            )
+        if assessment.episode_nonce != mission.episode_nonce:
+            issues.append("action assessment is bound to another episode")
+        if assessment.action_block_digest != proposal.action_block_digest:
+            issues.append("action assessment is bound to another action block")
+        if assessment.proposal_index != proposal.proposal_index:
+            issues.append("action assessment and block indices differ")
+        if assessment.observation_digest != proposal.observation_digest:
+            issues.append("action assessment and block observations differ")
+        if assessment.state_epoch != proposal.state_epoch:
+            issues.append("action assessment and block state epochs differ")
+        if assessment.generated_at_ns < proposal.proposed_at_ns:
+            issues.append("action assessment predates the action block")
+        if (
+            assessment.known
+            and assessment.predicted_skill != contract.skill
+        ):
+            issues.append(
+                f"predicted skill {assessment.predicted_skill!r} is not "
+                f"authorized as {contract.skill!r}"
+            )
+        if assessment.predicted_violation_atoms:
+            issues.append(
+                "action block predicts violations: "
+                + ", ".join(assessment.predicted_violation_atoms)
+            )
+        if not assessment.assessor_kind.efficacy_eligible:
+            issues.append(
+                f"action assessor kind {assessment.assessor_kind.value!r} "
+                "is not efficacy eligible"
+            )
         for name in ("target", "part", "region"):
             expected = getattr(contract, name)
-            actual = getattr(proposal, name)
+            actual = getattr(assessment, name)
             if expected is not None and actual is None:
-                issues.append(f"unknown: proposal omits required {name}")
+                if assessment.known:
+                    issues.append(f"unknown: action assessment omits required {name}")
             elif expected is not None and actual != expected:
                 issues.append(f"{name} {actual!r} is not authorized as {expected!r}")
             elif expected is None and actual is not None:
-                issues.append(f"proposal introduces unauthorized {name} {actual!r}")
+                issues.append(
+                    f"action assessment introduces unauthorized {name} {actual!r}"
+                )
         return self._result(
-            "intent_plan",
+            "intent_action_block",
             issues,
             {
                 "mission_root_digest": mission.root_digest,
                 "contract_digest": contract.contract_digest,
-                "proposal_digest": proposal.proposal_digest,
-                "final_command_digest": command_digest(final_command),
+                "action_block_digest": proposal.action_block_digest,
+                "assessment_digest": assessment.assessment_digest,
             },
         )
 
@@ -128,6 +165,8 @@ class DeterministicFastChecker:
         self,
         mission: MissionRoot,
         contract: ActiveContract,
+        assessment: ActionBlockAssessment,
+        execution_contract: BlockExecutionContract,
         proposal: ActionProposal,
         final_command: tuple[float, ...],
         state: StateSnapshot,
@@ -152,12 +191,40 @@ class DeterministicFastChecker:
             issues.append("proposal index is stale or replayed")
         if proposal.episode_nonce != mission.episode_nonce:
             issues.append("proposal is bound to another episode")
+        if execution_contract.episode_nonce != mission.episode_nonce:
+            issues.append("execution contract is bound to another episode")
+        if execution_contract.action_block_digest != proposal.action_block_digest:
+            issues.append("execution contract is bound to another action block")
+        if execution_contract.assessment_digest != assessment.assessment_digest:
+            issues.append("execution contract is bound to another assessment")
+        if execution_contract.proposal_index != proposal.proposal_index:
+            issues.append("execution contract and action block indices differ")
+        if execution_contract.observation_digest != proposal.observation_digest:
+            issues.append("execution contract and action block observations differ")
+        if execution_contract.state_epoch != proposal.state_epoch:
+            issues.append("execution contract and action block state epochs differ")
+        if execution_contract.issued_at_ns < assessment.generated_at_ns:
+            issues.append("execution contract predates the action assessment")
+        if proposal.proposed_at_ns > now_ns:
+            issues.append("action block is from the future")
+        if execution_contract.issued_at_ns > now_ns:
+            issues.append("execution contract is from the future")
+        if state.state_digest is not None:
+            if proposal.observation_digest != state.state_digest:
+                issues.append("action block is bound to another state observation")
+            if proposal.state_epoch != state.state_epoch:
+                issues.append("action block is bound to another state epoch")
         return self._result(
-            "plan_execution_pre",
+            "action_block_execution_pre",
             issues,
             {
                 "mission_root_digest": mission.root_digest,
                 "contract_digest": contract.contract_digest,
+                "action_block_digest": proposal.action_block_digest,
+                "assessment_digest": assessment.assessment_digest,
+                "execution_contract_digest": (
+                    execution_contract.execution_contract_digest
+                ),
                 "proposal_digest": proposal.proposal_digest,
                 "proposal_index": proposal.proposal_index,
                 "state_snapshot_digest": state.snapshot_digest,
@@ -184,6 +251,8 @@ class ExactPrefixAuthorizer:
         mission: MissionRoot,
         contract: ActiveContract,
         monitor: MonitorState,
+        assessment: ActionBlockAssessment,
+        execution_contract: BlockExecutionContract,
         proposal: ActionProposal,
         state: StateSnapshot,
         now_ns: int,
@@ -206,7 +275,12 @@ class ExactPrefixAuthorizer:
             )
         else:
             intent_check = (
-                self.checker.check_intent(mission, contract, proposal, final_command)
+                self.checker.check_intent(
+                    mission,
+                    contract,
+                    proposal,
+                    assessment,
+                )
                 if arm.intent_enabled
                 else LayerCheck.disabled()
             )
@@ -214,6 +288,8 @@ class ExactPrefixAuthorizer:
                 self.checker.check_execution_pre(
                     mission,
                     contract,
+                    assessment,
+                    execution_contract,
                     proposal,
                     final_command,
                     state,
@@ -247,6 +323,11 @@ class ExactPrefixAuthorizer:
             state_snapshot_digest=state.snapshot_digest,
             monitor_state_digest=monitor.state_digest,
             proposal_index=proposal.proposal_index,
+            action_block_digest=proposal.action_block_digest,
+            assessment_digest=assessment.assessment_digest,
+            execution_contract_digest=(
+                execution_contract.execution_contract_digest
+            ),
             proposal_digest=proposal.proposal_digest,
             nominal_command_digest=nominal_digest,
             final_command=final_command,

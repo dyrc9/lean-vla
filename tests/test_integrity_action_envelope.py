@@ -18,7 +18,8 @@ def _proposal(command: tuple[float, ...]) -> ActionProposal:
         episode_nonce="envelope-test",
         proposal_index=0,
         proposed_at_ns=1,
-        skill="vla_action_prefix",
+        observation_digest="a" * 64,
+        state_epoch=0,
         command=command,
     )
 

@@ -1,0 +1,60 @@
+{
+  "claim_boundary": "Qualification-outside synthetic no-dispatch evidence for the selected deterministic privileged-geometry selector and analytic local-checker stack. It does not qualify camera perception, semantic effect observation, online efficacy, closed-loop behavior, deployment, or physical safety.",
+  "created_at": "2026-07-25T00:00:00+08:00",
+  "execution_authorization": {
+    "action_dispatch_authorized": false,
+    "efficacy_rollout_authorized": false,
+    "outcome_read_authorized": false,
+    "policy_load_authorized": false,
+    "simulator_creation_authorized": false
+  },
+  "input_artifact_sha256": {
+    "experiments/proofalign_deterministic_selector_e1f.json": "6adaa32ef5e08e565395e0f8009612dc8726bdb5e4551719d6e14cc0a530ffd7",
+    "experiments/proofalign_deterministic_selector_e1f_protocol.json": "1c7f31619f06b79f6b6506ab54eaf0a7f41d4545e2a0c16f84c491c27dbc32a1",
+    "experiments/proofalign_local_checker_e3_v2_protocol.json": "80434b8b076eaf5cf902f6ddf27eb6b701738b1d17d0d9febb36842256802226",
+    "experiments/proofalign_pi05_action_conditioning_e2_protocol.json": "079cf5566f49f44cd7ade70cf9cc5a96ef8d539bf5754ad01ad0d1e31e56be6e",
+    "experiments/proofalign_pi05_selector_e1_protocol.json": "9ac6f615a8087b6710bee5c5dc5f542fc73383bf162c6e36ef1a475c9cd09ced",
+    "experiments/proofalign_semantic_v4_c5_protocol.json": "c5d5e3758fc7b1faf409409e9bfd66bb607ad0a27f892c2356779954871440c5",
+    "experiments/proofalign_semantic_v4_fixed_trace_c5.json": "b0e9bd5c399d6b5d84e50e80878c841edf5e2dc645c59e84847b58afbcd2db7a",
+    "experiments/proofalign_semantic_v4_lean_equivalence_c5.json": "bbdadfab998bfb81e2c9b2b9198b5f264ac2f880cc4c1e067c5ae88a83ab512a",
+    "results/proofalign_action_conditioning_e2_20260725_fresh1/SHA256SUMS": "7f2ab6470c30b3c2743ca29abe56a5a993e9d01644ea7a4574782dd97b387dcd",
+    "results/proofalign_action_conditioning_e2_20260725_fresh1/qualification.json": "ef0d5b0862dd9c17431d60a8202c2c67f43234001545ef6dbb9ad685065ab4ee",
+    "results/proofalign_local_checker_e3_v2_20260727_fresh1/qualification.json": "ed3242d112db98a4585b7007fdf5a8148f7df6c889eaae18c08b2f27ca11b402",
+    "results/proofalign_semantic_selector_e1_20260725_fresh1/SHA256SUMS": "fac445ca0d8b7798a8fd4274b6c709bb3215d6d5572c58f6a1ee62b76c27f215",
+    "results/proofalign_semantic_selector_e1_20260725_fresh1/qualification.json": "5f3661bb924d2f306d1449f69041b019179808ce547cb2d4dc898e1745f808c1"
+  },
+  "output": "results/proofalign_semantic_four_arm_e4_20260725_fresh1.json",
+  "post_e4_requirements": {
+    "clean_commit_binding_complete": false,
+    "deployment_perception_qualified": false,
+    "explicit_outcome_authorization_received": false,
+    "latency_resource_smoke_complete": false,
+    "semantic_effect_observer_qualified": false
+  },
+  "protocol_id": "proofalign-semantic-e4-no-dispatch-20260725",
+  "required_classifications": {
+    "c5_fixed_trace": "c5_no_dispatch_identity_pass",
+    "c5_scoped_equivalence": "c5_scoped_equivalence_pass",
+    "e1_raw_selector": "raw_pi05_selector_disqualified",
+    "e1f_fallback": "deterministic_fsm_fallback_gate_pass",
+    "e2_action_conditioning": "semantic_prompt_action_conditioning_disqualified",
+    "e3_local_checker": "analytic_local_checker_qualified"
+  },
+  "schema": "proofalign.semantic-e4-no-dispatch-protocol.v1",
+  "selected_stack": {
+    "raw_pi05_selector_enabled": false,
+    "selector": "deterministic_privileged_geometry_task_fsm",
+    "semantic_action_gate": "analytic_local_checker",
+    "semantic_prompt_as_behavioral_control": false
+  },
+  "source_sha256": {
+    "scripts/generate_semantic_v4_equivalence_evidence.py": "2161a4dac6b26d3601250208affb3634ad9b1e63635652611fc9c8093ffd994c",
+    "scripts/run_pi05_action_conditioning_e2.py": "535289b2c0dc9b8e6aee0354e9815385a7669b2bf71865b9c93630d45f76ffb3",
+    "scripts/run_semantic_no_dispatch_four_arm_e4.py": "86567d354a5725cc300e18ef80a893ba1eb6f19649a303e986a860c2bef7c175",
+    "scripts/run_semantic_v4_fixed_trace_gate.py": "6bf3bdda03af031bfcc0f9197df2770c74183f7b83b1909f1cd42844c060e3e4",
+    "scripts/validate_deterministic_selector_e1f.py": "f3d2d710a8b5d09fc88479e27ab228c22c51aa5da1fb592b10e8655e322a05fe",
+    "scripts/validate_local_checker_qualification_e3.py": "91f423fe3661cc2be0da8b58d725cbd690113d44bd776805ecc566348846a082",
+    "scripts/validate_pi05_selector_qualification_e1.py": "da38b0e2b6a00fc077bfe97a46117411f3b813af7c79623de724f16f857f55fd"
+  },
+  "status": "frozen_qualification_outside_trace_gate"
+}

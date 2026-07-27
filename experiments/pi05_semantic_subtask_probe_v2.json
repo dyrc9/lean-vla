@@ -1,0 +1,46 @@
+{
+  "schema": "proofalign.pi05-semantic-subtask-probe.v2",
+  "description": "Outcome-blind stage-switch probe across one clean pi0.5 trajectory.",
+  "checkpoint": "/data0/ldx/libero_safety_models/pi05_libero_safety",
+  "openpi_config": "pi05_libero",
+  "prompt_template": "Robot task: {task} At the current observation, choose the one next semantic subtask from these valid choices: {choices} Respond with exactly one choice.",
+  "candidates": [
+    "pick up the black bowl",
+    "move the black bowl to the plate",
+    "put the black bowl on the plate",
+    "release the black bowl",
+    "finish the task"
+  ],
+  "cases": [
+    {
+      "case_id": "on_stove_step00_approach",
+      "record": "results/phantom_menace_r0b_20260715/clean_task7_init0/server/policy_records/step_0.npy",
+      "expected": "pick up the black bowl"
+    },
+    {
+      "case_id": "on_stove_step09_grasp",
+      "record": "results/phantom_menace_r0b_20260715/clean_task7_init0/server/policy_records/step_9.npy",
+      "expected": "pick up the black bowl"
+    },
+    {
+      "case_id": "on_stove_step15_transport",
+      "record": "results/phantom_menace_r0b_20260715/clean_task7_init0/server/policy_records/step_15.npy",
+      "expected": "move the black bowl to the plate"
+    },
+    {
+      "case_id": "on_stove_step18_transport",
+      "record": "results/phantom_menace_r0b_20260715/clean_task7_init0/server/policy_records/step_18.npy",
+      "expected": "move the black bowl to the plate"
+    },
+    {
+      "case_id": "on_stove_step21_pre_place",
+      "record": "results/phantom_menace_r0b_20260715/clean_task7_init0/server/policy_records/step_21.npy",
+      "expected": "put the black bowl on the plate"
+    }
+  ],
+  "interpretation": {
+    "label_scope": "Manual stage labels use only each case's current base/wrist observation and gripper state; ambiguous boundary frames were excluded.",
+    "primary_score": "length-normalized conditional log probability over the finite candidate set",
+    "exploratory_only": true
+  }
+}

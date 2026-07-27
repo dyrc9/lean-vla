@@ -14,7 +14,9 @@ from proofalign.integrity_checker import ExactPrefixAuthorizer
 from proofalign.integrity_intervention import InterventionPolicy
 from proofalign.integrity_models import (
     ActionProposal,
+    ActionBlockAssessment,
     ActiveContract,
+    BlockExecutionContract,
     ContractTransaction,
     CoreVerdict,
     DispatchReceipt,
@@ -239,6 +241,8 @@ class SingleDispatchBoundary:
         actual_digest = command_digest(applied.command)
         receipt = DispatchReceipt(
             authorization_digest=authorization.authorization_digest,
+            action_block_digest=authorization.action_block_digest,
+            execution_contract_digest=authorization.execution_contract_digest,
             episode_nonce=authorization.episode_nonce,
             proposal_index=authorization.proposal_index,
             authorized_command_digest=authorization.final_command_digest or applied_digest,
@@ -270,6 +274,7 @@ class EffectObserverUpdater:
         mission: MissionRoot,
         monitor: PersistentContractMonitor,
         contract: ActiveContract,
+        execution_contract: BlockExecutionContract,
         authorization: PrefixAuthorization,
         receipt: DispatchReceipt,
         evidence: ExecutionEvidence,
@@ -290,29 +295,54 @@ class EffectObserverUpdater:
             issues.append("contract is bound to another mission")
         if before.active_contract_digest != contract.contract_digest:
             issues.append("monitor does not contain the active contract")
-
+        if authorization.mission_root_digest != mission.root_digest:
+            issues.append("authorization is bound to another mission")
+        if authorization.contract_digest != contract.contract_digest:
+            issues.append("authorization is bound to another contract")
+        if authorization.episode_nonce != mission.episode_nonce:
+            issues.append("authorization is bound to another episode")
+        if authorization.monitor_state_digest != before.state_digest:
+            issues.append("authorization is bound to a stale monitor state")
+        if receipt.authorization_digest != authorization.authorization_digest:
+            issues.append("receipt is bound to another authorization")
+        if evidence.authorization_digest != authorization.authorization_digest:
+            issues.append("effect evidence is bound to another authorization")
+        if evidence.receipt_digest != receipt.receipt_digest:
+            issues.append("effect evidence is bound to another receipt")
+        if (
+            receipt.episode_nonce != mission.episode_nonce
+            or evidence.episode_nonce != mission.episode_nonce
+        ):
+            issues.append("receipt/effect evidence is bound to another episode")
+        if (
+            receipt.proposal_index != authorization.proposal_index
+            or evidence.proposal_index != authorization.proposal_index
+        ):
+            issues.append("receipt/effect evidence is bound to another action block")
         if authorization.arm.execution_enabled:
-            if authorization.mission_root_digest != mission.root_digest:
-                issues.append("authorization is bound to another mission")
-            if authorization.contract_digest != contract.contract_digest:
-                issues.append("authorization is bound to another contract")
-            if authorization.episode_nonce != mission.episode_nonce:
-                issues.append("authorization is bound to another episode")
-            if authorization.monitor_state_digest != before.state_digest:
-                issues.append("authorization is bound to a stale monitor state")
-            if receipt.authorization_digest != authorization.authorization_digest:
-                issues.append("receipt is bound to another authorization")
-            if evidence.authorization_digest != authorization.authorization_digest:
-                issues.append("effect evidence is bound to another authorization")
-            if evidence.receipt_digest != receipt.receipt_digest:
-                issues.append("effect evidence is bound to another receipt")
-            if receipt.episode_nonce != mission.episode_nonce or evidence.episode_nonce != mission.episode_nonce:
-                issues.append("receipt/effect evidence is bound to another episode")
             if (
-                receipt.proposal_index != authorization.proposal_index
-                or evidence.proposal_index != authorization.proposal_index
+                execution_contract.execution_contract_digest
+                != authorization.execution_contract_digest
             ):
-                issues.append("receipt/effect evidence is bound to another proposal")
+                issues.append("authorization is bound to another execution contract")
+            if (
+                receipt.execution_contract_digest
+                != execution_contract.execution_contract_digest
+                or evidence.execution_contract_digest
+                != execution_contract.execution_contract_digest
+            ):
+                issues.append(
+                    "receipt/effect evidence is bound to another execution contract"
+                )
+            if (
+                execution_contract.action_block_digest
+                != authorization.action_block_digest
+                or receipt.action_block_digest != authorization.action_block_digest
+                or evidence.action_block_digest != authorization.action_block_digest
+            ):
+                issues.append(
+                    "authorization/receipt/effect evidence action-block binding differs"
+                )
             if receipt.applied_command_digest != authorization.final_command_digest:
                 issues.append("applied command differs from exact authorization")
             if evidence.observed_command_digest != receipt.applied_command_digest:
@@ -331,13 +361,59 @@ class EffectObserverUpdater:
 
         observed_atoms = set(before.completed_atoms)
         observed_atoms.update(evidence.observed_atoms)
-        completion_observed = set(contract.completion_atoms).issubset(observed_atoms)
-        checked_complete = completion_observed and not evidence.violation
-        verdict = (
-            CoreVerdict.REJECT
-            if evidence.violation
-            else CoreVerdict.COMPLETE if checked_complete else CoreVerdict.PENDING
+        current_atoms = set(evidence.observed_atoms)
+        missing_expected = set(execution_contract.expected_effect_atoms).difference(
+            current_atoms
         )
+        observed_forbidden = set(execution_contract.forbidden_effect_atoms).intersection(
+            current_atoms
+        )
+        execution_aligned = (
+            authorization.arm.execution_enabled
+            and evidence.observation_window_complete
+            and not missing_expected
+            and not observed_forbidden
+            and not evidence.violation
+        )
+        completion_observed = set(contract.completion_atoms).issubset(observed_atoms)
+        checked_complete = completion_observed and (
+            execution_aligned or not authorization.arm.execution_enabled
+        )
+        effect_issues: list[str] = []
+        if authorization.arm.execution_enabled and observed_forbidden:
+            effect_issues.append(
+                "forbidden effects observed: " + ", ".join(sorted(observed_forbidden))
+            )
+        if authorization.arm.execution_enabled and evidence.violation:
+            effect_issues.append("observer reported an execution violation")
+        if (
+            authorization.arm.execution_enabled
+            and missing_expected
+            and evidence.observation_window_complete
+        ):
+            effect_issues.append(
+                "expected effects missing at closed observation window: "
+                + ", ".join(sorted(missing_expected))
+            )
+        if (
+            not evidence.observation_window_complete
+            and (
+                not authorization.arm.execution_enabled
+                or (not observed_forbidden and not evidence.violation)
+            )
+        ):
+            return EffectUpdateResult(
+                CoreVerdict.PENDING,
+                before,
+                before,
+                ("effect observation window remains open",),
+            )
+        if effect_issues:
+            verdict = CoreVerdict.REJECT
+        elif checked_complete:
+            verdict = CoreVerdict.COMPLETE
+        else:
+            verdict = CoreVerdict.PENDING
 
         residual = tuple(
             item
@@ -362,6 +438,7 @@ class EffectObserverUpdater:
             contract_digest=contract.contract_digest,
             proposal_index=authorization.proposal_index,
             evidence_digest=evidence.evidence_digest,
+            issues=tuple(effect_issues),
         )
         try:
             committed = monitor.commit_transition(transition)
@@ -372,7 +449,7 @@ class EffectObserverUpdater:
                 monitor.state,
                 (str(exc),),
             )
-        return EffectUpdateResult(verdict, before, committed)
+        return EffectUpdateResult(verdict, before, committed, tuple(effect_issues))
 
 
 @dataclass
@@ -414,6 +491,8 @@ class ProofAlignPrototype:
     def authorize_exact_prefix(
         self,
         *,
+        assessment: ActionBlockAssessment,
+        execution_contract: BlockExecutionContract,
         proposal: ActionProposal,
         state: StateSnapshot,
         now_ns: int,
@@ -427,6 +506,8 @@ class ProofAlignPrototype:
             mission=self.mission,
             contract=contract,
             monitor=self.monitor.state,
+            assessment=assessment,
+            execution_contract=execution_contract,
             proposal=proposal,
             state=state,
             now_ns=now_ns,
@@ -445,6 +526,7 @@ class ProofAlignPrototype:
     def check_effect_update(
         self,
         *,
+        execution_contract: BlockExecutionContract,
         authorization: PrefixAuthorization,
         receipt: DispatchReceipt,
         evidence: ExecutionEvidence,
@@ -462,6 +544,7 @@ class ProofAlignPrototype:
             mission=self.mission,
             monitor=self.monitor,
             contract=contract,
+            execution_contract=execution_contract,
             authorization=authorization,
             receipt=receipt,
             evidence=evidence,
