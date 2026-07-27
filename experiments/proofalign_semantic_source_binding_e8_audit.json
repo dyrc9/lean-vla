@@ -14,7 +14,7 @@
       "exists": true,
       "git_status": "clean",
       "path": "Makefile",
-      "sha256": "fc2ee7bb088e827cf40622bc648d6b867082a77a38a5b00a12dad9cdb863a3e7",
+      "sha256": "4d41bb4fd783e3d45f563f50e38a7f39e821d27853922b1a46543fd3a50d38c9",
       "tracked": true
     },
     {
@@ -606,7 +606,7 @@
       "exists": true,
       "git_status": "clean",
       "path": "experiments/proofalign_semantic_v4_c5_readiness_packet_v1.json",
-      "sha256": "8971dbc15eedbb640549a990f5cc4d5cb263132ca22d374016b32fb2e69efc33",
+      "sha256": "e3c89d792689d3f7f074a496b8d2d78b7d797cda0feebda5dce8c2406694cc72",
       "tracked": true
     },
     {
@@ -709,8 +709,8 @@
   "policy_loaded": false,
   "repository_binding_semantics": "latest commit that changed the frozen semantic commit scope; later commits may contain only out-of-scope protocols or audit packets",
   "repository_fully_clean": true,
-  "repository_head_commit": "007cbac6ad74dfd0d5a6571e0d108968afdf89cc",
-  "repository_head_tree": "d80d4d97b4cd9d388a7bcc6c38227b71fafc13b7",
+  "repository_head_commit": "ead63a74748944219a7d122155fc7f457541c918",
+  "repository_head_tree": "7f79db6ba8f2eea7169b202b3fa7cd1b9eabc96f",
   "repository_status_row_count": 0,
   "schema": "proofalign.semantic-source-binding-e8-audit.v1",
   "simulator_created": false
