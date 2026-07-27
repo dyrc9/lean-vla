@@ -35,7 +35,9 @@ trusted BDDL goal 只有 `Checkgrippercontactpart`，已资格化 semantic wrapp
 - support-conditioned 45-pair population 有 90 units、每 stage 360 episodes；
 - 该支持集上的 post-outcome M2 描述性 transition 为 30/67=`44.78%`，cluster 95% CI
   `[30.77%,59.09%]`，仍超过披露的 40% exploratory threshold；
-- 新 fresh2 需要明确披露 population change 并单独授权，不能称为 fresh1 重试或 full-population 结果。
+- 用户已明确授权新的 support-conditioned fresh2。协议、360-row schedule/analysis、runner 与 one-shot
+  launcher 已冻结并通过全量门禁；当前 launcher 等待两张不同且各 `<1024 MiB` 的 GPU，尚未创建
+  fresh2 output root。它不能称为 fresh1 重试或 full-population 结果。
 
 ## 0A. 2026-07-27 qualification 与工程 smoke checkpoint
 
@@ -82,8 +84,8 @@ benchmark privileged-geometry no-outcome stack 完整；deployment perception �
 
 剩余 blocker：
 
-1. 决定是否授权 45-pair/360-episode support-conditioned clean fresh2；
-2. 若授权，先冻结新 population/schedule/analysis/preflight，禁止复用已失败 fresh1；
+1. 等待两张 `<1024 MiB` GPU；launcher 完整 preflight 后启动 45-pair/360-episode clean fresh2；
+2. 禁止复用已失败 fresh1，禁止跳过 fresh2 的首个 invalid 停止规则；
 3. support-conditioned clean gate 通过后，才可另行授权同一支持集上的 attacked stage；
 4. 所有结果保持 exploratory 标签，不得回写原 50% M2 nonpass；
 5. E9 暴露的 K=1 clean availability/deadlock 风险进入报告，不反向修改冻结阈值；
@@ -351,7 +353,7 @@ C1 semantic digest schema（已实现）
   -> v4 fixed-trace shadow（因缺少可信逐 proposal geometry 而跳过，不伪造）
   -> v4 clean fresh1（首 episode 初始化前 fail closed，0 valid ledger rows）
   -> semantic-support audit（45/60 supported；full population structurally infeasible）
-  -> support-conditioned clean 360 episodes（待新授权）
+  -> support-conditioned clean 360 episodes（已授权；launcher 等待两张合格 GPU）
   -> clean terminal gate
   -> support-conditioned attacked 360 episodes（须 clean pass + 新授权）
 ```
