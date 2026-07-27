@@ -82,7 +82,10 @@ def _git(*args: str) -> str:
     return completed.stdout.strip()
 
 
-def build_audit() -> dict[str, Any]:
+def build_audit(
+    *,
+    source_commit: str | None = None,
+) -> dict[str, Any]:
     confirmatory = load_json_object(CONFIRMATORY_PATH)
     validate_confirmatory_preregistration(confirmatory)
     design = load_json_object(DESIGN_PATH)
@@ -156,6 +159,9 @@ def build_audit() -> dict[str, Any]:
         "src/proofalign/benchmark/four_arm_v4_support.py",
         "scripts/audit_four_arm_v4_semantic_support.py",
     )
+    bound_commit = source_commit or _git("rev-parse", "HEAD")
+    _git("merge-base", "--is-ancestor", bound_commit, "HEAD")
+    bound_tree = _git("rev-parse", f"{bound_commit}^{{tree}}")
     return {
         "schema": SUPPORT_AUDIT_SCHEMA,
         "audit_id": "proofalign-four-arm-v4-semantic-support-20260727",
@@ -262,8 +268,8 @@ def build_audit() -> dict[str, Any]:
                 path: file_sha256(REPO_ROOT / path)
                 for path in source_paths
             },
-            "repository_commit": _git("rev-parse", "HEAD"),
-            "repository_tree": _git("rev-parse", "HEAD^{tree}"),
+            "repository_commit": bound_commit,
+            "repository_tree": bound_tree,
         },
         "recommended_next_step": (
             "do not weaken the checker or fabricate part geometry; if the "
@@ -285,7 +291,13 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--output", type=Path, default=OUTPUT_PATH)
     parser.add_argument("--check", action="store_true")
     args = parser.parse_args(argv)
-    text = canonical_text(build_audit())
+    source_commit = None
+    if args.check and args.output.is_file():
+        retained = load_json_object(args.output)
+        source_commit = retained.get("bindings", {}).get(
+            "repository_commit"
+        )
+    text = canonical_text(build_audit(source_commit=source_commit))
     if args.check:
         if (
             not args.output.is_file()
