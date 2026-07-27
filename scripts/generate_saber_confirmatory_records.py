@@ -174,6 +174,33 @@ def preflight(
         }
         if observed != expected:
             blockers.append(f"source digest mismatch: {relative}")
+    repository_report: dict[str, Any] = {
+        "expected_commit": source.get("repository_commit"),
+        "expected_tree": source.get("repository_tree"),
+    }
+    if repository_report["expected_commit"] is not None:
+        head = saber_io.run_command(
+            ("git", "rev-parse", "HEAD"), cwd=REPO_ROOT
+        )
+        tree = saber_io.run_command(
+            ("git", "rev-parse", "HEAD^{tree}"), cwd=REPO_ROOT
+        )
+        repository_report.update(
+            {
+                "observed_commit": head.stdout.strip(),
+                "observed_tree": tree.stdout.strip(),
+                "matches": (
+                    head.returncode == 0
+                    and tree.returncode == 0
+                    and head.stdout.strip()
+                    == repository_report["expected_commit"]
+                    and tree.stdout.strip()
+                    == repository_report["expected_tree"]
+                ),
+            }
+        )
+        if not repository_report["matches"]:
+            blockers.append("ProofAlign repository commit/tree mismatch")
     checkout_roots = {
         "saber": REPO_ROOT / "external" / "SABER",
         "libero_safety": REPO_ROOT / "external" / "LIBERO-Safety",
@@ -259,6 +286,7 @@ def preflight(
             "sha256": confirmatory["base_population_sha256"],
         },
         "source_files": file_reports,
+        "repository_binding": repository_report,
         "checkouts": checkout_reports,
         "attack_model": {"path": str(model_root), "files": model_reports},
         "gpu": gpu_report,

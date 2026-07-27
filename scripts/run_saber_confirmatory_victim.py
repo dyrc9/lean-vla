@@ -603,6 +603,34 @@ def preflight(
         }
         if observed != expected:
             blockers.append(f"source digest mismatch: {relative}")
+    source = protocol["source"]
+    repository_report: dict[str, Any] = {
+        "expected_commit": source.get("repository_commit"),
+        "expected_tree": source.get("repository_tree"),
+    }
+    if repository_report["expected_commit"] is not None:
+        head = saber_io.run_command(
+            ("git", "rev-parse", "HEAD"), cwd=REPO_ROOT
+        )
+        tree = saber_io.run_command(
+            ("git", "rev-parse", "HEAD^{tree}"), cwd=REPO_ROOT
+        )
+        repository_report.update(
+            {
+                "observed_commit": head.stdout.strip(),
+                "observed_tree": tree.stdout.strip(),
+                "matches": (
+                    head.returncode == 0
+                    and tree.returncode == 0
+                    and head.stdout.strip()
+                    == repository_report["expected_commit"]
+                    and tree.stdout.strip()
+                    == repository_report["expected_tree"]
+                ),
+            }
+        )
+        if not repository_report["matches"]:
+            blockers.append("ProofAlign repository commit/tree mismatch")
     checkout_reports: dict[str, Any] = {}
     checkout_roots = {
         "libero_safety": REPO_ROOT / "external" / "LIBERO-Safety",
@@ -706,6 +734,7 @@ def preflight(
         },
         "episode_count": len(victim_episode_specs(confirmatory)),
         "source_files": source_reports,
+        "repository_binding": repository_report,
         "checkouts": checkout_reports,
         "checkpoint": {"path": str(checkpoint), "files": checkpoint_reports},
         "producer": producer_report,
