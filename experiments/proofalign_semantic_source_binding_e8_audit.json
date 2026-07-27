@@ -14,7 +14,7 @@
       "exists": true,
       "git_status": "clean",
       "path": "Makefile",
-      "sha256": "71a9fae6ddabd1d7f351c888e025968f03071dbc9ad3de0417641ad415c8ede2",
+      "sha256": "e1c400fd78d5d14e5bbd6793180974e9de20b0452a096b9b10c0450508f0a5b3",
       "tracked": true
     },
     {
@@ -62,7 +62,7 @@
       "exists": true,
       "git_status": "clean",
       "path": "docs/progress_and_plan.md",
-      "sha256": "aabfe758c3a7272cd34dd3d8a29201470fe25dd948fd9d1d8c933bbc4217c874",
+      "sha256": "ce2b36d196c9065c1b50a6305e9b9a7a07a65df718efa6da4187085091ffe242",
       "tracked": true
     },
     {
@@ -606,7 +606,7 @@
       "exists": true,
       "git_status": "clean",
       "path": "experiments/proofalign_semantic_v4_c5_readiness_packet_v1.json",
-      "sha256": "e6557b0d50f7d2ba81ef195ebe13b7ca30b8c67b9b44de5d4acc4b995d1cba63",
+      "sha256": "6da11fd217a021eec771f2b4684f226c2f78ecfbf77fee3278363bf5076e23a5",
       "tracked": true
     },
     {
@@ -709,8 +709,8 @@
   "policy_loaded": false,
   "repository_binding_semantics": "latest commit that changed the frozen semantic commit scope; later commits may contain only out-of-scope protocols or audit packets",
   "repository_fully_clean": true,
-  "repository_head_commit": "8423613cd3bf38121bf7f871f3bfd2497d71a706",
-  "repository_head_tree": "f516a462bc774ed25ff3ecde31d116b41c6da9e9",
+  "repository_head_commit": "f1c76fa033968bb22b4bdd86f2b9cad11910f01b",
+  "repository_head_tree": "a701866a2dae6c7f6817e48d0d6c5a10427830d7",
   "repository_status_row_count": 0,
   "schema": "proofalign.semantic-source-binding-e8-audit.v1",
   "simulator_created": false
