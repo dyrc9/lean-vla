@@ -56,7 +56,7 @@
   "policy_loaded": false,
   "protocol_id": "proofalign-four-arm-v4-causal-successor-20260727",
   "protocol_path": "experiments/proofalign_four_arm_v4_successor_protocol.json",
-  "protocol_sha256": "b461627fdc2f992b9854128bbfd0c573cc4405f7d89c2d2209023a7e365e600b",
+  "protocol_sha256": "8e353ac7ab195fcac583f2b1acf2ec261d16054decc89b6c24b66b1093ef39e2",
   "schema": "proofalign.four-arm-v4-orchestration-dry-run.v1",
   "simulator_created": false,
   "stages": [

@@ -102,7 +102,7 @@ def build_protocol() -> dict[str, Any]:
         "protocol_status": (
             "v4_successor_frozen_execution_not_authorized"
         ),
-        "created_at": "2026-07-27T18:00:00+08:00",
+        "created_at": "2026-07-27T17:38:00+08:00",
         "outcomes_observed": False,
         "paper_role": (
             "primary two-layer ablation after the M2 attack-foundation gate"
@@ -398,10 +398,11 @@ def build_protocol() -> dict[str, Any]:
         },
         "claim_boundary": (
             "This successor freezes the current semantic-v4 causal design, "
-            "schedule, ledger, clean gate, and terminal statistics before "
-            "M2 or four-arm outcomes. It authorizes no policy load, simulator "
-            "creation, dispatch, threshold change, replacement, deployment "
-            "claim, or hardware-safety claim."
+            "schedule, ledger, clean gate, and terminal statistics during "
+            "blinded M2 execution, before any M2 terminal outcome or "
+            "four-arm outcome was inspected. It authorizes no policy load, "
+            "simulator creation, dispatch, threshold change, replacement, "
+            "deployment claim, or hardware-safety claim."
         ),
     }
 

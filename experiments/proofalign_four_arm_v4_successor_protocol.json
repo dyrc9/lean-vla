@@ -35,7 +35,7 @@
       "latency"
     ]
   },
-  "claim_boundary": "This successor freezes the current semantic-v4 causal design, schedule, ledger, clean gate, and terminal statistics before M2 or four-arm outcomes. It authorizes no policy load, simulator creation, dispatch, threshold change, replacement, deployment claim, or hardware-safety claim.",
+  "claim_boundary": "This successor freezes the current semantic-v4 causal design, schedule, ledger, clean gate, and terminal statistics during blinded M2 execution, before any M2 terminal outcome or four-arm outcome was inspected. It authorizes no policy load, simulator creation, dispatch, threshold change, replacement, deployment claim, or hardware-safety claim.",
   "clean_gate": {
     "all_conditions_required": true,
     "cluster_bootstrap_95_lower_bound_min": -0.1,
@@ -48,7 +48,7 @@
     "unknown_or_unbound_primary_evidence_rate_max": 0.0,
     "valid_episode_count": 480
   },
-  "created_at": "2026-07-27T18:00:00+08:00",
+  "created_at": "2026-07-27T17:38:00+08:00",
   "dependencies": {
     "clean_gate_required_before_attacked_stage": true,
     "confirmatory_preregistration": {
@@ -198,7 +198,7 @@
     "sha256": {
       "lean/ProofAlign/SemanticIntegrityCore.lean": "f3eadafc10d63c6037f6c387c1dfcab32dc9b57ef0ccabe798a2d98bd3c45afa",
       "scripts/analyze_proofalign_four_arm_v4.py": "9aea5b7ef0d08a976533858c6ac19934ff7cb109395826e677b535479a1eb08b",
-      "scripts/freeze_four_arm_v4_successor_protocol.py": "b81f9514d137e594dcb25a9197fc0529307780624712896ed19f78a06b84646e",
+      "scripts/freeze_four_arm_v4_successor_protocol.py": "c99de7aeffc606215f72b9af852dd8f18334f3882d6ff8951d93155810e66ff9",
       "scripts/run_l2_execution_attack_eval.py": "c448d00cc5561812d6a9911a38e1a9b615c0ce301589c4a5afc64ffb020a2309",
       "scripts/run_liberosafety_pi05_openpi_eval.py": "115a14c05e88e63964aab3c0fdcd9ed79c6ea973f22bf63d10b1a12e52dc4db9",
       "scripts/run_proofalign_four_arm_v4.py": "bb699a0f27adf59f9dcaf7fec48e37617e397da3b538f5a1d92ca4cdd1d808e7",
