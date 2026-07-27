@@ -66,8 +66,8 @@
       "openpi_head_commit": "15a9616a00943ada6c20a0f158e3adb39df2ccac",
       "openpi_tracked_worktree_clean": true,
       "path": "experiments/proofalign_semantic_source_binding_e8_audit.json",
-      "repository_head_commit": "007cbac6ad74dfd0d5a6571e0d108968afdf89cc",
-      "sha256": "207393fe760b38c878f12a70eb5532dc21859c6840bbb65949bae5abf15cee2f"
+      "repository_head_commit": "ead63a74748944219a7d122155fc7f457541c918",
+      "sha256": "293d0906861ab10f382cf7a83dd09c07dfa7bacb4c26dfe00a427c6e38904576"
     },
     "qualified_observer_online_wiring": {
       "complete": true,
@@ -117,7 +117,7 @@
   "schema": "proofalign.semantic-post-e5-readiness.v1",
   "simulator_created_during_readiness_audit": false,
   "source_bindings": {
-    "Makefile": "fc2ee7bb088e827cf40622bc648d6b867082a77a38a5b00a12dad9cdb863a3e7",
+    "Makefile": "4d41bb4fd783e3d45f563f50e38a7f39e821d27853922b1a46543fd3a50d38c9",
     "scripts/check_all.sh": "cb691dd33d9c2bd8d12822d0e65a70c6961579d20d9e8d17e5298061b945d4e8",
     "scripts/generate_semantic_source_binding_e8.py": "27c7b766dd94d711ebf639b2b1de0be900a0c89aba3d76003bc7a2c9f76b2988",
     "scripts/prepare_deployment_perception_dataset_e7.py": "e64bd9467d3fdfadfde9bda950660f6e38e16bbe2c3a5895b913ab053b9d1035",
