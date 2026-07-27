@@ -94,8 +94,13 @@ phase-gating theorem，而不是事后附加的形式化说明。
 5. 两轮 closed-loop no-attack engineering smoke 已完成，效果契约 bug 已修复并由 E3/E5 v2 重新资格化；
 6. M2 outcome-blind producer 已冻结为 60 个 base pair、每 pair 一条攻击记录；当前唯一执行 blocker 是
    尚无第二张满足 `<1 GiB` 预启动门的空闲 GPU；
-7. producer 完成并校验后运行 M2 的 240 个 clean/attacked VLA-only episode；M2 gate 通过后才运行
-   480 clean 四臂和 480 attacked 四臂。
+7. producer 完成并校验后运行 M2 的 240 个 clean/attacked VLA-only episode；该冻结任务与 gate
+   保持不变；
+8. L2 可运行性审计已完成：原论文的 coordinated joint-space FDIA 不能在当前 LIBERO `ΔEEF+RGB`
+   接口中忠实复现；当前代码只实现原文三个 `S_u` 的 source-command-operator transfer，并显式测试
+   pre-boundary、post-boundary truthful 与 forged-receipt 三种位置。M2 通过后先跑 12 个 non-primary
+   engineering smoke，再补齐独立 online 四臂开关；1920 episodes 只是之后可冻结的上限，不再视为
+   已可启动计划。
 
 入口文档：
 
@@ -104,6 +109,7 @@ phase-gating theorem，而不是事后附加的形式化说明。
 - [零训练 semantic hierarchy](docs/semantic_subtask_hierarchy.md)
 - [ActionBlock assessor 设计与资格化](docs/action_block_assessment.md)
 - [实验协议](docs/experiments.md)
+- [L2 与跨层攻击实验计划](docs/l2_and_cross_layer_experiments.md)
 - [旧实验复用与迁移](docs/experiment_reuse.md)
 - [相关工作](docs/paper/related_work.md)
 - [论文故事](docs/paper/paper_story.md)

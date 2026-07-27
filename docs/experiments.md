@@ -179,3 +179,80 @@ interval。Dual 的安全增益和 utility non-inferiority 必须同时满足预
 6. physical safety（当前协议不支持）。
 
 不得跨级。
+
+## 7. Post-M2 successor：externally grounded L2 与跨层实验
+
+M2 及其既有 gate 不因 successor 计划发生变化。可运行性审计确认当前 online runner 只有 VLA-only
+和同时绑定 semantic/execution 的 dual-like path；Semantic-only 与 Execution-only 尚未独立接线。
+因此原计划的 480 clean 与 480 attacked 四臂目前只保留为待实现设计，不得直接启动或解释为：
+
+- 已完成的 clean 四臂 efficacy；
+- 已完成的 SABER-only 四臂 efficacy。
+
+其攻击条件定义仍是 Clean（无 semantic/execution attack）和 SABER-only（只有已发表的 SABER
+semantic attack）。
+
+随后新增的 L2 与全链路证据不使用按 ProofAlign predicate 取反的自构造 case 作为主攻击。完整协议见
+[《L2 与跨层攻击实验计划》](l2_and_cross_layer_experiments.md)。核心外部来源为：
+
+- L2-A：精确冻结 Ueda–Blevins scaling、reflection、shearing 的 `S_u`，只作为从 joint velocity 到
+  LIBERO delta-EEF 的 `source_command_operator_transfer`；不复现 coordinated observation attack，
+  不声称 perfectly undetectable；
+- L2-B：ROS-Industrial replay 只保留 threat grounding；online cross-transaction capture/transport
+  完成前不产出 efficacy；
+- L2-C：当前缺少 feedback-linearized controller/state estimator，状态固定为
+  `interface_not_supported`；
+- Full chain：等独立 online 四臂和 non-primary smoke 通过后，再冻结 SABER × source-operator
+  primary。
+
+wrong digest/receipt、open window、unknown evidence 和 invalid phase advance 继续属于 A3/A4/Lean formal
+negative suite，只支持 component semantics 与 implementation audit，不单独支持现实攻击 efficacy。
+
+## 8. 扩展后的攻击/防御 factorial
+
+攻击侧：
+
+| Attack cell | Semantic attack | Execution attack |
+|---|---:|---:|
+| Clean | off | off |
+| S-only | SABER | off |
+| B-only | off | source `S_u` operator transfer |
+| Chained | SABER | source `S_u` operator transfer |
+
+目标防御侧仍为 VLA-only、Semantic-only、Execution-only 与 Dual 四臂，但 online implementation
+尚未完成。60 base pairs × 2 seeds × 4 arms × 4 attack cells = 1920 只是后续 Gate L2-3 可选择的
+上限，不是当前默认执行量。同一 base pair 的两个 seed 必须共享 outcome-blind attack record；三个
+source operator 的分配由预注册 mapping 决定，不允许 outcome-driven replacement 或 best-of-N。
+
+主报告必须逐段分解：
+
+- semantic divergence 与 L1 allow；
+- altered candidate 是否在 `env.step` 前被拒绝；
+- altered `env.step` input 与 detection 前执行次数；
+- forged receipt acceptance；
+- missing/forbidden/harmful effect；
+- false phase advance 或 containment；
+- clean retention、unknown、deadlock 和 time-to-completion。
+
+在线 effect observer 不能充当唯一 ground truth；独立 evaluator 必须读取 raw simulator state、实际
+`env.step` 输入、contact/object/gripper trace。当前没有 actuator telemetry，所以不得称为 hardware
+applied-action conformance。
+
+## 9. 扩展 gate 顺序
+
+~~~text
+current frozen producer/M2 240 episodes
+  -> M2 denominator/signal gate
+  -> source-matrix and P1/P2/P3 mock-online regression
+  -> 12-episode non-primary execution-node smoke
+  -> implement independent online L1/L2 arm switches
+  -> shared-source-chunk four-arm identity gate
+  -> freeze population/family/placement/endpoints/stopping rule
+  -> affine-only and SABER × L2 primary
+  -> adapted replay only after online capture/transport exists
+  -> independent terminal audit and cluster-bootstrap analysis
+~~~
+
+L2 结果统一称为 source-operator-grounded case studies；全链路结果称为 SABER 与 source-command
+operator transfer 的 cross-layer composition study。当前协议不支持将它们扩写为 Ueda--Blevins
+stealth reproduction、通用执行安全、完整硬件 attestation 或标准化 L2 benchmark。

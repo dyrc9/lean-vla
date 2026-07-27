@@ -304,3 +304,37 @@ C1 semantic digest schema（已实现）
 
 当前已按预注册回退到 deterministic task-FSM L1。不得用 M2/four-arm outcome 反向调整
 selector/checker/effect observer。
+
+## 8. M2 后的 published-attack-grounded successor
+
+当前正在推进的 M2 producer/victim 任务、240-episode population 和全部 stopping/gate rule 保持不变。
+M2 gate 关闭前不启动新的 confirmatory L2 或 chained outcome。完整 successor 见
+[《L2 与跨层攻击实验计划》](l2_and_cross_layer_experiments.md)。
+
+可运行性审计后的新增主线为：
+
+1. 已冻结 Ueda–Blevins 三个原始 `S_u`；当前只将其作用到 LIBERO 前六个 delta-EEF channel，标记为
+   `source_command_operator_transfer`，不声称复现 coordinated joint-space stealth attack；
+2. 先用 mock-online tests 固化 pre-boundary、post-boundary truthful、post-boundary forged 三个位置；
+3. M2 通过后运行 12 个 non-primary engineering episodes，只检查 hook/audit/interface，不比较 efficacy；
+4. 将 online runner 的 L1 semantic alignment 与 L2 execution integrity 拆成两个独立开关，并证明四臂
+   共享相同 source action chunk；
+5. 上述 gate 通过后，才冻结 affine-only 与 SABER × L2 的 population、family assignment、placement、
+   endpoint、stopping rule 和资源规模；1920 episodes 只是可选上限，不是当前已可启动计划；
+6. ROS replay 等 online cross-transaction capture/transport 完成后再运行；没有 ROS graph 时只称
+   adapted captured-prefix replay；
+7. 当前 feedback-linearized FDIA 明确记录 `interface_not_supported`，不以 privileged-state fixture
+   替代；
+8. 最终用独立 raw simulator evaluator 完成 terminal audit 和 base-pair cluster-bootstrap 分析。
+
+Evidence naming 固定为：
+
+- SABER：L1 benchmark；
+- source `S_u` transfer：externally grounded operator-transfer L2 case study；
+- ROS replay：只有 online capture/transport gate 通过后才是 adapted replay case study；
+- feedback FDIA：当前只报告 `interface_not_supported`；
+- SABER × source operator：cross-layer composition study；
+- wrong digest/receipt/effect/phase：formal negative suite。
+
+这项 successor 不授权修改历史 frozen artifact，也不授权把 L2 case-study 结果称为标准化 benchmark、
+一般物理安全或完整硬件 attestation。
