@@ -304,3 +304,32 @@ C1 semantic digest schema（已实现）
 
 当前已按预注册回退到 deterministic task-FSM L1。不得用 M2/four-arm outcome 反向调整
 selector/checker/effect observer。
+
+## 8. M2 后的 published-attack-grounded successor
+
+当前正在推进的 M2 producer/victim 任务、240-episode population 和全部 stopping/gate rule 保持不变。
+M2 gate 关闭前不启动新的 confirmatory L2 或 chained outcome。完整 successor 见
+[《L2 与跨层攻击实验计划》](l2_and_cross_layer_experiments.md)。
+
+M2 通过后的新增主线为：
+
+1. 保留原计划的 480 clean 与 480 SABER-only 四臂；
+2. 冻结 Ueda–Blevins affine transformation attack 到 LIBERO delta-EEF interface 的 source-parameter
+   mapping，并完成 no-outcome hook qualification；
+3. 运行 affine-only L2 case study，分别覆盖预注册 scaling、reflection、shearing；
+4. 迁移 ROS-Industrial PitM captured-command replay 与 modified replay，作为 freshness/replay case study；
+5. 只有在 feedback/state-estimator interface qualification 通过时运行 stealthy FDIA case；否则记录
+   interface_not_supported，不以 fixture 替代；
+6. 运行 480 个 SABER × affine chained 四臂 episode；
+7. 用独立 raw simulator evaluator 完成 terminal audit 和 base-pair cluster-bootstrap 分析。
+
+Evidence naming 固定为：
+
+- SABER：L1 benchmark；
+- affine、ROS replay、FDIA：externally grounded L2 case studies；
+- SABER × affine：cross-layer composition study；
+- wrong digest/receipt/effect/phase：formal negative suite。
+
+这项 successor 不授权修改历史 frozen artifact，也不授权把 L2 case-study 结果称为标准化 benchmark、
+一般物理安全或完整硬件 attestation。
+
