@@ -1,0 +1,4055 @@
+{
+  "actions_executed": false,
+  "bddl_bindings": {
+    "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate.bddl": "9b59eb1287802868ad9bc78d58e6d36d4ba31134e679cfdbdf4b0feb660c959b",
+    "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_from_table_center_and_place_it_on_the_plate.bddl": "5e19880ebc844f86b89f63b172aab0b7a89f85b6e6955891f544f0ea7d0795d5",
+    "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_in_the_top_drawer_of_the_wooden_cabinet_and_place_it_on_the_plate.bddl": "4371189e11d9fd29bb548ab9a8adcd741bb0ce41bb66c612672d0e8cb29a52a9",
+    "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_next_to_the_cookie_box_and_place_it_on_the_plate.bddl": "566c65596f3472e752e6522817bff51bbf3ce5159d7bec1d3554e5ead46b1e55",
+    "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_next_to_the_plate_and_place_it_on_the_plate.bddl": "c8fbb9effa27b947d04d26862d75273d93cac1806734e53836cd472a08aec1fe",
+    "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_next_to_the_ramekin_and_place_it_on_the_plate.bddl": "53a7516571412a2f46a27cbf8482d3b76dbad4221858c8f6b565d506c274e61d",
+    "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_on_the_cookie_box_and_place_it_on_the_plate.bddl": "3d4ccf070c3d9883ae0676f2d888588f98c696ddad71b7694f47c379fc99ef36",
+    "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_on_the_ramekin_and_place_it_on_the_plate.bddl": "10239815a9d18ad53e09365d453a362ee54d29ca276e04eef411cf1db8d72940",
+    "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_on_the_stove_and_place_it_on_the_plate.bddl": "dd11837141a30d874ebbbfaae20e91ecc67ec85ab3872ceb4cff3abfcbef7cb0",
+    "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_on_the_wooden_cabinet_and_place_it_on_the_plate.bddl": "5293e759381b477e126beaf83d738542bbd4d93f522a3eead1066e612bad4a8c"
+  },
+  "case_count": 160,
+  "claim_boundary": "Exhaustive finite boundary evidence for deterministic task-graph selection given exact benchmark privileged geometry. It does not qualify camera perception, hardware attestation, learned semantics, deployment generalization, efficacy, or safety.",
+  "classification": "deterministic_fsm_fallback_gate_pass",
+  "evidence_id": "proofalign-deterministic-selector-e1f-20260725",
+  "exact_match_count": 160,
+  "exact_match_rate": 1.0,
+  "gate_results": {
+    "exact_case_rate": true,
+    "p99_latency": true,
+    "unknown_fail_closed_rate": true
+  },
+  "geometry_mode": "benchmark_privileged_state",
+  "latency_ns": {
+    "maximum": 57732,
+    "measurement_count": 16000,
+    "p50": 4740,
+    "p95": 6500,
+    "p99": 7100
+  },
+  "outcomes_read": false,
+  "policy_loaded": false,
+  "protocol_binding": {
+    "path": "experiments/proofalign_deterministic_selector_e1f_protocol.json",
+    "protocol_id": "proofalign-deterministic-selector-e1f-20260725",
+    "sha256": "befd5656f908a118ef6eda112132ee350b2553c1c1de44f9337d62eb4db9e355"
+  },
+  "qualified": true,
+  "rows": [
+    {
+      "case_family": "missing_target_geometry",
+      "case_index": 0,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": false,
+        "reason": "missing_target_geometry",
+        "verb": "unknown"
+      },
+      "first_latency_ns": 7961,
+      "observation_digest": "ee1a46e03bbd2eeeb5fc662c28d9fad0df0c7f9037050603e8afe6383ce37a92",
+      "observed": {
+        "finished": false,
+        "known": false,
+        "reason": "missing_target_geometry",
+        "selected_subtask": "unknown(missing_target_geometry)",
+        "verb": "unknown"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "96ae34b3b2a53ba02732dd893ea64c3ae4a456325326447b15ec03fb3569ca4b",
+      "task_index": 0
+    },
+    {
+      "case_family": "missing_destination_geometry",
+      "case_index": 1,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": false,
+        "reason": "missing_destination_geometry",
+        "verb": "unknown"
+      },
+      "first_latency_ns": 4010,
+      "observation_digest": "d0955fd128c2d18c88ca33e57a6bc800052659d6a16982a396a46e4d3fc9f461",
+      "observed": {
+        "finished": false,
+        "known": false,
+        "reason": "missing_destination_geometry",
+        "selected_subtask": "unknown(missing_destination_geometry)",
+        "verb": "unknown"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "96ae34b3b2a53ba02732dd893ea64c3ae4a456325326447b15ec03fb3569ca4b",
+      "task_index": 0
+    },
+    {
+      "case_family": "open_far_target_pick",
+      "case_index": 2,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "target_not_held",
+        "verb": "pick_up"
+      },
+      "first_latency_ns": 10671,
+      "observation_digest": "9a7c86aa141e36c4e604671616235aa71e41c005d854df1aa4d11723299796a9",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "target_not_held",
+        "selected_subtask": "pick_up(akita_black_bowl_1)",
+        "verb": "pick_up"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "96ae34b3b2a53ba02732dd893ea64c3ae4a456325326447b15ec03fb3569ca4b",
+      "task_index": 0
+    },
+    {
+      "case_family": "open_goal_satisfied_finish",
+      "case_index": 3,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": true,
+        "known": true,
+        "reason": "all_supported_goals_satisfied",
+        "verb": "finish"
+      },
+      "first_latency_ns": 4691,
+      "observation_digest": "69cb669a4f695fb7babfedd4285903ad69b18ee26f42a699090c4d081bceecf4",
+      "observed": {
+        "finished": true,
+        "known": true,
+        "reason": "all_supported_goals_satisfied",
+        "selected_subtask": "finish()",
+        "verb": "finish"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "96ae34b3b2a53ba02732dd893ea64c3ae4a456325326447b15ec03fb3569ca4b",
+      "task_index": 0
+    },
+    {
+      "case_family": "closed_unbound_target_unknown",
+      "case_index": 4,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": false,
+        "reason": "closed_without_bound_target",
+        "verb": "unknown"
+      },
+      "first_latency_ns": 7020,
+      "observation_digest": "66b7dc3b9e805107ee6887e8b2fe55c8f557d8afc97d3edc7b668f684bdba6e3",
+      "observed": {
+        "finished": false,
+        "known": false,
+        "reason": "closed_without_bound_target",
+        "selected_subtask": "unknown(closed_without_bound_target)",
+        "verb": "unknown"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "96ae34b3b2a53ba02732dd893ea64c3ae4a456325326447b15ec03fb3569ca4b",
+      "task_index": 0
+    },
+    {
+      "case_family": "closed_held_far_move",
+      "case_index": 5,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "verb": "move"
+      },
+      "first_latency_ns": 7570,
+      "observation_digest": "ab1596cdb4e399c04be11ecebd4cfe95a3b35a525e298c376c2dee798de84939",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "selected_subtask": "move(akita_black_bowl_1,plate_1)",
+        "verb": "move"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "96ae34b3b2a53ba02732dd893ea64c3ae4a456325326447b15ec03fb3569ca4b",
+      "task_index": 0
+    },
+    {
+      "case_family": "closed_held_place_region",
+      "case_index": 6,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_requires_placement",
+        "verb": "place"
+      },
+      "first_latency_ns": 8901,
+      "observation_digest": "9154d6347359e1b56f2fec94b0c2eb6a06581d2dd986f09b692b1f445686c00b",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_requires_placement",
+        "selected_subtask": "place(akita_black_bowl_1,plate_1)",
+        "verb": "place"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "96ae34b3b2a53ba02732dd893ea64c3ae4a456325326447b15ec03fb3569ca4b",
+      "task_index": 0
+    },
+    {
+      "case_family": "closed_held_release_region",
+      "case_index": 7,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_inside_release_region",
+        "verb": "release"
+      },
+      "first_latency_ns": 8561,
+      "observation_digest": "fcbb822914260143e29911d93ff2343809af1b27f6b91a4e4ffd375e487a7e93",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_inside_release_region",
+        "selected_subtask": "release(akita_black_bowl_1)",
+        "verb": "release"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "96ae34b3b2a53ba02732dd893ea64c3ae4a456325326447b15ec03fb3569ca4b",
+      "task_index": 0
+    },
+    {
+      "case_family": "held_boundary_inside",
+      "case_index": 8,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "verb": "move"
+      },
+      "first_latency_ns": 7610,
+      "observation_digest": "253d34475aa03fb50a60f69aa9d43125966feedd4fa78f69046a12ca44d8e9e4",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "selected_subtask": "move(akita_black_bowl_1,plate_1)",
+        "verb": "move"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "96ae34b3b2a53ba02732dd893ea64c3ae4a456325326447b15ec03fb3569ca4b",
+      "task_index": 0
+    },
+    {
+      "case_family": "held_boundary_outside",
+      "case_index": 9,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": false,
+        "reason": "closed_without_bound_target",
+        "verb": "unknown"
+      },
+      "first_latency_ns": 4890,
+      "observation_digest": "4f508140358b03cef27ac430658331b34f5fc11cf85bfbee281a034414eb5c5c",
+      "observed": {
+        "finished": false,
+        "known": false,
+        "reason": "closed_without_bound_target",
+        "selected_subtask": "unknown(closed_without_bound_target)",
+        "verb": "unknown"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "96ae34b3b2a53ba02732dd893ea64c3ae4a456325326447b15ec03fb3569ca4b",
+      "task_index": 0
+    },
+    {
+      "case_family": "gripper_boundary_closed",
+      "case_index": 10,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "verb": "move"
+      },
+      "first_latency_ns": 6401,
+      "observation_digest": "09753b40890d4f95a46507d12c9df5a7d2d7665dcfa7b5efadd765bcc638f5a5",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "selected_subtask": "move(akita_black_bowl_1,plate_1)",
+        "verb": "move"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "96ae34b3b2a53ba02732dd893ea64c3ae4a456325326447b15ec03fb3569ca4b",
+      "task_index": 0
+    },
+    {
+      "case_family": "gripper_boundary_open",
+      "case_index": 11,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "target_not_held",
+        "verb": "pick_up"
+      },
+      "first_latency_ns": 4660,
+      "observation_digest": "3a1095f7c907bb769db20bcbdf4772bf2072abb56e4c5589c541dd3c3e1e038c",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "target_not_held",
+        "selected_subtask": "pick_up(akita_black_bowl_1)",
+        "verb": "pick_up"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "96ae34b3b2a53ba02732dd893ea64c3ae4a456325326447b15ec03fb3569ca4b",
+      "task_index": 0
+    },
+    {
+      "case_family": "destination_xy_boundary_inside",
+      "case_index": 12,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_requires_placement",
+        "verb": "place"
+      },
+      "first_latency_ns": 7371,
+      "observation_digest": "afa5fabc9d2016b6faf1088615cade182117b940344574ad2c2f4e75f1443862",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_requires_placement",
+        "selected_subtask": "place(akita_black_bowl_1,plate_1)",
+        "verb": "place"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "96ae34b3b2a53ba02732dd893ea64c3ae4a456325326447b15ec03fb3569ca4b",
+      "task_index": 0
+    },
+    {
+      "case_family": "destination_xy_boundary_outside",
+      "case_index": 13,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "verb": "move"
+      },
+      "first_latency_ns": 6271,
+      "observation_digest": "84effa086a5a44f69b575b9789963283d2be095ccc34ec915cc516140a4224e2",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "selected_subtask": "move(akita_black_bowl_1,plate_1)",
+        "verb": "move"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "96ae34b3b2a53ba02732dd893ea64c3ae4a456325326447b15ec03fb3569ca4b",
+      "task_index": 0
+    },
+    {
+      "case_family": "release_radius_inside",
+      "case_index": 14,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_inside_release_region",
+        "verb": "release"
+      },
+      "first_latency_ns": 9650,
+      "observation_digest": "44aea549a86f0843e1ca8a756b413e664e863fa75101001abc5f208ac1295e39",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_inside_release_region",
+        "selected_subtask": "release(akita_black_bowl_1)",
+        "verb": "release"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "96ae34b3b2a53ba02732dd893ea64c3ae4a456325326447b15ec03fb3569ca4b",
+      "task_index": 0
+    },
+    {
+      "case_family": "release_radius_outside",
+      "case_index": 15,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_requires_placement",
+        "verb": "place"
+      },
+      "first_latency_ns": 7000,
+      "observation_digest": "5cbd5f264980f13b18b07ddee02b2dcef0179bcc916cd9eb2e1a573c26f354f3",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_requires_placement",
+        "selected_subtask": "place(akita_black_bowl_1,plate_1)",
+        "verb": "place"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "96ae34b3b2a53ba02732dd893ea64c3ae4a456325326447b15ec03fb3569ca4b",
+      "task_index": 0
+    },
+    {
+      "case_family": "missing_target_geometry",
+      "case_index": 0,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": false,
+        "reason": "missing_target_geometry",
+        "verb": "unknown"
+      },
+      "first_latency_ns": 4620,
+      "observation_digest": "ee1a46e03bbd2eeeb5fc662c28d9fad0df0c7f9037050603e8afe6383ce37a92",
+      "observed": {
+        "finished": false,
+        "known": false,
+        "reason": "missing_target_geometry",
+        "selected_subtask": "unknown(missing_target_geometry)",
+        "verb": "unknown"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_from_table_center_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "d7c99616167aa75ef624788ac68c1ad6e731ba909745acf9a051c33b61a6ae6e",
+      "task_index": 1
+    },
+    {
+      "case_family": "missing_destination_geometry",
+      "case_index": 1,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": false,
+        "reason": "missing_destination_geometry",
+        "verb": "unknown"
+      },
+      "first_latency_ns": 3011,
+      "observation_digest": "d0955fd128c2d18c88ca33e57a6bc800052659d6a16982a396a46e4d3fc9f461",
+      "observed": {
+        "finished": false,
+        "known": false,
+        "reason": "missing_destination_geometry",
+        "selected_subtask": "unknown(missing_destination_geometry)",
+        "verb": "unknown"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_from_table_center_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "d7c99616167aa75ef624788ac68c1ad6e731ba909745acf9a051c33b61a6ae6e",
+      "task_index": 1
+    },
+    {
+      "case_family": "open_far_target_pick",
+      "case_index": 2,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "target_not_held",
+        "verb": "pick_up"
+      },
+      "first_latency_ns": 5910,
+      "observation_digest": "9a7c86aa141e36c4e604671616235aa71e41c005d854df1aa4d11723299796a9",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "target_not_held",
+        "selected_subtask": "pick_up(akita_black_bowl_1)",
+        "verb": "pick_up"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_from_table_center_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "d7c99616167aa75ef624788ac68c1ad6e731ba909745acf9a051c33b61a6ae6e",
+      "task_index": 1
+    },
+    {
+      "case_family": "open_goal_satisfied_finish",
+      "case_index": 3,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": true,
+        "known": true,
+        "reason": "all_supported_goals_satisfied",
+        "verb": "finish"
+      },
+      "first_latency_ns": 3790,
+      "observation_digest": "69cb669a4f695fb7babfedd4285903ad69b18ee26f42a699090c4d081bceecf4",
+      "observed": {
+        "finished": true,
+        "known": true,
+        "reason": "all_supported_goals_satisfied",
+        "selected_subtask": "finish()",
+        "verb": "finish"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_from_table_center_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "d7c99616167aa75ef624788ac68c1ad6e731ba909745acf9a051c33b61a6ae6e",
+      "task_index": 1
+    },
+    {
+      "case_family": "closed_unbound_target_unknown",
+      "case_index": 4,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": false,
+        "reason": "closed_without_bound_target",
+        "verb": "unknown"
+      },
+      "first_latency_ns": 4900,
+      "observation_digest": "66b7dc3b9e805107ee6887e8b2fe55c8f557d8afc97d3edc7b668f684bdba6e3",
+      "observed": {
+        "finished": false,
+        "known": false,
+        "reason": "closed_without_bound_target",
+        "selected_subtask": "unknown(closed_without_bound_target)",
+        "verb": "unknown"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_from_table_center_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "d7c99616167aa75ef624788ac68c1ad6e731ba909745acf9a051c33b61a6ae6e",
+      "task_index": 1
+    },
+    {
+      "case_family": "closed_held_far_move",
+      "case_index": 5,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "verb": "move"
+      },
+      "first_latency_ns": 6660,
+      "observation_digest": "ab1596cdb4e399c04be11ecebd4cfe95a3b35a525e298c376c2dee798de84939",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "selected_subtask": "move(akita_black_bowl_1,plate_1)",
+        "verb": "move"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_from_table_center_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "d7c99616167aa75ef624788ac68c1ad6e731ba909745acf9a051c33b61a6ae6e",
+      "task_index": 1
+    },
+    {
+      "case_family": "closed_held_place_region",
+      "case_index": 6,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_requires_placement",
+        "verb": "place"
+      },
+      "first_latency_ns": 7650,
+      "observation_digest": "9154d6347359e1b56f2fec94b0c2eb6a06581d2dd986f09b692b1f445686c00b",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_requires_placement",
+        "selected_subtask": "place(akita_black_bowl_1,plate_1)",
+        "verb": "place"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_from_table_center_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "d7c99616167aa75ef624788ac68c1ad6e731ba909745acf9a051c33b61a6ae6e",
+      "task_index": 1
+    },
+    {
+      "case_family": "closed_held_release_region",
+      "case_index": 7,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_inside_release_region",
+        "verb": "release"
+      },
+      "first_latency_ns": 7690,
+      "observation_digest": "fcbb822914260143e29911d93ff2343809af1b27f6b91a4e4ffd375e487a7e93",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_inside_release_region",
+        "selected_subtask": "release(akita_black_bowl_1)",
+        "verb": "release"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_from_table_center_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "d7c99616167aa75ef624788ac68c1ad6e731ba909745acf9a051c33b61a6ae6e",
+      "task_index": 1
+    },
+    {
+      "case_family": "held_boundary_inside",
+      "case_index": 8,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "verb": "move"
+      },
+      "first_latency_ns": 6770,
+      "observation_digest": "253d34475aa03fb50a60f69aa9d43125966feedd4fa78f69046a12ca44d8e9e4",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "selected_subtask": "move(akita_black_bowl_1,plate_1)",
+        "verb": "move"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_from_table_center_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "d7c99616167aa75ef624788ac68c1ad6e731ba909745acf9a051c33b61a6ae6e",
+      "task_index": 1
+    },
+    {
+      "case_family": "held_boundary_outside",
+      "case_index": 9,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": false,
+        "reason": "closed_without_bound_target",
+        "verb": "unknown"
+      },
+      "first_latency_ns": 5241,
+      "observation_digest": "4f508140358b03cef27ac430658331b34f5fc11cf85bfbee281a034414eb5c5c",
+      "observed": {
+        "finished": false,
+        "known": false,
+        "reason": "closed_without_bound_target",
+        "selected_subtask": "unknown(closed_without_bound_target)",
+        "verb": "unknown"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_from_table_center_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "d7c99616167aa75ef624788ac68c1ad6e731ba909745acf9a051c33b61a6ae6e",
+      "task_index": 1
+    },
+    {
+      "case_family": "gripper_boundary_closed",
+      "case_index": 10,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "verb": "move"
+      },
+      "first_latency_ns": 6270,
+      "observation_digest": "09753b40890d4f95a46507d12c9df5a7d2d7665dcfa7b5efadd765bcc638f5a5",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "selected_subtask": "move(akita_black_bowl_1,plate_1)",
+        "verb": "move"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_from_table_center_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "d7c99616167aa75ef624788ac68c1ad6e731ba909745acf9a051c33b61a6ae6e",
+      "task_index": 1
+    },
+    {
+      "case_family": "gripper_boundary_open",
+      "case_index": 11,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "target_not_held",
+        "verb": "pick_up"
+      },
+      "first_latency_ns": 4390,
+      "observation_digest": "3a1095f7c907bb769db20bcbdf4772bf2072abb56e4c5589c541dd3c3e1e038c",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "target_not_held",
+        "selected_subtask": "pick_up(akita_black_bowl_1)",
+        "verb": "pick_up"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_from_table_center_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "d7c99616167aa75ef624788ac68c1ad6e731ba909745acf9a051c33b61a6ae6e",
+      "task_index": 1
+    },
+    {
+      "case_family": "destination_xy_boundary_inside",
+      "case_index": 12,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_requires_placement",
+        "verb": "place"
+      },
+      "first_latency_ns": 6900,
+      "observation_digest": "afa5fabc9d2016b6faf1088615cade182117b940344574ad2c2f4e75f1443862",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_requires_placement",
+        "selected_subtask": "place(akita_black_bowl_1,plate_1)",
+        "verb": "place"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_from_table_center_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "d7c99616167aa75ef624788ac68c1ad6e731ba909745acf9a051c33b61a6ae6e",
+      "task_index": 1
+    },
+    {
+      "case_family": "destination_xy_boundary_outside",
+      "case_index": 13,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "verb": "move"
+      },
+      "first_latency_ns": 6190,
+      "observation_digest": "84effa086a5a44f69b575b9789963283d2be095ccc34ec915cc516140a4224e2",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "selected_subtask": "move(akita_black_bowl_1,plate_1)",
+        "verb": "move"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_from_table_center_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "d7c99616167aa75ef624788ac68c1ad6e731ba909745acf9a051c33b61a6ae6e",
+      "task_index": 1
+    },
+    {
+      "case_family": "release_radius_inside",
+      "case_index": 14,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_inside_release_region",
+        "verb": "release"
+      },
+      "first_latency_ns": 6880,
+      "observation_digest": "44aea549a86f0843e1ca8a756b413e664e863fa75101001abc5f208ac1295e39",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_inside_release_region",
+        "selected_subtask": "release(akita_black_bowl_1)",
+        "verb": "release"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_from_table_center_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "d7c99616167aa75ef624788ac68c1ad6e731ba909745acf9a051c33b61a6ae6e",
+      "task_index": 1
+    },
+    {
+      "case_family": "release_radius_outside",
+      "case_index": 15,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_requires_placement",
+        "verb": "place"
+      },
+      "first_latency_ns": 6850,
+      "observation_digest": "5cbd5f264980f13b18b07ddee02b2dcef0179bcc916cd9eb2e1a573c26f354f3",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_requires_placement",
+        "selected_subtask": "place(akita_black_bowl_1,plate_1)",
+        "verb": "place"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_from_table_center_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "d7c99616167aa75ef624788ac68c1ad6e731ba909745acf9a051c33b61a6ae6e",
+      "task_index": 1
+    },
+    {
+      "case_family": "missing_target_geometry",
+      "case_index": 0,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": false,
+        "reason": "missing_target_geometry",
+        "verb": "unknown"
+      },
+      "first_latency_ns": 4380,
+      "observation_digest": "ee1a46e03bbd2eeeb5fc662c28d9fad0df0c7f9037050603e8afe6383ce37a92",
+      "observed": {
+        "finished": false,
+        "known": false,
+        "reason": "missing_target_geometry",
+        "selected_subtask": "unknown(missing_target_geometry)",
+        "verb": "unknown"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_in_the_top_drawer_of_the_wooden_cabinet_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "de304f1e5be2764f86c7040890ed611532081aca1b8f450f134446d8f0fb11aa",
+      "task_index": 2
+    },
+    {
+      "case_family": "missing_destination_geometry",
+      "case_index": 1,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": false,
+        "reason": "missing_destination_geometry",
+        "verb": "unknown"
+      },
+      "first_latency_ns": 3020,
+      "observation_digest": "d0955fd128c2d18c88ca33e57a6bc800052659d6a16982a396a46e4d3fc9f461",
+      "observed": {
+        "finished": false,
+        "known": false,
+        "reason": "missing_destination_geometry",
+        "selected_subtask": "unknown(missing_destination_geometry)",
+        "verb": "unknown"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_in_the_top_drawer_of_the_wooden_cabinet_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "de304f1e5be2764f86c7040890ed611532081aca1b8f450f134446d8f0fb11aa",
+      "task_index": 2
+    },
+    {
+      "case_family": "open_far_target_pick",
+      "case_index": 2,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "target_not_held",
+        "verb": "pick_up"
+      },
+      "first_latency_ns": 5291,
+      "observation_digest": "9a7c86aa141e36c4e604671616235aa71e41c005d854df1aa4d11723299796a9",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "target_not_held",
+        "selected_subtask": "pick_up(akita_black_bowl_1)",
+        "verb": "pick_up"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_in_the_top_drawer_of_the_wooden_cabinet_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "de304f1e5be2764f86c7040890ed611532081aca1b8f450f134446d8f0fb11aa",
+      "task_index": 2
+    },
+    {
+      "case_family": "open_goal_satisfied_finish",
+      "case_index": 3,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": true,
+        "known": true,
+        "reason": "all_supported_goals_satisfied",
+        "verb": "finish"
+      },
+      "first_latency_ns": 3970,
+      "observation_digest": "69cb669a4f695fb7babfedd4285903ad69b18ee26f42a699090c4d081bceecf4",
+      "observed": {
+        "finished": true,
+        "known": true,
+        "reason": "all_supported_goals_satisfied",
+        "selected_subtask": "finish()",
+        "verb": "finish"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_in_the_top_drawer_of_the_wooden_cabinet_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "de304f1e5be2764f86c7040890ed611532081aca1b8f450f134446d8f0fb11aa",
+      "task_index": 2
+    },
+    {
+      "case_family": "closed_unbound_target_unknown",
+      "case_index": 4,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": false,
+        "reason": "closed_without_bound_target",
+        "verb": "unknown"
+      },
+      "first_latency_ns": 5450,
+      "observation_digest": "66b7dc3b9e805107ee6887e8b2fe55c8f557d8afc97d3edc7b668f684bdba6e3",
+      "observed": {
+        "finished": false,
+        "known": false,
+        "reason": "closed_without_bound_target",
+        "selected_subtask": "unknown(closed_without_bound_target)",
+        "verb": "unknown"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_in_the_top_drawer_of_the_wooden_cabinet_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "de304f1e5be2764f86c7040890ed611532081aca1b8f450f134446d8f0fb11aa",
+      "task_index": 2
+    },
+    {
+      "case_family": "closed_held_far_move",
+      "case_index": 5,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "verb": "move"
+      },
+      "first_latency_ns": 6270,
+      "observation_digest": "ab1596cdb4e399c04be11ecebd4cfe95a3b35a525e298c376c2dee798de84939",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "selected_subtask": "move(akita_black_bowl_1,plate_1)",
+        "verb": "move"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_in_the_top_drawer_of_the_wooden_cabinet_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "de304f1e5be2764f86c7040890ed611532081aca1b8f450f134446d8f0fb11aa",
+      "task_index": 2
+    },
+    {
+      "case_family": "closed_held_place_region",
+      "case_index": 6,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_requires_placement",
+        "verb": "place"
+      },
+      "first_latency_ns": 6310,
+      "observation_digest": "9154d6347359e1b56f2fec94b0c2eb6a06581d2dd986f09b692b1f445686c00b",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_requires_placement",
+        "selected_subtask": "place(akita_black_bowl_1,plate_1)",
+        "verb": "place"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_in_the_top_drawer_of_the_wooden_cabinet_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "de304f1e5be2764f86c7040890ed611532081aca1b8f450f134446d8f0fb11aa",
+      "task_index": 2
+    },
+    {
+      "case_family": "closed_held_release_region",
+      "case_index": 7,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_inside_release_region",
+        "verb": "release"
+      },
+      "first_latency_ns": 5950,
+      "observation_digest": "fcbb822914260143e29911d93ff2343809af1b27f6b91a4e4ffd375e487a7e93",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_inside_release_region",
+        "selected_subtask": "release(akita_black_bowl_1)",
+        "verb": "release"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_in_the_top_drawer_of_the_wooden_cabinet_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "de304f1e5be2764f86c7040890ed611532081aca1b8f450f134446d8f0fb11aa",
+      "task_index": 2
+    },
+    {
+      "case_family": "held_boundary_inside",
+      "case_index": 8,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "verb": "move"
+      },
+      "first_latency_ns": 5240,
+      "observation_digest": "253d34475aa03fb50a60f69aa9d43125966feedd4fa78f69046a12ca44d8e9e4",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "selected_subtask": "move(akita_black_bowl_1,plate_1)",
+        "verb": "move"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_in_the_top_drawer_of_the_wooden_cabinet_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "de304f1e5be2764f86c7040890ed611532081aca1b8f450f134446d8f0fb11aa",
+      "task_index": 2
+    },
+    {
+      "case_family": "held_boundary_outside",
+      "case_index": 9,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": false,
+        "reason": "closed_without_bound_target",
+        "verb": "unknown"
+      },
+      "first_latency_ns": 4490,
+      "observation_digest": "4f508140358b03cef27ac430658331b34f5fc11cf85bfbee281a034414eb5c5c",
+      "observed": {
+        "finished": false,
+        "known": false,
+        "reason": "closed_without_bound_target",
+        "selected_subtask": "unknown(closed_without_bound_target)",
+        "verb": "unknown"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_in_the_top_drawer_of_the_wooden_cabinet_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "de304f1e5be2764f86c7040890ed611532081aca1b8f450f134446d8f0fb11aa",
+      "task_index": 2
+    },
+    {
+      "case_family": "gripper_boundary_closed",
+      "case_index": 10,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "verb": "move"
+      },
+      "first_latency_ns": 5051,
+      "observation_digest": "09753b40890d4f95a46507d12c9df5a7d2d7665dcfa7b5efadd765bcc638f5a5",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "selected_subtask": "move(akita_black_bowl_1,plate_1)",
+        "verb": "move"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_in_the_top_drawer_of_the_wooden_cabinet_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "de304f1e5be2764f86c7040890ed611532081aca1b8f450f134446d8f0fb11aa",
+      "task_index": 2
+    },
+    {
+      "case_family": "gripper_boundary_open",
+      "case_index": 11,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "target_not_held",
+        "verb": "pick_up"
+      },
+      "first_latency_ns": 3900,
+      "observation_digest": "3a1095f7c907bb769db20bcbdf4772bf2072abb56e4c5589c541dd3c3e1e038c",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "target_not_held",
+        "selected_subtask": "pick_up(akita_black_bowl_1)",
+        "verb": "pick_up"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_in_the_top_drawer_of_the_wooden_cabinet_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "de304f1e5be2764f86c7040890ed611532081aca1b8f450f134446d8f0fb11aa",
+      "task_index": 2
+    },
+    {
+      "case_family": "destination_xy_boundary_inside",
+      "case_index": 12,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_requires_placement",
+        "verb": "place"
+      },
+      "first_latency_ns": 5870,
+      "observation_digest": "afa5fabc9d2016b6faf1088615cade182117b940344574ad2c2f4e75f1443862",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_requires_placement",
+        "selected_subtask": "place(akita_black_bowl_1,plate_1)",
+        "verb": "place"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_in_the_top_drawer_of_the_wooden_cabinet_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "de304f1e5be2764f86c7040890ed611532081aca1b8f450f134446d8f0fb11aa",
+      "task_index": 2
+    },
+    {
+      "case_family": "destination_xy_boundary_outside",
+      "case_index": 13,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "verb": "move"
+      },
+      "first_latency_ns": 5360,
+      "observation_digest": "84effa086a5a44f69b575b9789963283d2be095ccc34ec915cc516140a4224e2",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "selected_subtask": "move(akita_black_bowl_1,plate_1)",
+        "verb": "move"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_in_the_top_drawer_of_the_wooden_cabinet_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "de304f1e5be2764f86c7040890ed611532081aca1b8f450f134446d8f0fb11aa",
+      "task_index": 2
+    },
+    {
+      "case_family": "release_radius_inside",
+      "case_index": 14,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_inside_release_region",
+        "verb": "release"
+      },
+      "first_latency_ns": 6120,
+      "observation_digest": "44aea549a86f0843e1ca8a756b413e664e863fa75101001abc5f208ac1295e39",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_inside_release_region",
+        "selected_subtask": "release(akita_black_bowl_1)",
+        "verb": "release"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_in_the_top_drawer_of_the_wooden_cabinet_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "de304f1e5be2764f86c7040890ed611532081aca1b8f450f134446d8f0fb11aa",
+      "task_index": 2
+    },
+    {
+      "case_family": "release_radius_outside",
+      "case_index": 15,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_requires_placement",
+        "verb": "place"
+      },
+      "first_latency_ns": 5850,
+      "observation_digest": "5cbd5f264980f13b18b07ddee02b2dcef0179bcc916cd9eb2e1a573c26f354f3",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_requires_placement",
+        "selected_subtask": "place(akita_black_bowl_1,plate_1)",
+        "verb": "place"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_in_the_top_drawer_of_the_wooden_cabinet_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "de304f1e5be2764f86c7040890ed611532081aca1b8f450f134446d8f0fb11aa",
+      "task_index": 2
+    },
+    {
+      "case_family": "missing_target_geometry",
+      "case_index": 0,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": false,
+        "reason": "missing_target_geometry",
+        "verb": "unknown"
+      },
+      "first_latency_ns": 3560,
+      "observation_digest": "ee1a46e03bbd2eeeb5fc662c28d9fad0df0c7f9037050603e8afe6383ce37a92",
+      "observed": {
+        "finished": false,
+        "known": false,
+        "reason": "missing_target_geometry",
+        "selected_subtask": "unknown(missing_target_geometry)",
+        "verb": "unknown"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_next_to_the_cookie_box_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "e2fc41bc3006a6a32648f11c94e68d1fa9239db802f984a94936b2f34e86c6ce",
+      "task_index": 3
+    },
+    {
+      "case_family": "missing_destination_geometry",
+      "case_index": 1,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": false,
+        "reason": "missing_destination_geometry",
+        "verb": "unknown"
+      },
+      "first_latency_ns": 2560,
+      "observation_digest": "d0955fd128c2d18c88ca33e57a6bc800052659d6a16982a396a46e4d3fc9f461",
+      "observed": {
+        "finished": false,
+        "known": false,
+        "reason": "missing_destination_geometry",
+        "selected_subtask": "unknown(missing_destination_geometry)",
+        "verb": "unknown"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_next_to_the_cookie_box_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "e2fc41bc3006a6a32648f11c94e68d1fa9239db802f984a94936b2f34e86c6ce",
+      "task_index": 3
+    },
+    {
+      "case_family": "open_far_target_pick",
+      "case_index": 2,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "target_not_held",
+        "verb": "pick_up"
+      },
+      "first_latency_ns": 14410,
+      "observation_digest": "9a7c86aa141e36c4e604671616235aa71e41c005d854df1aa4d11723299796a9",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "target_not_held",
+        "selected_subtask": "pick_up(akita_black_bowl_1)",
+        "verb": "pick_up"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_next_to_the_cookie_box_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "e2fc41bc3006a6a32648f11c94e68d1fa9239db802f984a94936b2f34e86c6ce",
+      "task_index": 3
+    },
+    {
+      "case_family": "open_goal_satisfied_finish",
+      "case_index": 3,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": true,
+        "known": true,
+        "reason": "all_supported_goals_satisfied",
+        "verb": "finish"
+      },
+      "first_latency_ns": 4150,
+      "observation_digest": "69cb669a4f695fb7babfedd4285903ad69b18ee26f42a699090c4d081bceecf4",
+      "observed": {
+        "finished": true,
+        "known": true,
+        "reason": "all_supported_goals_satisfied",
+        "selected_subtask": "finish()",
+        "verb": "finish"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_next_to_the_cookie_box_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "e2fc41bc3006a6a32648f11c94e68d1fa9239db802f984a94936b2f34e86c6ce",
+      "task_index": 3
+    },
+    {
+      "case_family": "closed_unbound_target_unknown",
+      "case_index": 4,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": false,
+        "reason": "closed_without_bound_target",
+        "verb": "unknown"
+      },
+      "first_latency_ns": 4510,
+      "observation_digest": "66b7dc3b9e805107ee6887e8b2fe55c8f557d8afc97d3edc7b668f684bdba6e3",
+      "observed": {
+        "finished": false,
+        "known": false,
+        "reason": "closed_without_bound_target",
+        "selected_subtask": "unknown(closed_without_bound_target)",
+        "verb": "unknown"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_next_to_the_cookie_box_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "e2fc41bc3006a6a32648f11c94e68d1fa9239db802f984a94936b2f34e86c6ce",
+      "task_index": 3
+    },
+    {
+      "case_family": "closed_held_far_move",
+      "case_index": 5,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "verb": "move"
+      },
+      "first_latency_ns": 5480,
+      "observation_digest": "ab1596cdb4e399c04be11ecebd4cfe95a3b35a525e298c376c2dee798de84939",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "selected_subtask": "move(akita_black_bowl_1,plate_1)",
+        "verb": "move"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_next_to_the_cookie_box_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "e2fc41bc3006a6a32648f11c94e68d1fa9239db802f984a94936b2f34e86c6ce",
+      "task_index": 3
+    },
+    {
+      "case_family": "closed_held_place_region",
+      "case_index": 6,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_requires_placement",
+        "verb": "place"
+      },
+      "first_latency_ns": 5820,
+      "observation_digest": "9154d6347359e1b56f2fec94b0c2eb6a06581d2dd986f09b692b1f445686c00b",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_requires_placement",
+        "selected_subtask": "place(akita_black_bowl_1,plate_1)",
+        "verb": "place"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_next_to_the_cookie_box_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "e2fc41bc3006a6a32648f11c94e68d1fa9239db802f984a94936b2f34e86c6ce",
+      "task_index": 3
+    },
+    {
+      "case_family": "closed_held_release_region",
+      "case_index": 7,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_inside_release_region",
+        "verb": "release"
+      },
+      "first_latency_ns": 5651,
+      "observation_digest": "fcbb822914260143e29911d93ff2343809af1b27f6b91a4e4ffd375e487a7e93",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_inside_release_region",
+        "selected_subtask": "release(akita_black_bowl_1)",
+        "verb": "release"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_next_to_the_cookie_box_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "e2fc41bc3006a6a32648f11c94e68d1fa9239db802f984a94936b2f34e86c6ce",
+      "task_index": 3
+    },
+    {
+      "case_family": "held_boundary_inside",
+      "case_index": 8,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "verb": "move"
+      },
+      "first_latency_ns": 5220,
+      "observation_digest": "253d34475aa03fb50a60f69aa9d43125966feedd4fa78f69046a12ca44d8e9e4",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "selected_subtask": "move(akita_black_bowl_1,plate_1)",
+        "verb": "move"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_next_to_the_cookie_box_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "e2fc41bc3006a6a32648f11c94e68d1fa9239db802f984a94936b2f34e86c6ce",
+      "task_index": 3
+    },
+    {
+      "case_family": "held_boundary_outside",
+      "case_index": 9,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": false,
+        "reason": "closed_without_bound_target",
+        "verb": "unknown"
+      },
+      "first_latency_ns": 4210,
+      "observation_digest": "4f508140358b03cef27ac430658331b34f5fc11cf85bfbee281a034414eb5c5c",
+      "observed": {
+        "finished": false,
+        "known": false,
+        "reason": "closed_without_bound_target",
+        "selected_subtask": "unknown(closed_without_bound_target)",
+        "verb": "unknown"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_next_to_the_cookie_box_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "e2fc41bc3006a6a32648f11c94e68d1fa9239db802f984a94936b2f34e86c6ce",
+      "task_index": 3
+    },
+    {
+      "case_family": "gripper_boundary_closed",
+      "case_index": 10,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "verb": "move"
+      },
+      "first_latency_ns": 5000,
+      "observation_digest": "09753b40890d4f95a46507d12c9df5a7d2d7665dcfa7b5efadd765bcc638f5a5",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "selected_subtask": "move(akita_black_bowl_1,plate_1)",
+        "verb": "move"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_next_to_the_cookie_box_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "e2fc41bc3006a6a32648f11c94e68d1fa9239db802f984a94936b2f34e86c6ce",
+      "task_index": 3
+    },
+    {
+      "case_family": "gripper_boundary_open",
+      "case_index": 11,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "target_not_held",
+        "verb": "pick_up"
+      },
+      "first_latency_ns": 4350,
+      "observation_digest": "3a1095f7c907bb769db20bcbdf4772bf2072abb56e4c5589c541dd3c3e1e038c",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "target_not_held",
+        "selected_subtask": "pick_up(akita_black_bowl_1)",
+        "verb": "pick_up"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_next_to_the_cookie_box_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "e2fc41bc3006a6a32648f11c94e68d1fa9239db802f984a94936b2f34e86c6ce",
+      "task_index": 3
+    },
+    {
+      "case_family": "destination_xy_boundary_inside",
+      "case_index": 12,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_requires_placement",
+        "verb": "place"
+      },
+      "first_latency_ns": 6860,
+      "observation_digest": "afa5fabc9d2016b6faf1088615cade182117b940344574ad2c2f4e75f1443862",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_requires_placement",
+        "selected_subtask": "place(akita_black_bowl_1,plate_1)",
+        "verb": "place"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_next_to_the_cookie_box_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "e2fc41bc3006a6a32648f11c94e68d1fa9239db802f984a94936b2f34e86c6ce",
+      "task_index": 3
+    },
+    {
+      "case_family": "destination_xy_boundary_outside",
+      "case_index": 13,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "verb": "move"
+      },
+      "first_latency_ns": 5800,
+      "observation_digest": "84effa086a5a44f69b575b9789963283d2be095ccc34ec915cc516140a4224e2",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "selected_subtask": "move(akita_black_bowl_1,plate_1)",
+        "verb": "move"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_next_to_the_cookie_box_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "e2fc41bc3006a6a32648f11c94e68d1fa9239db802f984a94936b2f34e86c6ce",
+      "task_index": 3
+    },
+    {
+      "case_family": "release_radius_inside",
+      "case_index": 14,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_inside_release_region",
+        "verb": "release"
+      },
+      "first_latency_ns": 6710,
+      "observation_digest": "44aea549a86f0843e1ca8a756b413e664e863fa75101001abc5f208ac1295e39",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_inside_release_region",
+        "selected_subtask": "release(akita_black_bowl_1)",
+        "verb": "release"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_next_to_the_cookie_box_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "e2fc41bc3006a6a32648f11c94e68d1fa9239db802f984a94936b2f34e86c6ce",
+      "task_index": 3
+    },
+    {
+      "case_family": "release_radius_outside",
+      "case_index": 15,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_requires_placement",
+        "verb": "place"
+      },
+      "first_latency_ns": 6650,
+      "observation_digest": "5cbd5f264980f13b18b07ddee02b2dcef0179bcc916cd9eb2e1a573c26f354f3",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_requires_placement",
+        "selected_subtask": "place(akita_black_bowl_1,plate_1)",
+        "verb": "place"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_next_to_the_cookie_box_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "e2fc41bc3006a6a32648f11c94e68d1fa9239db802f984a94936b2f34e86c6ce",
+      "task_index": 3
+    },
+    {
+      "case_family": "missing_target_geometry",
+      "case_index": 0,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": false,
+        "reason": "missing_target_geometry",
+        "verb": "unknown"
+      },
+      "first_latency_ns": 3540,
+      "observation_digest": "ee1a46e03bbd2eeeb5fc662c28d9fad0df0c7f9037050603e8afe6383ce37a92",
+      "observed": {
+        "finished": false,
+        "known": false,
+        "reason": "missing_target_geometry",
+        "selected_subtask": "unknown(missing_target_geometry)",
+        "verb": "unknown"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_next_to_the_plate_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "6452bca58f8f4bb2c8ae455ad38cef5879a77b531bb097f8328e7331d8751d4e",
+      "task_index": 4
+    },
+    {
+      "case_family": "missing_destination_geometry",
+      "case_index": 1,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": false,
+        "reason": "missing_destination_geometry",
+        "verb": "unknown"
+      },
+      "first_latency_ns": 2890,
+      "observation_digest": "d0955fd128c2d18c88ca33e57a6bc800052659d6a16982a396a46e4d3fc9f461",
+      "observed": {
+        "finished": false,
+        "known": false,
+        "reason": "missing_destination_geometry",
+        "selected_subtask": "unknown(missing_destination_geometry)",
+        "verb": "unknown"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_next_to_the_plate_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "6452bca58f8f4bb2c8ae455ad38cef5879a77b531bb097f8328e7331d8751d4e",
+      "task_index": 4
+    },
+    {
+      "case_family": "open_far_target_pick",
+      "case_index": 2,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "target_not_held",
+        "verb": "pick_up"
+      },
+      "first_latency_ns": 5230,
+      "observation_digest": "9a7c86aa141e36c4e604671616235aa71e41c005d854df1aa4d11723299796a9",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "target_not_held",
+        "selected_subtask": "pick_up(akita_black_bowl_1)",
+        "verb": "pick_up"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_next_to_the_plate_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "6452bca58f8f4bb2c8ae455ad38cef5879a77b531bb097f8328e7331d8751d4e",
+      "task_index": 4
+    },
+    {
+      "case_family": "open_goal_satisfied_finish",
+      "case_index": 3,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": true,
+        "known": true,
+        "reason": "all_supported_goals_satisfied",
+        "verb": "finish"
+      },
+      "first_latency_ns": 4000,
+      "observation_digest": "69cb669a4f695fb7babfedd4285903ad69b18ee26f42a699090c4d081bceecf4",
+      "observed": {
+        "finished": true,
+        "known": true,
+        "reason": "all_supported_goals_satisfied",
+        "selected_subtask": "finish()",
+        "verb": "finish"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_next_to_the_plate_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "6452bca58f8f4bb2c8ae455ad38cef5879a77b531bb097f8328e7331d8751d4e",
+      "task_index": 4
+    },
+    {
+      "case_family": "closed_unbound_target_unknown",
+      "case_index": 4,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": false,
+        "reason": "closed_without_bound_target",
+        "verb": "unknown"
+      },
+      "first_latency_ns": 5820,
+      "observation_digest": "66b7dc3b9e805107ee6887e8b2fe55c8f557d8afc97d3edc7b668f684bdba6e3",
+      "observed": {
+        "finished": false,
+        "known": false,
+        "reason": "closed_without_bound_target",
+        "selected_subtask": "unknown(closed_without_bound_target)",
+        "verb": "unknown"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_next_to_the_plate_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "6452bca58f8f4bb2c8ae455ad38cef5879a77b531bb097f8328e7331d8751d4e",
+      "task_index": 4
+    },
+    {
+      "case_family": "closed_held_far_move",
+      "case_index": 5,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "verb": "move"
+      },
+      "first_latency_ns": 6211,
+      "observation_digest": "ab1596cdb4e399c04be11ecebd4cfe95a3b35a525e298c376c2dee798de84939",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "selected_subtask": "move(akita_black_bowl_1,plate_1)",
+        "verb": "move"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_next_to_the_plate_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "6452bca58f8f4bb2c8ae455ad38cef5879a77b531bb097f8328e7331d8751d4e",
+      "task_index": 4
+    },
+    {
+      "case_family": "closed_held_place_region",
+      "case_index": 6,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_requires_placement",
+        "verb": "place"
+      },
+      "first_latency_ns": 7240,
+      "observation_digest": "9154d6347359e1b56f2fec94b0c2eb6a06581d2dd986f09b692b1f445686c00b",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_requires_placement",
+        "selected_subtask": "place(akita_black_bowl_1,plate_1)",
+        "verb": "place"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_next_to_the_plate_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "6452bca58f8f4bb2c8ae455ad38cef5879a77b531bb097f8328e7331d8751d4e",
+      "task_index": 4
+    },
+    {
+      "case_family": "closed_held_release_region",
+      "case_index": 7,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_inside_release_region",
+        "verb": "release"
+      },
+      "first_latency_ns": 7050,
+      "observation_digest": "fcbb822914260143e29911d93ff2343809af1b27f6b91a4e4ffd375e487a7e93",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_inside_release_region",
+        "selected_subtask": "release(akita_black_bowl_1)",
+        "verb": "release"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_next_to_the_plate_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "6452bca58f8f4bb2c8ae455ad38cef5879a77b531bb097f8328e7331d8751d4e",
+      "task_index": 4
+    },
+    {
+      "case_family": "held_boundary_inside",
+      "case_index": 8,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "verb": "move"
+      },
+      "first_latency_ns": 6160,
+      "observation_digest": "253d34475aa03fb50a60f69aa9d43125966feedd4fa78f69046a12ca44d8e9e4",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "selected_subtask": "move(akita_black_bowl_1,plate_1)",
+        "verb": "move"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_next_to_the_plate_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "6452bca58f8f4bb2c8ae455ad38cef5879a77b531bb097f8328e7331d8751d4e",
+      "task_index": 4
+    },
+    {
+      "case_family": "held_boundary_outside",
+      "case_index": 9,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": false,
+        "reason": "closed_without_bound_target",
+        "verb": "unknown"
+      },
+      "first_latency_ns": 6521,
+      "observation_digest": "4f508140358b03cef27ac430658331b34f5fc11cf85bfbee281a034414eb5c5c",
+      "observed": {
+        "finished": false,
+        "known": false,
+        "reason": "closed_without_bound_target",
+        "selected_subtask": "unknown(closed_without_bound_target)",
+        "verb": "unknown"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_next_to_the_plate_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "6452bca58f8f4bb2c8ae455ad38cef5879a77b531bb097f8328e7331d8751d4e",
+      "task_index": 4
+    },
+    {
+      "case_family": "gripper_boundary_closed",
+      "case_index": 10,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "verb": "move"
+      },
+      "first_latency_ns": 5280,
+      "observation_digest": "09753b40890d4f95a46507d12c9df5a7d2d7665dcfa7b5efadd765bcc638f5a5",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "selected_subtask": "move(akita_black_bowl_1,plate_1)",
+        "verb": "move"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_next_to_the_plate_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "6452bca58f8f4bb2c8ae455ad38cef5879a77b531bb097f8328e7331d8751d4e",
+      "task_index": 4
+    },
+    {
+      "case_family": "gripper_boundary_open",
+      "case_index": 11,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "target_not_held",
+        "verb": "pick_up"
+      },
+      "first_latency_ns": 3790,
+      "observation_digest": "3a1095f7c907bb769db20bcbdf4772bf2072abb56e4c5589c541dd3c3e1e038c",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "target_not_held",
+        "selected_subtask": "pick_up(akita_black_bowl_1)",
+        "verb": "pick_up"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_next_to_the_plate_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "6452bca58f8f4bb2c8ae455ad38cef5879a77b531bb097f8328e7331d8751d4e",
+      "task_index": 4
+    },
+    {
+      "case_family": "destination_xy_boundary_inside",
+      "case_index": 12,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_requires_placement",
+        "verb": "place"
+      },
+      "first_latency_ns": 5680,
+      "observation_digest": "afa5fabc9d2016b6faf1088615cade182117b940344574ad2c2f4e75f1443862",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_requires_placement",
+        "selected_subtask": "place(akita_black_bowl_1,plate_1)",
+        "verb": "place"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_next_to_the_plate_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "6452bca58f8f4bb2c8ae455ad38cef5879a77b531bb097f8328e7331d8751d4e",
+      "task_index": 4
+    },
+    {
+      "case_family": "destination_xy_boundary_outside",
+      "case_index": 13,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "verb": "move"
+      },
+      "first_latency_ns": 4880,
+      "observation_digest": "84effa086a5a44f69b575b9789963283d2be095ccc34ec915cc516140a4224e2",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "selected_subtask": "move(akita_black_bowl_1,plate_1)",
+        "verb": "move"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_next_to_the_plate_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "6452bca58f8f4bb2c8ae455ad38cef5879a77b531bb097f8328e7331d8751d4e",
+      "task_index": 4
+    },
+    {
+      "case_family": "release_radius_inside",
+      "case_index": 14,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_inside_release_region",
+        "verb": "release"
+      },
+      "first_latency_ns": 5491,
+      "observation_digest": "44aea549a86f0843e1ca8a756b413e664e863fa75101001abc5f208ac1295e39",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_inside_release_region",
+        "selected_subtask": "release(akita_black_bowl_1)",
+        "verb": "release"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_next_to_the_plate_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "6452bca58f8f4bb2c8ae455ad38cef5879a77b531bb097f8328e7331d8751d4e",
+      "task_index": 4
+    },
+    {
+      "case_family": "release_radius_outside",
+      "case_index": 15,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_requires_placement",
+        "verb": "place"
+      },
+      "first_latency_ns": 5890,
+      "observation_digest": "5cbd5f264980f13b18b07ddee02b2dcef0179bcc916cd9eb2e1a573c26f354f3",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_requires_placement",
+        "selected_subtask": "place(akita_black_bowl_1,plate_1)",
+        "verb": "place"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_next_to_the_plate_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "6452bca58f8f4bb2c8ae455ad38cef5879a77b531bb097f8328e7331d8751d4e",
+      "task_index": 4
+    },
+    {
+      "case_family": "missing_target_geometry",
+      "case_index": 0,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": false,
+        "reason": "missing_target_geometry",
+        "verb": "unknown"
+      },
+      "first_latency_ns": 3390,
+      "observation_digest": "ee1a46e03bbd2eeeb5fc662c28d9fad0df0c7f9037050603e8afe6383ce37a92",
+      "observed": {
+        "finished": false,
+        "known": false,
+        "reason": "missing_target_geometry",
+        "selected_subtask": "unknown(missing_target_geometry)",
+        "verb": "unknown"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_next_to_the_ramekin_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "fa149f79ba63e6aa7f5a0ad847a08da3ecacf3e7e1ef6e27c6eba5a653f448e9",
+      "task_index": 5
+    },
+    {
+      "case_family": "missing_destination_geometry",
+      "case_index": 1,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": false,
+        "reason": "missing_destination_geometry",
+        "verb": "unknown"
+      },
+      "first_latency_ns": 2590,
+      "observation_digest": "d0955fd128c2d18c88ca33e57a6bc800052659d6a16982a396a46e4d3fc9f461",
+      "observed": {
+        "finished": false,
+        "known": false,
+        "reason": "missing_destination_geometry",
+        "selected_subtask": "unknown(missing_destination_geometry)",
+        "verb": "unknown"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_next_to_the_ramekin_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "fa149f79ba63e6aa7f5a0ad847a08da3ecacf3e7e1ef6e27c6eba5a653f448e9",
+      "task_index": 5
+    },
+    {
+      "case_family": "open_far_target_pick",
+      "case_index": 2,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "target_not_held",
+        "verb": "pick_up"
+      },
+      "first_latency_ns": 4410,
+      "observation_digest": "9a7c86aa141e36c4e604671616235aa71e41c005d854df1aa4d11723299796a9",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "target_not_held",
+        "selected_subtask": "pick_up(akita_black_bowl_1)",
+        "verb": "pick_up"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_next_to_the_ramekin_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "fa149f79ba63e6aa7f5a0ad847a08da3ecacf3e7e1ef6e27c6eba5a653f448e9",
+      "task_index": 5
+    },
+    {
+      "case_family": "open_goal_satisfied_finish",
+      "case_index": 3,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": true,
+        "known": true,
+        "reason": "all_supported_goals_satisfied",
+        "verb": "finish"
+      },
+      "first_latency_ns": 3400,
+      "observation_digest": "69cb669a4f695fb7babfedd4285903ad69b18ee26f42a699090c4d081bceecf4",
+      "observed": {
+        "finished": true,
+        "known": true,
+        "reason": "all_supported_goals_satisfied",
+        "selected_subtask": "finish()",
+        "verb": "finish"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_next_to_the_ramekin_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "fa149f79ba63e6aa7f5a0ad847a08da3ecacf3e7e1ef6e27c6eba5a653f448e9",
+      "task_index": 5
+    },
+    {
+      "case_family": "closed_unbound_target_unknown",
+      "case_index": 4,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": false,
+        "reason": "closed_without_bound_target",
+        "verb": "unknown"
+      },
+      "first_latency_ns": 4650,
+      "observation_digest": "66b7dc3b9e805107ee6887e8b2fe55c8f557d8afc97d3edc7b668f684bdba6e3",
+      "observed": {
+        "finished": false,
+        "known": false,
+        "reason": "closed_without_bound_target",
+        "selected_subtask": "unknown(closed_without_bound_target)",
+        "verb": "unknown"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_next_to_the_ramekin_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "fa149f79ba63e6aa7f5a0ad847a08da3ecacf3e7e1ef6e27c6eba5a653f448e9",
+      "task_index": 5
+    },
+    {
+      "case_family": "closed_held_far_move",
+      "case_index": 5,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "verb": "move"
+      },
+      "first_latency_ns": 5481,
+      "observation_digest": "ab1596cdb4e399c04be11ecebd4cfe95a3b35a525e298c376c2dee798de84939",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "selected_subtask": "move(akita_black_bowl_1,plate_1)",
+        "verb": "move"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_next_to_the_ramekin_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "fa149f79ba63e6aa7f5a0ad847a08da3ecacf3e7e1ef6e27c6eba5a653f448e9",
+      "task_index": 5
+    },
+    {
+      "case_family": "closed_held_place_region",
+      "case_index": 6,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_requires_placement",
+        "verb": "place"
+      },
+      "first_latency_ns": 5960,
+      "observation_digest": "9154d6347359e1b56f2fec94b0c2eb6a06581d2dd986f09b692b1f445686c00b",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_requires_placement",
+        "selected_subtask": "place(akita_black_bowl_1,plate_1)",
+        "verb": "place"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_next_to_the_ramekin_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "fa149f79ba63e6aa7f5a0ad847a08da3ecacf3e7e1ef6e27c6eba5a653f448e9",
+      "task_index": 5
+    },
+    {
+      "case_family": "closed_held_release_region",
+      "case_index": 7,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_inside_release_region",
+        "verb": "release"
+      },
+      "first_latency_ns": 5800,
+      "observation_digest": "fcbb822914260143e29911d93ff2343809af1b27f6b91a4e4ffd375e487a7e93",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_inside_release_region",
+        "selected_subtask": "release(akita_black_bowl_1)",
+        "verb": "release"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_next_to_the_ramekin_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "fa149f79ba63e6aa7f5a0ad847a08da3ecacf3e7e1ef6e27c6eba5a653f448e9",
+      "task_index": 5
+    },
+    {
+      "case_family": "held_boundary_inside",
+      "case_index": 8,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "verb": "move"
+      },
+      "first_latency_ns": 5170,
+      "observation_digest": "253d34475aa03fb50a60f69aa9d43125966feedd4fa78f69046a12ca44d8e9e4",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "selected_subtask": "move(akita_black_bowl_1,plate_1)",
+        "verb": "move"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_next_to_the_ramekin_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "fa149f79ba63e6aa7f5a0ad847a08da3ecacf3e7e1ef6e27c6eba5a653f448e9",
+      "task_index": 5
+    },
+    {
+      "case_family": "held_boundary_outside",
+      "case_index": 9,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": false,
+        "reason": "closed_without_bound_target",
+        "verb": "unknown"
+      },
+      "first_latency_ns": 4570,
+      "observation_digest": "4f508140358b03cef27ac430658331b34f5fc11cf85bfbee281a034414eb5c5c",
+      "observed": {
+        "finished": false,
+        "known": false,
+        "reason": "closed_without_bound_target",
+        "selected_subtask": "unknown(closed_without_bound_target)",
+        "verb": "unknown"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_next_to_the_ramekin_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "fa149f79ba63e6aa7f5a0ad847a08da3ecacf3e7e1ef6e27c6eba5a653f448e9",
+      "task_index": 5
+    },
+    {
+      "case_family": "gripper_boundary_closed",
+      "case_index": 10,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "verb": "move"
+      },
+      "first_latency_ns": 4991,
+      "observation_digest": "09753b40890d4f95a46507d12c9df5a7d2d7665dcfa7b5efadd765bcc638f5a5",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "selected_subtask": "move(akita_black_bowl_1,plate_1)",
+        "verb": "move"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_next_to_the_ramekin_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "fa149f79ba63e6aa7f5a0ad847a08da3ecacf3e7e1ef6e27c6eba5a653f448e9",
+      "task_index": 5
+    },
+    {
+      "case_family": "gripper_boundary_open",
+      "case_index": 11,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "target_not_held",
+        "verb": "pick_up"
+      },
+      "first_latency_ns": 3931,
+      "observation_digest": "3a1095f7c907bb769db20bcbdf4772bf2072abb56e4c5589c541dd3c3e1e038c",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "target_not_held",
+        "selected_subtask": "pick_up(akita_black_bowl_1)",
+        "verb": "pick_up"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_next_to_the_ramekin_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "fa149f79ba63e6aa7f5a0ad847a08da3ecacf3e7e1ef6e27c6eba5a653f448e9",
+      "task_index": 5
+    },
+    {
+      "case_family": "destination_xy_boundary_inside",
+      "case_index": 12,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_requires_placement",
+        "verb": "place"
+      },
+      "first_latency_ns": 6080,
+      "observation_digest": "afa5fabc9d2016b6faf1088615cade182117b940344574ad2c2f4e75f1443862",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_requires_placement",
+        "selected_subtask": "place(akita_black_bowl_1,plate_1)",
+        "verb": "place"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_next_to_the_ramekin_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "fa149f79ba63e6aa7f5a0ad847a08da3ecacf3e7e1ef6e27c6eba5a653f448e9",
+      "task_index": 5
+    },
+    {
+      "case_family": "destination_xy_boundary_outside",
+      "case_index": 13,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "verb": "move"
+      },
+      "first_latency_ns": 5820,
+      "observation_digest": "84effa086a5a44f69b575b9789963283d2be095ccc34ec915cc516140a4224e2",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "selected_subtask": "move(akita_black_bowl_1,plate_1)",
+        "verb": "move"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_next_to_the_ramekin_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "fa149f79ba63e6aa7f5a0ad847a08da3ecacf3e7e1ef6e27c6eba5a653f448e9",
+      "task_index": 5
+    },
+    {
+      "case_family": "release_radius_inside",
+      "case_index": 14,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_inside_release_region",
+        "verb": "release"
+      },
+      "first_latency_ns": 5820,
+      "observation_digest": "44aea549a86f0843e1ca8a756b413e664e863fa75101001abc5f208ac1295e39",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_inside_release_region",
+        "selected_subtask": "release(akita_black_bowl_1)",
+        "verb": "release"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_next_to_the_ramekin_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "fa149f79ba63e6aa7f5a0ad847a08da3ecacf3e7e1ef6e27c6eba5a653f448e9",
+      "task_index": 5
+    },
+    {
+      "case_family": "release_radius_outside",
+      "case_index": 15,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_requires_placement",
+        "verb": "place"
+      },
+      "first_latency_ns": 5720,
+      "observation_digest": "5cbd5f264980f13b18b07ddee02b2dcef0179bcc916cd9eb2e1a573c26f354f3",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_requires_placement",
+        "selected_subtask": "place(akita_black_bowl_1,plate_1)",
+        "verb": "place"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_next_to_the_ramekin_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "fa149f79ba63e6aa7f5a0ad847a08da3ecacf3e7e1ef6e27c6eba5a653f448e9",
+      "task_index": 5
+    },
+    {
+      "case_family": "missing_target_geometry",
+      "case_index": 0,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": false,
+        "reason": "missing_target_geometry",
+        "verb": "unknown"
+      },
+      "first_latency_ns": 3410,
+      "observation_digest": "ee1a46e03bbd2eeeb5fc662c28d9fad0df0c7f9037050603e8afe6383ce37a92",
+      "observed": {
+        "finished": false,
+        "known": false,
+        "reason": "missing_target_geometry",
+        "selected_subtask": "unknown(missing_target_geometry)",
+        "verb": "unknown"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_on_the_cookie_box_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "2dc58dbd8fb9bf6914376593e1f0a244666970ac08518919bdaaf8614bf2c86f",
+      "task_index": 6
+    },
+    {
+      "case_family": "missing_destination_geometry",
+      "case_index": 1,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": false,
+        "reason": "missing_destination_geometry",
+        "verb": "unknown"
+      },
+      "first_latency_ns": 2660,
+      "observation_digest": "d0955fd128c2d18c88ca33e57a6bc800052659d6a16982a396a46e4d3fc9f461",
+      "observed": {
+        "finished": false,
+        "known": false,
+        "reason": "missing_destination_geometry",
+        "selected_subtask": "unknown(missing_destination_geometry)",
+        "verb": "unknown"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_on_the_cookie_box_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "2dc58dbd8fb9bf6914376593e1f0a244666970ac08518919bdaaf8614bf2c86f",
+      "task_index": 6
+    },
+    {
+      "case_family": "open_far_target_pick",
+      "case_index": 2,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "target_not_held",
+        "verb": "pick_up"
+      },
+      "first_latency_ns": 5100,
+      "observation_digest": "9a7c86aa141e36c4e604671616235aa71e41c005d854df1aa4d11723299796a9",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "target_not_held",
+        "selected_subtask": "pick_up(akita_black_bowl_1)",
+        "verb": "pick_up"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_on_the_cookie_box_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "2dc58dbd8fb9bf6914376593e1f0a244666970ac08518919bdaaf8614bf2c86f",
+      "task_index": 6
+    },
+    {
+      "case_family": "open_goal_satisfied_finish",
+      "case_index": 3,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": true,
+        "known": true,
+        "reason": "all_supported_goals_satisfied",
+        "verb": "finish"
+      },
+      "first_latency_ns": 3350,
+      "observation_digest": "69cb669a4f695fb7babfedd4285903ad69b18ee26f42a699090c4d081bceecf4",
+      "observed": {
+        "finished": true,
+        "known": true,
+        "reason": "all_supported_goals_satisfied",
+        "selected_subtask": "finish()",
+        "verb": "finish"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_on_the_cookie_box_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "2dc58dbd8fb9bf6914376593e1f0a244666970ac08518919bdaaf8614bf2c86f",
+      "task_index": 6
+    },
+    {
+      "case_family": "closed_unbound_target_unknown",
+      "case_index": 4,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": false,
+        "reason": "closed_without_bound_target",
+        "verb": "unknown"
+      },
+      "first_latency_ns": 4650,
+      "observation_digest": "66b7dc3b9e805107ee6887e8b2fe55c8f557d8afc97d3edc7b668f684bdba6e3",
+      "observed": {
+        "finished": false,
+        "known": false,
+        "reason": "closed_without_bound_target",
+        "selected_subtask": "unknown(closed_without_bound_target)",
+        "verb": "unknown"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_on_the_cookie_box_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "2dc58dbd8fb9bf6914376593e1f0a244666970ac08518919bdaaf8614bf2c86f",
+      "task_index": 6
+    },
+    {
+      "case_family": "closed_held_far_move",
+      "case_index": 5,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "verb": "move"
+      },
+      "first_latency_ns": 5330,
+      "observation_digest": "ab1596cdb4e399c04be11ecebd4cfe95a3b35a525e298c376c2dee798de84939",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "selected_subtask": "move(akita_black_bowl_1,plate_1)",
+        "verb": "move"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_on_the_cookie_box_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "2dc58dbd8fb9bf6914376593e1f0a244666970ac08518919bdaaf8614bf2c86f",
+      "task_index": 6
+    },
+    {
+      "case_family": "closed_held_place_region",
+      "case_index": 6,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_requires_placement",
+        "verb": "place"
+      },
+      "first_latency_ns": 6080,
+      "observation_digest": "9154d6347359e1b56f2fec94b0c2eb6a06581d2dd986f09b692b1f445686c00b",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_requires_placement",
+        "selected_subtask": "place(akita_black_bowl_1,plate_1)",
+        "verb": "place"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_on_the_cookie_box_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "2dc58dbd8fb9bf6914376593e1f0a244666970ac08518919bdaaf8614bf2c86f",
+      "task_index": 6
+    },
+    {
+      "case_family": "closed_held_release_region",
+      "case_index": 7,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_inside_release_region",
+        "verb": "release"
+      },
+      "first_latency_ns": 5890,
+      "observation_digest": "fcbb822914260143e29911d93ff2343809af1b27f6b91a4e4ffd375e487a7e93",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_inside_release_region",
+        "selected_subtask": "release(akita_black_bowl_1)",
+        "verb": "release"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_on_the_cookie_box_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "2dc58dbd8fb9bf6914376593e1f0a244666970ac08518919bdaaf8614bf2c86f",
+      "task_index": 6
+    },
+    {
+      "case_family": "held_boundary_inside",
+      "case_index": 8,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "verb": "move"
+      },
+      "first_latency_ns": 6291,
+      "observation_digest": "253d34475aa03fb50a60f69aa9d43125966feedd4fa78f69046a12ca44d8e9e4",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "selected_subtask": "move(akita_black_bowl_1,plate_1)",
+        "verb": "move"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_on_the_cookie_box_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "2dc58dbd8fb9bf6914376593e1f0a244666970ac08518919bdaaf8614bf2c86f",
+      "task_index": 6
+    },
+    {
+      "case_family": "held_boundary_outside",
+      "case_index": 9,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": false,
+        "reason": "closed_without_bound_target",
+        "verb": "unknown"
+      },
+      "first_latency_ns": 5060,
+      "observation_digest": "4f508140358b03cef27ac430658331b34f5fc11cf85bfbee281a034414eb5c5c",
+      "observed": {
+        "finished": false,
+        "known": false,
+        "reason": "closed_without_bound_target",
+        "selected_subtask": "unknown(closed_without_bound_target)",
+        "verb": "unknown"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_on_the_cookie_box_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "2dc58dbd8fb9bf6914376593e1f0a244666970ac08518919bdaaf8614bf2c86f",
+      "task_index": 6
+    },
+    {
+      "case_family": "gripper_boundary_closed",
+      "case_index": 10,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "verb": "move"
+      },
+      "first_latency_ns": 5920,
+      "observation_digest": "09753b40890d4f95a46507d12c9df5a7d2d7665dcfa7b5efadd765bcc638f5a5",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "selected_subtask": "move(akita_black_bowl_1,plate_1)",
+        "verb": "move"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_on_the_cookie_box_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "2dc58dbd8fb9bf6914376593e1f0a244666970ac08518919bdaaf8614bf2c86f",
+      "task_index": 6
+    },
+    {
+      "case_family": "gripper_boundary_open",
+      "case_index": 11,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "target_not_held",
+        "verb": "pick_up"
+      },
+      "first_latency_ns": 4470,
+      "observation_digest": "3a1095f7c907bb769db20bcbdf4772bf2072abb56e4c5589c541dd3c3e1e038c",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "target_not_held",
+        "selected_subtask": "pick_up(akita_black_bowl_1)",
+        "verb": "pick_up"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_on_the_cookie_box_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "2dc58dbd8fb9bf6914376593e1f0a244666970ac08518919bdaaf8614bf2c86f",
+      "task_index": 6
+    },
+    {
+      "case_family": "destination_xy_boundary_inside",
+      "case_index": 12,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_requires_placement",
+        "verb": "place"
+      },
+      "first_latency_ns": 6810,
+      "observation_digest": "afa5fabc9d2016b6faf1088615cade182117b940344574ad2c2f4e75f1443862",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_requires_placement",
+        "selected_subtask": "place(akita_black_bowl_1,plate_1)",
+        "verb": "place"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_on_the_cookie_box_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "2dc58dbd8fb9bf6914376593e1f0a244666970ac08518919bdaaf8614bf2c86f",
+      "task_index": 6
+    },
+    {
+      "case_family": "destination_xy_boundary_outside",
+      "case_index": 13,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "verb": "move"
+      },
+      "first_latency_ns": 6040,
+      "observation_digest": "84effa086a5a44f69b575b9789963283d2be095ccc34ec915cc516140a4224e2",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "selected_subtask": "move(akita_black_bowl_1,plate_1)",
+        "verb": "move"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_on_the_cookie_box_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "2dc58dbd8fb9bf6914376593e1f0a244666970ac08518919bdaaf8614bf2c86f",
+      "task_index": 6
+    },
+    {
+      "case_family": "release_radius_inside",
+      "case_index": 14,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_inside_release_region",
+        "verb": "release"
+      },
+      "first_latency_ns": 6840,
+      "observation_digest": "44aea549a86f0843e1ca8a756b413e664e863fa75101001abc5f208ac1295e39",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_inside_release_region",
+        "selected_subtask": "release(akita_black_bowl_1)",
+        "verb": "release"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_on_the_cookie_box_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "2dc58dbd8fb9bf6914376593e1f0a244666970ac08518919bdaaf8614bf2c86f",
+      "task_index": 6
+    },
+    {
+      "case_family": "release_radius_outside",
+      "case_index": 15,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_requires_placement",
+        "verb": "place"
+      },
+      "first_latency_ns": 6700,
+      "observation_digest": "5cbd5f264980f13b18b07ddee02b2dcef0179bcc916cd9eb2e1a573c26f354f3",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_requires_placement",
+        "selected_subtask": "place(akita_black_bowl_1,plate_1)",
+        "verb": "place"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_on_the_cookie_box_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "2dc58dbd8fb9bf6914376593e1f0a244666970ac08518919bdaaf8614bf2c86f",
+      "task_index": 6
+    },
+    {
+      "case_family": "missing_target_geometry",
+      "case_index": 0,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": false,
+        "reason": "missing_target_geometry",
+        "verb": "unknown"
+      },
+      "first_latency_ns": 3521,
+      "observation_digest": "ee1a46e03bbd2eeeb5fc662c28d9fad0df0c7f9037050603e8afe6383ce37a92",
+      "observed": {
+        "finished": false,
+        "known": false,
+        "reason": "missing_target_geometry",
+        "selected_subtask": "unknown(missing_target_geometry)",
+        "verb": "unknown"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_on_the_ramekin_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "42b98bae50a03ca473f422f410d95d35178a124c758cb5c369d51f15b6724ef7",
+      "task_index": 7
+    },
+    {
+      "case_family": "missing_destination_geometry",
+      "case_index": 1,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": false,
+        "reason": "missing_destination_geometry",
+        "verb": "unknown"
+      },
+      "first_latency_ns": 2820,
+      "observation_digest": "d0955fd128c2d18c88ca33e57a6bc800052659d6a16982a396a46e4d3fc9f461",
+      "observed": {
+        "finished": false,
+        "known": false,
+        "reason": "missing_destination_geometry",
+        "selected_subtask": "unknown(missing_destination_geometry)",
+        "verb": "unknown"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_on_the_ramekin_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "42b98bae50a03ca473f422f410d95d35178a124c758cb5c369d51f15b6724ef7",
+      "task_index": 7
+    },
+    {
+      "case_family": "open_far_target_pick",
+      "case_index": 2,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "target_not_held",
+        "verb": "pick_up"
+      },
+      "first_latency_ns": 5590,
+      "observation_digest": "9a7c86aa141e36c4e604671616235aa71e41c005d854df1aa4d11723299796a9",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "target_not_held",
+        "selected_subtask": "pick_up(akita_black_bowl_1)",
+        "verb": "pick_up"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_on_the_ramekin_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "42b98bae50a03ca473f422f410d95d35178a124c758cb5c369d51f15b6724ef7",
+      "task_index": 7
+    },
+    {
+      "case_family": "open_goal_satisfied_finish",
+      "case_index": 3,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": true,
+        "known": true,
+        "reason": "all_supported_goals_satisfied",
+        "verb": "finish"
+      },
+      "first_latency_ns": 3871,
+      "observation_digest": "69cb669a4f695fb7babfedd4285903ad69b18ee26f42a699090c4d081bceecf4",
+      "observed": {
+        "finished": true,
+        "known": true,
+        "reason": "all_supported_goals_satisfied",
+        "selected_subtask": "finish()",
+        "verb": "finish"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_on_the_ramekin_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "42b98bae50a03ca473f422f410d95d35178a124c758cb5c369d51f15b6724ef7",
+      "task_index": 7
+    },
+    {
+      "case_family": "closed_unbound_target_unknown",
+      "case_index": 4,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": false,
+        "reason": "closed_without_bound_target",
+        "verb": "unknown"
+      },
+      "first_latency_ns": 5300,
+      "observation_digest": "66b7dc3b9e805107ee6887e8b2fe55c8f557d8afc97d3edc7b668f684bdba6e3",
+      "observed": {
+        "finished": false,
+        "known": false,
+        "reason": "closed_without_bound_target",
+        "selected_subtask": "unknown(closed_without_bound_target)",
+        "verb": "unknown"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_on_the_ramekin_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "42b98bae50a03ca473f422f410d95d35178a124c758cb5c369d51f15b6724ef7",
+      "task_index": 7
+    },
+    {
+      "case_family": "closed_held_far_move",
+      "case_index": 5,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "verb": "move"
+      },
+      "first_latency_ns": 6030,
+      "observation_digest": "ab1596cdb4e399c04be11ecebd4cfe95a3b35a525e298c376c2dee798de84939",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "selected_subtask": "move(akita_black_bowl_1,plate_1)",
+        "verb": "move"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_on_the_ramekin_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "42b98bae50a03ca473f422f410d95d35178a124c758cb5c369d51f15b6724ef7",
+      "task_index": 7
+    },
+    {
+      "case_family": "closed_held_place_region",
+      "case_index": 6,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_requires_placement",
+        "verb": "place"
+      },
+      "first_latency_ns": 7310,
+      "observation_digest": "9154d6347359e1b56f2fec94b0c2eb6a06581d2dd986f09b692b1f445686c00b",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_requires_placement",
+        "selected_subtask": "place(akita_black_bowl_1,plate_1)",
+        "verb": "place"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_on_the_ramekin_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "42b98bae50a03ca473f422f410d95d35178a124c758cb5c369d51f15b6724ef7",
+      "task_index": 7
+    },
+    {
+      "case_family": "closed_held_release_region",
+      "case_index": 7,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_inside_release_region",
+        "verb": "release"
+      },
+      "first_latency_ns": 6790,
+      "observation_digest": "fcbb822914260143e29911d93ff2343809af1b27f6b91a4e4ffd375e487a7e93",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_inside_release_region",
+        "selected_subtask": "release(akita_black_bowl_1)",
+        "verb": "release"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_on_the_ramekin_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "42b98bae50a03ca473f422f410d95d35178a124c758cb5c369d51f15b6724ef7",
+      "task_index": 7
+    },
+    {
+      "case_family": "held_boundary_inside",
+      "case_index": 8,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "verb": "move"
+      },
+      "first_latency_ns": 6140,
+      "observation_digest": "253d34475aa03fb50a60f69aa9d43125966feedd4fa78f69046a12ca44d8e9e4",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "selected_subtask": "move(akita_black_bowl_1,plate_1)",
+        "verb": "move"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_on_the_ramekin_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "42b98bae50a03ca473f422f410d95d35178a124c758cb5c369d51f15b6724ef7",
+      "task_index": 7
+    },
+    {
+      "case_family": "held_boundary_outside",
+      "case_index": 9,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": false,
+        "reason": "closed_without_bound_target",
+        "verb": "unknown"
+      },
+      "first_latency_ns": 5130,
+      "observation_digest": "4f508140358b03cef27ac430658331b34f5fc11cf85bfbee281a034414eb5c5c",
+      "observed": {
+        "finished": false,
+        "known": false,
+        "reason": "closed_without_bound_target",
+        "selected_subtask": "unknown(closed_without_bound_target)",
+        "verb": "unknown"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_on_the_ramekin_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "42b98bae50a03ca473f422f410d95d35178a124c758cb5c369d51f15b6724ef7",
+      "task_index": 7
+    },
+    {
+      "case_family": "gripper_boundary_closed",
+      "case_index": 10,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "verb": "move"
+      },
+      "first_latency_ns": 7550,
+      "observation_digest": "09753b40890d4f95a46507d12c9df5a7d2d7665dcfa7b5efadd765bcc638f5a5",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "selected_subtask": "move(akita_black_bowl_1,plate_1)",
+        "verb": "move"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_on_the_ramekin_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "42b98bae50a03ca473f422f410d95d35178a124c758cb5c369d51f15b6724ef7",
+      "task_index": 7
+    },
+    {
+      "case_family": "gripper_boundary_open",
+      "case_index": 11,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "target_not_held",
+        "verb": "pick_up"
+      },
+      "first_latency_ns": 4440,
+      "observation_digest": "3a1095f7c907bb769db20bcbdf4772bf2072abb56e4c5589c541dd3c3e1e038c",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "target_not_held",
+        "selected_subtask": "pick_up(akita_black_bowl_1)",
+        "verb": "pick_up"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_on_the_ramekin_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "42b98bae50a03ca473f422f410d95d35178a124c758cb5c369d51f15b6724ef7",
+      "task_index": 7
+    },
+    {
+      "case_family": "destination_xy_boundary_inside",
+      "case_index": 12,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_requires_placement",
+        "verb": "place"
+      },
+      "first_latency_ns": 7100,
+      "observation_digest": "afa5fabc9d2016b6faf1088615cade182117b940344574ad2c2f4e75f1443862",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_requires_placement",
+        "selected_subtask": "place(akita_black_bowl_1,plate_1)",
+        "verb": "place"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_on_the_ramekin_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "42b98bae50a03ca473f422f410d95d35178a124c758cb5c369d51f15b6724ef7",
+      "task_index": 7
+    },
+    {
+      "case_family": "destination_xy_boundary_outside",
+      "case_index": 13,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "verb": "move"
+      },
+      "first_latency_ns": 5931,
+      "observation_digest": "84effa086a5a44f69b575b9789963283d2be095ccc34ec915cc516140a4224e2",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "selected_subtask": "move(akita_black_bowl_1,plate_1)",
+        "verb": "move"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_on_the_ramekin_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "42b98bae50a03ca473f422f410d95d35178a124c758cb5c369d51f15b6724ef7",
+      "task_index": 7
+    },
+    {
+      "case_family": "release_radius_inside",
+      "case_index": 14,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_inside_release_region",
+        "verb": "release"
+      },
+      "first_latency_ns": 6811,
+      "observation_digest": "44aea549a86f0843e1ca8a756b413e664e863fa75101001abc5f208ac1295e39",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_inside_release_region",
+        "selected_subtask": "release(akita_black_bowl_1)",
+        "verb": "release"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_on_the_ramekin_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "42b98bae50a03ca473f422f410d95d35178a124c758cb5c369d51f15b6724ef7",
+      "task_index": 7
+    },
+    {
+      "case_family": "release_radius_outside",
+      "case_index": 15,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_requires_placement",
+        "verb": "place"
+      },
+      "first_latency_ns": 9000,
+      "observation_digest": "5cbd5f264980f13b18b07ddee02b2dcef0179bcc916cd9eb2e1a573c26f354f3",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_requires_placement",
+        "selected_subtask": "place(akita_black_bowl_1,plate_1)",
+        "verb": "place"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_on_the_ramekin_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "42b98bae50a03ca473f422f410d95d35178a124c758cb5c369d51f15b6724ef7",
+      "task_index": 7
+    },
+    {
+      "case_family": "missing_target_geometry",
+      "case_index": 0,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": false,
+        "reason": "missing_target_geometry",
+        "verb": "unknown"
+      },
+      "first_latency_ns": 3610,
+      "observation_digest": "ee1a46e03bbd2eeeb5fc662c28d9fad0df0c7f9037050603e8afe6383ce37a92",
+      "observed": {
+        "finished": false,
+        "known": false,
+        "reason": "missing_target_geometry",
+        "selected_subtask": "unknown(missing_target_geometry)",
+        "verb": "unknown"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_on_the_stove_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "aadd389bbfb5d6e669e0970732ce46dd63229484451ccff912e6484cddadda34",
+      "task_index": 8
+    },
+    {
+      "case_family": "missing_destination_geometry",
+      "case_index": 1,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": false,
+        "reason": "missing_destination_geometry",
+        "verb": "unknown"
+      },
+      "first_latency_ns": 2851,
+      "observation_digest": "d0955fd128c2d18c88ca33e57a6bc800052659d6a16982a396a46e4d3fc9f461",
+      "observed": {
+        "finished": false,
+        "known": false,
+        "reason": "missing_destination_geometry",
+        "selected_subtask": "unknown(missing_destination_geometry)",
+        "verb": "unknown"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_on_the_stove_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "aadd389bbfb5d6e669e0970732ce46dd63229484451ccff912e6484cddadda34",
+      "task_index": 8
+    },
+    {
+      "case_family": "open_far_target_pick",
+      "case_index": 2,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "target_not_held",
+        "verb": "pick_up"
+      },
+      "first_latency_ns": 5410,
+      "observation_digest": "9a7c86aa141e36c4e604671616235aa71e41c005d854df1aa4d11723299796a9",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "target_not_held",
+        "selected_subtask": "pick_up(akita_black_bowl_1)",
+        "verb": "pick_up"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_on_the_stove_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "aadd389bbfb5d6e669e0970732ce46dd63229484451ccff912e6484cddadda34",
+      "task_index": 8
+    },
+    {
+      "case_family": "open_goal_satisfied_finish",
+      "case_index": 3,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": true,
+        "known": true,
+        "reason": "all_supported_goals_satisfied",
+        "verb": "finish"
+      },
+      "first_latency_ns": 3990,
+      "observation_digest": "69cb669a4f695fb7babfedd4285903ad69b18ee26f42a699090c4d081bceecf4",
+      "observed": {
+        "finished": true,
+        "known": true,
+        "reason": "all_supported_goals_satisfied",
+        "selected_subtask": "finish()",
+        "verb": "finish"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_on_the_stove_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "aadd389bbfb5d6e669e0970732ce46dd63229484451ccff912e6484cddadda34",
+      "task_index": 8
+    },
+    {
+      "case_family": "closed_unbound_target_unknown",
+      "case_index": 4,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": false,
+        "reason": "closed_without_bound_target",
+        "verb": "unknown"
+      },
+      "first_latency_ns": 5180,
+      "observation_digest": "66b7dc3b9e805107ee6887e8b2fe55c8f557d8afc97d3edc7b668f684bdba6e3",
+      "observed": {
+        "finished": false,
+        "known": false,
+        "reason": "closed_without_bound_target",
+        "selected_subtask": "unknown(closed_without_bound_target)",
+        "verb": "unknown"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_on_the_stove_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "aadd389bbfb5d6e669e0970732ce46dd63229484451ccff912e6484cddadda34",
+      "task_index": 8
+    },
+    {
+      "case_family": "closed_held_far_move",
+      "case_index": 5,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "verb": "move"
+      },
+      "first_latency_ns": 6060,
+      "observation_digest": "ab1596cdb4e399c04be11ecebd4cfe95a3b35a525e298c376c2dee798de84939",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "selected_subtask": "move(akita_black_bowl_1,plate_1)",
+        "verb": "move"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_on_the_stove_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "aadd389bbfb5d6e669e0970732ce46dd63229484451ccff912e6484cddadda34",
+      "task_index": 8
+    },
+    {
+      "case_family": "closed_held_place_region",
+      "case_index": 6,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_requires_placement",
+        "verb": "place"
+      },
+      "first_latency_ns": 7111,
+      "observation_digest": "9154d6347359e1b56f2fec94b0c2eb6a06581d2dd986f09b692b1f445686c00b",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_requires_placement",
+        "selected_subtask": "place(akita_black_bowl_1,plate_1)",
+        "verb": "place"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_on_the_stove_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "aadd389bbfb5d6e669e0970732ce46dd63229484451ccff912e6484cddadda34",
+      "task_index": 8
+    },
+    {
+      "case_family": "closed_held_release_region",
+      "case_index": 7,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_inside_release_region",
+        "verb": "release"
+      },
+      "first_latency_ns": 7070,
+      "observation_digest": "fcbb822914260143e29911d93ff2343809af1b27f6b91a4e4ffd375e487a7e93",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_inside_release_region",
+        "selected_subtask": "release(akita_black_bowl_1)",
+        "verb": "release"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_on_the_stove_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "aadd389bbfb5d6e669e0970732ce46dd63229484451ccff912e6484cddadda34",
+      "task_index": 8
+    },
+    {
+      "case_family": "held_boundary_inside",
+      "case_index": 8,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "verb": "move"
+      },
+      "first_latency_ns": 6410,
+      "observation_digest": "253d34475aa03fb50a60f69aa9d43125966feedd4fa78f69046a12ca44d8e9e4",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "selected_subtask": "move(akita_black_bowl_1,plate_1)",
+        "verb": "move"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_on_the_stove_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "aadd389bbfb5d6e669e0970732ce46dd63229484451ccff912e6484cddadda34",
+      "task_index": 8
+    },
+    {
+      "case_family": "held_boundary_outside",
+      "case_index": 9,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": false,
+        "reason": "closed_without_bound_target",
+        "verb": "unknown"
+      },
+      "first_latency_ns": 5130,
+      "observation_digest": "4f508140358b03cef27ac430658331b34f5fc11cf85bfbee281a034414eb5c5c",
+      "observed": {
+        "finished": false,
+        "known": false,
+        "reason": "closed_without_bound_target",
+        "selected_subtask": "unknown(closed_without_bound_target)",
+        "verb": "unknown"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_on_the_stove_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "aadd389bbfb5d6e669e0970732ce46dd63229484451ccff912e6484cddadda34",
+      "task_index": 8
+    },
+    {
+      "case_family": "gripper_boundary_closed",
+      "case_index": 10,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "verb": "move"
+      },
+      "first_latency_ns": 6020,
+      "observation_digest": "09753b40890d4f95a46507d12c9df5a7d2d7665dcfa7b5efadd765bcc638f5a5",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "selected_subtask": "move(akita_black_bowl_1,plate_1)",
+        "verb": "move"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_on_the_stove_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "aadd389bbfb5d6e669e0970732ce46dd63229484451ccff912e6484cddadda34",
+      "task_index": 8
+    },
+    {
+      "case_family": "gripper_boundary_open",
+      "case_index": 11,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "target_not_held",
+        "verb": "pick_up"
+      },
+      "first_latency_ns": 4470,
+      "observation_digest": "3a1095f7c907bb769db20bcbdf4772bf2072abb56e4c5589c541dd3c3e1e038c",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "target_not_held",
+        "selected_subtask": "pick_up(akita_black_bowl_1)",
+        "verb": "pick_up"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_on_the_stove_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "aadd389bbfb5d6e669e0970732ce46dd63229484451ccff912e6484cddadda34",
+      "task_index": 8
+    },
+    {
+      "case_family": "destination_xy_boundary_inside",
+      "case_index": 12,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_requires_placement",
+        "verb": "place"
+      },
+      "first_latency_ns": 6810,
+      "observation_digest": "afa5fabc9d2016b6faf1088615cade182117b940344574ad2c2f4e75f1443862",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_requires_placement",
+        "selected_subtask": "place(akita_black_bowl_1,plate_1)",
+        "verb": "place"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_on_the_stove_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "aadd389bbfb5d6e669e0970732ce46dd63229484451ccff912e6484cddadda34",
+      "task_index": 8
+    },
+    {
+      "case_family": "destination_xy_boundary_outside",
+      "case_index": 13,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "verb": "move"
+      },
+      "first_latency_ns": 5950,
+      "observation_digest": "84effa086a5a44f69b575b9789963283d2be095ccc34ec915cc516140a4224e2",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "selected_subtask": "move(akita_black_bowl_1,plate_1)",
+        "verb": "move"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_on_the_stove_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "aadd389bbfb5d6e669e0970732ce46dd63229484451ccff912e6484cddadda34",
+      "task_index": 8
+    },
+    {
+      "case_family": "release_radius_inside",
+      "case_index": 14,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_inside_release_region",
+        "verb": "release"
+      },
+      "first_latency_ns": 7060,
+      "observation_digest": "44aea549a86f0843e1ca8a756b413e664e863fa75101001abc5f208ac1295e39",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_inside_release_region",
+        "selected_subtask": "release(akita_black_bowl_1)",
+        "verb": "release"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_on_the_stove_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "aadd389bbfb5d6e669e0970732ce46dd63229484451ccff912e6484cddadda34",
+      "task_index": 8
+    },
+    {
+      "case_family": "release_radius_outside",
+      "case_index": 15,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_requires_placement",
+        "verb": "place"
+      },
+      "first_latency_ns": 6940,
+      "observation_digest": "5cbd5f264980f13b18b07ddee02b2dcef0179bcc916cd9eb2e1a573c26f354f3",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_requires_placement",
+        "selected_subtask": "place(akita_black_bowl_1,plate_1)",
+        "verb": "place"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_on_the_stove_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "aadd389bbfb5d6e669e0970732ce46dd63229484451ccff912e6484cddadda34",
+      "task_index": 8
+    },
+    {
+      "case_family": "missing_target_geometry",
+      "case_index": 0,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": false,
+        "reason": "missing_target_geometry",
+        "verb": "unknown"
+      },
+      "first_latency_ns": 16030,
+      "observation_digest": "ee1a46e03bbd2eeeb5fc662c28d9fad0df0c7f9037050603e8afe6383ce37a92",
+      "observed": {
+        "finished": false,
+        "known": false,
+        "reason": "missing_target_geometry",
+        "selected_subtask": "unknown(missing_target_geometry)",
+        "verb": "unknown"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_on_the_wooden_cabinet_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "a453acd48171babbaef301692485ac64b0245a52b14804321e75371aea814896",
+      "task_index": 9
+    },
+    {
+      "case_family": "missing_destination_geometry",
+      "case_index": 1,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": false,
+        "reason": "missing_destination_geometry",
+        "verb": "unknown"
+      },
+      "first_latency_ns": 2860,
+      "observation_digest": "d0955fd128c2d18c88ca33e57a6bc800052659d6a16982a396a46e4d3fc9f461",
+      "observed": {
+        "finished": false,
+        "known": false,
+        "reason": "missing_destination_geometry",
+        "selected_subtask": "unknown(missing_destination_geometry)",
+        "verb": "unknown"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_on_the_wooden_cabinet_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "a453acd48171babbaef301692485ac64b0245a52b14804321e75371aea814896",
+      "task_index": 9
+    },
+    {
+      "case_family": "open_far_target_pick",
+      "case_index": 2,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "target_not_held",
+        "verb": "pick_up"
+      },
+      "first_latency_ns": 4781,
+      "observation_digest": "9a7c86aa141e36c4e604671616235aa71e41c005d854df1aa4d11723299796a9",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "target_not_held",
+        "selected_subtask": "pick_up(akita_black_bowl_1)",
+        "verb": "pick_up"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_on_the_wooden_cabinet_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "a453acd48171babbaef301692485ac64b0245a52b14804321e75371aea814896",
+      "task_index": 9
+    },
+    {
+      "case_family": "open_goal_satisfied_finish",
+      "case_index": 3,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": true,
+        "known": true,
+        "reason": "all_supported_goals_satisfied",
+        "verb": "finish"
+      },
+      "first_latency_ns": 3501,
+      "observation_digest": "69cb669a4f695fb7babfedd4285903ad69b18ee26f42a699090c4d081bceecf4",
+      "observed": {
+        "finished": true,
+        "known": true,
+        "reason": "all_supported_goals_satisfied",
+        "selected_subtask": "finish()",
+        "verb": "finish"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_on_the_wooden_cabinet_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "a453acd48171babbaef301692485ac64b0245a52b14804321e75371aea814896",
+      "task_index": 9
+    },
+    {
+      "case_family": "closed_unbound_target_unknown",
+      "case_index": 4,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": false,
+        "reason": "closed_without_bound_target",
+        "verb": "unknown"
+      },
+      "first_latency_ns": 4290,
+      "observation_digest": "66b7dc3b9e805107ee6887e8b2fe55c8f557d8afc97d3edc7b668f684bdba6e3",
+      "observed": {
+        "finished": false,
+        "known": false,
+        "reason": "closed_without_bound_target",
+        "selected_subtask": "unknown(closed_without_bound_target)",
+        "verb": "unknown"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_on_the_wooden_cabinet_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "a453acd48171babbaef301692485ac64b0245a52b14804321e75371aea814896",
+      "task_index": 9
+    },
+    {
+      "case_family": "closed_held_far_move",
+      "case_index": 5,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "verb": "move"
+      },
+      "first_latency_ns": 5200,
+      "observation_digest": "ab1596cdb4e399c04be11ecebd4cfe95a3b35a525e298c376c2dee798de84939",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "selected_subtask": "move(akita_black_bowl_1,plate_1)",
+        "verb": "move"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_on_the_wooden_cabinet_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "a453acd48171babbaef301692485ac64b0245a52b14804321e75371aea814896",
+      "task_index": 9
+    },
+    {
+      "case_family": "closed_held_place_region",
+      "case_index": 6,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_requires_placement",
+        "verb": "place"
+      },
+      "first_latency_ns": 6520,
+      "observation_digest": "9154d6347359e1b56f2fec94b0c2eb6a06581d2dd986f09b692b1f445686c00b",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_requires_placement",
+        "selected_subtask": "place(akita_black_bowl_1,plate_1)",
+        "verb": "place"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_on_the_wooden_cabinet_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "a453acd48171babbaef301692485ac64b0245a52b14804321e75371aea814896",
+      "task_index": 9
+    },
+    {
+      "case_family": "closed_held_release_region",
+      "case_index": 7,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_inside_release_region",
+        "verb": "release"
+      },
+      "first_latency_ns": 5830,
+      "observation_digest": "fcbb822914260143e29911d93ff2343809af1b27f6b91a4e4ffd375e487a7e93",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_inside_release_region",
+        "selected_subtask": "release(akita_black_bowl_1)",
+        "verb": "release"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_on_the_wooden_cabinet_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "a453acd48171babbaef301692485ac64b0245a52b14804321e75371aea814896",
+      "task_index": 9
+    },
+    {
+      "case_family": "held_boundary_inside",
+      "case_index": 8,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "verb": "move"
+      },
+      "first_latency_ns": 5050,
+      "observation_digest": "253d34475aa03fb50a60f69aa9d43125966feedd4fa78f69046a12ca44d8e9e4",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "selected_subtask": "move(akita_black_bowl_1,plate_1)",
+        "verb": "move"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_on_the_wooden_cabinet_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "a453acd48171babbaef301692485ac64b0245a52b14804321e75371aea814896",
+      "task_index": 9
+    },
+    {
+      "case_family": "held_boundary_outside",
+      "case_index": 9,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": false,
+        "reason": "closed_without_bound_target",
+        "verb": "unknown"
+      },
+      "first_latency_ns": 4300,
+      "observation_digest": "4f508140358b03cef27ac430658331b34f5fc11cf85bfbee281a034414eb5c5c",
+      "observed": {
+        "finished": false,
+        "known": false,
+        "reason": "closed_without_bound_target",
+        "selected_subtask": "unknown(closed_without_bound_target)",
+        "verb": "unknown"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_on_the_wooden_cabinet_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "a453acd48171babbaef301692485ac64b0245a52b14804321e75371aea814896",
+      "task_index": 9
+    },
+    {
+      "case_family": "gripper_boundary_closed",
+      "case_index": 10,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "verb": "move"
+      },
+      "first_latency_ns": 4790,
+      "observation_digest": "09753b40890d4f95a46507d12c9df5a7d2d7665dcfa7b5efadd765bcc638f5a5",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "selected_subtask": "move(akita_black_bowl_1,plate_1)",
+        "verb": "move"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_on_the_wooden_cabinet_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "a453acd48171babbaef301692485ac64b0245a52b14804321e75371aea814896",
+      "task_index": 9
+    },
+    {
+      "case_family": "gripper_boundary_open",
+      "case_index": 11,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "target_not_held",
+        "verb": "pick_up"
+      },
+      "first_latency_ns": 3750,
+      "observation_digest": "3a1095f7c907bb769db20bcbdf4772bf2072abb56e4c5589c541dd3c3e1e038c",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "target_not_held",
+        "selected_subtask": "pick_up(akita_black_bowl_1)",
+        "verb": "pick_up"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_on_the_wooden_cabinet_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "a453acd48171babbaef301692485ac64b0245a52b14804321e75371aea814896",
+      "task_index": 9
+    },
+    {
+      "case_family": "destination_xy_boundary_inside",
+      "case_index": 12,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_requires_placement",
+        "verb": "place"
+      },
+      "first_latency_ns": 6220,
+      "observation_digest": "afa5fabc9d2016b6faf1088615cade182117b940344574ad2c2f4e75f1443862",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_requires_placement",
+        "selected_subtask": "place(akita_black_bowl_1,plate_1)",
+        "verb": "place"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_on_the_wooden_cabinet_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "a453acd48171babbaef301692485ac64b0245a52b14804321e75371aea814896",
+      "task_index": 9
+    },
+    {
+      "case_family": "destination_xy_boundary_outside",
+      "case_index": 13,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "verb": "move"
+      },
+      "first_latency_ns": 4940,
+      "observation_digest": "84effa086a5a44f69b575b9789963283d2be095ccc34ec915cc516140a4224e2",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_outside_destination_xy",
+        "selected_subtask": "move(akita_black_bowl_1,plate_1)",
+        "verb": "move"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_on_the_wooden_cabinet_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "a453acd48171babbaef301692485ac64b0245a52b14804321e75371aea814896",
+      "task_index": 9
+    },
+    {
+      "case_family": "release_radius_inside",
+      "case_index": 14,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_inside_release_region",
+        "verb": "release"
+      },
+      "first_latency_ns": 5611,
+      "observation_digest": "44aea549a86f0843e1ca8a756b413e664e863fa75101001abc5f208ac1295e39",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_inside_release_region",
+        "selected_subtask": "release(akita_black_bowl_1)",
+        "verb": "release"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_on_the_wooden_cabinet_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "a453acd48171babbaef301692485ac64b0245a52b14804321e75371aea814896",
+      "task_index": 9
+    },
+    {
+      "case_family": "release_radius_outside",
+      "case_index": 15,
+      "destination": "plate_1",
+      "exact_match": true,
+      "expected": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_requires_placement",
+        "verb": "place"
+      },
+      "first_latency_ns": 5580,
+      "observation_digest": "5cbd5f264980f13b18b07ddee02b2dcef0179bcc916cd9eb2e1a573c26f354f3",
+      "observed": {
+        "finished": false,
+        "known": true,
+        "reason": "held_target_requires_placement",
+        "selected_subtask": "place(akita_black_bowl_1,plate_1)",
+        "verb": "place"
+      },
+      "target": "akita_black_bowl_1",
+      "task_bddl": "external/LIBERO-phantom-r0/libero/libero/bddl_files/libero_spatial/pick_up_the_black_bowl_on_the_wooden_cabinet_and_place_it_on_the_plate.bddl",
+      "task_graph_digest": "a453acd48171babbaef301692485ac64b0245a52b14804321e75371aea814896",
+      "task_index": 9
+    }
+  ],
+  "schema": "proofalign.deterministic-selector-e1f-evidence.v1",
+  "simulator_created": false,
+  "source_bindings": {
+    "scripts/run_deterministic_selector_qualification_e1f.py": "2d30d0bc96d4cc16dd74d340270b8bff33ca68ebd7045cb076d2bb6f0a632298",
+    "src/proofalign/semantic_local_checker.py": "3c7e883a8fd78d50d017203158a285c8d2ee77d83ce64cae1843e85eb88b1dff",
+    "src/proofalign/semantic_policy_wrapper.py": "90004b15b6eebe28b177a7e3c73f97a22badbc7a3ce4415cc685c20d2100d047"
+  },
+  "training_performed": false,
+  "unknown_case_count": 40,
+  "unknown_fail_closed_count": 40,
+  "unknown_fail_closed_rate": 1.0
+}

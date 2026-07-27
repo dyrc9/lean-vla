@@ -1,0 +1,167 @@
+{
+  "candidate_dataset": {
+    "e1_protocol_path": "experiments/proofalign_pi05_selector_e1_protocol.json",
+    "e1_protocol_sha256": "9ac6f615a8087b6710bee5c5dc5f542fc73383bf162c6e36ef1a475c9cd09ced",
+    "metadata_sha256": {
+      "/data0/ldx/datasets/modified_libero_rlds/libero_spatial_no_noops/1.0.0/dataset_info.json": "7fc2bdd61cfdafc80ff60143805954b37bdb436dfb206d13fd705dffdf863078",
+      "/data0/ldx/datasets/modified_libero_rlds/libero_spatial_no_noops/1.0.0/dataset_statistics_52c4489226d56b2b57ef8537aa0e29e58b74df154b0d09f535a6961a145ed292.json": "543f692902c2a632a7c32f7a1ea74ec03d5824a4d948d3380e2e70b7c7064fbb",
+      "/data0/ldx/datasets/modified_libero_rlds/libero_spatial_no_noops/1.0.0/features.json": "d6f56537585d15aa99772c6da942e5957cceda26b57a18098ef8e3164cdaffde"
+    },
+    "root": "/data0/ldx/datasets/modified_libero_rlds/libero_spatial_no_noops/1.0.0"
+  },
+  "claim_boundary": "Dataset-schema adequacy only. This preflight neither trains nor qualifies a perception model and contains no policy, simulator, action, outcome, efficacy, deployment, or safety evidence.",
+  "created_at": "2026-07-25T00:00:00+08:00",
+  "execution_authorization": {
+    "action_dispatch_authorized": false,
+    "model_selection_authorized": false,
+    "outcome_read_authorized": false,
+    "policy_load_authorized": false,
+    "simulator_creation_authorized": false,
+    "training_authorized": false
+  },
+  "gates": {
+    "all_required_evidence_present": true,
+    "independent_qualification_split_present": true,
+    "outcome_blind_labels": true
+  },
+  "output": "experiments/proofalign_deployment_perception_e7_preflight.json",
+  "protocol_id": "proofalign-deployment-perception-e7-20260725",
+  "qualification_design_if_data_gate_passes": {
+    "forbidden_label_sources": [
+      "reward",
+      "success",
+      "cost",
+      "collision",
+      "future_episode_outcome"
+    ],
+    "metrics": [
+      "target_3d_error",
+      "destination_3d_error",
+      "held_state_accuracy",
+      "visibility_calibration",
+      "coverage",
+      "ood_abstention",
+      "worst_group",
+      "latency"
+    ],
+    "minimum_snapshots": 2000,
+    "minimum_tasks": 10,
+    "minimum_trajectories_per_task": 20,
+    "qualification_split": "frozen_held_out",
+    "required_stage_groups": [
+      "approach",
+      "grasp",
+      "transport",
+      "pre_place",
+      "release"
+    ],
+    "required_stress_groups": [
+      "wrist_occluded",
+      "base_occluded",
+      "target_partially_visible",
+      "destination_partially_visible",
+      "novel_pose",
+      "near_boundary"
+    ],
+    "split_unit": "trajectory_and_scene",
+    "threshold_selection_split": "development_only"
+  },
+  "required_evidence": [
+    {
+      "any_of": [
+        "steps.observation.image"
+      ],
+      "description": "main RGB image",
+      "id": "main_rgb"
+    },
+    {
+      "any_of": [
+        "steps.observation.wrist_image"
+      ],
+      "description": "wrist RGB image",
+      "id": "wrist_rgb"
+    },
+    {
+      "any_of": [
+        "steps.observation.state"
+      ],
+      "description": "EEF/gripper state",
+      "id": "robot_state"
+    },
+    {
+      "any_of": [
+        "steps.observation.camera_intrinsics",
+        "episode_metadata.camera_intrinsics"
+      ],
+      "description": "per-camera intrinsic calibration",
+      "id": "camera_intrinsics"
+    },
+    {
+      "any_of": [
+        "steps.observation.camera_extrinsics",
+        "episode_metadata.camera_extrinsics"
+      ],
+      "description": "camera-to-robot/world extrinsic calibration",
+      "id": "camera_extrinsics"
+    },
+    {
+      "any_of": [
+        "steps.observation.target_instance_mask",
+        "steps.observation.target_pose",
+        "steps.observation.object_poses"
+      ],
+      "description": "target instance identity plus 2D/3D localization",
+      "id": "target_identity_localization"
+    },
+    {
+      "any_of": [
+        "steps.observation.destination_instance_mask",
+        "steps.observation.destination_pose",
+        "steps.observation.region_geometry"
+      ],
+      "description": "destination instance/region geometry",
+      "id": "destination_geometry"
+    },
+    {
+      "any_of": [
+        "steps.observation.visibility",
+        "steps.observation.occlusion"
+      ],
+      "description": "target/destination visibility and occlusion labels",
+      "id": "visibility_occlusion"
+    },
+    {
+      "any_of": [
+        "steps.observation.held_object",
+        "steps.observation.contact_state",
+        "steps.observation.grasp_state"
+      ],
+      "description": "held/grasp/contact supervision",
+      "id": "held_contact_state"
+    },
+    {
+      "any_of": [
+        "episode_metadata.file_path"
+      ],
+      "description": "trajectory identity for leakage-safe grouping",
+      "id": "trajectory_group_id"
+    },
+    {
+      "any_of": [
+        "dataset_split.validation",
+        "dataset_split.test",
+        "episode_metadata.qualification_split"
+      ],
+      "description": "frozen model/threshold-independent split",
+      "id": "independent_qualification_split"
+    }
+  ],
+  "schema": "proofalign.deployment-perception-preflight-e7.v1",
+  "source_sha256": {
+    "scripts/run_deployment_perception_preflight_e7.py": "ecea7fdf6ff93f24f25ed53cfb2d3ea91ab1bbb482fb942d182facc92ec46f2f",
+    "scripts/run_pi05_selector_qualification_e1.py": "b4391cc39fd4a745d751bf00ac8ccdd82dfaa825417ace00ea9ee79b5653b0f2",
+    "src/proofalign/semantic_effect_observer.py": "b181ad367f5038025162d227e7e8c287ee3f67fdd7d44d1884f79f584c6f91e5",
+    "src/proofalign/semantic_local_checker.py": "3c7e883a8fd78d50d017203158a285c8d2ee77d83ce64cae1843e85eb88b1dff"
+  },
+  "status": "frozen_data_adequacy_gate_before_model_selection"
+}

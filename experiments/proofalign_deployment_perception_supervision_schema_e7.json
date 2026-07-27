@@ -1,0 +1,150 @@
+{
+  "allowed_splits": [
+    "development",
+    "qualification"
+  ],
+  "allowed_stages": [
+    "approach",
+    "grasp",
+    "transport",
+    "pre_place",
+    "release"
+  ],
+  "allowed_stress_groups": [
+    "nominal",
+    "wrist_occluded",
+    "base_occluded",
+    "target_partially_visible",
+    "destination_partially_visible",
+    "novel_pose",
+    "near_boundary"
+  ],
+  "asset_record_fields": [
+    "path",
+    "sha256",
+    "shape",
+    "dtype"
+  ],
+  "camera_record_fields": [
+    "intrinsic_3x3",
+    "extrinsic_4x4",
+    "extrinsic_convention"
+  ],
+  "claim_boundary": "This contract defines outcome-blind supervision and split requirements only. A conforming dataset is not itself a qualified perception model, deployment result, efficacy result, or physical-safety result.",
+  "collection_authorization": {
+    "action_dispatch_authorized": false,
+    "existing_offline_data_export_authorized": true,
+    "model_selection_authorized": false,
+    "model_training_authorized": false,
+    "outcome_read_authorized": false,
+    "simulator_creation_authorized": false
+  },
+  "contact_state_values": [
+    "no_contact",
+    "target_contact",
+    "destination_contact",
+    "non_target_contact"
+  ],
+  "created_at": "2026-07-25T00:00:00+08:00",
+  "entity_record_fields": [
+    "entity_id",
+    "position_xyz",
+    "orientation_xyzw",
+    "instance_mask"
+  ],
+  "forbidden_field_names": [
+    "collision",
+    "cost",
+    "done",
+    "episode_outcome",
+    "return",
+    "reward",
+    "success",
+    "task_success"
+  ],
+  "grouping_rules": {
+    "metric_reporting_split": "qualification",
+    "scene_overlap_allowed": false,
+    "split_unit": "trajectory_and_scene",
+    "threshold_selection_split": "development",
+    "trajectory_overlap_allowed": false
+  },
+  "held_state_values": [
+    "held",
+    "not_held"
+  ],
+  "label_provenance_requirements": {
+    "allowed_sources": [
+      "simulator_privileged_state_export",
+      "calibrated_multiview_annotation",
+      "manual_instance_annotation"
+    ],
+    "future_frames_used": false,
+    "model_prediction_used_as_ground_truth": false,
+    "outcome_fields_read": false
+  },
+  "manifest_schema": "proofalign.deployment-perception-dataset-e7.v1",
+  "population_gates": {
+    "minimum_qualification_fraction": 0.3,
+    "minimum_snapshots": 2000,
+    "minimum_snapshots_per_non_nominal_stress_group": 100,
+    "minimum_snapshots_per_stage": 200,
+    "minimum_tasks": 10,
+    "minimum_trajectories_per_task": 20
+  },
+  "preflight_bindings": {
+    "evidence_path": "experiments/proofalign_deployment_perception_e7_preflight.json",
+    "evidence_sha256": "eb86c67f47291b3bd40c6b4f0dc236910fda50d1e61f2dc24b7fdad955e92c3f",
+    "protocol_path": "experiments/proofalign_deployment_perception_e7_protocol.json",
+    "protocol_sha256": "0e9451c6b40b555e22023850d3cd512c4c599956529ce222d9d0c935576573a0"
+  },
+  "required_snapshot_fields": {
+    "calibration": [
+      "main_camera",
+      "wrist_camera"
+    ],
+    "geometry": [
+      "eef_position",
+      "gripper_qpos",
+      "target",
+      "destination"
+    ],
+    "identity": [
+      "schema",
+      "case_id",
+      "split",
+      "task_id",
+      "trajectory_id",
+      "scene_id",
+      "frame_index",
+      "stage",
+      "stress_group"
+    ],
+    "images": [
+      "main_image",
+      "wrist_image"
+    ],
+    "provenance": [
+      "label_provenance"
+    ],
+    "state_labels": [
+      "visibility",
+      "held_state",
+      "contact_state"
+    ]
+  },
+  "schema": "proofalign.deployment-perception-supervision-contract-e7.v1",
+  "schema_id": "proofalign-deployment-perception-supervision-e7-20260725",
+  "snapshot_schema": "proofalign.deployment-perception-snapshot-e7.v1",
+  "source_binding": {
+    "path": "scripts/prepare_deployment_perception_dataset_e7.py",
+    "sha256": "feaf4d68c49eee9b05d3e040f33cc4fe42ec3fa533ece8fc3fa434d0a962b68c"
+  },
+  "status": "frozen_before_collection_or_model_selection",
+  "visibility_values": [
+    "fully_visible",
+    "partially_visible",
+    "occluded",
+    "out_of_view"
+  ]
+}

@@ -44,7 +44,13 @@ def test_adapter_exports_exact_consumed_prefixes_without_outcomes() -> None:
 
     assert adapted["outcome_fields_read"] == []
     assert adapted["unused_policy_chunk_tail_reconstructed"] is False
+    assert adapted["runtime_schema_class"] == "historical_v3"
     assert len(adapted["action_blocks"]) == 2
+    assert (
+        adapted["action_blocks"][0]["runtime_schema_class"]
+        == "historical_v3"
+    )
+    assert "semantic_subtask_digest" not in adapted["action_blocks"][0]
     assert adapted["action_blocks"][0]["action_count"] == 2
     assert adapted["action_blocks"][0]["action_dimension"] == 7
     assert len(adapted["action_blocks"][0]["action_block"]["command"]) == 14

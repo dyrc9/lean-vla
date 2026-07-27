@@ -43,6 +43,25 @@ phase-gating theorem，而不是事后附加的形式化说明。
 
 ## 当前证据边界
 
+- 2026-07-25 no-outcome semantic qualification：
+  - raw π0.5 selector 未通过（500 snapshots，coverage `0.822`，known legal-frontier
+    `0.564`），因此禁止用于 L1；
+  - privileged-geometry deterministic FSM 通过（160/160，unknown fail-closed `100%`）；
+  - semantic prompt behavioral control 未通过（median MAD `0.000190`，motion cosine
+    `0.998928`），因此不把 prompt 当安全机制；
+  - analytic local checker 通过 2500-case frozen corpus：clean retention `700/700`、
+    attacked false allow `0/1200`、OOD abstention `600/600`；
+  - E4 qualification-outside no-dispatch gate 通过：8 proposals、32 arm rows、跨臂 identity
+    一致、dispatch `0`；
+  - analytic effect observer 通过 2100-case frozen corpus：clean retention `500/500`、
+    attacked false allow `0/1000`、OOD abstention `600/600`，p99 `16.7µs`。
+  - E6 offline resource smoke 通过：300 次 frozen π0.5 policy call，checkpoint load
+    `8.70s`，policy/pipeline p99 `92.0/92.3ms`，GPU/RSS peak `8650/16465.6 MiB`，
+    action digest repeat `200/200`；simulator、dispatch、outcome 均为 `0`。
+  - E7 dataset qualification runner 已完成：会强制 population/split gate、资产 SHA、真实解码
+    shape/dtype 与 asset-root containment；当前仍没有满足 contract 的本机数据。
+  - E8 source-binding audit 已完成：evidence inventory 与 OpenPI binding 完整，但当前 68 个
+    semantic scope path 尚未绑定到 HEAD，因此分类为 `semantic_source_binding_not_clean`。
 - P0b：96/96 episode 有效，得到 23 个 clean-eligible pair 和 15 个攻击 transition；因
   `23 < 26` 未通过确认性 denominator gate。
 - R9 Execution-only：clean retention `22/23 = 95.7%`；attacked+defended `48/48`
@@ -58,12 +77,18 @@ phase-gating theorem，而不是事后附加的形式化说明。
 
 ## 当前主线
 
-1. M1A component closure：冻结 producer/victim、四臂 runner、trace exporter、Lean evidence 与 validator；
-2. M1B selector qualification：冻结 task graph、`Z_t` 词表、margin/unknown、OOD 和 latency gate；
-3. M1C local-checker qualification：报告 attacked false allow、clean retention、coverage 和 worst group；
-4. 贯通 `Z_t`/prompt/ActionBlock/contract identity，并更新 fixed-trace 与资源 gate；
-5. 运行 M2：60 base pair × 2 seeds，共 240 个 clean/attacked VLA-only episode；
-6. M2 gate 通过后，依次运行 fixed-trace 四臂、480 clean 四臂、480 attacked 四臂。
+1. no-outcome C1–C5、E1–E5 已关闭；当前选定
+   `deterministic privileged-geometry FSM + analytic checker/effect observer`；
+2. E6 latency/resource smoke 已由授权 successor 完成，10 项 gate 全部通过；该结果只关闭离线
+   工程资源门，不产生 efficacy/outcome 结论；
+3. E7 发现当前 RLDS 缺少 camera calibration、object/destination geometry、visibility/held/contact
+   supervision 与独立 split；对应 outcome-blind contract、validator 与 dataset qualification runner
+   已冻结/接线；
+4. E8 已机器审计 source/evidence/OpenPI binding；在不替用户提交 dirty worktree 的前提下，下一步是
+   将 68 个 scoped path 绑定到经确认的 clean commit；
+5. 获得明确 outcome 授权后，先运行少量 closed-loop no-attack engineering smoke；
+6. 再运行 M2：60 base pair × 2 seeds，共 240 个 clean/attacked VLA-only episode；
+7. M2 gate 通过后，依次运行 480 clean 四臂、480 attacked 四臂。
 
 入口文档：
 
@@ -90,6 +115,8 @@ bash scripts/check_all.sh
 
 冻结的旧协议、旧结果和废弃路线只用于审计，不授权新 rollout。
 
-当前 M1 packet 已确认 producer/victim、shared runner、Lean evidence、fresh roots、fixed-trace exporter
-与 outcome-blind ActionBlock prefix adapter 完成；剩余 blocker 是 semantic runtime integration、
-selector/local-checker qualification、授权后的资源/延迟 smoke measurement，以及 clean-commit binding。
+当前 post-E5 packet 已确认 benchmark privileged-geometry no-outcome stack 完整；opt-in 在线 LIBERO
+runtime 已接入资格化的 deterministic selector、analytic executable-prefix checker、fresh one-use
+authorization、ordered receipts 和 analytic effect observer。E6 离线资源/延迟 smoke 已通过；剩余
+blocker 是 deployment perception、E8 所报告的 clean-commit binding 与明确 outcome 授权。E7 已机器
+确认当前 RLDS supervision 不足；当前没有新 efficacy rollout。

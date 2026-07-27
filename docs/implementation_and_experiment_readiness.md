@@ -24,13 +24,19 @@ transaction 贯通，同时不污染 P0b/R9 或现有 v3 frozen evidence。
 - fixed-trace shared runner、historical executed-prefix adapter、M1 validator；
 - P0b/R9 的 attack、pairing、observer、ledger 和探索性 evidence。
 
-尚未贯通：
+当前贯通状态：
 
-- semantic context/`Z_t`/prompt digest 尚未进入 integrity transaction；
-- online LIBERO runner 尚未在生成动作前选择并绑定 `Z_t`；
-- local checker 尚未从真实 trusted observation 和 executable prefix 产生 qualified assessment；
-- projection/intervention 后的重新 assessment/contract/authorization 尚未形成一条在线路径；
-- fixed-trace/Lean equivalence artifact 尚未覆盖 semantic binding。
+- semantic context/`Z_t`/prompt digest 的独立 v4 schema 已进入 opt-in 在线 LIBERO policy-call 路径；
+- online runner 已在生成动作前从 pre-transform view 选择并绑定 `Z_t`；
+- analytic local checker 已从当前 trusted geometry 和 exact executable prefix 产生 assessment，并通过
+  E3 frozen analytic-corpus qualification；
+- bounded clip/projection 后会重新检查并生成 final proposal/assessment/contract，并签发 fresh v4
+  authorization；
+- `(H,7)` prefix 已作为一个 one-use logical dispatch session 接入 LIBERO boundary，每步 receipt 绑定同一
+  authorization，execution evidence 绑定 ordered receipts、实际 action 和 observation window；
+- E5-qualified analytic semantic effect observer 已接入 online receipt/window seal；只有 before/after
+  privileged geometry 支持 expected effect atoms 时才返回 known，否则 reject/unknown；
+- C5 fixed-trace/Lean scoped equivalence 已覆盖 semantic binding，并接入顶层检查。
 
 ## 3. Schema 决策
 
@@ -84,6 +90,26 @@ observation window
 - v3 frozen fixtures 仍按原 schema 读取，不能被静默升级；
 - unknown `Z_t` 不能生成 trusted action prompt 或 dispatchable v4 proposal；
 - legacy adapter 必须显式标记 `historical_v3`，不能伪造缺失 semantic fields。
+
+当前实现状态（2026-07-24）：
+
+- `src/proofalign/integrity_v4_models.py` 已实现独立的 `proofalign-integrity-v4` proposal、
+  assessment 和 execution contract，不改写 v3；
+- verified proposal factory 会重新编译 trusted prompt，绑定 trusted/policy 双视图和 source chunk；
+- proposal/assessment/contract 的换绑与 post-projection 旧 artifact 复用已有 negative tests；
+- unknown semantic artifact 无 trusted prompt，v4 unknown proposal 明确不可 dispatch；
+- historical executed-prefix adapter 显式输出 `runtime_schema_class=historical_v3`；
+- `integrity_v4_runtime.py` 已实现 artifact freshness、one-use authorization、ordered exact-action dispatch、
+  per-step receipt 和 receipt/effect window binding；
+- stale authorization、caller/sink substitution、重复派发和 projection 后旧 artifact 复用均 fail closed。
+- `semantic_policy_wrapper.py` 已把 deterministic BDDL task graph、trusted prompt、K=1 policy output、
+  local checker、selection 和 v4 artifacts 串成一条 consumer-side path；
+- `semantic_local_checker.py` 已实现 transport skills 的运动学/几何检查；articulation state 不足时
+  unknown/fail closed；
+- `run_liberosafety_pi05_openpi_eval.py --semantic-runtime` 在 checker/authorization reject 时保证 zero
+  `env.step`；通过后也只能由 `AuthorizedLiberoActionSink` 在 exact step receipt boundary 内调用
+  `env.step`，不再存在 checker 通过后直接派发路径；
+- 当前几何来自 LIBERO object-state privileged benchmark observation，尚不是 deployment perception。
 
 ## 4. 代码工作包
 
@@ -167,6 +193,16 @@ Z_t fixed
 - authorization 后修改 command；
 - 不同 arm 重新采样 policy/selector。
 
+当前实现状态（2026-07-24）：
+
+- C4 已完成：final proposal/assessment/contract 精确换绑后才可签发 authorization；
+- 一个 authorization 只可打开一次，但其 session 可按序消费完整 `(H,7)` prefix；
+- 每步记录 actual applied action 与 receipt，窗口 evidence 绑定初始观察、每步 post observation 和全部
+  receipt；
+- episode 提前结束会诚实记录 incomplete prefix，不能伪装成完整 exact dispatch；
+- E5 effect observer 已资格化并接线；incomplete prefix、epoch mismatch、缺失几何和 articulation
+  state 仍保持 `unknown`。
+
 ### C5：Shared runner、trace validator 与 Lean evidence
 
 `K=1` primary：
@@ -191,6 +227,19 @@ Lean/v4 准备项：
 - 保留 phase advance 蕴含 execution alignment 与 trusted completion；
 - 生成 Lean source digest、theorem inventory、Python truth-table/equivalence artifact；
 - 明确该 artifact 是 scoped equivalence evidence，不是完整 refinement proof。
+
+当前状态（2026-07-25）：
+
+- 新增 `lean/ProofAlign/SemanticIntegrityCore.lean`，v3 `IntegrityCore.lean` 保持不变；
+- 新增 `semantic_four_arm_runner.py`，只做确定性 shadow evaluation，不创建 simulator、sink 或 dispatch
+  session；
+- 新增并冻结 `proofalign_semantic_v4_c5_protocol.json`；
+- 已生成 `proofalign_semantic_v4_fixed_trace_c5.json`：8 cases、32 arm rows、artifact identity 通过、
+  dispatch count 为零；
+- 已生成 `proofalign_semantic_v4_lean_equivalence_c5.json`，绑定 v4 Lean source、14 个 theorem anchors、
+  Python sources 和 fixed-trace digest；
+- 两个 artifact generator 的 `--check` 与 Lean build 当前通过；
+- 专门 pytest、C5 readiness packet、`Makefile`/`scripts/check_all.sh` 接线均已完成，C5 已关闭。
 
 ## 5. 必需测试
 
@@ -232,6 +281,10 @@ frontier、top-1/top-k、margin、stability、unknown/OOD abstention、worst gro
 
 首轮 `0/4`、`4/4`、`3/5` 只用于选择 skill-level 粒度，不进入 qualification denominator。
 
+结果：raw π0.5 selector 未通过；500 snapshots 的 coverage `0.822`、known legal-frontier `0.5645`。
+预注册 deterministic privileged-geometry FSM fallback 在 160 cases 上 160/160，并对 unknown
+`100%` fail closed。
+
 ### E2：Action-conditioning qualification
 
 固定：
@@ -244,6 +297,9 @@ frontier、top-1/top-k、margin、stability、unknown/OOD abstention、worst gro
 
 报告完整 block digest、per-dimension delta、motion cosine、gripper change、阶段合理性和重复稳定性。该实验
 回答 `Z_t` 是否具有有意义的行为影响，不承担防御 efficacy claim。
+
+结果：未通过 behavioral-control gate；median MAD `0.000190`、motion cosine `0.998928`。semantic
+prompt 不授权为安全控制，analytic checker 仍为必需。
 
 ### E3：Local-checker qualification
 
@@ -264,6 +320,9 @@ CPU/GPU memory
 
 阈值必须在 M2/four-arm outcome 前冻结。
 
+结果：2500 cases 中 clean `700/700`、attacked false allow `0/1200`、OOD abstention `600/600`，
+p99 `58.3µs`，全部 gate 通过。该结论只覆盖 synthetic analytic privileged-geometry corpus。
+
 ### E4：No-dispatch four-arm gate
 
 使用 qualification 外的 frozen trace，验证：
@@ -274,9 +333,69 @@ CPU/GPU memory
 - zero simulator、zero sink dispatch；
 - Python/Lean evidence source digest 当前。
 
+结果：8 proposals、32 rows，15 项 gate 全部通过，dispatch/simulator/sink/outcome 均为零。
+
+### E5：Semantic effect-observer qualification
+
+冻结 before/after geometry、prefix completeness、expected/forbidden effect atoms 与 trusted violation
+fixtures。结果：2100 cases 中 clean `500/500`、attacked false allow `0/1000`、OOD abstention
+`600/600`，p99 `16.7µs`。在线 runner 已使用同一 observer 生成 bound `PrefixExecutionEvidence`。
+
+该结果不资格化 camera perception、simulator info trust 或在线效果分布。
+
+### E6：Latency/resource smoke
+
+已冻结 100 个 E2 snapshots × 3 measured passes 的 no-simulator workload，测量 checkpoint load、
+policy/semantic pipeline p50/p95/p99、selector/checker/observer CPU latency、process GPU/RSS peak、
+输出大小和 digest repeatability。固定 GPU 1 及 `<4096 MiB`/zero external compute process 启动门。
+
+授权 successor 已在本机 OpenPI 环境完成测量并分类为
+`semantic_resource_smoke_qualified`。checkpoint load `8.703s`；300 次 warm policy call 的
+p50/p95/p99 为 `80.8/87.5/92.0ms`，semantic pipeline p99 `92.3ms`；selector/checker/observer
+最大 qualification p99 `58.3µs`；process GPU/RSS peak `8650/16465.6 MiB`；输出
+`130069 bytes`；两个 repeat pass 共 `200/200` digest 完全一致。10 项 gate 全部通过，资源 monitor
+无查询错误。runner 记录 simulator、action sink、dispatch、outcome 和 training 均为 false。
+
+该结果只资格化冻结 workload 的本机工程预算，不资格化 camera perception、closed-loop efficacy 或
+物理安全。
+
+### E7：Deployment-perception data adequacy
+
+当前 frozen RLDS schema 有 main/wrist RGB、robot/joint state、action 和 trajectory path，但缺少：
+
+- camera intrinsics/extrinsics；
+- target identity/localization 与 destination geometry；
+- visibility/occlusion 与 held/contact supervision；
+- 独立 qualification split。
+
+因此 E7 分类为 `deployment_perception_data_inadequate`，不得直接训练或宣称 camera-only qualification。
+下一数据 artifact 必须 outcome-blind，并按 trajectory/scene 分组冻结 development/qualification split。
+`proofalign_deployment_perception_supervision_schema_e7.json` 已冻结完整逐帧 contract 和 population gates；
+validator 会拒绝 outcome 字段、资产 digest 漂移及 trajectory/scene split leakage。新增 dataset
+qualification runner 会在完整 population 上额外验证：
+
+- 每个资产路径都相对且不能逃出 asset root；
+- SHA-256 与实际文件一致，文件可由 Pillow 解码；
+- main/wrist image 必须是 `HxWx3 uint8`，instance mask 必须是 `HxW bool`；
+- 声明 shape/dtype 与实际数组一致；
+- qualification evidence 使用 fresh root 和 checksum，且明确不资格化 perception model。
+
+合成的 2000-snapshot、10-task、200-trajectory fixture 已覆盖全部 population/split/asset gate；当前
+本机没有可用于生成真实 qualification evidence 的 conforming dataset。旧 EDPA/SafeLIBERO bundle
+只保存 primary/wrist perturbation array 和当前 RLDS tree manifest，不提供 calibration、entity
+geometry/mask、held/contact 或独立 split，不能混作 E7 supervision。
+
+### E8：Source/evidence binding audit
+
+只读 E8 audit 已绑定主仓库 HEAD、semantic commit scope、本地 E1–E6 evidence inventory 和 OpenPI
+checkout。当前 evidence inventory 完整，OpenPI tracked worktree 干净并绑定
+`15a9616a00943ada6c20a0f158e3adb39df2ccac`；主仓库仍有 68 个 scoped path 未绑定到 HEAD
+`ef27c76d907473608b096550a0cc418e190f5d7d`，所以分类为
+`semantic_source_binding_not_clean`。audit 不执行 `git add/commit`，避免吞入归属未确认的用户改动。
+
 ## 7. Outcome gate 与停止条件
 
-完成 C1–C5、E1–E4 后，仍需用户/负责人明确授权才可运行：
+完成 C1–C5、E1–E5 后，仍需用户/负责人明确授权才可运行：
 
 1. 少量 closed-loop no-attack engineering smoke；
 2. M2 的 240 个 VLA-only clean/attacked episodes；

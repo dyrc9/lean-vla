@@ -128,3 +128,18 @@ ActionBlock。追加 `Current semantic subtask:` 到原任务后的影响更弱�
 
 最有价值的下一步是扩展不同 task/object/stage 的 predicate-labeled snapshot set，并加入 image/state ablation，
 而不是立即跑大规模 closed-loop outcome。
+
+## 6. 2026-07-25 frozen qualification 结论
+
+后续 E1 已在 10 tasks、500 个 frozen RLDS snapshots 上完成，不再沿用 pilot 的小样本判断。raw π0.5
+selector 未通过：coverage `0.822`、known legal-frontier `0.5645`、worst-stage `0.0682`、occlusion
+abstention `0.21`。因此它被明确禁止用于 L1。
+
+预注册 fallback `deterministic trusted geometry/task-graph FSM` 在 10 个真实 BDDL task graphs × 16
+fixture families 的 160 cases 上达到 160/160，unknown fail-closed `100%`。它只在 benchmark
+privileged-geometry claim 下资格化，不代表 camera perception 或 deployment 泛化。
+
+E2 在 100 snapshots、310 次 fixed-noise action inference 上也未通过 behavioral-control gate：
+expected/conflict digest 虽全部变化，但 median MAD 仅 `0.000190`、median motion cosine
+`0.998928`，release/conflict gripper delta 仅 `0.000320`。当前方法因此使用 analytic checker，而不把
+semantic prompt 当作独立安全控制。

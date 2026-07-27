@@ -1,0 +1,185 @@
+{
+  "actions_dispatched": false,
+  "available_feature_paths": [
+    "dataset_split.train",
+    "episode_metadata.file_path",
+    "steps.action",
+    "steps.discount",
+    "steps.is_first",
+    "steps.is_last",
+    "steps.is_terminal",
+    "steps.language_instruction",
+    "steps.observation.image",
+    "steps.observation.joint_state",
+    "steps.observation.state",
+    "steps.observation.wrist_image",
+    "steps.reward"
+  ],
+  "claim_boundary": "Dataset-schema adequacy only. This preflight neither trains nor qualifies a perception model and contains no policy, simulator, action, outcome, efficacy, deployment, or safety evidence.",
+  "classification": "deployment_perception_data_inadequate",
+  "evidence_id": "proofalign-deployment-perception-e7-preflight-20260725",
+  "gate_results": {
+    "all_required_evidence_present": false,
+    "independent_qualification_split_present": false,
+    "outcome_blind_labels": true
+  },
+  "missing_requirement_ids": [
+    "camera_intrinsics",
+    "camera_extrinsics",
+    "target_identity_localization",
+    "destination_geometry",
+    "visibility_occlusion",
+    "held_contact_state",
+    "independent_qualification_split"
+  ],
+  "model_selected": false,
+  "outcomes_read": false,
+  "policy_loaded": false,
+  "protocol_binding": {
+    "path": "experiments/proofalign_deployment_perception_e7_protocol.json",
+    "protocol_id": "proofalign-deployment-perception-e7-20260725",
+    "sha256": "0e9451c6b40b555e22023850d3cd512c4c599956529ce222d9d0c935576573a0"
+  },
+  "qualification_ready": false,
+  "required_next_artifact": {
+    "must_add": [
+      "camera_intrinsics",
+      "camera_extrinsics",
+      "target_identity_localization",
+      "destination_geometry",
+      "visibility_occlusion",
+      "held_contact_state",
+      "independent_qualification_split"
+    ],
+    "must_preserve": [
+      "trajectory-and-scene grouping",
+      "development-only threshold selection",
+      "held-out qualification split",
+      "no reward/success/cost/collision label generation"
+    ],
+    "type": "frozen_outcome_blind_perception_supervision_dataset"
+  },
+  "requirement_rows": [
+    {
+      "description": "main RGB image",
+      "id": "main_rgb",
+      "matched_paths": [
+        "steps.observation.image"
+      ],
+      "present": true,
+      "required_any_of": [
+        "steps.observation.image"
+      ]
+    },
+    {
+      "description": "wrist RGB image",
+      "id": "wrist_rgb",
+      "matched_paths": [
+        "steps.observation.wrist_image"
+      ],
+      "present": true,
+      "required_any_of": [
+        "steps.observation.wrist_image"
+      ]
+    },
+    {
+      "description": "EEF/gripper state",
+      "id": "robot_state",
+      "matched_paths": [
+        "steps.observation.state"
+      ],
+      "present": true,
+      "required_any_of": [
+        "steps.observation.state"
+      ]
+    },
+    {
+      "description": "per-camera intrinsic calibration",
+      "id": "camera_intrinsics",
+      "matched_paths": [],
+      "present": false,
+      "required_any_of": [
+        "steps.observation.camera_intrinsics",
+        "episode_metadata.camera_intrinsics"
+      ]
+    },
+    {
+      "description": "camera-to-robot/world extrinsic calibration",
+      "id": "camera_extrinsics",
+      "matched_paths": [],
+      "present": false,
+      "required_any_of": [
+        "steps.observation.camera_extrinsics",
+        "episode_metadata.camera_extrinsics"
+      ]
+    },
+    {
+      "description": "target instance identity plus 2D/3D localization",
+      "id": "target_identity_localization",
+      "matched_paths": [],
+      "present": false,
+      "required_any_of": [
+        "steps.observation.target_instance_mask",
+        "steps.observation.target_pose",
+        "steps.observation.object_poses"
+      ]
+    },
+    {
+      "description": "destination instance/region geometry",
+      "id": "destination_geometry",
+      "matched_paths": [],
+      "present": false,
+      "required_any_of": [
+        "steps.observation.destination_instance_mask",
+        "steps.observation.destination_pose",
+        "steps.observation.region_geometry"
+      ]
+    },
+    {
+      "description": "target/destination visibility and occlusion labels",
+      "id": "visibility_occlusion",
+      "matched_paths": [],
+      "present": false,
+      "required_any_of": [
+        "steps.observation.visibility",
+        "steps.observation.occlusion"
+      ]
+    },
+    {
+      "description": "held/grasp/contact supervision",
+      "id": "held_contact_state",
+      "matched_paths": [],
+      "present": false,
+      "required_any_of": [
+        "steps.observation.held_object",
+        "steps.observation.contact_state",
+        "steps.observation.grasp_state"
+      ]
+    },
+    {
+      "description": "trajectory identity for leakage-safe grouping",
+      "id": "trajectory_group_id",
+      "matched_paths": [
+        "episode_metadata.file_path"
+      ],
+      "present": true,
+      "required_any_of": [
+        "episode_metadata.file_path"
+      ]
+    },
+    {
+      "description": "frozen model/threshold-independent split",
+      "id": "independent_qualification_split",
+      "matched_paths": [],
+      "present": false,
+      "required_any_of": [
+        "dataset_split.validation",
+        "dataset_split.test",
+        "episode_metadata.qualification_split"
+      ]
+    }
+  ],
+  "schema": "proofalign.deployment-perception-preflight-result-e7.v1",
+  "simulator_created": false,
+  "training_performed": false
+}

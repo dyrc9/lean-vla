@@ -140,7 +140,8 @@ task source、observation tap、secure split、selector checkpoint/config；`Unt
 
 ## 6. 具体选择哪个动作
 
-当前 `run_liberosafety_pi05_openpi_eval.py` 的实际行为仍是：
+当前 `run_liberosafety_pi05_openpi_eval.py` 保留历史默认路径，并提供显式
+`--semantic-runtime` 的 K=1 在线路径。历史默认路径仍是：
 
 ```text
 π0.5 生成一个 10 x 7 chunk
@@ -152,7 +153,8 @@ task source、observation tap、secure split、selector checkpoint/config；`Unt
 重新观察并生成下一块
 ```
 
-它尚未集成 `Z_t` 或 semantic checker。目标方法采用 **select subtask → propose actions → constrain/select**：
+`--semantic-runtime` 路径已经采用
+**select subtask → propose actions → constrain/select → authorize/dispatch**：
 
 ```text
 1. 固定 Z_t 和 observation epoch
@@ -162,6 +164,8 @@ task source、observation tap、secure split、selector checkpoint/config；`Unt
 5. numeric envelope 只允许小幅投影
 6. 对投影后的 prefix 再做 semantic check
 7. 从可行集合选择一个并绑定 exact final bytes
+8. 为 final prefix 生成 fresh v4 assessment/contract/authorization
+9. 通过 single dispatch boundary 逐步消费 prefix，并绑定 receipt/effect evidence
 ```
 
 第一版 baseline 使用 `K=1`；`K>1` 是不训练的 best-of-K 扩展，通过不同且预先记录的 flow-noise seeds
@@ -192,9 +196,10 @@ Q_t = {
 “修复”，也不能临时选择另一个 `Z_t` 为原动作辩护。选中的是投影并复检后的 exact executable prefix，
 不是原始 10 步 chunk；原 chunk digest 只保留为 provenance。
 
-该纯选择边界实现于 `src/proofalign/semantic_action_selection.py`。它不实现 perception 或几何评分，只保证
-候选共享同一 `Z_t` 且与传入的 trusted `SemanticSubtaskArtifact.artifact_digest` 完全一致，并保证过滤
-顺序、投影预算、复检和确定性选择规则。
+纯选择边界实现于 `src/proofalign/semantic_action_selection.py`；在线 K=1 接线位于
+`semantic_policy_wrapper.py`、`integrity_v4_runtime.py` 和
+`run_liberosafety_pi05_openpi_eval.py`。当前几何来自 LIBERO benchmark privileged state，不能表述为
+camera-only deployment perception。未启用 `--semantic-runtime` 时仍保持冻结历史 runner 行为。
 
 ## 7. 新 L1
 
@@ -247,5 +252,7 @@ exact prompt digest 加入 execution contract provenance，但 Lean 不证明冻
 首轮结果只能回答“当前冻结 checkpoint 是否值得继续”，不能证明防御有效。若 PaliGemma 不能可靠选择
 `Z_t`，顺序是：确定性 FSM → 独立冻结 VLM → 最后才讨论小规模 LoRA；不会自动进入训练。
 
-首轮实际结果见 [`semantic_subtask_pilot.md`](semantic_subtask_pilot.md)。当前决策是把冻结 PaliGemma
-分数作为 proposal/ranking 特征，而不是授权依据；task graph/FSM 和 local checker 保持权威。
+首轮实际结果见 [`semantic_subtask_pilot.md`](semantic_subtask_pilot.md)。后续 E1 已证明 raw π0.5
+selector 未通过资格化，因此当前不再把其分数用于 L1 授权。预注册的 deterministic privileged-geometry
+task graph/FSM fallback 已通过 160-case gate；analytic local checker 和 effect observer 分别通过 E3/E5
+finite-corpus gate。该结论仅覆盖 benchmark privileged geometry，不覆盖 camera perception 或部署泛化。

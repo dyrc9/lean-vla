@@ -8,7 +8,57 @@ validator、fixed-trace shadow 和 Lean build 是 no-outcome 操作。
 不再需要运行 high-level plan text probe。真实 victim 导出原生 ActionBlock；进入 L1/四臂前还必须导出
 trusted semantic context、`Z_t`、exact prompt、trusted/policy observation 和 executable-prefix binding。
 
-## 2. 本地 no-outcome 检查
+## 2. 本机环境选择
+
+本仓库有两个用途不同的 Python 环境，不应混用：
+
+- `.venv/bin/python`（Python 3.10）用于 ProofAlign 单测、validator、artifact 生成和 no-outcome
+  检查；它不安装 JAX；
+- `external/openpi/.venv/bin/python`（Python 3.11）是按 OpenPI `uv sync` 建立的模型环境，包含
+  JAX、Orbax 和 `openpi`，只在需要加载 π0.5 checkpoint 时使用。
+
+先加载仓库统一的本机缓存配置：
+
+```bash
+source scripts/env_vla.sh
+```
+
+普通检查继续使用项目环境：
+
+```bash
+.venv/bin/python -m pytest -q
+```
+
+E6 这类离线 π0.5 测量必须使用 OpenPI 环境：
+
+```bash
+external/openpi/.venv/bin/python \
+  scripts/run_semantic_resource_smoke_e6.py --check-state
+```
+
+E6 runner 按冻结协议把物理 GPU 1 映射为进程内 `cuda:0`，并关闭 JAX 显存预分配。E6 不创建
+simulator，因此不需要 `MUJOCO_GL` 或 `MUJOCO_EGL_DEVICE_ID`。任何含 simulator/dispatch/outcome 的
+后续命令仍需单独授权。
+
+E7 数据到位后，先检查 contract，再对 manifest 和真实资产运行资格化：
+
+```bash
+.venv/bin/python \
+  scripts/run_deployment_perception_dataset_qualification_e7.py \
+  --check-contract
+.venv/bin/python \
+  scripts/run_deployment_perception_dataset_qualification_e7.py \
+  --audit --manifest /path/to/manifest.json \
+  --asset-root /path/to/assets
+```
+
+当前 source/evidence 绑定状态使用只读 E8 audit 检查：
+
+```bash
+.venv/bin/python scripts/generate_semantic_source_binding_e8.py --check
+```
+
+## 3. 本地 no-outcome 检查
 
 ```bash
 .venv/bin/pytest -q
@@ -27,7 +77,7 @@ M1 runner dry-runs：
 .venv/bin/python scripts/export_proofalign_fixed_trace.py --dry-run
 ```
 
-## 3. 远程环境必须冻结
+## 4. 远程环境必须冻结
 
 - repository commit/tree digest；
 - OpenPI/LIBERO-Safety checkout；
@@ -44,7 +94,7 @@ M1 runner dry-runs：
 - resource budget；
 - fresh output directory。
 
-## 4. M2 执行顺序
+## 5. M2 执行顺序
 
 1. 先通过 selector、local-checker、semantic identity、Lean evidence 和资源 no-outcome gate；
 2. 运行 producer：每个 base pair 一条 attack record，不看 victim outcome；
@@ -54,7 +104,7 @@ M1 runner dry-runs：
 6. gate 未通过则停止，不运行四臂；
 7. gate 通过后才生成 fixed ActionBlock traces 并运行四臂。
 
-## 5. 四臂运行顺序
+## 6. 四臂运行顺序
 
 ```text
 fixed-trace shadow (zero dispatch)
@@ -67,7 +117,7 @@ generation rule、assessor、observer 和初始状态。`K=1` fixed-trace 必须
 `K>1` 必须共享 ordered candidate set。closed-loop 在 treatment 首次介入后允许轨迹自然分叉，但不能在
 不同 arm 中重新定义 selector、阈值、candidate seed 或 observer。
 
-## 6. 故障处理
+## 7. 故障处理
 
 - 不替换失败 unit/seed；
 - 不覆盖 fresh output；
@@ -75,7 +125,7 @@ generation rule、assessor、observer 和初始状态。`K=1` fixed-trace 必须
 - GPU OOM、driver、timeout、invalid observation 都记录为预定义 invalid/infra outcome；
 - 不因初步效果修改 threshold、population 或 attack family。
 
-## 7. 历史 artifacts
+## 8. 历史 artifacts
 
 冻结 v1 preregistration 和 P0b/R9 结果保持 audit-only。其字段可能仍使用旧层名；validator 可以读取，但
 新 runner/result schema 必须使用 `intent_action_enabled` 与 `action_execution_enabled`。

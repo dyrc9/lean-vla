@@ -9,18 +9,51 @@ import os
 import shutil
 import sys
 from collections import Counter, defaultdict
+from dataclasses import dataclass, field
 from pathlib import Path
-from time import perf_counter
+from time import perf_counter, time_ns
 from typing import Any, Callable
 
 import numpy as np
 
 from proofalign.benchmark.attack_records import apply_attack_record, get_attack_record, load_attack_record_index
 from proofalign.benchmark.libero_runtime import (
+    AuthorizedLiberoActionSink,
     load_libero_task_runtime,
     make_libero_offscreen_env,
     normalize_env_step,
 )
+from proofalign.digests import digest_payload, digest_text
+from proofalign.integrity_v4_models import (
+    BlockExecutionContract,
+    IntegrityV4Error,
+    PrefixAuthorization,
+    PrefixExecutionEvidence,
+    StepDispatchReceipt,
+)
+from proofalign.integrity_v4_runtime import (
+    ExecutionEvaluation,
+    FreshPrefixAuthorizer,
+    PrefixDispatchSession,
+    SingleUsePrefixDispatchBoundary,
+    TransactionVerdict,
+)
+from proofalign.semantic_local_checker import (
+    LocalCheckerConfig,
+    LocalCheckerError,
+    TrustedLocalObservation,
+)
+from proofalign.semantic_effect_observer import (
+    EFFECT_OBSERVER_ID,
+    EFFECT_OBSERVER_VERSION,
+    SemanticPrefixEffectObserver,
+)
+from proofalign.semantic_policy_wrapper import (
+    PolicyPromptMode,
+    SemanticPolicyPreparation,
+    TrustedSemanticPolicyWrapper,
+)
+from proofalign.semantic_trust import UntrustedPolicyView
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -31,6 +64,24 @@ PHYSICAL_SUITES = ["affordance", "obstacle_avoidance", "human_safety", "obstacle
 ALL_SUITES = [*PHYSICAL_SUITES, "reasoning_safety"]
 DEFAULT_TASK_IDS = [0, 7, 14]
 LIBERO_DUMMY_ACTION = [0.0] * 6 + [-1.0]
+
+
+@dataclass
+class SemanticDispatchTransaction:
+    authorization: PrefixAuthorization
+    contract: BlockExecutionContract
+    session: PrefixDispatchSession
+    frame_audit_index: int
+    initial_observation_digest: str
+    semantic_subtask: str
+    release_destination: str | None
+    initial_local_observation: TrustedLocalObservation
+    window_started_at_ns: int
+    event: dict[str, Any]
+    observation_digests: list[str] = field(default_factory=list)
+    violation_atoms: list[str] = field(default_factory=list)
+    latest_local_observation: TrustedLocalObservation | None = None
+    effect_observation_unknown_reason: str | None = None
 
 
 def main() -> None:
@@ -124,6 +175,43 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--save-video", action="store_true")
     parser.add_argument("--continue-on-error", action="store_true")
     parser.add_argument("--attack-record", type=Path, help="JSON/JSONL file with SABER-style instruction overrides.")
+    parser.add_argument(
+        "--semantic-runtime",
+        action="store_true",
+        help=(
+            "Enable trusted Z_t selection and fail-closed executable-prefix "
+            "checking before any env.step dispatch."
+        ),
+    )
+    parser.add_argument(
+        "--semantic-policy-mode",
+        choices=[mode.value for mode in PolicyPromptMode],
+        default=PolicyPromptMode.DEPLOYMENT.value,
+        help=(
+            "deployment uses only trusted T+Z_t as the policy prompt; "
+            "attack_evaluation preserves the external prompt only in the "
+            "action-policy branch."
+        ),
+    )
+    parser.add_argument(
+        "--semantic-max-projection-l2",
+        type=float,
+        default=0.5,
+    )
+    parser.add_argument(
+        "--semantic-min-progress-m",
+        type=float,
+        default=None,
+    )
+    parser.add_argument(
+        "--semantic-authorization-ttl-ns",
+        type=int,
+        default=60_000_000_000,
+        help=(
+            "Freshness window for one logical semantic prefix "
+            "authorization transaction."
+        ),
+    )
     return parser.parse_args()
 
 
@@ -199,14 +287,22 @@ def run_episode(
     constraint_signal_extractor: Callable[[Any, np.ndarray, np.ndarray], dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     set_policy_seed(policy, jax, policy_seed)
-    runtime = load_libero_task_runtime(
+    trusted_runtime = load_libero_task_runtime(
         benchmark_name=suite,
         task_id=task_id,
         init_state_id=init_state_id,
         bddl_file=None,
     )
+    semantic_wrapper = build_semantic_wrapper(
+        args=args,
+        trusted_runtime=trusted_runtime,
+        suite=suite,
+        task_id=task_id,
+        init_state_id=init_state_id,
+        policy_seed=policy_seed,
+    )
     runtime = apply_attack_record(
-        runtime,
+        trusted_runtime,
         get_attack_record(
             attack_records,
             suite=suite,
@@ -215,10 +311,39 @@ def run_episode(
         ),
     )
     env = create_env(runtime, args)
+    semantic_authorizer = (
+        FreshPrefixAuthorizer(
+            authorization_ttl_ns=int(
+                getattr(
+                    args,
+                    "semantic_authorization_ttl_ns",
+                    60_000_000_000,
+                )
+            ),
+            max_artifact_age_ns=int(
+                getattr(
+                    args,
+                    "semantic_authorization_ttl_ns",
+                    60_000_000_000,
+                )
+            ),
+        )
+        if semantic_wrapper is not None
+        else None
+    )
+    semantic_dispatch_boundary = (
+        SingleUsePrefixDispatchBoundary(
+            AuthorizedLiberoActionSink(env)
+        )
+        if semantic_wrapper is not None
+        else None
+    )
     trace: list[dict[str, Any]] = []
     replay_images: list[np.ndarray] = []
     frame_audits: list[dict[str, Any]] = []
+    semantic_events: list[dict[str, Any]] = []
     action_plan: collections.deque[Any] = collections.deque()
+    active_semantic_transaction: SemanticDispatchTransaction | None = None
     episode_start = perf_counter()
     success_by_done = False
     stop_reason = "max_steps"
@@ -246,16 +371,74 @@ def run_episode(
 
             started_policy_call = not action_plan
             if started_policy_call:
+                proposal_index = len(frame_audits)
+                semantic_preparation = None
+                policy_prompt = runtime.instruction
+                if semantic_wrapper is not None:
+                    try:
+                        local_observation = (
+                            TrustedLocalObservation.from_libero_observation(
+                                obs,
+                                state_epoch=proposal_index,
+                            )
+                        )
+                        trusted_observation_digest = (
+                            trusted_libero_observation_digest(
+                                obs, local_observation
+                            )
+                        )
+                        semantic_preparation = (
+                            semantic_wrapper.begin_policy_call(
+                                proposal_index=proposal_index,
+                                local_observation=local_observation,
+                                trusted_observation_digest=(
+                                    trusted_observation_digest
+                                ),
+                                external_policy_prompt=runtime.instruction,
+                                generated_at_ns=time_ns(),
+                            )
+                        )
+                    except LocalCheckerError as exc:
+                        stop_reason = "semantic_unknown"
+                        semantic_events.append(
+                            {
+                                "proposal_index": proposal_index,
+                                "status": "unknown",
+                                "reason": f"trusted_observation_error:{exc}",
+                                "dispatch_attempted_at_decision": False,
+                            }
+                        )
+                        break
+                    if semantic_preparation.request is None:
+                        stop_reason = (
+                            "semantic_finish"
+                            if semantic_preparation.finished
+                            else "semantic_unknown"
+                        )
+                        semantic_events.append(
+                            semantic_preparation_payload(
+                                semantic_preparation,
+                                dispatch_attempted=False,
+                            )
+                        )
+                        break
+                    policy_prompt = (
+                        semantic_preparation.request.exact_policy_prompt
+                    )
                 element, replay_image, frame_audit = prepare_openpi_element(
                     obs,
-                    runtime.instruction,
+                    policy_prompt,
                     image_tools,
                     args.resize_size,
                     observation_transform=observation_transform,
                     wrist_observation_transform=wrist_observation_transform,
                 )
                 replay_images.append(replay_image)
-                frame_audit = {**frame_audit, "policy_call_index": len(frame_audits)}
+                frame_audit = {
+                    **frame_audit,
+                    "policy_call_index": proposal_index,
+                    "exact_policy_prompt_digest": digest_text(policy_prompt),
+                }
                 frame_audits.append(frame_audit)
                 policy_start = perf_counter()
                 action_chunk = np.asarray(policy.infer(element)["actions"])
@@ -264,48 +447,347 @@ def run_episode(
                     raise RuntimeError(
                         f"Policy returned {len(action_chunk)} actions, fewer than replan_steps={args.replan_steps}."
                     )
+                chunk_digest = array_digest(action_chunk)
+                if chunk_digest is None:  # pragma: no cover - ndarray is non-null.
+                    raise RuntimeError("Policy action chunk lacks a digest")
                 frame_audits[-1] = {
                     **frame_audits[-1],
-                    "policy_action_chunk_sha256": array_digest(action_chunk),
+                    "policy_action_chunk_sha256": chunk_digest,
                     "policy_action_chunk_shape": list(action_chunk.shape),
                     "policy_action_chunk_dtype": str(action_chunk.dtype),
                 }
-                action_plan.extend(action_chunk[: args.replan_steps])
+                executable_chunk = action_chunk[: args.replan_steps]
+                if semantic_wrapper is not None:
+                    assert semantic_preparation is not None
+                    assert semantic_preparation.request is not None
+                    if executable_chunk.ndim != 2:
+                        raise RuntimeError(
+                            "Semantic runtime requires a rank-2 ActionBlock"
+                        )
+                    policy_view = UntrustedPolicyView(
+                        policy_prompt=runtime.instruction,
+                        policy_observation_digest=(
+                            openpi_policy_observation_digest(element)
+                        ),
+                    )
+                    proposed_at_ns = time_ns()
+                    semantic_decision = (
+                        semantic_wrapper.complete_policy_call(
+                            semantic_preparation.request,
+                            policy_view=policy_view,
+                            source_policy_chunk_digest=chunk_digest,
+                            nominal_command=tuple(
+                                float(value)
+                                for value in executable_chunk.reshape(-1)
+                            ),
+                            command_shape=tuple(executable_chunk.shape),
+                            proposed_at_ns=proposed_at_ns,
+                            assessed_at_ns=proposed_at_ns + 1,
+                            contract_issued_at_ns=proposed_at_ns + 2,
+                        )
+                    )
+                    frame_audits[-1] = {
+                        **frame_audits[-1],
+                        "semantic_preparation": (
+                            semantic_preparation_payload(
+                                semantic_preparation,
+                                dispatch_attempted=False,
+                            )
+                        ),
+                        "semantic_decision": semantic_decision.audit_payload(),
+                    }
+                    semantic_event = {
+                        "proposal_index": proposal_index,
+                        "status": (
+                            "accepted"
+                            if semantic_decision.accepted
+                            else "rejected"
+                        ),
+                        "reason": semantic_decision.reason,
+                        "semantic_subtask_digest": (
+                            semantic_preparation.artifact.artifact_digest
+                        ),
+                        "action_block_digest": (
+                            semantic_decision.proposal.action_block_digest
+                        ),
+                        "assessment_digest": (
+                            semantic_decision.assessment.assessment_digest
+                        ),
+                        "execution_contract_digest": (
+                            semantic_decision.execution_contract.execution_contract_digest
+                            if semantic_decision.execution_contract
+                            is not None
+                            else None
+                        ),
+                        "dispatch_attempted_at_decision": False,
+                    }
+                    semantic_events.append(semantic_event)
+                    if not semantic_decision.accepted:
+                        stop_reason = "semantic_action_rejected"
+                        break
+                    assert semantic_decision.executable_prefix is not None
+                    assert semantic_decision.execution_contract is not None
+                    assert semantic_authorizer is not None
+                    assert semantic_dispatch_boundary is not None
+                    authorization_now_ns = max(
+                        time_ns(),
+                        semantic_decision.execution_contract.issued_at_ns,
+                    )
+                    try:
+                        authorization = semantic_authorizer.authorize(
+                            semantic_decision.proposal,
+                            semantic_decision.assessment,
+                            semantic_decision.execution_contract,
+                            current_state_epoch=(
+                                semantic_preparation.context.state_epoch
+                            ),
+                            current_trusted_observation_digest=(
+                                semantic_preparation.context.trusted_observation_digest
+                            ),
+                            now_ns=authorization_now_ns,
+                        )
+                    except IntegrityV4Error as exc:
+                        semantic_event.update(
+                            {
+                                "status": "authorization_rejected",
+                                "authorization_issue": str(exc),
+                                "dispatch_session_opened": False,
+                            }
+                        )
+                        stop_reason = "semantic_authorization_rejected"
+                        break
+                    opened = semantic_dispatch_boundary.open(
+                        authorization,
+                        now_ns=authorization_now_ns,
+                    )
+                    if (
+                        opened.verdict is not TransactionVerdict.ALLOW
+                        or opened.session is None
+                    ):
+                        semantic_event.update(
+                            {
+                                "status": "authorization_rejected",
+                                "authorization_digest": (
+                                    authorization.authorization_digest
+                                ),
+                                "authorization_issues": opened.issues,
+                                "dispatch_session_opened": False,
+                            }
+                        )
+                        stop_reason = "semantic_authorization_rejected"
+                        break
+                    semantic_event.update(
+                        {
+                            "authorization_digest": (
+                                authorization.authorization_digest
+                            ),
+                            "authorization_status": "authorized",
+                            "dispatch_session_opened": True,
+                        }
+                    )
+                    frame_audits[-1] = {
+                        **frame_audits[-1],
+                        "semantic_transaction": {
+                            "authorization": authorization_audit_payload(
+                                authorization
+                            ),
+                            "dispatch_status": "open",
+                            "step_receipts": [],
+                            "execution_evidence": None,
+                            "effect_verdict": None,
+                        },
+                    }
+                    active_semantic_transaction = (
+                        SemanticDispatchTransaction(
+                            authorization=authorization,
+                            contract=semantic_decision.execution_contract,
+                            session=opened.session,
+                            frame_audit_index=proposal_index,
+                            initial_observation_digest=(
+                                libero_execution_observation_digest(obs)
+                            ),
+                            semantic_subtask=(
+                                semantic_preparation.artifact.selected_subtask
+                            ),
+                            release_destination=(
+                                semantic_preparation.request.release_destination
+                            ),
+                            initial_local_observation=(
+                                semantic_preparation.request.local_observation
+                            ),
+                            window_started_at_ns=authorization_now_ns,
+                            event=semantic_event,
+                        )
+                    )
+                    executable_chunk = np.asarray(
+                        authorization.final_command,
+                        dtype=np.float64,
+                    ).reshape(authorization.command_shape)
+                    action_plan.extend(executable_chunk)
+                else:
+                    action_plan.extend(executable_chunk)
             else:
                 policy_time = 0.0
 
-            raw_action = np.asarray(action_plan.popleft(), dtype=np.float32)
-            action = np.clip(raw_action, -1.0, 1.0)
-            env_start = perf_counter()
-            obs, reward, done, info = normalize_env_step(env.step(action.tolist()))
-            env_time = perf_counter() - env_start
+            raw_action = np.asarray(
+                action_plan.popleft(),
+                dtype=(
+                    np.float64
+                    if active_semantic_transaction is not None
+                    else np.float32
+                ),
+            )
+            semantic_receipt: StepDispatchReceipt | None = None
+            semantic_dispatch_verdict = TransactionVerdict.ALLOW
+            semantic_dispatch_issues: tuple[str, ...] = ()
+            if active_semantic_transaction is not None:
+                assert semantic_dispatch_boundary is not None
+                env_start = perf_counter()
+                dispatched = semantic_dispatch_boundary.dispatch_next(
+                    active_semantic_transaction.session,
+                    tuple(float(value) for value in raw_action),
+                    now_ns=time_ns(),
+                )
+                env_time = perf_counter() - env_start
+                semantic_receipt = dispatched.receipt
+                semantic_dispatch_verdict = dispatched.verdict
+                semantic_dispatch_issues = dispatched.issues
+                if dispatched.transition is None:
+                    active_semantic_transaction.event.update(
+                        {
+                            "transaction_status": "dispatch_rejected",
+                            "dispatch_issues": dispatched.issues,
+                        }
+                    )
+                    update_semantic_transaction_audit(
+                        frame_audits,
+                        active_semantic_transaction,
+                        dispatch_status="rejected",
+                        dispatch_issues=dispatched.issues,
+                    )
+                    stop_reason = "semantic_dispatch_rejected"
+                    action_plan.clear()
+                    break
+                obs, reward, done, info = dispatched.transition
+                assert semantic_receipt is not None
+                action = np.asarray(
+                    semantic_receipt.applied_action,
+                    dtype=np.float64,
+                )
+            else:
+                action = np.clip(raw_action, -1.0, 1.0)
+                env_start = perf_counter()
+                obs, reward, done, info = normalize_env_step(
+                    env.step(action.tolist())
+                )
+                env_time = perf_counter() - env_start
             constraint_signals = (
                 constraint_signal_extractor(env, raw_action, action)
                 if constraint_signal_extractor is not None
                 else None
             )
-            trace.append(
-                make_trace_record(
-                    step_id,
-                    "policy",
-                    action,
-                    reward,
-                    done,
-                    info,
-                    policy_time,
-                    env_time,
-                    policy_call=(frame_audits[-1] if started_policy_call else None),
-                    raw_action=raw_action,
-                    constraint_signals=constraint_signals,
-                )
+            trace_record = make_trace_record(
+                step_id,
+                "policy",
+                action,
+                reward,
+                done,
+                info,
+                policy_time,
+                env_time,
+                policy_call=(frame_audits[-1] if started_policy_call else None),
+                raw_action=raw_action,
+                constraint_signals=constraint_signals,
             )
+            if semantic_receipt is not None:
+                trace_record["semantic_dispatch_receipt"] = (
+                    step_receipt_audit_payload(semantic_receipt)
+                )
+            trace.append(trace_record)
+            constraint_violation = has_cost_or_collision([trace[-1]])
+            execution_evaluation = None
+            if active_semantic_transaction is not None:
+                active_semantic_transaction.observation_digests.append(
+                    libero_execution_observation_digest(obs)
+                )
+                active_semantic_transaction.violation_atoms.extend(
+                    libero_violation_atoms(info)
+                )
+                try:
+                    active_semantic_transaction.latest_local_observation = (
+                        TrustedLocalObservation.from_libero_observation(
+                            obs,
+                            state_epoch=(
+                                active_semantic_transaction
+                                .initial_local_observation.state_epoch
+                                + 1
+                            ),
+                        )
+                    )
+                except LocalCheckerError as exc:
+                    active_semantic_transaction.latest_local_observation = None
+                    active_semantic_transaction.effect_observation_unknown_reason = (
+                        f"trusted_effect_observation_error:{exc}"
+                    )
+                if (
+                    active_semantic_transaction.session.complete
+                    or done
+                    or constraint_violation
+                    or semantic_dispatch_verdict
+                    is not TransactionVerdict.ALLOW
+                ):
+                    assert semantic_dispatch_boundary is not None
+                    execution_evaluation = finalize_semantic_transaction(
+                        frame_audits=frame_audits,
+                        transaction=active_semantic_transaction,
+                        boundary=semantic_dispatch_boundary,
+                        observed_at_ns=time_ns(),
+                        observation_window_complete=True,
+                        dispatch_issues=semantic_dispatch_issues,
+                    )
+                    if not active_semantic_transaction.session.complete:
+                        action_plan.clear()
+                    active_semantic_transaction = None
             if done:
                 success_by_done = True
                 stop_reason = "env_done"
                 break
-            if has_cost_or_collision([trace[-1]]):
+            if constraint_violation:
                 stop_reason = "constraint_violation"
                 break
+            if (
+                execution_evaluation is not None
+                and execution_evaluation.verdict
+                is not TransactionVerdict.ALLOW
+            ):
+                stop_reason = (
+                    "semantic_execution_unknown"
+                    if execution_evaluation.verdict
+                    is TransactionVerdict.UNKNOWN
+                    else "semantic_execution_rejected"
+                )
+                break
+
+        if active_semantic_transaction is not None:
+            assert semantic_dispatch_boundary is not None
+            incomplete = finalize_semantic_transaction(
+                frame_audits=frame_audits,
+                transaction=active_semantic_transaction,
+                boundary=semantic_dispatch_boundary,
+                observed_at_ns=time_ns(),
+                observation_window_complete=True,
+                dispatch_issues=(
+                    "runner_closed_before_authorized_prefix_completed",
+                ),
+            )
+            active_semantic_transaction = None
+            action_plan.clear()
+            if stop_reason == "max_steps":
+                stop_reason = (
+                    "semantic_prefix_incomplete"
+                    if incomplete.verdict is TransactionVerdict.REJECT
+                    else "semantic_execution_unknown"
+                )
 
         task_success = check_task_success(env)
         unsafe = has_cost_or_collision(trace)
@@ -328,6 +810,22 @@ def run_episode(
                 "initial_state_sha256": array_digest(runtime.init_state),
                 "observation_attack_type": "none",
                 "observation_attack_strength": None,
+                "semantic_runtime_enabled": semantic_wrapper is not None,
+                "semantic_policy_mode": (
+                    getattr(
+                        args,
+                        "semantic_policy_mode",
+                        PolicyPromptMode.DEPLOYMENT.value,
+                    )
+                    if semantic_wrapper is not None
+                    else None
+                ),
+                "semantic_geometry_source": (
+                    "libero_object_state_privileged_benchmark"
+                    if semantic_wrapper is not None
+                    else None
+                ),
+                "semantic_deployment_attestation": False,
             },
             "task_success": bool(task_success),
             "strict_success_no_cost": strict_success,
@@ -336,6 +834,7 @@ def run_episode(
             "decision": stop_reason,
             "trace": trace,
             "observation_frame_audits": frame_audits,
+            "semantic_events": semantic_events,
             "runtime": {"episode_wall_time_seconds": perf_counter() - episode_start},
         }
         seed_suffix = f"_pseed{policy_seed}" if getattr(args, "_multiple_policy_seeds", False) else ""
@@ -362,6 +861,335 @@ def create_env(runtime: Any, args: argparse.Namespace) -> Any:
     if hasattr(env, "seed"):
         env.seed(args.seed)
     return env
+
+
+def authorization_audit_payload(
+    authorization: PrefixAuthorization,
+) -> dict[str, Any]:
+    return {
+        **authorization.payload(),
+        "final_command_digest": authorization.final_command_digest,
+        "authorization_digest": authorization.authorization_digest,
+    }
+
+
+def step_receipt_audit_payload(
+    receipt: StepDispatchReceipt,
+) -> dict[str, Any]:
+    return {
+        **receipt.payload(),
+        "applied_action_digest": receipt.applied_action_digest,
+        "receipt_digest": receipt.receipt_digest,
+    }
+
+
+def execution_evidence_audit_payload(
+    evidence: PrefixExecutionEvidence,
+) -> dict[str, Any]:
+    return {
+        **evidence.payload(),
+        "evidence_digest": evidence.evidence_digest,
+    }
+
+
+def update_semantic_transaction_audit(
+    frame_audits: list[dict[str, Any]],
+    transaction: SemanticDispatchTransaction,
+    *,
+    dispatch_status: str,
+    dispatch_issues: tuple[str, ...] = (),
+    evidence: PrefixExecutionEvidence | None = None,
+    effect_verdict: TransactionVerdict | None = None,
+    effect_issues: tuple[str, ...] = (),
+) -> None:
+    index = transaction.frame_audit_index
+    frame_audits[index] = {
+        **frame_audits[index],
+        "semantic_transaction": {
+            "authorization": authorization_audit_payload(
+                transaction.authorization
+            ),
+            "dispatch_status": dispatch_status,
+            "dispatch_issues": dispatch_issues,
+            "step_receipts": [
+                step_receipt_audit_payload(receipt)
+                for receipt in transaction.session.receipts
+            ],
+            "execution_evidence": (
+                None
+                if evidence is None
+                else execution_evidence_audit_payload(evidence)
+            ),
+            "effect_verdict": (
+                None if effect_verdict is None else effect_verdict.value
+            ),
+            "effect_issues": effect_issues,
+        },
+    }
+
+
+def finalize_semantic_transaction(
+    *,
+    frame_audits: list[dict[str, Any]],
+    transaction: SemanticDispatchTransaction,
+    boundary: SingleUsePrefixDispatchBoundary,
+    observed_at_ns: int,
+    observation_window_complete: bool,
+    dispatch_issues: tuple[str, ...] = (),
+) -> ExecutionEvaluation:
+    effect_observation = None
+    if transaction.latest_local_observation is not None:
+        effect_observation = SemanticPrefixEffectObserver().observe(
+            semantic_subtask=transaction.semantic_subtask,
+            before=transaction.initial_local_observation,
+            after=transaction.latest_local_observation,
+            prefix_complete=transaction.session.complete,
+            release_destination=transaction.release_destination,
+            trusted_violation_atoms=transaction.violation_atoms,
+        )
+    effects = (
+        ()
+        if effect_observation is None
+        else effect_observation.observed_effect_atoms
+    )
+    violations = tuple(
+        dict.fromkeys(
+            (
+                *transaction.violation_atoms,
+                *(
+                    ()
+                    if effect_observation is None
+                    else effect_observation.observed_violation_atoms
+                ),
+            )
+        )
+    )
+    effects_known = (
+        effect_observation is not None and effect_observation.known
+    )
+    unknown_reason = (
+        None
+        if effects_known
+        else transaction.effect_observation_unknown_reason
+        or (
+            effect_observation.unknown_reason
+            if effect_observation is not None
+            else "trusted_effect_observation_unavailable"
+        )
+    )
+    evidence = None
+    try:
+        evidence = PrefixExecutionEvidence.for_window(
+            transaction.authorization,
+            transaction.contract,
+            transaction.session.receipts,
+            observer_id=EFFECT_OBSERVER_ID,
+            observer_version=EFFECT_OBSERVER_VERSION,
+            observer_config_digest=(
+                SemanticPrefixEffectObserver().config.config_digest
+            ),
+            window_started_at_ns=transaction.window_started_at_ns,
+            observed_at_ns=observed_at_ns,
+            initial_observation_digest=(
+                transaction.initial_observation_digest
+            ),
+            observation_digests=transaction.observation_digests,
+            observed_effect_atoms=effects,
+            observed_violation_atoms=violations,
+            observation_window_complete=observation_window_complete,
+            effects_known=effects_known,
+            unknown_reason=unknown_reason,
+        )
+        evaluation = boundary.seal(
+            transaction.session,
+            transaction.contract,
+            evidence,
+        )
+    except IntegrityV4Error as exc:
+        evaluation = ExecutionEvaluation(
+            TransactionVerdict.REJECT,
+            (f"receipt_or_evidence_binding_failed:{exc}",),
+        )
+    dispatch_status = (
+        "complete"
+        if transaction.session.complete and not dispatch_issues
+        else "rejected"
+        if dispatch_issues
+        else "incomplete"
+    )
+    update_semantic_transaction_audit(
+        frame_audits,
+        transaction,
+        dispatch_status=dispatch_status,
+        dispatch_issues=dispatch_issues,
+        evidence=evidence,
+        effect_verdict=evaluation.verdict,
+        effect_issues=evaluation.issues,
+    )
+    transaction.event.update(
+        {
+            "transaction_status": dispatch_status,
+            "consumed_action_count": len(transaction.session.receipts),
+            "authorized_action_count": (
+                transaction.authorization.action_count
+            ),
+            "receipt_digests": tuple(
+                receipt.receipt_digest
+                for receipt in transaction.session.receipts
+            ),
+            "execution_evidence_digest": (
+                None if evidence is None else evidence.evidence_digest
+            ),
+            "effect_verdict": evaluation.verdict.value,
+            "effect_issues": evaluation.issues,
+        }
+    )
+    return evaluation
+
+
+def libero_execution_observation_digest(
+    observation: dict[str, Any],
+) -> str:
+    """Bind every raw LIBERO observation field in one execution window."""
+
+    if not isinstance(observation, dict):
+        raise RuntimeError(
+            "LIBERO execution observation must be a dictionary"
+        )
+    fields = {}
+    for key in sorted(observation):
+        if not isinstance(key, str):
+            raise RuntimeError(
+                "LIBERO execution observation keys must be strings"
+            )
+        value = observation[key]
+        if value is None:
+            fields[key] = None
+        elif isinstance(value, (str, int, float, bool)):
+            fields[key] = {
+                "value_type": type(value).__name__,
+                "value": value,
+            }
+        else:
+            fields[key] = {
+                "value_type": type(value).__name__,
+                "array_digest": array_digest(value),
+            }
+    return digest_payload(
+        {
+            "schema": "proofalign.libero-execution-observation.v1",
+            "fields": fields,
+        }
+    )
+
+
+def libero_violation_atoms(info: dict[str, Any]) -> tuple[str, ...]:
+    atoms = []
+    if bool(info.get("collision")):
+        atoms.append("collision")
+    cost = info.get("cost")
+    if isinstance(cost, dict):
+        if any(bool(value) for value in cost.values()):
+            atoms.append("cost")
+    elif cost not in (None, {}, [], 0, 0.0, False):
+        atoms.append("cost")
+    for atom in ("workspace_exit", "wrong_target_contact"):
+        if bool(info.get(atom)):
+            atoms.append(atom)
+    return tuple(dict.fromkeys(atoms))
+
+
+def build_semantic_wrapper(
+    *,
+    args: argparse.Namespace,
+    trusted_runtime: Any,
+    suite: str,
+    task_id: int,
+    init_state_id: int,
+    policy_seed: int,
+) -> TrustedSemanticPolicyWrapper | None:
+    """Build the semantic branch before any attack record mutates the runtime."""
+
+    if not bool(getattr(args, "semantic_runtime", False)):
+        return None
+    bddl_path = Path(trusted_runtime.bddl_file)
+    bddl_text = bddl_path.read_text(encoding="utf-8")
+    episode_nonce = (
+        f"{suite}:task{task_id}:init{init_state_id}:policy-seed{policy_seed}"
+    )
+    return TrustedSemanticPolicyWrapper(
+        episode_nonce=episode_nonce,
+        trusted_task=str(trusted_runtime.instruction),
+        bddl_text=bddl_text,
+        prompt_mode=PolicyPromptMode(
+            getattr(
+                args,
+                "semantic_policy_mode",
+                PolicyPromptMode.DEPLOYMENT.value,
+            )
+        ),
+        checker_config=LocalCheckerConfig(),
+        min_progress_margin=getattr(
+            args, "semantic_min_progress_m", None
+        ),
+        max_projection_l2=float(
+            getattr(args, "semantic_max_projection_l2", 0.5)
+        ),
+    )
+
+
+def trusted_libero_observation_digest(
+    observation: dict[str, Any],
+    local_observation: TrustedLocalObservation,
+) -> str:
+    """Bind the clean pre-transform cameras and trusted geometry snapshot."""
+
+    return digest_payload(
+        {
+            "schema": "proofalign.libero-trusted-semantic-observation.v1",
+            "agentview_image_digest": array_digest(
+                observation["agentview_image"]
+            ),
+            "wrist_image_digest": array_digest(
+                observation["robot0_eye_in_hand_image"]
+            ),
+            "local_observation_digest": local_observation.observation_digest,
+        }
+    )
+
+
+def openpi_policy_observation_digest(element: dict[str, Any]) -> str:
+    """Bind the exact processed observation passed to the action policy."""
+
+    return digest_payload(
+        {
+            "schema": "proofalign.openpi-policy-observation.v1",
+            "base_image_digest": array_digest(element["observation/image"]),
+            "wrist_image_digest": array_digest(
+                element["observation/wrist_image"]
+            ),
+            "state_digest": array_digest(element["observation/state"]),
+        }
+    )
+
+
+def semantic_preparation_payload(
+    preparation: SemanticPolicyPreparation,
+    *,
+    dispatch_attempted: bool,
+) -> dict[str, Any]:
+    return {
+        "proposal_index": preparation.context.proposal_index,
+        "state_epoch": preparation.context.state_epoch,
+        "known": preparation.known,
+        "finished": preparation.finished,
+        "reason": preparation.reason,
+        "semantic_context_digest": preparation.context.context_digest,
+        "semantic_subtask": preparation.artifact.selected_subtask,
+        "semantic_subtask_digest": preparation.artifact.artifact_digest,
+        "selector_latency_ns": preparation.selector_latency_ns,
+        "dispatch_attempted_at_decision": dispatch_attempted,
+    }
 
 
 def prepare_openpi_element(

@@ -1,4 +1,4 @@
-.PHONY: sync test lean paper-artifacts paper-artifacts-check action-block-check m1-readiness-check check
+.PHONY: sync test lean paper-artifacts paper-artifacts-check action-block-check m1-readiness-check semantic-v4-c5-check e1-selector-check e1-fallback-check e2-conditioning-check e3-checker-check e4-no-dispatch-check e5-effect-observer-check e6-resource-smoke-preflight-check e7-perception-preflight-check semantic-post-e5-readiness-check check
 
 PYTHON ?= .venv/bin/python
 UV ?= uv
@@ -49,4 +49,42 @@ m1-readiness-check:
 	$(PYTHON) scripts/run_saber_confirmatory_victim.py --dry-run >/dev/null
 	$(PYTHON) scripts/export_proofalign_fixed_trace.py --dry-run >/dev/null
 
-check: test lean paper-artifacts-check action-block-check m1-readiness-check
+semantic-v4-c5-check:
+	$(PYTHON) scripts/run_semantic_v4_fixed_trace_gate.py --check
+	$(PYTHON) scripts/generate_semantic_v4_equivalence_evidence.py --check
+	$(PYTHON) scripts/validate_semantic_v4_c5_readiness.py --check
+
+e1-selector-check:
+	$(PYTHON) scripts/validate_pi05_selector_qualification_e1.py >/dev/null
+
+e1-fallback-check:
+	$(PYTHON) scripts/validate_deterministic_selector_e1f.py >/dev/null
+
+e2-conditioning-check:
+	$(PYTHON) scripts/run_pi05_action_conditioning_e2.py --check >/dev/null
+
+e3-checker-check:
+	$(PYTHON) scripts/validate_local_checker_qualification_e3.py >/dev/null
+
+e4-no-dispatch-check:
+	$(PYTHON) scripts/run_semantic_no_dispatch_four_arm_e4.py --check >/dev/null
+
+e5-effect-observer-check:
+	$(PYTHON) scripts/run_semantic_effect_observer_qualification_e5.py --check >/dev/null
+
+e6-resource-smoke-preflight-check:
+	$(PYTHON) scripts/prepare_semantic_resource_smoke_e6.py --check
+	$(PYTHON) scripts/run_semantic_resource_smoke_e6.py --check-state >/dev/null
+
+e7-perception-preflight-check:
+	$(PYTHON) scripts/run_deployment_perception_preflight_e7.py --check
+	$(PYTHON) scripts/prepare_deployment_perception_dataset_e7.py --check-schema
+	$(PYTHON) scripts/run_deployment_perception_dataset_qualification_e7.py --check-contract
+
+e8-source-binding-check:
+	$(PYTHON) scripts/generate_semantic_source_binding_e8.py --check
+
+semantic-post-e5-readiness-check:
+	$(PYTHON) scripts/validate_semantic_post_e5_readiness.py --check
+
+check: test lean paper-artifacts-check action-block-check m1-readiness-check semantic-v4-c5-check e1-selector-check e1-fallback-check e2-conditioning-check e3-checker-check e4-no-dispatch-check e5-effect-observer-check e6-resource-smoke-preflight-check e7-perception-preflight-check e8-source-binding-check semantic-post-e5-readiness-check

@@ -14,7 +14,7 @@
       "source_digest_count": 10
     },
     "confirmatory_vla_only_victim_and_artifact_validator": {
-      "complete": true,
+      "complete": false,
       "producer_bundle_bound": false,
       "source_digest_count": 9
     },
@@ -25,7 +25,7 @@
       "sha256": "67510a22583df8f7efaabdbcf7badb9d622112efa37d7e49e37fd6b76c01f164"
     },
     "fixed_trace_exporter": {
-      "complete": true,
+      "complete": false,
       "proposal_adapter_frozen": true,
       "trace_source_condition_frozen": true
     },
@@ -78,12 +78,14 @@
       "episode_and_disk_caps_frozen": true
     },
     "shared_four_arm_shadow_runner": {
-      "complete": true,
+      "complete": false,
       "dispatch_in_stage_a": false,
       "source_digest_count": 9
     }
   },
   "current_blockers": [
+    "victim source digest bindings are incomplete",
+    "four-arm source digest bindings are incomplete",
     "Intent-ActionBlock assessor and outcome-blind qualification thresholds are not designed and frozen",
     "GPU/CPU/RAM/wall-clock/storage throughput and checker-latency budgets lack an authorized smoke measurement"
   ],

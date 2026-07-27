@@ -1,5 +1,83 @@
 # 当前进展与执行计划
 
+## 0. 2026-07-25 no-outcome qualification checkpoint
+
+本轮完成 C5 与 E1–E5，未运行 simulator/outcome：
+
+- C5：8 cases × 4 arms = 32 rows，proposal/assessment/contract identity 通过，dispatch `0`；
+- E1 raw π0.5 selector：未通过；500 snapshots 的 coverage `0.822`、known legal-frontier
+  `0.5645`、worst-stage `0.0682`、occlusion abstention `0.21`；
+- E1F deterministic privileged-geometry FSM：160/160，unknown fail-closed `100%`，p99
+  `7.1µs`；
+- E2 action conditioning：未通过；median MAD `0.000190`、motion cosine `0.998928`，prompt
+  不授权为 behavioral control；
+- E3 analytic local checker：700/700 clean retained、0/1200 attacked false allow、600/600
+  OOD abstain，p99 `58.3µs`；
+- E4：qualification-outside four-arm no-dispatch gate 的 15 项检查全部通过；
+- E5 analytic effect observer：500/500 clean retained、0/1000 attacked false allow、600/600
+  OOD abstain，p99 `16.7µs`；在线 receipt/window seal 已接线。
+- E6 resource smoke：100 个 frozen E2 snapshots × 3 passes、GPU/RSS/latency/repeatability gate
+  已由授权 successor 完成；300 次调用的 checkpoint load `8.70s`，policy/pipeline p99
+  `92.0/92.3ms`，GPU/RSS peak `8650/16465.6 MiB`，digest repeat `200/200`，10 项 gate
+  全部通过；simulator/dispatch/outcome 均为 `0`；
+- E7 deployment-perception data gate：当前 RLDS 只含 RGB、robot/joint state、action 等，缺少
+  camera calibration、target/destination geometry、visibility/occlusion、held/contact supervision
+  与独立 qualification split，因此分类为 `deployment_perception_data_inadequate`；逐帧资产、标定、
+  3D entity/mask、provenance、split 防泄漏与 population gate contract 已冻结；dataset qualification
+  runner 进一步验证真实资产解码、SHA、shape/dtype、asset-root containment 和完整 population；
+  本机旧 EDPA/SafeLIBERO asset bundle 只含两张 `44×44` perturbation array 与同一 RLDS tree
+  manifest，不含缺失监督，因此明确排除复用；
+- E8 source binding：commit scope 与本地 evidence inventory 完整，OpenPI checkout 干净并绑定
+  `15a9616a...`；当前 semantic scope 有 68 个路径未绑定到主仓库 HEAD，因此正确分类为
+  `semantic_source_binding_not_clean`，未自动提交 worktree。
+
+`experiments/proofalign_semantic_post_e5_readiness_packet_v1.json` 当前判定
+benchmark privileged-geometry no-outcome stack 完整，但 deployment/outcome 仍未就绪。
+
+剩余 blocker：
+
+1. 先采集/导出 E7 所列 outcome-blind perception supervision，并冻结独立 split；
+2. 对 E8 列出的 68 个 scoped path 做人工 scope review 后绑定 clean commit；
+3. 尚未收到 closed-loop/outcome 明确授权。
+
+## 0A. 2026-07-24 历史收工 checkpoint
+
+本轮代码和生成 artifact 已保存到当前 worktree，**尚未提交 Git commit**，也没有运行任何新
+efficacy/outcome rollout。
+
+已完成并验证：
+
+- C4 已贯通 final proposal → fresh assessment/contract → authorization → one-use `(H,7)` dispatch
+  session → ordered step receipts → bound observation-window evidence；
+- C4 完成时全量 Python 为 `159 passed`，v4 online runner 的 `(2,7)` integration test 证明两步共享一个
+  authorization；
+- C5 已新增独立 `SemanticIntegrityCore.lean`，没有改写冻结 v3 `IntegrityCore.lean`；
+- C5 已新增 semantic v4 no-dispatch four-arm runner、protocol、fixed-trace evidence 和 scoped
+  Python/Lean equivalence evidence；
+- v4 fixed trace 覆盖 8 类案例 × 4 arms = 32 rows，包括 semantic mismatch、stale state、contract
+  substitution、projection 后旧 artifact、command substitution、authorization replay 和 unknown
+  assessment；
+- C5 artifact 当前 `--check` 通过，Lean `lake build ProofAlign` 通过；fixed trace 中 policy/simulator/sink
+  均未创建，dispatch count 为零；
+- 新 v4 protocol 显式绑定冻结 v3 fixed-trace/equivalence artifact digest，避免静默覆盖历史证据。
+
+本次收工时尚未完成：
+
+1. 为新增 semantic v4 shadow runner/generator 添加专门的 pytest；
+2. 新建 C5 readiness/fresh-root validator 和 packet；
+3. 将两个 v4 C5 `--check` 接入 `Makefile`/`scripts/check_all.sh`；
+4. 在上述接线完成后重新运行全量 Python、Lean 和完整 no-dispatch check；
+5. C5 完整关闭后再进入 E1 selector、action-conditioning、E2 checker qualification 和 E3 no-dispatch gate。
+
+下次恢复建议从以下命令开始：
+
+```bash
+.venv/bin/python scripts/run_semantic_v4_fixed_trace_gate.py --check
+.venv/bin/python scripts/generate_semantic_v4_equivalence_evidence.py --check
+make lean
+git status --short
+```
+
 ## 1. 2026-07-24 对齐结论
 
 主线已进一步改为：
@@ -43,12 +121,33 @@ wiring 本身推出。
 详见 [`semantic_subtask_pilot.md`](semantic_subtask_pilot.md)。
 
 动作选择已经形式化为 `Z_t` 先固定、π0.5 后提议、consumer 再过滤/小幅投影/复检。确定性 best-of-K
-选择边界和单元测试已实现于 `semantic_action_selection.py`；它尚未接入在线 LIBERO runner，当前 runner
-仍是单 chunk、clip、执行前五步。
+选择边界和单元测试已实现于 `semantic_action_selection.py`；K=1 路径现已接入在线 LIBERO runner，
+仍以实际执行的前 `replan_steps` 作为 exact executable prefix。
 
 可信 semantic context、`Z_t` artifact、外部攻击视图隔离和固定 prompt 编译已实现于
-`semantic_trust.py`；相关 trust-boundary 与 action-selection 定向测试共 22 个通过。下一工程步骤是把
-这两个边界接入 LIBERO runner，并实现 `Z_t -> executable prefix` local checker。
+`semantic_trust.py`。这两个边界现已通过 `semantic_policy_wrapper.py` 接入
+`run_liberosafety_pi05_openpi_eval.py`：每次 policy call 前从 pre-transform trusted view 选择并绑定
+`Z_t`，policy 返回后只把通过 nominal check、bounded clip/projection 和 post-projection recheck 的最终
+prefix 交给 v4 authorization/dispatch transaction。该路径由 `--semantic-runtime` 显式启用，未启用时
+保持历史 runner 行为。
+
+首版真正的 `Z_t -> executable prefix` analytic checker 已实现于 `semantic_local_checker.py`。它读取
+当前 trusted eef/gripper/object geometry 和 exact `(H,7)` prefix，支持
+`pick_up/move/place/release` 的目标、持有、方向、放置/释放顺序检查，以及 workspace、translation、
+rotation 和非目标 contact-neighborhood hard violations；缺失几何、stale epoch、未知 task 或当前没有
+trusted articulation state 时 fail closed。当前 LIBERO object position 属于 benchmark privileged state，
+runtime metadata 明确标注，不能冒充部署视觉或硬件 attestation。
+
+`proofalign-integrity-v4` 的首批 semantic-bound runtime schema 已实现于
+`integrity_v4_models.py`，独立绑定 semantic context、`Z_t`、exact prompt、trusted/policy observation、
+source policy chunk 和 executable-prefix bytes。assessment/contract 已提供 exact-binding 检查，
+unknown `Z_t` 不可形成 dispatchable v4 proposal；历史 prefix adapter 显式标为 `historical_v3`。
+`integrity_v4_runtime.py` 已实现 final proposal → fresh assessment/contract → authorization 的顺序，
+并把 `(H,7)` prefix 作为一个 one-use authorization session：每步 exact action receipt 绑定同一
+authorization，窗口 evidence 绑定实际消费 action、ordered receipts 和 post-dispatch observations。
+stale、caller/sink command substitution、重复打开 authorization、projection 后复用旧 artifact 均有
+negative tests。v3 frozen digest fixture 保持不变。全量 Python 测试为 159 个通过，Lean build 通过；
+没有运行新 outcome rollout。
 
 ## 2. 已完成
 
@@ -97,14 +196,14 @@ wiring 本身推出。
 
 ## 4. 当前 blocker 排序
 
-1. **Runtime schema/integration**：trusted semantic context、exact `Z_t`、prompt、candidate、
-   executable prefix、assessment 与 contract 的端到端绑定；
-2. **Local checker qualification**：`Z_t -> ActionBlock` 的 false-allow、coverage 和 OOD；
-3. **Zero-training selector qualification**：合法率、阶段合理性、稳定性、margin 和 unknown；
-4. **Lean/runtime evidence refresh**：semantic digests 接入后重新生成 fixed-trace、theorem/source digest 和
-   scoped Python-equivalence evidence；
-5. **资源预算**：selector/checker 与四臂 latency/GPU memory；
-6. **observer adequacy、clean commit binding 和 M2 execution authorization**。
+1. **Deployment perception qualification data**：E7 已证明当前 RLDS 缺少 7 类必要监督，不能外推为
+   camera-only deployment；
+2. **clean commit binding**：E8 已冻结可审计 inventory，但当前仍有 68 个 scoped path 未绑定
+   HEAD；提交前必须人工确认现有 dirty worktree 的归属和范围；
+3. **closed-loop/outcome 明确授权**：先 no-attack smoke，再按 M2 gate 运行 confirmatory population。
+
+E6 已关闭为 `semantic_resource_smoke_qualified`，只证明冻结离线 workload 满足预注册工程预算；不得
+据此选择 efficacy threshold，也不得把它解释为 simulator、camera perception 或物理安全证据。
 
 M1 producer/victim、shared runner、fixed-trace exporter、validator 和 outcome-blind ActionBlock prefix adapter
 已经完成；adapter 只读取 policy-call audit 与实际消费的 raw actions，不读取 reward/success/cost/collision，
@@ -155,12 +254,15 @@ fixed-trace 和 480+480 四臂。
 - 双层问题已定义在 action-only VLA 可观察接口上；
 - L2 的有限 transaction semantics 已由 Lean 检查；
 - P0b/R9 给出强探索性攻击/Execution-only 信号；
-- component runner 可验证两层开关和 digest identity。
+- component runner 可验证两层开关和 digest identity；
+- benchmark privileged-geometry 下的 deterministic selector、analytic local checker 和 analytic effect
+  observer 已通过各自 frozen finite-corpus gate；
+- E4 no-dispatch 四臂 gate 已通过。
 
 不可声称：
 
-- L1 assessor 已对真实 π0.5 资格化；
-- frozen semantic selector 已达到可用标准；
+- raw π0.5 selector 已达到可用标准；
+- semantic prompt 能可靠控制 ActionBlock；
 - secure split 或 trusted camera tap 已在真实部署环境得到硬件级 attestation；
 - 一般防御有效；
 - Dual 已验证；
@@ -173,17 +275,21 @@ fixed-trace 和 480+480 四臂。
 [`implementation_and_experiment_readiness.md`](implementation_and_experiment_readiness.md)。执行顺序固定为：
 
 ```text
-C1 semantic digest schema
-  -> C2 trusted prompt/policy wrapper
-  -> C3 executable-prefix local checker
-  -> C4 post-intervention rebind
-  -> C5 shared-trace/Lean evidence refresh
-  -> E1 selector snapshot qualification
-  -> E2 local-checker qualification
-  -> E3 no-dispatch four-arm
+C1 semantic digest schema（已实现）
+  -> C2 trusted prompt/policy wrapper（已实现 K=1 online path）
+  -> C3 executable-prefix local checker（已实现并通过 E3 analytic gate）
+  -> C4 post-intervention rebind + v4 transaction（已实现）
+  -> C5 shared-trace/Lean evidence refresh（已完成）
+  -> E1 raw selector 未通过 / E1F deterministic fallback 通过
+  -> E2 action conditioning 未通过（不作为安全机制）
+  -> E3 local-checker qualification（通过）
+  -> E4 no-dispatch four-arm（通过）
+  -> E5 effect-observer qualification + online wiring（通过）
+  -> E6 authorized resource smoke（通过）
+  -> E7 perception supervision collection/qualification（当前数据 gate 未通过）
   -> authorized no-attack smoke
   -> M2
 ```
 
-在 C1–C5 与 E1–E3 完成前，不运行新的 efficacy outcome。若 zero-training selector 不通过，允许按预注册
-回退到 deterministic task-FSM L1；不允许用 M2/four-arm outcome 反向调整 selector/checker。
+当前已按预注册回退到 deterministic task-FSM L1。没有明确授权前不运行新的 efficacy outcome，也不允许
+用 M2/four-arm outcome 反向调整 selector/checker/effect observer。

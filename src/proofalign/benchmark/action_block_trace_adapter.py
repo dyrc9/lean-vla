@@ -19,6 +19,7 @@ from proofalign.integrity_models import ActionProposal
 TRACE_ADAPTER_ID = "proofalign-executed-action-block-prefix-adapter"
 TRACE_ADAPTER_VERSION = "1"
 TRACE_SOURCE_SCHEMA = "proofalign.native-action-block-trace.v1"
+TRACE_RUNTIME_SCHEMA_CLASS = "historical_v3"
 
 
 class ActionBlockTraceError(ValueError):
@@ -59,6 +60,7 @@ class NativeActionBlockRecord:
         return {
             "adapter_id": TRACE_ADAPTER_ID,
             "adapter_version": TRACE_ADAPTER_VERSION,
+            "runtime_schema_class": TRACE_RUNTIME_SCHEMA_CLASS,
             "policy_call_index": self.policy_call_index,
             "action_count": self.action_count,
             "action_dimension": self.action_dimension,
@@ -170,6 +172,7 @@ def adapt_victim_episode(
         "schema": TRACE_SOURCE_SCHEMA,
         "adapter_id": TRACE_ADAPTER_ID,
         "adapter_version": TRACE_ADAPTER_VERSION,
+        "runtime_schema_class": TRACE_RUNTIME_SCHEMA_CLASS,
         "episode_nonce": episode_nonce,
         "outcome_fields_read": [],
         "unused_policy_chunk_tail_reconstructed": False,
@@ -182,6 +185,7 @@ __all__ = [
     "NativeActionBlockRecord",
     "TRACE_ADAPTER_ID",
     "TRACE_ADAPTER_VERSION",
+    "TRACE_RUNTIME_SCHEMA_CLASS",
     "TRACE_SOURCE_SCHEMA",
     "adapt_victim_episode",
 ]
