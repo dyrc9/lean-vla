@@ -519,7 +519,7 @@ def test_l2_successor_forged_multistep_audit_binds_each_runner_step(
     ] == [0, 1]
 
 
-def test_l2_successor_four_arms_share_one_policy_source_chunk(
+def test_l2_successor_four_arms_bind_paired_policy_inputs(
     monkeypatch, tmp_path
 ) -> None:
     arms = (
@@ -528,7 +528,7 @@ def test_l2_successor_four_arms_share_one_policy_source_chunk(
         ("execution_only", False, "off", "on"),
         ("dual", True, "on", "on"),
     )
-    source_digests = set()
+    audits = {}
 
     for label, semantic_runtime, l1_switch, l2_switch in arms:
         payload, environment, _policy = _run(
@@ -541,11 +541,8 @@ def test_l2_successor_four_arms_share_one_policy_source_chunk(
             l2_execution_integrity=l2_switch,
         )
         metadata = payload["metadata"]
-        source_digests.add(
-            payload["observation_frame_audits"][0][
-                "policy_action_chunk_sha256"
-            ]
-        )
+        audit = payload["observation_frame_audits"][0]
+        audits[label] = audit
         assert metadata["four_arm_label"] == label
         assert metadata["l1_semantic_alignment"] is (
             l1_switch == "on"
@@ -553,9 +550,61 @@ def test_l2_successor_four_arms_share_one_policy_source_chunk(
         assert metadata["l2_execution_integrity"] is (
             l2_switch == "on"
         )
+        assert len(
+            metadata["initial_execution_observation_digest"]
+        ) == 64
+        assert len(audit["policy_observation_digest"]) == 64
         assert np.isclose(environment.applied[0][0], 0.1)
 
-    assert len(source_digests) == 1
+    for left, right in (
+        ("vla_only", "execution_only"),
+        ("semantic_only", "dual"),
+    ):
+        assert audits[left]["policy_action_chunk_sha256"] == (
+            audits[right]["policy_action_chunk_sha256"]
+        )
+        assert audits[left]["policy_observation_digest"] == (
+            audits[right]["policy_observation_digest"]
+        )
+        assert audits[left]["exact_policy_prompt_digest"] == (
+            audits[right]["exact_policy_prompt_digest"]
+        )
+    assert audits["vla_only"]["exact_policy_prompt_digest"] != (
+        audits["semantic_only"]["exact_policy_prompt_digest"]
+    )
+
+
+def test_l2_successor_initial_observation_audit_uses_init_state() -> None:
+    reset_observation = _observation()
+    initialized_observation = {
+        **_observation(),
+        "robot0_eef_pos": np.asarray(
+            (0.2, 0.1, 0.3),
+            dtype=np.float64,
+        ),
+    }
+
+    class _InitializedEnvironment:
+        def reset(self):
+            return reset_observation
+
+        def set_init_state(self, _state):
+            return initialized_observation
+
+    proxy = l2_runner._InitialObservationAuditProxy(
+        _InitializedEnvironment()
+    )
+    proxy.reset()
+    proxy.set_init_state(np.zeros(1))
+
+    assert proxy.initial_observation_digest == (
+        runner.libero_execution_observation_digest(
+            initialized_observation
+        )
+    )
+    assert proxy.initial_observation_digest != (
+        runner.libero_execution_observation_digest(reset_observation)
+    )
 
 
 def test_l2_successor_semantic_only_allows_p1_after_l1_check(

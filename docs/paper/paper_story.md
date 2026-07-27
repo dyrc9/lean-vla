@@ -157,10 +157,12 @@ Python runtime 精化了 Lean 模型。这个边界限制 claim 的外延，但�
 冻结 runtime/schema 中的 `intent_only`、`intent_action_enabled` 字段仅作为兼容名称，不表示恢复自由文本
 plan。
 
-`K=1` primary design 中，四臂共享 byte-identical proposal、assessment 与 execution contract。若将来
-启用 `K>1`，四臂必须共享 byte-identical ordered candidate set 和每候选 assessment；VLA-only 使用
-预注册 base candidate，L1-enabled arms 才执行冻结 select/reject rule。最终命令差异此时是 treatment
-机制的一部分，不能再笼统声称四臂 final ActionBlock byte-identical。
+`K=1` primary design 分两种 identity contract。fixed-trace shadow 中四臂共享 byte-identical source
+ActionBlock、assessment 和 execution contract；closed-loop 中四臂只共享初始状态、初始观测、环境 seed
+和 policy seed。由于可信 `T+Z_t` prompt 本身属于 L1 treatment，跨 L1 的 policy output 不要求相同；
+只要求每个 L1 stratum 内的 L2 pair 在第一次 policy call 上具有相同 prompt、policy observation 和
+source chunk。treatment 介入后各臂状态可以分叉，禁止用 counterfactual chunk replay 强行维持后续
+byte identity。若将来启用 `K>1`，必须另行冻结 candidate-set 与 selection estimand。
 
 ## 9. 可主张的贡献与明确排除项
 
@@ -171,7 +173,8 @@ plan。
 - `Z_t -> ActionBlock` 的 local compatibility、abstention 和 deterministic selection boundary；
 - ActionBlock/authorization/receipt/effect/phase 的 Lean-specified transaction semantics，以及
   exact-dispatch/phase-gating 的 machine-checked theorem；
-- 共享 candidate/trace 的四臂因果评估协议；
+- fixed-trace exact identity、closed-loop paired initial identity 与 within-L1 L2 identity 的四臂因果评估
+  协议；
 - instruction/observation attack 下的 benchmark evidence。
 
 不主张：

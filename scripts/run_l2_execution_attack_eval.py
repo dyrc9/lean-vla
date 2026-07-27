@@ -97,6 +97,54 @@ class _AttackedEnvironmentProxy:
         return getattr(self._env, name)
 
 
+class _InitialObservationAuditProxy:
+    """Capture the exact initial raw observation without changing the base."""
+
+    def __init__(self, env: Any) -> None:
+        self._env = env
+        self.initial_observation_digest: str | None = None
+
+    def _capture(
+        self,
+        observation: Any,
+        *,
+        overwrite: bool = False,
+    ) -> Any:
+        if (
+            (
+                overwrite
+                or self.initial_observation_digest is None
+            )
+            and isinstance(observation, dict)
+        ):
+            self.initial_observation_digest = (
+                base.libero_execution_observation_digest(observation)
+            )
+        return observation
+
+    def reset(self, *args: Any, **kwargs: Any) -> Any:
+        return self._capture(self._env.reset(*args, **kwargs))
+
+    def set_init_state(self, *args: Any, **kwargs: Any) -> Any:
+        return self._capture(
+            self._env.set_init_state(*args, **kwargs),
+            overwrite=True,
+        )
+
+    def get_observation(self) -> Any:
+        for name in ("get_observation", "_get_observations"):
+            method = getattr(self._env, name, None)
+            if callable(method):
+                return self._capture(method())
+        raise RuntimeError("wrapped environment has no observation getter")
+
+    def _get_observations(self) -> Any:
+        return self.get_observation()
+
+    def __getattr__(self, name: str) -> Any:
+        return getattr(self._env, name)
+
+
 def _attack_boundary_class(
     relay: PublishedAffineRelay,
     *,
@@ -401,6 +449,9 @@ def _run_execution_only_episode(
             obs = env.set_init_state(runtime.init_state)
         if obs is None:
             obs = base.get_observation(env)
+        initial_observation_digest = (
+            base.libero_execution_observation_digest(obs)
+        )
 
         np.random.seed(args.seed)
         for step_id in range(args.max_steps + args.num_steps_wait):
@@ -474,6 +525,9 @@ def _run_execution_only_episode(
                     )
                 frame_audits[-1] = {
                     **frame_audits[-1],
+                    "policy_observation_digest": (
+                        base.openpi_policy_observation_digest(element)
+                    ),
                     "policy_action_chunk_sha256": chunk_digest,
                     "policy_action_chunk_shape": list(
                         action_chunk.shape
@@ -733,6 +787,9 @@ def _run_execution_only_episode(
                 "initial_state_sha256": base.array_digest(
                     runtime.init_state
                 ),
+                "initial_execution_observation_digest": (
+                    initial_observation_digest
+                ),
                 "observation_attack_type": "none",
                 "observation_attack_strength": None,
                 "semantic_runtime_enabled": False,
@@ -861,6 +918,47 @@ def run_episode(**kwargs: Any) -> dict[str, Any]:
 
     original_boundary = base.SingleUsePrefixDispatchBoundary
     original_create_env = base.create_env
+    original_prepare_openpi_element = base.prepare_openpi_element
+    audited_envs: list[_InitialObservationAuditProxy] = []
+
+    def audited_create_env(
+        *create_args: Any,
+        **create_kwargs: Any,
+    ) -> Any:
+        env = original_create_env(*create_args, **create_kwargs)
+        if not l1_enabled and relay is not None:
+            env = _AttackedEnvironmentProxy(
+                env,
+                relay,
+                wait_steps=int(args.num_steps_wait),
+            )
+        audited = _InitialObservationAuditProxy(env)
+        audited_envs.append(audited)
+        return audited
+
+    def audited_prepare_openpi_element(
+        *prepare_args: Any,
+        **prepare_kwargs: Any,
+    ) -> Any:
+        element, replay_image, frame_audit = (
+            original_prepare_openpi_element(
+                *prepare_args,
+                **prepare_kwargs,
+            )
+        )
+        return (
+            element,
+            replay_image,
+            {
+                **frame_audit,
+                "policy_observation_digest": (
+                    base.openpi_policy_observation_digest(element)
+                ),
+            },
+        )
+
+    base.create_env = audited_create_env
+    base.prepare_openpi_element = audited_prepare_openpi_element
     if l1_enabled:
         boundary_class = (
             SingleUsePrefixDispatchBoundary
@@ -876,20 +974,22 @@ def run_episode(**kwargs: Any) -> dict[str, Any]:
                 boundary_class=boundary_class,
             )
         )
-    elif relay is not None:
-        def attacked_create_env(*create_args: Any, **create_kwargs: Any) -> Any:
-            return _AttackedEnvironmentProxy(
-                original_create_env(*create_args, **create_kwargs),
-                relay,
-                wait_steps=int(args.num_steps_wait),
-            )
-
-        base.create_env = attacked_create_env
     try:
         payload = _BASE_RUN_EPISODE(**kwargs)
     finally:
         base.SingleUsePrefixDispatchBoundary = original_boundary
         base.create_env = original_create_env
+        base.prepare_openpi_element = original_prepare_openpi_element
+
+    if len(audited_envs) != 1:
+        raise RuntimeError(
+            "L2 successor expected exactly one episode environment"
+        )
+    metadata = dict(payload["metadata"])
+    metadata["initial_execution_observation_digest"] = (
+        audited_envs[0].initial_observation_digest
+    )
+    payload["metadata"] = metadata
 
     _annotate_payload(
         payload,

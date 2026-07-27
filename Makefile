@@ -1,4 +1,4 @@
-.PHONY: sync test lean paper-artifacts paper-artifacts-check action-block-check m1-readiness-check semantic-v4-c5-check e1-selector-check e1-fallback-check e2-conditioning-check e3-checker-check e4-no-dispatch-check e5-effect-observer-check e6-resource-smoke-preflight-check e7-perception-preflight-check semantic-post-e5-readiness-check l2-interface-check check
+.PHONY: sync test lean paper-artifacts paper-artifacts-check action-block-check m1-readiness-check semantic-v4-c5-check e1-selector-check e1-fallback-check e2-conditioning-check e3-checker-check e4-no-dispatch-check e5-effect-observer-check e6-resource-smoke-preflight-check e7-perception-preflight-check semantic-post-e5-readiness-check l2-interface-check four-arm-v4-check check
 
 PYTHON ?= .venv/bin/python
 UV ?= uv
@@ -92,4 +92,10 @@ l2-interface-check:
 	$(PYTHON) scripts/run_l2_four_arm_identity_gate.py --check >/dev/null
 	$(PYTHON) scripts/run_l2_execution_attack_eval.py --help >/dev/null
 
-check: test lean paper-artifacts-check action-block-check m1-readiness-check semantic-v4-c5-check e1-selector-check e1-fallback-check e2-conditioning-check e3-checker-check e4-no-dispatch-check e5-effect-observer-check e6-resource-smoke-preflight-check e7-perception-preflight-check e8-source-binding-check semantic-post-e5-readiness-check
+four-arm-v4-check:
+	$(PYTHON) -m pytest tests/test_four_arm_v4.py
+	$(PYTHON) scripts/freeze_four_arm_v4_successor_protocol.py --check
+	$(PYTHON) scripts/run_proofalign_four_arm_v4.py --check
+	$(PYTHON) scripts/analyze_proofalign_four_arm_v4.py --check-contract
+
+check: test lean paper-artifacts-check action-block-check m1-readiness-check semantic-v4-c5-check e1-selector-check e1-fallback-check e2-conditioning-check e3-checker-check e4-no-dispatch-check e5-effect-observer-check e6-resource-smoke-preflight-check e7-perception-preflight-check e8-source-binding-check semantic-post-e5-readiness-check four-arm-v4-check
