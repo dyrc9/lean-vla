@@ -1382,13 +1382,13 @@
       "unit_id": "ueda_blevins_shear__post_boundary_forged"
     }
   ],
-  "claim_boundary": "This outcome-free component gate proves that four treatment routes consume one byte-identical source action chunk and obey the expected L1/P1/P2/P3 routing truth table. It creates no policy, simulator, sink, dispatch, reward, success, or safety outcome. It does not prove that independent switches are wired into the live LIBERO runner and does not authorize four-arm rollout.",
+  "claim_boundary": "This outcome-free component gate proves that four treatment routes consume one byte-identical source action chunk and obey the expected L1/P1/P2/P3 routing truth table. It creates no policy, simulator, sink, dispatch, reward, success, or safety outcome. It does not by itself prove the separate live-runner wiring or authorize four-arm rollout.",
   "classification": "l2_four_arm_component_identity_pass",
   "complete": true,
   "dispatch_attempt_count": 0,
   "four_arm_confirmatory_ready": false,
   "gate_id": "proofalign-l2-four-arm-identity-20260727-v1",
-  "live_online_arm_switches_implemented": false,
+  "live_online_arm_switches_evidenced_by_this_gate": false,
   "outcomes_observed": false,
   "policy_loaded": false,
   "row_count": 48,

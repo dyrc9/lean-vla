@@ -160,7 +160,10 @@ def _run(
     episode_runner=None,
     execution_attack_family: str = "none",
     execution_attack_placement: str = "pre_boundary",
+    l1_semantic_alignment: str | None = None,
+    l2_execution_integrity: str | None = None,
 ):
+    tmp_path.mkdir(parents=True, exist_ok=True)
     bddl_path = tmp_path / "task.bddl"
     bddl_path.write_text(BDDL, encoding="utf-8")
     runtime = LiberoTaskRuntime(
@@ -202,6 +205,20 @@ def _run(
     )
     args.execution_attack_family = execution_attack_family
     args.execution_attack_placement = execution_attack_placement
+    args.l1_semantic_alignment = (
+        l1_semantic_alignment
+        if l1_semantic_alignment is not None
+        else "on"
+        if semantic_runtime
+        else "off"
+    )
+    args.l2_execution_integrity = (
+        l2_execution_integrity
+        if l2_execution_integrity is not None
+        else "on"
+        if semantic_runtime
+        else "off"
+    )
     payload = (episode_runner or runner.run_episode)(
         args=args,
         policy=policy,
@@ -500,3 +517,141 @@ def test_l2_successor_forged_multistep_audit_binds_each_runner_step(
         row["execution_attack"]["runner_step_id"]
         for row in payload["trace"]
     ] == [0, 1]
+
+
+def test_l2_successor_four_arms_share_one_policy_source_chunk(
+    monkeypatch, tmp_path
+) -> None:
+    arms = (
+        ("vla_only", False, "off", "off"),
+        ("semantic_only", True, "on", "off"),
+        ("execution_only", False, "off", "on"),
+        ("dual", True, "on", "on"),
+    )
+    source_digests = set()
+
+    for label, semantic_runtime, l1_switch, l2_switch in arms:
+        payload, environment, _policy = _run(
+            monkeypatch,
+            tmp_path / label,
+            first_delta_x=0.1,
+            semantic_runtime=semantic_runtime,
+            episode_runner=l2_runner.run_episode,
+            l1_semantic_alignment=l1_switch,
+            l2_execution_integrity=l2_switch,
+        )
+        metadata = payload["metadata"]
+        source_digests.add(
+            payload["observation_frame_audits"][0][
+                "policy_action_chunk_sha256"
+            ]
+        )
+        assert metadata["four_arm_label"] == label
+        assert metadata["l1_semantic_alignment"] is (
+            l1_switch == "on"
+        )
+        assert metadata["l2_execution_integrity"] is (
+            l2_switch == "on"
+        )
+        assert np.isclose(environment.applied[0][0], 0.1)
+
+    assert len(source_digests) == 1
+
+
+def test_l2_successor_semantic_only_allows_p1_after_l1_check(
+    monkeypatch, tmp_path
+) -> None:
+    payload, environment, _policy = _run(
+        monkeypatch,
+        tmp_path,
+        first_delta_x=0.1,
+        semantic_runtime=True,
+        episode_runner=l2_runner.run_episode,
+        execution_attack_family="ueda_blevins_scaling",
+        execution_attack_placement="pre_boundary",
+        l1_semantic_alignment="on",
+        l2_execution_integrity="off",
+    )
+
+    assert np.isclose(environment.applied[0][0], 0.4)
+    assert payload["decision"] == "env_done"
+    assert payload["metadata"]["four_arm_label"] == "semantic_only"
+    assert payload["observation_frame_audits"][0][
+        "semantic_transaction"
+    ]["dispatch_status"] == "complete"
+
+
+def test_l2_successor_execution_only_rejects_p1_before_env_step(
+    monkeypatch, tmp_path
+) -> None:
+    payload, environment, _policy = _run(
+        monkeypatch,
+        tmp_path,
+        first_delta_x=0.1,
+        semantic_runtime=False,
+        episode_runner=l2_runner.run_episode,
+        execution_attack_family="ueda_blevins_scaling",
+        execution_attack_placement="pre_boundary",
+        l1_semantic_alignment="off",
+        l2_execution_integrity="on",
+    )
+
+    assert environment.applied == []
+    assert payload["decision"] == "execution_dispatch_rejected"
+    transaction = payload["execution_only_transactions"][0]
+    assert transaction["dispatch_status"] == "rejected"
+    assert transaction["step_receipts"] == []
+    assert payload["execution_attack_audit"]["records"][0][
+        "env_step_reached"
+    ] is False
+
+
+def test_l2_successor_execution_only_detects_truthful_p2(
+    monkeypatch, tmp_path
+) -> None:
+    payload, environment, _policy = _run(
+        monkeypatch,
+        tmp_path,
+        first_delta_x=0.1,
+        semantic_runtime=False,
+        episode_runner=l2_runner.run_episode,
+        execution_attack_family="ueda_blevins_scaling",
+        execution_attack_placement="post_boundary_truthful",
+        l1_semantic_alignment="off",
+        l2_execution_integrity="on",
+    )
+
+    assert np.isclose(environment.applied[0][0], 0.4)
+    assert payload["decision"] == "execution_dispatch_rejected"
+    transaction = payload["execution_only_transactions"][0]
+    assert transaction["integrity_verdict"] == "reject"
+    assert "different from the exact raw-policy authorization" in (
+        transaction["integrity_issues"][0]
+    )
+
+
+def test_l2_successor_execution_only_p3_exposes_sink_limit(
+    monkeypatch, tmp_path
+) -> None:
+    payload, environment, _policy = _run(
+        monkeypatch,
+        tmp_path,
+        first_delta_x=0.1,
+        semantic_runtime=False,
+        episode_runner=l2_runner.run_episode,
+        execution_attack_family="ueda_blevins_scaling",
+        execution_attack_placement="post_boundary_forged",
+        l1_semantic_alignment="off",
+        l2_execution_integrity="on",
+    )
+
+    assert np.isclose(environment.applied[0][0], 0.4)
+    assert payload["decision"] == "env_done"
+    receipt = payload["trace"][0]["execution_dispatch_receipt"]
+    assert np.isclose(receipt["reported_action"][0], 0.1)
+    attack = payload["trace"][0]["execution_attack"]
+    assert np.isclose(attack["env_input_action"][0], 0.4)
+    assert np.isclose(attack["reported_action"][0], 0.1)
+    assert payload["execution_only_transactions"][0][
+        "integrity_verdict"
+    ] == "allow"

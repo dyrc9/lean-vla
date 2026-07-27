@@ -4,6 +4,7 @@ from hashlib import sha256
 import json
 from pathlib import Path
 import sys
+from types import SimpleNamespace
 
 import pytest
 
@@ -74,6 +75,7 @@ def test_l2_feasibility_artifact_matches_implemented_enums_and_paths() -> None:
         "attack_module",
         "four_arm_identity_module",
         "four_arm_identity_gate_runner",
+        "online_arm_runtime",
         "successor_runner",
         "frozen_base_runner",
     ):
@@ -91,9 +93,12 @@ def test_l2_feasibility_artifact_matches_implemented_enums_and_paths() -> None:
     assert online["component_arm_switches_independent"] is True
     assert (
         online["live_switch_cli_contract"]
-        == "implemented_fail_closed_for_mixed_arms"
+        == "implemented_all_four_arms"
     )
-    assert online["live_independent_arm_switches"] is False
+    assert online["live_independent_arm_switches"] is True
+    assert online["semantic_only"] == "implemented_mock_online"
+    assert online["execution_only"] == "implemented_mock_online"
+    assert online["shared_source_live_gpu_gate"] == "not_run"
     assert online["four_arm_confirmatory_ready"] is False
 
 
@@ -140,36 +145,17 @@ def test_l2_successor_cli_dry_parse_exposes_all_attack_switches(
     assert args.policy_seed == 5
 
 
-def test_l2_successor_cli_accepts_explicit_supported_arm_switches(
-    monkeypatch,
-) -> None:
-    monkeypatch.setattr(
-        sys,
-        "argv",
-        [
-            "run_l2_execution_attack_eval.py",
-            "--l1-semantic-alignment",
-            "off",
-            "--l2-execution-integrity",
-            "off",
-        ],
-    )
-
-    args = l2_runner.parse_args()
-
-    assert args.semantic_runtime is False
-    assert args.l1_semantic_alignment == "off"
-    assert args.l2_execution_integrity == "off"
-
-
 @pytest.mark.parametrize(
-    ("l1", "l2"),
-    [("on", "off"), ("off", "on")],
+    ("l1", "l2", "semantic_runtime"),
+    [
+        ("off", "off", False),
+        ("on", "off", True),
+        ("off", "on", False),
+        ("on", "on", True),
+    ],
 )
-def test_l2_successor_cli_blocks_mixed_live_arms_before_execution(
-    monkeypatch,
-    l1,
-    l2,
+def test_l2_successor_cli_accepts_all_explicit_arm_switches(
+    monkeypatch, l1, l2, semantic_runtime
 ) -> None:
     monkeypatch.setattr(
         sys,
@@ -183,8 +169,22 @@ def test_l2_successor_cli_blocks_mixed_live_arms_before_execution(
         ],
     )
 
-    with pytest.raises(SystemExit):
-        l2_runner.parse_args()
+    args = l2_runner.parse_args()
+
+    assert args.semantic_runtime is semantic_runtime
+    assert args.l1_semantic_alignment == l1
+    assert args.l2_execution_integrity == l2
+
+
+def test_l2_successor_rejects_programmatic_arm_mismatch_before_runtime() -> None:
+    args = SimpleNamespace(
+        semantic_runtime=False,
+        l1_semantic_alignment="on",
+        l2_execution_integrity="off",
+    )
+
+    with pytest.raises(ValueError, match="semantic_runtime"):
+        l2_runner.run_episode(args=args)
 
 
 def _rows_by_arm(result: dict) -> dict[str, dict]:
@@ -369,7 +369,10 @@ def test_committed_four_arm_identity_gate_is_canonical_and_no_outcome() -> None:
     assert evidence["simulator_created"] is False
     assert evidence["sink_created"] is False
     assert evidence["outcomes_observed"] is False
-    assert evidence["live_online_arm_switches_implemented"] is False
+    assert (
+        evidence["live_online_arm_switches_evidenced_by_this_gate"]
+        is False
+    )
     assert evidence["four_arm_confirmatory_ready"] is False
     assert FOUR_ARM_IDENTITY_OUTPUT.read_text(
         encoding="utf-8"

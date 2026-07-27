@@ -13,7 +13,7 @@
 | Ueda--Blevins coordinated perfectly-undetectable FDIA | **不支持** | 不得声称复现或反驳其 stealth theorem |
 | ROS captured-prefix replay | **v4 component semantics 已有，online capture/transport 尚缺** | 目前只能报告 component/fixed-trace 结果 |
 | feedback-linearized FDIA | **`interface_not_supported`** | 不进入 LIBERO efficacy |
-| 2×2 防御四臂 online rollout | **尚不可运行** | 当前 online runner 只有 VLA-only 与绑定 L1+L2 的 dual-like 路径 |
+| 2×2 防御四臂 online rollout | **四条 live path 已通过 mock；GPU shared-source gate 未运行** | 可做 engineering smoke，不能启动 confirmatory population |
 | SABER × L2 完整 confirmatory | **未就绪** | 等 M2 和下面的 online-arm gate 通过后再冻结 |
 
 这里最重要的修正是：当前 runner 能记录的是 `env.step` 的输入，不是低层 actuator 最终执行值。因此
@@ -248,26 +248,24 @@ placement 各跑一次，再加对应 nominal，共 12 个 engineering episodes�
 
 ### Gate L2-2：补齐 online 四臂
 
-当前 `--semantic-runtime` 同时启用 semantic selection/checking 和 execution transaction，无法独立产生
-Semantic-only 与 Execution-only。必须先增加并测试：
+successor runner 已增加并测试：
 
 ```text
 --l1-semantic-alignment on/off
 --l2-execution-integrity on/off
 ```
 
-四臂还必须在相同 policy seed/base pair 下共享相同 source action chunk；否则不是干净的 2×2
-ablation。该 gate 未通过前，不能启动 1920-episode 计划。
+`Semantic-only` 保留真实 L1 ActionBlock 检查、关闭 L2 exact/effect enforcement；`Execution-only`
+使用独立的 raw-policy-prefix authorization，绑定 source chunk digest、policy observation digest、
+episode/proposal identity、freshness 和逐步 receipt，不伪造 semantic-known artifact。P1/P2/P3 的
+mock-online routing 已锁定。
 
 当前 no-dispatch component gate 已完成：四臂共享同一个 source chunk digest，四种开关组合唯一，
 且三个 source family 的 P1/P2/P3 routing truth table 已由单测锁定。这个结果只关闭 component
-identity 子门；live runner 仍缺 Semantic-only、Execution-only 的独立 dispatch 路径，因此
-`four_arm_confirmatory_ready` 继续为 `false`。
-
-successor CLI 已保留上述两个显式开关。当前只允许 `off/off` 和 `on/on`；`on/off`、`off/on`
-会在 policy/model 加载前 fail closed。原因是现有 v4 proposal schema 没有“semantic binding
-disabled、但 raw source ActionBlock 可被 L2 独立授权”的合法记录类型，不能用伪造的 known semantic
-artifact 冒充 Execution-only。
+identity 子门。live mock runner 的四条路径也已完成，但不同 L1 设置会使用不同 policy prompt，
+所以独立模型调用不能自动证明真实 rollout 的 source chunk 相同。还需在 GPU 节点实现并通过
+shared-source capture/replay（或等价的单次 policy inference fan-out）identity gate，随后跑 L2-1
+的 12-episode smoke；在这两项完成前，`four_arm_confirmatory_ready` 继续为 `false`。
 
 ### Gate L2-3：冻结 primary
 
@@ -309,8 +307,9 @@ P2/P3 作为 trust-boundary stress table 单独报告，不能把 P2 的 after-o
 | Execution-only | off | on |
 | Dual | on | on |
 
-但 `480 × 4 attack cells = 1920` 只是 Gate L2-3 可选择的上限，不再写成已经可启动的默认计划。当前
-online runner 没有独立四臂，直接跑这个规模会把代码路径差异和 defense effect 混在一起。
+但 `480 × 4 attack cells = 1920` 只是 Gate L2-3 可选择的上限，不再写成已经可启动的默认计划。
+当前独立四臂代码已经存在，但真实 policy 的 shared-source fan-out 与 GPU smoke 尚未通过；直接跑
+这个规模仍会把 source-policy 差异和 defense effect 混在一起。
 
 若最终冻结 60 base pairs × 2 seeds × 4 arms：
 

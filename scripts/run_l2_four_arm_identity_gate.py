@@ -133,7 +133,7 @@ def build_evidence() -> dict[str, Any]:
         "simulator_created": False,
         "sink_created": False,
         "outcomes_observed": False,
-        "live_online_arm_switches_implemented": False,
+        "live_online_arm_switches_evidenced_by_this_gate": False,
         "four_arm_confirmatory_ready": False,
         "source_bindings": {
             relative: file_sha256(REPO_ROOT / relative)
@@ -145,9 +145,8 @@ def build_evidence() -> dict[str, Any]:
             "routes consume one byte-identical source action chunk and obey "
             "the expected L1/P1/P2/P3 routing truth table. It creates no "
             "policy, simulator, sink, dispatch, reward, success, or safety "
-            "outcome. It does not prove that independent switches are wired "
-            "into the live LIBERO runner and does not authorize four-arm "
-            "rollout."
+            "outcome. It does not by itself prove the separate live-runner "
+            "wiring or authorize four-arm rollout."
         ),
     }
 
