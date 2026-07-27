@@ -105,6 +105,12 @@ Python-to-Lean refinement proof。
 少量已授权 episode 只检查工程可运行性、latency、deadlock 和 clean retention，不用于阈值调参或论文
 有效性结论。
 
+2026-07-27 的首轮 smoke 发现 approach progress 被错误声明为 `near_target`；修复后 E3/E5 v2 在原
+corpus size、阈值和 gate 下重新资格化。继任 smoke 完成 2 个 effect-allow prefix 和 10 个 exact
+dispatch receipts，effect reject/unknown 为 0；第三个 K=1 proposal 因未达到冻结最小进度门而在
+dispatch 前拒绝。该结果证明修复后的最小闭环可推进两个事务，也同时暴露 clean availability 风险；
+两者都不构成 efficacy 估计。
+
 ## 3. M2：confirmatory VLA-only attack foundation
 
 冻结设计：

@@ -439,7 +439,7 @@ def build_report() -> dict[str, Any]:
             "E6 resource smoke completed but did not qualify",
         )
     blockers.append(
-        "an outcome-bearing M2/four-arm protocol has not yet been frozen"
+        "M2 producer/victim execution remains outside this no-outcome packet"
     )
     return {
         "schema": "proofalign.semantic-post-e5-readiness.v1",

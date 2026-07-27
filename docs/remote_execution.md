@@ -36,7 +36,7 @@ external/openpi/.venv/bin/python \
   scripts/run_semantic_resource_smoke_e6.py --check-state
 ```
 
-E6 runner 按冻结协议把物理 GPU 1 映射为进程内 `cuda:0`，并关闭 JAX 显存预分配。E6 不创建
+当前 E6 v2 runner 按冻结协议把物理 GPU 0 映射为进程内 `cuda:0`，并关闭 JAX 显存预分配。E6 不创建
 simulator，因此不需要 `MUJOCO_GL` 或 `MUJOCO_EGL_DEVICE_ID`。任何含 simulator/dispatch/outcome 的
 后续命令仍需单独授权。
 
@@ -103,6 +103,10 @@ M1 runner dry-runs：
 5. 关闭输出并运行 denominator/signal gate；
 6. gate 未通过则停止，不运行四臂；
 7. gate 通过后才生成 fixed ActionBlock traces 并运行四臂。
+
+2026-07-27 状态：60-record producer successor 已授权并通过 population、source、model、checkout 和
+fresh-root 预检；冻结资源门要求两张预启动显存占用 `<1 GiB` 的 GPU，当前只有 GPU 0 满足，因此未
+启动生成，也未创建 partial output root。不得通过放宽门槛或占用他人进程绕过。
 
 ## 6. 四臂运行顺序
 

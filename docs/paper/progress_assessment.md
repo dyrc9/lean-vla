@@ -7,14 +7,15 @@
 | Trusted semantic boundary | 中高 | context/allowlist/prompt/double-view binding 已接入 opt-in online path；尚无硬件级 trusted tap |
 | Semantic selector | benchmark 中高 / deployment 低 | raw π0.5 未通过；deterministic privileged-geometry FSM 160/160，通过 unknown fail-closed |
 | Action conditioning | 低 | E2 未通过，semantic prompt 不作为独立 safety control |
-| Local ActionBlock checker | benchmark 中高 / deployment 低 | E3 analytic corpus 通过；camera perception supervision 尚不足 |
+| Local ActionBlock checker | benchmark 中高 / deployment 低 | E3 v2 analytic corpus 通过；approach progress 与 near-target 已分离；camera perception supervision 尚不足 |
 | ActionBlock runtime schema | 高 | semantic-bound v4 proposal/assessment/contract/authorization/receipt/evidence 已端到端贯通 |
 | Action–Execution checker | 中高 | Python tests + Lean semantic core + scoped equivalence；仍无完整 Python refinement 或现实世界证明 |
 | Four-arm fixed trace | 高（no-dispatch） | C5/E4 共覆盖 8 proposals × 4 arms，identity gate 通过且 zero dispatch |
-| Observer adequacy | benchmark 中高 / deployment 低 | E5 analytic observer 通过并在线接线；camera/contact attestation 尚未资格化 |
-| Resource readiness | 高（冻结本机 workload） | E6 10 项 gate 通过，policy/pipeline p99 约 92 ms |
-| Source/evidence binding | 待关闭 | E8 inventory 完整，但 semantic scope 尚未绑定 clean commit |
-| M2 confirmatory foundation | 设计完成、待执行 | 60 pair × 2 seed × 2 condition；必须先做小规模 no-attack smoke |
+| Observer adequacy | benchmark 中高 / deployment 低 | E5 v2 analytic observer 通过并在线接线；camera/contact attestation 尚未资格化 |
+| Resource readiness | 高（冻结本机 workload） | E6 v2 10 项 gate 通过，policy/pipeline p99 约 97 ms |
+| Source/evidence binding | 已关闭 | E8 clean commit binding 完整，未绑定 semantic scope path 为 0 |
+| Closed-loop no-attack smoke | 工程链路通过、活性风险待量化 | 2 个 effect-allow prefix、10 个 exact receipts；随后 K=1 proposal 被 L1 fail-closed |
+| M2 confirmatory foundation | 协议就绪、资源等待 | 60 pair × 2 seed × 2 condition；producer 仅缺第二张 `<1 GiB` 空闲 GPU |
 | Closed-loop Semantic-only/Dual | 未开始 | 必须在 selector/checker、identity、M2 gate 后 |
 
 论文主故事仍是两层对齐，而不是 SemanticSubtask 本身。当前最重要的科学风险集中在 L1：
@@ -31,12 +32,12 @@ control。
 
 当前最短可发表路径：
 
-1. 将当前 semantic source/evidence scope 绑定到 clean commit；
-2. 运行少量 benchmark privileged-geometry closed-loop no-attack engineering smoke；
+1. 等待第二张满足冻结启动门的 GPU，运行 60-record outcome-blind M2 producer；
+2. 校验 record bundle 后运行 240 个 VLA-only clean/attacked episode；
 3. 保持 E7 camera/deployment perception 为独立未关闭 claim，不混入 benchmark 结果；
-4. 获得 M2 的 240-episode denominator/signal；
-5. M2 gate 通过后运行 fixed-trace、480 clean 和 480 attacked 四臂；
-6. 按预注册分别报告 safety、utility、coverage、unknown 和 deadlock，不扩大到 physical safety。
+4. 按预注册 denominator/signal gate 决定是否进入四臂；
+5. gate 通过后运行 fixed-trace、480 clean 和 480 attacked 四臂；
+6. 分别报告 safety、utility、coverage、unknown 和 deadlock，不扩大到 physical safety。
 
 当前已经执行这一路线回退：论文使用“双层对齐 + deterministic privileged-geometry task-FSM +
 analytic checker”的窄版本。raw π0.5 selector 与 semantic prompt control 的失败应作为结果如实报告，

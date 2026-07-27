@@ -1,8 +1,8 @@
 # 当前进展与执行计划
 
-## 0. 2026-07-25 no-outcome qualification checkpoint
+## 0. 2026-07-27 qualification 与工程 smoke checkpoint
 
-本轮完成 C5 与 E1–E5，未运行 simulator/outcome：
+当前 C5 与 E1–E8 证据链已关闭，并完成两轮单 episode clean/no-attack 工程 smoke：
 
 - C5：8 cases × 4 arms = 32 rows，proposal/assessment/contract identity 通过，dispatch `0`；
 - E1 raw π0.5 selector：未通过；500 snapshots 的 coverage `0.822`、known legal-frontier
@@ -11,14 +11,14 @@
   `7.1µs`；
 - E2 action conditioning：未通过；median MAD `0.000190`、motion cosine `0.998928`，prompt
   不授权为 behavioral control；
-- E3 analytic local checker：700/700 clean retained、0/1200 attacked false allow、600/600
-  OOD abstain，p99 `58.3µs`；
+- E3 v2 analytic local checker：700/700 clean retained、0/1200 attacked false allow、600/600
+  OOD abstain，p99 `59.1µs`；`closer_to_target` 与 `near_target` 已分离；
 - E4：qualification-outside four-arm no-dispatch gate 的 15 项检查全部通过；
-- E5 analytic effect observer：500/500 clean retained、0/1000 attacked false allow、600/600
-  OOD abstain，p99 `16.7µs`；在线 receipt/window seal 已接线。
+- E5 v2 analytic effect observer：500/500 clean retained、0/1000 attacked false allow、600/600
+  OOD abstain，p99 `21.6µs`；在线 receipt/window seal 已接线。
 - E6 resource smoke：100 个 frozen E2 snapshots × 3 passes、GPU/RSS/latency/repeatability gate
-  已由授权 successor 完成；300 次调用的 checkpoint load `8.70s`，policy/pipeline p99
-  `92.0/92.3ms`，GPU/RSS peak `8650/16465.6 MiB`，digest repeat `200/200`，10 项 gate
+  已由 v2 授权 successor 完成；300 次调用的 checkpoint load `6.22s`，policy/pipeline p99
+  `97.3/97.6ms`，GPU/RSS peak `8646/18830.5 MiB`，digest repeat `200/200`，10 项 gate
   全部通过；simulator/dispatch/outcome 均为 `0`；
 - E7 deployment-perception data gate：当前 RLDS 只含 RGB、robot/joint state、action 等，缺少
   camera calibration、target/destination geometry、visibility/occlusion、held/contact supervision
@@ -28,17 +28,21 @@
   本机旧 EDPA/SafeLIBERO asset bundle 只含两张 `44×44` perturbation array 与同一 RLDS tree
   manifest，不含缺失监督，因此明确排除复用；
 - E8 source binding：commit scope 与本地 evidence inventory 完整，OpenPI checkout 干净并绑定
-  `15a9616a...`；当前 semantic scope 有 68 个路径未绑定到主仓库 HEAD，因此正确分类为
-  `semantic_source_binding_not_clean`，未自动提交 worktree。
+  `15a9616a...`；semantic scope 未绑定路径为 `0`，分类为
+  `semantic_source_binding_clean`；
+- E9 第一轮准确暴露 approach progress 被错误声明为 `near_target`；修复后继任 smoke 完成两个
+  effect-allow prefix、10 个 exact receipts、零 effect reject/unknown，随后第三个 K=1 proposal 因
+  `1.93mm < 2mm` 在 dispatch 前 fail closed。
 
 `experiments/proofalign_semantic_post_e5_readiness_packet_v1.json` 当前判定
-benchmark privileged-geometry no-outcome stack 完整，但 deployment/outcome 仍未就绪。
+benchmark privileged-geometry no-outcome stack 完整；deployment perception 仍未资格化。
 
 剩余 blocker：
 
 1. 先采集/导出 E7 所列 outcome-blind perception supervision，并冻结独立 split；
-2. 对 E8 列出的 68 个 scoped path 做人工 scope review 后绑定 clean commit；
-3. 尚未收到 closed-loop/outcome 明确授权。
+2. M2 的 60-record outcome-blind producer 已通过 population/source/model/checkout 预检，但当前只有
+   GPU 0 满足 `<1 GiB` 启动门，尚缺第二张空闲卡；
+3. E9 暴露的 K=1 clean availability/deadlock 风险进入后续报告，不反向修改冻结阈值。
 
 ## 0A. 2026-07-24 历史收工 checkpoint
 
@@ -146,8 +150,9 @@ unknown `Z_t` 不可形成 dispatchable v4 proposal；历史 prefix adapter 显�
 并把 `(H,7)` prefix 作为一个 one-use authorization session：每步 exact action receipt 绑定同一
 authorization，窗口 evidence 绑定实际消费 action、ordered receipts 和 post-dispatch observations。
 stale、caller/sink command substitution、重复打开 authorization、projection 后复用旧 artifact 均有
-negative tests。v3 frozen digest fixture 保持不变。全量 Python 测试为 159 个通过，Lean build 通过；
-没有运行新 outcome rollout。
+negative tests。v3 frozen digest fixture 保持不变。全量 Python 测试为 197 个通过，Lean build 通过。
+2026-07-27 已运行两轮单 episode clean/no-attack engineering smoke；它们是工程诊断，不是 efficacy
+估计。
 
 ## 2. 已完成
 
@@ -198,9 +203,13 @@ negative tests。v3 frozen digest fixture 保持不变。全量 Python 测试为
 
 1. **Deployment perception qualification data**：E7 已证明当前 RLDS 缺少 7 类必要监督，不能外推为
    camera-only deployment；
-2. **clean commit binding**：E8 已冻结可审计 inventory，但当前仍有 68 个 scoped path 未绑定
-   HEAD；提交前必须人工确认现有 dirty worktree 的归属和范围；
-3. **closed-loop/outcome 明确授权**：先 no-attack smoke，再按 M2 gate 运行 confirmatory population。
+2. **M2 producer GPU 资源**：60-record outcome-blind producer 的 population/source/model/checkout
+   预检均通过，但当前只有 GPU 0 满足 `<1 GiB` 启动门，尚缺第二张空闲卡；
+3. **closed-loop clean availability**：E9 v2 的前两个 prefix 均 effect-allow，第三个 K=1 proposal
+   被 L1 在 dispatch 前拒绝；作为 deadlock/utility 信号进入后续报告，不反向调冻结阈值。
+
+E8 已绑定 clean commit，semantic scope 未绑定路径为 `0`。E7 仍是 deployment claim blocker，但不阻止
+明确标注 privileged geometry 的 benchmark M2。
 
 E6 已关闭为 `semantic_resource_smoke_qualified`，只证明冻结离线 workload 满足预注册工程预算；不得
 据此选择 efficacy threshold，也不得把它解释为 simulator、camera perception 或物理安全证据。
@@ -244,7 +253,8 @@ M1 producer/victim、shared runner、fixed-trace exporter、validator 和 outcom
 
 ### M2：240 episode
 
-仅在用户/项目负责人明确授权 GPU rollout 后运行。先完成 VLA-only attack foundation，gate 通过后再跑
+用户已授权继续推进。当前先等待第二张满足冻结启动门的 GPU，完成 60-record outcome-blind producer；
+record bundle 终态校验通过后再冻结 victim successor 并运行 240 个 VLA-only episode。gate 通过后才跑
 fixed-trace 和 480+480 四臂。
 
 ## 6. 当前可声称与不可声称
@@ -287,9 +297,10 @@ C1 semantic digest schema（已实现）
   -> E5 effect-observer qualification + online wiring（通过）
   -> E6 authorized resource smoke（通过）
   -> E7 perception supervision collection/qualification（当前数据 gate 未通过）
-  -> authorized no-attack smoke
-  -> M2
+  -> authorized no-attack smoke（已完成；效果契约修复后 2 prefix allow，随后 L1 fail-closed）
+  -> M2 producer（协议/源码/模型预检通过，等待第二张空闲 GPU）
+  -> M2 victim 240 episodes
 ```
 
-当前已按预注册回退到 deterministic task-FSM L1。没有明确授权前不运行新的 efficacy outcome，也不允许
-用 M2/four-arm outcome 反向调整 selector/checker/effect observer。
+当前已按预注册回退到 deterministic task-FSM L1。不得用 M2/four-arm outcome 反向调整
+selector/checker/effect observer。

@@ -37,6 +37,8 @@ transaction 贯通，同时不污染 P0b/R9 或现有 v3 frozen evidence。
 - E5-qualified analytic semantic effect observer 已接入 online receipt/window seal；只有 before/after
   privileged geometry 支持 expected effect atoms 时才返回 known，否则 reject/unknown；
 - C5 fixed-trace/Lean scoped equivalence 已覆盖 semantic binding，并接入顶层检查。
+- E3/E5 v2 已将 `closer_to_target` 与 `near_target` 分离，并在原冻结 corpus/gate 下重新通过；
+- E8 已绑定 clean commit；两轮 E9 clean/no-attack smoke 已完成，第二轮连续通过两个 effect window。
 
 ## 3. Schema 决策
 
@@ -320,8 +322,9 @@ CPU/GPU memory
 
 阈值必须在 M2/four-arm outcome 前冻结。
 
-结果：2500 cases 中 clean `700/700`、attacked false allow `0/1200`、OOD abstention `600/600`，
-p99 `58.3µs`，全部 gate 通过。该结论只覆盖 synthetic analytic privileged-geometry corpus。
+结果：v2 在 2500 cases 中 clean `700/700`、attacked false allow `0/1200`、OOD abstention
+`600/600`，p99 `59.1µs`，全部 gate 通过。v2 使用 `closer_to_target` 表示 approach progress，
+保留 `near_target` 表示真实进入目标邻域。该结论只覆盖 synthetic analytic privileged-geometry corpus。
 
 ### E4：No-dispatch four-arm gate
 
@@ -339,7 +342,8 @@ p99 `58.3µs`，全部 gate 通过。该结论只覆盖 synthetic analytic privi
 
 冻结 before/after geometry、prefix completeness、expected/forbidden effect atoms 与 trusted violation
 fixtures。结果：2100 cases 中 clean `500/500`、attacked false allow `0/1000`、OOD abstention
-`600/600`，p99 `16.7µs`。在线 runner 已使用同一 observer 生成 bound `PrefixExecutionEvidence`。
+`600/600`，p99 `21.6µs`。在线 runner 已使用同一 v2 observer 生成 bound
+`PrefixExecutionEvidence`。
 
 该结果不资格化 camera perception、simulator info trust 或在线效果分布。
 
@@ -347,13 +351,14 @@ fixtures。结果：2100 cases 中 clean `500/500`、attacked false allow `0/100
 
 已冻结 100 个 E2 snapshots × 3 measured passes 的 no-simulator workload，测量 checkpoint load、
 policy/semantic pipeline p50/p95/p99、selector/checker/observer CPU latency、process GPU/RSS peak、
-输出大小和 digest repeatability。固定 GPU 1 及 `<4096 MiB`/zero external compute process 启动门。
+输出大小和 digest repeatability。v2 successor 固定 GPU 0 及 `<4096 MiB`/zero external compute
+process 启动门。
 
 授权 successor 已在本机 OpenPI 环境完成测量并分类为
-`semantic_resource_smoke_qualified`。checkpoint load `8.703s`；300 次 warm policy call 的
-p50/p95/p99 为 `80.8/87.5/92.0ms`，semantic pipeline p99 `92.3ms`；selector/checker/observer
-最大 qualification p99 `58.3µs`；process GPU/RSS peak `8650/16465.6 MiB`；输出
-`130069 bytes`；两个 repeat pass 共 `200/200` digest 完全一致。10 项 gate 全部通过，资源 monitor
+`semantic_resource_smoke_qualified`。checkpoint load `6.222s`；300 次 warm policy call 的
+p50/p95/p99 为 `85.3/94.8/97.3ms`，semantic pipeline p99 `97.6ms`；selector/checker/observer
+最大 qualification p99 `59.1µs`；process GPU/RSS peak `8646/18830.5 MiB`；输出
+`130086 bytes`；两个 repeat pass 共 `200/200` digest 完全一致。10 项 gate 全部通过，资源 monitor
 无查询错误。runner 记录 simulator、action sink、dispatch、outcome 和 training 均为 false。
 
 该结果只资格化冻结 workload 的本机工程预算，不资格化 camera perception、closed-loop efficacy 或
@@ -389,17 +394,17 @@ geometry/mask、held/contact 或独立 split，不能混作 E7 supervision。
 
 只读 E8 audit 已绑定主仓库 HEAD、semantic commit scope、本地 E1–E6 evidence inventory 和 OpenPI
 checkout。当前 evidence inventory 完整，OpenPI tracked worktree 干净并绑定
-`15a9616a00943ada6c20a0f158e3adb39df2ccac`；主仓库仍有 68 个 scoped path 未绑定到 HEAD
-`ef27c76d907473608b096550a0cc418e190f5d7d`，所以分类为
-`semantic_source_binding_not_clean`。audit 不执行 `git add/commit`，避免吞入归属未确认的用户改动。
+`15a9616a00943ada6c20a0f158e3adb39df2ccac`；semantic scope 未绑定路径为 `0`，分类为
+`semantic_source_binding_clean`。audit 仍不执行隐式 `git add/commit`。
 
 ## 7. Outcome gate 与停止条件
 
-完成 C1–C5、E1–E5 后，仍需用户/负责人明确授权才可运行：
+用户已授权继续推进，执行仍按冻结 successor protocol 逐级收窄：
 
-1. 少量 closed-loop no-attack engineering smoke；
-2. M2 的 240 个 VLA-only clean/attacked episodes；
-3. M2 denominator/signal gate 后的 clean/attacked 四臂。
+1. 少量 closed-loop no-attack engineering smoke（已完成）；
+2. M2 60-record outcome-blind producer（仅缺第二张满足启动门的 GPU）；
+3. producer 终态校验后的 240 个 VLA-only clean/attacked episodes；
+4. M2 denominator/signal gate 后的 clean/attacked 四臂。
 
 立即停止并不得进入新 outcome 的条件：
 

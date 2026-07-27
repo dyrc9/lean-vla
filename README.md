@@ -43,25 +43,31 @@ phase-gating theorem，而不是事后附加的形式化说明。
 
 ## 当前证据边界
 
-- 2026-07-25 no-outcome semantic qualification：
+- 2026-07-27 semantic qualification 与工程 smoke：
   - raw π0.5 selector 未通过（500 snapshots，coverage `0.822`，known legal-frontier
     `0.564`），因此禁止用于 L1；
   - privileged-geometry deterministic FSM 通过（160/160，unknown fail-closed `100%`）；
   - semantic prompt behavioral control 未通过（median MAD `0.000190`，motion cosine
     `0.998928`），因此不把 prompt 当安全机制；
-  - analytic local checker 通过 2500-case frozen corpus：clean retention `700/700`、
-    attacked false allow `0/1200`、OOD abstention `600/600`；
+  - analytic local checker v2 通过 2500-case frozen corpus：clean retention `700/700`、
+    attacked false allow `0/1200`、OOD abstention `600/600`，p99 `59.1µs`；v2 将“正在靠近”
+    表示为 `closer_to_target`，不再误写为已进入 `near_target`；
   - E4 qualification-outside no-dispatch gate 通过：8 proposals、32 arm rows、跨臂 identity
     一致、dispatch `0`；
-  - analytic effect observer 通过 2100-case frozen corpus：clean retention `500/500`、
-    attacked false allow `0/1000`、OOD abstention `600/600`，p99 `16.7µs`。
-  - E6 offline resource smoke 通过：300 次 frozen π0.5 policy call，checkpoint load
-    `8.70s`，policy/pipeline p99 `92.0/92.3ms`，GPU/RSS peak `8650/16465.6 MiB`，
+  - analytic effect observer v2 通过 2100-case frozen corpus：clean retention `500/500`、
+    attacked false allow `0/1000`、OOD abstention `600/600`，p99 `21.6µs`；
+  - E6 v2 offline resource smoke 通过：300 次 frozen π0.5 policy call，checkpoint load
+    `6.22s`，policy/pipeline p99 `97.3/97.6ms`，GPU/RSS peak `8646/18830.5 MiB`，
     action digest repeat `200/200`；simulator、dispatch、outcome 均为 `0`。
   - E7 dataset qualification runner 已完成：会强制 population/split gate、资产 SHA、真实解码
     shape/dtype 与 asset-root containment；当前仍没有满足 contract 的本机数据。
-  - E8 source-binding audit 已完成：evidence inventory 与 OpenPI binding 完整，但当前 68 个
-    semantic scope path 尚未绑定到 HEAD，因此分类为 `semantic_source_binding_not_clean`。
+  - E8 source-binding audit 已绑定 clean commit，semantic scope 未绑定路径为 `0`，分类为
+    `semantic_source_binding_clean`。
+- E9 clean/no-attack engineering smoke：
+  - 首轮暴露 `near_target`/approach-progress 契约混淆，5 个 exact receipt 后被 L2 正确拒绝；
+  - v2 复测连续完成 2 个 prefix、10 个 exact receipt、2 个 effect allow，effect reject/unknown 均为
+    `0`；第三次 K=1 proposal 因预测进度 `1.93mm < 2mm` 在 dispatch 前被 L1 拒绝，记录为 clean
+    availability/deadlock 信号，不据此修改冻结阈值。
 - P0b：96/96 episode 有效，得到 23 个 clean-eligible pair 和 15 个攻击 transition；因
   `23 < 26` 未通过确认性 denominator gate。
 - R9 Execution-only：clean retention `22/23 = 95.7%`；attacked+defended `48/48`
@@ -77,18 +83,19 @@ phase-gating theorem，而不是事后附加的形式化说明。
 
 ## 当前主线
 
-1. no-outcome C1–C5、E1–E5 已关闭；当前选定
+1. no-outcome C1–C5、E1–E8 已按 benchmark privileged-geometry 边界关闭；当前选定
    `deterministic privileged-geometry FSM + analytic checker/effect observer`；
 2. E6 latency/resource smoke 已由授权 successor 完成，10 项 gate 全部通过；该结果只关闭离线
    工程资源门，不产生 efficacy/outcome 结论；
 3. E7 发现当前 RLDS 缺少 camera calibration、object/destination geometry、visibility/held/contact
    supervision 与独立 split；对应 outcome-blind contract、validator 与 dataset qualification runner
    已冻结/接线；
-4. E8 已机器审计 source/evidence/OpenPI binding；在不替用户提交 dirty worktree 的前提下，下一步是
-   将 68 个 scoped path 绑定到经确认的 clean commit；
-5. 获得明确 outcome 授权后，先运行少量 closed-loop no-attack engineering smoke；
-6. 再运行 M2：60 base pair × 2 seeds，共 240 个 clean/attacked VLA-only episode；
-7. M2 gate 通过后，依次运行 480 clean 四臂、480 attacked 四臂。
+4. E8 已将 semantic source/evidence/OpenPI inventory 绑定到 clean commit；
+5. 两轮 closed-loop no-attack engineering smoke 已完成，效果契约 bug 已修复并由 E3/E5 v2 重新资格化；
+6. M2 outcome-blind producer 已冻结为 60 个 base pair、每 pair 一条攻击记录；当前唯一执行 blocker 是
+   尚无第二张满足 `<1 GiB` 预启动门的空闲 GPU；
+7. producer 完成并校验后运行 M2 的 240 个 clean/attacked VLA-only episode；M2 gate 通过后才运行
+   480 clean 四臂和 480 attacked 四臂。
 
 入口文档：
 
