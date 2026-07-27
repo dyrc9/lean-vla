@@ -655,7 +655,7 @@ def preflight(
         blockers.append(str(exc))
         producer_report = {"bound": False, "error": str(exc)}
     status = saber_io.run_command(
-        ("git", "status", "--porcelain=v1", "--untracked-files=normal"),
+        ("git", "status", "--porcelain=v1", "--untracked-files=no"),
         cwd=REPO_ROOT,
     )
     proofalign_status = (

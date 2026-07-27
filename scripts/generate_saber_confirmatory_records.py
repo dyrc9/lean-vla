@@ -203,7 +203,7 @@ def preflight(
             blockers.append(f"attack model digest mismatch: {relative}")
 
     status = saber_io.run_command(
-        ("git", "status", "--porcelain=v1", "--untracked-files=normal"),
+        ("git", "status", "--porcelain=v1", "--untracked-files=no"),
         cwd=REPO_ROOT,
     )
     tracked_status = status.stdout.splitlines() if status.returncode == 0 else []
