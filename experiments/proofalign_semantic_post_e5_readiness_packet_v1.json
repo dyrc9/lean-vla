@@ -66,8 +66,8 @@
       "openpi_head_commit": "15a9616a00943ada6c20a0f158e3adb39df2ccac",
       "openpi_tracked_worktree_clean": true,
       "path": "experiments/proofalign_semantic_source_binding_e8_audit.json",
-      "repository_head_commit": "447c00692e2152095a97928826a786aff9e4d56e",
-      "sha256": "5cb95a68757dfc4d65586cc8002b190195e7ce42e662a948466119bf13acdb5d"
+      "repository_head_commit": "62e91dbbc8468395e17fb03b73b70b7d67640bb9",
+      "sha256": "03f0a72ca60b0ba41beed9e730599024256f1c013742ff97c4a6f112941e3b62"
     },
     "qualified_observer_online_wiring": {
       "complete": true,
