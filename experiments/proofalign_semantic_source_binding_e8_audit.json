@@ -14,7 +14,7 @@
       "exists": true,
       "git_status": "clean",
       "path": "Makefile",
-      "sha256": "f2fc7a35076b8059c208d64b77d1a48ce44b9a314e604ae06466e7fffb3acbb9",
+      "sha256": "c0abb37074a73e12f97baadc5e1844fdc7c474942c4d373ad339eaad2c4d07e3",
       "tracked": true
     },
     {
@@ -22,7 +22,7 @@
       "exists": true,
       "git_status": "clean",
       "path": "README.md",
-      "sha256": "560562d4d81817c1301b5b4bdc6dc9fb65ac49301fb9436262a0316dc912e241",
+      "sha256": "eda9339a2f07197d3de9a4a44040c4ccca6aa68b354c247fb43cae6703ad3adb",
       "tracked": true
     },
     {
@@ -38,7 +38,7 @@
       "exists": true,
       "git_status": "clean",
       "path": "docs/experiments.md",
-      "sha256": "eb30e4d4882b8d15bf9e593a7ed8b17a9f5a64c4a8d10ae2712ee6cbb17e418b",
+      "sha256": "53bb81f1684ca614024e85edbc35d90a223d91d2c2cd5e72ff8fbaa08546d687",
       "tracked": true
     },
     {
@@ -62,7 +62,7 @@
       "exists": true,
       "git_status": "clean",
       "path": "docs/progress_and_plan.md",
-      "sha256": "6d667edac11e17ab065fa0ddd927efb833503c8b58fb04ebf2b30dcd194ee430",
+      "sha256": "58e25b144f4d7ee2a7c5fd4b4fda0f2cac2304c9669d88a42cfed74f1ff77cc5",
       "tracked": true
     },
     {
@@ -438,7 +438,7 @@
       "exists": true,
       "git_status": "clean",
       "path": "tests/test_semantic_online_runner.py",
-      "sha256": "6e6bcba44dbf1ebf98424bda5bd9072afa7856f98ecbcf9231a29c590ed8fa43",
+      "sha256": "e1e38b61eae945c574996d6a4b998779d837aab163ff5b4a35d0a1f3b66f6877",
       "tracked": true
     },
     {
@@ -709,8 +709,8 @@
   "policy_loaded": false,
   "repository_binding_semantics": "latest commit that changed the frozen semantic commit scope; later commits may contain only out-of-scope protocols or audit packets",
   "repository_fully_clean": true,
-  "repository_head_commit": "34d7afebb4351e40d057d3f8e3dd19dfa434894d",
-  "repository_head_tree": "74bb6ff3d5977d1a4ea6aaf24f33a1964eafe98a",
+  "repository_head_commit": "447c00692e2152095a97928826a786aff9e4d56e",
+  "repository_head_tree": "4f47bcd5be2830711c412a84f41e889c062cd44e",
   "repository_status_row_count": 0,
   "schema": "proofalign.semantic-source-binding-e8-audit.v1",
   "simulator_created": false
