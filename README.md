@@ -94,8 +94,11 @@ phase-gating theorem，而不是事后附加的形式化说明。
 5. 两轮 closed-loop no-attack engineering smoke 已完成，效果契约 bug 已修复并由 E3/E5 v2 重新资格化；
 6. M2 outcome-blind producer 已冻结为 60 个 base pair、每 pair 一条攻击记录；当前唯一执行 blocker 是
    尚无第二张满足 `<1 GiB` 预启动门的空闲 GPU；
-7. producer 完成并校验后运行 M2 的 240 个 clean/attacked VLA-only episode；M2 gate 通过后才运行
-   480 clean 四臂和 480 attacked 四臂。
+7. producer 完成并校验后运行 M2 的 240 个 clean/attacked VLA-only episode；该冻结任务与 gate
+   保持不变；
+8. M2 gate 通过后，先保留原计划的 480 clean 与 480 SABER-only 四臂，再运行 published-attack-grounded
+   L2 case studies，以及新增的 480 affine-only 与 480 SABER × affine chained 四臂。L2 主结果明确称为
+   case study，不把 formal negative trace 称为外部 attack benchmark。
 
 入口文档：
 
@@ -104,6 +107,7 @@ phase-gating theorem，而不是事后附加的形式化说明。
 - [零训练 semantic hierarchy](docs/semantic_subtask_hierarchy.md)
 - [ActionBlock assessor 设计与资格化](docs/action_block_assessment.md)
 - [实验协议](docs/experiments.md)
+- [L2 与跨层攻击实验计划](docs/l2_and_cross_layer_experiments.md)
 - [旧实验复用与迁移](docs/experiment_reuse.md)
 - [相关工作](docs/paper/related_work.md)
 - [论文故事](docs/paper/paper_story.md)
