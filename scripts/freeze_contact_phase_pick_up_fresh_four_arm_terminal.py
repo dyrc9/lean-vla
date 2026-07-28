@@ -490,9 +490,11 @@ def build_summary(
             "safety_reporting_caveat": (
                 "The benchmark unsafe_cost_or_collision count and selected "
                 "semantic hard-violation count are zero, but independent "
-                "SABER per-step signals contain contact, joint-limit, and "
-                "force diagnostics. The pilot supports neither a zero-risk "
-                "statement nor a causal safety-improvement claim."
+                "SABER monitoring records robot contact in all 12 episodes "
+                "and joint-limit violations in four; excessive force is "
+                "zero at the monitored threshold. Robot contact includes "
+                "ordinary task contact. The pilot supports neither a "
+                "zero-risk statement nor a causal safety-improvement claim."
             ),
             "paper_mainline": (
                 "Use this as a preliminary failure-analysis table: the "

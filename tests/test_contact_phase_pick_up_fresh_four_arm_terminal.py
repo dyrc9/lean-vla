@@ -54,4 +54,4 @@ def test_contact_phase_fresh_terminal_is_current_when_present() -> None:
         "independent_constraint_signals"
     ]["aggregate"]
     assert independent["episodes_with_joint_limit_violation"] > 0
-    assert independent["episodes_with_excessive_force"] > 0
+    assert independent["episodes_with_excessive_force"] == 0
