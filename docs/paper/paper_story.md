@@ -211,8 +211,9 @@ M1 component closure
   -> end-to-end no-outcome identity/resource gate
   -> M2 VLA-only attack foundation（原 50% gate nonpass）
   -> disclosed post-outcome 40% exploratory continuation
-  -> clean four-arm exploratory stage
-  -> attacked four-arm exploratory stage（仅在 clean pass 后另行授权）
+  -> full-population clean initialization failure
+  -> support45 clean four-arm exploratory stage（360/360 valid，gate nonpass）
+  -> attacked four-arm exploratory stage（clean prerequisite 未过，停止且未授权）
 ```
 
 M2 artifact 不含新 v4 fixed-trace 所需的逐 proposal trusted geometry，因此不得补造该阶段。任何阶段
@@ -225,3 +226,12 @@ failure taxonomy；不能用一个 aggregate “safe success” 隐藏 unknown�
 fresh1 因此在首单元、dispatch 前 fail closed。静态支持率为 45/60=75%，原 `unknown=0` clean gate
 结构上不可通过。任何后续 45-pair support-conditioned 结果必须与 full-population failure 并列报告，
 不能把它写成原 480 设计完成。
+
+45-pair clean 后继现已终态完成，且给出比 full-population 初始化失败更直接的闭环反证：360/360
+episodes valid，但 VLA-only、Execution-only、Semantic-only、Dual 的 strict clean success 分别为
+61/90、66/90、0/90、0/90；Dual deadlock 88/90，`Dual−VLA=-67.78pp`，base-pair cluster 95% CI
+`[-80.00pp,-55.56pp]`。两个 semantic-enabled arms 的终止分布完全一致：各 36/90
+`missing_destination_geometry`、54/90 `no_feasible_checked_action_block`。前者涉及 18/45 retained
+base pairs，说明静态 audit 只是 wrapper-initialization support；后者的终止 K=1 candidate 全部低于
+冻结的 2 mm progress 条件。该 nonpass 将论文的正面 claim 限定为双层问题分解、Lean transaction、
+证据绑定与 failure localization；不支持当前 Dual defense efficacy。Stage C 不执行，阈值不结果后改写。

@@ -17,7 +17,7 @@
 | Closed-loop no-attack smoke | 工程链路通过、活性风险待量化 | 2 个 effect-allow prefix、10 个 exact receipts；随后 K=1 proposal 被 L1 fail-closed |
 | M2 confirmatory foundation | 终局 nonpass | 240/240 valid；39/86 transition=`45.35%`，95% cluster CI `[32.93%,57.78%]`；原 50% gate 未通过 |
 | Four-arm v4 full population | 结构性不可执行/不可通过 | fresh1 首单元在 dispatch 前 fail closed；15/60 affordance pairs 缺少可信 part geometry，而 clean gate 要求 0 unknown |
-| Support-conditioned successor | clean 已授权、等待 GPU | 45 pairs / 90 units / 360 episodes；M2 subset 30/67=`44.78%`；one-shot launcher 等待两张 `<1024 MiB` GPU |
+| Support-conditioned successor | clean 终局 nonpass | 360/360 valid；VLA-only 61/90、Execution-only 66/90、Semantic-only/Dual 0/90 strict success；Dual deadlock 88/90，attacked 未授权 |
 
 论文主故事仍是两层对齐，而不是 SemanticSubtask 本身。当前最重要的科学风险集中在 L1：
 
@@ -35,12 +35,19 @@ control。
 
 1. 保留 M2 原 50% terminal nonpass，并在正文/附录披露 40% 是 outcome-informed continuation；
 2. 报告 fresh1 零 dispatch/零有效 ledger 的 semantic-support fail-closed，不隐藏 full-population coverage failure；
-3. 已冻结 45-pair support-conditioned fresh2；两张 GPU 合格后执行 360 clean episodes；
-4. 不为 affordance suite 虚构 part geometry，也不从 M2 artifact 伪造 fixed-trace shadow；
-5. support-conditioned clean gate 通过后，才另行授权同一支持集的 attacked exploratory stage；
-5. 保持 E7 camera/deployment perception 为独立未关闭 claim，不混入 benchmark 结果；
-6. 分别报告 safety、utility、coverage、unknown 和 deadlock，不扩大到 physical safety。
+3. 报告 support45 clean 的完整 nonpass：360/360 valid，Dual 0/90 strict success、88/90 deadlock，
+   `Dual−VLA=-67.78pp`，cluster 95% CI `[-80.00pp,-55.56pp]`；
+4. 把 18/45 pair 的初始 `missing_destination_geometry` 与其余路径最终 K=1/2 mm reject 分开报告，
+   并更正“45-pair supported”为“45-pair wrapper-initializable”；
+5. attacked stage 因 clean prerequisite 未过而停止，不再追加当前协议 rollout，也不结果后降低 checker
+   threshold；
+6. 论文转为“可审计双层体系 + coverage/availability failure taxonomy”的诚实系统论文主线；若未来恢复
+   efficacy claim，先用独立 split 重做 L1 closed-loop qualification 并另行冻结新协议；
+7. 保持 E7 camera/deployment perception 与 MuJoCo `ncon=5000` warning 为明确 limitation，分别报告
+   utility、coverage、unknown、deadlock 和 simulator diagnostics，不扩大到 physical safety。
 
 当前已经执行这一路线回退：论文使用“双层对齐 + deterministic privileged-geometry task-FSM +
 analytic checker”的窄版本。raw π0.5 selector 与 semantic prompt control 的失败应作为结果如实报告，
-不能为了保留 learned hierarchy 叙事而放宽 gate。
+不能为了保留 learned hierarchy 叙事而放宽 gate。support45 clean 进一步证明当前窄版本尚不能支撑
+positive defense-efficacy claim；可保留的核心贡献是问题分解、形式化 transaction、证据绑定协议和
+闭环失败定位，而不是 Dual 优于 baseline。

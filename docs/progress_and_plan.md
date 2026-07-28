@@ -17,8 +17,8 @@ hypothesis-generating evidence：
 - 不把 M2 或后续四臂结果称为 confirmatory；
 - M2 产物缺少重建新 v4 semantic assessment 所需的逐 proposal trusted geometry，因此不伪造
   fixed-trace Stage A；
-- 当前只授权 480-episode clean four-arm Stage B；
-- attacked Stage C 仍未授权，必须等 clean terminal gate 后另行绑定；
+- 该后继当时只授权 480-episode clean four-arm Stage B；
+- attacked Stage C 未授权，并以 clean terminal gate 为前置条件；
 - fresh root、append-only ledger、首个 invalid 即停止、checkpoint/source/checkout/GPU/disk gate
   均 fail closed。
 
@@ -35,9 +35,19 @@ trusted BDDL goal 只有 `Checkgrippercontactpart`，已资格化 semantic wrapp
 - support-conditioned 45-pair population 有 90 units、每 stage 360 episodes；
 - 该支持集上的 post-outcome M2 描述性 transition 为 30/67=`44.78%`，cluster 95% CI
   `[30.77%,59.09%]`，仍超过披露的 40% exploratory threshold；
-- 用户已明确授权新的 support-conditioned fresh2。协议、360-row schedule/analysis、runner 与 one-shot
-  launcher 已冻结并通过全量门禁；当前 launcher 等待两张不同且各 `<1024 MiB` 的 GPU，尚未创建
-  fresh2 output root。它不能称为 fresh1 重试或 full-population 结果。
+- 用户明确授权的 support-conditioned fresh2 已终态完成：360/360 episodes valid，artifact/checksum/
+  terminal recomputation 全部通过，但分类为 `support45_clean_gate_nonpass`；
+- VLA-only strict clean success 为 61/90，Execution-only 为 66/90，Semantic-only 与 Dual 均为
+  0/90；Dual deadlock 88/90、phase completion 0/90、相对 VLA-only 的 strict-success 差为
+  `-67.78pp`，base-pair cluster 95% CI `[-80.00pp,-55.56pp]`；
+- 两个 semantic-enabled arms 各有 36/90 `missing_destination_geometry` 和 54/90
+  `no_feasible_checked_action_block`。前者涉及 18/45 base pairs，证明先前 45-pair audit 只建立
+  wrapper/BDDL 初始化支持，不建立在线 trusted-geometry 或闭环支持；后者的终止 K=1 candidate
+  全部低于冻结的 2 mm progress 条件；
+- terminal summary 已冻结为
+  `experiments/proofalign_four_arm_v4_support45_clean_terminal_summary.json`。该结果不能称为 fresh1
+  重试、full-population 或 confirmatory 结果；clean prerequisite 未通过，因此 Stage C attacked
+  不授权、不启动，且不再为当前协议追加 clean retry。
 
 ## 0A. 2026-07-27 qualification 与工程 smoke checkpoint
 
@@ -82,15 +92,18 @@ trusted BDDL goal 只有 `Checkgrippercontactpart`，已资格化 semantic wrapp
 `experiments/proofalign_semantic_post_e5_readiness_packet_v1.json` 当前判定
 benchmark privileged-geometry no-outcome stack 完整；deployment perception 仍未资格化。
 
-剩余 blocker：
+当前 blocker 与停止边界：
 
-1. 等待两张 `<1024 MiB` GPU；launcher 完整 preflight 后启动 45-pair/360-episode clean fresh2；
-2. 禁止复用已失败 fresh1，禁止跳过 fresh2 的首个 invalid 停止规则；
-3. support-conditioned clean gate 通过后，才可另行授权同一支持集上的 attacked stage；
-4. 所有结果保持 exploratory 标签，不得回写原 50% M2 nonpass；
-5. E9 暴露的 K=1 clean availability/deadlock 风险进入报告，不反向修改冻结阈值；
-6. E7 perception 数据仍阻断 camera-only deployment claim，但不阻断明确标注 privileged geometry 的
-   benchmark 论文主线。
+1. 当前 L1 不具备闭环 clean availability：初始化支持集内仍有 18/45 base pairs 在第 0 proposal
+   缺 destination geometry，其余路径最终被 K=1/2 mm checker 拒绝；
+2. attacked Stage C 以 clean gate 为冻结前置条件，现已永久阻断于本协议；不得把“继续跑攻击”用于绕过
+   clean nonpass；
+3. 所有结果保持 exploratory 标签，不得回写原 50% M2 nonpass，也不得结果后降低 2 mm checker 条件；
+4. 下一步只做不产生 efficacy outcome 的 L1 redesign/qualification：把 geometry availability 纳入
+   population gate，并在独立 clean qualification split 上验证 trajectory-level coverage、K 候选策略和
+   false-allow/false-reject；
+5. E7 perception 数据仍阻断 camera-only deployment claim；当前 privileged-geometry benchmark 也必须先
+   解决上述在线 geometry closure，不能再把初始化成功当作部署支持。
 
 ## 0B. 2026-07-24 历史收工 checkpoint
 
@@ -249,12 +262,14 @@ negative tests。v3 frozen digest fixture 保持不变。全量 Python 测试为
 
 ## 4. 当前 blocker 排序
 
-1. **M2 terminal evidence**：producer 已完成，victim 正在授权 fresh root 中运行；完成前不读取中间
-   outcome，也不启动依赖其结果的四臂 rollout；
-2. **closed-loop clean availability**：E9 v2 的前两个 prefix 均 effect-allow，第三个 K=1 proposal
-   被 L1 在 dispatch 前拒绝；作为 deadlock/utility 信号进入后续报告，不反向调冻结阈值。
+1. **L1 closed-loop availability**：support45 clean 中 Semantic-only/Dual 都是 0/90 strict success、
+   88/90 deadlock；36/90 initial geometry unknown 与 54/90 K=1 action reject 构成当前首要主线缺口；
+2. **Population qualification mismatch**：先前静态 audit 只证明 BDDL/task-graph 初始化，不能再命名为
+   closed-loop support；新设计必须在 outcome 前验证 online geometry availability 与 trajectory-level
+   coverage；
 3. **Deployment perception qualification data**：E7 已证明当前 RLDS 缺少 7 类必要监督；这是
-   camera-only deployment claim blocker，不是 privileged-geometry benchmark 主线的先决 gate。
+   camera-only deployment claim blocker；privileged-geometry benchmark 也仍需先关闭在线 geometry
+   availability。
 
 E8 已绑定 clean commit，semantic scope 未绑定路径为 `0`。E7 仍是 deployment claim blocker，但不阻止
 明确标注 privileged geometry 的 benchmark M2。
@@ -299,12 +314,13 @@ M1 producer/victim、shared runner、fixed-trace exporter、validator 和 outcom
 - 更新 Lean source binding、关键 theorem inventory 和 scoped Python-equivalence artifact；
 - 完成 zero-dispatch fixed-trace、latency/resource smoke 和 fresh-root validator。
 
-### M2：240 episode
+### M2 与四臂 clean 终局
 
 60-record outcome-blind producer 与 240-episode victim 均已终态完成。M2 rate 为 45.35%，原 50%
 confirmatory gate nonpass；结果后 40% exploratory continuation 的 full-population fresh1 又因
-semantic support coverage 在首单元 dispatch 前 fail closed。当前等待是否授权 45-pair
-support-conditioned fresh2。
+semantic support coverage 在首单元 dispatch 前 fail closed。随后单独授权的 45-pair support-conditioned
+fresh2 已完成 360/360 valid episodes，但 clean gate nonpass：Dual 0/90 strict success、88/90 deadlock，
+因此 attacked stage 不再进入当前论文执行链。
 
 ## 6. 当前可声称与不可声称
 
@@ -353,9 +369,10 @@ C1 semantic digest schema（已实现）
   -> v4 fixed-trace shadow（因缺少可信逐 proposal geometry 而跳过，不伪造）
   -> v4 clean fresh1（首 episode 初始化前 fail closed，0 valid ledger rows）
   -> semantic-support audit（45/60 supported；full population structurally infeasible）
-  -> support-conditioned clean 360 episodes（已授权；launcher 等待两张合格 GPU）
-  -> clean terminal gate
-  -> support-conditioned attacked 360 episodes（须 clean pass + 新授权）
+  -> support-conditioned clean 360 episodes（已完成；360/360 valid）
+  -> clean terminal gate（nonpass：Dual 0/90，deadlock 88/90）
+  -> support-conditioned attacked 360 episodes（前置 gate 未过，未授权且不执行）
+  -> L1 closed-loop coverage redesign / independent no-efficacy qualification
 ```
 
 当前继续使用预先资格化的 deterministic task-FSM L1。40% 只改变是否继续收集探索性四臂证据，
@@ -369,8 +386,9 @@ M2 producer/victim 的 240-episode population、stopping rule、原 50% gate 和
 
 论文主线与次要 stress study 现在明确分开：
 
-1. 论文事实链是 M2 confirmatory nonpass → disclosed 40% post-outcome exploratory continuation →
-   clean four-arm gate →（若 clean pass）separately authorized attacked four-arm；
+1. 已观察的论文事实链是 M2 confirmatory nonpass → disclosed 40% post-outcome exploratory
+   continuation → full-population initialization-support failure → support45 clean-gate nonpass；attacked
+   four-arm 因冻结前置条件未过而停止；
 2. online runner 已将 L1 semantic alignment 与 L2 execution integrity 拆成独立开关。closed-loop 不要求
    跨 L1 source chunk 相同，只要求 paired initial identity 和 within-L1 L2 pair 的首个 policy input/output
    identity；
@@ -382,8 +400,9 @@ M2 producer/victim 的 240-episode population、stopping rule、原 50% gate 和
    limitation；需要 GPU 的 12-episode smoke 只检查接口，不比较 efficacy；
 6. ROS 没有真实 graph 时只称 adapted captured-prefix replay；feedback-linearized FDIA 当前保持
    `interface_not_supported`；
-7. terminal analysis 使用完整 population、保守 missing/invalid、base-pair cluster bootstrap、exact
-   McNemar 和 Holm；40% threshold change 必须始终披露为 outcome-driven exploratory decision。
+7. terminal analysis 使用完整 support-conditioned population、保守 missing/invalid 和 base-pair cluster
+   bootstrap；40% threshold change 必须始终披露为 outcome-driven exploratory decision。当前 45-pair
+   结果还必须披露 MuJoCo `ncon=5000` warning 176 次，因此 contact-proxy magnitude 不作扩大解释。
 
 Evidence naming 固定为：
 

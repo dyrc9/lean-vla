@@ -109,6 +109,7 @@ four-arm-v4-exploratory-check:
 	$(PYTHON) scripts/monitor_and_launch_four_arm_v4_clean.py --help >/dev/null
 	$(PYTHON) scripts/run_proofalign_four_arm_v4_support45_clean.py --help >/dev/null
 	$(PYTHON) scripts/monitor_and_launch_four_arm_v4_support45_clean.py --help >/dev/null
+	$(PYTHON) scripts/freeze_four_arm_v4_support45_terminal.py --help >/dev/null
 	@if [ -f results/proofalign_four_arm_v4_exploratory40_clean_20260727_fresh1/run_manifest.json ]; then \
 		$(PYTHON) scripts/audit_four_arm_v4_semantic_support.py --check; \
 	else \
@@ -119,6 +120,13 @@ four-arm-v4-exploratory-check:
 		$(PYTHON) scripts/freeze_four_arm_v4_support45_successor.py --check; \
 	else \
 		echo "Skipping support45 successor check: protocol or local-only failure evidence is absent"; \
+	fi
+	@if [ -f experiments/proofalign_four_arm_v4_support45_clean_terminal_summary.json ] && \
+	    [ -f results/proofalign_four_arm_v4_support45_clean_20260727_fresh2/analysis.json ] && \
+	    [ -f results/proofalign_four_arm_v4_support45_clean_launcher_20260727/clean_execution.log ]; then \
+		$(PYTHON) scripts/freeze_four_arm_v4_support45_terminal.py --check; \
+	else \
+		echo "Skipping support45 terminal check: tracked summary or local-only evidence is absent"; \
 	fi
 
 check: test lean paper-artifacts-check action-block-check m1-readiness-check semantic-v4-c5-check e1-selector-check e1-fallback-check e2-conditioning-check e3-checker-check e4-no-dispatch-check e5-effect-observer-check e6-resource-smoke-preflight-check e7-perception-preflight-check e8-source-binding-check semantic-post-e5-readiness-check four-arm-v4-check four-arm-v4-exploratory-check
