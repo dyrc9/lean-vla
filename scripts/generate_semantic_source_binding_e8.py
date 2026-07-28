@@ -140,6 +140,13 @@ COMMIT_SCOPE_PATHS = (
         "scripts/"
         "freeze_horizon_consistent_v7_four_arm_initial_terminal.py"
     ),
+    "scripts/freeze_contact_phase_pick_up_qualification.py",
+    "scripts/freeze_contact_phase_pick_up_regression.py",
+    "scripts/freeze_contact_phase_pick_up_fresh_four_arm.py",
+    (
+        "scripts/"
+        "freeze_contact_phase_pick_up_fresh_four_arm_terminal.py"
+    ),
     "scripts/generate_semantic_source_binding_e8.py",
     "scripts/generate_semantic_v4_equivalence_evidence.py",
     "scripts/prepare_deployment_perception_dataset_e7.py",
@@ -155,6 +162,7 @@ COMMIT_SCOPE_PATHS = (
     "scripts/run_l2_execution_attack_eval_v5.py",
     "scripts/run_l2_execution_attack_eval_v6.py",
     "scripts/run_l2_execution_attack_eval_v7.py",
+    "scripts/run_l2_execution_attack_eval_v8.py",
     (
         "scripts/"
         "run_horizon_consistent_pick_up_fresh_dual_pilot.py"
@@ -184,6 +192,8 @@ COMMIT_SCOPE_PATHS = (
         "run_horizon_consistent_release_regression_smoke.py"
     ),
     "scripts/run_horizon_consistent_v7_four_arm_initial.py",
+    "scripts/run_contact_phase_pick_up_qualification.py",
+    "scripts/run_contact_phase_pick_up_clean_pilot.py",
     "scripts/run_pick_up_prefix_progress_replay_qualification.py",
     "scripts/run_four_arm_v4_l1_repair_qualification.py",
     "scripts/run_four_arm_v4_l1_repair_qualification_v2.py",
@@ -217,6 +227,7 @@ COMMIT_SCOPE_PATHS = (
     "src/proofalign/horizon_consistent_release.py",
     "src/proofalign/horizon_consistent_release_h4.py",
     "src/proofalign/horizon_consistent_release_prefix.py",
+    "src/proofalign/contact_phase_pick_up.py",
     "src/proofalign/semantic_action_selection.py",
     "src/proofalign/semantic_effect_observer.py",
     "src/proofalign/semantic_local_checker.py",
@@ -239,6 +250,11 @@ COMMIT_SCOPE_PATHS = (
     "tests/test_horizon_consistent_release_prefix.py",
     "tests/test_horizon_consistent_v7_four_arm_initial.py",
     "tests/test_horizon_consistent_v7_four_arm_initial_terminal.py",
+    "tests/test_contact_phase_pick_up.py",
+    "tests/test_contact_phase_pick_up_qualification.py",
+    "tests/test_contact_phase_pick_up_regression.py",
+    "tests/test_contact_phase_pick_up_fresh_four_arm.py",
+    "tests/test_contact_phase_pick_up_fresh_four_arm_terminal.py",
     "tests/test_local_checker_qualification_e3.py",
     "tests/test_l1_repair_qualification.py",
     "tests/test_l1_repair_qualification_v2.py",
@@ -408,6 +424,23 @@ COMMIT_SCOPE_PATHS = (
         "proofalign_horizon_consistent_v7_four_arm_"
         "initial_terminal_summary.json"
     ),
+    (
+        "experiments/"
+        "proofalign_contact_phase_pick_up_qualification_protocol.json"
+    ),
+    (
+        "experiments/"
+        "proofalign_contact_phase_pick_up_regression_protocol.json"
+    ),
+    (
+        "experiments/"
+        "proofalign_contact_phase_pick_up_fresh_four_arm_protocol.json"
+    ),
+    (
+        "experiments/"
+        "proofalign_contact_phase_pick_up_fresh_four_arm_"
+        "terminal_summary.json"
+    ),
     "experiments/proofalign_pi05_action_conditioning_e2_protocol.json",
     "experiments/proofalign_pi05_selector_e1_protocol.json",
     (
@@ -496,6 +529,30 @@ EVIDENCE_PATHS = (
     (
         "results/proofalign_horizon_consistent_v7_four_arm_initial_"
         "20260728_fresh2/SHA256SUMS"
+    ),
+    (
+        "results/proofalign_contact_phase_pick_up_qualification_"
+        "20260728_fresh1/qualification.json"
+    ),
+    (
+        "results/proofalign_contact_phase_pick_up_qualification_"
+        "20260728_fresh1/SHA256SUMS"
+    ),
+    (
+        "results/proofalign_contact_phase_pick_up_regression_"
+        "20260728_fresh1/pilot_evidence.json"
+    ),
+    (
+        "results/proofalign_contact_phase_pick_up_regression_"
+        "20260728_fresh1/SHA256SUMS"
+    ),
+    (
+        "results/proofalign_contact_phase_pick_up_fresh_four_arm_"
+        "20260728_fresh1/pilot_evidence.json"
+    ),
+    (
+        "results/proofalign_contact_phase_pick_up_fresh_four_arm_"
+        "20260728_fresh1/SHA256SUMS"
     ),
 )
 
