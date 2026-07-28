@@ -44,6 +44,8 @@ COMMIT_SCOPE_PATHS = (
         "scripts/"
         "freeze_four_arm_v4_l1_repair_qualification_terminal.py"
     ),
+    "scripts/freeze_four_arm_v4_l1_block10_qualification.py",
+    "scripts/freeze_four_arm_v4_l1_block10_terminal.py",
     "scripts/generate_semantic_source_binding_e8.py",
     "scripts/generate_semantic_v4_equivalence_evidence.py",
     "scripts/prepare_deployment_perception_dataset_e7.py",
@@ -56,6 +58,7 @@ COMMIT_SCOPE_PATHS = (
     "scripts/run_l2_execution_attack_eval_v2.py",
     "scripts/run_four_arm_v4_l1_repair_qualification.py",
     "scripts/run_four_arm_v4_l1_repair_qualification_v2.py",
+    "scripts/run_four_arm_v4_l1_block10_qualification.py",
     "scripts/run_local_checker_qualification_e3.py",
     "scripts/run_pi05_action_conditioning_e2.py",
     "scripts/run_pi05_selector_qualification_e1.py",
@@ -85,6 +88,7 @@ COMMIT_SCOPE_PATHS = (
     "tests/test_local_checker_qualification_e3.py",
     "tests/test_l1_repair_qualification.py",
     "tests/test_l1_repair_qualification_v2.py",
+    "tests/test_l1_block10_qualification.py",
     "tests/test_pi05_action_conditioning_e2.py",
     "tests/test_pi05_selector_qualification.py",
     "tests/test_semantic_effect_observer.py",
@@ -123,6 +127,14 @@ COMMIT_SCOPE_PATHS = (
     (
         "experiments/"
         "proofalign_four_arm_v4_l1_repair_qualification_terminal_summary.json"
+    ),
+    (
+        "experiments/"
+        "proofalign_four_arm_v4_l1_block10_qualification_protocol.json"
+    ),
+    (
+        "experiments/"
+        "proofalign_four_arm_v4_l1_block10_terminal_summary.json"
     ),
     "experiments/proofalign_pi05_action_conditioning_e2_protocol.json",
     "experiments/proofalign_pi05_selector_e1_protocol.json",

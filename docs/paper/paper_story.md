@@ -243,3 +243,11 @@ qualification 显示：exact simulator site/body geometry 将初态 coverage 补
 24/45，21 个失败样本的最佳 predicted progress 最高仅 `1.738mm < 2mm`。这支持“geometry gap
 可定位并修复，但当前公开 π0.5 的 bounded resampling 不能恢复 L1 availability”的负结论，不授权
 新 clean 或 attacked efficacy rollout，也不能用来覆盖原 support45 nonpass。
+
+随后冻结的 Block-10 successor 在逐任务不重叠 init、新 env/policy seed 上把 K 固定为1，只改变
+checked prefix length，并对同一个 source chunk shadow-check H=2/5/10。在不改变2 mm progress、
+0.5 projection 与 hard constraints 的条件下，availability 为 `0/45, 17/45, 36/45`；配对 pattern
+为 `000:9, 001:19, 011:17`，说明从 H=5 到 H=10 有19个 gain、0个 loss。该结果支持“公开 π0.5
+需要更长时间尺度才能显现局部语义进展”，但 H=10 总率80%与最差 suite 73.33%仍低于冻结 gate，
+所以仍是 qualification nonpass。论文可将其作为 matched block-size availability ablation，不能写成
+trajectory success、攻击防御或 Dual efficacy。

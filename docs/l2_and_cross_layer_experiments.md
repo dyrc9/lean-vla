@@ -319,6 +319,11 @@ support45 终局后的 post-outcome L1 repair 另行做了 zero-dispatch/no-outc
 原 v4 efficacy stage：exact simulator geometry 达到 45/45，但 K=4 availability 为 24/45=`53.33%`
 且 worst suite 7/15，未通过 90%/80% gates。K=1 到 K=4 的累计 coverage 均为 24/45，因此不能用
 “更多采样”解释为已恢复 clean utility；该 nonpass 不改变 Stage C 的停止状态。
+
+另行冻结的 Block-10 successor 用不重叠 init 和新 seed 将 K 固定为1，对同一个 source chunk
+匹配检查 H=2/5/10，availability 为 `0/45, 17/45, 36/45`。H=10 相对 H=5 有19个 gain、0个
+loss，但总80%与 worst-suite 73.33%仍未通过90%/80% gates；因此它只进入 block-size
+availability ablation，不恢复 clean/attacked execution authorization。
 P1/P2/P3 保留为次要 trust-boundary stress table：P2 的 after-one-step detection 不能算 prevention，P3
 也不能期待被 exact digest 单独解决。
 
