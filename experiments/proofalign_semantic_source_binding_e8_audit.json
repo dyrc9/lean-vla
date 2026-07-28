@@ -3,7 +3,7 @@
   "audit_id": "proofalign-semantic-source-binding-e8-20260725",
   "audit_source": {
     "path": "scripts/generate_semantic_source_binding_e8.py",
-    "sha256": "27494c581f41bc7799bd5cd4f9a2f1fde45571b6704ea83dddea8df8b4ed2343"
+    "sha256": "6194812d2ea88a65fb6be8acd07efbc1ffcb66e1b71e968b22e508b67e88949a"
   },
   "claim_boundary": "This read-only audit binds the current semantic source scope, local evidence inventory, latest source-scope commit, and OpenPI checkout. A not-clean classification does not modify or commit the worktree. A clean classification would establish provenance only, not perception quality, efficacy, outcome, or safety.",
   "classification": "semantic_source_binding_clean",
@@ -357,8 +357,24 @@
       "bound_to_head": true,
       "exists": true,
       "git_status": "clean",
+      "path": "scripts/freeze_horizon_consistent_v7_four_arm_initial.py",
+      "sha256": "46912c2d9e681b9bc4c015cb0f81ce860b9b8dabbf691432dd638cc150f8858c",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/freeze_horizon_consistent_v7_four_arm_initial_terminal.py",
+      "sha256": "18b8a233936fa757fd095fafd04a91358b806ab97d74018f90164e8cf7c2e7d5",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
       "path": "scripts/generate_semantic_source_binding_e8.py",
-      "sha256": "27494c581f41bc7799bd5cd4f9a2f1fde45571b6704ea83dddea8df8b4ed2343",
+      "sha256": "6194812d2ea88a65fb6be8acd07efbc1ffcb66e1b71e968b22e508b67e88949a",
       "tracked": true
     },
     {
@@ -527,6 +543,14 @@
       "git_status": "clean",
       "path": "scripts/run_horizon_consistent_release_regression_smoke.py",
       "sha256": "cbb09e8f4e6b2b098fe4762a628e09c13a8ddfa263b985d91e5bc5634edf8c45",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/run_horizon_consistent_v7_four_arm_initial.py",
+      "sha256": "32fd44f09e6a601da95d80755971fa3f9a5396add3fa29ed5b9866c5e9a5ca34",
       "tracked": true
     },
     {
@@ -879,6 +903,22 @@
       "git_status": "clean",
       "path": "tests/test_horizon_consistent_release_prefix.py",
       "sha256": "5523bbba54184426aacf84f9057ca188b494e75b59f1bfaa0e4569c1ee40ca16",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_horizon_consistent_v7_four_arm_initial.py",
+      "sha256": "192de80c1a6a7a5aa1ae831151331cb82c97e8668c2baa06ed8137613044156c",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_horizon_consistent_v7_four_arm_initial_terminal.py",
+      "sha256": "1f6ad05372debe93171a6a5553f3072de2231633dd5be1056666661ad879d348",
       "tracked": true
     },
     {
@@ -1341,6 +1381,22 @@
       "bound_to_head": true,
       "exists": true,
       "git_status": "clean",
+      "path": "experiments/proofalign_horizon_consistent_v7_four_arm_initial_protocol.json",
+      "sha256": "42b738f03fd28cf60936ac0924244e013b66b6f7e2689c98662e6b18b672e9c2",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_horizon_consistent_v7_four_arm_initial_terminal_summary.json",
+      "sha256": "3cafab04c70b2c0a4535d2f6a0087ba4d9044905c0791065de62812bed20c2d2",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
       "path": "experiments/proofalign_pi05_action_conditioning_e2_protocol.json",
       "sha256": "079cf5566f49f44cd7ade70cf9cc5a96ef8d539bf5754ad01ad0d1e31e56be6e",
       "tracked": true
@@ -1530,6 +1586,18 @@
       "ignored_by_git": true,
       "path": "results/proofalign_four_arm_v4_l1_progress_projection_qualification_20260728_fresh1/SHA256SUMS",
       "sha256": "5bc064b385369301f73c0c5c9ba1648c723405d0135849ad77ad31a1706906ac"
+    },
+    {
+      "exists": true,
+      "ignored_by_git": true,
+      "path": "results/proofalign_horizon_consistent_v7_four_arm_initial_20260728_fresh2/initial_evidence.json",
+      "sha256": "8cabd87764139ffd8813a8180d3ad99fa8ad61f7c0a3981879aead38f13dd486"
+    },
+    {
+      "exists": true,
+      "ignored_by_git": true,
+      "path": "results/proofalign_horizon_consistent_v7_four_arm_initial_20260728_fresh2/SHA256SUMS",
+      "sha256": "e540d5b32a1abd07dba6ccb364923dbd46cd113acfab55d9d46072685ffaf293"
     }
   ],
   "evidence_inventory_complete": true,
@@ -1545,8 +1613,8 @@
   "policy_loaded": false,
   "repository_binding_semantics": "latest commit that changed the frozen semantic commit scope; later commits may contain only out-of-scope protocols or audit packets",
   "repository_fully_clean": true,
-  "repository_head_commit": "cdda7f8e5a07c3f117319562438f70cd0e40fd7e",
-  "repository_head_tree": "172afde143c8c03189f59d2912e2281c3967d69b",
+  "repository_head_commit": "5af1f885edc4f8c6c4c9110751f98cf1c4bf707c",
+  "repository_head_tree": "851b975555426b6e9ada146bcb278382d07a9eea",
   "repository_status_row_count": 0,
   "schema": "proofalign.semantic-source-binding-e8-audit.v1",
   "simulator_created": false
