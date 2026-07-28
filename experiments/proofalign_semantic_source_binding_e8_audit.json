@@ -366,7 +366,7 @@
       "exists": true,
       "git_status": "clean",
       "path": "scripts/freeze_horizon_consistent_v7_four_arm_initial_terminal.py",
-      "sha256": "18b8a233936fa757fd095fafd04a91358b806ab97d74018f90164e8cf7c2e7d5",
+      "sha256": "4afb235e2fa937fa3605ff30e23ad698c18e94d105f26747b8f6681c18be6a9e",
       "tracked": true
     },
     {
@@ -918,7 +918,7 @@
       "exists": true,
       "git_status": "clean",
       "path": "tests/test_horizon_consistent_v7_four_arm_initial_terminal.py",
-      "sha256": "1f6ad05372debe93171a6a5553f3072de2231633dd5be1056666661ad879d348",
+      "sha256": "235d1953f0cde1ea02511bf6b66ddb2490d611455c5a029e843551bccb4f510d",
       "tracked": true
     },
     {
@@ -1390,7 +1390,7 @@
       "exists": true,
       "git_status": "clean",
       "path": "experiments/proofalign_horizon_consistent_v7_four_arm_initial_terminal_summary.json",
-      "sha256": "3cafab04c70b2c0a4535d2f6a0087ba4d9044905c0791065de62812bed20c2d2",
+      "sha256": "1465249485bd33d2fd8be75862c85f30e5eb9e6408d427bfa52a178707ffbe9e",
       "tracked": true
     },
     {
@@ -1613,8 +1613,8 @@
   "policy_loaded": false,
   "repository_binding_semantics": "latest commit that changed the frozen semantic commit scope; later commits may contain only out-of-scope protocols or audit packets",
   "repository_fully_clean": true,
-  "repository_head_commit": "5af1f885edc4f8c6c4c9110751f98cf1c4bf707c",
-  "repository_head_tree": "851b975555426b6e9ada146bcb278382d07a9eea",
+  "repository_head_commit": "db61f11cca0a25ed08dd5a882fb1485915ece8ce",
+  "repository_head_tree": "1b7ea5516c75a44c5f6aa4ee4bc276d1b5793ce9",
   "repository_status_row_count": 0,
   "schema": "proofalign.semantic-source-binding-e8-audit.v1",
   "simulator_created": false
