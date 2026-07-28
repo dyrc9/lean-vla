@@ -3,7 +3,7 @@
   "audit_id": "proofalign-semantic-source-binding-e8-20260725",
   "audit_source": {
     "path": "scripts/generate_semantic_source_binding_e8.py",
-    "sha256": "ca8adc8394f157166d0191f150243446db7edb95484bacb00b0710bc1550410a"
+    "sha256": "27494c581f41bc7799bd5cd4f9a2f1fde45571b6704ea83dddea8df8b4ed2343"
   },
   "claim_boundary": "This read-only audit binds the current semantic source scope, local evidence inventory, latest source-scope commit, and OpenPI checkout. A not-clean classification does not modify or commit the worktree. A clean classification would establish provenance only, not perception quality, efficacy, outcome, or safety.",
   "classification": "semantic_source_binding_clean",
@@ -261,8 +261,104 @@
       "bound_to_head": true,
       "exists": true,
       "git_status": "clean",
+      "path": "scripts/freeze_horizon_consistent_pick_up_fresh_dual_pilot.py",
+      "sha256": "7d88bd74a83b007e4e7d777bc46e736cd7684b24aa8f6318c4a4d1196c6b4715",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/freeze_horizon_consistent_pick_up_fresh_dual_pilot_terminal.py",
+      "sha256": "c3a717cea4256fa06b8a89ad6195407fe7a5185b4c4770cf7ec64821aa201ef0",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/freeze_horizon_consistent_release_h4_regression_smoke.py",
+      "sha256": "0e84b7786a9d9d60b5d6ab92278a0b36caf746c221bbbdb832db3c48a24253e8",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/freeze_horizon_consistent_release_h4_regression_smoke_terminal.py",
+      "sha256": "bdf43c417a0a1ada300cf75d5691d6df4c098f1eada38ffbf000669f1cd0b3d4",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/freeze_horizon_consistent_release_h4_regression_smoke_v2.py",
+      "sha256": "a1f0246aac7651e2ad62be995b02fa98656a17350d4ac32248800e6664671477",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/freeze_horizon_consistent_release_prefix_regression_smoke.py",
+      "sha256": "f44049767e4689c236230ffb6c1d368729641d550ab7207f9d78b294f54b8adc",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/freeze_horizon_consistent_release_prefix_regression_smoke_terminal.py",
+      "sha256": "0ec46c6f4e302a7a5b6ec8ab759830d559483a306fc312fc6fff5adf5023ca0a",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/freeze_horizon_consistent_release_qualification.py",
+      "sha256": "6064ccc777d20dfe91a59a94b11bad814949e3ead3279e4e25d046e646bed883",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/freeze_horizon_consistent_release_qualification_terminal.py",
+      "sha256": "f406696d53f836138202b91a3b50d1f28ae84a06718af8eeb2120ad3767bca47",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/freeze_horizon_consistent_release_qualification_v2.py",
+      "sha256": "495771661c025f8419f128f4456ef61e2b6c837875b4eb3c56a808fa51e032f2",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/freeze_horizon_consistent_release_regression_smoke.py",
+      "sha256": "d0a565c65b016175a9b3a69347f821a12abf6215c85495215a6f333272ef5571",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/freeze_horizon_consistent_release_regression_smoke_terminal.py",
+      "sha256": "9094e736a3ce4540f563366e29e944a7cb4c6391d763e4a5ec0e3adf9dfe8228",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
       "path": "scripts/generate_semantic_source_binding_e8.py",
-      "sha256": "ca8adc8394f157166d0191f150243446db7edb95484bacb00b0710bc1550410a",
+      "sha256": "27494c581f41bc7799bd5cd4f9a2f1fde45571b6704ea83dddea8df8b4ed2343",
       "tracked": true
     },
     {
@@ -357,6 +453,38 @@
       "bound_to_head": true,
       "exists": true,
       "git_status": "clean",
+      "path": "scripts/run_l2_execution_attack_eval_v5.py",
+      "sha256": "755dda72b9df446e4ffe63094fe01ab027a95852c355b6c5ac7565f51b6b9cf9",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/run_l2_execution_attack_eval_v6.py",
+      "sha256": "d38d4023829e3420127c027288a248e4bba0eeef2a776e91551da71bd1d0a88c",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/run_l2_execution_attack_eval_v7.py",
+      "sha256": "3f63cbbc02d1b974780db422eb88f13607d89313ebd9f61523c8d685483baf98",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/run_horizon_consistent_pick_up_fresh_dual_pilot.py",
+      "sha256": "eec47c25c801c3a4621ab25d370a3c47b316edc934f60a932ff9ed50b42aa3b1",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
       "path": "scripts/run_horizon_consistent_pick_up_phase_transition_smoke.py",
       "sha256": "c9131ce697e042fa2cc8873496460751e5285d9563601325fdd33306ca790a7b",
       "tracked": true
@@ -367,6 +495,38 @@
       "git_status": "clean",
       "path": "scripts/run_horizon_consistent_pick_up_regression_smoke.py",
       "sha256": "587df289f1a0abe435ea20550adc4c8fc5896e3e78e399649ec2dd6e3853c21f",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/run_horizon_consistent_release_h4_regression_smoke.py",
+      "sha256": "ffc292e51363169b35569f6b1e8778acb8da35cab73bb015618de37e770eedaf",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/run_horizon_consistent_release_prefix_regression_smoke.py",
+      "sha256": "80ea4972c8b427d7548cc194063352b5e9a9be57c619d4b62f2173babba0ca40",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/run_horizon_consistent_release_qualification.py",
+      "sha256": "d2ebaf90670eaabbd82bf6c4fc10a42dbcc4536015a05288d18b8cbabd1a1695",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/run_horizon_consistent_release_regression_smoke.py",
+      "sha256": "cbb09e8f4e6b2b098fe4762a628e09c13a8ddfa263b985d91e5bc5634edf8c45",
       "tracked": true
     },
     {
@@ -565,6 +725,30 @@
       "bound_to_head": true,
       "exists": true,
       "git_status": "clean",
+      "path": "src/proofalign/horizon_consistent_release.py",
+      "sha256": "27a9e98ab6807b1dd22f95927e8d88e86fe4c9311730a5e6e6ddd8387ccdd085",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "src/proofalign/horizon_consistent_release_h4.py",
+      "sha256": "f45076a2035f1940cce8beb416b1143cf063ac1e8853c182c18f845420cb7ff6",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "src/proofalign/horizon_consistent_release_prefix.py",
+      "sha256": "880e45ac6aa4e325c6c78e7a0aa45342ada751630c4d743ad8d1b66761177b9c",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
       "path": "src/proofalign/semantic_action_selection.py",
       "sha256": "2e35c9b5215005912b3288ae370baaa9633788ded4e05219e52304b90af70907",
       "tracked": true
@@ -661,8 +845,40 @@
       "bound_to_head": true,
       "exists": true,
       "git_status": "clean",
+      "path": "tests/test_horizon_consistent_pick_up_fresh_dual_pilot.py",
+      "sha256": "3744a34407ed541f33b4e45223b632903d157cfad3c43e08e408e91015b15c49",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
       "path": "tests/test_horizon_consistent_pick_up_smoke.py",
       "sha256": "ff43657eca00962ed304b4db6fcc5691603988acc7988e2af2e1a26bf2561746",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_horizon_consistent_release.py",
+      "sha256": "1ff6a17bdafda80fb946e164a8c30a6ddacab3c97f9f815a01400b6642414a2a",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_horizon_consistent_release_h4.py",
+      "sha256": "9ab9088b9062ccba00a236d7501b8f1c45338027fa0387f5323c3c5580db82b1",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_horizon_consistent_release_prefix.py",
+      "sha256": "5523bbba54184426aacf84f9057ca188b494e75b59f1bfaa0e4569c1ee40ca16",
       "tracked": true
     },
     {
@@ -1029,6 +1245,102 @@
       "bound_to_head": true,
       "exists": true,
       "git_status": "clean",
+      "path": "experiments/proofalign_horizon_consistent_pick_up_fresh_dual_pilot_protocol.json",
+      "sha256": "05fcad1d583c5083f332a4fd3a935674ca636af29c469da2b7828ddc1bce3363",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_horizon_consistent_pick_up_fresh_dual_pilot_terminal_summary.json",
+      "sha256": "094e60c1644e8f351479569aa9fcb08ce8400f429a77be4a92d9cff7c79be910",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_horizon_consistent_release_h4_regression_smoke_protocol.json",
+      "sha256": "86bb706c24e4dfb7584fa6d432dfadfdf1187f7cced7ec869e325542f363c1bb",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_horizon_consistent_release_h4_regression_smoke_terminal_summary.json",
+      "sha256": "c632cfa92f995bb36e1dc243c88a4e4465583488ef6b845e82ffab06a4e4fe4b",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_horizon_consistent_release_h4_regression_smoke_v2_protocol.json",
+      "sha256": "0bfb5bfeaeb57e67579c91f4f43c335a4f1c5e6d425346a8aae797d0e9d7d3ee",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_horizon_consistent_release_prefix_regression_smoke_protocol.json",
+      "sha256": "c0738ef5c6c6f6dcc6bb6e5d65cba552059012d13774534d8be776fadc77b475",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_horizon_consistent_release_prefix_regression_smoke_terminal_summary.json",
+      "sha256": "7692d958cc341d0a04208d149bcdc7c72d1f896322f8f4ec9f08da93517aff5d",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_horizon_consistent_release_qualification_protocol.json",
+      "sha256": "7a07d9b3b663f2f239a02ecd0d8e16d65578f9a8605cfbed6e0dde86ba8a22e2",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_horizon_consistent_release_qualification_terminal_summary.json",
+      "sha256": "cbce448f418f5c38d95c496e27f3431098e7fc764ac2d2f9b8d0bdd532e50382",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_horizon_consistent_release_qualification_v2_protocol.json",
+      "sha256": "9fcf8f0ef321d6302bfcc63642acf059e6858de7c855ebdbab118a633debd337",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_horizon_consistent_release_regression_smoke_protocol.json",
+      "sha256": "210bc0b57f7f1c6484c5f3f7acd0419c6c231bb396ce07fa7dcebea3c58f7036",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_horizon_consistent_release_regression_smoke_terminal_summary.json",
+      "sha256": "4e8b9c2b500af023cbafd690fe39de9dc509d120b73d31b661f6dd190ea4f37d",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
       "path": "experiments/proofalign_pi05_action_conditioning_e2_protocol.json",
       "sha256": "079cf5566f49f44cd7ade70cf9cc5a96ef8d539bf5754ad01ad0d1e31e56be6e",
       "tracked": true
@@ -1233,8 +1545,8 @@
   "policy_loaded": false,
   "repository_binding_semantics": "latest commit that changed the frozen semantic commit scope; later commits may contain only out-of-scope protocols or audit packets",
   "repository_fully_clean": true,
-  "repository_head_commit": "8d8501161a9722de473dcfd1c82d8caec40cda04",
-  "repository_head_tree": "cc0453cf7642baf4c1b3ec359fab14c36d2386cf",
+  "repository_head_commit": "cdda7f8e5a07c3f117319562438f70cd0e40fd7e",
+  "repository_head_tree": "172afde143c8c03189f59d2912e2281c3967d69b",
   "repository_status_row_count": 0,
   "schema": "proofalign.semantic-source-binding-e8-audit.v1",
   "simulator_created": false
