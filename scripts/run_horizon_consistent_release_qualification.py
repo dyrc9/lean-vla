@@ -37,6 +37,7 @@ from proofalign.semantic_local_checker import (  # noqa: E402
     TrustedLocalObservation,
 )
 from scripts import saber_io  # noqa: E402
+from scripts import run_saber_threat_validation_r5 as p0b  # noqa: E402
 
 
 PROTOCOL_SCHEMA = (
@@ -48,7 +49,7 @@ RESULT_SCHEMA = (
 DEFAULT_PROTOCOL = (
     REPO_ROOT
     / "experiments"
-    / "proofalign_horizon_consistent_release_qualification_protocol.json"
+    / "proofalign_horizon_consistent_release_qualification_v2_protocol.json"
 )
 
 
@@ -456,7 +457,7 @@ def execute(
     if result["summary"]["p99_canonicalization_latency_ns"] > p99_gate:
         # The result remains a valid terminal nonpass.
         pass
-    saber_io.write_checksums(output_root)
+    p0b.write_checksums(output_root)
     return result
 
 
@@ -467,7 +468,7 @@ def validate_results(
 ) -> dict[str, Any]:
     validate_protocol(protocol, protocol_path=protocol_path)
     output_root = _output_root(protocol)
-    saber_io.read_checksums(output_root)
+    p0b.read_checksums(output_root)
     result = load_json_object(output_root / "qualification.json")
     if (
         result.get("schema") != RESULT_SCHEMA
