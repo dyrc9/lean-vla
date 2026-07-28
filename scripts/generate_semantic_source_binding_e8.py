@@ -48,6 +48,18 @@ COMMIT_SCOPE_PATHS = (
     "scripts/freeze_four_arm_v4_l1_block10_terminal.py",
     "scripts/freeze_four_arm_v4_l1_block10_k4_qualification.py",
     "scripts/freeze_four_arm_v4_l1_block10_k4_terminal.py",
+    (
+        "scripts/"
+        "freeze_four_arm_v4_l1_progress_projection_qualification.py"
+    ),
+    (
+        "scripts/"
+        "freeze_four_arm_v4_l1_progress_projection_terminal.py"
+    ),
+    (
+        "scripts/"
+        "freeze_four_arm_v4_l1_progress_projection_smoke.py"
+    ),
     "scripts/generate_semantic_source_binding_e8.py",
     "scripts/generate_semantic_v4_equivalence_evidence.py",
     "scripts/prepare_deployment_perception_dataset_e7.py",
@@ -58,10 +70,19 @@ COMMIT_SCOPE_PATHS = (
     "scripts/run_liberosafety_pi05_openpi_eval.py",
     "scripts/run_l2_execution_attack_eval.py",
     "scripts/run_l2_execution_attack_eval_v2.py",
+    "scripts/run_l2_execution_attack_eval_v3.py",
     "scripts/run_four_arm_v4_l1_repair_qualification.py",
     "scripts/run_four_arm_v4_l1_repair_qualification_v2.py",
     "scripts/run_four_arm_v4_l1_block10_qualification.py",
     "scripts/run_four_arm_v4_l1_block10_k4_qualification.py",
+    (
+        "scripts/"
+        "run_four_arm_v4_l1_progress_projection_qualification.py"
+    ),
+    (
+        "scripts/"
+        "run_four_arm_v4_l1_progress_projection_smoke.py"
+    ),
     "scripts/run_local_checker_qualification_e3.py",
     "scripts/run_pi05_action_conditioning_e2.py",
     "scripts/run_pi05_selector_qualification_e1.py",
@@ -82,6 +103,7 @@ COMMIT_SCOPE_PATHS = (
     "src/proofalign/semantic_effect_observer.py",
     "src/proofalign/semantic_local_checker.py",
     "src/proofalign/semantic_policy_wrapper.py",
+    "src/proofalign/semantic_progress_projection.py",
     "src/proofalign/semantic_trust.py",
     "tests/test_deployment_perception_dataset_qualification_e7.py",
     "tests/test_deployment_perception_preflight_e7.py",
@@ -93,6 +115,8 @@ COMMIT_SCOPE_PATHS = (
     "tests/test_l1_repair_qualification_v2.py",
     "tests/test_l1_block10_qualification.py",
     "tests/test_l1_block10_k4_qualification.py",
+    "tests/test_l1_progress_projection_qualification.py",
+    "tests/test_l1_progress_projection_smoke.py",
     "tests/test_pi05_action_conditioning_e2.py",
     "tests/test_pi05_selector_qualification.py",
     "tests/test_semantic_effect_observer.py",
@@ -101,8 +125,10 @@ COMMIT_SCOPE_PATHS = (
     "tests/test_semantic_no_dispatch_four_arm_e4.py",
     "tests/test_semantic_online_runner.py",
     "tests/test_semantic_online_runner_v2.py",
+    "tests/test_semantic_online_runner_v3.py",
     "tests/test_semantic_policy_wrapper.py",
     "tests/test_semantic_post_e5_readiness.py",
+    "tests/test_semantic_progress_projection.py",
     "tests/test_semantic_resource_smoke_e6.py",
     "tests/test_semantic_source_binding_e8.py",
     "tests/test_semantic_v4_c5.py",
@@ -147,6 +173,21 @@ COMMIT_SCOPE_PATHS = (
     (
         "experiments/"
         "proofalign_four_arm_v4_l1_block10_k4_terminal_summary.json"
+    ),
+    (
+        "experiments/"
+        "proofalign_four_arm_v4_l1_progress_projection_"
+        "qualification_protocol.json"
+    ),
+    (
+        "experiments/"
+        "proofalign_four_arm_v4_l1_progress_projection_"
+        "terminal_summary.json"
+    ),
+    (
+        "experiments/"
+        "proofalign_four_arm_v4_l1_progress_projection_"
+        "smoke_protocol.json"
     ),
     "experiments/proofalign_pi05_action_conditioning_e2_protocol.json",
     "experiments/proofalign_pi05_selector_e1_protocol.json",
@@ -208,6 +249,14 @@ EVIDENCE_PATHS = (
     (
         "results/proofalign_semantic_resource_smoke_e6_v2_"
         "20260727_fresh2/SHA256SUMS"
+    ),
+    (
+        "results/proofalign_four_arm_v4_l1_progress_projection_"
+        "qualification_20260728_fresh1/summary.json"
+    ),
+    (
+        "results/proofalign_four_arm_v4_l1_progress_projection_"
+        "qualification_20260728_fresh1/SHA256SUMS"
     ),
 )
 
