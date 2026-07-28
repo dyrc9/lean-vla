@@ -71,6 +71,8 @@ COMMIT_SCOPE_PATHS = (
     "scripts/run_l2_execution_attack_eval.py",
     "scripts/run_l2_execution_attack_eval_v2.py",
     "scripts/run_l2_execution_attack_eval_v3.py",
+    "scripts/run_l2_execution_attack_eval_v4.py",
+    "scripts/run_pick_up_prefix_progress_replay_qualification.py",
     "scripts/run_four_arm_v4_l1_repair_qualification.py",
     "scripts/run_four_arm_v4_l1_repair_qualification_v2.py",
     "scripts/run_four_arm_v4_l1_block10_qualification.py",
@@ -99,6 +101,7 @@ COMMIT_SCOPE_PATHS = (
     "src/proofalign/benchmark/semantic_four_arm_runner.py",
     "src/proofalign/integrity_v4_models.py",
     "src/proofalign/integrity_v4_runtime.py",
+    "src/proofalign/horizon_consistent_pick_up.py",
     "src/proofalign/semantic_action_selection.py",
     "src/proofalign/semantic_effect_observer.py",
     "src/proofalign/semantic_local_checker.py",
@@ -110,6 +113,7 @@ COMMIT_SCOPE_PATHS = (
     "tests/test_deterministic_selector_qualification.py",
     "tests/test_integrity_v4_models.py",
     "tests/test_integrity_v4_runtime.py",
+    "tests/test_horizon_consistent_pick_up.py",
     "tests/test_local_checker_qualification_e3.py",
     "tests/test_l1_repair_qualification.py",
     "tests/test_l1_repair_qualification_v2.py",
@@ -119,6 +123,7 @@ COMMIT_SCOPE_PATHS = (
     "tests/test_l1_progress_projection_smoke.py",
     "tests/test_pi05_action_conditioning_e2.py",
     "tests/test_pi05_selector_qualification.py",
+    "tests/test_pick_up_prefix_progress_replay.py",
     "tests/test_semantic_effect_observer.py",
     "tests/test_semantic_effect_observer_qualification_e5.py",
     "tests/test_semantic_local_checker.py",
@@ -191,6 +196,18 @@ COMMIT_SCOPE_PATHS = (
     ),
     "experiments/proofalign_pi05_action_conditioning_e2_protocol.json",
     "experiments/proofalign_pi05_selector_e1_protocol.json",
+    (
+        "experiments/"
+        "proofalign_pick_up_prefix_progress_replay_protocol.json"
+    ),
+    (
+        "experiments/"
+        "proofalign_pick_up_prefix_progress_replay_v2_protocol.json"
+    ),
+    (
+        "experiments/"
+        "proofalign_pick_up_prefix_progress_replay_v3_protocol.json"
+    ),
     "experiments/proofalign_semantic_effect_observer_e5_protocol.json",
     "experiments/proofalign_semantic_effect_observer_e5_v2_protocol.json",
     "experiments/proofalign_semantic_four_arm_e4_protocol.json",
