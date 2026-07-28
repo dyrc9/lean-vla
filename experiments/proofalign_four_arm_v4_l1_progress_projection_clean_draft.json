@@ -917,15 +917,17 @@
     "semantic_only_terminal_l1_rejection_rate_max": 0.4
   },
   "source": {
-    "repository_commit": "b10a42c6d3f976ada97f47b30f1d6d6b9dfc5bec",
-    "repository_tree": "01fb25a78da29970184dfa2c574e70f14c117fb1",
+    "repository_commit": "4497b0062cc0daedd182cab87b4b7800b5634fc6",
+    "repository_tree": "bc9ef083e910b9a16b4679c2f9e6456b82b685b9",
     "sha256": {
-      "scripts/prepare_four_arm_v4_l1_progress_projection_clean.py": "944443331cba1545d2b17c182ee71e34c4127812cf493e4cc5157e35b60fa4b5",
+      "scripts/prepare_four_arm_v4_l1_progress_projection_clean.py": "46d4b87556979315ceaf98294d0fc38414f20159a72346e19feca05a22b0af59",
+      "scripts/run_four_arm_v4_l1_progress_projection_clean.py": "de2e104ca0bdc35eff398fc6c046d80adc0398754f6f52e52a5e1f6d618ba8b3",
       "scripts/run_l2_execution_attack_eval_v3.py": "7d2c4af5e3f4b0322e6c73c824ea642f83b72677a976717f659551e45ca20df2",
       "scripts/run_proofalign_four_arm_v4_clean.py": "b6aa3718a67797f3193e3a093b947515c7c7ed4a8128ac6ea6f3f7c60a0264fa",
       "scripts/run_saber_threat_validation_r5.py": "aa6ade389d5bf0e3df49d1e8271d5779430a6c7a2b01f5ccc2b12e756143ac16",
       "src/proofalign/benchmark/four_arm_v4_progress_clean.py": "84c146a224370e04595ae1af8e45f6e700fbdb1d63c248e45d468cf6cf065248",
-      "tests/test_four_arm_v4_progress_clean.py": "f69b97f402a70d0082052867b39508b30ff030ed0b08b4580248133a9a460ef2"
+      "tests/test_four_arm_v4_progress_clean.py": "f69b97f402a70d0082052867b39508b30ff030ed0b08b4580248133a9a460ef2",
+      "tests/test_four_arm_v4_progress_clean_runner.py": "7682dc62fdce6d6cee90e5bb60eb5fa55c605c45f9af7af5084eb5cc4be4ec8b"
     }
   },
   "status": "draft_waiting_for_closed_loop_smoke_pass",
