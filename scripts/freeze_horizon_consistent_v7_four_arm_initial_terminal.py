@@ -202,8 +202,11 @@ def _terminal_censoring(
                             final.get("step_receipts", [])
                         ),
                         "authorized_action_count": (
-                            final.get("authorization", {})
-                            .get("action_count")
+                            len(
+                                final.get("authorization", {}).get(
+                                    "actions", []
+                                )
+                            )
                         ),
                         "interpretation": (
                             "environment success ended the episode in "
