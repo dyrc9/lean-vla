@@ -57,10 +57,12 @@ OUTPUT_PATH = (
 SOURCE_PATHS = (
     "src/proofalign/benchmark/four_arm_v4_progress_clean.py",
     "scripts/prepare_four_arm_v4_l1_progress_projection_clean.py",
+    "scripts/run_four_arm_v4_l1_progress_projection_clean.py",
     "scripts/run_l2_execution_attack_eval_v3.py",
     "scripts/run_proofalign_four_arm_v4_clean.py",
     "scripts/run_saber_threat_validation_r5.py",
     "tests/test_four_arm_v4_progress_clean.py",
+    "tests/test_four_arm_v4_progress_clean_runner.py",
 )
 CREATED_AT = "2026-07-28T18:00:00+08:00"
 
