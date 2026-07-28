@@ -213,8 +213,10 @@ def build_terminal(
             "remaining_effect_failure_stage": "release",
             "remaining_effect_failure": (
                 "The accepted release H10 block promised gripper_open and "
-                "target_released, but its final two gripper commands closed "
-                "again; the observer saw only command_applied and rejected."
+                "target_released, but only its final two steps issued the "
+                "open command after eight non-opening steps; the gripper did "
+                "not physically open within the finite window, so the "
+                "observer saw only command_applied and rejected."
             ),
             "other_terminal_l1_rejections": [
                 "close_outside_target_neighborhood",
