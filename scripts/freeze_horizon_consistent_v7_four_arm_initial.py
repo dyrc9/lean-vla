@@ -202,9 +202,25 @@ def build_protocol(
             "minimum_free_disk_gib": 20,
             "output_disk_cap_gib": 2,
         },
+        "excluded_invalid_attempts": [
+            {
+                "root": (
+                    "results/proofalign_horizon_consistent_v7_"
+                    "four_arm_initial_20260728_fresh1"
+                ),
+                "reason": (
+                    "launch used the repository test interpreter, which "
+                    "does not contain JAX; failure occurred before policy "
+                    "loading and before any episode or outcome"
+                ),
+                "episode_count": 0,
+                "outcomes_observed": False,
+                "reuse_for_analysis": False,
+            }
+        ],
         "fresh_output_root": (
             "results/proofalign_horizon_consistent_v7_"
-            "four_arm_initial_20260728_fresh1"
+            "four_arm_initial_20260728_fresh2"
         ),
         "source": {
             "repository_commit": bound_commit,
