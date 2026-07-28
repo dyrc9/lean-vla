@@ -78,6 +78,60 @@ COMMIT_SCOPE_PATHS = (
         "freeze_horizon_consistent_pick_up_"
         "regression_smoke_terminal.py"
     ),
+    (
+        "scripts/"
+        "freeze_horizon_consistent_pick_up_fresh_dual_pilot.py"
+    ),
+    (
+        "scripts/"
+        "freeze_horizon_consistent_pick_up_"
+        "fresh_dual_pilot_terminal.py"
+    ),
+    (
+        "scripts/"
+        "freeze_horizon_consistent_release_h4_regression_smoke.py"
+    ),
+    (
+        "scripts/"
+        "freeze_horizon_consistent_release_h4_"
+        "regression_smoke_terminal.py"
+    ),
+    (
+        "scripts/"
+        "freeze_horizon_consistent_release_h4_"
+        "regression_smoke_v2.py"
+    ),
+    (
+        "scripts/"
+        "freeze_horizon_consistent_release_prefix_"
+        "regression_smoke.py"
+    ),
+    (
+        "scripts/"
+        "freeze_horizon_consistent_release_prefix_"
+        "regression_smoke_terminal.py"
+    ),
+    (
+        "scripts/"
+        "freeze_horizon_consistent_release_qualification.py"
+    ),
+    (
+        "scripts/"
+        "freeze_horizon_consistent_release_qualification_terminal.py"
+    ),
+    (
+        "scripts/"
+        "freeze_horizon_consistent_release_qualification_v2.py"
+    ),
+    (
+        "scripts/"
+        "freeze_horizon_consistent_release_regression_smoke.py"
+    ),
+    (
+        "scripts/"
+        "freeze_horizon_consistent_release_"
+        "regression_smoke_terminal.py"
+    ),
     "scripts/generate_semantic_source_binding_e8.py",
     "scripts/generate_semantic_v4_equivalence_evidence.py",
     "scripts/prepare_deployment_perception_dataset_e7.py",
@@ -90,6 +144,13 @@ COMMIT_SCOPE_PATHS = (
     "scripts/run_l2_execution_attack_eval_v2.py",
     "scripts/run_l2_execution_attack_eval_v3.py",
     "scripts/run_l2_execution_attack_eval_v4.py",
+    "scripts/run_l2_execution_attack_eval_v5.py",
+    "scripts/run_l2_execution_attack_eval_v6.py",
+    "scripts/run_l2_execution_attack_eval_v7.py",
+    (
+        "scripts/"
+        "run_horizon_consistent_pick_up_fresh_dual_pilot.py"
+    ),
     (
         "scripts/"
         "run_horizon_consistent_pick_up_phase_transition_smoke.py"
@@ -97,6 +158,22 @@ COMMIT_SCOPE_PATHS = (
     (
         "scripts/"
         "run_horizon_consistent_pick_up_regression_smoke.py"
+    ),
+    (
+        "scripts/"
+        "run_horizon_consistent_release_h4_regression_smoke.py"
+    ),
+    (
+        "scripts/"
+        "run_horizon_consistent_release_prefix_regression_smoke.py"
+    ),
+    (
+        "scripts/"
+        "run_horizon_consistent_release_qualification.py"
+    ),
+    (
+        "scripts/"
+        "run_horizon_consistent_release_regression_smoke.py"
     ),
     "scripts/run_pick_up_prefix_progress_replay_qualification.py",
     "scripts/run_four_arm_v4_l1_repair_qualification.py",
@@ -128,6 +205,9 @@ COMMIT_SCOPE_PATHS = (
     "src/proofalign/integrity_v4_models.py",
     "src/proofalign/integrity_v4_runtime.py",
     "src/proofalign/horizon_consistent_pick_up.py",
+    "src/proofalign/horizon_consistent_release.py",
+    "src/proofalign/horizon_consistent_release_h4.py",
+    "src/proofalign/horizon_consistent_release_prefix.py",
     "src/proofalign/semantic_action_selection.py",
     "src/proofalign/semantic_effect_observer.py",
     "src/proofalign/semantic_local_checker.py",
@@ -140,7 +220,14 @@ COMMIT_SCOPE_PATHS = (
     "tests/test_integrity_v4_models.py",
     "tests/test_integrity_v4_runtime.py",
     "tests/test_horizon_consistent_pick_up.py",
+    (
+        "tests/"
+        "test_horizon_consistent_pick_up_fresh_dual_pilot.py"
+    ),
     "tests/test_horizon_consistent_pick_up_smoke.py",
+    "tests/test_horizon_consistent_release.py",
+    "tests/test_horizon_consistent_release_h4.py",
+    "tests/test_horizon_consistent_release_prefix.py",
     "tests/test_local_checker_qualification_e3.py",
     "tests/test_l1_repair_qualification.py",
     "tests/test_l1_repair_qualification_v2.py",
@@ -239,6 +326,66 @@ COMMIT_SCOPE_PATHS = (
     (
         "experiments/"
         "proofalign_horizon_consistent_pick_up_"
+        "regression_smoke_terminal_summary.json"
+    ),
+    (
+        "experiments/"
+        "proofalign_horizon_consistent_pick_up_"
+        "fresh_dual_pilot_protocol.json"
+    ),
+    (
+        "experiments/"
+        "proofalign_horizon_consistent_pick_up_"
+        "fresh_dual_pilot_terminal_summary.json"
+    ),
+    (
+        "experiments/"
+        "proofalign_horizon_consistent_release_h4_"
+        "regression_smoke_protocol.json"
+    ),
+    (
+        "experiments/"
+        "proofalign_horizon_consistent_release_h4_"
+        "regression_smoke_terminal_summary.json"
+    ),
+    (
+        "experiments/"
+        "proofalign_horizon_consistent_release_h4_"
+        "regression_smoke_v2_protocol.json"
+    ),
+    (
+        "experiments/"
+        "proofalign_horizon_consistent_release_prefix_"
+        "regression_smoke_protocol.json"
+    ),
+    (
+        "experiments/"
+        "proofalign_horizon_consistent_release_prefix_"
+        "regression_smoke_terminal_summary.json"
+    ),
+    (
+        "experiments/"
+        "proofalign_horizon_consistent_release_"
+        "qualification_protocol.json"
+    ),
+    (
+        "experiments/"
+        "proofalign_horizon_consistent_release_"
+        "qualification_terminal_summary.json"
+    ),
+    (
+        "experiments/"
+        "proofalign_horizon_consistent_release_"
+        "qualification_v2_protocol.json"
+    ),
+    (
+        "experiments/"
+        "proofalign_horizon_consistent_release_"
+        "regression_smoke_protocol.json"
+    ),
+    (
+        "experiments/"
+        "proofalign_horizon_consistent_release_"
         "regression_smoke_terminal_summary.json"
     ),
     "experiments/proofalign_pi05_action_conditioning_e2_protocol.json",
