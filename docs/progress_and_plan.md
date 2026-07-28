@@ -48,6 +48,12 @@ trusted BDDL goal 只有 `Checkgrippercontactpart`，已资格化 semantic wrapp
   `experiments/proofalign_four_arm_v4_support45_clean_terminal_summary.json`。该结果不能称为 fresh1
   重试、full-population 或 confirmatory 结果；clean prerequisite 未通过，因此 Stage C attacked
   不授权、不启动，且不再为当前协议追加 clean retry。
+- 结果后 L1 repair 只做了 no-outcome、zero-dispatch 资格测试：exact simulator site/body geometry
+  将 destination coverage 补到 45/45，但 K=4 有可行候选的初态只有 24/45=`53.33%`，低于冻结的
+  90% gate，worst suite 为 7/15=`46.67%`；K=1 到 K=4 的累计 coverage 全部是 24/45，说明 180 个
+  不同 chunk 没有扩展可用初态。全程 0 policy-conditioned env step、0 dispatch、0 task outcome、
+  0 selected hard violation，分类为 `l1_repair_initial_availability_qualification_nonpass`，已冻结到
+  `experiments/proofalign_four_arm_v4_l1_repair_qualification_terminal_summary.json`。
 
 ## 0A. 2026-07-27 qualification 与工程 smoke checkpoint
 
@@ -94,8 +100,8 @@ benchmark privileged-geometry no-outcome stack 完整；deployment perception �
 
 当前 blocker 与停止边界：
 
-1. 当前 L1 不具备闭环 clean availability：初始化支持集内仍有 18/45 base pairs 在第 0 proposal
-   缺 destination geometry，其余路径最终被 K=1/2 mm checker 拒绝；
+1. 当前 L1 不具备闭环 clean availability：post-outcome oracle geometry repair 已关闭 18/45 的
+   初态 destination gap，但 K=4 availability 仍只有 24/45，且没有比 K=1 增加任何可用初态；
 2. attacked Stage C 以 clean gate 为冻结前置条件，现已永久阻断于本协议；不得把“继续跑攻击”用于绕过
    clean nonpass；
 3. 所有结果保持 exploratory 标签，不得回写原 50% M2 nonpass，也不得结果后降低 2 mm checker 条件；
@@ -372,7 +378,8 @@ C1 semantic digest schema（已实现）
   -> support-conditioned clean 360 episodes（已完成；360/360 valid）
   -> clean terminal gate（nonpass：Dual 0/90，deadlock 88/90）
   -> support-conditioned attacked 360 episodes（前置 gate 未过，未授权且不执行）
-  -> L1 closed-loop coverage redesign / independent no-efficacy qualification
+  -> post-outcome L1 geometry+K4 no-outcome qualification（nonpass：24/45）
+  -> materially-new L1 redesign / new frozen split（未授权，不能复用本 qualification population）
 ```
 
 当前继续使用预先资格化的 deterministic task-FSM L1。40% 只改变是否继续收集探索性四臂证据，
@@ -387,8 +394,9 @@ M2 producer/victim 的 240-episode population、stopping rule、原 50% gate 和
 论文主线与次要 stress study 现在明确分开：
 
 1. 已观察的论文事实链是 M2 confirmatory nonpass → disclosed 40% post-outcome exploratory
-   continuation → full-population initialization-support failure → support45 clean-gate nonpass；attacked
-   four-arm 因冻结前置条件未过而停止；
+   continuation → full-population initialization-support failure → support45 clean-gate nonpass →
+   post-outcome oracle-geometry+K4 availability qualification nonpass；attacked four-arm 因冻结前置条件
+   未过而停止；
 2. online runner 已将 L1 semantic alignment 与 L2 execution integrity 拆成独立开关。closed-loop 不要求
    跨 L1 source chunk 相同，只要求 paired initial identity 和 within-L1 L2 pair 的首个 policy input/output
    identity；

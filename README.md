@@ -68,13 +68,28 @@ phase-gating theorem，而不是事后附加的形式化说明。
   - v2 复测连续完成 2 个 prefix、10 个 exact receipt、2 个 effect allow，effect reject/unknown 均为
     `0`；第三次 K=1 proposal 因预测进度 `1.93mm < 2mm` 在 dispatch 前被 L1 拒绝，记录为 clean
     availability/deadlock 信号，不据此修改冻结阈值。
+- M2 与四臂主线终局：
+  - M2 240/240 valid，攻击 transition `39/86=45.35%`，未达到原预注册 `50%`，永久保持
+    `confirmatory_attack_foundation_nonpass`；后续 `40%` 只标注 post-outcome exploratory；
+  - full-population clean 因 15/60 affordance pairs 缺 part-level trusted geometry 在首单元、
+    dispatch 前 fail closed；
+  - support45 clean 360/360 valid，但四臂 strict success 为 `61/90, 66/90, 0/90, 0/90`，
+    Dual deadlock `88/90`，因此 clean gate nonpass，attacked stage 未授权、未执行。
+- 2026-07-28 post-outcome L1 repair qualification：
+  - benchmark-only exact simulator geometry 将初态 destination coverage 补到 `45/45`；
+  - K=4 共 180 个不同 source chunks，但有可行候选的初态只有 `24/45=53.33%`，低于冻结的
+    `90%` gate；三个 suite 分别为 `60.0% / 53.33% / 46.67%`；
+  - K=1、K=2、K=3、K=4 的累计 coverage 均为 `24/45`，新增采样没有增加可用初态；
+  - 资格测试为 0 dispatch、0 policy-conditioned env step、0 task outcome、0 selected hard
+    violation，终局分类为 `l1_repair_initial_availability_qualification_nonpass`。
 - P0b：96/96 episode 有效，得到 23 个 clean-eligible pair 和 15 个攻击 transition；因
   `23 < 26` 未通过确认性 denominator gate。
 - R9 Execution-only：clean retention `22/23 = 95.7%`；attacked+defended `48/48`
   有效；cost/collision unsafe `1/48`；signal subset `15/15 -> 0/15` cost/collision；
   strict-success recovery `8/15`；`11/15` 仍有 residual contact proxy。
 
-因此现有结果仍是**强探索性正结果**，不能声称一般防御有效、完整物理安全或 Dual 已验证。旧结果可复用为：
+因此现有证据是“L2 有强探索性信号、当前 L1/Dual 闭环 nonpass”的混合结果，不能声称一般防御有效、
+完整物理安全或 Dual 已验证。旧结果可复用为：
 
 - P0b：原始 instruction/observation attack、clean pairing 和攻击 transition 基础；
 - R9：ActionBlock dispatch、intervention、receipt/effect logging 和 Execution-only 基线。
@@ -83,24 +98,16 @@ phase-gating theorem，而不是事后附加的形式化说明。
 
 ## 当前主线
 
-1. no-outcome C1–C5、E1–E8 已按 benchmark privileged-geometry 边界关闭；当前选定
-   `deterministic privileged-geometry FSM + analytic checker/effect observer`；
-2. E6 latency/resource smoke 已由授权 successor 完成，10 项 gate 全部通过；该结果只关闭离线
-   工程资源门，不产生 efficacy/outcome 结论；
-3. E7 发现当前 RLDS 缺少 camera calibration、object/destination geometry、visibility/held/contact
-   supervision 与独立 split；对应 outcome-blind contract、validator 与 dataset qualification runner
-   已冻结/接线；
-4. E8 已将 semantic source/evidence/OpenPI inventory 绑定到 clean commit；
-5. 两轮 closed-loop no-attack engineering smoke 已完成，效果契约 bug 已修复并由 E3/E5 v2 重新资格化；
-6. M2 outcome-blind producer 已冻结为 60 个 base pair、每 pair 一条攻击记录；当前唯一执行 blocker 是
-   尚无第二张满足 `<1 GiB` 预启动门的空闲 GPU；
-7. producer 完成并校验后运行 M2 的 240 个 clean/attacked VLA-only episode；该冻结任务与 gate
-   保持不变；
-8. L2 可运行性审计已完成：原论文的 coordinated joint-space FDIA 不能在当前 LIBERO `ΔEEF+RGB`
-   接口中忠实复现；当前代码只实现原文三个 `S_u` 的 source-command-operator transfer，并显式测试
-   pre-boundary、post-boundary truthful 与 forged-receipt 三种位置。M2 通过后先跑 12 个 non-primary
-   engineering smoke，再补齐独立 online 四臂开关；1920 episodes 只是之后可冻结的上限，不再视为
-   已可启动计划。
+1. C1–C5、E1–E8 的 component、provenance、Lean transaction 与资源证据已关闭；E7 仍明确阻断
+   camera-only deployment claim。
+2. M2 原 `50%` confirmatory gate、full-population support failure 和 support45 clean nonpass 均已
+   终局冻结，不被后续探索性工作覆盖。
+3. support45 的 attacked stage 以 clean pass 为冻结前置条件；当前未通过，因此不执行攻击 rollout。
+4. post-outcome L1 repair 已完成一次严格的 no-outcome qualification：oracle geometry 有效，但 K=4
+   availability nonpass；同一 population 不再 retry，也不降低 2 mm checker threshold。
+5. 当前论文主线转为完整报告 problem decomposition、Lean transaction、L2 探索信号、L1 coverage/
+   availability failure taxonomy 与负结果。任何后续正向 L1 机制都必须是 materially new、明确
+   post-outcome，并先在新冻结 population/seed 上资格化，不能直接进入 efficacy rollout。
 
 入口文档：
 

@@ -235,3 +235,11 @@ episodes valid，但 VLA-only、Execution-only、Semantic-only、Dual 的 strict
 base pairs，说明静态 audit 只是 wrapper-initialization support；后者的终止 K=1 candidate 全部低于
 冻结的 2 mm progress 条件。该 nonpass 将论文的正面 claim 限定为双层问题分解、Lean transaction、
 证据绑定与 failure localization；不支持当前 Dual defense efficacy。Stage C 不执行，阈值不结果后改写。
+
+在该闭环结果之后进行的 L1 repair 必须单列为 post-outcome exploratory。冻结的 no-outcome
+qualification 显示：exact simulator site/body geometry 将初态 coverage 补到 45/45，但 K=4 仅
+24/45=`53.33%` 初态存在可行候选，低于 90% gate；三个 suite 为 `60.0% / 53.33% / 46.67%`。
+45 个样本各自的 4 个 source chunk digest 均不同，但 K=1、K=2、K=3、K=4 累计 coverage 都是
+24/45，21 个失败样本的最佳 predicted progress 最高仅 `1.738mm < 2mm`。这支持“geometry gap
+可定位并修复，但当前公开 π0.5 的 bounded resampling 不能恢复 L1 availability”的负结论，不授权
+新 clean 或 attacked efficacy rollout，也不能用来覆盖原 support45 nonpass。
