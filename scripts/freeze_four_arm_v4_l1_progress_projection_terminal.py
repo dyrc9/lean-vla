@@ -91,7 +91,8 @@ def _repair_audit(rows: list[dict[str, Any]]) -> dict[str, Any]:
     semantic_repairs = []
     projection_l2_values = []
     for row in rows:
-        projection = row["candidate_selection"]["projection"]
+        candidate = row["candidate_selection"]["candidates"][0]
+        projection = candidate["progress_projection"]
         projection_l2_values.append(float(projection["projection_l2"]))
         if projection["reason"] != "minimum_l2_terminal_progress_projection":
             continue
@@ -99,19 +100,23 @@ def _repair_audit(rows: list[dict[str, Any]]) -> dict[str, Any]:
             {
                 "base_pair_id": row["base_pair_id"],
                 "suite": row["suite"],
-                "trusted_subtask": row["trusted_subtask"],
+                "trusted_subtask": projection["semantic_subtask"],
                 "nominal_terminal_progress_m": projection[
-                    "nominal_terminal_progress"
+                    "nominal_terminal_progress_m"
                 ],
                 "projected_terminal_progress_m": projection[
-                    "projected_terminal_progress"
+                    "final_terminal_progress_m"
                 ],
                 "projection_l2": projection["projection_l2"],
-                "nominal_hard_violations": projection[
-                    "nominal_hard_violations"
+                "nominal_hard_violations": candidate[
+                    "nominal_checked"
+                ][
+                    "hard_violation_atoms"
                 ],
-                "projected_hard_violations": projection[
-                    "projected_hard_violations"
+                "projected_hard_violations": candidate[
+                    "checked"
+                ][
+                    "hard_violation_atoms"
                 ],
             }
         )
@@ -121,7 +126,9 @@ def _repair_audit(rows: list[dict[str, Any]]) -> dict[str, Any]:
         "projection_reason_counts": dict(
             sorted(
                 Counter(
-                    row["candidate_selection"]["projection"]["reason"]
+                    row["candidate_selection"]["candidates"][0][
+                        "progress_projection"
+                    ]["reason"]
                     for row in rows
                 ).items()
             )
@@ -135,17 +142,17 @@ def _repair_audit(rows: list[dict[str, Any]]) -> dict[str, Any]:
         },
         "nominal_hard_violation_row_count": sum(
             bool(
-                row["candidate_selection"]["projection"][
-                    "nominal_hard_violations"
-                ]
+                row["candidate_selection"]["candidates"][0][
+                    "nominal_checked"
+                ]["hard_violation_atoms"]
             )
             for row in rows
         ),
         "projected_hard_violation_row_count": sum(
             bool(
-                row["candidate_selection"]["projection"][
-                    "projected_hard_violations"
-                ]
+                row["candidate_selection"]["candidates"][0][
+                    "checked"
+                ]["hard_violation_atoms"]
             )
             for row in rows
         ),
