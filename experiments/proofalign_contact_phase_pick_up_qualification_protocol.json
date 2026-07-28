@@ -1,0 +1,54 @@
+{
+  "bound_v7_evidence": {
+    "path": "results/proofalign_horizon_consistent_v7_four_arm_initial_20260728_fresh2/initial_evidence.json",
+    "sha256": "8cabd87764139ffd8813a8180d3ad99fa8ad61f7c0a3981879aead38f13dd486"
+  },
+  "claim_boundary": "This outcome-conditioned read-only replay asks only whether the exact v7 projection-budget rejections meet the narrower phase-aware selector rule. It loads no policy, creates no simulator, changes no command, dispatches no action, and estimates no clean efficacy, attacked defense, or safety.",
+  "created_at": "2026-07-28T21:15:00+08:00",
+  "execution_authorization": {
+    "action_dispatch": false,
+    "policy_load": false,
+    "read_bound_episode_artifacts": true,
+    "simulator_create": false,
+    "task_outcome_generation": false
+  },
+  "fresh_output_root": "results/proofalign_contact_phase_pick_up_qualification_20260728_fresh1",
+  "gates": {
+    "expected_online_audit_count": 76,
+    "expected_predecessor_projection_budget_reject_count": 4,
+    "expected_recovered_arm_instance_count": 4,
+    "expected_recovered_unique_source_block_count": 2,
+    "maximum_command_change_count": 0,
+    "maximum_recovered_hard_violation_atom_count": 0
+  },
+  "method_delta": {
+    "action_command_changed": false,
+    "contact_phase_rule": "A pick_up block already judged known, semantic-compatible, post-compatible, and zero-hard by the exact local checker receives phase-aware selector credit when only the generic terminal-progress projection exceeds budget.",
+    "effect_observer_changed": false,
+    "generic_projection_budget_changed": false,
+    "hard_violation_gates_changed": false,
+    "semantic_subtask_changed": false
+  },
+  "parent_initial_terminal": {
+    "classification": "horizon_consistent_v7_four_arm_initial_complete",
+    "path": "experiments/proofalign_horizon_consistent_v7_four_arm_initial_terminal_summary.json",
+    "sha256": "1465249485bd33d2fd8be75862c85f30e5eb9e6408d427bfa52a178707ffbe9e"
+  },
+  "protocol_id": "proofalign-contact-phase-pick-up-replay-qualification-20260728",
+  "schema": "proofalign.contact-phase-pick-up-replay-qualification-protocol.v1",
+  "source": {
+    "freezer": "scripts/freeze_contact_phase_pick_up_qualification.py",
+    "freezer_sha256": "33806ae88cbf6dafe1adc028204a6f60a89f49268b4638a75b1ed16ac4ad4bc3",
+    "repository_commit": "fcba8ef055672a401a6d17556ee273d94abb62e2",
+    "repository_tree": "1028aabae15c271b553b9dfa006b6b6074746e20",
+    "sha256": {
+      "scripts/freeze_contact_phase_pick_up_qualification.py": "33806ae88cbf6dafe1adc028204a6f60a89f49268b4638a75b1ed16ac4ad4bc3",
+      "scripts/run_contact_phase_pick_up_qualification.py": "4169512b6043a7d82efd56cde614ed805ce166828aa5c243360b9e2e34a2d842",
+      "scripts/run_l2_execution_attack_eval_v8.py": "69369919c7aca7c4038d031a3cfbf57dd2519785f79107204cf7a021ddece12f",
+      "src/proofalign/contact_phase_pick_up.py": "d916fa7d94df5a8e54ef2d4cfe1b62b5e95a320acb23e3641a520fed86162aeb",
+      "tests/test_contact_phase_pick_up.py": "b0b9a7c94d7aba4cff1756b306bc51a414005fc4f11c8abc9931630df499f5ab",
+      "tests/test_contact_phase_pick_up_qualification.py": "53c30809561fc725774138ed0ab645c52227709de8833d151df3e18c5d75aca5"
+    }
+  },
+  "status": "authorized_read_only_contact_phase_replay"
+}
