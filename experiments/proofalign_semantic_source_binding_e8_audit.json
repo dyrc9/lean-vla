@@ -3,7 +3,7 @@
   "audit_id": "proofalign-semantic-source-binding-e8-20260725",
   "audit_source": {
     "path": "scripts/generate_semantic_source_binding_e8.py",
-    "sha256": "9a603f0b9c396c7ae14bc276ed5fcb48f0586da2e1d1a718410d555737123af9"
+    "sha256": "ca8adc8394f157166d0191f150243446db7edb95484bacb00b0710bc1550410a"
   },
   "claim_boundary": "This read-only audit binds the current semantic source scope, local evidence inventory, latest source-scope commit, and OpenPI checkout. A not-clean classification does not modify or commit the worktree. A clean classification would establish provenance only, not perception quality, efficacy, outcome, or safety.",
   "classification": "semantic_source_binding_clean",
@@ -229,8 +229,40 @@
       "bound_to_head": true,
       "exists": true,
       "git_status": "clean",
+      "path": "scripts/freeze_horizon_consistent_pick_up_phase_transition_smoke.py",
+      "sha256": "0d43fb2f332a5e954ee561d8120e8b1133d8ec4067ed7940932576bd01e7e7a5",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/freeze_horizon_consistent_pick_up_phase_transition_smoke_terminal.py",
+      "sha256": "45bc5ef11e13477b3abaefc8d38813ff6f0b3646207f4ab4def1d39a43f8838e",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/freeze_horizon_consistent_pick_up_regression_smoke.py",
+      "sha256": "3bf7a2ea6efb52fe5c8295a398a4a1c03434b2438d6810d808fb676bb6f38b00",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/freeze_horizon_consistent_pick_up_regression_smoke_terminal.py",
+      "sha256": "5ca05f9b134c53bf209e0be328e76401100ef3459552b2454c895921b6a6697e",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
       "path": "scripts/generate_semantic_source_binding_e8.py",
-      "sha256": "9a603f0b9c396c7ae14bc276ed5fcb48f0586da2e1d1a718410d555737123af9",
+      "sha256": "ca8adc8394f157166d0191f150243446db7edb95484bacb00b0710bc1550410a",
       "tracked": true
     },
     {
@@ -319,6 +351,22 @@
       "git_status": "clean",
       "path": "scripts/run_l2_execution_attack_eval_v4.py",
       "sha256": "e5404595baca242bfa87a93e162416847291c1d4e0cbc2aadee1f4ccd3fb03fe",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/run_horizon_consistent_pick_up_phase_transition_smoke.py",
+      "sha256": "c9131ce697e042fa2cc8873496460751e5285d9563601325fdd33306ca790a7b",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/run_horizon_consistent_pick_up_regression_smoke.py",
+      "sha256": "587df289f1a0abe435ea20550adc4c8fc5896e3e78e399649ec2dd6e3853c21f",
       "tracked": true
     },
     {
@@ -607,6 +655,14 @@
       "git_status": "clean",
       "path": "tests/test_horizon_consistent_pick_up.py",
       "sha256": "8d24009beabc7ad12e0532a0f8b5500f4c0caa58ff5b19e3842f0785378a4afc",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_horizon_consistent_pick_up_smoke.py",
+      "sha256": "ff43657eca00962ed304b4db6fcc5691603988acc7988e2af2e1a26bf2561746",
       "tracked": true
     },
     {
@@ -941,6 +997,38 @@
       "bound_to_head": true,
       "exists": true,
       "git_status": "clean",
+      "path": "experiments/proofalign_horizon_consistent_pick_up_phase_transition_smoke_protocol.json",
+      "sha256": "c8473a3adf1a28acff83b8d14d3c444583e1f59e4a738514e27851bdf385a375",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_horizon_consistent_pick_up_phase_transition_smoke_terminal_summary.json",
+      "sha256": "3bcf1d97454af5cf3faabb587ac513c84ea51999c7093db8423fcf23255ddd56",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_horizon_consistent_pick_up_regression_smoke_protocol.json",
+      "sha256": "d46dafe7a722d7a7db4dde68bedaec9b216b5ebc1511bb58610056767ced70b7",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_horizon_consistent_pick_up_regression_smoke_terminal_summary.json",
+      "sha256": "1309ceb394e2238701459d3b196c72c9f844de5b00dfb14f992d094675ec6813",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
       "path": "experiments/proofalign_pi05_action_conditioning_e2_protocol.json",
       "sha256": "079cf5566f49f44cd7ade70cf9cc5a96ef8d539bf5754ad01ad0d1e31e56be6e",
       "tracked": true
@@ -1145,8 +1233,8 @@
   "policy_loaded": false,
   "repository_binding_semantics": "latest commit that changed the frozen semantic commit scope; later commits may contain only out-of-scope protocols or audit packets",
   "repository_fully_clean": true,
-  "repository_head_commit": "56d3007493cbae4c2de7401e7eed53329d3d153e",
-  "repository_head_tree": "a183ef7dffa8ca621d2b9be048d3ac87e9a099f4",
+  "repository_head_commit": "8d8501161a9722de473dcfd1c82d8caec40cda04",
+  "repository_head_tree": "cc0453cf7642baf4c1b3ec359fab14c36d2386cf",
   "repository_status_row_count": 0,
   "schema": "proofalign.semantic-source-binding-e8-audit.v1",
   "simulator_created": false
