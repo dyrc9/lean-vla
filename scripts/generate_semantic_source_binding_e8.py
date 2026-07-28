@@ -26,7 +26,9 @@ COMMIT_SCOPE_PATHS = (
     "docs/action_block_assessment.md",
     "docs/experiments.md",
     "docs/implementation_and_experiment_readiness.md",
+    "docs/l2_and_cross_layer_experiments.md",
     "docs/method.md",
+    "docs/paper/paper_story.md",
     "docs/progress_and_plan.md",
     "docs/remote_execution.md",
     "docs/semantic_subtask_hierarchy.md",
@@ -35,6 +37,13 @@ COMMIT_SCOPE_PATHS = (
     "lean/ProofAlign.lean",
     "lean/ProofAlign/SemanticIntegrityCore.lean",
     "scripts/check_all.sh",
+    "scripts/freeze_four_arm_v4_l1_repair_qualification.py",
+    "scripts/freeze_four_arm_v4_l1_repair_qualification_fresh2.py",
+    "scripts/freeze_four_arm_v4_l1_repair_qualification_fresh3.py",
+    (
+        "scripts/"
+        "freeze_four_arm_v4_l1_repair_qualification_terminal.py"
+    ),
     "scripts/generate_semantic_source_binding_e8.py",
     "scripts/generate_semantic_v4_equivalence_evidence.py",
     "scripts/prepare_deployment_perception_dataset_e7.py",
@@ -43,6 +52,10 @@ COMMIT_SCOPE_PATHS = (
     "scripts/run_deployment_perception_preflight_e7.py",
     "scripts/run_deterministic_selector_qualification_e1f.py",
     "scripts/run_liberosafety_pi05_openpi_eval.py",
+    "scripts/run_l2_execution_attack_eval.py",
+    "scripts/run_l2_execution_attack_eval_v2.py",
+    "scripts/run_four_arm_v4_l1_repair_qualification.py",
+    "scripts/run_four_arm_v4_l1_repair_qualification_v2.py",
     "scripts/run_local_checker_qualification_e3.py",
     "scripts/run_pi05_action_conditioning_e2.py",
     "scripts/run_pi05_selector_qualification_e1.py",
@@ -59,15 +72,19 @@ COMMIT_SCOPE_PATHS = (
     "src/proofalign/benchmark/semantic_four_arm_runner.py",
     "src/proofalign/integrity_v4_models.py",
     "src/proofalign/integrity_v4_runtime.py",
+    "src/proofalign/semantic_action_selection.py",
     "src/proofalign/semantic_effect_observer.py",
     "src/proofalign/semantic_local_checker.py",
     "src/proofalign/semantic_policy_wrapper.py",
+    "src/proofalign/semantic_trust.py",
     "tests/test_deployment_perception_dataset_qualification_e7.py",
     "tests/test_deployment_perception_preflight_e7.py",
     "tests/test_deterministic_selector_qualification.py",
     "tests/test_integrity_v4_models.py",
     "tests/test_integrity_v4_runtime.py",
     "tests/test_local_checker_qualification_e3.py",
+    "tests/test_l1_repair_qualification.py",
+    "tests/test_l1_repair_qualification_v2.py",
     "tests/test_pi05_action_conditioning_e2.py",
     "tests/test_pi05_selector_qualification.py",
     "tests/test_semantic_effect_observer.py",
@@ -75,6 +92,7 @@ COMMIT_SCOPE_PATHS = (
     "tests/test_semantic_local_checker.py",
     "tests/test_semantic_no_dispatch_four_arm_e4.py",
     "tests/test_semantic_online_runner.py",
+    "tests/test_semantic_online_runner_v2.py",
     "tests/test_semantic_policy_wrapper.py",
     "tests/test_semantic_post_e5_readiness.py",
     "tests/test_semantic_resource_smoke_e6.py",
@@ -90,6 +108,22 @@ COMMIT_SCOPE_PATHS = (
     "experiments/proofalign_deterministic_selector_e1f_protocol.json",
     "experiments/proofalign_local_checker_e3_protocol.json",
     "experiments/proofalign_local_checker_e3_v2_protocol.json",
+    (
+        "experiments/"
+        "proofalign_four_arm_v4_l1_repair_qualification_protocol.json"
+    ),
+    (
+        "experiments/"
+        "proofalign_four_arm_v4_l1_repair_qualification_fresh2_protocol.json"
+    ),
+    (
+        "experiments/"
+        "proofalign_four_arm_v4_l1_repair_qualification_fresh3_protocol.json"
+    ),
+    (
+        "experiments/"
+        "proofalign_four_arm_v4_l1_repair_qualification_terminal_summary.json"
+    ),
     "experiments/proofalign_pi05_action_conditioning_e2_protocol.json",
     "experiments/proofalign_pi05_selector_e1_protocol.json",
     "experiments/proofalign_semantic_effect_observer_e5_protocol.json",
