@@ -33,6 +33,15 @@
     "resize_size": 224,
     "sample_steps": 10
   },
+  "excluded_invalid_attempts": [
+    {
+      "episode_count": 0,
+      "outcomes_observed": false,
+      "reason": "launch used the repository test interpreter, which does not contain JAX; failure occurred before policy loading and before any episode or outcome",
+      "reuse_for_analysis": false,
+      "root": "results/proofalign_horizon_consistent_v7_four_arm_initial_20260728_fresh1"
+    }
+  ],
   "execution_authorization": {
     "action_dispatch": true,
     "attacked_rollout": false,
@@ -41,7 +50,7 @@
     "full_clean_efficacy_rollout": false,
     "task_outcome_observation": true
   },
-  "fresh_output_root": "results/proofalign_horizon_consistent_v7_four_arm_initial_20260728_fresh1",
+  "fresh_output_root": "results/proofalign_horizon_consistent_v7_four_arm_initial_20260728_fresh2",
   "gates": {
     "effect_rejection_limit": null,
     "expected_episode_count": 12,
@@ -221,11 +230,11 @@
   },
   "source": {
     "freezer": "scripts/freeze_horizon_consistent_v7_four_arm_initial.py",
-    "freezer_sha256": "9952836204cdcccd6e9969be89f2696aa1d0c8b00ab4792564b716ef479d95d8",
-    "repository_commit": "5b2272bc7335a8922af803f69df547825c1062c2",
-    "repository_tree": "8f0fe59e4e283c4ea50de474aa39452deec55c24",
+    "freezer_sha256": "46912c2d9e681b9bc4c015cb0f81ce860b9b8dabbf691432dd638cc150f8858c",
+    "repository_commit": "2145e3ac50af74ee40341ac55d200dc2ff032eeb",
+    "repository_tree": "24063628cc91cdb436c5ab89f906eb49041efb1c",
     "sha256": {
-      "scripts/freeze_horizon_consistent_v7_four_arm_initial.py": "9952836204cdcccd6e9969be89f2696aa1d0c8b00ab4792564b716ef479d95d8",
+      "scripts/freeze_horizon_consistent_v7_four_arm_initial.py": "46912c2d9e681b9bc4c015cb0f81ce860b9b8dabbf691432dd638cc150f8858c",
       "scripts/run_horizon_consistent_v7_four_arm_initial.py": "32fd44f09e6a601da95d80755971fa3f9a5396add3fa29ed5b9866c5e9a5ca34",
       "scripts/run_l2_execution_attack_eval_v4.py": "e5404595baca242bfa87a93e162416847291c1d4e0cbc2aadee1f4ccd3fb03fe",
       "scripts/run_l2_execution_attack_eval_v6.py": "d38d4023829e3420127c027288a248e4bba0eeef2a776e91551da71bd1d0a88c",
