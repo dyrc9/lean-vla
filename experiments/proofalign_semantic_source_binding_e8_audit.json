@@ -3,7 +3,7 @@
   "audit_id": "proofalign-semantic-source-binding-e8-20260725",
   "audit_source": {
     "path": "scripts/generate_semantic_source_binding_e8.py",
-    "sha256": "2caad6fc11d68c1136c1dfbf0bc88a0b9e7363f0fa4c2b5e96846bab7e7ddaa5"
+    "sha256": "283b5d40df761dc9ec508382944e468d77ff141f60abc89da21b2b127e0aa2b9"
   },
   "claim_boundary": "This read-only audit binds the current semantic source scope, local evidence inventory, latest source-scope commit, and OpenPI checkout. A not-clean classification does not modify or commit the worktree. A clean classification would establish provenance only, not perception quality, efficacy, outcome, or safety.",
   "classification": "semantic_source_binding_clean",
@@ -22,7 +22,7 @@
       "exists": true,
       "git_status": "clean",
       "path": "README.md",
-      "sha256": "4f6ed6c387ab682cede3d93ded37e4c6282a4d085e94303922a7142f2240d1f1",
+      "sha256": "500cb8db8adf9970a128f691ada9520a7f8d60b6c46dfcd30010b527ee879fc8",
       "tracked": true
     },
     {
@@ -54,7 +54,7 @@
       "exists": true,
       "git_status": "clean",
       "path": "docs/l2_and_cross_layer_experiments.md",
-      "sha256": "fb38a9c4f44fb3bb66433deb400a6fec16881720edfb1487f4b2959323b694f1",
+      "sha256": "97793bc8902d3c372754d7d9eee3e90b51d620e9be71d812a8ab666cacd8b606",
       "tracked": true
     },
     {
@@ -70,7 +70,7 @@
       "exists": true,
       "git_status": "clean",
       "path": "docs/paper/paper_story.md",
-      "sha256": "49a216bf22b5ce29705f4107b1dc5bc554f26e373bb24cd62f7af967af4968bc",
+      "sha256": "6f169a20078d376070dae4238f056c44a944adcb8ffdf6777de8401fb9fbc90d",
       "tracked": true
     },
     {
@@ -78,7 +78,7 @@
       "exists": true,
       "git_status": "clean",
       "path": "docs/progress_and_plan.md",
-      "sha256": "06854daae1f873000ebd4a3cf26ffecf6853b55d924ba25f392766c545820bcd",
+      "sha256": "9ed85f58e6155b5a170426bceb46eb4cf69e39a00a96bdebbf76f6bd76853775",
       "tracked": true
     },
     {
@@ -173,8 +173,24 @@
       "bound_to_head": true,
       "exists": true,
       "git_status": "clean",
+      "path": "scripts/freeze_four_arm_v4_l1_block10_qualification.py",
+      "sha256": "37213a537929f253a8099a609088817d35a4ae31c7e749a66ed6f8a1ef5ecdcb",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/freeze_four_arm_v4_l1_block10_terminal.py",
+      "sha256": "7ad720f2ed30d9ab0d5b3f32c49cdf77c6bd61ff477a7cf3bdb2af2111844dd5",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
       "path": "scripts/generate_semantic_source_binding_e8.py",
-      "sha256": "2caad6fc11d68c1136c1dfbf0bc88a0b9e7363f0fa4c2b5e96846bab7e7ddaa5",
+      "sha256": "283b5d40df761dc9ec508382944e468d77ff141f60abc89da21b2b127e0aa2b9",
       "tracked": true
     },
     {
@@ -263,6 +279,14 @@
       "git_status": "clean",
       "path": "scripts/run_four_arm_v4_l1_repair_qualification_v2.py",
       "sha256": "de6d565bf9ac1d60a89948a40f016a9dbf26c176cfa3ee4666769311ad0939b7",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/run_four_arm_v4_l1_block10_qualification.py",
+      "sha256": "b51a1542910d592e3d3908ac0e7e3b61c66e7d80162538b2fdcf50c45ce62700",
       "tracked": true
     },
     {
@@ -501,6 +525,14 @@
       "bound_to_head": true,
       "exists": true,
       "git_status": "clean",
+      "path": "tests/test_l1_block10_qualification.py",
+      "sha256": "196e608f16ea4f5acae39ab1c5c9c8bb96fed72308a43ea2caedf59f43ec8905",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
       "path": "tests/test_pi05_action_conditioning_e2.py",
       "sha256": "507c9ff3d6141d6dd712e93654f52dedd3e8c30c02d0a1afeee7b5fce67f71ed",
       "tracked": true
@@ -693,6 +725,22 @@
       "bound_to_head": true,
       "exists": true,
       "git_status": "clean",
+      "path": "experiments/proofalign_four_arm_v4_l1_block10_qualification_protocol.json",
+      "sha256": "91586bbd2fd59b527a345109e8777fdbb432bd046dd4f75c13d1db372dc45509",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_four_arm_v4_l1_block10_terminal_summary.json",
+      "sha256": "327a47c591b3e5927a6203cab814b2be5c0b7e8fb8106fd3eb7a1274a2dffc19",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
       "path": "experiments/proofalign_pi05_action_conditioning_e2_protocol.json",
       "sha256": "079cf5566f49f44cd7ade70cf9cc5a96ef8d539bf5754ad01ad0d1e31e56be6e",
       "tracked": true
@@ -861,8 +909,8 @@
   "policy_loaded": false,
   "repository_binding_semantics": "latest commit that changed the frozen semantic commit scope; later commits may contain only out-of-scope protocols or audit packets",
   "repository_fully_clean": true,
-  "repository_head_commit": "e3bca442fab68f046c894fddafab91765939e829",
-  "repository_head_tree": "f22247ca5146910d46c6edbbf89e5151a8350633",
+  "repository_head_commit": "1ce4c961a58fb0c147c4139ad4efc1a555c942a7",
+  "repository_head_tree": "bb7f11b11f694ae8e0e39511459defa77e04023a",
   "repository_status_row_count": 0,
   "schema": "proofalign.semantic-source-binding-e8-audit.v1",
   "simulator_created": false
