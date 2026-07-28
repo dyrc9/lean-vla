@@ -161,10 +161,6 @@ def test_wrapper_accepts_checked_projected_prefix_and_builds_v4_chain() -> None:
     assert decision.execution_contract.assessment_digest == (
         decision.assessment.assessment_digest
     )
-    assert decision.execution_contract.expected_effect_atoms == (
-        "command_applied",
-        "pick_up_prefix_progress",
-    )
     assert decision.checked_candidate.projection_l2 > 0
 
 
@@ -230,22 +226,6 @@ def test_selector_progresses_pick_move_place_release_finish() -> None:
     assert release.artifact.selected_subtask == "release(red_mug_1)"
     assert finish.finished
     assert finish.artifact.selected_subtask == "finish()"
-
-
-def test_selector_does_not_advance_from_pick_up_on_nearness_alone() -> None:
-    near_but_not_held = _begin(
-        _wrapper(),
-        _observation(
-            epoch=1,
-            eef=(0.14, 0.0, 0.25),
-            target=(0.15, 0.0, 0.25),
-            gripper=(0.04, -0.04),
-        ),
-    )
-
-    assert near_but_not_held.artifact.selected_subtask == (
-        "pick_up(red_mug_1)"
-    )
 
 
 def test_missing_geometry_and_wrong_closed_grasp_fail_before_policy_call() -> None:

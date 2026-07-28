@@ -69,30 +69,8 @@ def test_pick_up_accepts_approach_progress() -> None:
     assert result.known
     assert result.semantic_compatible
     assert result.motion_atoms == ("approach",)
-    assert result.predicted_effect_atoms == (
-        "pick_up_prefix_progress",
-    )
+    assert result.predicted_effect_atoms == ("closer_to_target",)
     assert result.progress_margin is not None and result.progress_margin > 0
-
-
-def test_pick_up_close_near_promises_prefix_progress_not_completed_grasp() -> None:
-    result = _checker().assess(
-        semantic_subtask="pick_up(red_mug_1)",
-        observation=_observation(
-            eef=(0.05, 0.0, 0.25),
-            target=(0.10, 0.0, 0.25),
-        ),
-        command=_flat((0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0)),
-        command_shape=(1, 7),
-        expected_state_epoch=4,
-    )
-
-    assert result.semantic_compatible
-    assert result.motion_atoms == ("grasp",)
-    assert result.predicted_effect_atoms == (
-        "pick_up_prefix_progress",
-    )
-    assert "holding_target" not in result.predicted_effect_atoms
 
 
 def test_pick_up_rejects_close_outside_target_neighborhood() -> None:

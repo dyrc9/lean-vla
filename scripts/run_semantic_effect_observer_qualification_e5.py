@@ -34,12 +34,12 @@ from proofalign.semantic_local_checker import (  # noqa: E402
 PROTOCOL_PATH = (
     REPO_ROOT
     / "experiments"
-    / "proofalign_semantic_effect_observer_e5_v3_protocol.json"
+    / "proofalign_semantic_effect_observer_e5_v2_protocol.json"
 )
 OUTPUT_ROOT = (
     REPO_ROOT
     / "results"
-    / "proofalign_semantic_effect_observer_e5_v3_20260728_fresh1"
+    / "proofalign_semantic_effect_observer_e5_v2_20260727_fresh1"
 )
 RESULT_PATH = OUTPUT_ROOT / "qualification.json"
 CHECKSUMS_PATH = OUTPUT_ROOT / "SHA256SUMS"
@@ -50,7 +50,6 @@ SOURCE_PATHS = (
 )
 CLEAN_GROUPS = (
     "pick_approach_observed",
-    "pick_near_without_holding_observed",
     "pick_holding_observed",
     "move_progress_observed",
     "place_region_observed",
@@ -110,44 +109,41 @@ def canonical_text(value: Any) -> str:
 def build_protocol() -> dict[str, Any]:
     return {
         "schema": (
-            "proofalign.semantic-effect-observer-qualification-e5-v3.v1"
+            "proofalign.semantic-effect-observer-qualification-e5.v1"
         ),
         "protocol_id": (
-            "proofalign-semantic-effect-observer-e5-v3-20260728"
+            "proofalign-semantic-effect-observer-e5-v2-20260727"
         ),
         "status": (
-            "post_outcome_exploratory_horizon_consistent_pick_up_"
-            "effect_qualification"
+            "frozen_outcome_blind_analytic_transition_corpus_"
+            "successor_after_e9_smoke"
         ),
-        "created_at": "2026-07-28T17:29:00+08:00",
+        "created_at": "2026-07-27T10:20:00+08:00",
         "predecessor": {
             "protocol_path": (
                 "experiments/"
-                "proofalign_semantic_effect_observer_e5_v2_protocol.json"
+                "proofalign_semantic_effect_observer_e5_protocol.json"
             ),
             "protocol_sha256": (
-                "8d00b06c802ee99df465aea9f519cd8b881d855d723290fc29a9b734eb862b71"
+                "647a1349250ae2b4e31213639c7376d54c810d7413e662f37f3b811a23ac081a"
             ),
             "result_path": (
-                "results/proofalign_semantic_effect_observer_e5_v2_"
-                "20260727_fresh1/qualification.json"
+                "results/proofalign_semantic_effect_observer_e5_"
+                "20260725_fresh1/qualification.json"
             ),
             "result_sha256": (
-                "2cfcc985486d411f76aed3fe8347f8bbbfdf6af6df8a5da7fc911f37852baff9"
+                "affcb1500e4b9cdfc624ed93ba9d3c303bbf3070392a2a015c30ce1391e1a72c"
             ),
         },
         "successor_change": (
-            "Version 3 adds pick_up_prefix_progress, observed exactly when "
-            "the finite prefix makes at least 2 mm approach progress, ends "
-            "inside the 10 cm target neighborhood, or has a trusted held "
-            "state. This post-outcome change makes the block contract "
-            "horizon-consistent; holding_target remains a separate trusted "
-            "effect and task-graph transition guard. Numeric thresholds and "
-            "all false-allow gates are unchanged."
+            "Version 2 observes closer_to_target for positive approach "
+            "progress and reserves near_target for actual neighborhood "
+            "occupancy. Corpus size, gates, and numeric thresholds are "
+            "unchanged."
         ),
         "observer": {
             "id": "proofalign-libero-analytic-effect-observer",
-            "version": "3",
+            "version": "2",
             "config": SemanticEffectObserverConfig().__dict__,
         },
         "corpus": {
@@ -156,7 +152,7 @@ def build_protocol() -> dict[str, Any]:
             "clean_groups": CLEAN_GROUPS,
             "attack_groups": ATTACK_GROUPS,
             "ood_groups": OOD_GROUPS,
-            "expected_case_count": 2200,
+            "expected_case_count": 2100,
             "label_source": (
                 "independent frozen before/after geometry fixture oracle; "
                 "labels are not derived from observer outputs"
@@ -202,7 +198,7 @@ def build_protocol() -> dict[str, Any]:
 def validate_protocol(protocol: dict[str, Any]) -> None:
     if (
         protocol.get("schema")
-        != "proofalign.semantic-effect-observer-qualification-e5-v3.v1"
+        != "proofalign.semantic-effect-observer-qualification-e5.v1"
     ):
         raise EffectObserverQualificationError(
             "unsupported E5 protocol schema"
@@ -220,7 +216,7 @@ def validate_protocol(protocol: dict[str, Any]) -> None:
         raise EffectObserverQualificationError(
             "E5 OOD groups changed"
         )
-    if corpus["expected_case_count"] != 2200:
+    if corpus["expected_case_count"] != 2100:
         raise EffectObserverQualificationError(
             "E5 population changed"
         )
@@ -319,10 +315,7 @@ def build_cases(protocol: dict[str, Any]) -> list[Case]:
             prefix_complete = True
             release_destination = None
             violations: tuple[str, ...] = ()
-            required = (
-                "command_applied",
-                "pick_up_prefix_progress",
-            )
+            required = ("command_applied", "closer_to_target")
             before = _observation(
                 epoch=epoch,
                 eef=origin,
@@ -338,34 +331,12 @@ def build_cases(protocol: dict[str, Any]) -> list[Case]:
                 closed=False,
             )
 
-            if group == "pick_near_without_holding_observed":
-                target = (dx + 0.03, dy, 0.55 + dz)
-                required = (
-                    "command_applied",
-                    "near_target",
-                    "pick_up_prefix_progress",
-                )
-                before = _observation(
-                    epoch=epoch,
-                    eef=(dx + 0.02, dy, 0.55 + dz),
-                    target=target,
-                    destination=destination,
-                    closed=False,
-                )
-                after = _observation(
-                    epoch=epoch + 1,
-                    eef=(dx + 0.04, dy, 0.55 + dz),
-                    target=target,
-                    destination=destination,
-                    closed=False,
-                )
-            elif group == "pick_holding_observed":
+            if group == "pick_holding_observed":
                 target = (dx + 0.03, dy, 0.55 + dz)
                 required = (
                     "command_applied",
                     "near_target",
                     "holding_target",
-                    "pick_up_prefix_progress",
                 )
                 before = _observation(
                     epoch=epoch,
@@ -901,10 +872,10 @@ def build_result(protocol: dict[str, Any]) -> dict[str, Any]:
     )
     return {
         "schema": (
-            "proofalign.semantic-effect-observer-result-e5-v3.v1"
+            "proofalign.semantic-effect-observer-result-e5.v1"
         ),
         "run_id": (
-            "proofalign-semantic-effect-observer-e5-v3-20260728-fresh1"
+            "proofalign-semantic-effect-observer-e5-20260725-fresh1"
         ),
         "classification": (
             "analytic_semantic_effect_observer_qualified"
@@ -933,7 +904,7 @@ def validate_result(
 ) -> None:
     if (
         observed.get("schema")
-        != "proofalign.semantic-effect-observer-result-e5-v3.v1"
+        != "proofalign.semantic-effect-observer-result-e5.v1"
     ):
         raise EffectObserverQualificationError(
             "unsupported E5 result schema"

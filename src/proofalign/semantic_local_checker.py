@@ -22,9 +22,8 @@ from proofalign.semantic_action_selection import CheckedActionBlock
 
 
 LOCAL_CHECKER_ID = "proofalign-libero-analytic-local-checker"
-LOCAL_CHECKER_VERSION = "3"
+LOCAL_CHECKER_VERSION = "2"
 LOCAL_OBSERVATION_SCHEMA = "proofalign.libero-trusted-local-observation.v1"
-PICK_UP_PREFIX_PROGRESS_EFFECT = "pick_up_prefix_progress"
 
 
 class LocalCheckerError(ValueError):
@@ -606,12 +605,11 @@ class SemanticExecutablePrefixChecker:
             if closes_near
             else ("approach",)
         )
-        # A finite close-near prefix does not guarantee that the simulator
-        # will already report a stable grasp at this exact block boundary.
-        # Promise only horizon-consistent local progress here. The trusted
-        # task-graph selector still requires an observed held state before it
-        # advances from pick_up to move.
-        effects = (PICK_UP_PREFIX_PROGRESS_EFFECT,)
+        effects = (
+            ("holding_target",)
+            if closes_near or lifts_held
+            else ("closer_to_target",)
+        )
         return LocalActionAssessment(
             known=True,
             semantic_compatible=compatible,
@@ -787,7 +785,6 @@ class SemanticExecutablePrefixChecker:
 __all__ = [
     "LOCAL_CHECKER_ID",
     "LOCAL_CHECKER_VERSION",
-    "PICK_UP_PREFIX_PROGRESS_EFFECT",
     "EntityPosition",
     "LocalActionAssessment",
     "LocalCheckerConfig",

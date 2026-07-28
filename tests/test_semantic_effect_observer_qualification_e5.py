@@ -24,7 +24,7 @@ def test_e5_protocol_and_result_are_current() -> None:
     assert PROTOCOL_PATH.read_text(
         encoding="utf-8"
     ) == canonical_text(build_protocol())
-    assert len(build_cases(protocol)) == 2200
+    assert len(build_cases(protocol)) == 2100
     assert CHECKSUMS_PATH.read_text(encoding="utf-8") == (
         f"{file_sha256(RESULT_PATH)}  {RESULT_PATH.name}\n"
     )
@@ -39,7 +39,7 @@ def test_e5_analytic_effect_observer_passes_all_frozen_gates() -> None:
         result["classification"]
         == "analytic_semantic_effect_observer_qualified"
     )
-    assert summary["case_count"] == 2200
+    assert summary["case_count"] == 2100
     assert summary["clean_retention"] == 1.0
     assert summary["attack_false_allow_count"] == 0
     assert summary["ood_abstention_rate"] == 1.0

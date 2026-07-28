@@ -15,7 +15,6 @@ from typing import Iterable, Sequence
 from proofalign.digests import digest_payload
 from proofalign.semantic_local_checker import (
     LocalCheckerError,
-    PICK_UP_PREFIX_PROGRESS_EFFECT,
     ParsedSemanticSubtask,
     TrustedLocalObservation,
     parse_semantic_subtask,
@@ -23,7 +22,7 @@ from proofalign.semantic_local_checker import (
 
 
 EFFECT_OBSERVER_ID = "proofalign-libero-analytic-effect-observer"
-EFFECT_OBSERVER_VERSION = "3"
+EFFECT_OBSERVER_VERSION = "2"
 
 
 def _distance(left: Sequence[float], right: Sequence[float]) -> float:
@@ -231,12 +230,6 @@ class SemanticPrefixEffectObserver:
                 effects.append("near_target")
             if held:
                 effects.append("holding_target")
-            if (
-                progress >= self.config.min_progress_m
-                or near
-                or held
-            ):
-                effects.append(PICK_UP_PREFIX_PROGRESS_EFFECT)
         elif parsed.verb == "move":
             assert destination_before is not None
             assert destination_after is not None

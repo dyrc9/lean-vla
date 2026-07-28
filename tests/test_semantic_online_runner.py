@@ -285,7 +285,6 @@ def test_online_runner_seals_qualified_observed_effects(
         "command_applied",
         "closer_to_target",
         "near_target",
-        "pick_up_prefix_progress",
     )
     assert transaction["effect_verdict"] == "allow"
 
