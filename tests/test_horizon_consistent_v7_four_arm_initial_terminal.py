@@ -30,3 +30,8 @@ def test_initial_terminal_summary_is_current_when_present() -> None:
     assert retained["diagnostics"][
         "semantic_projection_budget_rejection_count"
     ] == 4
+    independent = retained["diagnostics"][
+        "independent_constraint_signals"
+    ]["aggregate"]
+    assert independent["episodes_with_joint_limit_violation"] > 0
+    assert independent["episodes_with_excessive_force"] > 0
