@@ -50,7 +50,7 @@
       "release_command_missing"
     ],
     "pick_up_repair_generalized_across_all_three_suites": true,
-    "remaining_effect_failure": "The accepted release H10 block promised gripper_open and target_released, but its final two gripper commands closed again; the observer saw only command_applied and rejected.",
+    "remaining_effect_failure": "The accepted release H10 block promised gripper_open and target_released, but only its final two steps issued the open command after eight non-opening steps; the gripper did not physically open within the finite window, so the observer saw only command_applied and rejected.",
     "remaining_effect_failure_stage": "release"
   },
   "lifecycle": {
@@ -122,8 +122,8 @@
   "schema": "proofalign.horizon-consistent-pick-up-fresh-dual-pilot-terminal-summary.v1",
   "source": {
     "generator": "scripts/freeze_horizon_consistent_pick_up_fresh_dual_pilot_terminal.py",
-    "generator_sha256": "1deab5b92a14b833916bfa93aa3c7d26a6c6535dc55db1e23347a45f9b222011",
-    "repository_commit": "dcade170c392290393ae35416f3ab7659d9fed62",
-    "repository_tree": "d67cefa5956302cd95782cf99e3cc1e92fd8f61c"
+    "generator_sha256": "c3a717cea4256fa06b8a89ad6195407fe7a5185b4c4770cf7ec64821aa201ef0",
+    "repository_commit": "e4c06cd7f570879b0ab17b17e91a0c0a01eaf92f",
+    "repository_tree": "6164617bd8d1c8896fc917e8f7c55cead2cc18ad"
   }
 }
