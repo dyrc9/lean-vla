@@ -324,6 +324,11 @@ support45 终局后的 post-outcome L1 repair 另行做了 zero-dispatch/no-outc
 匹配检查 H=2/5/10，availability 为 `0/45, 17/45, 36/45`。H=10 相对 H=5 有19个 gain、0个
 loss，但总80%与 worst-suite 73.33%仍未通过90%/80% gates；因此它只进入 block-size
 availability ablation，不恢复 clean/attacked execution authorization。
+
+H>10 不受当前 policy source interface 支持，因此没有拼接 stale-observation chunks。第三套
+H10×K4 no-outcome successor 的匹配 K=1/2/4 coverage 为 `35/45, 35/45, 36/45`，K=4
+仅净增1个初态；suite `13/15, 14/15, 9/15` 仍未过 gate。这关闭了“继续加随机 candidate 即可恢复
+clean utility”的解释，也不恢复 Stage C。
 P1/P2/P3 保留为次要 trust-boundary stress table：P2 的 after-one-step detection 不能算 prevention，P3
 也不能期待被 exact digest 单独解决。
 

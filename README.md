@@ -91,6 +91,12 @@ phase-gating theorem，而不是事后附加的形式化说明。
     73.33%低于80% gate，因此分类仍为 `l1_block10_initial_availability_qualification_nonpass`；
   - 全部三个长度的 hard-violation candidate 都为0；该消融只说明初态 checker availability，
     不说明轨迹 success 或防御 efficacy。
+- 2026-07-28 H10×K4 successor：
+  - 在第三套逐任务不重叠 init 与新 seed 上保持 H=10，只把候选数从1增到4；
+  - 同一 ordered candidate set 的 K=1/K=2/K=4 coverage 为 `35/45, 35/45, 36/45`，45个
+    样本都具有4个不同 source chunk，但额外3次推理只增加1个可用初态；
+  - K=4 三个 suite 为 `13/15, 14/15, 9/15`，总80%与最差60%仍为 nonpass；因此停止继续堆
+    stale horizon 或 IID candidate，下一步必须改变 action generator、训练条件或反馈接口。
 - P0b：96/96 episode 有效，得到 23 个 clean-eligible pair 和 15 个攻击 transition；因
   `23 < 26` 未通过确认性 denominator gate。
 - R9 Execution-only：clean retention `22/23 = 95.7%`；attacked+defended `48/48`
@@ -112,9 +118,10 @@ phase-gating theorem，而不是事后附加的形式化说明。
 2. M2 原 `50%` confirmatory gate、full-population support failure 和 support45 clean nonpass 均已
    终局冻结，不被后续探索性工作覆盖。
 3. support45 的 attacked stage 以 clean pass 为冻结前置条件；当前未通过，因此不执行攻击 rollout。
-4. post-outcome L1 repair 与 Block-10 successor 均已完成严格的 no-outcome qualification：oracle
-   geometry 有效，Block-10 将匹配 availability 提高到80%，但仍未通过90%/worst-suite 80% gates；
-   同一 population 不再 retry，也不降低 2 mm checker threshold。
+4. post-outcome L1 repair、Block-10 与 H10×K4 successor 均已完成严格的 no-outcome
+   qualification：oracle geometry 有效，Block-10 将 availability 提高到约80%，但 K=4 只比K=1
+   增加1/45，仍未通过90%/worst-suite 80% gates；不再继续 blind horizon/candidate search，也不降低
+   2 mm checker threshold。
 5. 当前论文主线转为完整报告 problem decomposition、Lean transaction、L2 探索信号、L1 coverage/
    availability failure taxonomy 与负结果。任何后续正向 L1 机制都必须是 materially new、明确
    post-outcome，并先在新冻结 population/seed 上资格化，不能直接进入 efficacy rollout。

@@ -61,6 +61,12 @@ trusted BDDL goal 只有 `Checkgrippercontactpart`，已资格化 semantic wrapp
   `13/15, 12/15, 11/15`。虽然 H=10 相对 H=5 提高42.22pp，仍未达到总90%与 worst-suite 80%
   gates，故保持 `l1_block10_initial_availability_qualification_nonpass`，终局见
   `experiments/proofalign_four_arm_v4_l1_block10_terminal_summary.json`。
+- 因 checkpoint 不支持原生 H>10，后继没有拼接 stale-observation chunk，而是在第三套不重叠 init、
+  seed 97/37 上冻结 H10×K4。匹配 K=1/2/4 coverage 为 `35/45, 35/45, 36/45`；
+  pattern `111:35, 001:1, 000:9`，45/45 行的四个 source digest 均不同。K=4 仅净增1个初态，
+  suite 为 `13/15, 14/15, 9/15`，总80%与 worst-suite 60%继续 nonpass。该终局冻结在
+  `experiments/proofalign_four_arm_v4_l1_block10_k4_terminal_summary.json`，并停止继续增加 blind
+  stochastic samples 或伪造 H>10 open-loop block。
 
 ## 0A. 2026-07-27 qualification 与工程 smoke checkpoint
 
@@ -108,7 +114,8 @@ benchmark privileged-geometry no-outcome stack 完整；deployment perception �
 当前 blocker 与停止边界：
 
 1. 当前 L1 不具备闭环 clean availability：oracle geometry 已关闭 destination gap，Block-10
-   将新 split 初态 availability 提高到36/45，但总 gate 与最差 suite gate 仍未通过；
+   把不同 successor split 的初态 availability 提高到约80%，但 H10×K4 证明多采样只净增1/45，
+   总 gate 与最差 suite gate仍未通过；
 2. attacked Stage C 以 clean gate 为冻结前置条件，现已永久阻断于本协议；不得把“继续跑攻击”用于绕过
    clean nonpass；
 3. 所有结果保持 exploratory 标签，不得回写原 50% M2 nonpass，也不得结果后降低 2 mm checker 条件；
@@ -387,7 +394,8 @@ C1 semantic digest schema（已实现）
   -> support-conditioned attacked 360 episodes（前置 gate 未过，未授权且不执行）
   -> post-outcome L1 geometry+K4 no-outcome qualification（nonpass：24/45）
   -> Block-10 + matched H=2/5/10 no-outcome qualification（nonpass：36/45）
-  -> materially-new L1 redesign（未授权，不能复用上述 qualification population）
+  -> H10×K4 + matched K=1/2/4 no-outcome qualification（nonpass：36/45）
+  -> materially-new action generator / trained conditioning / feedback interface
 ```
 
 当前继续使用预先资格化的 deterministic task-FSM L1。40% 只改变是否继续收集探索性四臂证据，
@@ -404,7 +412,8 @@ M2 producer/victim 的 240-episode population、stopping rule、原 50% gate 和
 1. 已观察的论文事实链是 M2 confirmatory nonpass → disclosed 40% post-outcome exploratory
    continuation → full-population initialization-support failure → support45 clean-gate nonpass →
    post-outcome oracle-geometry+K4 availability qualification nonpass → Block-10 availability
-   qualification nonpass；attacked four-arm 因冻结前置条件未过而停止；
+   qualification nonpass → H10×K4 availability qualification nonpass；attacked four-arm 因冻结
+   前置条件未过而停止；
 2. online runner 已将 L1 semantic alignment 与 L2 execution integrity 拆成独立开关。closed-loop 不要求
    跨 L1 source chunk 相同，只要求 paired initial identity 和 within-L1 L2 pair 的首个 policy input/output
    identity；

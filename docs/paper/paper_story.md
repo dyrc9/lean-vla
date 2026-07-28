@@ -251,3 +251,11 @@ checked prefix length，并对同一个 source chunk shadow-check H=2/5/10。在
 需要更长时间尺度才能显现局部语义进展”，但 H=10 总率80%与最差 suite 73.33%仍低于冻结 gate，
 所以仍是 qualification nonpass。论文可将其作为 matched block-size availability ablation，不能写成
 trajectory success、攻击防御或 Dual efficacy。
+
+由于 checkpoint 原生 source chunk 只有10步，H>10 不能通过从同一 stale initial observation
+重复调用并拼接来构造。第三个冻结 successor 因而保持 H=10，只在第三套不重叠 init 上匹配比较
+K=1/2/4。coverage 为 `35/45, 35/45, 36/45`，pattern 为 `111:35, 001:1, 000:9`；虽然每行
+四个 source digest 都不同，K=4 仅比K=1增加1个初态。K=4 suite 为 `13/15, 14/15, 9/15`，
+总80%与最差60%仍 nonpass。论文应据此明确区分：时间尺度 H=10 对 availability 有明显作用，
+blind stochastic resampling 几乎没有作用；后续正向改进需要改变 action generator、训练 semantic
+conditioning 或 feedback-aware policy interface，而不是继续堆 IID samples。
