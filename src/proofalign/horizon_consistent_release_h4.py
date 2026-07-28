@@ -71,9 +71,9 @@ class HorizonConsistentReleaseH4CandidatePolicy(
             max_projection_l2=wrapper.max_projection_l2,
         )
         eligible = selection.selected is not None
-        returned = exact.copy()
+        returned = source.copy()
         if not eligible:
-            returned[:, 6] = 1.0
+            returned[: self.replan_steps, 6] = 1.0
         if not self.audits:
             raise HorizonConsistentReleaseH4Error(
                 "H4 release successor lacks predecessor audit"

@@ -18,7 +18,11 @@ from proofalign.horizon_consistent_release_h4 import (  # noqa: E402
     HorizonConsistentReleaseH4CandidatePolicy,
     RELEASE_MICRO_BLOCK_STEPS,
 )
+from proofalign.semantic_local_checker import (  # noqa: E402
+    parse_semantic_subtask,
+)
 from scripts import run_l2_execution_attack_eval as v1  # noqa: E402
+from scripts import run_l2_execution_attack_eval_v2 as v2  # noqa: E402
 from scripts import run_l2_execution_attack_eval_v3 as v3  # noqa: E402
 from scripts import run_l2_execution_attack_eval_v4 as v4  # noqa: E402
 
@@ -26,20 +30,66 @@ from scripts import run_l2_execution_attack_eval_v4 as v4  # noqa: E402
 RUNNER_VARIANT = "proofalign_l2_execution_attack_successor_v6"
 
 
+class H4ReleaseSemanticPolicyWrapper(
+    v2.TrustedSemanticPolicyWrapper
+):
+    """Compile only a release proposal into an exact four-action block."""
+
+    def complete_policy_call(
+        self,
+        request: Any,
+        *,
+        nominal_command: Any,
+        command_shape: Any,
+        **kwargs: Any,
+    ) -> Any:
+        command = tuple(float(value) for value in nominal_command)
+        shape = tuple(int(value) for value in command_shape)
+        if (
+            parse_semantic_subtask(
+                request.artifact.selected_subtask
+            ).verb
+            == "release"
+        ):
+            if (
+                len(shape) != 2
+                or shape[1] != 7
+                or shape[0] < RELEASE_MICRO_BLOCK_STEPS
+            ):
+                raise RuntimeError(
+                    "release H4 wrapper requires an Hx7 source block"
+                )
+            command = command[
+                : RELEASE_MICRO_BLOCK_STEPS * shape[1]
+            ]
+            shape = (RELEASE_MICRO_BLOCK_STEPS, shape[1])
+        return super().complete_policy_call(
+            request,
+            nominal_command=command,
+            command_shape=shape,
+            **kwargs,
+        )
+
+
 def run_episode(**kwargs: Any) -> dict[str, Any]:
     """Run v4 checker/observer bindings with the H4 release policy."""
 
     args: argparse.Namespace = kwargs["args"]
     l1_enabled, _l2_enabled = v1._arm_switches(args)
-    original = v3.OnlineProgressProjectionCandidatePolicy
+    original_policy = v3.OnlineProgressProjectionCandidatePolicy
+    original_wrapper = v2.TrustedSemanticPolicyWrapper
     if l1_enabled:
         v3.OnlineProgressProjectionCandidatePolicy = (
             HorizonConsistentReleaseH4CandidatePolicy
         )
+        v2.TrustedSemanticPolicyWrapper = (
+            H4ReleaseSemanticPolicyWrapper
+        )
     try:
         payload = v4.run_episode(**kwargs)
     finally:
-        v3.OnlineProgressProjectionCandidatePolicy = original
+        v3.OnlineProgressProjectionCandidatePolicy = original_policy
+        v2.TrustedSemanticPolicyWrapper = original_wrapper
     metadata = dict(payload["metadata"])
     metadata.update(
         {

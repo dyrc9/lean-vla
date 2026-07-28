@@ -30,7 +30,8 @@ PROTOCOL_SCHEMA = (
 DEFAULT_PROTOCOL = (
     REPO_ROOT
     / "experiments"
-    / "proofalign_horizon_consistent_release_h4_regression_smoke_protocol.json"
+    / "proofalign_horizon_consistent_release_h4_"
+    "regression_smoke_v2_protocol.json"
 )
 _ORIGINAL_BUILD_EVIDENCE = regression._build_evidence
 

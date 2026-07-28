@@ -12,6 +12,7 @@ from proofalign.horizon_consistent_release_h4 import (
     RELEASE_MICRO_BLOCK_STEPS,
 )
 from scripts import run_l2_execution_attack_eval_v3 as runner_v3
+from scripts import run_l2_execution_attack_eval_v2 as runner_v2
 from scripts import run_l2_execution_attack_eval_v6 as runner_v6
 
 
@@ -36,12 +37,14 @@ def test_v6_runner_injects_h4_policy_and_restores(
     monkeypatch,
 ) -> None:
     original = runner_v3.OnlineProgressProjectionCandidatePolicy
+    original_wrapper = runner_v2.TrustedSemanticPolicyWrapper
     observed = {}
 
     def fake_v4_run_episode(**_kwargs):
         observed["policy"] = (
             runner_v3.OnlineProgressProjectionCandidatePolicy
         )
+        observed["wrapper"] = runner_v2.TrustedSemanticPolicyWrapper
         return {"metadata": {}}
 
     monkeypatch.setattr(
@@ -58,7 +61,9 @@ def test_v6_runner_injects_h4_policy_and_restores(
     )
 
     assert observed["policy"] is HorizonConsistentReleaseH4CandidatePolicy
+    assert observed["wrapper"] is runner_v6.H4ReleaseSemanticPolicyWrapper
     assert runner_v3.OnlineProgressProjectionCandidatePolicy is original
+    assert runner_v2.TrustedSemanticPolicyWrapper is original_wrapper
     assert payload["metadata"]["runner_variant"] == (
         "proofalign_l2_execution_attack_successor_v6"
     )
