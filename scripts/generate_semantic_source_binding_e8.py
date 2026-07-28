@@ -132,6 +132,14 @@ COMMIT_SCOPE_PATHS = (
         "freeze_horizon_consistent_release_"
         "regression_smoke_terminal.py"
     ),
+    (
+        "scripts/"
+        "freeze_horizon_consistent_v7_four_arm_initial.py"
+    ),
+    (
+        "scripts/"
+        "freeze_horizon_consistent_v7_four_arm_initial_terminal.py"
+    ),
     "scripts/generate_semantic_source_binding_e8.py",
     "scripts/generate_semantic_v4_equivalence_evidence.py",
     "scripts/prepare_deployment_perception_dataset_e7.py",
@@ -175,6 +183,7 @@ COMMIT_SCOPE_PATHS = (
         "scripts/"
         "run_horizon_consistent_release_regression_smoke.py"
     ),
+    "scripts/run_horizon_consistent_v7_four_arm_initial.py",
     "scripts/run_pick_up_prefix_progress_replay_qualification.py",
     "scripts/run_four_arm_v4_l1_repair_qualification.py",
     "scripts/run_four_arm_v4_l1_repair_qualification_v2.py",
@@ -228,6 +237,8 @@ COMMIT_SCOPE_PATHS = (
     "tests/test_horizon_consistent_release.py",
     "tests/test_horizon_consistent_release_h4.py",
     "tests/test_horizon_consistent_release_prefix.py",
+    "tests/test_horizon_consistent_v7_four_arm_initial.py",
+    "tests/test_horizon_consistent_v7_four_arm_initial_terminal.py",
     "tests/test_local_checker_qualification_e3.py",
     "tests/test_l1_repair_qualification.py",
     "tests/test_l1_repair_qualification_v2.py",
@@ -388,6 +399,15 @@ COMMIT_SCOPE_PATHS = (
         "proofalign_horizon_consistent_release_"
         "regression_smoke_terminal_summary.json"
     ),
+    (
+        "experiments/"
+        "proofalign_horizon_consistent_v7_four_arm_initial_protocol.json"
+    ),
+    (
+        "experiments/"
+        "proofalign_horizon_consistent_v7_four_arm_"
+        "initial_terminal_summary.json"
+    ),
     "experiments/proofalign_pi05_action_conditioning_e2_protocol.json",
     "experiments/proofalign_pi05_selector_e1_protocol.json",
     (
@@ -468,6 +488,14 @@ EVIDENCE_PATHS = (
     (
         "results/proofalign_four_arm_v4_l1_progress_projection_"
         "qualification_20260728_fresh1/SHA256SUMS"
+    ),
+    (
+        "results/proofalign_horizon_consistent_v7_four_arm_initial_"
+        "20260728_fresh2/initial_evidence.json"
+    ),
+    (
+        "results/proofalign_horizon_consistent_v7_four_arm_initial_"
+        "20260728_fresh2/SHA256SUMS"
     ),
 )
 
