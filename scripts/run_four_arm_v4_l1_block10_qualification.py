@@ -9,6 +9,8 @@ import subprocess
 import sys
 from typing import Any
 
+import numpy as np
+
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 for root in (REPO_ROOT / "src", REPO_ROOT):
@@ -22,6 +24,9 @@ from proofalign.benchmark.confirmatory import (  # noqa: E402
 from proofalign.benchmark.four_arm_v4 import canonical_text  # noqa: E402
 from scripts import run_four_arm_v4_l1_repair_qualification as base  # noqa: E402
 from scripts import run_four_arm_v4_l1_repair_qualification_v2 as launch  # noqa: E402
+from scripts.run_l2_execution_attack_eval_v2 import (  # noqa: E402
+    BoundedCandidatePolicy,
+)
 
 
 PROTOCOL_SCHEMA = (
@@ -47,6 +52,84 @@ _BASE_BUILD_SUMMARY = base.build_summary
 
 class Block10QualificationError(RuntimeError):
     """Raised when the Block-10 qualification must fail closed."""
+
+
+class Block10CandidatePolicy(BoundedCandidatePolicy):
+    """Gate on H=10 and record matched H=2/5/10 shadow assessments."""
+
+    def infer(self, element: dict[str, Any]) -> dict[str, Any]:
+        result = super().infer(element)
+        if self.wrapper is None or self.request is None:
+            raise Block10QualificationError(
+                "Block-10 shadow assessment lacks semantic bindings"
+            )
+        chunk = np.asarray(result["actions"], dtype=np.float64)
+        if chunk.ndim != 2 or len(chunk) < 10:
+            raise Block10QualificationError(
+                "Block-10 source chunk is shorter than ten actions"
+            )
+        primary = self.audits[-1]["candidates"][0]["checked"]
+        assessments: dict[str, dict[str, Any]] = {"10": dict(primary)}
+        for steps in (2, 5):
+            nominal = chunk[:steps]
+            final = np.clip(nominal, -1.0, 1.0)
+            checked, local = self.wrapper.checker.checked_candidate(
+                candidate_index=0,
+                semantic_subtask_digest=(
+                    self.request.artifact.artifact_digest
+                ),
+                semantic_subtask=(
+                    self.request.artifact.selected_subtask
+                ),
+                observation=self.request.local_observation,
+                nominal_command=tuple(
+                    float(value) for value in nominal.reshape(-1)
+                ),
+                final_command=tuple(
+                    float(value) for value in final.reshape(-1)
+                ),
+                command_shape=tuple(nominal.shape),
+                expected_state_epoch=self.request.context.state_epoch,
+                release_destination=self.request.release_destination,
+            )
+            assessments[str(steps)] = {
+                "known": checked.known,
+                "semantic_compatible": checked.semantic_compatible,
+                "post_projection_compatible": (
+                    checked.post_projection_compatible
+                ),
+                "hard_violation_atoms": checked.hard_violation_atoms,
+                "progress_margin": checked.progress_margin,
+                "projection_l2": checked.projection_l2,
+                "unknown_reason": local.unknown_reason,
+            }
+        for steps, assessment in assessments.items():
+            assessment["eligible_under_fixed_gate"] = bool(
+                assessment["known"]
+                and assessment["semantic_compatible"]
+                and assessment["post_projection_compatible"]
+                and not assessment["hard_violation_atoms"]
+                and assessment["progress_margin"]
+                >= self.wrapper.min_progress_margin
+                and assessment["projection_l2"]
+                <= self.wrapper.max_projection_l2
+            )
+            assessment["steps"] = int(steps)
+        self.audits[-1]["matched_block_size_shadow"] = {
+            "schema": (
+                "proofalign.semantic-matched-block-size-shadow.v1"
+            ),
+            "source_policy_call_count": 1,
+            "source_policy_chunk_sha256": self.audits[-1][
+                "returned_source_policy_chunk_sha256"
+            ],
+            "primary_gate_steps": 10,
+            "shadow_only_steps": (2, 5),
+            "fixed_min_progress_m": self.wrapper.min_progress_margin,
+            "fixed_max_projection_l2": self.wrapper.max_projection_l2,
+            "assessments": assessments,
+        }
+        return result
 
 
 def _validate_design(protocol: dict[str, Any]) -> None:
@@ -207,6 +290,7 @@ def _install_block10_runtime() -> None:
     base.preflight = preflight
     base.build_summary = build_summary
     base.ROW_SCHEMA = ROW_SCHEMA
+    base.BoundedCandidatePolicy = Block10CandidatePolicy
     base._configure_single_gpu = launch._configure_single_gpu
     base._args = launch._args
 
