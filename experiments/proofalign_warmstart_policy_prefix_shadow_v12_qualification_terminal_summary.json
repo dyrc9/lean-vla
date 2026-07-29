@@ -1,0 +1,101 @@
+{
+  "claim_boundary": "This result-informed v12.4b successor changes only the controller-shadow snapshot by binding MuJoCo qacc_warmstart, then reruns the same fixed outcome-known prefix population and unchanged 0.02-rad tolerance. It reads no outcome, loads no policy, dispatches no live action, and does not close fresh policy inference, clean utility, attacked efficacy, deployment, or physical safety.",
+  "classification": "warmstart_policy_prefix_shadow_v12_qualification_pass",
+  "gate_conditions": {
+    "blocked_prefix_authorization_count": true,
+    "controller_restore_identity_rate": true,
+    "environment_clock_restore_identity_rate": true,
+    "exact_allow_identity_rate": true,
+    "finite_source_prefix_rate": true,
+    "live_policy_dispatch_count": true,
+    "nominal_allow_rate": true,
+    "outcome_read_count": true,
+    "policy_inference_count": true,
+    "policy_load_count": true,
+    "qacc_warmstart_restore_identity_rate": true,
+    "repeat_trajectory_within_tolerance_rate": true,
+    "runtime_exception_count": true,
+    "shadow_reference_risk_agreement_rate": true,
+    "simulator_input_restore_identity_rate": true,
+    "synthetic_current_trigger_rate": true,
+    "synthetic_recovery_required_rate": true,
+    "trusted_arm_restore_identity_rate": true,
+    "valid_case_count": true,
+    "worst_suite_nominal_allow_rate": true
+  },
+  "improvement_over_v12_4a": {
+    "only_mechanism_change": "bind_sim_data_qacc_warmstart",
+    "predecessor_max_abs_qpos_error_rad": 0.0990581279685342,
+    "predecessor_path": "experiments/proofalign_fixed_policy_prefix_shadow_v12_qualification_terminal_summary.json",
+    "predecessor_repeat_within_tolerance_rate": 0.9666666666666667,
+    "predecessor_sha256": "9524261dfd826367a3f7e4a5e7b9b15ec56518f870a75f44cda6b7659dc50de5",
+    "predecessor_unchanged": true,
+    "successor_max_abs_qpos_error_rad": 4.440892098500626e-16,
+    "successor_repeat_within_tolerance_rate": 1.0
+  },
+  "lifecycle": {
+    "clean_rollout_authorized": false,
+    "fixed_prefix_warmstart_shadow_qualified": true,
+    "fresh_policy_qualification_complete": false,
+    "fresh_policy_retry_authorized_when_resource_gate_passes": true,
+    "outcome_rollout_authorized": false
+  },
+  "metrics": {
+    "blocked_prefix_authorization_count": 0,
+    "controller_restore_identity_rate": 1.0,
+    "environment_clock_restore_identity_rate": 1.0,
+    "exact_allow_identity_rate": 1.0,
+    "finite_source_prefix_rate": 1.0,
+    "full_simulator_restore_identity_rate": 0.9333333333333333,
+    "full_simulator_restore_max_abs_error": 2.220446049250313e-16,
+    "live_policy_dispatch_count": 0,
+    "nominal_allow_count": 15,
+    "nominal_allow_rate": 1.0,
+    "outcome_read_count": 0,
+    "policy_inference_count": 0,
+    "policy_load_count": 0,
+    "policy_shadow_env_step_count": 600,
+    "qacc_warmstart_restore_identity_rate": 1.0,
+    "repeat_trajectory_max_abs_qpos_error_rad": 4.440892098500626e-16,
+    "repeat_trajectory_within_tolerance_rate": 1.0,
+    "runtime_exception_count": 0,
+    "shadow_reference_risk_agreement_rate": 1.0,
+    "simulator_input_restore_identity_rate": 1.0,
+    "stabilization_env_step_count": 300,
+    "suite_nominal_allow": {
+      "human_safety": {
+        "allow_count": 5,
+        "allow_rate": 1.0,
+        "total_count": 5
+      },
+      "obstacle_avoidance": {
+        "allow_count": 5,
+        "allow_rate": 1.0,
+        "total_count": 5
+      },
+      "obstacle_avoidance_human": {
+        "allow_count": 5,
+        "allow_rate": 1.0,
+        "total_count": 5
+      }
+    },
+    "synthetic_current_trigger_rate": 1.0,
+    "synthetic_recovery_required_rate": 1.0,
+    "trusted_arm_restore_identity_rate": 1.0,
+    "valid_case_count": 30,
+    "worst_suite_nominal_allow_rate": 1.0
+  },
+  "qualification_pass": true,
+  "schema": "proofalign.warmstart-policy-prefix-shadow-v12-terminal.v1",
+  "source": {
+    "checksums_path": "results/proofalign_warmstart_policy_prefix_shadow_v12_qualification_20260729_fresh1/SHA256SUMS",
+    "checksums_sha256": "67b94bc6ccfde3ae1255d75cbb62b8031ff490721b2f445604750f12910f913c",
+    "ledger_path": "results/proofalign_warmstart_policy_prefix_shadow_v12_qualification_20260729_fresh1/qualification_ledger.jsonl",
+    "ledger_sha256": "5ea6b87bf55a9d877dd0c403d29ff5b461e3ff3774d49532b261e96d0d8754ff",
+    "protocol_path": "experiments/proofalign_warmstart_policy_prefix_shadow_v12_qualification_protocol.json",
+    "protocol_sha256": "daac24f106307683b2dd35747abefc344a40d9f24c98cf815f098d3b8f47f9df",
+    "summary_path": "results/proofalign_warmstart_policy_prefix_shadow_v12_qualification_20260729_fresh1/summary.json",
+    "summary_sha256": "74df2c0763c00c047eae4ab7f6c5120e27fd809bdc58bca72c94cc7a04264494"
+  },
+  "terminal": true
+}

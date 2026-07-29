@@ -352,3 +352,20 @@ snapshot boundary：arm `qpos/qvel` identity 为210/210，9个 full-state mismat
 非机械臂诊断值，最大绝对差异 `2.22e-16`。论文可据此主张 typed recovery transaction 和
 多关节 simulator feasibility 已显著增强；在完成 policy-prefix predictive shadow、fresh clean
 utility 和 attacked cells 之前，仍不能主张 task-preserving recovery 或 defense efficacy。
+
+v12.4 随后把 predictive shadow 接到 controller-aware simulator snapshot。fresh OpenPI π0.5
+工程 pilot 在 checkpoint restore 时因共享 GPU 显存不足 fail closed，发生在第一次 inference、
+simulator case、dispatch 和 outcome read 之前；因此它是 resource nonstart，不是方法 non-pass。
+独立的 fixed-recorded-prefix 机械资格从冻结 v11 clean trace 提取15个实际执行过的10-step prefix，
+只重放动作与检查状态，不读取历史或当前 outcome。30个 nominal/synthetic cases 的 risk agreement
+为30/30，nominal exact allow 与 synthetic recovery-required 均为15/15。
+
+该实验也定位了两层隐藏状态。首先，恢复 `controller.new_update=False` 而不恢复 cached pose、
+joint、Jacobian 和 mass matrix 会使第二次 replay 复用第一次 terminal cache；补齐后工程 pilot 的
+repeat fidelity 从0/6变为6/6。其次，MuJoCo constraint solver 的 `qacc_warmstart` 不属于
+`MjSimState`；独立 v12.4b 将其纳入 snapshot 后，在不改变 population、prefix 或 tolerance 的
+条件下把正式 repeat fidelity 从29/30提高到30/30，最大 qpos 误差从 `0.0990581` 降到
+`4.44e-16 rad`。这支持 controller-shadow transaction 的机械可复现性，但 fixed prefix 来自
+outcome-known trace 且没有 fresh policy inference，不能写成 task utility、policy qualification
+或 defense efficacy。论文应把 fresh-policy GPU resource gate 和 synthetic dense-contact
+`ncon=5000` warning 一并保留为限制。

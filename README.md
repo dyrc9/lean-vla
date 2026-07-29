@@ -172,6 +172,11 @@ Dual 已验证。旧结果可复用为：
    完成，旧授权/recovery replay 接受均为0。v12.2 因完整 simulator snapshot identity 仅
    201/210 而保持 non-pass；独立 v12.3 证明可信 arm `qpos/qvel` identity 为210/210，差异只在
    非机械臂诊断状态且最大为 `2.22e-16`。当前只进入 no-outcome policy-prefix shadow qualification。
+9. v12.4a/v12.4b policy shadow 已完成：fresh OpenPI pilot 因共享 GPU 显存不足在 inference 前
+   fail closed；随后 fixed-recorded-prefix 机械资格在30个案例中通过。完整 controller cache 将
+   pilot repeat fidelity 从0/6修到6/6，进一步绑定 MuJoCo `qacc_warmstart` 后，正式 repeat
+   fidelity 从29/30提高到30/30，最大 qpos 误差从 `0.0991` 降到 `4.44e-16 rad`。该结果仍不等于
+   fresh-policy、clean utility 或 efficacy 资格，clean/attacked 保持未授权。
 
 入口文档：
 
@@ -190,6 +195,7 @@ Dual 已验证。旧结果可复用为：
 - [v12 稀疏 L1 与可恢复 L2 计划](docs/v12_recoverable_alignment_plan.md)
 - [v12 无 outcome 资格 checkpoint](docs/v12_qualification_checkpoint.md)
 - [v12.2/v12.3 多关节恢复 checkpoint](docs/v12_recovery_successor_checkpoint.md)
+- [v12.4 policy-prefix shadow checkpoint](docs/v12_policy_prefix_shadow_checkpoint.md)
 
 常用检查：
 

@@ -1,8 +1,31 @@
 # 当前进展与执行计划
 
-## 最新 checkpoint：2026-07-29 v12.2/v12.3 多关节恢复 successor
+## 最新 checkpoint：2026-07-29 v12.4 policy-prefix shadow
 
-v12.1 后续优化已经完成并终态冻结：
+v12.4a/v12.4b 已完成并终态冻结，但证据范围严格限于 no-outcome controller shadow：
+
+- fresh OpenPI π0.5 工程 pilot 在 checkpoint restore 阶段因共享 policy GPU 显存不足 fail closed；
+  policy inference、simulator case、live dispatch 和 outcome read 均为0，因此不能声称 fresh-policy
+  qualification 完成；
+- 为继续检查执行机制，v12.4a 从冻结 v11 clean trace 中机械提取15个10-step prefix；正式
+  nominal/synthetic population 为30 cases，风险判断30/30一致，nominal exact allow 15/15，
+  synthetic recovery-required 15/15，旧/blocked prefix 被授权为0；
+- 初始 pilot 暴露 controller cache 恢复缺口，repeat fidelity 为0/6；补齐 pose、joint、Jacobian、
+  mass matrix 等缓存后，新 pilot 为6/6；
+- v12.4a 正式 repeat fidelity 为29/30，仍通过冻结的≥95% gate；唯一尾部处于 dense
+  contact/joint-limit dynamics，最大 qpos 误差为 `0.0990581 rad`；
+- 独立 v12.4b 进一步绑定 MuJoCo `qacc_warmstart`，在相同30-case population、相同 tolerance
+  下达到30/30，最大误差降至 `4.44e-16 rad`。所有 trusted arm/controller/input/clock/warm-start
+  restore gate 均为100%。
+
+完整表格、资源 nonstart、claim boundary 和产物位置见
+[`v12_policy_prefix_shadow_checkpoint.md`](v12_policy_prefix_shadow_checkpoint.md)。下一步等待足量
+policy GPU 后运行已经实现的 fresh-prefix qualification；此前不生成 clean/attacked outcome
+协议，也不把固定历史前缀结果写成 task utility 或 defense efficacy。
+
+## 前一 checkpoint：2026-07-29 v12.2/v12.3 多关节恢复 successor
+
+v12.1 后续恢复优化已经完成并终态冻结：
 
 - typed recovery runtime fixed trace 10/10 通过；old-policy revoke、one-use recovery、
   command receipt identity、recovery replay reject 和 fresh-policy state binding 全部通过；
@@ -16,9 +39,8 @@ v12.1 后续优化已经完成并终态冻结：
   `2.220446049250313e-16`；v12.3 pass 不回写 v12.2 non-pass。
 
 完整表格、claim boundary 和产物位置见
-[`v12_recovery_successor_checkpoint.md`](v12_recovery_successor_checkpoint.md)。当前下一步是
-no-outcome policy-prefix predictive-shadow qualification；仍不授权 clean、attacked 或 efficacy
-outcome rollout。
+[`v12_recovery_successor_checkpoint.md`](v12_recovery_successor_checkpoint.md)。其后继
+policy-prefix shadow 结果见最新 checkpoint；仍不授权 clean、attacked 或 efficacy outcome rollout。
 
 ## 前一 checkpoint：2026-07-29 v12 无 outcome 资格实验通过
 
@@ -57,9 +79,9 @@ Sparse L1 exact-passthrough intent guard
   -> fresh policy replan
 ```
 
-当前已完成 V12-C1–C5 的 Python contract 和首轮 Q/no-outcome simulator preflight。下一步必须先完成
-zero-policy runtime transaction gate、全关节双侧 synthetic coverage 和 policy-prefix predictive
-shadow qualification；这些 gate 全部通过前不得启动新 clean，clean gate 通过前不得启动 attacked。
+当前已完成 V12-C1–C5 Python contract、zero-policy runtime transaction、全关节双侧 synthetic
+coverage，以及 fixed-recorded-prefix controller shadow；fresh-policy shadow 尚因显存资源 gate
+未启动。这一 gate 通过前不得启动新 clean，clean gate 通过前不得启动 attacked。
 
 ## 0. 2026-07-27 M2 终局与 40% 探索性后继
 

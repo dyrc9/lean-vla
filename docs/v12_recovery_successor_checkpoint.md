@@ -84,5 +84,7 @@ v12.2 的原资格分类改写为 pass。
 边界全部通过。剩余主要缺口是 joint-1 upper 的 1/15 coverage 和一个案例超过 0.02 rad 的
 shadow/replay 容差。
 
-下一步只授权 no-outcome policy-prefix predictive-shadow qualification：对真实 policy prefix 做
-只读风险预测、恢复选择和 fresh replan 边界验证。完成前仍不启动 clean 或 attacked rollout。
+后继 policy-prefix shadow 已按 no-outcome 边界推进到 v12.4b：fixed-recorded-prefix mechanics
+通过，fresh OpenPI qualification 因共享 GPU 显存不足尚未启动。完整结果见
+[`v12_policy_prefix_shadow_checkpoint.md`](v12_policy_prefix_shadow_checkpoint.md)；fresh policy
+gate 完成前仍不启动 clean 或 attacked rollout。

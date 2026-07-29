@@ -7,7 +7,9 @@
 > no-outcome 资格结果见
 > [`../v12_qualification_checkpoint.md`](../v12_qualification_checkpoint.md)，多关节 typed
 > recovery 后继见
-> [`../v12_recovery_successor_checkpoint.md`](../v12_recovery_successor_checkpoint.md)。
+> [`../v12_recovery_successor_checkpoint.md`](../v12_recovery_successor_checkpoint.md)，controller
+> shadow 后继见
+> [`../v12_policy_prefix_shadow_checkpoint.md`](../v12_policy_prefix_shadow_checkpoint.md)。
 
 | 模块 | 就绪度 | 证据/缺口 |
 |---|---|---|
@@ -31,6 +33,7 @@
 | Typed L2 containment v11 | mechanism pass / efficacy mixed | fresh15 与 held-out scale45 均为 trigger 后旧 policy dispatch 0；scale45 joint-limit burden 显著下降，但 clean Dual−Semantic-only task success `−24.4pp` |
 | Recoverable L2 v12.1 | no-outcome preflight pass / efficacy 未测 | 655-case contract gate 与45-pair simulator-reset recovery gate 通过；只覆盖 joint-5 upper-limit，未加载策略或读取 outcome |
 | Recoverable L2 v12.2/v12.3 | mechanism strengthened / efficacy 未测 | typed runtime 10/10；多关节210-case覆盖209，actual recovery 209/209；v12.2因full-state identity 201/210保持non-pass，v12.3 trusted-arm identity 210/210通过 |
+| Policy-prefix shadow v12.4 | fixed-prefix mechanics pass / fresh policy 未完成 | 30-case risk agreement 30/30；warm-start 后 repeat fidelity 30/30、最大误差 `4.44e-16 rad`；fresh π0.5 checkpoint restore 因显存不足在 inference 前 fail closed |
 | Deployment | 未就绪 | E7 缺少7类 perception supervision；所有正向结果仍限于 privileged simulator geometry |
 
 ## 2026-07-29 终局判断
@@ -60,6 +63,14 @@ authorization/receipt/replay/fresh-state 边界通过。v12.2 的 full-state ide
 保持 non-pass；v12.3 另行证明 trusted arm `qpos/qvel` identity 210/210，剩余差异是最大
 `2.22e-16` 的非机械臂诊断状态。它显著增强恢复机制证据，但没有 policy-prefix、clean utility 或
 attacked efficacy，因此不改变上述论文强度判断。
+
+v12.4 又关闭了 controller-aware shadow 的机械复现缺口：固定的10-step policy prefix 在15个
+nominal 与15个 synthetic joint-pressure case 上均给出绑定决策和30/30 risk agreement；
+`qacc_warmstart` 后继将 repeat fidelity 从29/30提高到30/30，最大 qpos 误差从
+`0.0990581` 降到 `4.44e-16 rad`。但这些 prefix 来自 outcome-known 历史 trace，且本轮没有重新
+输入 π0.5。fresh policy checkpoint restore 在 inference 前因显存不足停止，所以该结果增强的是
+simulator/controller mechanics，不是 clean utility、task-preserving recovery 或 attacked efficacy。
+因此论文可以增加一项可复算的机制结果，但“现有完整系统论文、尚非强正面 efficacy 论文”的判断不变。
 
 
 论文主故事仍是两层对齐，而不是 SemanticSubtask 本身。当前最重要的科学风险集中在 L1：
