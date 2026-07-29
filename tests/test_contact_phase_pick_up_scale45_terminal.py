@@ -45,3 +45,12 @@ def test_scale45_terminal_is_current_when_present() -> None:
     assert retained["diagnostics"][
         "independent_constraint_signals"
     ]["aggregate"]["episode_count"] == 180
+    official = retained["diagnostics"][
+        "official_unsafe_cost_or_collision"
+    ]
+    assert official["unsafe_episode_count"] == retained["result"][
+        "aggregate"
+    ]["unsafe_cost_or_collision_count"]
+    assert official["unsafe_unique_task_init_count"] <= official[
+        "unsafe_episode_count"
+    ]

@@ -394,6 +394,59 @@ def _failure_diagnostics(
     }
 
 
+def _official_unsafe_diagnostics(
+    evidence: Mapping[str, Any],
+) -> dict[str, Any]:
+    unsafe = [
+        row for row in evidence["per_episode"]
+        if row["unsafe_cost_or_collision"]
+    ]
+    pair_ids = sorted(
+        {str(row["base_pair_id"]) for row in unsafe}
+    )
+    return {
+        "unsafe_episode_count": len(unsafe),
+        "unsafe_unique_task_init_count": len(pair_ids),
+        "by_arm": dict(
+            sorted(Counter(row["arm"] for row in unsafe).items())
+        ),
+        "by_suite": dict(
+            sorted(Counter(row["suite"] for row in unsafe).items())
+        ),
+        "per_pair": [
+            {
+                "base_pair_id": pair_id,
+                "unsafe_arms": sorted(
+                    row["arm"]
+                    for row in unsafe
+                    if row["base_pair_id"] == pair_id
+                ),
+                "unsafe_episode_count": sum(
+                    row["base_pair_id"] == pair_id
+                    for row in unsafe
+                ),
+            }
+            for pair_id in pair_ids
+        ],
+        "episodes": [
+            {
+                "episode_id": row["episode_id"],
+                "base_pair_id": row["base_pair_id"],
+                "suite": row["suite"],
+                "arm": row["arm"],
+                "task_success": row["task_success"],
+                "decision": row["decision"],
+            }
+            for row in unsafe
+        ],
+        "interpretation": (
+            "Unsafe episodes cluster by paired task/init. Arms that stop "
+            "early have different physical exposure, so episode counts "
+            "must not be treated as independent causal safety effects."
+        ),
+    }
+
+
 def build_summary(
     *,
     created_at: str = CREATED_AT,
@@ -495,6 +548,9 @@ def build_summary(
         "paired_comparisons": comparisons,
         "diagnostics": {
             "failures": _failure_diagnostics(evidence),
+            "official_unsafe_cost_or_collision": (
+                _official_unsafe_diagnostics(evidence)
+            ),
             "independent_constraint_signals": risk,
         },
         "interpretation": {
