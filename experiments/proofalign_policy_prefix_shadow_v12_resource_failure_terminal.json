@@ -1,0 +1,31 @@
+{
+  "claim_boundary": "The engineering launch failed closed while restoring the OpenPI checkpoint because the selected co-tenant GPU lacked memory. It produced no policy prefix and is not evidence about predictor accuracy, controller restoration, clean utility, or efficacy. A separately labeled fixed-recorded-prefix successor may qualify controller-shadow mechanics without claiming fresh-policy closure.",
+  "classification": "policy_prefix_shadow_v12_policy_load_resource_nonstart",
+  "failure": {
+    "error": "XlaRuntimeError: RESOURCE_EXHAUSTED: Out of memory while trying to allocate 2415919104 bytes.",
+    "policy_gpu": 1,
+    "policy_gpu_memory_total_mib": 49140,
+    "policy_gpu_memory_used_mib_at_preflight": 25428,
+    "stage": "checkpoint_restore_before_policy_inference"
+  },
+  "lifecycle": {
+    "clean_rollout_authorized": false,
+    "fixed_recorded_prefix_shadow_successor_authorized": true,
+    "fresh_policy_pilot_root_reusable": false,
+    "fresh_policy_qualification_authorized": false,
+    "outcome_rollout_authorized": false
+  },
+  "live_policy_dispatch_count": 0,
+  "outcome_read_count": 0,
+  "policy_inference_count": 0,
+  "qualification_started": false,
+  "schema": "proofalign.policy-prefix-shadow-v12-resource-terminal.v1",
+  "simulator_case_count": 0,
+  "source": {
+    "checksums_path": "results/proofalign_policy_prefix_shadow_v12_engineering_pilot_20260729_resource_failed1/SHA256SUMS",
+    "checksums_sha256": "3855b20fa9951452c7b8d2cbfb5e8cda9947f7eab877edc9227e932e4965c36c",
+    "manifest_path": "results/proofalign_policy_prefix_shadow_v12_engineering_pilot_20260729_resource_failed1/run_manifest.json",
+    "manifest_sha256": "dec9cec632009d8b2844559c628353c3ba613672d08234fc5230fa4367807345"
+  },
+  "terminal": true
+}

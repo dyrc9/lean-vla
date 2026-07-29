@@ -1,0 +1,52 @@
+{
+  "classification": "fixed_policy_prefix_shadow_v12_engineering_pilot_complete",
+  "completed_at": "2026-07-29T11:03:45.073570+00:00",
+  "created_at": "2026-07-29T11:03:06.871738+00:00",
+  "formal": false,
+  "gpu": 1,
+  "outcomes_observed": false,
+  "policy_loaded": false,
+  "preflight": {
+    "blockers": [],
+    "formal": false,
+    "free_disk_gib": 2111.615188598633,
+    "output_root_absent": true,
+    "ready": true,
+    "schema": "proofalign.fixed-policy-prefix-shadow-v12-preflight.v1",
+    "selected_gpu": {
+      "driver_version": "570.133.07",
+      "index": 1,
+      "memory_total_mib": 49140,
+      "memory_used_mib": 25430,
+      "name": "NVIDIA RTX 6000 Ada Generation",
+      "uuid": "GPU-9630f0c1-163a-1dc7-564b-8242ac677a1e"
+    },
+    "worktree_status": [
+      "?? experiments/proofalign_fixed_policy_prefix_v12_corpus.json",
+      "?? experiments/proofalign_policy_prefix_shadow_v12_resource_failure_terminal.json",
+      "?? scripts/freeze_fixed_policy_prefix_shadow_v12_qualification.py",
+      "?? scripts/freeze_policy_prefix_shadow_v12_qualification.py",
+      "?? scripts/freeze_policy_prefix_shadow_v12_resource_failure.py",
+      "?? scripts/generate_fixed_policy_prefix_v12_corpus.py",
+      "?? scripts/run_fixed_policy_prefix_shadow_v12_qualification.py",
+      "?? scripts/run_policy_prefix_shadow_v12_qualification.py",
+      "?? src/proofalign/policy_prefix_shadow_v12.py",
+      "?? tests/test_policy_prefix_shadow_v12.py"
+    ]
+  },
+  "protocol_id": "fixed-prefix-engineering-pilot",
+  "protocol_sha256": null,
+  "runtime_config": {
+    "config": {
+      "assets": "/home/ldx/lean-vla/external/LIBERO-Safety/libero/libero/assets",
+      "bddl_files": "/home/ldx/lean-vla/external/LIBERO-Safety/libero/libero/bddl_files",
+      "benchmark_root": "/home/ldx/lean-vla/external/LIBERO-Safety/libero/libero",
+      "datasets": "/home/ldx/lean-vla/external/LIBERO-Safety/libero/datasets",
+      "init_states": "/home/ldx/lean-vla/external/LIBERO-Safety/libero/libero/init_files"
+    },
+    "directory": "/home/ldx/lean-vla/results/proofalign_fixed_policy_prefix_shadow_v12_engineering_pilot_20260729_fresh2/runtime/libero_config",
+    "sha256": "8d1cc08bf89c204f7d592bc6b87f4ffebeed91f7e870097b340a858c07741a3c"
+  },
+  "schema": "proofalign.fixed-policy-prefix-shadow-v12-run.v1",
+  "status": "complete"
+}
