@@ -3,7 +3,7 @@
   "audit_id": "proofalign-semantic-source-binding-e8-20260725",
   "audit_source": {
     "path": "scripts/generate_semantic_source_binding_e8.py",
-    "sha256": "17d48f98562ed52a04df9ad85a135f87a27afd9d49cb80e9ee386f9a5d90eb9d"
+    "sha256": "edbfd629b422334d41e31e7fdde129782a735c5fbe03d6b97a8caf9d399911df"
   },
   "claim_boundary": "This read-only audit binds the current semantic source scope, local evidence inventory, latest source-scope commit, and OpenPI checkout. A not-clean classification does not modify or commit the worktree. A clean classification would establish provenance only, not perception quality, efficacy, outcome, or safety.",
   "classification": "semantic_source_binding_clean",
@@ -22,7 +22,7 @@
       "exists": true,
       "git_status": "clean",
       "path": "README.md",
-      "sha256": "81b7ace3bae9942235d2683437d195e86da559f29ac974cb921fbe046921d62e",
+      "sha256": "8bd3bc9294e0eb61941fbedfb87582990269984b8329f0374c297b3af8e50603",
       "tracked": true
     },
     {
@@ -62,7 +62,7 @@
       "exists": true,
       "git_status": "clean",
       "path": "docs/method.md",
-      "sha256": "fcfd9d9224bef60c6008ec173124a01466ad19420ed7b611ff4cdf94cfc5d40a",
+      "sha256": "f3d4aaa103793f5f25a53d9f9414002ff2e12d56275dc90fd46bca892f6445b9",
       "tracked": true
     },
     {
@@ -70,7 +70,7 @@
       "exists": true,
       "git_status": "clean",
       "path": "docs/paper/paper_story.md",
-      "sha256": "ab8ce955bd1ce54bb2f813b55446fcdf68f02e88793a3e1ff22dc0bfa34ed297",
+      "sha256": "4fb937ea26678ee5b07d1a0501ae48c7b4c2f5cc2093b43454b84e4c35ba1842",
       "tracked": true
     },
     {
@@ -78,7 +78,7 @@
       "exists": true,
       "git_status": "clean",
       "path": "docs/progress_and_plan.md",
-      "sha256": "5b99c26d23a8ed5092a7ebb66f785762a519be34490c536941d3a6df3834daca",
+      "sha256": "c13875d95c7bcee9c1a86624509ccf505844cc366d9340574da638a37482804a",
       "tracked": true
     },
     {
@@ -429,6 +429,46 @@
       "bound_to_head": true,
       "exists": true,
       "git_status": "clean",
+      "path": "scripts/freeze_risk_selective_scale45_replay_qualification.py",
+      "sha256": "ba72104efd3a2116bf2136c4a825b0068ce33dc1736f964fd7cc03153ff39753",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/freeze_risk_selective_fresh15_cotenant.py",
+      "sha256": "2755efb303b001f2f08f7f353e57d904f4f564e2f3d88360cc1569ddcdb5626a",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/freeze_physical_sufficiency_replay_qualification.py",
+      "sha256": "12202ace7a2baf514c00b302c339c5b95a65175a477060fcd7ef0fc6fdd92281",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/freeze_physical_sufficiency_fresh15_cotenant.py",
+      "sha256": "4e5a18c24351e636b7a41e4c66527223bcc2a5c86e3acecda96e27a99a02c57b",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/freeze_physical_sufficiency_fresh15_terminal.py",
+      "sha256": "96c2f955efd50962dfbb16cf888320a6abee079a1684b18cb0418ca00afda620",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
       "path": "scripts/monitor_and_launch_contact_phase_scale45.py",
       "sha256": "c5318ea04835e0199ea67b93c3bccfdd7759b0b334630f94950e35ea9a3b30d2",
       "tracked": true
@@ -438,7 +478,7 @@
       "exists": true,
       "git_status": "clean",
       "path": "scripts/generate_semantic_source_binding_e8.py",
-      "sha256": "17d48f98562ed52a04df9ad85a135f87a27afd9d49cb80e9ee386f9a5d90eb9d",
+      "sha256": "edbfd629b422334d41e31e7fdde129782a735c5fbe03d6b97a8caf9d399911df",
       "tracked": true
     },
     {
@@ -559,6 +599,54 @@
       "git_status": "clean",
       "path": "scripts/run_l2_execution_attack_eval_v8.py",
       "sha256": "69369919c7aca7c4038d031a3cfbf57dd2519785f79107204cf7a021ddece12f",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/run_l2_execution_attack_eval_v9.py",
+      "sha256": "8dba9d97c65e28381e68a233d11fd637b65b39adf323ca1e8444cbeb18cfc1f2",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/run_l2_execution_attack_eval_v10.py",
+      "sha256": "c5e8687f5ced7ec18495d6759ccabed514bca9b841c9e5cb47919c33b24d601a",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/run_risk_selective_scale45_replay_qualification.py",
+      "sha256": "c4385e6964d272976558fd107aa59b2a198d646f9bd512486f189405ccd15a1c",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/run_risk_selective_clean_pilot.py",
+      "sha256": "4e60972031f63eac85c4ff44f43bb6f206efbac14d390d6b1525be79f7b42375",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/run_physical_sufficiency_replay_qualification.py",
+      "sha256": "9605d2c6c29fbbfdb0dff9e83c1edeb73d731ffd1908badac6f1a5e2b3e13331",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/run_physical_sufficiency_clean_pilot.py",
+      "sha256": "3c7a23ac4716b1ab5f87b8d7792491906a31e6b3e76664a2bd8df002c9897327",
       "tracked": true
     },
     {
@@ -869,6 +957,22 @@
       "bound_to_head": true,
       "exists": true,
       "git_status": "clean",
+      "path": "src/proofalign/risk_selective_semantic.py",
+      "sha256": "ca73c803e1a37a131ebabe4388d72288045c6d3b4a55f80ff474389f5b82988d",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "src/proofalign/physical_sufficiency_semantic.py",
+      "sha256": "634340eed6bef812a204df629280f287c4f47849c00af55c059309ca6e49b6f9",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
       "path": "src/proofalign/semantic_action_selection.py",
       "sha256": "2e35c9b5215005912b3288ae370baaa9633788ded4e05219e52304b90af70907",
       "tracked": true
@@ -1087,6 +1191,62 @@
       "git_status": "clean",
       "path": "tests/test_monitor_and_launch_contact_phase_scale45.py",
       "sha256": "c4884e3491f79861e784771f1c975d78bca418a17ade384a512326dcd8fce34c",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_risk_selective_semantic.py",
+      "sha256": "c4c1ba22ae002aaad5b434c8676130528b71c2c362f1787a842b8f347303d849",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_risk_selective_scale45_replay_qualification.py",
+      "sha256": "86ee96f0d731a281b5e39bae0bc9c1601fd5ac4c6924bf8aaa02cd4fa9f4dc04",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_risk_selective_fresh15_cotenant.py",
+      "sha256": "78f8cfc75f13674f94abbfbb293b742e4085933511f02bf8e7d95d1203585fa4",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_physical_sufficiency_semantic.py",
+      "sha256": "35deb6d427ab92448ac38eb62596a2f3e9ef4a8da9b8ead5e3bb711a515004ee",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_physical_sufficiency_replay_qualification.py",
+      "sha256": "6cdf3383515b971c5080482abe96d70bff83ecf9a71f518f727c508dbbdcf7d1",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_physical_sufficiency_fresh15_cotenant.py",
+      "sha256": "927631d7bc6a77bd8abec865cd33445afd89ca97a18c74a7e6b0e46440458268",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_physical_sufficiency_fresh15_terminal.py",
+      "sha256": "3dc5461d77fe1f2398be7e193b25ed1e703c8c22ec637a8da476d8091107dc49",
       "tracked": true
     },
     {
@@ -1621,6 +1781,46 @@
       "bound_to_head": true,
       "exists": true,
       "git_status": "clean",
+      "path": "experiments/proofalign_risk_selective_scale45_replay_qualification_protocol.json",
+      "sha256": "7e1f14fa6ce869d2c8c582b7fdfb1b0c4ae3c07fc1cf7218f2be971a2d4b2afa",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_risk_selective_fresh15_cotenant_protocol.json",
+      "sha256": "974229631d22751e759db218f6cc02484031d47688f0c00e38b35783e1ed9cd6",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_physical_sufficiency_replay_qualification_protocol.json",
+      "sha256": "34d88eaf0acfee7543839b80c8258eafaaadc1b4d050920ac0f34302d03aed86",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_physical_sufficiency_fresh15_cotenant_protocol.json",
+      "sha256": "1586a64baf9f0a7b2c8c41966d5025a274d0bcee9d220e5e62dc1d005c03a289",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_physical_sufficiency_fresh15_terminal_summary.json",
+      "sha256": "7733a1c6e62863e0d37b3399eab0e9a43fe40cede3aa7d5ba57afc7320791c06",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
       "path": "experiments/proofalign_pi05_action_conditioning_e2_protocol.json",
       "sha256": "079cf5566f49f44cd7ade70cf9cc5a96ef8d539bf5754ad01ad0d1e31e56be6e",
       "tracked": true
@@ -1870,6 +2070,54 @@
       "ignored_by_git": true,
       "path": "results/proofalign_contact_phase_pick_up_scale45_cotenant_20260729_fresh1/SHA256SUMS",
       "sha256": "fc0913bec05308ddcc8447e7596621800a4c571676938f3c86ffeb61635a9553"
+    },
+    {
+      "exists": true,
+      "ignored_by_git": false,
+      "path": "results/proofalign_risk_selective_scale45_replay_qualification_20260729_fresh1/qualification.json",
+      "sha256": "70e001485a0c8f36670c1ae55e911be5b8bed6d3d7363067a054e2b23bf10882"
+    },
+    {
+      "exists": true,
+      "ignored_by_git": false,
+      "path": "results/proofalign_risk_selective_scale45_replay_qualification_20260729_fresh1/SHA256SUMS",
+      "sha256": "fb6a5ae03d4055b2f2e61ddd168e5ef1cde1df7ad29bfcd88a3434ed40697f98"
+    },
+    {
+      "exists": true,
+      "ignored_by_git": false,
+      "path": "results/proofalign_risk_selective_fresh15_cotenant_20260729_fresh1/pilot_evidence.json",
+      "sha256": "41b2be6473783c382dbb06aece0841b99e8a21b183e06611dd92ef5791655e19"
+    },
+    {
+      "exists": true,
+      "ignored_by_git": false,
+      "path": "results/proofalign_risk_selective_fresh15_cotenant_20260729_fresh1/SHA256SUMS",
+      "sha256": "cc7df85f4e916159595f69abe36e48513975ff05c14fb2939820498857b4cb45"
+    },
+    {
+      "exists": true,
+      "ignored_by_git": false,
+      "path": "results/proofalign_physical_sufficiency_replay_qualification_20260729_fresh1/qualification.json",
+      "sha256": "bcbf4b6f61754602421857578059481c6d909a4052eb31c8acf93e798f498d53"
+    },
+    {
+      "exists": true,
+      "ignored_by_git": false,
+      "path": "results/proofalign_physical_sufficiency_replay_qualification_20260729_fresh1/SHA256SUMS",
+      "sha256": "97343b459d503357f29c5e70b6c7dd7bbbe36c3fbc971c9543aca859391c29c5"
+    },
+    {
+      "exists": true,
+      "ignored_by_git": false,
+      "path": "results/proofalign_physical_sufficiency_fresh15_cotenant_20260729_fresh1/pilot_evidence.json",
+      "sha256": "03bbb051eada9d8a3c1625bd7e773a62a37755f1c9768184d027364a8f6c9470"
+    },
+    {
+      "exists": true,
+      "ignored_by_git": false,
+      "path": "results/proofalign_physical_sufficiency_fresh15_cotenant_20260729_fresh1/SHA256SUMS",
+      "sha256": "974f51e527dc60e8f8c4afc2291d0542c2a7ed5dae8cc170ef5d312625f51489"
     }
   ],
   "evidence_inventory_complete": true,
@@ -1885,8 +2133,8 @@
   "policy_loaded": false,
   "repository_binding_semantics": "latest commit that changed the frozen semantic commit scope; later commits may contain only out-of-scope protocols or audit packets",
   "repository_fully_clean": true,
-  "repository_head_commit": "0d04e5afd6eea977d45bd628c06beccb5061d243",
-  "repository_head_tree": "1e060c1ae2c4baae48a0ae6352f6eb245242c6db",
+  "repository_head_commit": "fdc34c63b66cce35900a7570f147530d0d0f007b",
+  "repository_head_tree": "bc05088af445d1e990073933cee7f4654bcd7233",
   "repository_status_row_count": 0,
   "schema": "proofalign.semantic-source-binding-e8-audit.v1",
   "simulator_created": false
