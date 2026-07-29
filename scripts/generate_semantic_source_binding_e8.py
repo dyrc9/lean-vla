@@ -166,6 +166,16 @@ COMMIT_SCOPE_PATHS = (
         "scripts/"
         "freeze_physical_sufficiency_attacked_fresh15_terminal.py"
     ),
+    "scripts/analyze_joint_limit_containment_v11_replay.py",
+    (
+        "scripts/"
+        "freeze_joint_limit_containment_v11_clean_fresh15.py"
+    ),
+    (
+        "scripts/"
+        "freeze_joint_limit_containment_v11_attacked_fresh15.py"
+    ),
+    "scripts/freeze_joint_limit_containment_v11_terminal.py",
     "scripts/monitor_and_launch_contact_phase_scale45.py",
     "scripts/generate_semantic_source_binding_e8.py",
     "scripts/generate_semantic_v4_equivalence_evidence.py",
@@ -196,6 +206,9 @@ COMMIT_SCOPE_PATHS = (
     ),
     "scripts/run_physical_sufficiency_clean_pilot.py",
     "scripts/run_physical_sufficiency_attacked_pilot.py",
+    "scripts/run_l2_joint_limit_containment_v11.py",
+    "scripts/run_joint_limit_containment_v11_clean_pilot.py",
+    "scripts/run_joint_limit_containment_v11_attacked_pilot.py",
     (
         "scripts/"
         "run_horizon_consistent_pick_up_fresh_dual_pilot.py"
@@ -263,6 +276,7 @@ COMMIT_SCOPE_PATHS = (
     "src/proofalign/contact_phase_pick_up.py",
     "src/proofalign/risk_selective_semantic.py",
     "src/proofalign/physical_sufficiency_semantic.py",
+    "src/proofalign/joint_limit_containment.py",
     "src/proofalign/semantic_action_selection.py",
     "src/proofalign/semantic_effect_observer.py",
     "src/proofalign/semantic_local_checker.py",
@@ -306,6 +320,11 @@ COMMIT_SCOPE_PATHS = (
         "tests/"
         "test_physical_sufficiency_attacked_fresh15_terminal.py"
     ),
+    "tests/test_joint_limit_containment.py",
+    "tests/test_joint_limit_containment_v11_replay.py",
+    "tests/test_joint_limit_containment_v11_clean_fresh15.py",
+    "tests/test_joint_limit_containment_v11_attacked_fresh15.py",
+    "tests/test_joint_limit_containment_v11_terminal.py",
     "tests/test_local_checker_qualification_e3.py",
     "tests/test_l1_repair_qualification.py",
     "tests/test_l1_repair_qualification_v2.py",
@@ -535,6 +554,25 @@ COMMIT_SCOPE_PATHS = (
         "proofalign_physical_sufficiency_attacked_fresh15_"
         "terminal_summary.json"
     ),
+    (
+        "experiments/"
+        "proofalign_joint_limit_containment_v11_replay_"
+        "qualification.json"
+    ),
+    (
+        "experiments/"
+        "proofalign_joint_limit_containment_v11_clean_"
+        "fresh15_protocol.json"
+    ),
+    (
+        "experiments/"
+        "proofalign_joint_limit_containment_v11_attacked_"
+        "fresh15_protocol.json"
+    ),
+    (
+        "experiments/"
+        "proofalign_joint_limit_containment_v11_terminal_summary.json"
+    ),
     "experiments/proofalign_pi05_action_conditioning_e2_protocol.json",
     "experiments/proofalign_pi05_selector_e1_protocol.json",
     (
@@ -695,6 +733,22 @@ EVIDENCE_PATHS = (
     (
         "results/proofalign_physical_sufficiency_attacked_fresh15_"
         "20260729_fresh1/SHA256SUMS"
+    ),
+    (
+        "results/proofalign_joint_limit_containment_v11_clean_"
+        "fresh15_20260729_fresh1/pilot_evidence.json"
+    ),
+    (
+        "results/proofalign_joint_limit_containment_v11_clean_"
+        "fresh15_20260729_fresh1/SHA256SUMS"
+    ),
+    (
+        "results/proofalign_joint_limit_containment_v11_attacked_"
+        "fresh15_20260729_fresh1/pilot_evidence.json"
+    ),
+    (
+        "results/proofalign_joint_limit_containment_v11_attacked_"
+        "fresh15_20260729_fresh1/SHA256SUMS"
     ),
 )
 
