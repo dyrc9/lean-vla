@@ -1,5 +1,10 @@
 # 论文就绪度评估
 
+> 2026-07-29 更新：本页原 support45 评估保留为历史诊断；最新 outcome checkpoint 已推进到
+> v11 unchanged-method held-out scale45。终局结果和不可覆盖边界见
+> [`../v11_terminal_checkpoint.md`](../v11_terminal_checkpoint.md)，后继优化见
+> [`../v12_recoverable_alignment_plan.md`](../v12_recoverable_alignment_plan.md)。
+
 | 模块 | 就绪度 | 证据/缺口 |
 |---|---|---|
 | Threat model | 高 | 沿用原始可信 intent + attacked policy view |
@@ -18,6 +23,31 @@
 | M2 confirmatory foundation | 终局 nonpass | 240/240 valid；39/86 transition=`45.35%`，95% cluster CI `[32.93%,57.78%]`；原 50% gate 未通过 |
 | Four-arm v4 full population | 结构性不可执行/不可通过 | fresh1 首单元在 dispatch 前 fail closed；15/60 affordance pairs 缺少可信 part geometry，而 clean gate 要求 0 unknown |
 | Support-conditioned successor | clean 终局 nonpass | 360/360 valid；VLA-only 61/90、Execution-only 66/90、Semantic-only/Dual 0/90 strict success；Dual deadlock 88/90，attacked 未授权 |
+| Risk-selective L1 v10 | mixed/negative | exact passthrough 消除大部分人为动作改写；clean/attacked fresh15 未建立 non-inferiority 或 safety efficacy |
+| Typed L2 containment v11 | mechanism pass / efficacy mixed | fresh15 与 held-out scale45 均为 trigger 后旧 policy dispatch 0；scale45 joint-limit burden 显著下降，但 clean Dual−Semantic-only task success `−24.4pp` |
+| Deployment | 未就绪 | E7 缺少7类 perception supervision；所有正向结果仍限于 privileged simulator geometry |
+
+## 2026-07-29 终局判断
+
+v11 scale45 clean/attacked 各180条完整。任务成功率为：
+
+| Condition | VLA-only | Execution-only | Semantic-only | Dual |
+|---|---:|---:|---:|---:|
+| Clean | 32/45 | 27/45 | 31/45 | 20/45 |
+| Attacked | 30/45 | 28/45 | 25/45 | 21/45 |
+
+joint-limit step rate 为：
+
+| Condition | VLA-only | Execution-only | Semantic-only | Dual |
+|---|---:|---:|---:|---:|
+| Clean | 12.794% | 0.116% | 13.980% | 0.110% |
+| Attacked | 8.194% | 0.063% | 5.826% | 0.049% |
+
+当前论文足以形成“形式化 transaction integrity + auditable failure localization + containment–utility
+tradeoff”的完整系统论文；不足以形成“通用 defense efficacy、first-hit prevention 或完整物理安全”
+的强正面论文。v12 若要恢复正面 efficacy claim，必须通过新版本 sparse L1、predictive L2 和 typed
+recovery 的独立资格与 fresh gate，不能把 v11 改判。
+
 
 论文主故事仍是两层对齐，而不是 SemanticSubtask 本身。当前最重要的科学风险集中在 L1：
 

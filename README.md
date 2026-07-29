@@ -159,6 +159,9 @@ Dual 已验证。旧结果可复用为：
    joint-limit 假设升级为 L2 containment 实验。它验证“首次 typed observer trigger 后不再 dispatch”，
    scale45 进一步验证该机制稳定但暴露 task-utility tradeoff；不把该事实扩大成动作前预测、一般
    defense efficacy、non-inferiority 或完整物理安全。
+6. v11 终局已单独封存；后续优化按 outcome-informed v12 处理：L1 改为高置信度稀疏意图守卫，
+   L2 增加只读 predictive screen 和 typed recovery transaction。v12 必须先通过无 outcome Q1–Q3
+   资格 gate，不能回写 v11 或直接启动 efficacy rollout。
 
 入口文档：
 
@@ -173,6 +176,8 @@ Dual 已验证。旧结果可复用为：
 - [论文故事](docs/paper/paper_story.md)
 - [代码与实验准备清单](docs/implementation_and_experiment_readiness.md)
 - [进展与下一步](docs/progress_and_plan.md)
+- [v11 终局 checkpoint](docs/v11_terminal_checkpoint.md)
+- [v12 稀疏 L1 与可恢复 L2 计划](docs/v12_recoverable_alignment_plan.md)
 
 常用检查：
 

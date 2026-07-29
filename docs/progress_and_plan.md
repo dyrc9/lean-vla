@@ -1,5 +1,28 @@
 # 当前进展与执行计划
 
+## 最新 checkpoint：2026-07-29 v11 终局与 v12 启动边界
+
+v11 unchanged-method held-out scale45 已终态完成并单独封存于
+[`v11_terminal_checkpoint.md`](v11_terminal_checkpoint.md)。clean/attacked 各180条均完整，
+observer agreement 为 `21250/21250`、`26464/26464`，39次 typed joint-limit trigger 后旧 policy
+dispatch 为0；同时 clean Dual−Semantic-only task success 为 `−24.4pp`
+（exact McNemar `p=0.00098`）。因此终局保持
+`joint_limit_containment_v11_scale45_heldout_mixed_evidence`：mechanical containment 稳定，
+task-preserving safety shield、first-hit prevention、整体 physical safety 与 non-inferiority 均未建立。
+
+后续优化不再修改 v11。新的 outcome-informed v12 见
+[`v12_recoverable_alignment_plan.md`](v12_recoverable_alignment_plan.md)，核心是：
+
+```text
+Sparse L1 exact-passthrough intent guard
+  -> predictive L2 shadow screen
+  -> typed recovery authorization
+  -> fresh policy replan
+```
+
+当前只授权 V12-C1–C6 实现与 Q1–Q3 no-outcome qualification。Q gate 全部通过前不得启动新 clean；
+clean gate 通过前不得启动 attacked。
+
 ## 0. 2026-07-27 M2 终局与 40% 探索性后继
 
 M2 已自然完成并通过 artifact/ledger/terminal validator：240/240 complete、240/240 valid，
