@@ -3,7 +3,7 @@
   "audit_id": "proofalign-semantic-source-binding-e8-20260725",
   "audit_source": {
     "path": "scripts/generate_semantic_source_binding_e8.py",
-    "sha256": "a9a9575d1b1b2ddc66f7dae65d9f0be7703e334c18f5ff5d1465dbee55b078e6"
+    "sha256": "ab42f3ae31962e41e35135f90bddc8c3c11dfdc709438e7713da573d145ca952"
   },
   "claim_boundary": "This read-only audit binds the current semantic source scope, local evidence inventory, latest source-scope commit, and OpenPI checkout. A not-clean classification does not modify or commit the worktree. A clean classification would establish provenance only, not perception quality, efficacy, outcome, or safety.",
   "classification": "semantic_source_binding_clean",
@@ -22,7 +22,7 @@
       "exists": true,
       "git_status": "clean",
       "path": "README.md",
-      "sha256": "8bd3bc9294e0eb61941fbedfb87582990269984b8329f0374c297b3af8e50603",
+      "sha256": "c9fd8ad1db13bb2bb48f3ac4c3b513dd329ba59fdfc21d38e1a0503f36c41e8f",
       "tracked": true
     },
     {
@@ -70,7 +70,7 @@
       "exists": true,
       "git_status": "clean",
       "path": "docs/paper/paper_story.md",
-      "sha256": "ba57d427ac4cc1703c3165c63a387785e215cfdc857a4e2acc7ef4497121f0e5",
+      "sha256": "d0e588792d9307af7ba147102616760cb5bd6d0bccd3ad4ff41e6413d6999b9a",
       "tracked": true
     },
     {
@@ -78,7 +78,7 @@
       "exists": true,
       "git_status": "clean",
       "path": "docs/progress_and_plan.md",
-      "sha256": "882650d03e67c378dad4ea8488573421eaca057caf10a9f1011fbd6f4b56e81b",
+      "sha256": "4f3929c93d2430618f13bfdc433c9ac7095e3c411354e5cf55c2bbcebc24c9f1",
       "tracked": true
     },
     {
@@ -477,6 +477,14 @@
       "bound_to_head": true,
       "exists": true,
       "git_status": "clean",
+      "path": "scripts/freeze_physical_sufficiency_attacked_fresh15_terminal.py",
+      "sha256": "a4c4fdcfebd67a9b1e40531a3863cb9de69cc30f76c047e40b6a39c25819b179",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
       "path": "scripts/monitor_and_launch_contact_phase_scale45.py",
       "sha256": "c5318ea04835e0199ea67b93c3bccfdd7759b0b334630f94950e35ea9a3b30d2",
       "tracked": true
@@ -486,7 +494,7 @@
       "exists": true,
       "git_status": "clean",
       "path": "scripts/generate_semantic_source_binding_e8.py",
-      "sha256": "a9a9575d1b1b2ddc66f7dae65d9f0be7703e334c18f5ff5d1465dbee55b078e6",
+      "sha256": "ab42f3ae31962e41e35135f90bddc8c3c11dfdc709438e7713da573d145ca952",
       "tracked": true
     },
     {
@@ -1277,6 +1285,14 @@
       "bound_to_head": true,
       "exists": true,
       "git_status": "clean",
+      "path": "tests/test_physical_sufficiency_attacked_fresh15_terminal.py",
+      "sha256": "c175d0deec5df4fd013f454fac5de48821245ba8f1ed11afd2f7297d9f3b6f36",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
       "path": "tests/test_local_checker_qualification_e3.py",
       "sha256": "23c209fd61acdd06d2ba844333a400af03f48ce5aad9b7595fdbed1f41d8c6d1",
       "tracked": true
@@ -1853,6 +1869,14 @@
       "bound_to_head": true,
       "exists": true,
       "git_status": "clean",
+      "path": "experiments/proofalign_physical_sufficiency_attacked_fresh15_terminal_summary.json",
+      "sha256": "6671668240c142750a10e240633309aa8c634e1f617b0bff5bf0eca46e673774",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
       "path": "experiments/proofalign_pi05_action_conditioning_e2_protocol.json",
       "sha256": "079cf5566f49f44cd7ade70cf9cc5a96ef8d539bf5754ad01ad0d1e31e56be6e",
       "tracked": true
@@ -2150,6 +2174,18 @@
       "ignored_by_git": false,
       "path": "results/proofalign_physical_sufficiency_fresh15_cotenant_20260729_fresh1/SHA256SUMS",
       "sha256": "974f51e527dc60e8f8c4afc2291d0542c2a7ed5dae8cc170ef5d312625f51489"
+    },
+    {
+      "exists": true,
+      "ignored_by_git": false,
+      "path": "results/proofalign_physical_sufficiency_attacked_fresh15_20260729_fresh1/pilot_evidence.json",
+      "sha256": "d4bf51a96e5ad6523fe9022646e8f0e85373675b74babfdcba0464703db9c5ae"
+    },
+    {
+      "exists": true,
+      "ignored_by_git": false,
+      "path": "results/proofalign_physical_sufficiency_attacked_fresh15_20260729_fresh1/SHA256SUMS",
+      "sha256": "e642c83f3dadcae57122973a676a61005955d15adc896448396390a81b7a2745"
     }
   ],
   "evidence_inventory_complete": true,
@@ -2165,8 +2201,8 @@
   "policy_loaded": false,
   "repository_binding_semantics": "latest commit that changed the frozen semantic commit scope; later commits may contain only out-of-scope protocols or audit packets",
   "repository_fully_clean": true,
-  "repository_head_commit": "14eefe4958660ec63a372afc34c631d99c47cb03",
-  "repository_head_tree": "40cfd2dac4d0d6c130ad16b18b6a96edf72392dd",
+  "repository_head_commit": "2b407f3a78014785a919b897409e6a6105c59434",
+  "repository_head_tree": "d6ffc2e650e0cb65d26d87c4b721f3e2c7a732e6",
   "repository_status_row_count": 0,
   "schema": "proofalign.semantic-source-binding-e8-audit.v1",
   "simulator_created": false
