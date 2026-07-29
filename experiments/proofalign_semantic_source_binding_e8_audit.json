@@ -3,7 +3,7 @@
   "audit_id": "proofalign-semantic-source-binding-e8-20260725",
   "audit_source": {
     "path": "scripts/generate_semantic_source_binding_e8.py",
-    "sha256": "66da9e2d0cf5be2d7e0a4ed6256869974e4415157b7b5a13cf65658615fd0dbc"
+    "sha256": "17d48f98562ed52a04df9ad85a135f87a27afd9d49cb80e9ee386f9a5d90eb9d"
   },
   "claim_boundary": "This read-only audit binds the current semantic source scope, local evidence inventory, latest source-scope commit, and OpenPI checkout. A not-clean classification does not modify or commit the worktree. A clean classification would establish provenance only, not perception quality, efficacy, outcome, or safety.",
   "classification": "semantic_source_binding_clean",
@@ -405,8 +405,40 @@
       "bound_to_head": true,
       "exists": true,
       "git_status": "clean",
+      "path": "scripts/freeze_contact_phase_pick_up_scale45_four_arm.py",
+      "sha256": "c7b5816cc0790d682e9d82d8214cfd5a8e795e225fe7f171526179b099bcec10",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/freeze_contact_phase_pick_up_scale45_cotenant.py",
+      "sha256": "b53d09fc9142d8809aa42483a155337505b33c91d05a9abf3c426f14bf97d77d",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/freeze_contact_phase_pick_up_scale45_terminal.py",
+      "sha256": "8a7ba5df25d3f51bf369ec7c44fe83e1674e743eabf3ab4c3d417ecd836e40ab",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/monitor_and_launch_contact_phase_scale45.py",
+      "sha256": "c5318ea04835e0199ea67b93c3bccfdd7759b0b334630f94950e35ea9a3b30d2",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
       "path": "scripts/generate_semantic_source_binding_e8.py",
-      "sha256": "66da9e2d0cf5be2d7e0a4ed6256869974e4415157b7b5a13cf65658615fd0dbc",
+      "sha256": "17d48f98562ed52a04df9ad85a135f87a27afd9d49cb80e9ee386f9a5d90eb9d",
       "tracked": true
     },
     {
@@ -1029,6 +1061,38 @@
       "bound_to_head": true,
       "exists": true,
       "git_status": "clean",
+      "path": "tests/test_contact_phase_pick_up_scale45_four_arm.py",
+      "sha256": "22b2f26a6186bda6f6d02b1092694d40bb1dee804487f9c382d63376deab442f",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_contact_phase_pick_up_scale45_cotenant.py",
+      "sha256": "3ef0c4195bd417aac2c70a1a509123a5e4df7057f93b6816bb36fdcb1af457c3",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_contact_phase_pick_up_scale45_terminal.py",
+      "sha256": "7f7a55ce820e88f9345ef0a2441c000e83a3706d41575427e109878c0593a062",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_monitor_and_launch_contact_phase_scale45.py",
+      "sha256": "c4884e3491f79861e784771f1c975d78bca418a17ade384a512326dcd8fce34c",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
       "path": "tests/test_local_checker_qualification_e3.py",
       "sha256": "23c209fd61acdd06d2ba844333a400af03f48ce5aad9b7595fdbed1f41d8c6d1",
       "tracked": true
@@ -1533,6 +1597,30 @@
       "bound_to_head": true,
       "exists": true,
       "git_status": "clean",
+      "path": "experiments/proofalign_contact_phase_pick_up_scale45_four_arm_protocol.json",
+      "sha256": "05716b6d3f69a677d656da378f034890b8b0e19d5c60c49ca9339ad7a7848128",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_contact_phase_pick_up_scale45_cotenant_protocol.json",
+      "sha256": "12792d9ad8cb111da98fb35e9499faba3167bae4a57cf44fa51417be96cc2e62",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_contact_phase_pick_up_scale45_terminal_summary.json",
+      "sha256": "68f2c8f74856be7a6eba94bf3420bcef824ff5918d927d22ceac04d0a2e4b91a",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
       "path": "experiments/proofalign_pi05_action_conditioning_e2_protocol.json",
       "sha256": "079cf5566f49f44cd7ade70cf9cc5a96ef8d539bf5754ad01ad0d1e31e56be6e",
       "tracked": true
@@ -1770,6 +1858,18 @@
       "ignored_by_git": true,
       "path": "results/proofalign_contact_phase_pick_up_fresh_four_arm_20260728_fresh1/SHA256SUMS",
       "sha256": "e829e40ccc4f263998253cae62a1de29039f3a6363ada0d2527e0694e105e400"
+    },
+    {
+      "exists": true,
+      "ignored_by_git": true,
+      "path": "results/proofalign_contact_phase_pick_up_scale45_cotenant_20260729_fresh1/pilot_evidence.json",
+      "sha256": "acffa947f74a59dfab785e0706aeb5638fa3ccbe65fda7fb6675535944eaa476"
+    },
+    {
+      "exists": true,
+      "ignored_by_git": true,
+      "path": "results/proofalign_contact_phase_pick_up_scale45_cotenant_20260729_fresh1/SHA256SUMS",
+      "sha256": "fc0913bec05308ddcc8447e7596621800a4c571676938f3c86ffeb61635a9553"
     }
   ],
   "evidence_inventory_complete": true,
@@ -1785,8 +1885,8 @@
   "policy_loaded": false,
   "repository_binding_semantics": "latest commit that changed the frozen semantic commit scope; later commits may contain only out-of-scope protocols or audit packets",
   "repository_fully_clean": true,
-  "repository_head_commit": "ba307a615aa59eeb98a104ab5c7b7af5931cf541",
-  "repository_head_tree": "f29779b5bb4584258a1177d5451030001b414498",
+  "repository_head_commit": "8e8037f8dbc8f61a0fbf7c8ef3de06ca2d97036f",
+  "repository_head_tree": "e6f6712659f9e8cc8e04232d59b8d28287aa2e34",
   "repository_status_row_count": 0,
   "schema": "proofalign.semantic-source-binding-e8-audit.v1",
   "simulator_created": false
