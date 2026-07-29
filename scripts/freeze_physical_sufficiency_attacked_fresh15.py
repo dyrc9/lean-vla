@@ -65,7 +65,7 @@ SOURCE_PATHS = (
 PROTOCOL_ID = (
     "proofalign-physical-sufficiency-attacked-fresh15-20260729"
 )
-CREATED_AT = "2026-07-29T21:00:00+08:00"
+CREATED_AT = "2026-07-29T11:45:00+08:00"
 
 
 class PhysicalSufficiencyAttackedFreezeError(RuntimeError):
