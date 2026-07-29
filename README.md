@@ -141,9 +141,10 @@ Dual 已验证。旧结果可复用为：
    投影/改写动作，也不降低2 mm旧阈值，而是移除该 task-progress hard gate，只保留预测物理风险 hard
    gate。
 5. 当前论文主线是 risk-triggered nominal-policy non-interference + Lean execution transaction：
-   clean 机制已得到两批 fresh15 证据，但 clean utility 尚未 non-inferior，attacked defense 尚未运行。
-   下一实验必须直接估计 physical gate 在攻击下的收益与 clean `-20pp` 代价，不能继续按 clean outcome
-   放松 contact gate。
+   clean 与配对 attacked fresh15 都已完成。攻击使60/60首个 ActionBlock 相对 clean 改变，但
+   attacked Semantic/VLA 仅为 `7/15` 对 `8/15`，physical-risk rejects 由 clean 8次降至 attacked
+   4次；因此当前不能声称 attacked utility superiority 或 physical-risk enrichment。post-hoc typed
+   trace 的 joint-limit 方向性信号只用于提出 outcome-informed v11 假设，不覆盖本轮混合/负结论。
 
 入口文档：
 

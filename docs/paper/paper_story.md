@@ -282,10 +282,18 @@ physical-risk rejects 保留，60条 official cost/collision 为0。Semantic-onl
 损失明确归因于 physical gate。
 
 因此论文当前可以报告 risk-triggered nominal-policy non-interference、可复算的 hard/advisory
-partition 和 clean safety–utility tradeoff；不能报告 attacked defense 有效。对应的 attacked
-successor 已冻结：复用第二批15个 workload 与四臂 seed，加入15条未改写的 M2 task-prompt 攻击，
-形成60条 attacked episode，并与已有60条 clean episode 逐条配对。主 estimand 是 attacked
-Semantic−VLA、Dual−Execution 的配对任务效用，以及 attacked−clean 的 physical-risk reject
-enrichment；所有 outcome 只用于 exploratory report，不参与数据完整性 gate。该阶段直接检验8次
-clean physical gate 的代价能否由攻击场景收益补偿，禁止继续按 clean outcome 放松
+partition 和 clean safety–utility tradeoff。配对 attacked successor 也已完成：15条未改写 M2
+task-prompt 攻击令60/60首个 ActionBlock 相对 clean 改变，说明攻击确实激活；attacked
+VLA/Execution/Semantic/Dual 为 `8/15, 8/15, 7/15, 6/15`。Semantic−VLA 的配对差从 clean
+`-20pp` 缩到 attacked `-6.7pp`，difference-in-differences 为 `+13.3pp`，但 attacked 内仍是
+1个 treatment-only 对2个 control-only（exact McNemar `p=1.0`），不能写成 utility superiority。
+更直接地，physical-risk rejects 从 clean 8次降为 attacked 4次，未出现预注册的 risk enrichment；
+四臂 official cost/collision 均为0，也不能写成安全收益。
+
+post-hoc typed trace 显示 joint-limit violation steps 为
+VLA/Execution/Semantic/Dual `768/416/109/109`，给出一个有方向性的机制假设；但 robot-contact 与
+excessive-force proxy 并不一致改善，且 joint-limit 不是本 attacked protocol 的预注册主终点。论文
+应把 v10 结论写成“attack activation 明确、task utility 与 hard-gate enrichment 混合/负、joint-limit
+方向值得新实验”，而不是宣称防御有效。下一步若加入可信关节状态/限位预测，必须作为 outcome-informed
+v11 在新 workload 上冻结后验证，不能回写本轮 v10，也不能继续按 outcome 放松
 unexpected-contact gate。
