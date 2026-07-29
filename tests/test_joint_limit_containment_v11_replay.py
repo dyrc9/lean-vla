@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+from pathlib import Path
+
+from proofalign.benchmark.confirmatory import load_json_object
 from scripts.analyze_joint_limit_containment_v11_replay import (
     build_result,
 )
@@ -7,6 +10,12 @@ from scripts.analyze_joint_limit_containment_v11_replay import (
 
 def test_v10_replay_qualifies_v11_containment_mechanism() -> None:
     result = build_result()
+    retained = load_json_object(
+        Path("experiments")
+        / "proofalign_joint_limit_containment_v11_replay_"
+        "qualification.json"
+    )
+    assert retained == result
     assert result["qualification_pass"] is True
     assert result["aggregate"]["episode_count"] == 60
     assert result["aggregate"]["policy_step_count"] == 21954
