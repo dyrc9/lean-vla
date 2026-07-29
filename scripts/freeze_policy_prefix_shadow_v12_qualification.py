@@ -104,6 +104,16 @@ def _git(*args: str, cwd: Path = REPO_ROOT) -> str:
     return completed.stdout.strip()
 
 
+def _source_commit() -> str:
+    return _git(
+        "log",
+        "-1",
+        "--format=%H",
+        "--",
+        *SOURCE_PATHS,
+    )
+
+
 def _select_pairs(
     source: dict[str, Any],
     *,
@@ -349,7 +359,7 @@ def build_protocol() -> dict[str, Any]:
             "outcome_rollout_authorized": False,
         },
         "source": {
-            "repository_commit": _git("rev-parse", "HEAD"),
+            "repository_commit": _source_commit(),
             "sha256": source_bindings,
             "runtime_sha256": runtime_bindings,
             "openpi": _checkout_binding(REPO_ROOT / "external/openpi"),

@@ -99,6 +99,18 @@ def _git(*args: str) -> str:
     return completed.stdout.strip()
 
 
+def _source_commit() -> str:
+    """Bind the latest commit that changed controlled source, not protocol HEAD."""
+
+    return _git(
+        "log",
+        "-1",
+        "--format=%H",
+        "--",
+        *SOURCE_PATHS,
+    )
+
+
 def _with_injections(
     prefixes: list[dict[str, Any]],
 ) -> list[dict[str, Any]]:
@@ -287,7 +299,7 @@ def build_protocol() -> dict[str, Any]:
             "outcome_rollout_authorized": False,
         },
         "source": {
-            "repository_commit": _git("rev-parse", "HEAD"),
+            "repository_commit": _source_commit(),
             "sha256": {
                 relative: _sha256(REPO_ROOT / relative)
                 for relative in SOURCE_PATHS
