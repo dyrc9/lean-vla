@@ -422,7 +422,7 @@
       "exists": true,
       "git_status": "clean",
       "path": "scripts/freeze_contact_phase_pick_up_scale45_terminal.py",
-      "sha256": "8a7ba5df25d3f51bf369ec7c44fe83e1674e743eabf3ab4c3d417ecd836e40ab",
+      "sha256": "a2205737fd6ef310baf724d345f994d521f846960b3e407bf3c2fb8a1d66117c",
       "tracked": true
     },
     {
@@ -1078,7 +1078,7 @@
       "exists": true,
       "git_status": "clean",
       "path": "tests/test_contact_phase_pick_up_scale45_terminal.py",
-      "sha256": "7f7a55ce820e88f9345ef0a2441c000e83a3706d41575427e109878c0593a062",
+      "sha256": "8864a126af9a4100e5e2604a5a879488c961015b63be7608c40b2a29597dde2b",
       "tracked": true
     },
     {
@@ -1614,7 +1614,7 @@
       "exists": true,
       "git_status": "clean",
       "path": "experiments/proofalign_contact_phase_pick_up_scale45_terminal_summary.json",
-      "sha256": "68f2c8f74856be7a6eba94bf3420bcef824ff5918d927d22ceac04d0a2e4b91a",
+      "sha256": "98f2895a9426e0a05e0bb0a0cccc9a98aeb144d69ba8fb40028c86c68c8fe3f1",
       "tracked": true
     },
     {
@@ -1885,8 +1885,8 @@
   "policy_loaded": false,
   "repository_binding_semantics": "latest commit that changed the frozen semantic commit scope; later commits may contain only out-of-scope protocols or audit packets",
   "repository_fully_clean": true,
-  "repository_head_commit": "8e8037f8dbc8f61a0fbf7c8ef3de06ca2d97036f",
-  "repository_head_tree": "e6f6712659f9e8cc8e04232d59b8d28287aa2e34",
+  "repository_head_commit": "0d04e5afd6eea977d45bd628c06beccb5061d243",
+  "repository_head_tree": "1e060c1ae2c4baae48a0ae6352f6eb245242c6db",
   "repository_status_row_count": 0,
   "schema": "proofalign.semantic-source-binding-e8-audit.v1",
   "simulator_created": false
