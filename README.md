@@ -115,6 +115,13 @@ phase-gating theorem，而不是事后附加的形式化说明。
     15/15 paired first blocks 一致，8次 physical-risk reject 保留，official cost/collision 为0/60。
     Semantic-only 相对 VLA 为 `-20pp`（paired exact McNemar `p=0.25`），因此当前只支持
     risk-triggered mechanism 与明确的 clean safety–utility tradeoff，不支持 non-inferiority 或防御有效。
+  - outcome-informed v11 不声称动作前预测，而把 robosuite 原生 joint-limit signal 作为 L2 post-step
+    containment：clean/attacked 各60条，16次总触发后 dispatch 均为0；clean joint-limit steps 为
+    `884/6/780/4`，attacked 为 `202/3/462/3`（VLA/Execution/Semantic/Dual）。
+    clean task success 为 `10/15, 8/15, 9/15, 8/15`，attacked 为
+    `11/15, 10/15, 9/15, 8/15`。配对 sign/McNemar 检验不显著且 official cost/collision 无一致排序，
+    因此只支持 typed L2 containment 与描述性 burden reduction，不支持 first-hit prevention、
+    non-inferiority 或整体 physical safety。
 - P0b：96/96 episode 有效，得到 23 个 clean-eligible pair 和 15 个攻击 transition；因
   `23 < 26` 未通过确认性 denominator gate。
 - R9 Execution-only：clean retention `22/23 = 95.7%`；attacked+defended `48/48`
@@ -140,11 +147,10 @@ Dual 已验证。旧结果可复用为：
 4. post-outcome L1 repair、Block-10、H10×K4、v8 scale45、v9 与 v10 均按时间顺序保留；最终方法不再
    投影/改写动作，也不降低2 mm旧阈值，而是移除该 task-progress hard gate，只保留预测物理风险 hard
    gate。
-5. 当前论文主线是 risk-triggered nominal-policy non-interference + Lean execution transaction：
-   clean 与配对 attacked fresh15 都已完成。攻击使60/60首个 ActionBlock 相对 clean 改变，但
-   attacked Semantic/VLA 仅为 `7/15` 对 `8/15`，physical-risk rejects 由 clean 8次降至 attacked
-   4次；因此当前不能声称 attacked utility superiority 或 physical-risk enrichment。post-hoc typed
-   trace 的 joint-limit 方向性信号只用于提出 outcome-informed v11 假设，不覆盖本轮混合/负结论。
+5. 当前论文主线是 risk-triggered nominal-policy non-interference + Lean execution transaction。
+   v10 clean/attacked 的混合/负结论保持不变；v11 作为单独 outcome-informed successor 已完成，并把
+   joint-limit 假设升级为 L2 containment 实验。它验证“首次 typed observer trigger 后不再 dispatch”，
+   但不把该事实扩大成动作前预测、一般 defense efficacy 或完整物理安全。
 
 入口文档：
 

@@ -132,6 +132,17 @@ missing task-progress effect 与 `target_not_held_after_move` 触发 audited rep
 workspace/wrong-contact、command/receipt substitution、stale/replay 和未识别 evidence unknown 仍
 fail closed。对于启用 L2 的 arm，phase 只有在 `L2 ∧ task_completion_observed` 时推进。
 
+v10 attacked 结果之后，v11 另行增加了一个明确标注为 outcome-informed 的 L2 observer refinement：
+每次 `env.step` 后读取 robosuite 模型关节范围定义的 `joint_limit_violation`，与独立 SABER typed
+signal 逐步核对；若首次为真，则把 `joint_limit_violation` 绑定进当前 L2 evidence，封存事务，并禁止
+本 episode 的任何后续 dispatch。该规则只在 Execution-only 与 Dual 启用，不修改 source ActionBlock，
+也不作用于 VLA-only/Semantic-only。
+
+这个 refinement 是 **containment**，不是 pre-dispatch **prevention**：首次触发已经发生并计入
+violation。当前 trusted observation 没有绑定足以精确预测 OSC 动作到关节状态的动力学契约，因此论文
+不得把 post-step latch 写成“提前预测关节限位”。缺失 observer、信号 schema 错误或与独立 signal
+不一致均 fail closed。
+
 ## 4. Lean 的位置
 
 Lean 是 L2 方法的一等组成：它固定 transaction vocabulary 和允许的 phase transition，并对

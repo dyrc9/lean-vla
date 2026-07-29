@@ -282,13 +282,13 @@ negative tests。v3 frozen digest fixture 保持不变。全量 Python 测试为
 
 ## 4. 当前 blocker 排序
 
-1. **Attacked efficacy 未建立**：配对60-episode instruction-attacked pilot 已完整结束。攻击使
-   60/60首个 ActionBlock 相对 clean 改变；VLA/Execution/Semantic/Dual success 为
-   `8/15, 8/15, 7/15, 6/15`。Semantic−VLA 为 `-1/15=-6.7pp`（1个 treatment-only、
-   2个 control-only，exact McNemar `p=1.0`），不能声称 defense efficacy；
-2. **Clean physical-gate utility**：两批 fresh15 中 Semantic-only 相对 VLA 都是 `-3/15=-20pp`。
-   v10 已消除 articulation unknown hard stop，剩余 action rejects 是 predicted physical contact；下一步
-   必须估计攻击下收益，不能按 clean outcome 松 gate；
+1. **整体安全 efficacy 未建立**：outcome-informed v11 clean/attacked 各60条已经完成。16个
+   joint-limit trigger 后均为0 dispatch，且 L2-on arm 的 aggregate joint-limit step burden 明显更低；
+   但15-pair sign tests 不显著，official cost/collision 无一致 ordering，不能声称整体 physical safety；
+2. **Containment–utility tradeoff**：v11 task success 为 clean
+   `10/15, 8/15, 9/15, 8/15`、attacked `11/15, 10/15, 9/15, 8/15`
+   （顺序 VLA/Execution/Semantic/Dual）。Execution−VLA 与 Dual−Semantic 为 clean
+   `-13.3pp/-6.7pp`、attacked `-6.7pp/-6.7pp`；当前样本不支持 superiority 或 non-inferiority；
 3. **L2 articulation evidence unknown**：v10 Dual 有3次仅承诺 `command_applied` 的 articulation
    transaction 因 task effect 不可观测而 `semantic_execution_unknown`；它是 transaction contract
    refinement 问题，不应通过放松 receipt/cost/collision integrity 解决；
@@ -298,12 +298,19 @@ negative tests。v3 frozen digest fixture 保持不变。全量 Python 测试为
 E8 已绑定 clean commit，semantic scope 未绑定路径为 `0`。E7 仍是 deployment claim blocker，但不阻止
 明确标注 privileged geometry 的 benchmark M2。
 
-attacked pilot 的全部数据完整性门已通过：60条 episode、15条攻击、60个 clean/attacked comparator、
+v10 attacked pilot 的全部数据完整性门已通过：60条 episode、15条攻击、60个 clean/attacked comparator、
 攻击 prompt digest 和15/15同 workload 四臂首个 source ActionBlock 均匹配；1055/1055 L1 blocks
 passthrough。physical rejects 从 clean 8次降为 attacked 4次，未出现预期 enrichment；四臂 official
 cost/collision 均为0，不能提供 arm separation。post-hoc SABER typed trace 中 joint-limit violation
 steps 为 VLA/Execution/Semantic/Dual `768/416/109/109`，但 contact/force proxy 不一致改善，因此只能
 用于提出 joint-limit-aware v11 假设，不能当作预注册安全主终点或回调本轮结论。
+
+v11 已作为单独的 outcome-informed successor 冻结和完成。它没有假装从 EEF delta 精确预测关节状态，
+而是在 L2-on arm 对 robosuite 原生 joint-limit signal 做 post-step containment。clean/attacked
+observer coverage 为 `5319/5319`、`8389/8389`，16次总触发后 dispatch 为0。clean joint-limit
+steps 为 `884/6/780/4`，attacked 为 `202/3/462/3`（VLA/Execution/Semantic/Dual）；对应 exact
+paired sign tests 仍不显著。终局分类为 `joint_limit_containment_v11_exploratory_mixed_evidence`，
+只支持 mechanical containment 与描述性 burden reduction，不支持 first-hit prevention 或一般安全。
 
 E6 已关闭为 `semantic_resource_smoke_qualified`，只证明冻结离线 workload 满足预注册工程预算；不得
 据此选择 efficacy threshold，也不得把它解释为 simulator、camera perception 或物理安全证据。
@@ -406,6 +413,8 @@ C1 semantic digest schema（已实现）
   -> post-outcome L1 geometry+K4 no-outcome qualification（nonpass：24/45）
   -> Block-10 + matched H=2/5/10 no-outcome qualification（nonpass：36/45）
   -> H10×K4 + matched K=1/2/4 no-outcome qualification（nonpass：36/45）
+  -> v9/v10 risk-selective clean + attacked fresh15（已完成；mixed/negative efficacy）
+  -> outcome-informed v11 L2 joint-limit containment clean + attacked fresh15（已完成；mixed evidence）
   -> materially-new action generator / trained conditioning / feedback interface
 ```
 

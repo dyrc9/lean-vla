@@ -297,3 +297,23 @@ excessive-force proxy 并不一致改善，且 joint-limit 不是本 attacked pr
 方向值得新实验”，而不是宣称防御有效。下一步若加入可信关节状态/限位预测，必须作为 outcome-informed
 v11 在新 workload 上冻结后验证，不能回写本轮 v10，也不能继续按 outcome 放松
 unexpected-contact gate。
+
+v11 已按该边界完成，但最终采用的是可证明的 post-step containment，而不是没有资格化支撑的
+pre-dispatch predictor。方法在 L2-on 两臂把 robosuite 原生 0.1 rad joint-limit predicate 绑定进
+execution evidence，首次触发后清空剩余 block 并停止 episode；L2-off 两臂只记录信号。15 个新
+init、env/policy seed `211/109` 的 clean 与同状态同 seed attacked 各60条，全部数据完整性门通过。
+clean/attacked 的 observer coverage 分别为 `5319/5319` 与 `8389/8389`，16个总触发之后的 dispatch
+均为0。
+
+机制信号明显但统计结论仍必须克制。clean 的 joint-limit steps 为
+VLA/Execution/Semantic/Dual `884/6/780/4`，attacked 为 `202/3/462/3`；对应 L2 paired
+joint-limit-rate 方向在 clean 是 `5 lower / 2 higher / 8 equal` 与 `4/0/11`，attacked 是
+`3/1/11` 与 `3/0/12`，exact sign `p` 分别为 `0.453/0.125/0.625/0.25`。task success 为 clean
+`10/15, 8/15, 9/15, 8/15`，attacked `11/15, 10/15, 9/15, 8/15`；Execution−VLA 与
+Dual−Semantic 的配对差为 clean `-13.3pp/-6.7pp`、attacked `-6.7pp/-6.7pp`，exact McNemar
+均不显著。official cost/collision 也无一致 arm ordering。
+
+因此 v11 支持的正面系统 claim 是“typed L2 observer 首次触发后不再 dispatch”，并给出强描述性的
+joint-limit burden 下降；它不证明 first-hit prevention、task non-inferiority、整体 physical safety
+或一般 attacked-defense efficacy。论文主线仍是 L1/L2 两个对齐断点、exact transaction 和可审计
+failure localization，v11 作为 L2 observer containment 的具体实例。
