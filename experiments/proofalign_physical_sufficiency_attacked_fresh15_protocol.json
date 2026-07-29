@@ -726,7 +726,7 @@
     "timing_claim_authorized": false
   },
   "complete_classification": "physical_sufficiency_attacked_fresh15_data_complete",
-  "created_at": "2026-07-29T21:00:00+08:00",
+  "created_at": "2026-07-29T11:45:00+08:00",
   "design": {
     "all_outcome_estimands_exploratory": true,
     "condition": "instruction_attacked",
@@ -1693,11 +1693,11 @@
   },
   "source": {
     "freezer": "scripts/freeze_physical_sufficiency_attacked_fresh15.py",
-    "freezer_sha256": "04d4447bcdfaff7f8b5ca74351a87e3f6e22c557e6e12ec527f32608eb4001b2",
-    "repository_commit": "63d229112d6779bb1a93c119514855ac4d90d350",
-    "repository_tree": "1e11b2ce6d95d9da572b93700e3a89b7aca4c956",
+    "freezer_sha256": "2829246f73b0bcedde2d96f6a66ec72c79a1b663ae0d615498272a950877d22e",
+    "repository_commit": "a4898e3d9ec2983eb0ec25e4f4a18749c19d24d9",
+    "repository_tree": "5d0ddc786725cd60784fd76923cc420670958b75",
     "sha256": {
-      "scripts/freeze_physical_sufficiency_attacked_fresh15.py": "04d4447bcdfaff7f8b5ca74351a87e3f6e22c557e6e12ec527f32608eb4001b2",
+      "scripts/freeze_physical_sufficiency_attacked_fresh15.py": "2829246f73b0bcedde2d96f6a66ec72c79a1b663ae0d615498272a950877d22e",
       "scripts/run_l2_execution_attack_eval_v10.py": "c5e8687f5ced7ec18495d6759ccabed514bca9b841c9e5cb47919c33b24d601a",
       "scripts/run_physical_sufficiency_attacked_pilot.py": "dd786a3f74743a6a4ceb8a2f76160a30516e9156116817eb9c6d0fb64cd23176",
       "scripts/run_physical_sufficiency_clean_pilot.py": "3c7a23ac4716b1ab5f87b8d7792491906a31e6b3e76664a2bd8df002c9897327",
