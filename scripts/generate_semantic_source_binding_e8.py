@@ -150,6 +150,17 @@ COMMIT_SCOPE_PATHS = (
     "scripts/freeze_contact_phase_pick_up_scale45_four_arm.py",
     "scripts/freeze_contact_phase_pick_up_scale45_cotenant.py",
     "scripts/freeze_contact_phase_pick_up_scale45_terminal.py",
+    (
+        "scripts/"
+        "freeze_risk_selective_scale45_replay_qualification.py"
+    ),
+    "scripts/freeze_risk_selective_fresh15_cotenant.py",
+    (
+        "scripts/"
+        "freeze_physical_sufficiency_replay_qualification.py"
+    ),
+    "scripts/freeze_physical_sufficiency_fresh15_cotenant.py",
+    "scripts/freeze_physical_sufficiency_fresh15_terminal.py",
     "scripts/monitor_and_launch_contact_phase_scale45.py",
     "scripts/generate_semantic_source_binding_e8.py",
     "scripts/generate_semantic_v4_equivalence_evidence.py",
@@ -167,6 +178,18 @@ COMMIT_SCOPE_PATHS = (
     "scripts/run_l2_execution_attack_eval_v6.py",
     "scripts/run_l2_execution_attack_eval_v7.py",
     "scripts/run_l2_execution_attack_eval_v8.py",
+    "scripts/run_l2_execution_attack_eval_v9.py",
+    "scripts/run_l2_execution_attack_eval_v10.py",
+    (
+        "scripts/"
+        "run_risk_selective_scale45_replay_qualification.py"
+    ),
+    "scripts/run_risk_selective_clean_pilot.py",
+    (
+        "scripts/"
+        "run_physical_sufficiency_replay_qualification.py"
+    ),
+    "scripts/run_physical_sufficiency_clean_pilot.py",
     (
         "scripts/"
         "run_horizon_consistent_pick_up_fresh_dual_pilot.py"
@@ -232,6 +255,8 @@ COMMIT_SCOPE_PATHS = (
     "src/proofalign/horizon_consistent_release_h4.py",
     "src/proofalign/horizon_consistent_release_prefix.py",
     "src/proofalign/contact_phase_pick_up.py",
+    "src/proofalign/risk_selective_semantic.py",
+    "src/proofalign/physical_sufficiency_semantic.py",
     "src/proofalign/semantic_action_selection.py",
     "src/proofalign/semantic_effect_observer.py",
     "src/proofalign/semantic_local_checker.py",
@@ -263,6 +288,13 @@ COMMIT_SCOPE_PATHS = (
     "tests/test_contact_phase_pick_up_scale45_cotenant.py",
     "tests/test_contact_phase_pick_up_scale45_terminal.py",
     "tests/test_monitor_and_launch_contact_phase_scale45.py",
+    "tests/test_risk_selective_semantic.py",
+    "tests/test_risk_selective_scale45_replay_qualification.py",
+    "tests/test_risk_selective_fresh15_cotenant.py",
+    "tests/test_physical_sufficiency_semantic.py",
+    "tests/test_physical_sufficiency_replay_qualification.py",
+    "tests/test_physical_sufficiency_fresh15_cotenant.py",
+    "tests/test_physical_sufficiency_fresh15_terminal.py",
     "tests/test_local_checker_qualification_e3.py",
     "tests/test_l1_repair_qualification.py",
     "tests/test_l1_repair_qualification_v2.py",
@@ -461,6 +493,28 @@ COMMIT_SCOPE_PATHS = (
         "experiments/"
         "proofalign_contact_phase_pick_up_scale45_terminal_summary.json"
     ),
+    (
+        "experiments/"
+        "proofalign_risk_selective_scale45_replay_"
+        "qualification_protocol.json"
+    ),
+    (
+        "experiments/"
+        "proofalign_risk_selective_fresh15_cotenant_protocol.json"
+    ),
+    (
+        "experiments/"
+        "proofalign_physical_sufficiency_replay_"
+        "qualification_protocol.json"
+    ),
+    (
+        "experiments/"
+        "proofalign_physical_sufficiency_fresh15_cotenant_protocol.json"
+    ),
+    (
+        "experiments/"
+        "proofalign_physical_sufficiency_fresh15_terminal_summary.json"
+    ),
     "experiments/proofalign_pi05_action_conditioning_e2_protocol.json",
     "experiments/proofalign_pi05_selector_e1_protocol.json",
     (
@@ -580,6 +634,38 @@ EVIDENCE_PATHS = (
     ),
     (
         "results/proofalign_contact_phase_pick_up_scale45_cotenant_"
+        "20260729_fresh1/SHA256SUMS"
+    ),
+    (
+        "results/proofalign_risk_selective_scale45_replay_"
+        "qualification_20260729_fresh1/qualification.json"
+    ),
+    (
+        "results/proofalign_risk_selective_scale45_replay_"
+        "qualification_20260729_fresh1/SHA256SUMS"
+    ),
+    (
+        "results/proofalign_risk_selective_fresh15_cotenant_"
+        "20260729_fresh1/pilot_evidence.json"
+    ),
+    (
+        "results/proofalign_risk_selective_fresh15_cotenant_"
+        "20260729_fresh1/SHA256SUMS"
+    ),
+    (
+        "results/proofalign_physical_sufficiency_replay_"
+        "qualification_20260729_fresh1/qualification.json"
+    ),
+    (
+        "results/proofalign_physical_sufficiency_replay_"
+        "qualification_20260729_fresh1/SHA256SUMS"
+    ),
+    (
+        "results/proofalign_physical_sufficiency_fresh15_cotenant_"
+        "20260729_fresh1/pilot_evidence.json"
+    ),
+    (
+        "results/proofalign_physical_sufficiency_fresh15_cotenant_"
         "20260729_fresh1/SHA256SUMS"
     ),
 )
