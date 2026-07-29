@@ -147,6 +147,10 @@ COMMIT_SCOPE_PATHS = (
         "scripts/"
         "freeze_contact_phase_pick_up_fresh_four_arm_terminal.py"
     ),
+    "scripts/freeze_contact_phase_pick_up_scale45_four_arm.py",
+    "scripts/freeze_contact_phase_pick_up_scale45_cotenant.py",
+    "scripts/freeze_contact_phase_pick_up_scale45_terminal.py",
+    "scripts/monitor_and_launch_contact_phase_scale45.py",
     "scripts/generate_semantic_source_binding_e8.py",
     "scripts/generate_semantic_v4_equivalence_evidence.py",
     "scripts/prepare_deployment_perception_dataset_e7.py",
@@ -255,6 +259,10 @@ COMMIT_SCOPE_PATHS = (
     "tests/test_contact_phase_pick_up_regression.py",
     "tests/test_contact_phase_pick_up_fresh_four_arm.py",
     "tests/test_contact_phase_pick_up_fresh_four_arm_terminal.py",
+    "tests/test_contact_phase_pick_up_scale45_four_arm.py",
+    "tests/test_contact_phase_pick_up_scale45_cotenant.py",
+    "tests/test_contact_phase_pick_up_scale45_terminal.py",
+    "tests/test_monitor_and_launch_contact_phase_scale45.py",
     "tests/test_local_checker_qualification_e3.py",
     "tests/test_l1_repair_qualification.py",
     "tests/test_l1_repair_qualification_v2.py",
@@ -441,6 +449,18 @@ COMMIT_SCOPE_PATHS = (
         "proofalign_contact_phase_pick_up_fresh_four_arm_"
         "terminal_summary.json"
     ),
+    (
+        "experiments/"
+        "proofalign_contact_phase_pick_up_scale45_four_arm_protocol.json"
+    ),
+    (
+        "experiments/"
+        "proofalign_contact_phase_pick_up_scale45_cotenant_protocol.json"
+    ),
+    (
+        "experiments/"
+        "proofalign_contact_phase_pick_up_scale45_terminal_summary.json"
+    ),
     "experiments/proofalign_pi05_action_conditioning_e2_protocol.json",
     "experiments/proofalign_pi05_selector_e1_protocol.json",
     (
@@ -553,6 +573,14 @@ EVIDENCE_PATHS = (
     (
         "results/proofalign_contact_phase_pick_up_fresh_four_arm_"
         "20260728_fresh1/SHA256SUMS"
+    ),
+    (
+        "results/proofalign_contact_phase_pick_up_scale45_cotenant_"
+        "20260729_fresh1/pilot_evidence.json"
+    ),
+    (
+        "results/proofalign_contact_phase_pick_up_scale45_cotenant_"
+        "20260729_fresh1/SHA256SUMS"
     ),
 )
 
