@@ -283,7 +283,10 @@ negative tests。v3 frozen digest fixture 保持不变。全量 Python 测试为
 ## 4. 当前 blocker 排序
 
 1. **Attacked benefit 尚未估计**：risk-selective v9/v10 已把 clean semantic success 从历史
-   `5/45` 提高到两批 fresh15 的 `7/15`，但尚无对应 attacked rollout，不能声称 defense efficacy；
+   `5/45` 提高到两批 fresh15 的 `7/15`，但尚无 attacked outcome，不能声称 defense efficacy。
+   当前已冻结与第二批 clean workload/arm/seed 一一对应的60-episode instruction-attacked pilot；
+   15条攻击是 M2 prompt-only 输出按 suite/task 确定性匹配并保持攻击文本不变，等待可用的独立
+   policy/EGL GPU 后执行；
 2. **Clean physical-gate utility**：两批 fresh15 中 Semantic-only 相对 VLA 都是 `-3/15=-20pp`。
    v10 已消除 articulation unknown hard stop，剩余 action rejects 是 predicted physical contact；下一步
    必须估计攻击下收益，不能按 clean outcome 松 gate；
@@ -295,6 +298,11 @@ negative tests。v3 frozen digest fixture 保持不变。全量 Python 测试为
 
 E8 已绑定 clean commit，semantic scope 未绑定路径为 `0`。E7 仍是 deployment claim blocker，但不阻止
 明确标注 privileged geometry 的 benchmark M2。
+
+attacked pilot 的数据完整性门只检查60条 episode、15条攻击、clean/attacked 配对、攻击 prompt
+确实进入 policy，以及同 workload 四臂首个 source ActionBlock 相同；task success、unsafe count 和
+physical-risk enrichment 都是冻结 estimand，不是 completion gate。由此结果好坏都必须报告，且不能
+用于回调 unexpected-contact gate。
 
 E6 已关闭为 `semantic_resource_smoke_qualified`，只证明冻结离线 workload 满足预注册工程预算；不得
 据此选择 efficacy threshold，也不得把它解释为 simulator、camera perception 或物理安全证据。

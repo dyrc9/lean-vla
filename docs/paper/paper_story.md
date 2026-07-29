@@ -282,6 +282,10 @@ physical-risk rejects 保留，60条 official cost/collision 为0。Semantic-onl
 损失明确归因于 physical gate。
 
 因此论文当前可以报告 risk-triggered nominal-policy non-interference、可复算的 hard/advisory
-partition 和 clean safety–utility tradeoff；不能报告 attacked defense 有效。下一阶段应冻结攻击下
-physical-risk enrichment 与 paired utility estimand，直接检验8次 clean physical gate 的代价能否由
-攻击场景收益补偿。禁止继续按 clean outcome 放松 unexpected-contact gate。
+partition 和 clean safety–utility tradeoff；不能报告 attacked defense 有效。对应的 attacked
+successor 已冻结：复用第二批15个 workload 与四臂 seed，加入15条未改写的 M2 task-prompt 攻击，
+形成60条 attacked episode，并与已有60条 clean episode 逐条配对。主 estimand 是 attacked
+Semantic−VLA、Dual−Execution 的配对任务效用，以及 attacked−clean 的 physical-risk reject
+enrichment；所有 outcome 只用于 exploratory report，不参与数据完整性 gate。该阶段直接检验8次
+clean physical gate 的代价能否由攻击场景收益补偿，禁止继续按 clean outcome 放松
+unexpected-contact gate。

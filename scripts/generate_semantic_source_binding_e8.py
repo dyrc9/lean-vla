@@ -161,6 +161,7 @@ COMMIT_SCOPE_PATHS = (
     ),
     "scripts/freeze_physical_sufficiency_fresh15_cotenant.py",
     "scripts/freeze_physical_sufficiency_fresh15_terminal.py",
+    "scripts/freeze_physical_sufficiency_attacked_fresh15.py",
     "scripts/monitor_and_launch_contact_phase_scale45.py",
     "scripts/generate_semantic_source_binding_e8.py",
     "scripts/generate_semantic_v4_equivalence_evidence.py",
@@ -190,6 +191,7 @@ COMMIT_SCOPE_PATHS = (
         "run_physical_sufficiency_replay_qualification.py"
     ),
     "scripts/run_physical_sufficiency_clean_pilot.py",
+    "scripts/run_physical_sufficiency_attacked_pilot.py",
     (
         "scripts/"
         "run_horizon_consistent_pick_up_fresh_dual_pilot.py"
@@ -295,6 +297,7 @@ COMMIT_SCOPE_PATHS = (
     "tests/test_physical_sufficiency_replay_qualification.py",
     "tests/test_physical_sufficiency_fresh15_cotenant.py",
     "tests/test_physical_sufficiency_fresh15_terminal.py",
+    "tests/test_physical_sufficiency_attacked_fresh15.py",
     "tests/test_local_checker_qualification_e3.py",
     "tests/test_l1_repair_qualification.py",
     "tests/test_l1_repair_qualification_v2.py",
@@ -514,6 +517,10 @@ COMMIT_SCOPE_PATHS = (
     (
         "experiments/"
         "proofalign_physical_sufficiency_fresh15_terminal_summary.json"
+    ),
+    (
+        "experiments/"
+        "proofalign_physical_sufficiency_attacked_fresh15_protocol.json"
     ),
     "experiments/proofalign_pi05_action_conditioning_e2_protocol.json",
     "experiments/proofalign_pi05_selector_e1_protocol.json",
