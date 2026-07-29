@@ -1,6 +1,23 @@
 # 当前进展与执行计划
 
-## 最新 checkpoint：2026-07-29 v11 终局与 v12 启动边界
+## 最新 checkpoint：2026-07-29 v12 无 outcome 资格实验通过
+
+v11 终局保持不变。v12 已完成第一批实现和两层 no-outcome 资格：
+
+- 纯 contract corpus 为 655 cases：Sparse L1 315、analytic shadow 220、recovery transaction
+  120；所有冻结 gate 通过，simulator/`env.step`/policy/outcome/dispatch 全部为0；
+- v12.1 simulator-reset preflight 在与 v11 scale45 outcome 零重叠的45个 task/init pair 上通过：
+  recovery coverage、terminal safe、recovery completion、state restore identity 均为45/45，
+  hard-limit crossing、old-policy authorization acceptance、policy load/dispatch/outcome read 均为0；
+- 45/45 都选择 `negative_ry`，只覆盖 joint 5 upper-limit 合成模式；selected replay 的逐浮点
+  bitwise identity 仅2/45，且出现一次 MuJoCo `ncon=5000` warning。这些是下一阶段必须关闭的限制，
+  不能从 preflight 推出一般 recovery、clean utility 或 attacked efficacy。
+
+完整结果、claim boundary 与后续顺序见
+[`v12_qualification_checkpoint.md`](v12_qualification_checkpoint.md)。当前只授权 typed recovery 的
+zero-policy runtime fixed-trace integration；仍不授权 clean、attacked 或 outcome rollout。
+
+## 前一 checkpoint：2026-07-29 v11 终局与 v12 启动边界
 
 v11 unchanged-method held-out scale45 已终态完成并单独封存于
 [`v11_terminal_checkpoint.md`](v11_terminal_checkpoint.md)。clean/attacked 各180条均完整，
@@ -20,8 +37,9 @@ Sparse L1 exact-passthrough intent guard
   -> fresh policy replan
 ```
 
-当前只授权 V12-C1–C6 实现与 Q1–Q3 no-outcome qualification。Q gate 全部通过前不得启动新 clean；
-clean gate 通过前不得启动 attacked。
+当前已完成 V12-C1–C5 的 Python contract 和首轮 Q/no-outcome simulator preflight。下一步必须先完成
+zero-policy runtime transaction gate、全关节双侧 synthetic coverage 和 policy-prefix predictive
+shadow qualification；这些 gate 全部通过前不得启动新 clean，clean gate 通过前不得启动 attacked。
 
 ## 0. 2026-07-27 M2 终局与 40% 探索性后继
 

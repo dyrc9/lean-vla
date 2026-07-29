@@ -1,4 +1,4 @@
-.PHONY: sync test lean paper-artifacts paper-artifacts-check action-block-check m1-readiness-check semantic-v4-c5-check e1-selector-check e1-fallback-check e2-conditioning-check e3-checker-check e4-no-dispatch-check e5-effect-observer-check e6-resource-smoke-preflight-check e7-perception-preflight-check semantic-post-e5-readiness-check l2-interface-check four-arm-v4-check four-arm-v4-exploratory-check check
+.PHONY: sync test lean paper-artifacts paper-artifacts-check action-block-check m1-readiness-check semantic-v4-c5-check e1-selector-check e1-fallback-check e2-conditioning-check e3-checker-check e4-no-dispatch-check e5-effect-observer-check e6-resource-smoke-preflight-check e7-perception-preflight-check semantic-post-e5-readiness-check l2-interface-check four-arm-v4-check four-arm-v4-exploratory-check v12-contract-check v12-simulator-preflight-check check
 
 PYTHON ?= .venv/bin/python
 UV ?= uv
@@ -129,4 +129,21 @@ four-arm-v4-exploratory-check:
 		echo "Skipping support45 terminal check: tracked summary or local-only evidence is absent"; \
 	fi
 
-check: test lean paper-artifacts-check action-block-check m1-readiness-check semantic-v4-c5-check e1-selector-check e1-fallback-check e2-conditioning-check e3-checker-check e4-no-dispatch-check e5-effect-observer-check e6-resource-smoke-preflight-check e7-perception-preflight-check e8-source-binding-check semantic-post-e5-readiness-check four-arm-v4-check four-arm-v4-exploratory-check
+v12-contract-check:
+	$(PYTHON) scripts/freeze_recoverable_alignment_v12_contract_qualification.py --check
+	@if [ -f results/proofalign_recoverable_alignment_v12_contract_qualification_20260729_fresh1/qualification.json ]; then \
+		$(PYTHON) scripts/run_recoverable_alignment_v12_contract_qualification.py --check; \
+		$(PYTHON) scripts/freeze_recoverable_alignment_v12_contract_terminal.py --check; \
+	else \
+		echo "Skipping v12 contract result check: local-only qualification evidence is absent"; \
+	fi
+
+v12-simulator-preflight-check:
+	$(PYTHON) scripts/freeze_escape_recovery_v12_simulator_preflight.py --check
+	@if [ -f results/proofalign_escape_recovery_v12_simulator_preflight_20260729_fresh1/summary.json ]; then \
+		$(PYTHON) scripts/freeze_escape_recovery_v12_simulator_preflight_terminal.py --check; \
+	else \
+		echo "Skipping v12 simulator-preflight result check: local-only evidence is absent"; \
+	fi
+
+check: test lean paper-artifacts-check action-block-check m1-readiness-check semantic-v4-c5-check e1-selector-check e1-fallback-check e2-conditioning-check e3-checker-check e4-no-dispatch-check e5-effect-observer-check e6-resource-smoke-preflight-check e7-perception-preflight-check e8-source-binding-check semantic-post-e5-readiness-check four-arm-v4-check four-arm-v4-exploratory-check v12-contract-check v12-simulator-preflight-check

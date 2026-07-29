@@ -3,7 +3,9 @@
 > 2026-07-29 更新：本页原 support45 评估保留为历史诊断；最新 outcome checkpoint 已推进到
 > v11 unchanged-method held-out scale45。终局结果和不可覆盖边界见
 > [`../v11_terminal_checkpoint.md`](../v11_terminal_checkpoint.md)，后继优化见
-> [`../v12_recoverable_alignment_plan.md`](../v12_recoverable_alignment_plan.md)。
+> [`../v12_recoverable_alignment_plan.md`](../v12_recoverable_alignment_plan.md)。v12 首轮
+> no-outcome 资格结果见
+> [`../v12_qualification_checkpoint.md`](../v12_qualification_checkpoint.md)。
 
 | 模块 | 就绪度 | 证据/缺口 |
 |---|---|---|
@@ -25,6 +27,7 @@
 | Support-conditioned successor | clean 终局 nonpass | 360/360 valid；VLA-only 61/90、Execution-only 66/90、Semantic-only/Dual 0/90 strict success；Dual deadlock 88/90，attacked 未授权 |
 | Risk-selective L1 v10 | mixed/negative | exact passthrough 消除大部分人为动作改写；clean/attacked fresh15 未建立 non-inferiority 或 safety efficacy |
 | Typed L2 containment v11 | mechanism pass / efficacy mixed | fresh15 与 held-out scale45 均为 trigger 后旧 policy dispatch 0；scale45 joint-limit burden 显著下降，但 clean Dual−Semantic-only task success `−24.4pp` |
+| Recoverable L2 v12.1 | no-outcome preflight pass / efficacy 未测 | 655-case contract gate 与45-pair simulator-reset recovery gate 通过；只覆盖 joint-5 upper-limit，未加载策略或读取 outcome |
 | Deployment | 未就绪 | E7 缺少7类 perception supervision；所有正向结果仍限于 privileged simulator geometry |
 
 ## 2026-07-29 终局判断
@@ -47,6 +50,10 @@ joint-limit step rate 为：
 tradeoff”的完整系统论文；不足以形成“通用 defense efficacy、first-hit prevention 或完整物理安全”
 的强正面论文。v12 若要恢复正面 efficacy claim，必须通过新版本 sparse L1、predictive L2 和 typed
 recovery 的独立资格与 fresh gate，不能把 v11 改判。
+
+v12 当前只增加了“设计具备可行恢复路径”的无 outcome 证据：45/45 synthetic joint-5 states
+都能由冻结原语恢复到 safe margin，但所有选择都集中在 `negative_ry`，且 shadow/replay 逐浮点
+bitwise identity 仅2/45。它改善了下一阶段方案可信度，不改变上述论文强度判断。
 
 
 论文主故事仍是两层对齐，而不是 SemanticSubtask 本身。当前最重要的科学风险集中在 L1：

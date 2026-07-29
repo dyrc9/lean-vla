@@ -17,8 +17,10 @@
 11. [`v11_terminal_checkpoint.md`](v11_terminal_checkpoint.md)：不可覆盖的 v11/scale45 终局结果与 claim boundary；
 12. [`v12_recoverable_alignment_plan.md`](v12_recoverable_alignment_plan.md)：稀疏 L1、predictive/recoverable
     L2、资格 gate 与后续实验计划；
-13. [`progress_and_plan.md`](progress_and_plan.md)：当前 blocker、历史复用和下一步；
-14. [`remote_execution.md`](remote_execution.md)：执行授权与远程运行规则。
+13. [`v12_qualification_checkpoint.md`](v12_qualification_checkpoint.md)：v12 contract 与 v12.1
+    simulator-reset 无 outcome 资格结果；
+14. [`progress_and_plan.md`](progress_and_plan.md)：当前 blocker、历史复用和下一步；
+15. [`remote_execution.md`](remote_execution.md)：执行授权与远程运行规则。
 
 论文组织：
 
@@ -27,6 +29,7 @@
 - [`paper/confirmatory_preregistration.md`](paper/confirmatory_preregistration.md)
 - [`v11_terminal_checkpoint.md`](v11_terminal_checkpoint.md)
 - [`v12_recoverable_alignment_plan.md`](v12_recoverable_alignment_plan.md)
+- [`v12_qualification_checkpoint.md`](v12_qualification_checkpoint.md)
 
 审计原则：
 

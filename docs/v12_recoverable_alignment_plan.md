@@ -1,6 +1,8 @@
 # v12 稀疏 L1 与可恢复 L2 计划
 
-> 状态：2026-07-29 outcome-informed successor plan。
+> 状态：2026-07-29 outcome-informed successor plan；首轮 contract 与 simulator-reset
+> no-outcome qualification 已完成，见
+> [`v12_qualification_checkpoint.md`](v12_qualification_checkpoint.md)。
 > 本计划在任何 v12 outcome rollout 前冻结；v11 与更早结果保持不变。
 
 ## 1. 动机与目标
@@ -85,6 +87,13 @@ authorization，恢复完成后的新 policy block 必须经过完整 fresh tran
 ## 3. Phase Q：无 outcome 资格实验
 
 Phase Q 不创建 outcome rollout，不读取 reward/success/cost/collision，不调 v11 threshold。
+
+当前状态：
+
+- Q1–Q3 的纯 contract finite corpus 共655 cases，所有冻结 gate 通过；
+- v12.1 simulator-reset preflight 共45个不与 v11 scale45 outcome 重叠的 pair，冻结 gate 全部通过；
+- 当前 pass 只授权 zero-policy runtime integration。由于 preflight 只覆盖 joint 5 upper-limit，且
+  selected shadow/replay bitwise identity 为2/45，不授权 clean 或 outcome rollout。
 
 ### Q1 Sparse-L1 finite corpus
 

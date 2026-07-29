@@ -36,6 +36,19 @@ fi
 "$PYTHON_BIN" scripts/run_deployment_perception_dataset_qualification_e7.py --check-contract
 "$PYTHON_BIN" scripts/generate_semantic_source_binding_e8.py --check
 "$PYTHON_BIN" scripts/validate_semantic_post_e5_readiness.py --check
+"$PYTHON_BIN" scripts/freeze_recoverable_alignment_v12_contract_qualification.py --check
+if [[ -f results/proofalign_recoverable_alignment_v12_contract_qualification_20260729_fresh1/qualification.json ]]; then
+    "$PYTHON_BIN" scripts/run_recoverable_alignment_v12_contract_qualification.py --check
+    "$PYTHON_BIN" scripts/freeze_recoverable_alignment_v12_contract_terminal.py --check
+else
+    echo "Skipping v12 contract result check: local-only qualification evidence is absent"
+fi
+"$PYTHON_BIN" scripts/freeze_escape_recovery_v12_simulator_preflight.py --check
+if [[ -f results/proofalign_escape_recovery_v12_simulator_preflight_20260729_fresh1/summary.json ]]; then
+    "$PYTHON_BIN" scripts/freeze_escape_recovery_v12_simulator_preflight_terminal.py --check
+else
+    echo "Skipping v12 simulator-preflight result check: local-only evidence is absent"
+fi
 "$PYTHON_BIN" scripts/generate_saber_confirmatory_records.py --dry-run >/dev/null
 "$PYTHON_BIN" scripts/run_saber_confirmatory_victim.py --dry-run >/dev/null
 "$PYTHON_BIN" scripts/export_proofalign_fixed_trace.py --dry-run >/dev/null

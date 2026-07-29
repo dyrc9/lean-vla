@@ -1,0 +1,10 @@
+{
+  "env_step_count": 0,
+  "outcomes_observed": false,
+  "protocol_id": "proofalign-recoverable-alignment-v12-contract-qualification-20260729",
+  "protocol_sha256": "3f6d5d60cba4f071b8f0807d8396e5c92cd8b04b3f5c33b9b199e33409b4f165",
+  "row_count": 655,
+  "schema": "proofalign.recoverable-alignment-v12-contract-qualification-result.v1.run-manifest",
+  "simulator_created": false,
+  "status": "complete"
+}

@@ -162,6 +162,11 @@ Dual 已验证。旧结果可复用为：
 6. v11 终局已单独封存；后续优化按 outcome-informed v12 处理：L1 改为高置信度稀疏意图守卫，
    L2 增加只读 predictive screen 和 typed recovery transaction。v12 必须先通过无 outcome Q1–Q3
    资格 gate，不能回写 v11 或直接启动 efficacy rollout。
+7. v12 第一批 no-outcome 资格已完成：655-case 纯 contract gate 全部通过；45-pair
+   simulator-reset recovery preflight 的 coverage/terminal-safe/completion 均为100%，策略加载、
+   policy dispatch 和 outcome read 均为0。该结果只覆盖 synthetic joint-5 upper-limit，且
+   shadow/replay bitwise identity 为2/45，因此当前只进入 zero-policy runtime transaction
+   integration，不启动 clean/attacked。
 
 入口文档：
 
@@ -178,6 +183,7 @@ Dual 已验证。旧结果可复用为：
 - [进展与下一步](docs/progress_and_plan.md)
 - [v11 终局 checkpoint](docs/v11_terminal_checkpoint.md)
 - [v12 稀疏 L1 与可恢复 L2 计划](docs/v12_recoverable_alignment_plan.md)
+- [v12 无 outcome 资格 checkpoint](docs/v12_qualification_checkpoint.md)
 
 常用检查：
 
