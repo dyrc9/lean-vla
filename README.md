@@ -122,6 +122,13 @@ phase-gating theorem，而不是事后附加的形式化说明。
     `11/15, 10/15, 9/15, 8/15`。配对 sign/McNemar 检验不显著且 official cost/collision 无一致排序，
     因此只支持 typed L2 containment 与描述性 burden reduction，不支持 first-hit prevention、
     non-inferiority 或整体 physical safety。
+  - 在不改机制或阈值后冻结的 held-out scale45 中，clean/attacked 各180条均完整，攻击令
+    `180/180` 首个 ActionBlock 改变；observer agreement 为 `21250/21250`、`26464/26464`，39次
+    总触发后 dispatch 仍为0。clean task success 为 `32/45, 27/45, 31/45, 20/45`，attacked 为
+    `30/45, 28/45, 25/45, 21/45`；clean joint-limit rate 为
+    `12.79%, 0.116%, 13.98%, 0.110%`，attacked 为 `8.19%, 0.063%, 5.83%, 0.049%`。
+    burden reduction 在多个配对检验中得到支持，但 clean Dual−Semantic task success 为
+    `-24.4pp`（exact McNemar `p=0.00098`），所以终局仍是 held-out mixed evidence。
 - P0b：96/96 episode 有效，得到 23 个 clean-eligible pair 和 15 个攻击 transition；因
   `23 < 26` 未通过确认性 denominator gate。
 - R9 Execution-only：clean retention `22/23 = 95.7%`；attacked+defended `48/48`
@@ -150,7 +157,8 @@ Dual 已验证。旧结果可复用为：
 5. 当前论文主线是 risk-triggered nominal-policy non-interference + Lean execution transaction。
    v10 clean/attacked 的混合/负结论保持不变；v11 作为单独 outcome-informed successor 已完成，并把
    joint-limit 假设升级为 L2 containment 实验。它验证“首次 typed observer trigger 后不再 dispatch”，
-   但不把该事实扩大成动作前预测、一般 defense efficacy 或完整物理安全。
+   scale45 进一步验证该机制稳定但暴露 task-utility tradeoff；不把该事实扩大成动作前预测、一般
+   defense efficacy、non-inferiority 或完整物理安全。
 
 入口文档：
 

@@ -282,13 +282,14 @@ negative tests。v3 frozen digest fixture 保持不变。全量 Python 测试为
 
 ## 4. 当前 blocker 排序
 
-1. **整体安全 efficacy 未建立**：outcome-informed v11 clean/attacked 各60条已经完成。16个
-   joint-limit trigger 后均为0 dispatch，且 L2-on arm 的 aggregate joint-limit step burden 明显更低；
-   但15-pair sign tests 不显著，official cost/collision 无一致 ordering，不能声称整体 physical safety；
-2. **Containment–utility tradeoff**：v11 task success 为 clean
-   `10/15, 8/15, 9/15, 8/15`、attacked `11/15, 10/15, 9/15, 8/15`
+1. **整体安全 efficacy 未建立**：机制和阈值不变的 held-out scale45 clean/attacked 各180条已完成。
+   39个 joint-limit trigger 后均为0 dispatch，且 L2-on arm 的 joint-limit step burden 明显更低；
+   但 official cost/collision 无一致 ordering，不能声称整体 physical safety；
+2. **Containment–utility tradeoff 已被 scale45 确认存在**：task success 为 clean
+   `32/45, 27/45, 31/45, 20/45`、attacked `30/45, 28/45, 25/45, 21/45`
    （顺序 VLA/Execution/Semantic/Dual）。Execution−VLA 与 Dual−Semantic 为 clean
-   `-13.3pp/-6.7pp`、attacked `-6.7pp/-6.7pp`；当前样本不支持 superiority 或 non-inferiority；
+   `-11.1pp/-24.4pp`、attacked `-4.4pp/-8.9pp`；clean Dual−Semantic exact McNemar
+   `p=0.00098`，当前不支持 task non-inferiority；
 3. **L2 articulation evidence unknown**：v10 Dual 有3次仅承诺 `command_applied` 的 articulation
    transaction 因 task effect 不可观测而 `semantic_execution_unknown`；它是 transaction contract
    refinement 问题，不应通过放松 receipt/cost/collision integrity 解决；
@@ -311,6 +312,15 @@ observer coverage 为 `5319/5319`、`8389/8389`，16次总触发后 dispatch 为
 steps 为 `884/6/780/4`，attacked 为 `202/3/462/3`（VLA/Execution/Semantic/Dual）；对应 exact
 paired sign tests 仍不显著。终局分类为 `joint_limit_containment_v11_exploratory_mixed_evidence`，
 只支持 mechanical containment 与描述性 burden reduction，不支持 first-hit prevention 或一般安全。
+
+随后在不改方法或阈值的 held-out scale45 上，clean/attacked 各180条均完整；攻击激活
+`180/180`，observer agreement 为 `21250/21250`、`26464/26464`，39次总触发后 dispatch 为0。
+clean joint-limit rate 为 VLA/Execution/Semantic/Dual
+`12.79%/0.116%/13.98%/0.110%`，attacked 为
+`8.19%/0.063%/5.83%/0.049%`。burden reduction 的配对信号更强，但 clean Dual−Semantic task
+success 差为 `-24.4pp`（`p=0.00098`）。终局分类为
+`joint_limit_containment_v11_scale45_heldout_mixed_evidence`：mechanical containment 稳定，
+task-preserving safety shield 未建立。
 
 E6 已关闭为 `semantic_resource_smoke_qualified`，只证明冻结离线 workload 满足预注册工程预算；不得
 据此选择 efficacy threshold，也不得把它解释为 simulator、camera perception 或物理安全证据。
@@ -415,6 +425,7 @@ C1 semantic digest schema（已实现）
   -> H10×K4 + matched K=1/2/4 no-outcome qualification（nonpass：36/45）
   -> v9/v10 risk-selective clean + attacked fresh15（已完成；mixed/negative efficacy）
   -> outcome-informed v11 L2 joint-limit containment clean + attacked fresh15（已完成；mixed evidence）
+  -> v11 unchanged-method held-out clean + attacked scale45（已完成；mixed evidence）
   -> materially-new action generator / trained conditioning / feedback interface
 ```
 

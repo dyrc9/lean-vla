@@ -176,6 +176,18 @@ COMMIT_SCOPE_PATHS = (
         "freeze_joint_limit_containment_v11_attacked_fresh15.py"
     ),
     "scripts/freeze_joint_limit_containment_v11_terminal.py",
+    (
+        "scripts/"
+        "freeze_joint_limit_containment_v11_clean_scale45.py"
+    ),
+    (
+        "scripts/"
+        "freeze_joint_limit_containment_v11_attacked_scale45.py"
+    ),
+    (
+        "scripts/"
+        "freeze_joint_limit_containment_v11_scale45_terminal.py"
+    ),
     "scripts/monitor_and_launch_contact_phase_scale45.py",
     "scripts/generate_semantic_source_binding_e8.py",
     "scripts/generate_semantic_v4_equivalence_evidence.py",
@@ -209,6 +221,8 @@ COMMIT_SCOPE_PATHS = (
     "scripts/run_l2_joint_limit_containment_v11.py",
     "scripts/run_joint_limit_containment_v11_clean_pilot.py",
     "scripts/run_joint_limit_containment_v11_attacked_pilot.py",
+    "scripts/run_joint_limit_containment_v11_clean_scale45.py",
+    "scripts/run_joint_limit_containment_v11_attacked_scale45.py",
     (
         "scripts/"
         "run_horizon_consistent_pick_up_fresh_dual_pilot.py"
@@ -325,6 +339,9 @@ COMMIT_SCOPE_PATHS = (
     "tests/test_joint_limit_containment_v11_clean_fresh15.py",
     "tests/test_joint_limit_containment_v11_attacked_fresh15.py",
     "tests/test_joint_limit_containment_v11_terminal.py",
+    "tests/test_joint_limit_containment_v11_clean_scale45.py",
+    "tests/test_joint_limit_containment_v11_attacked_scale45.py",
+    "tests/test_joint_limit_containment_v11_scale45_terminal.py",
     "tests/test_local_checker_qualification_e3.py",
     "tests/test_l1_repair_qualification.py",
     "tests/test_l1_repair_qualification_v2.py",
@@ -573,6 +590,21 @@ COMMIT_SCOPE_PATHS = (
         "experiments/"
         "proofalign_joint_limit_containment_v11_terminal_summary.json"
     ),
+    (
+        "experiments/"
+        "proofalign_joint_limit_containment_v11_clean_"
+        "scale45_protocol.json"
+    ),
+    (
+        "experiments/"
+        "proofalign_joint_limit_containment_v11_attacked_"
+        "scale45_protocol.json"
+    ),
+    (
+        "experiments/"
+        "proofalign_joint_limit_containment_v11_"
+        "scale45_terminal_summary.json"
+    ),
     "experiments/proofalign_pi05_action_conditioning_e2_protocol.json",
     "experiments/proofalign_pi05_selector_e1_protocol.json",
     (
@@ -749,6 +781,22 @@ EVIDENCE_PATHS = (
     (
         "results/proofalign_joint_limit_containment_v11_attacked_"
         "fresh15_20260729_fresh1/SHA256SUMS"
+    ),
+    (
+        "results/proofalign_joint_limit_containment_v11_clean_"
+        "scale45_20260729_fresh1/pilot_evidence.json"
+    ),
+    (
+        "results/proofalign_joint_limit_containment_v11_clean_"
+        "scale45_20260729_fresh1/SHA256SUMS"
+    ),
+    (
+        "results/proofalign_joint_limit_containment_v11_attacked_"
+        "scale45_20260730_fresh1/pilot_evidence.json"
+    ),
+    (
+        "results/proofalign_joint_limit_containment_v11_attacked_"
+        "scale45_20260730_fresh1/SHA256SUMS"
     ),
 )
 

@@ -143,6 +143,13 @@ violation。当前 trusted observation 没有绑定足以精确预测 OSC 动作
 不得把 post-step latch 写成“提前预测关节限位”。缺失 observer、信号 schema 错误或与独立 signal
 不一致均 fail closed。
 
+fresh15 开发性结果之后，方法和阈值保持不变，并在每个任务3个新 init 的 held-out scale45 上复验。
+clean/attacked 各180条中共有39次 L2 containment trigger，所有 trigger 后的 dispatch 数仍为0；
+这支持 transaction-level mechanical containment 的稳定性。与此同时，scale45 clean 的
+Dual−Semantic task success 从 `31/45` 降到 `20/45`，因此该机制不能被写成 task-preserving shield。
+方法章节必须把 containment guarantee 与 empirical utility tradeoff 分开：前者是首次 typed signal
+之后的系统行为，后者取决于 workload，且当前没有 non-inferiority 结论。
+
 ## 4. Lean 的位置
 
 Lean 是 L2 方法的一等组成：它固定 transaction vocabulary 和允许的 phase transition，并对

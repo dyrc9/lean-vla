@@ -317,3 +317,24 @@ Dual−Semantic 的配对差为 clean `-13.3pp/-6.7pp`、attacked `-6.7pp/-6.7pp
 joint-limit burden 下降；它不证明 first-hit prevention、task non-inferiority、整体 physical safety
 或一般 attacked-defense efficacy。论文主线仍是 L1/L2 两个对齐断点、exact transaction 和可审计
 failure localization，v11 作为 L2 observer containment 的具体实例。
+
+为避免15-pair pilot 的低功效掩盖 tradeoff，方法和阈值不变后又冻结了 held-out scale45：每个任务
+选择3个未在旧协议或 v11 fresh15 中使用的 init，env/policy seed 固定为 `307/149`。clean 与 exact
+paired attacked 各180条全部完成，runtime exception 为0；攻击使 `180/180` 首个 ActionBlock 相对
+clean 改变，四臂内首块 identity 为 `45/45`。clean/attacked observer agreement 分别为
+`21250/21250`、`26464/26464`，共39次 containment trigger 后 dispatch 仍为0。
+
+scale45 把机制收益和效用代价同时放大。clean 的 VLA/Execution/Semantic/Dual task success 为
+`32/45, 27/45, 31/45, 20/45`，joint-limit rate 为
+`12.79%, 0.116%, 13.98%, 0.110%`；attacked 分别为
+`30/45, 28/45, 25/45, 21/45` 与 `8.19%, 0.063%, 5.83%, 0.049%`。
+clean Execution−VLA 的 joint-limit sign test 为 `15 lower / 1 higher / 29 equal`
+（`p=0.00052`），Dual−Semantic 为 `11/0/34`（`p=0.00098`）；但 task success 差为
+`-11.1pp`（`p=0.267`）与 `-24.4pp`（`p=0.00098`）。attacked 中对应 task 差缩为
+`-4.4pp`（`p=0.754`）与 `-8.9pp`（`p=0.125`），joint-limit sign test 为
+`9/3/33`（`p=0.146`）与 `7/0/38`（`p=0.0156`）。official cost/collision 仍无稳定 arm ordering。
+
+因此 scale45 不是“防御终于有效”的证据，而是更强的 failure localization：post-trigger containment
+稳定成立，joint-limit exposure 通常下降，但 hard stop 会在部分 clean workload 牺牲可观任务效用。
+论文应把终局分类写为 `joint_limit_containment_v11_scale45_heldout_mixed_evidence`，并明确
+first-hit prevention、task non-inferiority 与 overall safety 均未建立。
