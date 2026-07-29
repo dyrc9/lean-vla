@@ -14,7 +14,7 @@
       "exists": true,
       "git_status": "clean",
       "path": "Makefile",
-      "sha256": "f55bb86429de42f040e9d03568e2df71dff5ca014876bb1a134f73f46a51ad1c",
+      "sha256": "1e92f727dc1abefa20a48ae1c6bbdea51d22c7af32b1eff94a53f4ae9ea683b4",
       "tracked": true
     },
     {
@@ -22,7 +22,7 @@
       "exists": true,
       "git_status": "clean",
       "path": "README.md",
-      "sha256": "1a32d09e6a17c3e08c6c443d1a8dc02f6c25b14c4c992514a0a7d7c43c0f4a34",
+      "sha256": "260d3e5e9e91edc8d186924a0cee7ca72b8adc7b6ebe709a4fe41975cda91e4e",
       "tracked": true
     },
     {
@@ -78,7 +78,7 @@
       "exists": true,
       "git_status": "clean",
       "path": "docs/progress_and_plan.md",
-      "sha256": "ebd63720feaef3ee63ac41604679b1fb5999f8c81e8c4c12eef19ea10d8ce629",
+      "sha256": "afe1154d9b8e33fa9c937d5f031b6cb6be73976369d4170a695ddc234c91b5a8",
       "tracked": true
     },
     {
@@ -134,7 +134,7 @@
       "exists": true,
       "git_status": "clean",
       "path": "scripts/check_all.sh",
-      "sha256": "cb691dd33d9c2bd8d12822d0e65a70c6961579d20d9e8d17e5298061b945d4e8",
+      "sha256": "c83b408d62c086d38c2ead12a1dad0996cadd848db7413d3f55fd06bc086a7e0",
       "tracked": true
     },
     {
@@ -2473,8 +2473,8 @@
   "policy_loaded": false,
   "repository_binding_semantics": "latest commit that changed the frozen semantic commit scope; later commits may contain only out-of-scope protocols or audit packets",
   "repository_fully_clean": true,
-  "repository_head_commit": "836d6ca76a6968518eb297157b6aac3ad55b3a7b",
-  "repository_head_tree": "0c8d27f3dea8909d18f9df93c7140d825e263dee",
+  "repository_head_commit": "65404fb480640fde63fcc5bb6ec588e6508d62ca",
+  "repository_head_tree": "43b2008e0d942c3a6e649f358f3e38be60ec3f1d",
   "repository_status_row_count": 0,
   "schema": "proofalign.semantic-source-binding-e8-audit.v1",
   "simulator_created": false
