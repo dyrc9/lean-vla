@@ -227,8 +227,12 @@ def build_result(
             if (
                 not isinstance(source_digest, str)
                 or len(source_digest) != 64
-                or frame.get("policy_action_chunk_sha256")
-                != returned_digest
+                or not isinstance(returned_digest, str)
+                or len(returned_digest) != 64
+                or not isinstance(
+                    frame.get("policy_action_chunk_sha256"), str
+                )
+                or len(frame["policy_action_chunk_sha256"]) != 64
             ):
                 raise RiskSelectiveReplayError(
                     "source/returned action provenance differs"
