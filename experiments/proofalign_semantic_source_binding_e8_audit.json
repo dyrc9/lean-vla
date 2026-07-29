@@ -3,7 +3,7 @@
   "audit_id": "proofalign-semantic-source-binding-e8-20260725",
   "audit_source": {
     "path": "scripts/generate_semantic_source_binding_e8.py",
-    "sha256": "edbfd629b422334d41e31e7fdde129782a735c5fbe03d6b97a8caf9d399911df"
+    "sha256": "a9a9575d1b1b2ddc66f7dae65d9f0be7703e334c18f5ff5d1465dbee55b078e6"
   },
   "claim_boundary": "This read-only audit binds the current semantic source scope, local evidence inventory, latest source-scope commit, and OpenPI checkout. A not-clean classification does not modify or commit the worktree. A clean classification would establish provenance only, not perception quality, efficacy, outcome, or safety.",
   "classification": "semantic_source_binding_clean",
@@ -70,7 +70,7 @@
       "exists": true,
       "git_status": "clean",
       "path": "docs/paper/paper_story.md",
-      "sha256": "4fb937ea26678ee5b07d1a0501ae48c7b4c2f5cc2093b43454b84e4c35ba1842",
+      "sha256": "ba57d427ac4cc1703c3165c63a387785e215cfdc857a4e2acc7ef4497121f0e5",
       "tracked": true
     },
     {
@@ -78,7 +78,7 @@
       "exists": true,
       "git_status": "clean",
       "path": "docs/progress_and_plan.md",
-      "sha256": "c13875d95c7bcee9c1a86624509ccf505844cc366d9340574da638a37482804a",
+      "sha256": "882650d03e67c378dad4ea8488573421eaca057caf10a9f1011fbd6f4b56e81b",
       "tracked": true
     },
     {
@@ -469,6 +469,14 @@
       "bound_to_head": true,
       "exists": true,
       "git_status": "clean",
+      "path": "scripts/freeze_physical_sufficiency_attacked_fresh15.py",
+      "sha256": "2829246f73b0bcedde2d96f6a66ec72c79a1b663ae0d615498272a950877d22e",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
       "path": "scripts/monitor_and_launch_contact_phase_scale45.py",
       "sha256": "c5318ea04835e0199ea67b93c3bccfdd7759b0b334630f94950e35ea9a3b30d2",
       "tracked": true
@@ -478,7 +486,7 @@
       "exists": true,
       "git_status": "clean",
       "path": "scripts/generate_semantic_source_binding_e8.py",
-      "sha256": "edbfd629b422334d41e31e7fdde129782a735c5fbe03d6b97a8caf9d399911df",
+      "sha256": "a9a9575d1b1b2ddc66f7dae65d9f0be7703e334c18f5ff5d1465dbee55b078e6",
       "tracked": true
     },
     {
@@ -647,6 +655,14 @@
       "git_status": "clean",
       "path": "scripts/run_physical_sufficiency_clean_pilot.py",
       "sha256": "3c7a23ac4716b1ab5f87b8d7792491906a31e6b3e76664a2bd8df002c9897327",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/run_physical_sufficiency_attacked_pilot.py",
+      "sha256": "dd786a3f74743a6a4ceb8a2f76160a30516e9156116817eb9c6d0fb64cd23176",
       "tracked": true
     },
     {
@@ -1253,6 +1269,14 @@
       "bound_to_head": true,
       "exists": true,
       "git_status": "clean",
+      "path": "tests/test_physical_sufficiency_attacked_fresh15.py",
+      "sha256": "f70d8fe5dfe2c35d05c99de74a2ef6fb563b5d610d28da739543ab6694707d39",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
       "path": "tests/test_local_checker_qualification_e3.py",
       "sha256": "23c209fd61acdd06d2ba844333a400af03f48ce5aad9b7595fdbed1f41d8c6d1",
       "tracked": true
@@ -1821,6 +1845,14 @@
       "bound_to_head": true,
       "exists": true,
       "git_status": "clean",
+      "path": "experiments/proofalign_physical_sufficiency_attacked_fresh15_protocol.json",
+      "sha256": "0449c0129074c9b36a811ffa7b1a37e2b9f57bd14760b07b7923cd48a93ef6a2",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
       "path": "experiments/proofalign_pi05_action_conditioning_e2_protocol.json",
       "sha256": "079cf5566f49f44cd7ade70cf9cc5a96ef8d539bf5754ad01ad0d1e31e56be6e",
       "tracked": true
@@ -2133,8 +2165,8 @@
   "policy_loaded": false,
   "repository_binding_semantics": "latest commit that changed the frozen semantic commit scope; later commits may contain only out-of-scope protocols or audit packets",
   "repository_fully_clean": true,
-  "repository_head_commit": "fdc34c63b66cce35900a7570f147530d0d0f007b",
-  "repository_head_tree": "bc05088af445d1e990073933cee7f4654bcd7233",
+  "repository_head_commit": "14eefe4958660ec63a372afc34c631d99c47cb03",
+  "repository_head_tree": "40cfd2dac4d0d6c130ad16b18b6a96edf72392dd",
   "repository_status_row_count": 0,
   "schema": "proofalign.semantic-source-binding-e8-audit.v1",
   "simulator_created": false
