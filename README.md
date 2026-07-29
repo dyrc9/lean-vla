@@ -97,14 +97,33 @@ phase-gating theorem，而不是事后附加的形式化说明。
     样本都具有4个不同 source chunk，但额外3次推理只增加1个可用初态；
   - K=4 三个 suite 为 `13/15, 14/15, 9/15`，总80%与最差60%仍为 nonpass；因此停止继续堆
     stale horizon 或 IID candidate，下一步必须改变 action generator、训练条件或反馈接口。
+- 2026-07-29 v8 完整 clean 诊断：
+  - 45 个 paired tasks、四臂共 180/180 episodes 完整；VLA-only、Execution-only、
+    Semantic-only、Dual success 为 `34/45, 33/45, 5/45, 5/45`；
+  - 旧 L1 在 1142 个在线审计中改写 1036 个 source blocks，并产生 49 个动作终止；其中 43 个仅由
+    task-semantic/progress 条件造成，6 个包含 predicted unexpected contact；
+  - 该结果只冻结失败机制，不授权 attacked-defense 或 confirmatory claim。
+- 2026-07-29 risk-selective / physical-sufficiency successor：
+  - v9 保留完整任务 prompt，无预测物理风险时返回 exact source block；scale45 read-only replay 中
+    43/49 个软动作终止和 9/17 个 missing-effect 终止可转为 replan，6 个 physical rejects 保留；
+  - v9 fresh15 clean 为 VLA/Execution/Semantic/Dual
+    `10/15, 10/15, 7/15, 6/15`；656/656 L1 blocks 不改写，15/15 paired first blocks 一致；
+  - v10 将 `trusted_articulation_state_unavailable` 改为“继续做可用物理筛查、任务状态 advisory”，并将
+    `target_not_held_after_move` 改为 replan；read-only replay 恢复6个 semantic unknown、保留3个
+    contact rejects；
+  - v10 第二批 fresh15 clean 为 `10/15, 8/15, 7/15, 7/15`；909/909 L1 blocks 不改写，
+    15/15 paired first blocks 一致，8次 physical-risk reject 保留，official cost/collision 为0/60。
+    Semantic-only 相对 VLA 为 `-20pp`（paired exact McNemar `p=0.25`），因此当前只支持
+    risk-triggered mechanism 与明确的 clean safety–utility tradeoff，不支持 non-inferiority 或防御有效。
 - P0b：96/96 episode 有效，得到 23 个 clean-eligible pair 和 15 个攻击 transition；因
   `23 < 26` 未通过确认性 denominator gate。
 - R9 Execution-only：clean retention `22/23 = 95.7%`；attacked+defended `48/48`
   有效；cost/collision unsafe `1/48`；signal subset `15/15 -> 0/15` cost/collision；
   strict-success recovery `8/15`；`11/15` 仍有 residual contact proxy。
 
-因此现有证据是“L2 有强探索性信号、当前 L1/Dual 闭环 nonpass”的混合结果，不能声称一般防御有效、
-完整物理安全或 Dual 已验证。旧结果可复用为：
+因此现有证据是“L2 有强探索性信号、risk-selective L1 已消除大部分人为 deadlock，但仍有可测 clean
+utility 代价”的混合结果，不能声称一般防御有效、完整物理安全、clean non-inferiority 或 attacked
+Dual 已验证。旧结果可复用为：
 
 - P0b：原始 instruction/observation attack、clean pairing 和攻击 transition 基础；
 - R9：ActionBlock dispatch、intervention、receipt/effect logging 和 Execution-only 基线。
@@ -118,13 +137,13 @@ phase-gating theorem，而不是事后附加的形式化说明。
 2. M2 原 `50%` confirmatory gate、full-population support failure 和 support45 clean nonpass 均已
    终局冻结，不被后续探索性工作覆盖。
 3. support45 的 attacked stage 以 clean pass 为冻结前置条件；当前未通过，因此不执行攻击 rollout。
-4. post-outcome L1 repair、Block-10 与 H10×K4 successor 均已完成严格的 no-outcome
-   qualification：oracle geometry 有效，Block-10 将 availability 提高到约80%，但 K=4 只比K=1
-   增加1/45，仍未通过90%/worst-suite 80% gates；不再继续 blind horizon/candidate search，也不降低
-   2 mm checker threshold。
-5. 当前论文主线转为完整报告 problem decomposition、Lean transaction、L2 探索信号、L1 coverage/
-   availability failure taxonomy 与负结果。任何后续正向 L1 机制都必须是 materially new、明确
-   post-outcome，并先在新冻结 population/seed 上资格化，不能直接进入 efficacy rollout。
+4. post-outcome L1 repair、Block-10、H10×K4、v8 scale45、v9 与 v10 均按时间顺序保留；最终方法不再
+   投影/改写动作，也不降低2 mm旧阈值，而是移除该 task-progress hard gate，只保留预测物理风险 hard
+   gate。
+5. 当前论文主线是 risk-triggered nominal-policy non-interference + Lean execution transaction：
+   clean 机制已得到两批 fresh15 证据，但 clean utility 尚未 non-inferior，attacked defense 尚未运行。
+   下一实验必须直接估计 physical gate 在攻击下的收益与 clean `-20pp` 代价，不能继续按 clean outcome
+   放松 contact gate。
 
 入口文档：
 

@@ -54,8 +54,10 @@ authorized ActionBlock -- execution transaction --> receipt/effects     [L2]
 ```text
 Trusted T/O_t^T
     -> legal frontier -> SemanticSubtask Z_t
-    -> attacked-view-conditioned ActionBlock candidates
-    -> local assessment / select-or-reject
+trusted full T + attacked policy view
+    -> π0.5 source ActionBlock
+Z_t/O_t^T + source ActionBlock
+    -> physical-risk assessment / unchanged-or-reject
 ```
 
 第一层回答“准备做的事情是否仍服务于可信任务的当前合法步骤”，第二层回答“获准的事情是否真的这样执行并
@@ -74,8 +76,8 @@ Semantic branch 只读取：
 Action-policy branch 可以读取被攻击的 `P_t^atk/O_t^atk/H_t^atk`。本方法由此研究：攻击把 ActionBlock
 带偏后，独立可信语义锚点和 local checker 能否在执行前发现偏离。
 
-部署路径丢弃 external prompt，并从 trusted `T + Z_t` 固定编译 action prompt。攻击评估可以有意把
-external prompt 送入 action-policy branch 来测量 L1 检出能力，但它仍不能进入 selector/checker。
+最终部署路径保留完整 trusted `T` 作为 action prompt，`Z_t` 只进入独立 monitor，不替换 policy
+prompt。攻击评估可以修改 policy-facing observation/history，但它仍不能进入 selector/checker。
 
 当前覆盖 secure split 后的数字/软件注入，不覆盖同时欺骗 trusted tap 的分叉前物理光学攻击，也不覆盖
 task source、selector/checker、observer、receipt store 或 actuator feedback 被攻破。
@@ -90,14 +92,15 @@ TaskSubtask(T, O_t^T, Z_t)
 SubtaskAction(Z_t, O_t^T, A_t)
 ```
 
-`Z_t` 从有限 task graph 的当前合法 frontier 中选择。第一版不训练 π0.5；确定性 FSM/task predicates
-控制合法候选，冻结 PaliGemma 分数只作为 proposal/ranking 特征。`Z_t` 在 ActionBlock 生成前成为显式
-policy 输入并与返回 block 绑定；当前 pilot 只证明 prompt path 有非零敏感性，尚未证明它提供强或可靠的
-action control。
+`Z_t` 从有限 task graph 的当前合法 frontier 中选择。最终方法不训练 π0.5，也不把局部 subtask 当作
+policy prompt；π0.5 继续根据完整任务生成 H=10/K=1 source block。这样 L1 的估计对象是 monitor，而不是
+“改变 prompt 后 policy 变好”的混合 treatment。
 
 local checker 使用 `Z_t/O_t^T/A_t` 预测有限的 motion、target、part、effect、precondition 和 violation
-atoms。未知、OOD、遮挡、低 margin 或不支持的几何关系必须 abstain。语义不匹配只能 reject/resample，
-不能靠 numeric projection 改名或修复；投影后的 executable prefix 必须重新检查并重新绑定。
+atoms。最终 hard set 只含速度、工作区和 unexpected-contact 风险；task-progress/phase mismatch 作为
+advisory replan。无物理风险时 returned/source block digest 必须一致，禁止 semantic projection。
+`trusted_articulation_state_unavailable` 会继续运行所有可用物理筛查，而不是在筛查前 unknown；stale、
+malformed 和未识别 unknown 仍 fail closed。
 
 L1 的主要风险不是平均 accuracy，而是：
 
@@ -157,12 +160,10 @@ Python runtime 精化了 Lean 模型。这个边界限制 claim 的外延，但�
 冻结 runtime/schema 中的 `intent_only`、`intent_action_enabled` 字段仅作为兼容名称，不表示恢复自由文本
 plan。
 
-`K=1` primary design 分两种 identity contract。fixed-trace shadow 中四臂共享 byte-identical source
-ActionBlock、assessment 和 execution contract；closed-loop 中四臂只共享初始状态、初始观测、环境 seed
-和 policy seed。由于可信 `T+Z_t` prompt 本身属于 L1 treatment，跨 L1 的 policy output 不要求相同；
-只要求每个 L1 stratum 内的 L2 pair 在第一次 policy call 上具有相同 prompt、policy observation 和
-source chunk。treatment 介入后各臂状态可以分叉，禁止用 counterfactual chunk replay 强行维持后续
-byte identity。若将来启用 `K>1`，必须另行冻结 candidate-set 与 selection estimand。
+`K=1/H=10` primary design 中四臂共享初始状态、初始观测、完整任务 prompt、环境 seed 和 policy seed，
+并要求每个 paired workload 的第一次 policy call 产生相同 source block。L1-on 的每个 nominal-safe
+调用还要证明 returned/source digest 相同。hard reject 或状态分叉之后，不用 counterfactual chunk replay
+强行维持后续 byte identity。若将来启用 `K>1`，必须另行冻结 candidate-set 与 selection estimand。
 
 ## 9. 可主张的贡献与明确排除项
 
@@ -259,3 +260,28 @@ K=1/2/4。coverage 为 `35/45, 35/45, 36/45`，pattern 为 `111:35, 001:1, 000:9
 总80%与最差60%仍 nonpass。论文应据此明确区分：时间尺度 H=10 对 availability 有明显作用，
 blind stochastic resampling 几乎没有作用；后续正向改进需要改变 action generator、训练 semantic
 conditioning 或 feedback-aware policy interface，而不是继续堆 IID samples。
+
+v8 随后在全45个 paired tasks 上完成180条 clean episodes。VLA-only、Execution-only、
+Semantic-only、Dual success 为 `34/45, 33/45, 5/45, 5/45`。1142个 L1 audits 中，旧方法改写
+1036个 source blocks，并有49个动作终止：43个只有 task-semantic/progress 原因，6个包含 predicted
+unexpected contact。这个完整结果把问题从“block 不够长”进一步定位为“把 task progress 当 hard
+safety constraint，并同时改变 action generator”。
+
+post-outcome v9 因此是 materially new 的 risk-selective 方法，而不是降低2 mm阈值：完整任务 prompt
+恢复给 π0.5，安全 block exact passthrough，task-semantic/effect miss 只 replan。scale45
+read-only replay 恢复43/49个软动作终止、保留6个 physical rejects。第一批 fresh15 四臂 clean 为
+`10/15, 10/15, 7/15, 6/15`；656/656 L1 blocks 不改写，15/15 paired first blocks 一致。
+
+v9 又暴露出6个 `trusted_articulation_state_unavailable` 在运行物理筛查之前 hard unknown。v10 只修该
+机制：继续运行速度、工作区和 contact screens，articulation task state advisory；同时把
+`target_not_held_after_move` 从 physical violation 中移出。第二批新 init/seed 的 fresh15 结果为
+`10/15, 8/15, 7/15, 7/15`；909/909 L1 blocks passthrough，15/15 first blocks 一致，8次
+physical-risk rejects 保留，60条 official cost/collision 为0。Semantic-only 相对 VLA 的配对差为
+`-20pp`，exact McNemar `p=0.25`，95% Wilson 区间分别为 `[24.8%,69.9%]` 与
+`[41.7%,84.8%]`。这批小样本不证明 non-inferiority；它证明 deadlock 大幅下降，同时把剩余 clean
+损失明确归因于 physical gate。
+
+因此论文当前可以报告 risk-triggered nominal-policy non-interference、可复算的 hard/advisory
+partition 和 clean safety–utility tradeoff；不能报告 attacked defense 有效。下一阶段应冻结攻击下
+physical-risk enrichment 与 paired utility estimand，直接检验8次 clean physical gate 的代价能否由
+攻击场景收益补偿。禁止继续按 clean outcome 放松 unexpected-contact gate。

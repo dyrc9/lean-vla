@@ -282,14 +282,16 @@ negative tests。v3 frozen digest fixture 保持不变。全量 Python 测试为
 
 ## 4. 当前 blocker 排序
 
-1. **L1 closed-loop availability**：support45 clean 中 Semantic-only/Dual 都是 0/90 strict success、
-   88/90 deadlock；36/90 initial geometry unknown 与 54/90 K=1 action reject 构成当前首要主线缺口；
-2. **Population qualification mismatch**：先前静态 audit 只证明 BDDL/task-graph 初始化，不能再命名为
-   closed-loop support；新设计必须在 outcome 前验证 online geometry availability 与 trajectory-level
-   coverage；
-3. **Deployment perception qualification data**：E7 已证明当前 RLDS 缺少 7 类必要监督；这是
-   camera-only deployment claim blocker；privileged-geometry benchmark 也仍需先关闭在线 geometry
-   availability。
+1. **Attacked benefit 尚未估计**：risk-selective v9/v10 已把 clean semantic success 从历史
+   `5/45` 提高到两批 fresh15 的 `7/15`，但尚无对应 attacked rollout，不能声称 defense efficacy；
+2. **Clean physical-gate utility**：两批 fresh15 中 Semantic-only 相对 VLA 都是 `-3/15=-20pp`。
+   v10 已消除 articulation unknown hard stop，剩余 action rejects 是 predicted physical contact；下一步
+   必须估计攻击下收益，不能按 clean outcome 松 gate；
+3. **L2 articulation evidence unknown**：v10 Dual 有3次仅承诺 `command_applied` 的 articulation
+   transaction 因 task effect 不可观测而 `semantic_execution_unknown`；它是 transaction contract
+   refinement 问题，不应通过放松 receipt/cost/collision integrity 解决；
+4. **Deployment perception qualification data**：E7 已证明当前 RLDS 缺少7类必要监督；这是
+   camera-only deployment claim blocker。当前正向证据仍限于 privileged-geometry benchmark。
 
 E8 已绑定 clean commit，semantic scope 未绑定路径为 `0`。E7 仍是 deployment claim blocker，但不阻止
 明确标注 privileged geometry 的 benchmark M2。

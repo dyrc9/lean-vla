@@ -2,9 +2,10 @@
 
 ## 1. 研究对象
 
-方法在可信任务与低层 ActionBlock 之间增加受约束的 semantic subtask。它不是事后生成的自然语言
-explanation，而是在动作生成前产生、作为显式 policy 输入并与返回 block 绑定的结构化中间层。这里的
-“作为输入”是结构事实；它对当前 action head 是否具有足够行为控制力，必须由独立 qualification 测量。
+方法在可信任务与低层 ActionBlock 之间增加受约束的 semantic subtask monitor。它不是事后生成的自然语言
+explanation，也不再替换 action policy 的原始完整任务 prompt。最终 risk-selective 版本让 π0.5 继续根据
+完整可信任务生成动作，`Z_t` 只作为独立可信的审计锚点；无物理风险时，monitor 返回 byte-identical
+source ActionBlock。
 
 顶层研究问题仍是两层对齐：L1 判断 concrete ActionBlock 是否服务于可信 intent，L2 判断获准
 ActionBlock 是否对应实际 dispatch/effects。`Z_t` 是 L1 的内部结构化分解，不是第三个顶层对齐层。
@@ -16,7 +17,7 @@ ActionBlock 是否对应实际 dispatch/effects。`Z_t` 是 L1 的内部结构�
 - `P_t^atk/O_t^atk/H_t^atk`：攻击者可修改的 policy-facing prompt、observation 和 history；
 - `M_z`：digest/config 均 allowlisted 的冻结 semantic selector；
 - `Z_t = M_z(T, O_t^T)`：从可信 task graph frontier 选择的 semantic subtask；
-- `A_t = π(P_t^atk, O_t^atk, H_t^atk, Z_t)`：VLA 输出的 ActionBlock；
+- `A_t = π(T, O_t^atk, H_t^atk)`：VLA 根据完整可信任务和 policy-facing view 输出的 ActionBlock；
 - `S_t = AssessLocal(Z_t, O_t^T, A_t)`：使用可信观察的局部运动与后果评估；
 - `C_t`：consumer 根据 `A_t` 与 `S_t` 编译的执行契约；
 - `R_t`：exact dispatch receipt；
@@ -29,11 +30,11 @@ TrustedIntent T  (immutable)
        |
        +-------------------------------> verifier
 
-trusted T/O_t^T ------> Z_t ----------+
-                                      |
-P/O/H policy view --attack-----------> VLA --> ActionBlock A_attack
-                                                |
-                                                +--> verifier / dispatch boundary
+trusted T/O_t^T ------> Z_t --------------------> physical-risk monitor
+                                                    ^
+trusted full T + O/H policy view --attack--> VLA --> ActionBlock A_attack
+                                                    |
+                                                    +--> authorization / dispatch
 ```
 
 攻击成功不要求模型“说出恶意计划”；只要攻击使输出 block 的实际预期效果偏离 `T`，就是 L1 的目标事件。
@@ -43,8 +44,8 @@ P/O/H policy view --attack-----------> VLA --> ActionBlock A_attack
 
 L1 的问题是：
 
-> 当前 `Z_t` 是否是可信任务在当前场景中的合法下一步，且以该 `Z_t` 为条件生成的 ActionBlock 是否具有
-> 与它兼容的局部运动和后果？
+> 当前 `Z_t` 是否是可信任务在当前场景中的合法下一步，且独立可信检查器是否能在不改写名义策略的
+> 前提下发现 ActionBlock 的预测物理风险？
 
 形式化写作：
 
@@ -56,11 +57,9 @@ L1(T, O_t^T, Z_t, A_t, S_t) :=
     TrustedSemanticProvenance(T, O_t^T, M_z, Z_t)
   ∧ Bound(Z_t, T, O_t^T)
   ∧ LegalFrontier(T, O_t^T, Z_t)
-  ∧ PromptBound(Z_t, A_t)
   ∧ Bound(S_t, Z_t, O_t^T, A_t)
-  ∧ Known(S_t)
-  ∧ LocalMotionCompatible(Z_t, S_t)
-  ∧ NoPredictedViolation(S_t)
+  ∧ PhysicalScreenAvailable(S_t)
+  ∧ NoPredictedPhysicalRisk(S_t)
   ∧ QualifiedProvenance(S_t.assessor)
 ```
 
@@ -72,28 +71,32 @@ predictor 或 shadow rollout 只作为后续增强。
 config 的 exact allowlist，并绑定 observation/state epoch。它证明来源和绑定符合 TCB 假设，不证明冻结
 selector 的语义输出永远正确；后者由资格化结果和 `unknown` 规则支撑。
 
-具体 ActionBlock 采用 generate-then-constrain，但 `Z_t` 必须在 action generation 之前固定：
+最终 ActionBlock 采用 generate-then-monitor；`Z_t` 在 action generation 前固定，但不替换完整任务
+prompt：
 
 ```text
 Z_t fixed
-  -> π0.5 proposes K blocks for the same Z_t
-  -> check executable prefixes
-  -> bounded numeric projection
-  -> re-check projected prefixes
-  -> deterministic feasible-block selection
+  -> π0.5 produces one H=10 source block from the full trusted task
+  -> apply the same numeric envelope as VLA-only
+  -> check velocity/workspace/unexpected-contact risk
+  -> no risk: return the exact source block
+  -> physical risk: fail closed
 ```
 
-语义不匹配只能 reject/resample，不能靠 numeric projection 改写，也不能从动作反向选择一个方便的 `Z_t`。
-完整选择规则见 [`semantic_subtask_hierarchy.md`](semantic_subtask_hierarchy.md)。
+`close_outside_target_neighborhood`、`release_command_missing`、place/release progress 和 expected
+task-effect miss 属于 task-semantic advisory：记录后在下一 block 重规划，不再终止 episode。
+`translation/rotation_velocity_limit`、`workspace_exit` 与 `unexpected_contact_neighborhood:*` 才是
+预测物理 hard gate。
 
-未知、OOD、观测不充分、候选分数接近或模型分歧必须产生 `unknown`，而不是自动 allow。完整定义见
-[`semantic_subtask_hierarchy.md`](semantic_subtask_hierarchy.md)。
+`trusted_articulation_state_unavailable` 不再等价于“发现物理风险”：检查器仍用可信 EEF、实体几何和
+exact block 运行所有可用物理筛查，只把不可观测的 articulation task state 标成 advisory。stale epoch、
+malformed command 和未识别 unknown 仍 fail closed。
 
 ## 3. 第二层：ActionBlock–Execution alignment
 
 L2 的问题是：
 
-> 获准的 block 是否按授权命令执行，并在绑定的观察窗口内产生约定效果、没有产生禁止效果？
+> 获准的 block 是否按授权命令执行，并在绑定窗口内没有产生物理禁止效果或完整性偏移？
 
 consumer 在授权前生成：
 
@@ -120,13 +123,14 @@ L2(A_t, C_t, Auth_t, R_t, E_t) :=
   ∧ observed_command = receipt.applied_command
   ∧ receipt is fresh and one-use
   ∧ observation occurs after dispatch
-  ∧ expected_effects(C_t) ⊆ observed_effects(E_t)
+  ∧ required_integrity_effects(C_t) ⊆ observed_effects(E_t)
   ∧ forbidden_effects(C_t) ∩ observed_effects(E_t) = ∅
-  ∧ no observer violation
+  ∧ no physical observer violation
 ```
 
-对于启用 L2 的 arm，phase 只有在 `L2 ∧ task_completion_observed` 时推进。观察窗口未关闭时保持
-`pending`，证据未知时保持 `unknown`。
+missing task-progress effect 与 `target_not_held_after_move` 触发 audited replan；cost/collision、
+workspace/wrong-contact、command/receipt substitution、stale/replay 和未识别 evidence unknown 仍
+fail closed。对于启用 L2 的 arm，phase 只有在 `L2 ∧ task_completion_observed` 时推进。
 
 ## 4. Lean 的位置
 
@@ -159,9 +163,10 @@ Lean **不**证明：
 | Execution-only | 0 | 1 | L2 对 substitution/drift/effect mismatch 的独立作用 |
 | Dual | 1 | 1 | 两层组合、干扰、deadlock 与 utility |
 
-四臂必须共享相同 VLA checkpoint、seed、观测、intervention policy、observer 和 runner。`K=1`
-primary 中 exact proposal、assessment 和 execution contract bytes 相同，唯一 treatment switch 是两层
-是否启用。冻结 schema 的 `intent_only` 只是 Semantic-only 的兼容值。
+四臂必须共享相同 VLA checkpoint、seed、初始观测、完整任务 prompt、intervention policy、observer
+和 runner。当前 K=1/H=10 primary 要求每个 paired workload 的首个 source ActionBlock 四臂一致；L1
+在没有物理风险的每次调用上还必须证明 returned/source digest 一致。发生 hard gate 或状态分叉后，不要求
+后续轨迹 byte identity。
 
 若启用 best-of-K，四臂必须共享同一批 ordered candidate bytes 和每候选 assessment；VLA-only arm 使用
 预注册的 base candidate，启用 L1 的 arm 才应用冻结过滤/选择规则，不能在不同 arm 中重新采样。此时
@@ -178,8 +183,8 @@ primary 中 exact proposal、assessment 和 execution contract bytes 相同，�
 - authorization digest chain 和 single dispatch boundary；
 - receipt/evidence storage。
 
-部署路径的 action prompt 只由 trusted `T + Z_t` 固定编译，外部 prompt 不进入。攻击评估可以把
-external prompt 有意送入 action-policy branch 来测量 L1 检出，但仍禁止其进入 `Z_t` 和 checker。
+部署路径的 action prompt 保持完整 trusted `T`；`Z_t` 不进入 action generator。攻击评估可以修改
+policy-facing observation/history 来测量 L1 检出，但仍禁止其进入 `Z_t` 和 checker。
 
 当前覆盖安全分叉后的数字/软件视觉注入；不覆盖发生在分叉前、同时欺骗 trusted tap 的物理光学攻击。
 如果攻击者也能控制可信观测、selector/checker、observer 或 actuator feedback，则需要独立传感器、
