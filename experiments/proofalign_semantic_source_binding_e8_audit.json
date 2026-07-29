@@ -3,7 +3,7 @@
   "audit_id": "proofalign-semantic-source-binding-e8-20260725",
   "audit_source": {
     "path": "scripts/generate_semantic_source_binding_e8.py",
-    "sha256": "873e46124341360eb57e0a1c89ba01b490f116532cfc70fdbbb3bf20d8188345"
+    "sha256": "c9b658473c7003e7af9d9e94227e2277f4c261662c02bb302f365fccf58d876d"
   },
   "claim_boundary": "This read-only audit binds the current semantic source scope, local evidence inventory, latest source-scope commit, and OpenPI checkout. A not-clean classification does not modify or commit the worktree. A clean classification would establish provenance only, not perception quality, efficacy, outcome, or safety.",
   "classification": "semantic_source_binding_clean",
@@ -22,7 +22,7 @@
       "exists": true,
       "git_status": "clean",
       "path": "README.md",
-      "sha256": "c91ec21eab779b098ea0a511d88b08aaf8ae1ecd578421d14be96a5764358294",
+      "sha256": "1a32d09e6a17c3e08c6c443d1a8dc02f6c25b14c4c992514a0a7d7c43c0f4a34",
       "tracked": true
     },
     {
@@ -62,7 +62,7 @@
       "exists": true,
       "git_status": "clean",
       "path": "docs/method.md",
-      "sha256": "0c32646fbe4718230b95ac38ef164af1036e6d9d50f41327e7b77a811150d4b1",
+      "sha256": "76540c1e7e2ab4c7eb746ac4821bc59fc41dd3ebbe0a59d793c697fd175e92c7",
       "tracked": true
     },
     {
@@ -70,7 +70,7 @@
       "exists": true,
       "git_status": "clean",
       "path": "docs/paper/paper_story.md",
-      "sha256": "59c927c41d311457e3fefd2fb5b58ea20825c5f33727c29269a2de699fea7988",
+      "sha256": "0048992821a26713456edab2096cb8dcdc62b40676b08cd9cd3f55242f7ce7e3",
       "tracked": true
     },
     {
@@ -78,7 +78,7 @@
       "exists": true,
       "git_status": "clean",
       "path": "docs/progress_and_plan.md",
-      "sha256": "368d555d5ccd4e930c6301dcdc0485e425c92a5270061ea83a73412243d46cb6",
+      "sha256": "ebd63720feaef3ee63ac41604679b1fb5999f8c81e8c4c12eef19ea10d8ce629",
       "tracked": true
     },
     {
@@ -517,6 +517,30 @@
       "bound_to_head": true,
       "exists": true,
       "git_status": "clean",
+      "path": "scripts/freeze_joint_limit_containment_v11_clean_scale45.py",
+      "sha256": "3dc108f6ed9e46a8d89f65072f05567251aa9bd325f444695ddefe7b793a8c86",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/freeze_joint_limit_containment_v11_attacked_scale45.py",
+      "sha256": "b1d9c88aaae29d20ab9fc1906618d6a7c956e55cc736f2428eebb09d8429b042",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/freeze_joint_limit_containment_v11_scale45_terminal.py",
+      "sha256": "0cc176c00a3f86cd6092108cc71084174643c436c68dbfc491107ab036609e20",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
       "path": "scripts/monitor_and_launch_contact_phase_scale45.py",
       "sha256": "c5318ea04835e0199ea67b93c3bccfdd7759b0b334630f94950e35ea9a3b30d2",
       "tracked": true
@@ -526,7 +550,7 @@
       "exists": true,
       "git_status": "clean",
       "path": "scripts/generate_semantic_source_binding_e8.py",
-      "sha256": "873e46124341360eb57e0a1c89ba01b490f116532cfc70fdbbb3bf20d8188345",
+      "sha256": "c9b658473c7003e7af9d9e94227e2277f4c261662c02bb302f365fccf58d876d",
       "tracked": true
     },
     {
@@ -727,6 +751,22 @@
       "git_status": "clean",
       "path": "scripts/run_joint_limit_containment_v11_attacked_pilot.py",
       "sha256": "638570362bdb5cd742b22eeb14d25e6aac7905cfdb6eef3a5d6db47128e8eb96",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/run_joint_limit_containment_v11_clean_scale45.py",
+      "sha256": "fea392979da0bfd6aeb502d8725b7517b29aa756ff6abcd00c3adf90365df737",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/run_joint_limit_containment_v11_attacked_scale45.py",
+      "sha256": "3a78797befe9182a5454f05e4007e0003c1d5fa21d39d46930f91a8c5a67e80c",
       "tracked": true
     },
     {
@@ -1397,6 +1437,30 @@
       "bound_to_head": true,
       "exists": true,
       "git_status": "clean",
+      "path": "tests/test_joint_limit_containment_v11_clean_scale45.py",
+      "sha256": "4fc978501cfc03a716d72c5ecd5bb2e0f234620a5b25999e2f68dbbc14afddea",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_joint_limit_containment_v11_attacked_scale45.py",
+      "sha256": "8878038ce7618968db0e6eeef9abed3c982dc065cd6c6134d2f4619ea49fc4b8",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_joint_limit_containment_v11_scale45_terminal.py",
+      "sha256": "1f0fc05163c87d22ecde9fe79f3392f655530d586a7d181c139412262853f334",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
       "path": "tests/test_local_checker_qualification_e3.py",
       "sha256": "23c209fd61acdd06d2ba844333a400af03f48ce5aad9b7595fdbed1f41d8c6d1",
       "tracked": true
@@ -2013,6 +2077,30 @@
       "bound_to_head": true,
       "exists": true,
       "git_status": "clean",
+      "path": "experiments/proofalign_joint_limit_containment_v11_clean_scale45_protocol.json",
+      "sha256": "bd60ee8e083bff652229f5abd7b1cceaf2430719d79cb217f71b784486bad5a2",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_joint_limit_containment_v11_attacked_scale45_protocol.json",
+      "sha256": "d0f8500819fa87a3d1e97cdf878b5eecf96bad1214adc48ee9731387f746b1db",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_joint_limit_containment_v11_scale45_terminal_summary.json",
+      "sha256": "3e07cb45c47ddfe4d7abbcd070b4c2e51bdc879878accff83f52b61a7e5753c1",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
       "path": "experiments/proofalign_pi05_action_conditioning_e2_protocol.json",
       "sha256": "079cf5566f49f44cd7ade70cf9cc5a96ef8d539bf5754ad01ad0d1e31e56be6e",
       "tracked": true
@@ -2346,6 +2434,30 @@
       "ignored_by_git": false,
       "path": "results/proofalign_joint_limit_containment_v11_attacked_fresh15_20260729_fresh1/SHA256SUMS",
       "sha256": "59690eb5b847f78bfdeb0ac034a157e8920cc3838a06532605623737490b042f"
+    },
+    {
+      "exists": true,
+      "ignored_by_git": false,
+      "path": "results/proofalign_joint_limit_containment_v11_clean_scale45_20260729_fresh1/pilot_evidence.json",
+      "sha256": "9d14768046a1c5e201b4a983e0f0340e94cc6f917f4f483b1beff81351e4b40d"
+    },
+    {
+      "exists": true,
+      "ignored_by_git": false,
+      "path": "results/proofalign_joint_limit_containment_v11_clean_scale45_20260729_fresh1/SHA256SUMS",
+      "sha256": "67c93d0f7d12617b7f9e858fd7bd5f43bc61bdf9274d072155b49fab3f827a36"
+    },
+    {
+      "exists": true,
+      "ignored_by_git": false,
+      "path": "results/proofalign_joint_limit_containment_v11_attacked_scale45_20260730_fresh1/pilot_evidence.json",
+      "sha256": "44e542a71729a8b0a23d0a6d9cf5abf659b8476c1bfb6f6847447a45b73156b4"
+    },
+    {
+      "exists": true,
+      "ignored_by_git": false,
+      "path": "results/proofalign_joint_limit_containment_v11_attacked_scale45_20260730_fresh1/SHA256SUMS",
+      "sha256": "6bca8c63eefd214ec5209cba07df49e459110c87b30496b388b4d7f9f8532a80"
     }
   ],
   "evidence_inventory_complete": true,
@@ -2361,8 +2473,8 @@
   "policy_loaded": false,
   "repository_binding_semantics": "latest commit that changed the frozen semantic commit scope; later commits may contain only out-of-scope protocols or audit packets",
   "repository_fully_clean": true,
-  "repository_head_commit": "f65b650fc4285223b69b2aff8842cd5733b7dd5b",
-  "repository_head_tree": "3878f5b995476871fbb430523099e161afbeef99",
+  "repository_head_commit": "836d6ca76a6968518eb297157b6aac3ad55b3a7b",
+  "repository_head_tree": "0c8d27f3dea8909d18f9df93c7140d825e263dee",
   "repository_status_row_count": 0,
   "schema": "proofalign.semantic-source-binding-e8-audit.v1",
   "simulator_created": false
