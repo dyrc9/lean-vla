@@ -1,4 +1,4 @@
-.PHONY: sync test lean paper-artifacts paper-artifacts-check action-block-check m1-readiness-check semantic-v4-c5-check e1-selector-check e1-fallback-check e2-conditioning-check e3-checker-check e4-no-dispatch-check e5-effect-observer-check e6-resource-smoke-preflight-check e7-perception-preflight-check semantic-post-e5-readiness-check l2-interface-check four-arm-v4-check four-arm-v4-exploratory-check v12-contract-check v12-simulator-preflight-check check
+.PHONY: sync test lean paper-artifacts paper-artifacts-check action-block-check m1-readiness-check semantic-v4-c5-check e1-selector-check e1-fallback-check e2-conditioning-check e3-checker-check e4-no-dispatch-check e5-effect-observer-check e6-resource-smoke-preflight-check e7-perception-preflight-check semantic-post-e5-readiness-check l2-interface-check four-arm-v4-check four-arm-v4-exploratory-check v12-contract-check v12-simulator-preflight-check v12-recovery-successor-check check
 
 PYTHON ?= .venv/bin/python
 UV ?= uv
@@ -146,4 +146,13 @@ v12-simulator-preflight-check:
 		echo "Skipping v12 simulator-preflight result check: local-only evidence is absent"; \
 	fi
 
-check: test lean paper-artifacts-check action-block-check m1-readiness-check semantic-v4-c5-check e1-selector-check e1-fallback-check e2-conditioning-check e3-checker-check e4-no-dispatch-check e5-effect-observer-check e6-resource-smoke-preflight-check e7-perception-preflight-check e8-source-binding-check semantic-post-e5-readiness-check four-arm-v4-check four-arm-v4-exploratory-check v12-contract-check v12-simulator-preflight-check
+v12-recovery-successor-check:
+	$(PYTHON) scripts/freeze_recovery_runtime_v12_fixed_trace.py --check
+	$(PYTHON) scripts/run_recovery_runtime_v12_fixed_trace.py --check
+	$(PYTHON) scripts/freeze_recovery_runtime_v12_fixed_trace_terminal.py --check
+	$(PYTHON) scripts/freeze_prefix_recovery_v12_multijoint_qualification.py --check
+	$(PYTHON) scripts/freeze_prefix_recovery_v12_multijoint_terminal.py --check
+	$(PYTHON) scripts/freeze_recovery_snapshot_v12_qualification.py --check
+	$(PYTHON) scripts/freeze_recovery_snapshot_v12_terminal.py --check
+
+check: test lean paper-artifacts-check action-block-check m1-readiness-check semantic-v4-c5-check e1-selector-check e1-fallback-check e2-conditioning-check e3-checker-check e4-no-dispatch-check e5-effect-observer-check e6-resource-smoke-preflight-check e7-perception-preflight-check e8-source-binding-check semantic-post-e5-readiness-check four-arm-v4-check four-arm-v4-exploratory-check v12-contract-check v12-simulator-preflight-check v12-recovery-successor-check

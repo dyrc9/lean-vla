@@ -338,3 +338,17 @@ clean Execution−VLA 的 joint-limit sign test 为 `15 lower / 1 higher / 29 eq
 稳定成立，joint-limit exposure 通常下降，但 hard stop 会在部分 clean workload 牺牲可观任务效用。
 论文应把终局分类写为 `joint_limit_containment_v11_scale45_heldout_mixed_evidence`，并明确
 first-hit prevention、task non-inferiority 与 overall safety 均未建立。
+
+outcome-informed v12 随后只在 no-outcome 资格边界内把 hard stop 改造成 typed recovery。
+v12.1 的 contract corpus 655/655、单模式 simulator-reset 45/45 通过；v12.2 又加入
+old-policy revoke、one-use recovery authorization、ordered command receipts、fresh-state replan
+和 shortest-safe-prefix。在15 pairs × 7 joints × 2 sides 的正式210-case population 中，
+candidate coverage 为209/210，209/209 selected recovery 都在 actual replay 中达到 safe margin，
+hard crossing/transient violation 为0，旧授权与 recovery replay 接受均为0。
+
+v12.2 必须保留 `prefix_recovery_v12_multijoint_qualification_nonpass`：冻结的 full
+`MjSimState` identity gate 只有201/210。后续独立 v12.3 没有改判它，而是资格化更准确的 trusted
+snapshot boundary：arm `qpos/qvel` identity 为210/210，9个 full-state mismatch 只包含40个
+非机械臂诊断值，最大绝对差异 `2.22e-16`。论文可据此主张 typed recovery transaction 和
+多关节 simulator feasibility 已显著增强；在完成 policy-prefix predictive shadow、fresh clean
+utility 和 attacked cells 之前，仍不能主张 task-preserving recovery 或 defense efficacy。

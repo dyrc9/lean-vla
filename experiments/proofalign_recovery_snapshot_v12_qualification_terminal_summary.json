@@ -1,0 +1,89 @@
+{
+  "claim_boundary": "This result-informed successor decomposes the sole failed v12.2 restore gate. It replays the frozen selected recovery action prefix (or one hold step for the sole abstention) solely to measure trigger MjSimState restoration and qualification-harness trusted arm restoration across the same 210 cases. It does not relabel the v12.2 nonpass, load or dispatch a policy, read task outcomes, establish controller-internal state restoration for nominal policy screening, clean utility, attacked efficacy, deployment, or physical safety.",
+  "classification": "recovery_snapshot_v12_qualification_pass",
+  "execution_boundary": {
+    "outcome_read_count": 0,
+    "policy_action_dispatch_count": 0,
+    "policy_load_count": 0,
+    "probe_env_step_count": 466,
+    "simulator_create_count": 15
+  },
+  "gate_conditions": {
+    "baseline_model_trigger": true,
+    "harness_trusted_arm_bitwise_identity": true,
+    "outcome_read_count": true,
+    "policy_action_dispatch_count": true,
+    "policy_load_count": true,
+    "runtime_exception_count": true,
+    "trigger_full_state_bitwise_identity": true,
+    "trigger_trusted_arm_bitwise_identity": true,
+    "valid_case_count": true
+  },
+  "interpretation": {
+    "diagnostic": "Harness full-state bitwise identity remained 201/210. The nine first-case differences affected 40 non-arm values with maximum absolute error 2.220446049250313e-16, while trusted arm identity remained 210/210.",
+    "limit": "This result-informed pass does not relabel the v12.2 nonpass and does not qualify controller-internal snapshots for nominal policy-prefix prediction, clean utility, attacked efficacy, deployment, or physical safety.",
+    "positive": "Across all 210 frozen cases, trigger-state MjSimState and trusted arm qpos/qvel restored with bitwise identity. Qualification-harness trusted arm qpos/qvel also restored with bitwise identity."
+  },
+  "lifecycle": {
+    "clean_rollout_authorized": false,
+    "next_step": "Freeze a no-outcome policy-prefix predictive-shadow qualification that explicitly snapshots controller state.",
+    "outcome_rollout_authorized": false,
+    "overwrite_allowed": false,
+    "policy_prefix_shadow_qualification_authorized": true,
+    "terminal": true,
+    "v12_2_nonpass_unchanged": true
+  },
+  "metrics": {
+    "baseline_model_trigger_rate": 1.0,
+    "harness_full_state_bitwise_identity_rate": 0.9571428571428572,
+    "harness_full_state_differing_value_count": 40,
+    "harness_full_state_max_abs_error": 2.220446049250313e-16,
+    "harness_trusted_arm_bitwise_identity_rate": 1.0,
+    "outcome_read_count": 0,
+    "policy_action_dispatch_count": 0,
+    "policy_load_count": 0,
+    "probe_env_step_count": 466,
+    "runtime_exception_count": 0,
+    "simulator_create_count": 15,
+    "trigger_full_state_bitwise_identity_rate": 1.0,
+    "trigger_full_state_differing_value_count": 0,
+    "trigger_full_state_max_abs_error": 0.0,
+    "trigger_trusted_arm_bitwise_identity_rate": 1.0,
+    "valid_case_count": 210
+  },
+  "predecessor_positive_metrics": {
+    "fresh_policy_authorization_rate": 1.0,
+    "old_policy_authorization_accept_count": 0,
+    "receipt_identity_rate": 1.0,
+    "recovery_authorization_replay_accept_count": 0,
+    "recovery_candidate_coverage": 0.9952380952380953,
+    "recovery_completion_rate": 1.0,
+    "selected_replay_joint_limit_crossing_count": 0,
+    "selected_replay_terminal_safe_rate": 1.0,
+    "selected_replay_transient_loss_count": 0,
+    "worst_joint_side_recovery_coverage": 0.9333333333333333,
+    "worst_suite_recovery_coverage": 0.9857142857142858
+  },
+  "protocol_id": "proofalign-recovery-snapshot-v12-qualification-20260729",
+  "qualification_pass": true,
+  "schema": "proofalign.recovery-snapshot-v12-qualification-terminal.v1",
+  "source": {
+    "checksums_sha256": "1be90ca0d9407675783c446e3a2e7d9bcba67135ac074d7700512df8cf3b9f81",
+    "ledger_sha256": "bc51c075b03c61d83565cdac5d2e1a31a273e8c1db0db1ff0b980c1ad74b6e6f",
+    "manifest_sha256": "9df629b8f7c77a62c921d48dba9b34af99cb865d2061611b04c18d22e88b171e",
+    "predecessor": {
+      "classification": "prefix_recovery_v12_multijoint_qualification_nonpass",
+      "failed_gates": [
+        "shadow_restore_identity"
+      ],
+      "path": "experiments/proofalign_prefix_recovery_v12_multijoint_qualification_terminal_summary.json",
+      "qualification_pass": false,
+      "sha256": "12871a7fc2df0d171a0bf96f52aec833394ed7951366cf0bc872c790f0b77ee9",
+      "unchanged": true
+    },
+    "protocol_path": "experiments/proofalign_recovery_snapshot_v12_qualification_protocol.json",
+    "protocol_sha256": "7d058b1ac09ebb30b0125c908d3ca6cd61eb18a909812b659723b50157b4834e",
+    "result_root": "results/proofalign_recovery_snapshot_v12_qualification_20260729_fresh1",
+    "summary_sha256": "cd90cf41d6def8b1ce00975b2590c5a4fb6ffd6e3385ff69665813602448763a"
+  }
+}

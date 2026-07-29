@@ -1,0 +1,10 @@
+{
+  "outcomes_observed": false,
+  "policy_action_dispatched": false,
+  "policy_loaded": false,
+  "protocol_id": "proofalign-prefix-recovery-v12-multijoint-qualification-20260729",
+  "protocol_sha256": "e2a14f21f8b6b8c031d22d29ed2c0daa91f7ea1fa7b4d181ee90d3b4397abbbe",
+  "row_count": 210,
+  "schema": "proofalign.prefix-recovery-v12-multijoint-qualification-summary.v1.run-manifest",
+  "status": "complete"
+}

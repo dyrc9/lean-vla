@@ -167,6 +167,11 @@ Dual 已验证。旧结果可复用为：
    policy dispatch 和 outcome read 均为0。该结果只覆盖 synthetic joint-5 upper-limit，且
    shadow/replay bitwise identity 为2/45，因此当前只进入 zero-policy runtime transaction
    integration，不启动 clean/attacked。
+8. v12.2/v12.3 recovery successor 已完成：typed runtime fixed trace 为10/10；正式多关节实验在
+   15 pairs × 7 joints × 2 sides 的210个注入中覆盖209个，209/209 selected recovery 均实际安全
+   完成，旧授权/recovery replay 接受均为0。v12.2 因完整 simulator snapshot identity 仅
+   201/210 而保持 non-pass；独立 v12.3 证明可信 arm `qpos/qvel` identity 为210/210，差异只在
+   非机械臂诊断状态且最大为 `2.22e-16`。当前只进入 no-outcome policy-prefix shadow qualification。
 
 入口文档：
 
@@ -184,6 +189,7 @@ Dual 已验证。旧结果可复用为：
 - [v11 终局 checkpoint](docs/v11_terminal_checkpoint.md)
 - [v12 稀疏 L1 与可恢复 L2 计划](docs/v12_recoverable_alignment_plan.md)
 - [v12 无 outcome 资格 checkpoint](docs/v12_qualification_checkpoint.md)
+- [v12.2/v12.3 多关节恢复 checkpoint](docs/v12_recovery_successor_checkpoint.md)
 
 常用检查：
 

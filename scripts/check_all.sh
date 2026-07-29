@@ -49,6 +49,13 @@ if [[ -f results/proofalign_escape_recovery_v12_simulator_preflight_20260729_fre
 else
     echo "Skipping v12 simulator-preflight result check: local-only evidence is absent"
 fi
+"$PYTHON_BIN" scripts/freeze_recovery_runtime_v12_fixed_trace.py --check
+"$PYTHON_BIN" scripts/run_recovery_runtime_v12_fixed_trace.py --check
+"$PYTHON_BIN" scripts/freeze_recovery_runtime_v12_fixed_trace_terminal.py --check
+"$PYTHON_BIN" scripts/freeze_prefix_recovery_v12_multijoint_qualification.py --check
+"$PYTHON_BIN" scripts/freeze_prefix_recovery_v12_multijoint_terminal.py --check
+"$PYTHON_BIN" scripts/freeze_recovery_snapshot_v12_qualification.py --check
+"$PYTHON_BIN" scripts/freeze_recovery_snapshot_v12_terminal.py --check
 "$PYTHON_BIN" scripts/generate_saber_confirmatory_records.py --dry-run >/dev/null
 "$PYTHON_BIN" scripts/run_saber_confirmatory_victim.py --dry-run >/dev/null
 "$PYTHON_BIN" scripts/export_proofalign_fixed_trace.py --dry-run >/dev/null

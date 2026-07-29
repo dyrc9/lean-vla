@@ -92,8 +92,13 @@ Phase Q 不创建 outcome rollout，不读取 reward/success/cost/collision，�
 
 - Q1–Q3 的纯 contract finite corpus 共655 cases，所有冻结 gate 通过；
 - v12.1 simulator-reset preflight 共45个不与 v11 scale45 outcome 重叠的 pair，冻结 gate 全部通过；
-- 当前 pass 只授权 zero-policy runtime integration。由于 preflight 只覆盖 joint 5 upper-limit，且
-  selected shadow/replay bitwise identity 为2/45，不授权 clean 或 outcome rollout。
+- v12.2 zero-policy typed runtime fixed trace 10/10 通过，多关节正式 qualification 在210个
+  joint-side 注入中覆盖209个，209/209 selected recovery 实际完成；
+- v12.2 因 full simulator-state identity 201/210 保持 non-pass；独立 v12.3 证明 trusted arm
+  `qpos/qvel` identity 为210/210，full-state 差异最大仅 `2.22e-16` 且位于非机械臂诊断状态；
+- 当前只授权 no-outcome policy-prefix predictive-shadow qualification，不授权 clean 或 outcome
+  rollout。详见
+  [`v12_recovery_successor_checkpoint.md`](v12_recovery_successor_checkpoint.md)。
 
 ### Q1 Sparse-L1 finite corpus
 
@@ -181,13 +186,16 @@ Holm family。first-hit prevention、post-trigger containment、task utility、o
 
 ## 6. 实现工作包
 
-1. **V12-C1 Sparse L1 decision**：将 hard/advisory/replan 分区做成纯函数，保留 exact passthrough。
-2. **V12-C2 Trusted execution state**：定义 joint state、limits、epoch 和 source provenance schema。
-3. **V12-C3 Shadow predictor**：只读 cloned state，返回 known/unknown risk assessment。
-4. **V12-C4 Recovery selector**：冻结 7D candidate library、margin objective 和 deterministic tie-break。
-5. **V12-C5 Recovery transaction**：独立 authorization、receipt、mode transition 和 replay protection。
+1. **V12-C1 Sparse L1 decision（已完成）**：将 hard/advisory/replan 分区做成纯函数，保留 exact passthrough。
+2. **V12-C2 Trusted execution state（已完成）**：定义 joint state、limits、epoch 和 source provenance schema。
+3. **V12-C3 Shadow predictor（analytic 已完成；policy-prefix 待资格）**：只读 cloned state，返回
+   known/unknown risk assessment。
+4. **V12-C4 Recovery selector（已完成多关节后继）**：冻结 7D candidate library、margin objective、
+   deterministic tie-break 和 shortest-safe-prefix。
+5. **V12-C5 Recovery transaction（已完成 zero-policy gate）**：独立 authorization、receipt、mode
+   transition、replay protection 和 fresh-policy state binding。
 6. **V12-C6 Lean successor**：证明 old-policy authorization 在 trigger 后不可消费。
-7. **V12-Q1–Q3 runners**：fresh root、append-only ledger、checksum、terminal validator。
+7. **V12-Q1–Q3 runners（已完成至 v12.3）**：fresh root、append-only ledger、checksum、terminal validator。
 8. **V12-Clean/Attack**：只有资格与前置 gate 通过后才生成 outcome protocol。
 
 ## 7. 停止与审计规则

@@ -1,6 +1,26 @@
 # 当前进展与执行计划
 
-## 最新 checkpoint：2026-07-29 v12 无 outcome 资格实验通过
+## 最新 checkpoint：2026-07-29 v12.2/v12.3 多关节恢复 successor
+
+v12.1 后续优化已经完成并终态冻结：
+
+- typed recovery runtime fixed trace 10/10 通过；old-policy revoke、one-use recovery、
+  command receipt identity、recovery replay reject 和 fresh-policy state binding 全部通过；
+- shortest-safe-prefix 把工程 coverage 从固定 H=10 的12/14提高到14/14；
+- 正式 v12.2 在15 pairs × 7 joints × 2 sides 的210个注入中覆盖209个；209/209 selected
+  recovery 都在 actual replay 中到达 safe margin，hard crossing/transient violation 为0，
+  old-policy/recovery replay acceptance 为0；
+- v12.2 仍按冻结 gate 判 non-pass：full simulator snapshot identity 为201/210，而不是100%；
+- 独立 v12.3 snapshot qualification 表明 trusted arm `qpos/qvel` restore identity 为210/210。
+  9 个 full-state mismatch 只包含40个非机械臂状态值，最大绝对误差为
+  `2.220446049250313e-16`；v12.3 pass 不回写 v12.2 non-pass。
+
+完整表格、claim boundary 和产物位置见
+[`v12_recovery_successor_checkpoint.md`](v12_recovery_successor_checkpoint.md)。当前下一步是
+no-outcome policy-prefix predictive-shadow qualification；仍不授权 clean、attacked 或 efficacy
+outcome rollout。
+
+## 前一 checkpoint：2026-07-29 v12 无 outcome 资格实验通过
 
 v11 终局保持不变。v12 已完成第一批实现和两层 no-outcome 资格：
 
@@ -17,7 +37,7 @@ v11 终局保持不变。v12 已完成第一批实现和两层 no-outcome 资格
 [`v12_qualification_checkpoint.md`](v12_qualification_checkpoint.md)。当前只授权 typed recovery 的
 zero-policy runtime fixed-trace integration；仍不授权 clean、attacked 或 outcome rollout。
 
-## 前一 checkpoint：2026-07-29 v11 终局与 v12 启动边界
+## 更早 checkpoint：2026-07-29 v11 终局与 v12 启动边界
 
 v11 unchanged-method held-out scale45 已终态完成并单独封存于
 [`v11_terminal_checkpoint.md`](v11_terminal_checkpoint.md)。clean/attacked 各180条均完整，
