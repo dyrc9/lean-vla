@@ -245,6 +245,11 @@ safe region；near-limit recovery selector 又要求相对当前状态额外 `+0
 后继不应降低 recovery gain，也不应继续称 recovery，而应定义独立 safe bridge：只允许一个
 满足原 transient/no-crossing/H1 threshold 的保守 action 改变观测，然后重新 fresh H1 gate。
 
+safe-bridge runner 已冻结：每次搜索先对13个一步原语检查
+`margin >= current−0.005` 且严格高于 `0.1 rad` trigger，再按 terminal margin 排序；候选
+endpoint 必须在同一 frozen post-bridge seed 下产生 H1 `allow_exact` 才可 shadow execute。
+每 cycle 最多2个 bridge。它不使用、修改或冒充 recovery gain contract。
+
 冻结产物：
 
 - protocol：`experiments/proofalign_simulator_integrated_predictive_recovery_v12_qualification_protocol.json`

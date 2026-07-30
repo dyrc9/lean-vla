@@ -78,6 +78,10 @@ recovery-terminal node；未执行 escalation/policy、未读 outcome。失败�
 原因是 safe-state `block_replan` 与 near-limit recovery contract 不匹配。下一版应单独定义
 one-step safe bridge/shield，保持 transient/no-crossing/H1 门，不篡改 recovery gain。
 
+safe-bridge runner 与测试已实现：13个一步原语先过 unchanged transient/trigger gate，再要求
+fresh post-bridge H1 allow；每 cycle 最多2个 bridge。bridge 独立记账，不记为 recovery，
+所有执行仍为 restored shadow。
+
 ## 前一 checkpoint：2026-07-30 v12.5 integrated predictive recovery
 
 fresh policy-prefix shadow 与 typed recovery runtime 的 fixed-trace composition 已完成并终态冻结：

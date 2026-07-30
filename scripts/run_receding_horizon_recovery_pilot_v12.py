@@ -167,6 +167,169 @@ def pilot_config() -> dict[str, Any]:
     return config
 
 
+def _search_safe_bridge(
+    config: dict[str, Any],
+    *,
+    env: Any,
+    robot: Any,
+    qidx: np.ndarray,
+    limits: np.ndarray,
+    branch_state: Any,
+    snapshot: Any,
+    contacts: base.ContactCapacityAudit,
+    runtime: Any,
+    policy: Any,
+    jax: Any,
+    image_tools: Any,
+    runner: Any,
+    args: Any,
+    policy_seed: int,
+    source_id: str,
+) -> dict[str, Any]:
+    library = _candidate_library(config)
+    transient_floor = branch_state.minimum_margin - float(
+        config["recovery"]["max_transient_margin_loss_rad"]
+    )
+    trigger_margin = float(config["episode"]["trigger_margin_rad"])
+    restore_identity = True
+    physical_rows = []
+    physical_steps = 0
+    for action_id, action in library.items():
+        restore_identity = (
+            restore_identity
+            and _restore_identity(env, robot, snapshot)
+        )
+        positions, margins = _execute_actions(
+            env,
+            actions=(action,),
+            qidx=qidx,
+            limits=limits,
+            contacts=contacts,
+        )
+        physical_steps += 1
+        margin = margins[-1]
+        physical_rows.append(
+            {
+                "action_id": action_id,
+                "action": action,
+                "terminal_margin_rad": margin,
+                "transient_safe": (
+                    margin >= transient_floor and margin >= trigger_margin
+                ),
+                "policy_screened": False,
+                "post_h1_verdict": None,
+                "post_h1_minimum_margin_rad": None,
+                "post_h1_risk_agreement": None,
+                "post_h1_restore_identity": None,
+                "selected": False,
+                "terminal_qpos": list(positions[-1]),
+            }
+        )
+    restore_identity = (
+        restore_identity and _restore_identity(env, robot, snapshot)
+    )
+    eligible = [row for row in physical_rows if row["transient_safe"]]
+    eligible.sort(
+        key=lambda row: (
+            -row["terminal_margin_rad"],
+            row["action_id"],
+        )
+    )
+    inference_count = 0
+    h1_shadow_steps = 0
+    candidate_replay_steps = 0
+    selected = None
+    for row in eligible:
+        restore_identity = (
+            restore_identity
+            and _restore_identity(env, robot, snapshot)
+        )
+        action = tuple(float(value) for value in row["action"])
+        _positions, replay_margins = _execute_actions(
+            env,
+            actions=(action,),
+            qidx=qidx,
+            limits=limits,
+            contacts=contacts,
+        )
+        candidate_replay_steps += 1
+        endpoint_state = trusted_joint_state_from_libero(
+            env,
+            state_epoch=branch_state.state_epoch + 1,
+            source_id=f"{source_id}:{row['action_id']}:endpoint",
+        )
+        prefix, frame, chunk = base._infer_prefix(
+            config,
+            env=env,
+            runtime=runtime,
+            policy=policy,
+            jax=jax,
+            image_tools=image_tools,
+            runner=runner,
+            args=args,
+            policy_seed=policy_seed,
+        )
+        inference_count += 1
+        post_h1 = base._screen_prefix(
+            config,
+            env=env,
+            robot=robot,
+            qidx=qidx,
+            state=endpoint_state,
+            prefix=prefix[:1],
+            source_id=f"{source_id}:{row['action_id']}:post-h1",
+            contact_audit=contacts,
+        )
+        h1_shadow_steps += post_h1["shadow_env_step_count"]
+        row.update(
+            {
+                "policy_screened": True,
+                "policy_seed": policy_seed,
+                "clean_frame_sha256": frame["clean_frame_sha256"],
+                "policy_chunk_sha256": chunk,
+                "minimum_replay_margin_rad": min(replay_margins),
+                "post_h1_verdict": post_h1[
+                    "decision"
+                ].verdict.value,
+                "post_h1_minimum_margin_rad": post_h1[
+                    "assessment"
+                ].minimum_margin,
+                "post_h1_risk_agreement": post_h1[
+                    "risk_agreement"
+                ],
+                "post_h1_restore_identity": post_h1[
+                    "restore_identity"
+                ],
+            }
+        )
+        restore_identity = (
+            restore_identity and post_h1["restore_identity"]
+        )
+        if (
+            row["post_h1_verdict"]
+            == PolicyPrefixShadowVerdict.ALLOW_EXACT.value
+            and row["post_h1_risk_agreement"]
+            and row["post_h1_restore_identity"]
+        ):
+            row["selected"] = True
+            selected = row
+            break
+    restore_identity = (
+        restore_identity and _restore_identity(env, robot, snapshot)
+    )
+    return {
+        "selected": selected,
+        "candidate_evaluations": physical_rows,
+        "restore_identity": restore_identity,
+        "physical_shadow_env_step_count": physical_steps,
+        "candidate_replay_shadow_env_step_count": (
+            candidate_replay_steps
+        ),
+        "post_h1_shadow_env_step_count": h1_shadow_steps,
+        "policy_inference_count": inference_count,
+    }
+
+
 def _run_case(
     config: dict[str, Any],
     pair: dict[str, Any],
@@ -182,6 +345,8 @@ def _run_case(
     maximum_recovery_escalations_per_cycle: int = 0,
     recovery_round_seed_stride: int = 1_000,
     escalation_candidate_builder: Any | None = None,
+    maximum_safe_bridges_per_cycle: int = 0,
+    safe_bridge_seed_stride: int = 2_000,
     row_schema: str = ROW_SCHEMA,
     source_version: str = "v12.11",
 ) -> dict[str, Any]:
@@ -190,6 +355,8 @@ def _run_case(
         or seed_attempt_stride <= 0
         or maximum_recovery_escalations_per_cycle < 0
         or recovery_round_seed_stride <= 0
+        or maximum_safe_bridges_per_cycle < 0
+        or safe_bridge_seed_stride <= 0
     ):
         raise RecedingHorizonPilotError(
             "invalid replan or recovery-escalation bounds"
@@ -288,6 +455,9 @@ def _run_case(
         recovery_shadow_steps = 0
         escalation_candidate_shadow_steps = 0
         escalation_execution_shadow_steps = 0
+        bridge_candidate_shadow_steps = 0
+        bridge_post_h1_shadow_steps = 0
+        bridge_execution_shadow_steps = 0
         policy_advance_steps = 0
         for lane_index, base_seed in enumerate(LANE_BASE_SEEDS):
             restore_identity = (
@@ -341,9 +511,15 @@ def _run_case(
             for cycle_index in range(RECEDING_CYCLE_COUNT):
                 attempts = []
                 recovery_escalations = []
+                safe_bridges = []
                 selected_prefix = None
+                control_round_count = (
+                    maximum_recovery_escalations_per_cycle
+                    + maximum_safe_bridges_per_cycle
+                    + 1
+                )
                 for recovery_round in range(
-                    maximum_recovery_escalations_per_cycle + 1
+                    control_round_count
                 ):
                     one_step_screen = None
                     for attempt_index in range(
@@ -470,6 +646,134 @@ def _run_case(
                             break
                     if selected_prefix is not None:
                         break
+                    if len(safe_bridges) < maximum_safe_bridges_per_cycle:
+                        if one_step_screen is None:
+                            raise RecedingHorizonPilotError(
+                                "missing failed H1 screen for safe bridge"
+                            )
+                        bridge_seed = (
+                            int(base_seed)
+                            + cycle_index * SEED_CYCLE_STRIDE
+                            + (len(safe_bridges) + 1)
+                            * safe_bridge_seed_stride
+                        )
+                        bridge = _search_safe_bridge(
+                            config,
+                            env=env,
+                            robot=robot,
+                            qidx=qidx,
+                            limits=limits,
+                            branch_state=branch_state,
+                            snapshot=one_step_screen["snapshot"],
+                            contacts=contacts,
+                            runtime=runtime,
+                            policy=policy,
+                            jax=jax,
+                            image_tools=image_tools,
+                            runner=runner,
+                            args=args,
+                            policy_seed=bridge_seed,
+                            source_id=(
+                                f"{source_version}:{TARGET_ID}:"
+                                f"lane{lane_index}:cycle{cycle_index}:"
+                                f"round{recovery_round}:safe-bridge"
+                            ),
+                        )
+                        inference_count += bridge[
+                            "policy_inference_count"
+                        ]
+                        bridge_candidate_shadow_steps += (
+                            bridge[
+                                "physical_shadow_env_step_count"
+                            ]
+                            + bridge[
+                                "candidate_replay_shadow_env_step_count"
+                            ]
+                        )
+                        bridge_post_h1_shadow_steps += bridge[
+                            "post_h1_shadow_env_step_count"
+                        ]
+                        restore_identity = (
+                            restore_identity
+                            and bridge["restore_identity"]
+                        )
+                        selected_bridge = bridge["selected"]
+                        bridge_row = {
+                            "bridge_index": len(safe_bridges),
+                            "policy_seed": bridge_seed,
+                            "candidate_evaluations": bridge[
+                                "candidate_evaluations"
+                            ],
+                            "selected_action_id": (
+                                selected_bridge["action_id"]
+                                if selected_bridge is not None
+                                else None
+                            ),
+                            "selected_terminal_margin_rad": (
+                                selected_bridge[
+                                    "terminal_margin_rad"
+                                ]
+                                if selected_bridge is not None
+                                else None
+                            ),
+                            "executed_in_shadow": False,
+                        }
+                        safe_bridges.append(bridge_row)
+                        if selected_bridge is not None:
+                            restore_identity = (
+                                restore_identity
+                                and _restore_identity(
+                                    env,
+                                    robot,
+                                    one_step_screen["snapshot"],
+                                )
+                            )
+                            bridge_action = tuple(
+                                float(value)
+                                for value in selected_bridge["action"]
+                            )
+                            _bridge_positions, bridge_margins = (
+                                _execute_actions(
+                                    env,
+                                    actions=(bridge_action,),
+                                    qidx=qidx,
+                                    limits=limits,
+                                    contacts=contacts,
+                                )
+                            )
+                            bridge_execution_shadow_steps += 1
+                            if (
+                                min(bridge_margins)
+                                < float(
+                                    config["episode"][
+                                        "trigger_margin_rad"
+                                    ]
+                                )
+                                or min(bridge_margins) < 0
+                            ):
+                                raise RecedingHorizonPilotError(
+                                    "selected safe bridge replay failed"
+                                )
+                            bridge_row["executed_in_shadow"] = True
+                            bridge_row[
+                                "execution_terminal_margin_rad"
+                            ] = bridge_margins[-1]
+                            branch_state = (
+                                trusted_joint_state_from_libero(
+                                    env,
+                                    state_epoch=(
+                                        branch_state.state_epoch + 1
+                                    ),
+                                    source_id=(
+                                        f"{source_version}:{TARGET_ID}:"
+                                        f"lane{lane_index}:"
+                                        f"cycle{cycle_index}:"
+                                        f"round{recovery_round}:"
+                                        "safe-bridge-executed"
+                                    ),
+                                )
+                            )
+                            continue
                     if (
                         recovery_round
                         >= maximum_recovery_escalations_per_cycle
@@ -689,6 +993,7 @@ def _run_case(
                     "attempt_count": len(attempts),
                     "attempts": attempts,
                     "recovery_escalations": recovery_escalations,
+                    "safe_bridges": safe_bridges,
                     "policy_seed": terminal_attempt["policy_seed"],
                     "clean_frame_sha256": terminal_attempt[
                         "clean_frame_sha256"
@@ -827,6 +1132,9 @@ def _run_case(
             "maximum_recovery_escalations_per_cycle": (
                 maximum_recovery_escalations_per_cycle
             ),
+            "maximum_safe_bridges_per_cycle": (
+                maximum_safe_bridges_per_cycle
+            ),
             "recovery_round_seed_stride": (
                 recovery_round_seed_stride
             ),
@@ -848,6 +1156,15 @@ def _run_case(
             ),
             "escalation_execution_shadow_env_step_count": (
                 escalation_execution_shadow_steps
+            ),
+            "bridge_candidate_shadow_env_step_count": (
+                bridge_candidate_shadow_steps
+            ),
+            "bridge_post_h1_shadow_env_step_count": (
+                bridge_post_h1_shadow_steps
+            ),
+            "bridge_execution_shadow_env_step_count": (
+                bridge_execution_shadow_steps
             ),
             "full_prefix_shadow_env_step_count": (
                 full_prefix_shadow_steps
