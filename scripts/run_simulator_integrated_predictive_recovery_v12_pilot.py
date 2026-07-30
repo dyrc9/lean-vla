@@ -847,6 +847,8 @@ def _run_case(
             "post_recovery_shadow_minimum_margin_rad": None,
             "post_recovery_shadow_issues": None,
             "post_recovery_fresh_authorization_allowed": None,
+            "post_recovery_replan_attempts": [],
+            "post_recovery_selected_attempt_index": None,
             "substituted_post_state_authorization_allowed": None,
             "policy_load_count": 1,
             "policy_inference_count": 1,
@@ -972,57 +974,100 @@ def _run_case(
                 ),
             }
         )
-        post_prefix, _post_frame, _post_chunk = _infer_prefix(
-            config,
-            env=env,
-            runtime=runtime,
-            policy=policy,
-            jax=jax,
-            image_tools=image_tools,
-            runner=runner,
-            args=args,
-            policy_seed=policy_seed + 10_000,
-        )
-        post_screen = _screen_prefix(
-            config,
-            env=env,
-            robot=robot,
-            qidx=qidx,
-            state=post_state,
-            prefix=post_prefix,
-            source_id=(
-                f"v12.6:{pair['base_pair_id']}:{condition}:post-screen"
-            ),
-            contact_audit=contact_audit,
-        )
-        post_route = integrated.route(
-            post_screen["decision"],
-            post_state,
-            submitted_policy_prefix_digest=post_screen[
-                "prefix_digest"
-            ],
-            recovery_selection=None,
-            now_ns=2_000_000 + case_index * 1000,
-        )
-        fresh_allowed = (
-            post_route.policy_authorization_digest is not None
-            and integrated.coordinator.fresh_policy_authorization_allowed(
-                post_route.policy_authorization_digest,
-                current_state=post_state,
+        attempt_limit = int(
+            config["episode"].get(
+                "post_recovery_replan_attempts", 1
             )
         )
-        substituted_allowed = (
-            post_route.policy_authorization_digest is not None
-            and integrated.coordinator.fresh_policy_authorization_allowed(
-                post_route.policy_authorization_digest,
-                current_state=replace(
-                    post_state, source_id="substituted"
+        if attempt_limit < 1:
+            raise SimulatorIntegratedPilotError(
+                "post-recovery replan attempts must be positive"
+            )
+        attempts = []
+        post_shadow_steps = 0
+        fresh_allowed = False
+        substituted_allowed = False
+        post_screen = None
+        for attempt_index in range(attempt_limit):
+            attempt_seed = policy_seed + 10_000 + attempt_index
+            post_prefix, _post_frame, _post_chunk = _infer_prefix(
+                config,
+                env=env,
+                runtime=runtime,
+                policy=policy,
+                jax=jax,
+                image_tools=image_tools,
+                runner=runner,
+                args=args,
+                policy_seed=attempt_seed,
+            )
+            post_screen = _screen_prefix(
+                config,
+                env=env,
+                robot=robot,
+                qidx=qidx,
+                state=post_state,
+                prefix=post_prefix,
+                source_id=(
+                    f"v12.6:{pair['base_pair_id']}:{condition}:"
+                    f"post-screen:{attempt_index}"
+                ),
+                contact_audit=contact_audit,
+            )
+            post_shadow_steps += post_screen["shadow_env_step_count"]
+            post_route = integrated.route(
+                post_screen["decision"],
+                post_state,
+                submitted_policy_prefix_digest=post_screen[
+                    "prefix_digest"
+                ],
+                recovery_selection=None,
+                now_ns=(
+                    2_000_000
+                    + case_index * 1000
+                    + attempt_index
                 ),
             )
-        )
+            fresh_allowed = (
+                post_route.policy_authorization_digest is not None
+                and integrated.coordinator.fresh_policy_authorization_allowed(
+                    post_route.policy_authorization_digest,
+                    current_state=post_state,
+                )
+            )
+            substituted_allowed = (
+                post_route.policy_authorization_digest is not None
+                and integrated.coordinator.fresh_policy_authorization_allowed(
+                    post_route.policy_authorization_digest,
+                    current_state=replace(
+                        post_state, source_id="substituted"
+                    ),
+                )
+            )
+            attempts.append(
+                {
+                    "attempt_index": attempt_index,
+                    "policy_seed": attempt_seed,
+                    "verdict": post_screen["decision"].verdict.value,
+                    "minimum_shadow_margin_rad": (
+                        post_screen["assessment"].minimum_margin
+                    ),
+                    "risk_agreement": post_screen["risk_agreement"],
+                    "fresh_authorization_allowed": fresh_allowed,
+                    "substituted_state_authorization_allowed": (
+                        substituted_allowed
+                    ),
+                }
+            )
+            if fresh_allowed:
+                break
+        if post_screen is None:
+            raise SimulatorIntegratedPilotError(
+                "post-recovery replan loop produced no attempt"
+            )
         row.update(
             {
-                "post_recovery_policy_inference_count": 1,
+                "post_recovery_policy_inference_count": len(attempts),
                 "post_recovery_shadow_verdict": (
                     post_screen["decision"].verdict.value
                 ),
@@ -1038,13 +1083,19 @@ def _run_case(
                 "post_recovery_fresh_authorization_allowed": (
                     fresh_allowed
                 ),
+                "post_recovery_replan_attempts": attempts,
+                "post_recovery_selected_attempt_index": (
+                    attempts[-1]["attempt_index"]
+                    if fresh_allowed
+                    else None
+                ),
                 "substituted_post_state_authorization_allowed": (
                     substituted_allowed
                 ),
-                "policy_inference_count": 2,
+                "policy_inference_count": 1 + len(attempts),
                 "policy_shadow_env_step_count": (
                     row["policy_shadow_env_step_count"]
-                    + post_screen["shadow_env_step_count"]
+                    + post_shadow_steps
                 ),
                 "contact_capacity_observation_count": (
                     contact_audit.observation_count
@@ -1168,7 +1219,7 @@ def _summarize(rows: list[dict[str, Any]]) -> dict[str, Any]:
             for row in synthetic
         ),
         "post_recovery_policy_inference_rate": sum(
-            row["post_recovery_policy_inference_count"] == 1
+            row["post_recovery_policy_inference_count"] >= 1
             for row in synthetic
         )
         / len(synthetic),
