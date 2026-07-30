@@ -438,11 +438,14 @@ def _screen_reset_backup_actions(
     limits: np.ndarray,
     snapshot: Any,
     contacts: base.ContactCapacityAudit,
+    source_id: str,
+    require_safe_successor: bool = False,
 ) -> dict[str, Any]:
     floor = float(config["recovery"]["safe_margin_rad"])
     rows = []
     restore_identity = True
     reset_count = 0
+    shadow_steps = 0
     for action_id, action in _candidate_library(config).items():
         restore_identity = (
             restore_identity
@@ -457,21 +460,73 @@ def _screen_reset_backup_actions(
             limits=limits,
             contacts=contacts,
         )
+        shadow_steps += 1
+        safe = min(margins) >= floor and min(margins) >= 0
+        successor = None
+        if safe and require_safe_successor:
+            endpoint_snapshot = (
+                base.capture_warmstart_policy_shadow_snapshot(
+                    env,
+                    robot,
+                    source_id=f"{source_id}:{action_id}:endpoint",
+                )
+            )
+            successor = _screen_reset_backup_actions(
+                config,
+                env=env,
+                robot=robot,
+                qidx=qidx,
+                limits=limits,
+                snapshot=endpoint_snapshot,
+                contacts=contacts,
+                source_id=f"{source_id}:{action_id}:successor",
+                require_safe_successor=False,
+            )
+            shadow_steps += successor["shadow_env_step_count"]
+            reset_count += successor["controller_goal_reset_count"]
+            restore_identity = (
+                restore_identity and successor["restore_identity"]
+            )
         rows.append(
             {
                 "action_id": action_id,
                 "action": action,
                 "minimum_margin_rad": min(margins),
                 "terminal_margin_rad": margins[-1],
-                "safe": min(margins) >= floor and min(margins) >= 0,
+                "safe": safe,
+                "safe_successor_required": require_safe_successor,
+                "safe_successor_candidate_count": (
+                    sum(
+                        item["safe"]
+                        for item in successor[
+                            "candidate_evaluations"
+                        ]
+                    )
+                    if successor is not None
+                    else None
+                ),
+                "selected_successor_action_id": (
+                    successor["selected"]["action_id"]
+                    if successor is not None
+                    and successor["selected"] is not None
+                    else None
+                ),
+                "viable": (
+                    safe
+                    and (
+                        not require_safe_successor
+                        or successor is not None
+                        and successor["selected"] is not None
+                    )
+                ),
             }
         )
     restore_identity = (
         restore_identity
         and _restore_identity(env, robot, snapshot)
     )
-    safe = [row for row in rows if row["safe"]]
-    safe.sort(
+    viable = [row for row in rows if row["viable"]]
+    viable.sort(
         key=lambda row: (
             -row["terminal_margin_rad"],
             -row["minimum_margin_rad"],
@@ -480,9 +535,9 @@ def _screen_reset_backup_actions(
     )
     return {
         "candidate_evaluations": rows,
-        "selected": safe[0] if safe else None,
+        "selected": viable[0] if viable else None,
         "restore_identity": restore_identity,
-        "shadow_env_step_count": len(rows),
+        "shadow_env_step_count": shadow_steps,
         "controller_goal_reset_count": reset_count,
     }
 
@@ -511,6 +566,7 @@ def _run_case(
     controller_goal_reset_before_bridge: bool = False,
     controller_reset_exact_h1_fallback: bool = False,
     reset_exact_h1_require_backup_viability: bool = False,
+    reset_backup_require_safe_successor: bool = False,
     maximum_reset_reserve_bridges_per_cycle: int = 0,
     lane_base_seeds: tuple[int, ...] = LANE_BASE_SEEDS,
     row_schema: str = ROW_SCHEMA,
@@ -903,6 +959,16 @@ def _run_case(
                                     limits=limits,
                                     snapshot=endpoint_snapshot,
                                     contacts=contacts,
+                                    source_id=(
+                                        f"{source_version}:{TARGET_ID}:"
+                                        f"lane{lane_index}:"
+                                        f"cycle{cycle_index}:"
+                                        f"round{recovery_round}:"
+                                        "exact-h1-backup"
+                                    ),
+                                    require_safe_successor=(
+                                        reset_backup_require_safe_successor
+                                    ),
                                 )
                             )
                             reset_backup_candidate_shadow_steps += (
@@ -961,6 +1027,16 @@ def _run_case(
                                 if backup_viability is not None
                                 else None
                             ),
+                            "backup_viability_viable_candidate_count": (
+                                sum(
+                                    item["viable"]
+                                    for item in backup_viability[
+                                        "candidate_evaluations"
+                                    ]
+                                )
+                                if backup_viability is not None
+                                else None
+                            ),
                             "backup_viability_selected_action_id": (
                                 backup_viability["selected"][
                                     "action_id"
@@ -1007,6 +1083,16 @@ def _run_case(
                                         "snapshot"
                                     ],
                                     contacts=contacts,
+                                    source_id=(
+                                        f"{source_version}:{TARGET_ID}:"
+                                        f"lane{lane_index}:"
+                                        f"cycle{cycle_index}:"
+                                        f"round{recovery_round}:"
+                                        "reset-reserve"
+                                    ),
+                                    require_safe_successor=(
+                                        reset_backup_require_safe_successor
+                                    ),
                                 )
                             )
                             reset_backup_candidate_shadow_steps += (
@@ -1781,6 +1867,9 @@ def _run_case(
             ),
             "reset_exact_h1_require_backup_viability": (
                 reset_exact_h1_require_backup_viability
+            ),
+            "reset_backup_require_safe_successor": (
+                reset_backup_require_safe_successor
             ),
             "maximum_reset_reserve_bridges_per_cycle": (
                 maximum_reset_reserve_bridges_per_cycle
