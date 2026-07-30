@@ -71,7 +71,14 @@ OUTPUT_ROOT = (
     REPO_ROOT
     / "results"
     / "proofalign_simulator_integrated_predictive_recovery_v12_"
+    "engineering_pilot_20260730_fresh2"
+)
+SUPERSEDED_PILOT_SUMMARY_PATH = (
+    REPO_ROOT
+    / "results"
+    / "proofalign_simulator_integrated_predictive_recovery_v12_"
     "engineering_pilot_20260730"
+    / "summary.json"
 )
 INTEGRATED_TERMINAL_PATH = (
     REPO_ROOT
@@ -87,11 +94,11 @@ RECOVERY_PROTOCOL_PATH = (
 )
 ROW_SCHEMA = (
     "proofalign.simulator-integrated-predictive-recovery-v12-"
-    "pilot-row.v1"
+    "pilot-row.v2"
 )
 SUMMARY_SCHEMA = (
     "proofalign.simulator-integrated-predictive-recovery-v12-"
-    "pilot-summary.v1"
+    "pilot-summary.v2"
 )
 
 
@@ -99,13 +106,42 @@ class SimulatorIntegratedPilotError(RuntimeError):
     """Raised when the v12.6 engineering pilot must fail closed."""
 
 
+class ContactCapacityAudit:
+    """Track whether observed MuJoCo contacts reach the compiled capacity."""
+
+    def __init__(self) -> None:
+        self.observation_count = 0
+        self.maximum_ncon = 0
+        self.minimum_nconmax: int | None = None
+        self.saturation_count = 0
+
+    def observe(self, env: Any) -> None:
+        ncon = int(env.sim.data.ncon)
+        nconmax = int(env.sim.model.nconmax)
+        self.observation_count += 1
+        self.maximum_ncon = max(self.maximum_ncon, ncon)
+        self.minimum_nconmax = (
+            nconmax
+            if self.minimum_nconmax is None
+            else min(self.minimum_nconmax, nconmax)
+        )
+        if ncon >= nconmax:
+            self.saturation_count += 1
+
+
 class SimulatorRecoverySink:
     """Apply only a typed recovery action and discard transition outcomes."""
 
     sink_id = "libero-v12.6-no-outcome-integrated-recovery-sink"
 
-    def __init__(self, env: Any) -> None:
+    def __init__(
+        self,
+        env: Any,
+        *,
+        contact_audit: ContactCapacityAudit | None = None,
+    ) -> None:
         self.env = env
+        self.contact_audit = contact_audit
         self.apply_count = 0
 
     def apply_recovery(
@@ -113,6 +149,8 @@ class SimulatorRecoverySink:
     ) -> AppliedRecoveryAction:
         # The transition tuple is deliberately discarded in full.
         self.env.step(np.asarray(action, dtype=np.float64))
+        if self.contact_audit is not None:
+            self.contact_audit.observe(self.env)
         self.apply_count += 1
         return AppliedRecoveryAction(
             action=action,
@@ -178,12 +216,36 @@ def pilot_config() -> dict[str, Any]:
         pair["synthetic_joint_side"] = side
     policy_source = _load(POLICY_SOURCE_PATH)
     recovery = _load(RECOVERY_PROTOCOL_PATH)
+    superseded = _load(SUPERSEDED_PILOT_SUMMARY_PATH)
+    if (
+        superseded.get("classification")
+        != (
+            "simulator_integrated_predictive_recovery_v12_"
+            "engineering_pilot_complete"
+        )
+        or superseded.get("valid_case_count") != 6
+    ):
+        raise SimulatorIntegratedPilotError(
+            "superseded engineering pilot is incomplete"
+        )
     return {
         "schema": (
             "proofalign.simulator-integrated-predictive-recovery-"
-            "v12-pilot-config.v1"
+            "v12-pilot-config.v2"
         ),
-        "protocol_id": "engineering-pilot",
+        "protocol_id": "engineering-pilot-fresh2",
+        "supersedes": {
+            "path": str(
+                SUPERSEDED_PILOT_SUMMARY_PATH.relative_to(REPO_ROOT)
+            ),
+            "sha256": _sha256(SUPERSEDED_PILOT_SUMMARY_PATH),
+            "reason": (
+                "The first pilot used ControlEnv.set_init_state(), whose "
+                "wrapper calls check_success() even though the return value "
+                "is discarded. Fresh2 directly restores simulator state and "
+                "does not invoke that wrapper outcome query."
+            ),
+        },
         "predecessor": {
             "path": str(
                 INTEGRATED_TERMINAL_PATH.relative_to(REPO_ROOT)
@@ -199,6 +261,8 @@ def pilot_config() -> dict[str, Any]:
             "selection": (
                 "Pair-source position 11 per suite; disjoint from v12.2 "
                 "positions 0:5, fresh formal 5:10, and fresh pilot 10."
+                " Reused only to audit the corrected initialization "
+                "boundary; the successor formal population is disjoint."
             ),
         },
         "policy": {
@@ -241,6 +305,7 @@ def pilot_config() -> dict[str, Any]:
             "post_recovery_fresh_inference_authorized": True,
             "policy_action_dispatch_authorized": False,
             "task_outcome_read_authorized": False,
+            "set_init_state_wrapper_authorized": False,
             "clean_rollout_authorized": False,
             "attacked_rollout_authorized": False,
         },
@@ -249,8 +314,9 @@ def pilot_config() -> dict[str, Any]:
             "inference, controller-aware read-only shadow, typed recovery "
             "simulator steps, ordered receipts, and post-recovery fresh "
             "inference on independently reset nominal/synthetic cases. It "
-            "does not dispatch a policy action or inspect reward, success, "
-            "done, cost, collision, or any task outcome. It is not formal "
+            "does not dispatch a policy action, call the LIBERO "
+            "set_init_state wrapper, or inspect reward, success, done, cost, "
+            "collision, or any task outcome. It is not formal "
             "qualification, clean utility, efficacy, deployment, or "
             "physical-safety evidence."
         ),
@@ -264,6 +330,20 @@ def _policy_protocol(config: dict[str, Any]) -> dict[str, Any]:
             "sample_steps": config["episode"]["sample_steps"],
         },
     }
+
+
+def _set_init_state_without_outcome(env: Any, state: Any) -> None:
+    """Restore a LIBERO state without ControlEnv.set_init_state().
+
+    LIBERO-Safety's wrapper calls ``check_success()`` inside
+    ``set_init_state``. The no-outcome experiment must not invoke that path.
+    """
+
+    env.set_state(state)
+    env.sim.data.time = 0
+    env.sim.forward()
+    env._post_process()
+    env._update_observables(force=True)
 
 
 def _infer_prefix(
@@ -303,6 +383,42 @@ def _infer_prefix(
     )
 
 
+def _replay_prefix(
+    env: Any,
+    robot: Any,
+    qidx: np.ndarray,
+    snapshot: Any,
+    prefix: np.ndarray,
+    contact_audit: ContactCapacityAudit,
+) -> tuple[list[list[float]], list[dict[str, Any]]]:
+    restores = [
+        fresh._snapshot_payload(
+            restore_warmstart_policy_shadow_snapshot(
+                env, robot, snapshot
+            )
+        )
+    ]
+    positions = []
+    for action in prefix:
+        # The transition tuple is deliberately discarded in full.
+        env.step(np.asarray(action, dtype=np.float64))
+        contact_audit.observe(env)
+        positions.append(
+            [
+                float(value)
+                for value in env.sim.data.qpos[qidx]
+            ]
+        )
+    restores.append(
+        fresh._snapshot_payload(
+            restore_warmstart_policy_shadow_snapshot(
+                env, robot, snapshot
+            )
+        )
+    )
+    return positions, restores
+
+
 def _screen_prefix(
     config: dict[str, Any],
     *,
@@ -312,12 +428,13 @@ def _screen_prefix(
     state: Any,
     prefix: np.ndarray,
     source_id: str,
+    contact_audit: ContactCapacityAudit,
 ) -> dict[str, Any]:
     snapshot = capture_warmstart_policy_shadow_snapshot(
         env, robot, source_id=source_id
     )
-    first, first_restores = fresh._replay_prefix(
-        env, robot, qidx, snapshot, prefix
+    first, first_restores = _replay_prefix(
+        env, robot, qidx, snapshot, prefix, contact_audit
     )
     command = tuple(float(value) for value in prefix.reshape(-1))
     prefix_digest = command_digest(command)
@@ -334,8 +451,8 @@ def _screen_prefix(
             config["episode"]["trigger_margin_rad"]
         ),
     )
-    second, second_restores = fresh._replay_prefix(
-        env, robot, qidx, snapshot, prefix
+    second, second_restores = _replay_prefix(
+        env, robot, qidx, snapshot, prefix, contact_audit
     )
     second_trajectory = ShadowJointTrajectory(
         initial_state_digest=state.state_digest,
@@ -399,6 +516,7 @@ def _select_recovery(
     state: Any,
     snapshot: Any,
     source_id: str,
+    contact_audit: ContactCapacityAudit,
 ):
     recovery = config["recovery"]
     horizon = int(recovery["shadow_horizon_steps"])
@@ -421,6 +539,7 @@ def _select_recovery(
         margins = []
         for _ in range(horizon):
             env.step(action)
+            contact_audit.observe(env)
             shadow_steps += 1
             qpos = np.asarray(
                 env.sim.data.qpos[qidx], dtype=np.float64
@@ -477,10 +596,16 @@ def _select_recovery(
     return selection, recovery_config, shadow_steps, restore_identity
 
 
-def _stabilize(config: dict[str, Any], env: Any, runner: Any) -> None:
+def _stabilize(
+    config: dict[str, Any],
+    env: Any,
+    runner: Any,
+    contact_audit: ContactCapacityAudit,
+) -> None:
     for _ in range(int(config["episode"]["stabilization_steps"])):
         # The transition tuple is discarded without reading outcome fields.
         env.step(runner.LIBERO_DUMMY_ACTION)
+        contact_audit.observe(env)
 
 
 def _run_case(
@@ -504,9 +629,12 @@ def _run_case(
     )
     env = runner.create_env(runtime, args)
     try:
+        contact_audit = ContactCapacityAudit()
         env.reset()
-        env.set_init_state(runtime.init_state)
-        _stabilize(config, env, runner)
+        contact_audit.observe(env)
+        _set_init_state_without_outcome(env, runtime.init_state)
+        contact_audit.observe(env)
+        _stabilize(config, env, runner, contact_audit)
         robot, qidx, vidx, limits = _robot_arrays(env)
         _reset_controller(robot)
         if condition == "synthetic_joint_pressure":
@@ -522,6 +650,7 @@ def _run_case(
             )
             env.sim.data.qvel[vidx] = 0.0
             env.sim.forward()
+            contact_audit.observe(env)
             _reset_controller(robot)
         elif condition != "nominal":
             raise SimulatorIntegratedPilotError(
@@ -560,8 +689,11 @@ def _run_case(
             source_id=(
                 f"v12.6:{pair['base_pair_id']}:{condition}:screen"
             ),
+            contact_audit=contact_audit,
         )
-        sink = SimulatorRecoverySink(env)
+        sink = SimulatorRecoverySink(
+            env, contact_audit=contact_audit
+        )
         integrated = PredictiveRecoveryRuntime(
             sink,
             safe_margin_rad=float(
@@ -588,6 +720,7 @@ def _run_case(
                 source_id=(
                     f"v12.6:{pair['base_pair_id']}:{condition}:recovery"
                 ),
+                contact_audit=contact_audit,
             )
         route = integrated.route(
             screen["decision"],
@@ -683,6 +816,15 @@ def _run_case(
             ),
             "live_policy_dispatch_count": 0,
             "outcome_read_count": 0,
+            "set_init_state_wrapper_call_count": 0,
+            "contact_capacity_observation_count": (
+                contact_audit.observation_count
+            ),
+            "maximum_observed_contact_count": contact_audit.maximum_ncon,
+            "minimum_contact_capacity": contact_audit.minimum_nconmax,
+            "contact_capacity_saturation_count": (
+                contact_audit.saturation_count
+            ),
             "runtime_exception_count": 0,
         }
         if condition == "nominal":
@@ -762,6 +904,18 @@ def _run_case(
                     min(replay_margins) < 0
                 ),
                 "typed_recovery_env_step_count": sink.apply_count,
+                "contact_capacity_observation_count": (
+                    contact_audit.observation_count
+                ),
+                "maximum_observed_contact_count": (
+                    contact_audit.maximum_ncon
+                ),
+                "minimum_contact_capacity": (
+                    contact_audit.minimum_nconmax
+                ),
+                "contact_capacity_saturation_count": (
+                    contact_audit.saturation_count
+                ),
             }
         )
         post_prefix, _post_frame, _post_chunk = _infer_prefix(
@@ -785,6 +939,7 @@ def _run_case(
             source_id=(
                 f"v12.6:{pair['base_pair_id']}:{condition}:post-screen"
             ),
+            contact_audit=contact_audit,
         )
         post_route = integrated.route(
             post_screen["decision"],
@@ -830,6 +985,18 @@ def _run_case(
                 "policy_shadow_env_step_count": (
                     row["policy_shadow_env_step_count"]
                     + post_screen["shadow_env_step_count"]
+                ),
+                "contact_capacity_observation_count": (
+                    contact_audit.observation_count
+                ),
+                "maximum_observed_contact_count": (
+                    contact_audit.maximum_ncon
+                ),
+                "minimum_contact_capacity": (
+                    contact_audit.minimum_nconmax
+                ),
+                "contact_capacity_saturation_count": (
+                    contact_audit.saturation_count
                 ),
             }
         )
@@ -957,13 +1124,23 @@ def _summarize(rows: list[dict[str, Any]]) -> dict[str, Any]:
         ),
         "live_policy_dispatch_count": 0,
         "outcome_read_count": 0,
+        "set_init_state_wrapper_call_count": 0,
+        "maximum_observed_contact_count": max(
+            row["maximum_observed_contact_count"] for row in rows
+        ),
+        "minimum_contact_capacity": min(
+            row["minimum_contact_capacity"] for row in rows
+        ),
+        "contact_capacity_saturation_count": sum(
+            row["contact_capacity_saturation_count"] for row in rows
+        ),
         "runtime_exception_count": 0,
     }
     return {
         "schema": SUMMARY_SCHEMA,
         "classification": (
             "simulator_integrated_predictive_recovery_v12_"
-            "engineering_pilot_complete"
+            "engineering_pilot_fresh2_complete"
         ),
         "qualification_pass": None,
         "valid_case_count": metrics["valid_case_count"],
