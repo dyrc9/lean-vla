@@ -386,6 +386,10 @@ saturation 或 outcome read。第4 cycle 的关键事实是 qvel 已约 `+5.47 r
 定义允许正速度，超过 envelope 时把 joint-1 torque 置为 actuator minimum；只搜索冻结 slope，
 按最小干预且 one-step safe 选择，并继续执行完全相同的 policy action bytes。
 
+v12.25 已冻结 `0/0.5/1/2/4/8/16 s⁻¹` 七档 slope，并把 terminal envelope satisfaction 纳入
+授权门；最大可行 slope 代表最小干预。候选与执行均记录25个 controller substeps、终点 qvel
+及预测/执行误差，15个相关定向测试通过，双 lane 结果待跑。
+
 冻结产物：
 
 - protocol：`experiments/proofalign_simulator_integrated_predictive_recovery_v12_qualification_protocol.json`

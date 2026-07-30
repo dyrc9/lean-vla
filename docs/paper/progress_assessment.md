@@ -187,6 +187,9 @@ action、裁剪 actuator limits、保持配置前 qpos/qvel identity，并继续
 因此论文方法若要恢复活性，必须表述为提前保持可制动性的 joint-limit velocity envelope，而不是
 事后阻尼。后继仍保持 exact source action bytes，但在进入不可制动状态前约束 joint-1 正速度。
 
+v12.25 已将这一判断编码为双重 gate：单步位置 floor 与终点 velocity envelope 必须同时成立，
+并在七档冻结 slope 中选择最大可行值。相关15个定向测试通过；正式双 lane 结果尚未生成。
+
 
 论文主故事仍是两层对齐，而不是 SemanticSubtask 本身。当前最重要的科学风险集中在 L1：
 

@@ -211,6 +211,10 @@ envelope，joint 1 使用最大可用负 torque，其余 joints 与 source-polic
 候选只改变冻结的 envelope slope，仍按最小干预、one-step floor、fresh H3 与完整 scope audit
 选择，目标是避免上一动作把不可制动的高速状态带入下一 cycle。
 
+v12.25 runner 已实现，slope 冻结为 `0/0.5/1/2/4/8/16 s⁻¹`；eligible gate 同时要求单步
+全局 margin ≥0.15 与终点 envelope 成立，再选择最大的可行 slope（最小干预）。15个
+receding/H2/H3 定向测试通过，待 clean-tree preflight 后执行双 lane。
+
 ## 前一 checkpoint：2026-07-30 v12.5 integrated predictive recovery
 
 fresh policy-prefix shadow 与 typed recovery runtime 的 fixed-trace composition 已完成并终态冻结：

@@ -748,6 +748,179 @@ def _scoped_joint_velocity_damping(
         del controller.run_controller
 
 
+def _configure_joint_limit_velocity_envelope(
+    *,
+    env: Any,
+    robot: Any,
+    qidx: np.ndarray,
+    vidx: np.ndarray,
+    limits: np.ndarray,
+    joint_index: int,
+    joint_side: str,
+    margin_floor: float,
+    slope: float,
+) -> dict[str, Any]:
+    if (
+        joint_index < 0
+        or joint_index >= len(qidx)
+        or len(qidx) != len(vidx)
+        or limits.shape != (len(qidx), 2)
+        or joint_side not in {"lower", "upper"}
+        or not np.isfinite(margin_floor)
+        or margin_floor < 0
+        or not np.isfinite(slope)
+        or slope < 0
+    ):
+        raise RecedingHorizonPilotError(
+            "invalid joint-limit velocity-envelope configuration"
+        )
+    before_qpos = np.asarray(
+        env.sim.data.qpos[qidx], dtype=np.float64
+    ).copy()
+    before_qvel = np.asarray(
+        env.sim.data.qvel[vidx], dtype=np.float64
+    ).copy()
+    controller = robot.controller
+    controller.update(force=True)
+    controller.reset_goal()
+    after_qpos = np.asarray(
+        env.sim.data.qpos[qidx], dtype=np.float64
+    )
+    after_qvel = np.asarray(
+        env.sim.data.qvel[vidx], dtype=np.float64
+    )
+    limit = float(
+        limits[
+            joint_index,
+            1 if joint_side == "upper" else 0,
+        ]
+    )
+    return {
+        "target_joint_index": joint_index,
+        "target_joint_side": joint_side,
+        "target_joint_limit_rad": limit,
+        "minimum_margin_floor_rad": float(margin_floor),
+        "slope_per_s": float(slope),
+        "controller_goal_reset": True,
+        "configuration_qpos_identity": bool(
+            np.array_equal(before_qpos, after_qpos)
+        ),
+        "configuration_qvel_identity": bool(
+            np.array_equal(before_qvel, after_qvel)
+        ),
+    }
+
+
+@contextmanager
+def _scoped_joint_limit_velocity_envelope(
+    robot: Any,
+    *,
+    joint_index: int,
+    joint_side: str,
+    joint_limit: float,
+    margin_floor: float,
+    slope: float,
+) -> Any:
+    controller = robot.controller
+    actuator_min = np.asarray(
+        controller.actuator_min, dtype=np.float64
+    )
+    actuator_max = np.asarray(
+        controller.actuator_max, dtype=np.float64
+    )
+    if (
+        joint_index < 0
+        or joint_index >= len(actuator_min)
+        or actuator_min.shape != actuator_max.shape
+        or joint_side not in {"lower", "upper"}
+        or not np.isfinite(joint_limit)
+        or not np.isfinite(margin_floor)
+        or margin_floor < 0
+        or not np.isfinite(slope)
+        or slope < 0
+    ):
+        raise RecedingHorizonPilotError(
+            "invalid scoped joint-limit velocity envelope"
+        )
+    if "run_controller" in controller.__dict__:
+        raise RecedingHorizonPilotError(
+            "controller already has a run_controller override"
+        )
+    original_run_controller = controller.run_controller
+    torque_audit: list[dict[str, Any]] = []
+
+    def enveloped_run_controller(
+        controller_self: Any,
+    ) -> np.ndarray:
+        nominal = np.asarray(
+            original_run_controller(), dtype=np.float64
+        ).copy()
+        joint_position = float(
+            np.asarray(
+                controller_self.joint_pos, dtype=np.float64
+            )[joint_index]
+        )
+        joint_velocity = float(
+            np.asarray(
+                controller_self.joint_vel, dtype=np.float64
+            )[joint_index]
+        )
+        if joint_side == "upper":
+            margin = float(joint_limit) - joint_position
+            toward_limit_velocity = joint_velocity
+            brake_torque = float(actuator_min[joint_index])
+        else:
+            margin = joint_position - float(joint_limit)
+            toward_limit_velocity = -joint_velocity
+            brake_torque = float(actuator_max[joint_index])
+        allowed_toward_limit_velocity = float(slope) * max(
+            margin - float(margin_floor), 0.0
+        )
+        activated = (
+            toward_limit_velocity > allowed_toward_limit_velocity
+        )
+        unclipped = nominal.copy()
+        if activated:
+            unclipped[joint_index] = brake_torque
+        applied = np.asarray(
+            controller_self.clip_torques(unclipped),
+            dtype=np.float64,
+        ).copy()
+        controller_self.torques = applied
+        torque_audit.append(
+            {
+                "controller_substep_index": len(torque_audit),
+                "joint_position_rad": joint_position,
+                "joint_velocity_rad_s": joint_velocity,
+                "joint_margin_rad": margin,
+                "toward_limit_velocity_rad_s": (
+                    toward_limit_velocity
+                ),
+                "allowed_toward_limit_velocity_rad_s": (
+                    allowed_toward_limit_velocity
+                ),
+                "envelope_activated": activated,
+                "nominal_torque": float(nominal[joint_index]),
+                "unclipped_torque": float(unclipped[joint_index]),
+                "applied_torque": float(applied[joint_index]),
+                "actuator_min": float(actuator_min[joint_index]),
+                "actuator_max": float(actuator_max[joint_index]),
+                "target_joint_torque_clipped": bool(
+                    unclipped[joint_index] != applied[joint_index]
+                ),
+            }
+        )
+        return applied
+
+    controller.run_controller = MethodType(
+        enveloped_run_controller, controller
+    )
+    try:
+        yield torque_audit
+    finally:
+        del controller.run_controller
+
+
 def _run_case(
     config: dict[str, Any],
     pair: dict[str, Any],
@@ -783,6 +956,11 @@ def _run_case(
         float, ...
     ] = (),
     controller_joint_damping_target_joint_index: int = 1,
+    controller_joint_velocity_envelope_exact_h1_slopes: tuple[
+        float, ...
+    ] = (),
+    controller_joint_velocity_envelope_target_joint_index: int = 1,
+    controller_joint_velocity_envelope_target_joint_side: str = "upper",
     lane_base_seeds: tuple[int, ...] = LANE_BASE_SEEDS,
     row_schema: str = ROW_SCHEMA,
     source_version: str = "v12.11",
@@ -814,6 +992,26 @@ def _run_case(
         )
         or controller_joint_damping_target_joint_index < 0
         or controller_joint_damping_target_joint_index >= 7
+        or any(
+            not np.isfinite(slope) or slope < 0
+            for slope in (
+                controller_joint_velocity_envelope_exact_h1_slopes
+            )
+        )
+        or tuple(
+            controller_joint_velocity_envelope_exact_h1_slopes
+        )
+        != tuple(
+            sorted(
+                set(
+                    controller_joint_velocity_envelope_exact_h1_slopes
+                )
+            )
+        )
+        or controller_joint_velocity_envelope_target_joint_index < 0
+        or controller_joint_velocity_envelope_target_joint_index >= 7
+        or controller_joint_velocity_envelope_target_joint_side
+        not in {"lower", "upper"}
         or controller_nullspace_target_joint_side
         not in {"lower", "upper"}
     ):
@@ -927,6 +1125,8 @@ def _run_case(
         nullspace_controller_configuration_count = 0
         joint_damping_exact_h1_shadow_steps = 0
         joint_damping_controller_configuration_count = 0
+        joint_velocity_envelope_exact_h1_shadow_steps = 0
+        joint_velocity_envelope_controller_configuration_count = 0
         policy_advance_steps = 0
         for lane_index, base_seed in enumerate(lane_base_seeds):
             restore_identity = (
@@ -985,10 +1185,12 @@ def _run_case(
                 reset_reserve_bridges = []
                 nullspace_exact_h1_fallbacks = []
                 joint_damping_exact_h1_fallbacks = []
+                joint_velocity_envelope_exact_h1_fallbacks = []
                 selected_prefix = None
                 selected_advance_controller_goal_reset = False
                 selected_advance_nullspace_offset = None
                 selected_advance_joint_damping_gain = None
+                selected_advance_joint_velocity_envelope_slope = None
                 selected_advance_minimum_margin_floor = float(
                     config["episode"]["trigger_margin_rad"]
                 )
@@ -1436,6 +1638,240 @@ def _run_case(
                             selected_prefix = prefix
                             selected_advance_joint_damping_gain = (
                                 selected_damping["gain"]
+                            )
+                            selected_advance_minimum_margin_floor = (
+                                fallback_floor
+                            )
+                            break
+                    if (
+                        controller_joint_velocity_envelope_exact_h1_slopes
+                    ):
+                        if one_step_screen is None:
+                            raise RecedingHorizonPilotError(
+                                "missing failed gate for velocity envelope"
+                            )
+                        exact_action = tuple(
+                            float(value) for value in prefix[0]
+                        )
+                        candidate_rows = []
+                        fallback_floor = float(
+                            config["recovery"]["safe_margin_rad"]
+                        )
+                        target_joint = (
+                            controller_joint_velocity_envelope_target_joint_index
+                        )
+                        target_side = (
+                            controller_joint_velocity_envelope_target_joint_side
+                        )
+                        target_limit = float(
+                            limits[
+                                target_joint,
+                                1 if target_side == "upper" else 0,
+                            ]
+                        )
+                        for slope in (
+                            controller_joint_velocity_envelope_exact_h1_slopes
+                        ):
+                            restore_identity = (
+                                restore_identity
+                                and _restore_identity(
+                                    env,
+                                    robot,
+                                    one_step_screen["snapshot"],
+                                )
+                            )
+                            configuration = (
+                                _configure_joint_limit_velocity_envelope(
+                                    env=env,
+                                    robot=robot,
+                                    qidx=qidx,
+                                    vidx=vidx,
+                                    limits=limits,
+                                    joint_index=target_joint,
+                                    joint_side=target_side,
+                                    margin_floor=fallback_floor,
+                                    slope=float(slope),
+                                )
+                            )
+                            joint_velocity_envelope_controller_configuration_count += (
+                                1
+                            )
+                            if (
+                                not configuration[
+                                    "configuration_qpos_identity"
+                                ]
+                                or not configuration[
+                                    "configuration_qvel_identity"
+                                ]
+                            ):
+                                raise RecedingHorizonPilotError(
+                                    "velocity-envelope config changed qpos/qvel"
+                                )
+                            with _scoped_joint_limit_velocity_envelope(
+                                robot,
+                                joint_index=target_joint,
+                                joint_side=target_side,
+                                joint_limit=target_limit,
+                                margin_floor=fallback_floor,
+                                slope=float(slope),
+                            ) as torque_audit:
+                                (
+                                    _enveloped_positions,
+                                    enveloped_margins,
+                                ) = _execute_actions(
+                                    env,
+                                    actions=(exact_action,),
+                                    qidx=qidx,
+                                    limits=limits,
+                                    contacts=contacts,
+                                )
+                            joint_velocity_envelope_exact_h1_shadow_steps += (
+                                1
+                            )
+                            terminal_joint_position = float(
+                                env.sim.data.qpos[qidx[target_joint]]
+                            )
+                            terminal_joint_velocity = float(
+                                env.sim.data.qvel[vidx[target_joint]]
+                            )
+                            if target_side == "upper":
+                                terminal_target_margin = (
+                                    target_limit
+                                    - terminal_joint_position
+                                )
+                                terminal_toward_velocity = (
+                                    terminal_joint_velocity
+                                )
+                            else:
+                                terminal_target_margin = (
+                                    terminal_joint_position
+                                    - target_limit
+                                )
+                                terminal_toward_velocity = (
+                                    -terminal_joint_velocity
+                                )
+                            terminal_allowed_velocity = float(
+                                slope
+                            ) * max(
+                                terminal_target_margin
+                                - fallback_floor,
+                                0.0,
+                            )
+                            terminal_envelope_satisfied = (
+                                terminal_toward_velocity
+                                <= terminal_allowed_velocity + 1e-9
+                            )
+                            candidate_rows.append(
+                                {
+                                    "slope_per_s": float(slope),
+                                    "configuration": configuration,
+                                    "controller_substep_torque_audit": (
+                                        torque_audit
+                                    ),
+                                    "controller_scope_restored": (
+                                        "run_controller"
+                                        not in robot.controller.__dict__
+                                    ),
+                                    "predicted_minimum_margin_rad": min(
+                                        enveloped_margins
+                                    ),
+                                    "predicted_terminal_margin_rad": (
+                                        enveloped_margins[-1]
+                                    ),
+                                    "predicted_terminal_target_joint_margin_rad": (
+                                        terminal_target_margin
+                                    ),
+                                    "predicted_terminal_target_joint_velocity_rad_s": (
+                                        terminal_joint_velocity
+                                    ),
+                                    "predicted_terminal_toward_limit_velocity_rad_s": (
+                                        terminal_toward_velocity
+                                    ),
+                                    "predicted_terminal_allowed_toward_limit_velocity_rad_s": (
+                                        terminal_allowed_velocity
+                                    ),
+                                    "terminal_envelope_satisfied": (
+                                        terminal_envelope_satisfied
+                                    ),
+                                    "safe": (
+                                        min(enveloped_margins)
+                                        >= fallback_floor
+                                        and min(enveloped_margins) >= 0
+                                        and terminal_envelope_satisfied
+                                    ),
+                                    "selected": False,
+                                }
+                            )
+                        restore_identity = (
+                            restore_identity
+                            and _restore_identity(
+                                env,
+                                robot,
+                                one_step_screen["snapshot"],
+                            )
+                        )
+                        safe_candidates = [
+                            candidate
+                            for candidate in candidate_rows
+                            if candidate["safe"]
+                        ]
+                        safe_candidates.sort(
+                            key=lambda candidate: (
+                                -candidate["slope_per_s"],
+                                -candidate[
+                                    "predicted_terminal_margin_rad"
+                                ],
+                            )
+                        )
+                        selected_envelope = (
+                            safe_candidates[0]
+                            if safe_candidates
+                            else None
+                        )
+                        if selected_envelope is not None:
+                            selected_envelope["selected"] = True
+                        envelope_row = {
+                            "recovery_round": recovery_round,
+                            "policy_seed": attempts[-1][
+                                "policy_seed"
+                            ],
+                            "policy_chunk_sha256": attempts[-1][
+                                "policy_chunk_sha256"
+                            ],
+                            "exact_first_action": exact_action,
+                            "target_joint_index": target_joint,
+                            "target_joint_side": target_side,
+                            "minimum_margin_floor_rad": fallback_floor,
+                            "candidate_evaluations": candidate_rows,
+                            "selected_slope_per_s": (
+                                selected_envelope["slope_per_s"]
+                                if selected_envelope is not None
+                                else None
+                            ),
+                            "authorized": (
+                                selected_envelope is not None
+                            ),
+                            "executed_in_shadow": False,
+                            "exact_action_identity": None,
+                            "execution_configuration": None,
+                            "execution_controller_substep_torque_audit": [],
+                            "execution_controller_scope_restored": None,
+                            "execution_terminal_margin_rad": None,
+                            "execution_terminal_target_joint_margin_rad": None,
+                            "execution_terminal_target_joint_velocity_rad_s": None,
+                            "execution_terminal_toward_limit_velocity_rad_s": None,
+                            "execution_terminal_allowed_toward_limit_velocity_rad_s": None,
+                            "execution_terminal_envelope_satisfied": None,
+                            "prediction_execution_margin_error_rad": None,
+                            "prediction_execution_target_joint_velocity_error_rad_s": None,
+                        }
+                        joint_velocity_envelope_exact_h1_fallbacks.append(
+                            envelope_row
+                        )
+                        if selected_envelope is not None:
+                            selected_prefix = prefix
+                            selected_advance_joint_velocity_envelope_slope = (
+                                selected_envelope["slope_per_s"]
                             )
                             selected_advance_minimum_margin_floor = (
                                 fallback_floor
@@ -2233,6 +2669,9 @@ def _run_case(
                     "joint_damping_exact_h1_fallbacks": (
                         joint_damping_exact_h1_fallbacks
                     ),
+                    "joint_velocity_envelope_exact_h1_fallbacks": (
+                        joint_velocity_envelope_exact_h1_fallbacks
+                    ),
                     "policy_seed": terminal_attempt["policy_seed"],
                     "clean_frame_sha256": terminal_attempt[
                         "clean_frame_sha256"
@@ -2272,7 +2711,119 @@ def _run_case(
                 # policy dispatch. The transition tuple is discarded.
                 executed_configuration = None
                 execution_torque_audit: list[dict[str, Any]] = []
-                if selected_advance_joint_damping_gain is not None:
+                execution_envelope_state = None
+                if (
+                    selected_advance_joint_velocity_envelope_slope
+                    is not None
+                ):
+                    target_joint = (
+                        controller_joint_velocity_envelope_target_joint_index
+                    )
+                    target_side = (
+                        controller_joint_velocity_envelope_target_joint_side
+                    )
+                    target_limit = float(
+                        limits[
+                            target_joint,
+                            1 if target_side == "upper" else 0,
+                        ]
+                    )
+                    executed_configuration = (
+                        _configure_joint_limit_velocity_envelope(
+                            env=env,
+                            robot=robot,
+                            qidx=qidx,
+                            vidx=vidx,
+                            limits=limits,
+                            joint_index=target_joint,
+                            joint_side=target_side,
+                            margin_floor=(
+                                selected_advance_minimum_margin_floor
+                            ),
+                            slope=(
+                                selected_advance_joint_velocity_envelope_slope
+                            ),
+                        )
+                    )
+                    joint_velocity_envelope_controller_configuration_count += (
+                        1
+                    )
+                    if (
+                        not executed_configuration[
+                            "configuration_qpos_identity"
+                        ]
+                        or not executed_configuration[
+                            "configuration_qvel_identity"
+                        ]
+                    ):
+                        raise RecedingHorizonPilotError(
+                            "executed velocity-envelope config changed qpos/qvel"
+                        )
+                    with _scoped_joint_limit_velocity_envelope(
+                        robot,
+                        joint_index=target_joint,
+                        joint_side=target_side,
+                        joint_limit=target_limit,
+                        margin_floor=(
+                            selected_advance_minimum_margin_floor
+                        ),
+                        slope=(
+                            selected_advance_joint_velocity_envelope_slope
+                        ),
+                    ) as execution_torque_audit:
+                        env.step(
+                            np.asarray(
+                                selected_prefix[0],
+                                dtype=np.float64,
+                            )
+                        )
+                    terminal_joint_position = float(
+                        env.sim.data.qpos[qidx[target_joint]]
+                    )
+                    terminal_joint_velocity = float(
+                        env.sim.data.qvel[vidx[target_joint]]
+                    )
+                    if target_side == "upper":
+                        terminal_target_margin = (
+                            target_limit - terminal_joint_position
+                        )
+                        terminal_toward_velocity = (
+                            terminal_joint_velocity
+                        )
+                    else:
+                        terminal_target_margin = (
+                            terminal_joint_position - target_limit
+                        )
+                        terminal_toward_velocity = (
+                            -terminal_joint_velocity
+                        )
+                    terminal_allowed_velocity = (
+                        selected_advance_joint_velocity_envelope_slope
+                        * max(
+                            terminal_target_margin
+                            - selected_advance_minimum_margin_floor,
+                            0.0,
+                        )
+                    )
+                    execution_envelope_state = {
+                        "target_joint_margin_rad": (
+                            terminal_target_margin
+                        ),
+                        "target_joint_velocity_rad_s": (
+                            terminal_joint_velocity
+                        ),
+                        "toward_limit_velocity_rad_s": (
+                            terminal_toward_velocity
+                        ),
+                        "allowed_toward_limit_velocity_rad_s": (
+                            terminal_allowed_velocity
+                        ),
+                        "terminal_envelope_satisfied": bool(
+                            terminal_toward_velocity
+                            <= terminal_allowed_velocity + 1e-9
+                        ),
+                    }
+                elif selected_advance_joint_damping_gain is not None:
                     executed_configuration = (
                         _configure_joint_velocity_damping(
                             env=env,
@@ -2487,8 +3038,97 @@ def _run_case(
                             "predicted_terminal_margin_rad"
                         ]
                     )
+                if joint_velocity_envelope_exact_h1_fallbacks:
+                    executed_envelope = (
+                        joint_velocity_envelope_exact_h1_fallbacks[-1]
+                    )
+                    executed_candidate = next(
+                        candidate
+                        for candidate in executed_envelope[
+                            "candidate_evaluations"
+                        ]
+                        if candidate["selected"]
+                    )
+                    executed_envelope["executed_in_shadow"] = True
+                    executed_envelope[
+                        "execution_configuration"
+                    ] = executed_configuration
+                    executed_envelope[
+                        "execution_controller_substep_torque_audit"
+                    ] = execution_torque_audit
+                    executed_envelope[
+                        "execution_controller_scope_restored"
+                    ] = (
+                        "run_controller"
+                        not in robot.controller.__dict__
+                    )
+                    executed_envelope["exact_action_identity"] = bool(
+                        np.array_equal(
+                            np.asarray(
+                                executed_envelope[
+                                    "exact_first_action"
+                                ],
+                                dtype=np.float64,
+                            ),
+                            np.asarray(
+                                selected_prefix[0],
+                                dtype=np.float64,
+                            ),
+                        )
+                    )
+                    executed_envelope[
+                        "execution_terminal_margin_rad"
+                    ] = advanced_margin
+                    executed_envelope[
+                        "execution_terminal_target_joint_margin_rad"
+                    ] = execution_envelope_state[
+                        "target_joint_margin_rad"
+                    ]
+                    executed_envelope[
+                        "execution_terminal_target_joint_velocity_rad_s"
+                    ] = execution_envelope_state[
+                        "target_joint_velocity_rad_s"
+                    ]
+                    executed_envelope[
+                        "execution_terminal_toward_limit_velocity_rad_s"
+                    ] = execution_envelope_state[
+                        "toward_limit_velocity_rad_s"
+                    ]
+                    executed_envelope[
+                        "execution_terminal_allowed_toward_limit_velocity_rad_s"
+                    ] = execution_envelope_state[
+                        "allowed_toward_limit_velocity_rad_s"
+                    ]
+                    executed_envelope[
+                        "execution_terminal_envelope_satisfied"
+                    ] = execution_envelope_state[
+                        "terminal_envelope_satisfied"
+                    ]
+                    executed_envelope[
+                        "prediction_execution_margin_error_rad"
+                    ] = abs(
+                        advanced_margin
+                        - executed_candidate[
+                            "predicted_terminal_margin_rad"
+                        ]
+                    )
+                    executed_envelope[
+                        "prediction_execution_target_joint_velocity_error_rad_s"
+                    ] = abs(
+                        execution_envelope_state[
+                            "target_joint_velocity_rad_s"
+                        ]
+                        - executed_candidate[
+                            "predicted_terminal_target_joint_velocity_rad_s"
+                        ]
+                    )
                 if advanced_margin < (
                     selected_advance_minimum_margin_floor
+                ) or (
+                    execution_envelope_state is not None
+                    and not execution_envelope_state[
+                        "terminal_envelope_satisfied"
+                    ]
                 ):
                     lane_safe = False
                     break
@@ -2611,6 +3251,15 @@ def _run_case(
             "controller_joint_damping_target_joint_index": (
                 controller_joint_damping_target_joint_index
             ),
+            "controller_joint_velocity_envelope_exact_h1_slopes": list(
+                controller_joint_velocity_envelope_exact_h1_slopes
+            ),
+            "controller_joint_velocity_envelope_target_joint_index": (
+                controller_joint_velocity_envelope_target_joint_index
+            ),
+            "controller_joint_velocity_envelope_target_joint_side": (
+                controller_joint_velocity_envelope_target_joint_side
+            ),
             "lane_base_seeds": list(lane_base_seeds),
             "recovery_round_seed_stride": (
                 recovery_round_seed_stride
@@ -2672,6 +3321,12 @@ def _run_case(
             ),
             "joint_damping_controller_configuration_count": (
                 joint_damping_controller_configuration_count
+            ),
+            "joint_velocity_envelope_exact_h1_shadow_env_step_count": (
+                joint_velocity_envelope_exact_h1_shadow_steps
+            ),
+            "joint_velocity_envelope_controller_configuration_count": (
+                joint_velocity_envelope_controller_configuration_count
             ),
             "full_prefix_shadow_env_step_count": (
                 full_prefix_shadow_steps
