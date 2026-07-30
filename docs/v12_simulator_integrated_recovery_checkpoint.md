@@ -429,6 +429,12 @@ H3均不变。每一步仍先以真实 contact-aware shadow证明位置安全，
 
 v12.29 已用独立 runner 和显式 gate 实现，默认 strict路径不变；22个相关定向测试通过。
 
+v12.29 结果为3/5：两 lane均安全执行 vertex25→vertex9，最低margin约0.2003，全部identity与
+预测/执行一致；第三次64 vertices全空。该结果定位为 greedy one-step选择导致的 viability损失。
+
+v12.30 在每个首步候选endpoint上，以同一policy chunk的第二个exact action做64-vertex successor
+screen；只授权safe successor count>0的首步，并按该count优先排序，实际仍只执行首步并fresh H3。
+
 冻结产物：
 
 - protocol：`experiments/proofalign_simulator_integrated_predictive_recovery_v12_qualification_protocol.json`
@@ -460,3 +466,4 @@ v12.29 已用独立 runner 和显式 gate 实现，默认 strict路径不变；2
 - H3 joint anticipatory brake exact H1：`results/proofalign_h3_joint_anticipatory_brake_exact_h1_pilot_v12_20260730/`
 - H3 coupled inverse-mass brake exact H1：`results/proofalign_h3_coupled_inverse_mass_brake_exact_h1_pilot_v12_20260730/`
 - H3 contact-aware vertex exact H1 strict-terminal pilot：`results/proofalign_h3_contact_aware_vertex_exact_h1_pilot_v12_20260730/`
+- H3 contact-aware vertex receding-floor pilot：`results/proofalign_h3_contact_aware_vertex_receding_floor_pilot_v12_20260730/`

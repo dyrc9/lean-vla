@@ -271,6 +271,16 @@ contact saturation/outcome read，不因放松代理条件而放松物理 floor�
 v12.29 runner 已实现并通过22个相关定向测试；代码路径只增加一个显式 boolean gate，默认仍
 保持v12.28 strict行为，新 runner 单独冻结为false，避免改变历史结果语义。
 
+v12.29 双 lane 回到3/5 non-pass，但两次 shielded fallback 均安全执行：选择序列在两 lane
+一致为 vertex25→vertex9，最低 advanced margin约0.2003；384/384 candidate identities、
+4/4 exact action与prediction/execution position/qvel error 0。第三 fallback才出现64/64无安全
+vertex，说明问题是 greedy one-step ranking没有维护 successor viability。
+
+v12.30 对每个one-step safe vertex的endpoint恢复快照，并用当前 source-policy chunk的第二个
+exact action枚举同一64-vertex successor set。首步只有在至少一个 successor仍满足0.15 floor时
+才 eligible；排序先最大 safe-successor count，再最大首步 target/global margin与稳定ID。
+执行后仍fresh inference/H3，successor只作保守viability证据、不被实际消费。
+
 ## 前一 checkpoint：2026-07-30 v12.5 integrated predictive recovery
 
 fresh policy-prefix shadow 与 typed recovery runtime 的 fixed-trace composition 已完成并终态冻结：

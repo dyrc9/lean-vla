@@ -216,6 +216,10 @@ floor和fresh H3约束全部 advances。
 
 v12.29 独立 runner 已通过22个相关定向测试；实验结果尚未生成，不提前计入正证据。
 
+冻结结果为3/5：vertex25→vertex9安全推进两步且最低margin约0.2003，随后64/64候选为空。
+因此 contact-aware control有局部效果，剩余缺口是选择规则未维护下一步viability；后继增加
+第二个source-policy action上的vertex successor存在性门，不消费该预测动作。
+
 
 论文主故事仍是两层对齐，而不是 SemanticSubtask 本身。当前最重要的科学风险集中在 L1：
 
