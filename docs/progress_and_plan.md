@@ -39,6 +39,13 @@ seed10509 仍全部 `block_replan`；最好 post-policy margin 仅为 `−0.0118
 “需要显式增加 joint 1 上界余量”。下一轮使用 simulator-shadow beam search，每步可切换原13个
 动作，按 joint-1 upper margin 排序，同时保留原全局 recovery safety 与 policy gate。
 
+joint-targeted beam 也已完成：它把恢复终点 joint-1 upper margin 提高到 `0.27944 rad`，
+96/96 保留轨迹通过原 recovery selector，但 seed10509 仍全部 `block_replan`，最好
+post-policy margin 反而只有 `−0.01543 rad`。endpoint margin 与 post-policy margin 相关仅
+`−0.135`，说明 fresh policy 对新观测的响应抵消了 open-loop retreat。下一步转为
+receding-horizon 机制试验：每轮只放行经原 gate 验证的首个 action，然后立即在新状态 replan；
+仍只做 restored shadow，不派发、不读 outcome。
+
 ## 前一 checkpoint：2026-07-30 v12.5 integrated predictive recovery
 
 fresh policy-prefix shadow 与 typed recovery runtime 的 fixed-trace composition 已完成并终态冻结：

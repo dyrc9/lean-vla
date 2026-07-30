@@ -167,6 +167,22 @@ margin 做 beam search，允许每一步切换原语，同时继续施加原全�
 joint-targeted beam 产生的安全轨迹送入未改变的 policy gate。该设计仍是 result-informed
 engineering，不回写 formal。
 
+joint-targeted beam 已用 width 24、最大深度10执行。搜索在深度4把 joint-1 terminal upper
+margin 推到 `0.27944 rad`；深度7开始所有扩展都违反原 transient gate，因此自动终止。搜索
+累计8151个 shadow env steps，保留的120个 recovery-terminal nodes 中按冻结规则取前96个，
+96/96 均通过完整 recovery selector 且 joint crossing 为0。
+
+但是96个候选在 seed10509 下仍全部 `block_replan`；最好 post-policy margin 为
+`−0.01543 rad`，且 endpoint joint-1 margin 与 post-policy margin 的 Pearson 相关只有
+`−0.135`。所有 post-policy limiting atoms 仍是 joint-1 upper，并在 prefix 的早期
+step 1–3 达到最小值。这表明 open-loop retreat 已能改变恢复终点，但 fresh policy 会随新观测
+重新产生快速逼近上界的动作；继续增加 retreat 距离不是有效方向。
+
+下一步应版本化 receding-horizon safety control：从已恢复状态对 fresh policy chunk 只验证并
+影子推进首个安全 action，随后在新状态立即 fresh replan，而不是要求整个10-step chunk
+`allow_exact`。这不是放宽风险阈值；每个实际候选 action 仍必须逐步通过原 predictive gate。
+首轮只做 restored shadow、zero dispatch、zero outcome 的机制试验。
+
 冻结产物：
 
 - protocol：`experiments/proofalign_simulator_integrated_predictive_recovery_v12_qualification_protocol.json`
@@ -178,3 +194,4 @@ engineering，不回写 formal。
 - all-prefix policy-aware：`results/proofalign_policy_aware_recovery_all_prefix_pilot_v12_20260730/`
 - two-stage policy-aware：`results/proofalign_two_stage_policy_aware_recovery_pilot_v12_20260730/`
 - continuous-blend：`results/proofalign_continuous_blend_recovery_pilot_v12_20260730/`
+- joint-targeted beam：`results/proofalign_joint_targeted_beam_recovery_pilot_v12_20260730/`

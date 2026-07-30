@@ -101,7 +101,10 @@ margin 只从单前缀的 `−0.01246` 改善到 `−0.01194 rad`。这进一步
 下一步需要诊断具体 joint/direction 后再构造连续或 joint-space generator。随后164个局部连续
 blend 全部 recovery-safe，却同样在 seed10509 下 block；最好值仅到 `−0.01187 rad`，而且
 164/164 limiting atoms 都是 joint-1 upper。这排除了局部笛卡尔插值，支持下一步做
-joint-1-targeted、仍受全局 recovery gate 约束的序列搜索。
+joint-1-targeted、仍受全局 recovery gate 约束的序列搜索。该 beam 后继把 joint-1 terminal
+margin 推到 `0.27944 rad`，96/96 retained trajectories 均 recovery-safe，但 fresh policy
+仍全部 block；endpoint 与 post-policy margin 相关仅 `−0.135`。因此剩余缺口已从 recovery
+generator 转移到闭环控制时域：需要逐 action safety/replan，而不是更远的 open-loop retreat。
 
 
 论文主故事仍是两层对齐，而不是 SemanticSubtask 本身。当前最重要的科学风险集中在 L1：
