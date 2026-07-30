@@ -313,6 +313,17 @@ OSC `update(force=True); reset_goal()`，将 controller goal 重绑定到当前�
 0.15 floor、零 crossing，并在终点/精确重放后两次通过同一 H3 prefix gate。reset 次数和
 bridge action 分开记账，双-lane 5-cycle 成功门不变。
 
+controller-goal brake 运行仍为 non-pass：122/122 个 reset+一步 bridge 候选都满足0.15 floor，
+244次 reset 均发生在 restored candidate/replay branch，但122个 post-H3 screens 全部 block；
+最好值 `−0.013713 rad`，bridge execution 为0，两条 lane 各完成1/5 policy cycles。
+这证明 reset 后的单步机械状态可控，但“reset 一次后要求后续三步未重置 policy 同时安全”仍不成立。
+
+下一 successor 将 contract 改为 reset-guarded exact H1 fallback，而不是动作替换：H3 block 后
+在精确 snapshot 上 reset controller goal，只重放同一 policy prefix 的首动作；该 action 必须
+全程 `margin >= 0.15 rad` 且零 crossing。通过后恢复同一 snapshot，执行同一 reset 与同一
+action bytes，然后立即 fresh H3 replan。每个 cycle 仍消费 exact policy action，不使用 bridge
+library、不清零 qpos/qvel、不修改 recovery threshold。成功门仍是两条 lane 各5次 exact advance。
+
 冻结产物：
 
 - protocol：`experiments/proofalign_simulator_integrated_predictive_recovery_v12_qualification_protocol.json`
@@ -333,3 +344,4 @@ bridge action 分开记账，双-lane 5-cycle 成功门不变。
 - H2 scaled bridge：`results/proofalign_h2_scaled_bridge_receding_pilot_v12_20260730/`
 - absolute-safe H2 bridge：`results/proofalign_absolute_safe_h2_bridge_pilot_v12_20260730/`
 - H3 sequence bridge：`results/proofalign_h3_sequence_bridge_pilot_v12_20260730/`
+- H3 controller-goal brake：`results/proofalign_h3_controller_goal_brake_pilot_v12_20260730/`

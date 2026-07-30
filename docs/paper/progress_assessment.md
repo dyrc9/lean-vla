@@ -145,6 +145,12 @@ H3 sequence 终态依然 non-pass：两条 lane 各推进1步；每条 lane 有4
 随后仍由0.15 floor、零 crossing 和 exact H3 gate约束。若其双-lane 5-cycle 通过，仍需冻结后
 用未见 seeds 复验。
 
+controller-goal reset 本身仍没有让122个 post-H3 screens 中任何一个通过，最好 margin 为
+`−0.013713 rad`；但122/122 reset+一步候选均物理安全，说明 reset 的价值在逐步制动，而不是
+一次性改变三步 policy 语义。下一工程协议应采用 reset-guarded exact H1：H3 block 时仅在 reset
+controller 上验证并执行原 prefix 的首个 exact action，随后立即 fresh H3 replan。这样测试的是
+“预测提前触发 + 低层逐步制动 + exact action identity”，不是用保守替代动作制造表面成功。
+
 
 论文主故事仍是两层对齐，而不是 SemanticSubtask 本身。当前最重要的科学风险集中在 L1：
 

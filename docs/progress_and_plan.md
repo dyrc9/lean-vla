@@ -129,6 +129,18 @@ dispatch、typed recovery、outcome read 均为0。
 reset+action 并确认同一 prefix。它不清零物理 qvel、不修改 simulator qpos，也不改 recovery
 合同或风险阈值。
 
+controller-goal brake pilot 已完成但 post-H3 gate 仍 non-pass：122/122 个 reset+一步候选都
+守住0.15 floor并完成 policy screen，reset 审计计数244，但122/122 post-H3 仍 block；
+最好 margin 为 `−0.013713 rad`，selection/execution 为0，两条 lane 各保持1个 exact policy
+advance。该结果说明 reset 能稳定单步物理状态，却不能让后续未重置的三步 policy prefix 一次性安全。
+
+下一版不再要求 reset 后的整个 H3 prefix 变成安全，而定义与 receding control 一致的
+`reset-guarded exact H1 fallback`：H3 block 时，从绑定 snapshot 执行 controller goal reset，
+只 shadow 检查同一个 policy prefix 的精确首动作；若该 exact action 重放全程保持
+`margin >= 0.15 rad` 且零 crossing，恢复 snapshot 后执行同一 reset+同一 action bytes，
+随后立即 fresh H3 replan。它不是替代动作或 projection，仍逐 cycle 消费 exact policy action；
+两 lane 各5个 exact advances 的成功门与所有零审计计数不变。
+
 ## 前一 checkpoint：2026-07-30 v12.5 integrated predictive recovery
 
 fresh policy-prefix shadow 与 typed recovery runtime 的 fixed-trace composition 已完成并终态冻结：
