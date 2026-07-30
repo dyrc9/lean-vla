@@ -71,13 +71,13 @@ OUTPUT_ROOT = (
     REPO_ROOT
     / "results"
     / "proofalign_simulator_integrated_predictive_recovery_v12_"
-    "engineering_pilot_20260730_fresh2"
+    "engineering_pilot_20260730_fresh3"
 )
 SUPERSEDED_PILOT_SUMMARY_PATH = (
     REPO_ROOT
     / "results"
     / "proofalign_simulator_integrated_predictive_recovery_v12_"
-    "engineering_pilot_20260730"
+    "engineering_pilot_20260730_fresh2"
     / "summary.json"
 )
 INTEGRATED_TERMINAL_PATH = (
@@ -94,11 +94,11 @@ RECOVERY_PROTOCOL_PATH = (
 )
 ROW_SCHEMA = (
     "proofalign.simulator-integrated-predictive-recovery-v12-"
-    "pilot-row.v2"
+    "pilot-row.v3"
 )
 SUMMARY_SCHEMA = (
     "proofalign.simulator-integrated-predictive-recovery-v12-"
-    "pilot-summary.v2"
+    "pilot-summary.v3"
 )
 
 
@@ -127,6 +127,29 @@ class ContactCapacityAudit:
         )
         if ncon >= nconmax:
             self.saturation_count += 1
+
+
+class MujocoWarningAudit:
+    """Capture low-level MuJoCo warnings while the callback is installed."""
+
+    def __init__(self) -> None:
+        self.messages: list[str] = []
+
+    def __call__(self, warning: str | bytes) -> None:
+        message = (
+            warning.decode(errors="replace")
+            if isinstance(warning, bytes)
+            else str(warning)
+        )
+        self.messages.append(message)
+
+    @property
+    def contact_capacity_warning_count(self) -> int:
+        return sum(
+            "too many contacts" in message.lower()
+            or "nconmax" in message.lower()
+            for message in self.messages
+        )
 
 
 class SimulatorRecoverySink:
@@ -221,7 +244,7 @@ def pilot_config() -> dict[str, Any]:
         superseded.get("classification")
         != (
             "simulator_integrated_predictive_recovery_v12_"
-            "engineering_pilot_complete"
+            "engineering_pilot_fresh2_complete"
         )
         or superseded.get("valid_case_count") != 6
     ):
@@ -231,19 +254,19 @@ def pilot_config() -> dict[str, Any]:
     return {
         "schema": (
             "proofalign.simulator-integrated-predictive-recovery-"
-            "v12-pilot-config.v2"
+            "v12-pilot-config.v3"
         ),
-        "protocol_id": "engineering-pilot-fresh2",
+        "protocol_id": "engineering-pilot-fresh3",
         "supersedes": {
             "path": str(
                 SUPERSEDED_PILOT_SUMMARY_PATH.relative_to(REPO_ROOT)
             ),
             "sha256": _sha256(SUPERSEDED_PILOT_SUMMARY_PATH),
             "reason": (
-                "The first pilot used ControlEnv.set_init_state(), whose "
-                "wrapper calls check_success() even though the return value "
-                "is discarded. Fresh2 directly restores simulator state and "
-                "does not invoke that wrapper outcome query."
+                "Fresh2 corrected the initialization outcome-query path and "
+                "added point-sampled ncon audits, but low-level MuJoCo "
+                "contact warnings remained outside those samples. Fresh3 "
+                "installs the MuJoCo warning callback for exact accounting."
             ),
         },
         "predecessor": {
@@ -1134,13 +1157,20 @@ def _summarize(rows: list[dict[str, Any]]) -> dict[str, Any]:
         "contact_capacity_saturation_count": sum(
             row["contact_capacity_saturation_count"] for row in rows
         ),
+        "mujoco_warning_count": sum(
+            row["mujoco_warning_count"] for row in rows
+        ),
+        "mujoco_contact_capacity_warning_count": sum(
+            row["mujoco_contact_capacity_warning_count"]
+            for row in rows
+        ),
         "runtime_exception_count": 0,
     }
     return {
         "schema": SUMMARY_SCHEMA,
         "classification": (
             "simulator_integrated_predictive_recovery_v12_"
-            "engineering_pilot_fresh2_complete"
+            "engineering_pilot_fresh3_complete"
         ),
         "qualification_pass": None,
         "valid_case_count": metrics["valid_case_count"],
@@ -1220,27 +1250,46 @@ def _run(
         )
         manifest["status"] = "running_no_outcome_engineering_pilot"
         saber_io.atomic_json(manifest_path, manifest)
+        import mujoco
+
+        previous_warning_callback = mujoco.get_mju_user_warning()
+        warning_audit = MujocoWarningAudit()
+        mujoco.set_mju_user_warning(warning_audit)
         rows = []
-        for pair_index, pair in enumerate(
-            config["population"]["pairs"]
-        ):
-            for condition_index, condition in enumerate(
-                ("nominal", "synthetic_joint_pressure")
+        try:
+            for pair_index, pair in enumerate(
+                config["population"]["pairs"]
             ):
-                row = _run_case(
-                    config,
-                    pair,
-                    condition=condition,
-                    pair_index=pair_index,
-                    case_index=pair_index * 2 + condition_index,
-                    policy=policy,
-                    jax=jax,
-                    image_tools=image_tools,
-                    runner=runner,
-                    args=args,
-                )
-                rows.append(row)
-                saber_io.append_ledger(ledger_path, row)
+                for condition_index, condition in enumerate(
+                    ("nominal", "synthetic_joint_pressure")
+                ):
+                    warning_start = len(warning_audit.messages)
+                    contact_warning_start = (
+                        warning_audit.contact_capacity_warning_count
+                    )
+                    row = _run_case(
+                        config,
+                        pair,
+                        condition=condition,
+                        pair_index=pair_index,
+                        case_index=pair_index * 2 + condition_index,
+                        policy=policy,
+                        jax=jax,
+                        image_tools=image_tools,
+                        runner=runner,
+                        args=args,
+                    )
+                    row["mujoco_warning_count"] = (
+                        len(warning_audit.messages) - warning_start
+                    )
+                    row["mujoco_contact_capacity_warning_count"] = (
+                        warning_audit.contact_capacity_warning_count
+                        - contact_warning_start
+                    )
+                    rows.append(row)
+                    saber_io.append_ledger(ledger_path, row)
+        finally:
+            mujoco.set_mju_user_warning(previous_warning_callback)
         summary = _summarize(rows)
         saber_io.atomic_json(OUTPUT_ROOT / "summary.json", summary)
         manifest["status"] = "complete"

@@ -4,6 +4,7 @@ import numpy as np
 
 from scripts.run_simulator_integrated_predictive_recovery_v12_pilot import (
     ContactCapacityAudit,
+    MujocoWarningAudit,
     SimulatorRecoverySink,
     _set_init_state_without_outcome,
     pilot_config,
@@ -122,3 +123,16 @@ def test_contact_capacity_audit_counts_saturation() -> None:
     assert audit.maximum_ncon == 8
     assert audit.minimum_nconmax == 8
     assert audit.saturation_count == 1
+
+
+def test_mujoco_warning_audit_classifies_contact_capacity() -> None:
+    audit = MujocoWarningAudit()
+
+    audit("Too many contacts: nconmax exceeded")
+    audit(b"unrelated warning")
+
+    assert audit.messages == [
+        "Too many contacts: nconmax exceeded",
+        "unrelated warning",
+    ]
+    assert audit.contact_capacity_warning_count == 1
