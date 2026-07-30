@@ -78,7 +78,7 @@
       "exists": true,
       "git_status": "clean",
       "path": "docs/progress_and_plan.md",
-      "sha256": "d7be00b9ebe63cb6fde06a2d8048d6d884088015bf51babaa54529ed0dbfeb2f",
+      "sha256": "3c336394044c45f1ce668e8f81b87c2a71e76a1e30a6b9c197f2803051293228",
       "tracked": true
     },
     {
@@ -2473,8 +2473,8 @@
   "policy_loaded": false,
   "repository_binding_semantics": "latest commit that changed the frozen semantic commit scope; later commits may contain only out-of-scope protocols or audit packets",
   "repository_fully_clean": true,
-  "repository_head_commit": "591e287ac182a89c85d57d2733598ac764c16b76",
-  "repository_head_tree": "1372d04244c768e646f0887fc4d7cf1730729c6d",
+  "repository_head_commit": "0b58aa3cff9c7c2d5f4251d361375f33dc63a304",
+  "repository_head_tree": "4c7eb0591f3e0a90e7a01aa0e9c838d0f2c4134f",
   "repository_status_row_count": 0,
   "schema": "proofalign.semantic-source-binding-e8-audit.v1",
   "simulator_created": false
