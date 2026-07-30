@@ -1,6 +1,24 @@
 # 当前进展与执行计划
 
-## 最新 checkpoint：2026-07-30 v12.4c fresh policy-prefix shadow
+## 最新 checkpoint：2026-07-30 v12.5 integrated predictive recovery
+
+fresh policy-prefix shadow 与 typed recovery runtime 的 fixed-trace composition 已完成并终态冻结：
+
+- engineering pilot 使用与 formal 不重叠的3个 fresh-policy pairs，12/12 paths 命中预期；
+- formal 绑定 v12.4c 冻结 ledger 中15个 pairs、30个 source cases，运行60条 integrated paths；
+- nominal exact authorization 15/15，prefix substitution reject 15/15；
+- synthetic recovery open 15/15，recovery-selection state substitution reject 15/15；
+- recovery receipt identity、completion、fresh-state authorization 均为15/15；
+- old policy authorization、recovery replay、substituted fresh state 接受均为0，negative path sink
+  side effect 为0；
+- policy load/inference/action dispatch、simulator create 和 outcome read 全部为0。
+
+完整结果与边界见
+[`v12_integrated_predictive_recovery_checkpoint.md`](v12_integrated_predictive_recovery_checkpoint.md)。
+该结果只关闭 source-digest-bound in-memory transaction composition；下一步仅授权 no-outcome
+simulator-integrated pilot，仍不授权 clean、attacked 或 efficacy rollout。
+
+## 前一 checkpoint：2026-07-30 v12.4c fresh policy-prefix shadow
 
 v12.4a/v12.4b/v12.4c 已完成并终态冻结，证据范围严格限于 no-outcome controller shadow：
 

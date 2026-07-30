@@ -23,8 +23,10 @@
     typed recovery 与 v12.3 snapshot-boundary 资格结果；
 15. [`v12_policy_prefix_shadow_checkpoint.md`](v12_policy_prefix_shadow_checkpoint.md)：v12.4
     policy-load resource nonstart、fixed-prefix controller shadow 与 warm-start 后继；
-16. [`progress_and_plan.md`](progress_and_plan.md)：当前 blocker、历史复用和下一步；
-17. [`remote_execution.md`](remote_execution.md)：执行授权与远程运行规则。
+16. [`v12_integrated_predictive_recovery_checkpoint.md`](v12_integrated_predictive_recovery_checkpoint.md)：
+    v12.5 fresh-shadow 与 typed-recovery fixed-trace composition；
+17. [`progress_and_plan.md`](progress_and_plan.md)：当前 blocker、历史复用和下一步；
+18. [`remote_execution.md`](remote_execution.md)：执行授权与远程运行规则。
 
 论文组织：
 
@@ -36,6 +38,7 @@
 - [`v12_qualification_checkpoint.md`](v12_qualification_checkpoint.md)
 - [`v12_recovery_successor_checkpoint.md`](v12_recovery_successor_checkpoint.md)
 - [`v12_policy_prefix_shadow_checkpoint.md`](v12_policy_prefix_shadow_checkpoint.md)
+- [`v12_integrated_predictive_recovery_checkpoint.md`](v12_integrated_predictive_recovery_checkpoint.md)
 
 审计原则：
 

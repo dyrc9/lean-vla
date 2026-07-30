@@ -179,6 +179,11 @@ Dual 已验证。旧结果可复用为：
    fresh π0.5 正式 qualification 也通过：30次 inference、risk agreement 30/30、nominal allow
    15/15、synthetic recovery-required 15/15，live dispatch/outcome read 为0。该结果仍不等于
    clean utility 或 efficacy，clean/attacked 保持未授权。
+10. v12.5 integrated fixed trace 已完成：在15个 fresh source pairs 上运行60条 composition
+    paths，exact allow、prefix substitution、typed recovery 和 recovery-selection substitution
+    全部符合预期。旧授权/recovery replay/substituted fresh state 接受均为0，receipt、completion
+    和 fresh-state authorization 均为15/15；policy/simulator/outcome均为0。下一步只进入
+    no-outcome simulator-integrated pilot。
 
 入口文档：
 
@@ -198,6 +203,7 @@ Dual 已验证。旧结果可复用为：
 - [v12 无 outcome 资格 checkpoint](docs/v12_qualification_checkpoint.md)
 - [v12.2/v12.3 多关节恢复 checkpoint](docs/v12_recovery_successor_checkpoint.md)
 - [v12.4 policy-prefix shadow checkpoint](docs/v12_policy_prefix_shadow_checkpoint.md)
+- [v12.5 integrated predictive-recovery checkpoint](docs/v12_integrated_predictive_recovery_checkpoint.md)
 
 常用检查：
 

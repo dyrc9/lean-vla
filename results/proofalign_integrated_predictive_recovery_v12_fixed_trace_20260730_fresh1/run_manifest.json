@@ -1,0 +1,12 @@
+{
+  "outcomes_observed": false,
+  "policy_action_dispatched": false,
+  "policy_inference_performed": false,
+  "policy_loaded": false,
+  "protocol_id": "proofalign-integrated-predictive-recovery-v12-fixed-trace-20260730",
+  "protocol_sha256": "8ba8a54689ccae040a7b6098f044064b1d83e98a9c669a8cc0540b297c786a9a",
+  "row_count": 60,
+  "schema": "proofalign.integrated-predictive-recovery-v12-fixed-trace-summary.v1.run-manifest",
+  "simulator_created": false,
+  "status": "complete"
+}

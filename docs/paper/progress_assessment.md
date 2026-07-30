@@ -34,6 +34,7 @@
 | Recoverable L2 v12.1 | no-outcome preflight pass / efficacy 未测 | 655-case contract gate 与45-pair simulator-reset recovery gate 通过；只覆盖 joint-5 upper-limit，未加载策略或读取 outcome |
 | Recoverable L2 v12.2/v12.3 | mechanism strengthened / efficacy 未测 | typed runtime 10/10；多关节210-case覆盖209，actual recovery 209/209；v12.2因full-state identity 201/210保持non-pass，v12.3 trusted-arm identity 210/210通过 |
 | Policy-prefix shadow v12.4 | fresh no-outcome mechanism pass / efficacy 未测 | fixed-prefix warm-start 后 repeat 30/30；fresh π0.5 formal 为30次 inference、risk agreement 30/30、nominal allow 15/15、synthetic recovery-required 15/15，repeat 29/30；dispatch/outcome 为0 |
+| Integrated recovery v12.5 | fixed-trace composition pass / simulator integration 未测 | 60/60 routes；exact allow 与两类 substitution boundary通过，typed recovery receipt/completion/fresh-state authorization 15/15；policy/simulator/outcome为0 |
 | Deployment | 未就绪 | E7 缺少7类 perception supervision；所有正向结果仍限于 privileged simulator geometry |
 
 ## 2026-07-29 终局判断
@@ -74,6 +75,13 @@ nominal 与15个 synthetic joint-pressure case 上均给出绑定决策和30/30 
 仍一致要求 recovery。该结果增强的是 simulator/controller/policy-prefix mechanism，不是 clean
 utility、task-preserving recovery 或 attacked efficacy；“完整系统论文、尚非强正面 efficacy
 论文”的判断不变。
+
+v12.5 进一步把 fresh screen evidence 与 typed recovery transaction 接成单一 fixed-trace route：
+15个 nominal exact authorizations、15个 prefix substitutions、15个 recovery happy paths 和15个
+selection-state substitutions 全部符合预期；旧 policy authorization、recovery replay 和 substituted
+fresh state 接受均为0。该结果关闭的是 source-digest-bound software composition，使用 in-memory
+sink 且不创建 simulator，因此仍不能表述为实际 task-preserving recovery。它让论文的 transaction
+integrity 证据更完整，但不改变 efficacy 强度判断。
 
 
 论文主故事仍是两层对齐，而不是 SemanticSubtask 本身。当前最重要的科学风险集中在 L1：

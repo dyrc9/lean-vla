@@ -383,3 +383,16 @@ synthetic case，误差 `0.0249513 rad`，两个 replay 都在 step0 判 risk �
 fresh policy-prefix no-outcome mechanism qualification 已完成，但在 predictive screen 尚未与
 typed recovery、receipt 和 fresh-state replan 接成完整 gate，且没有 clean/attacked outcome 前，
 仍不能主张 task-preserving recovery 或 defense efficacy。
+
+v12.5 随后增加 predictive screen 与 recovery runtime 之间的唯一 transaction route。formal 从
+v12.4c 冻结 ledger 绑定15个 pairs 的 nominal/synthetic source-prefix digest，并为每个 pair
+运行 exact allow、prefix substitution、recovery happy path 和 recovery-selection state substitution
+四条路径，共60 cases。所有 route 命中预期；15条 recovery 的旧 policy authorization 和 recovery
+replay 接受均为0，ordered receipt、completion 和 fresh-state authorization 均为15/15，错误
+fresh state 接受为0。
+
+这一证据必须称为 source-digest-bound fixed-trace composition：recovery sink 在内存中执行30个
+action records，没有加载 policy、创建 simulator、dispatch policy action 或读取 outcome。它证明
+软件 transaction 组合没有把“shadow pass”和“recovery pass”之间留成未绑定的缝，但还不是
+simulator-integrated recovery。后续只有 no-outcome simulator pilot 可以升级该边界；在此之前
+clean utility、attacked efficacy 和 physical safety 仍不成立。
