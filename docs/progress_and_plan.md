@@ -400,6 +400,19 @@ v12.37 runner已实现，通用guard runner默认profile仍为None，v12.35/v12.
 hard profile的scope enter/exit、range/solref/solimp恢复及配置契约均有定向测试；相关33个测试
 通过，正式双lane结果尚未生成。
 
+v12.37 已在result-informed seeds `10509/10510`上终态通过并经checksum/summary重算：两lane均
+完成5/5 exact policy advances，最低actual advanced-state global margin为`0.1661929 rad`。
+6次guard execution的action identity 6/6，预测/执行margin与qvel误差均0；160/160 beam configs
+的qpos/qvel/scope identity成立，range/profile restore 6/6，downstream-clipped bound violation、
+active warning、contact capacity saturation、live dispatch、typed recovery和outcome read均0。
+guard constraint在50个执行substeps激活，最大target-DOF generalized constraint force约
+`9999.04`，必须作为高刚度simulator brake的重要limitation披露。
+
+方法现已冻结，唯一授权的下一步是未见seed复验：使用`20509/20510`，逐值复用四个guard margins、
+hard solref/solimp、beam/retention、H3/H1、0.15 floor、action与所有成功门。不得根据已知seed
+结果修改参数；held-out仍须两lane 5/5和全部identity/zero-anomaly门通过，才能称为稳定的
+simulator engineering正结果。
+
 ## 前一 checkpoint：2026-07-30 v12.5 integrated predictive recovery
 
 fresh policy-prefix shadow 与 typed recovery runtime 的 fixed-trace composition 已完成并终态冻结：

@@ -274,6 +274,12 @@ virtual-brake机制证据。
 
 v12.37实现与33个相关定向测试已完成，历史soft profile路径不变。正式结果前论文结论不变。
 
+known-seed正式结果首次通过预注册活性门：`10509/10510`均5/5 exact advances，最低actual
+advanced margin `0.16619 rad`，6/6 guard action identity和预测/执行一致性、160/160配置identity
+及全部zero-anomaly门通过。该正结果来自高刚度virtual joint stop，执行中最大target-DOF
+constraint force约9999，不能回填actuator-only、task utility或物理安全claim。方法现冻结，
+必须在未见`20509/20510`复验后才能称为稳定simulator机制证据。
+
 
 论文主故事仍是两层对齐，而不是 SemanticSubtask 本身。当前最重要的科学风险集中在 L1：
 

@@ -520,6 +520,14 @@ solimp后forward。该版本检验hard virtual brake，不是actuator-only改进
 runner与三组model参数的逐值恢复审计已实现；默认soft路径保持不变，33个相关定向测试通过。
 正式结果前不计正证据。
 
+v12.37 known-seed结果通过：`10509/10510`均5/5，最低actual advanced margin
+`0.1661929 rad`；6/6 guard exact action identity、0 prediction/execution error，160/160
+config identities与6/6 range/profile restore成立，全部runtime异常计数为0。50个执行substeps
+命中guard，最大target-DOF constraint force约9999，故结果仅限高刚度simulator virtual brake。
+
+方法与参数已冻结。下一run仅替换为未见`20509/20510` seeds；若同样双lane 5/5并通过所有门，
+才形成可保留的跨seed simulator机制正证据。
+
 冻结产物：
 
 - protocol：`experiments/proofalign_simulator_integrated_predictive_recovery_v12_qualification_protocol.json`
@@ -555,3 +563,4 @@ runner与三组model参数的逐值恢复审计已实现；默认soft路径保�
 - H3 contact-aware vertex two-step successor pilot：`results/proofalign_h3_contact_aware_vertex_successor_pilot_v12_20260730/`
 - H3 contact-aware full-horizon extreme-vertex beam：`results/proofalign_h3_contact_aware_vertex_beam_pilot_v12_20260730/`
 - H3 contact-aware smooth 64-mode beam：`results/proofalign_h3_contact_aware_vertex_blend_beam_pilot_v12_20260730/`
+- H3 hard virtual joint guard known-seed：`results/proofalign_h3_hard_virtual_joint_guard_beam_pilot_v12_20260730/`
