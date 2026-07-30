@@ -542,6 +542,74 @@ def _screen_reset_backup_actions(
     }
 
 
+def _configure_nullspace_retreat(
+    *,
+    env: Any,
+    robot: Any,
+    qidx: np.ndarray,
+    vidx: np.ndarray,
+    limits: np.ndarray,
+    joint_index: int,
+    joint_side: str,
+    offset_rad: float,
+) -> dict[str, Any]:
+    if (
+        joint_index < 0
+        or joint_index >= len(qidx)
+        or joint_side not in {"lower", "upper"}
+        or offset_rad <= 0
+    ):
+        raise RecedingHorizonPilotError(
+            "invalid nullspace retreat configuration"
+        )
+    before_qpos = np.asarray(
+        env.sim.data.qpos[qidx], dtype=np.float64
+    ).copy()
+    before_qvel = np.asarray(
+        env.sim.data.qvel[vidx], dtype=np.float64
+    ).copy()
+    robot.controller.update(force=True)
+    initial_joint = np.asarray(
+        robot.controller.initial_joint, dtype=np.float64
+    ).copy()
+    target = initial_joint.copy()
+    if joint_side == "upper":
+        target[joint_index] = max(
+            float(limits[joint_index, 0]),
+            float(before_qpos[joint_index] - offset_rad),
+        )
+    else:
+        target[joint_index] = min(
+            float(limits[joint_index, 1]),
+            float(before_qpos[joint_index] + offset_rad),
+        )
+    robot.controller.initial_joint = target
+    robot.controller.reset_goal()
+    after_qpos = np.asarray(
+        env.sim.data.qpos[qidx], dtype=np.float64
+    )
+    after_qvel = np.asarray(
+        env.sim.data.qvel[vidx], dtype=np.float64
+    )
+    return {
+        "prior_initial_joint": initial_joint,
+        "retreat_initial_joint": target,
+        "target_joint_index": joint_index,
+        "target_joint_side": joint_side,
+        "requested_offset_rad": offset_rad,
+        "applied_target_delta_rad": (
+            float(target[joint_index])
+            - float(before_qpos[joint_index])
+        ),
+        "configuration_qpos_identity": bool(
+            np.array_equal(before_qpos, after_qpos)
+        ),
+        "configuration_qvel_identity": bool(
+            np.array_equal(before_qvel, after_qvel)
+        ),
+    }
+
+
 def _run_case(
     config: dict[str, Any],
     pair: dict[str, Any],
@@ -568,6 +636,11 @@ def _run_case(
     reset_exact_h1_require_backup_viability: bool = False,
     reset_backup_require_safe_successor: bool = False,
     maximum_reset_reserve_bridges_per_cycle: int = 0,
+    controller_nullspace_exact_h1_offsets_rad: tuple[
+        float, ...
+    ] = (),
+    controller_nullspace_target_joint_index: int = 1,
+    controller_nullspace_target_joint_side: str = "upper",
     lane_base_seeds: tuple[int, ...] = LANE_BASE_SEEDS,
     row_schema: str = ROW_SCHEMA,
     source_version: str = "v12.11",
@@ -585,6 +658,12 @@ def _run_case(
         > int(config["policy"]["source_prefix_steps"])
         or not lane_base_seeds
         or len(set(lane_base_seeds)) != len(lane_base_seeds)
+        or any(
+            not np.isfinite(offset) or offset <= 0
+            for offset in controller_nullspace_exact_h1_offsets_rad
+        )
+        or controller_nullspace_target_joint_side
+        not in {"lower", "upper"}
     ):
         raise RecedingHorizonPilotError(
             "invalid replan or recovery-escalation bounds"
@@ -692,6 +771,8 @@ def _run_case(
         reset_backup_candidate_shadow_steps = 0
         reset_reserve_execution_shadow_steps = 0
         reset_backup_controller_goal_reset_count = 0
+        nullspace_exact_h1_shadow_steps = 0
+        nullspace_controller_configuration_count = 0
         policy_advance_steps = 0
         for lane_index, base_seed in enumerate(lane_base_seeds):
             restore_identity = (
@@ -748,8 +829,10 @@ def _run_case(
                 safe_bridges = []
                 reset_exact_h1_fallbacks = []
                 reset_reserve_bridges = []
+                nullspace_exact_h1_fallbacks = []
                 selected_prefix = None
                 selected_advance_controller_goal_reset = False
+                selected_advance_nullspace_offset = None
                 selected_advance_minimum_margin_floor = float(
                     config["episode"]["trigger_margin_rad"]
                 )
@@ -896,6 +979,150 @@ def _run_case(
                             break
                     if selected_prefix is not None:
                         break
+                    if controller_nullspace_exact_h1_offsets_rad:
+                        if one_step_screen is None:
+                            raise RecedingHorizonPilotError(
+                                "missing failed gate for nullspace fallback"
+                            )
+                        exact_action = tuple(
+                            float(value) for value in prefix[0]
+                        )
+                        candidate_rows = []
+                        fallback_floor = float(
+                            config["recovery"]["safe_margin_rad"]
+                        )
+                        for offset_rad in (
+                            controller_nullspace_exact_h1_offsets_rad
+                        ):
+                            restore_identity = (
+                                restore_identity
+                                and _restore_identity(
+                                    env,
+                                    robot,
+                                    one_step_screen["snapshot"],
+                                )
+                            )
+                            configuration = (
+                                _configure_nullspace_retreat(
+                                    env=env,
+                                    robot=robot,
+                                    qidx=qidx,
+                                    vidx=vidx,
+                                    limits=limits,
+                                    joint_index=(
+                                        controller_nullspace_target_joint_index
+                                    ),
+                                    joint_side=(
+                                        controller_nullspace_target_joint_side
+                                    ),
+                                    offset_rad=float(offset_rad),
+                                )
+                            )
+                            nullspace_controller_configuration_count += 1
+                            if (
+                                not configuration[
+                                    "configuration_qpos_identity"
+                                ]
+                                or not configuration[
+                                    "configuration_qvel_identity"
+                                ]
+                            ):
+                                raise RecedingHorizonPilotError(
+                                    "nullspace configuration changed qpos/qvel"
+                                )
+                            (
+                                _nullspace_positions,
+                                nullspace_margins,
+                            ) = _execute_actions(
+                                env,
+                                actions=(exact_action,),
+                                qidx=qidx,
+                                limits=limits,
+                                contacts=contacts,
+                            )
+                            nullspace_exact_h1_shadow_steps += 1
+                            candidate_rows.append(
+                                {
+                                    "offset_rad": float(offset_rad),
+                                    "configuration": configuration,
+                                    "predicted_minimum_margin_rad": min(
+                                        nullspace_margins
+                                    ),
+                                    "predicted_terminal_margin_rad": (
+                                        nullspace_margins[-1]
+                                    ),
+                                    "safe": (
+                                        min(nullspace_margins)
+                                        >= fallback_floor
+                                        and min(nullspace_margins) >= 0
+                                    ),
+                                    "selected": False,
+                                }
+                            )
+                        restore_identity = (
+                            restore_identity
+                            and _restore_identity(
+                                env,
+                                robot,
+                                one_step_screen["snapshot"],
+                            )
+                        )
+                        safe_candidates = [
+                            candidate
+                            for candidate in candidate_rows
+                            if candidate["safe"]
+                        ]
+                        safe_candidates.sort(
+                            key=lambda candidate: (
+                                candidate["offset_rad"],
+                                -candidate[
+                                    "predicted_terminal_margin_rad"
+                                ],
+                            )
+                        )
+                        selected_nullspace = (
+                            safe_candidates[0]
+                            if safe_candidates
+                            else None
+                        )
+                        if selected_nullspace is not None:
+                            selected_nullspace["selected"] = True
+                        nullspace_row = {
+                            "recovery_round": recovery_round,
+                            "policy_seed": attempts[-1][
+                                "policy_seed"
+                            ],
+                            "policy_chunk_sha256": attempts[-1][
+                                "policy_chunk_sha256"
+                            ],
+                            "exact_first_action": exact_action,
+                            "minimum_margin_floor_rad": fallback_floor,
+                            "candidate_evaluations": candidate_rows,
+                            "selected_offset_rad": (
+                                selected_nullspace["offset_rad"]
+                                if selected_nullspace is not None
+                                else None
+                            ),
+                            "authorized": (
+                                selected_nullspace is not None
+                            ),
+                            "executed_in_shadow": False,
+                            "exact_action_identity": None,
+                            "execution_terminal_margin_rad": None,
+                            "prediction_execution_margin_error_rad": None,
+                        }
+                        nullspace_exact_h1_fallbacks.append(
+                            nullspace_row
+                        )
+                        if selected_nullspace is not None:
+                            selected_prefix = prefix
+                            selected_advance_nullspace_offset = (
+                                selected_nullspace["offset_rad"]
+                            )
+                            selected_advance_minimum_margin_floor = (
+                                fallback_floor
+                            )
+                            break
                     if controller_reset_exact_h1_fallback:
                         if one_step_screen is None:
                             raise RecedingHorizonPilotError(
@@ -1682,6 +1909,9 @@ def _run_case(
                         reset_exact_h1_fallbacks
                     ),
                     "reset_reserve_bridges": reset_reserve_bridges,
+                    "nullspace_exact_h1_fallbacks": (
+                        nullspace_exact_h1_fallbacks
+                    ),
                     "policy_seed": terminal_attempt["policy_seed"],
                     "clean_frame_sha256": terminal_attempt[
                         "clean_frame_sha256"
@@ -1719,7 +1949,38 @@ def _run_case(
                     break
                 # This is an explicitly isolated shadow advance, not a live
                 # policy dispatch. The transition tuple is discarded.
-                if selected_advance_controller_goal_reset:
+                if selected_advance_nullspace_offset is not None:
+                    executed_configuration = (
+                        _configure_nullspace_retreat(
+                            env=env,
+                            robot=robot,
+                            qidx=qidx,
+                            vidx=vidx,
+                            limits=limits,
+                            joint_index=(
+                                controller_nullspace_target_joint_index
+                            ),
+                            joint_side=(
+                                controller_nullspace_target_joint_side
+                            ),
+                            offset_rad=(
+                                selected_advance_nullspace_offset
+                            ),
+                        )
+                    )
+                    nullspace_controller_configuration_count += 1
+                    if (
+                        not executed_configuration[
+                            "configuration_qpos_identity"
+                        ]
+                        or not executed_configuration[
+                            "configuration_qvel_identity"
+                        ]
+                    ):
+                        raise RecedingHorizonPilotError(
+                            "executed nullspace config changed qpos/qvel"
+                        )
+                elif selected_advance_controller_goal_reset:
                     _reset_controller(robot)
                     reset_exact_h1_controller_goal_reset_count += 1
                 env.step(
@@ -1762,6 +2023,46 @@ def _run_case(
                     ] = abs(
                         advanced_margin
                         - executed_fallback[
+                            "predicted_terminal_margin_rad"
+                        ]
+                    )
+                if nullspace_exact_h1_fallbacks:
+                    executed_nullspace = (
+                        nullspace_exact_h1_fallbacks[-1]
+                    )
+                    executed_candidate = next(
+                        candidate
+                        for candidate in executed_nullspace[
+                            "candidate_evaluations"
+                        ]
+                        if candidate["selected"]
+                    )
+                    executed_nullspace["executed_in_shadow"] = True
+                    executed_nullspace[
+                        "execution_configuration"
+                    ] = executed_configuration
+                    executed_nullspace["exact_action_identity"] = bool(
+                        np.array_equal(
+                            np.asarray(
+                                executed_nullspace[
+                                    "exact_first_action"
+                                ],
+                                dtype=np.float64,
+                            ),
+                            np.asarray(
+                                selected_prefix[0],
+                                dtype=np.float64,
+                            ),
+                        )
+                    )
+                    executed_nullspace[
+                        "execution_terminal_margin_rad"
+                    ] = advanced_margin
+                    executed_nullspace[
+                        "prediction_execution_margin_error_rad"
+                    ] = abs(
+                        advanced_margin
+                        - executed_candidate[
                             "predicted_terminal_margin_rad"
                         ]
                     )
@@ -1874,6 +2175,15 @@ def _run_case(
             "maximum_reset_reserve_bridges_per_cycle": (
                 maximum_reset_reserve_bridges_per_cycle
             ),
+            "controller_nullspace_exact_h1_offsets_rad": list(
+                controller_nullspace_exact_h1_offsets_rad
+            ),
+            "controller_nullspace_target_joint_index": (
+                controller_nullspace_target_joint_index
+            ),
+            "controller_nullspace_target_joint_side": (
+                controller_nullspace_target_joint_side
+            ),
             "lane_base_seeds": list(lane_base_seeds),
             "recovery_round_seed_stride": (
                 recovery_round_seed_stride
@@ -1923,6 +2233,12 @@ def _run_case(
             ),
             "reset_backup_controller_goal_reset_count": (
                 reset_backup_controller_goal_reset_count
+            ),
+            "nullspace_exact_h1_shadow_env_step_count": (
+                nullspace_exact_h1_shadow_steps
+            ),
+            "nullspace_controller_configuration_count": (
+                nullspace_controller_configuration_count
             ),
             "full_prefix_shadow_env_step_count": (
                 full_prefix_shadow_steps
