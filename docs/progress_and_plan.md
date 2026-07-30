@@ -141,6 +141,19 @@ advance。该结果说明 reset 能稳定单步物理状态，却不能让后续
 随后立即 fresh H3 replan。它不是替代动作或 projection，仍逐 cycle 消费 exact policy action；
 两 lane 各5个 exact advances 的成功门与所有零审计计数不变。
 
+reset-guarded exact-H1 已完成但达到3/5后 non-pass。两条 lane 各有第1个 action 由 H3 直接
+放行，之后共有6次 reset-H1 screens，其中4次授权并执行；4/4 action bytes identity，
+prediction/execution margin error 最大为0。每条 lane 第3次 advance 后 minimum margin 约
+`0.15456 rad`，下一 exact action 虽经过 reset 仍低于0.15 floor，因此正确拒绝。总计6个
+exact policy advances，无 crossing、warning、dispatch、typed recovery 或 outcome read。
+
+该结果证明 exact-H1 本身可重复，但只看当前一步会把状态送出 backup-controllable set。
+下一版增加 controller backup viability，不改0.15门：对 reset+exact action 的终点再验证
+至少存在一个原61动作中的 reset+一步安全 backup；只有存在才执行 exact action。若不存在，
+从当前 snapshot 选择 terminal margin 最大的已验证 reset+reserve action，执行后 fresh policy
+replan，仍在同一个 policy cycle 中等待 exact action；每 cycle 最多2个 reserve actions。
+成功仍要求每条 lane 完成5个 exact policy advances，reserve 数量单独披露。
+
 ## 前一 checkpoint：2026-07-30 v12.5 integrated predictive recovery
 
 fresh policy-prefix shadow 与 typed recovery runtime 的 fixed-trace composition 已完成并终态冻结：

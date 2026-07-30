@@ -151,6 +151,12 @@ controller-goal reset 本身仍没有让122个 post-H3 screens 中任何一个�
 controller 上验证并执行原 prefix 的首个 exact action，随后立即 fresh H3 replan。这样测试的是
 “预测提前触发 + 低层逐步制动 + exact action identity”，不是用保守替代动作制造表面成功。
 
+该 exact-H1 successor 将活性提高到每条 lane 3/5：4次 fallback execution 的 action identity
+4/4、预测/执行误差0，但第3步后只剩约 `0.15456 rad`，下一 exact action 被0.15 floor拒绝。
+因此下一设计点不是放宽 floor，而是验证 control-invariant backup set：exact action 终点必须仍有
+至少一个安全 reset+backup；否则先执行单独记账的 reserve action并 fresh replan。最终正结果仍
+以5个 exact policy advances计，不把 reserve action计作 policy success。
+
 
 论文主故事仍是两层对齐，而不是 SemanticSubtask 本身。当前最重要的科学风险集中在 L1：
 

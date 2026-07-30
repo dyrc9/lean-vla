@@ -324,6 +324,18 @@ controller-goal brake 运行仍为 non-pass：122/122 个 reset+一步 bridge �
 action bytes，然后立即 fresh H3 replan。每个 cycle 仍消费 exact policy action，不使用 bridge
 library、不清零 qpos/qvel、不修改 recovery threshold。成功门仍是两条 lane 各5次 exact advance。
 
+运行把每条 lane 从1步提高到3步，但仍 non-pass：H3 direct allow 共2次；6次 reset-H1 screens
+中4次授权和执行，4/4 exact action identity，预测/执行 margin error 为0。第3步后最低余量约
+`0.15456 rad`，随后 exact action 违反0.15 floor而停止。restore identity 100%，所有 crossing、
+warning、contact saturation、live dispatch、typed recovery 和 outcome read 均为0。
+
+下一 controller-invariant successor 为每个 reset+exact H1 增加一步 backup viability：从 exact
+终点恢复并 reset，枚举原61个一步动作；至少一个 backup 全程保持0.15 floor，exact action 才可
+授权。如果 viability 为空，则不执行 policy action，而从原 snapshot 选 terminal margin 最大的
+合法 reset+reserve action，执行后 fresh inference，并在同一 policy cycle 再尝试；每 cycle 最多
+2个 reserve。成功门仍是每条 lane 5个 exact policy advances，所有 reserve 单独计数，不作为
+policy success。
+
 冻结产物：
 
 - protocol：`experiments/proofalign_simulator_integrated_predictive_recovery_v12_qualification_protocol.json`
@@ -345,3 +357,4 @@ library、不清零 qpos/qvel、不修改 recovery threshold。成功门仍是�
 - absolute-safe H2 bridge：`results/proofalign_absolute_safe_h2_bridge_pilot_v12_20260730/`
 - H3 sequence bridge：`results/proofalign_h3_sequence_bridge_pilot_v12_20260730/`
 - H3 controller-goal brake：`results/proofalign_h3_controller_goal_brake_pilot_v12_20260730/`
+- H3 reset-guarded exact H1：`results/proofalign_h3_reset_guarded_exact_h1_pilot_v12_20260730/`
