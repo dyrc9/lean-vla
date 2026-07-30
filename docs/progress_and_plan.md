@@ -33,10 +33,11 @@ H=1/2/3，共156个组合。65个组合通过原 recovery safety，但全部在�
 typed recovery 和 outcome read 均为0。下一步应先定位被 post-policy prefix 压过边界的具体
 joint/direction，再设计连续动作或显式 joint-space retreat；继续保持原 gate。
 
-当前已实现下一轮局部连续搜索：围绕最好结构 `positive_y@h5+positive_z@h1` 生成164个
-有界混合动作，并在每次 post-policy screen 中记录 limiting joint、side、step 和7个关节各自
-的最小 margin。该轮仍只允许 restored shadow，不修改阈值；代码与测试先形成独立 Git
-checkpoint，资源预检通过后再执行。
+局部连续搜索也已完成：围绕最好结构生成的164个有界混合动作全部 recovery-safe，但
+seed10509 仍全部 `block_replan`；最好 post-policy margin 仅为 `−0.01187 rad`。新增诊断显示
+164/164 的 limiting atom 都是 `joint 1 upper`，因此问题已经从“未知 generator 容量”收缩为
+“需要显式增加 joint 1 上界余量”。下一轮使用 simulator-shadow beam search，每步可切换原13个
+动作，按 joint-1 upper margin 排序，同时保留原全局 recovery safety 与 policy gate。
 
 ## 前一 checkpoint：2026-07-30 v12.5 integrated predictive recovery
 

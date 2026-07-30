@@ -155,6 +155,18 @@ identity 为100%，active warning、contact saturation、typed recovery、dispat
 逐关节最小 margin、limiting joint/side/step；若局部搜索仍失败，这些诊断直接用于构造
 joint-targeted retreat，而不是继续扩大离散笛卡尔积。
 
+该轮也已完成并再次得到负结果：164/164 个组合通过原 recovery safety，且没有 joint
+crossing；但164个 seed-10509 screens 全部为 `block_replan`。最优候选
+`positive_y@h5+blend_z1.00_y0.50@h1` 的 post-policy margin 为 `−0.01187 rad`，
+只比两阶段离散最优值再提高 `0.00007 rad`。全部164个候选的 limiting atom 都是
+`joint 1 upper`，不是其他关节或 contact。branch restore identity 为100%，active warning、
+contact saturation、typed recovery、dispatch 和 outcome read 均为0。
+
+因此后续不再扩大局部连续网格。下一 generator 应在 simulator shadow 中按 `joint 1 upper`
+margin 做 beam search，允许每一步切换原语，同时继续施加原全局 recovery safety；只把
+joint-targeted beam 产生的安全轨迹送入未改变的 policy gate。该设计仍是 result-informed
+engineering，不回写 formal。
+
 冻结产物：
 
 - protocol：`experiments/proofalign_simulator_integrated_predictive_recovery_v12_qualification_protocol.json`
@@ -165,3 +177,4 @@ joint-targeted retreat，而不是继续扩大离散笛卡尔积。
 - shortest policy-aware：`results/proofalign_policy_aware_recovery_candidate_pilot_v12_20260730/`
 - all-prefix policy-aware：`results/proofalign_policy_aware_recovery_all_prefix_pilot_v12_20260730/`
 - two-stage policy-aware：`results/proofalign_two_stage_policy_aware_recovery_pilot_v12_20260730/`
+- continuous-blend：`results/proofalign_continuous_blend_recovery_pilot_v12_20260730/`

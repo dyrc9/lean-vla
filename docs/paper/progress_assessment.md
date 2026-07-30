@@ -98,7 +98,10 @@ branch screen 已在 shortest/all-safe-prefix 两阶段为3个 outlier 中的2�
 recovery generator 容量，而非 margin、seed retry 或候选排序。继续扩展的156个两阶段组合中
 65个通过原 recovery safety，但在 seed10509 下仍全部 `block_replan`；最好 post-policy
 margin 只从单前缀的 `−0.01246` 改善到 `−0.01194 rad`。这进一步排除了简单串联离散原语，
-下一步需要诊断具体 joint/direction 后再构造连续或 joint-space generator。
+下一步需要诊断具体 joint/direction 后再构造连续或 joint-space generator。随后164个局部连续
+blend 全部 recovery-safe，却同样在 seed10509 下 block；最好值仅到 `−0.01187 rad`，而且
+164/164 limiting atoms 都是 joint-1 upper。这排除了局部笛卡尔插值，支持下一步做
+joint-1-targeted、仍受全局 recovery gate 约束的序列搜索。
 
 
 论文主故事仍是两层对齐，而不是 SemanticSubtask 本身。当前最重要的科学风险集中在 L1：
