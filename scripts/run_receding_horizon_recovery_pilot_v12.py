@@ -4,11 +4,13 @@
 from __future__ import annotations
 
 import argparse
+from contextlib import contextmanager
 from copy import deepcopy
 import json
 import os
 from pathlib import Path
 import sys
+from types import MethodType
 from typing import Any
 
 import numpy as np
@@ -610,6 +612,142 @@ def _configure_nullspace_retreat(
     }
 
 
+def _configure_joint_velocity_damping(
+    *,
+    env: Any,
+    robot: Any,
+    qidx: np.ndarray,
+    vidx: np.ndarray,
+    joint_index: int,
+    gain: float,
+) -> dict[str, Any]:
+    if (
+        joint_index < 0
+        or joint_index >= len(qidx)
+        or len(qidx) != len(vidx)
+        or not np.isfinite(gain)
+        or gain <= 0
+    ):
+        raise RecedingHorizonPilotError(
+            "invalid joint-velocity damping configuration"
+        )
+    before_qpos = np.asarray(
+        env.sim.data.qpos[qidx], dtype=np.float64
+    ).copy()
+    before_qvel = np.asarray(
+        env.sim.data.qvel[vidx], dtype=np.float64
+    ).copy()
+    controller = robot.controller
+    controller.update(force=True)
+    controller.reset_goal()
+    after_qpos = np.asarray(
+        env.sim.data.qpos[qidx], dtype=np.float64
+    )
+    after_qvel = np.asarray(
+        env.sim.data.qvel[vidx], dtype=np.float64
+    )
+    actuator_min = np.asarray(
+        controller.actuator_min, dtype=np.float64
+    )
+    actuator_max = np.asarray(
+        controller.actuator_max, dtype=np.float64
+    )
+    if (
+        actuator_min.shape != (len(qidx),)
+        or actuator_max.shape != (len(qidx),)
+    ):
+        raise RecedingHorizonPilotError(
+            "unexpected controller actuator-limit shape"
+        )
+    return {
+        "target_joint_index": joint_index,
+        "gain": float(gain),
+        "controller_goal_reset": True,
+        "target_actuator_min": float(actuator_min[joint_index]),
+        "target_actuator_max": float(actuator_max[joint_index]),
+        "configuration_qpos_identity": bool(
+            np.array_equal(before_qpos, after_qpos)
+        ),
+        "configuration_qvel_identity": bool(
+            np.array_equal(before_qvel, after_qvel)
+        ),
+    }
+
+
+@contextmanager
+def _scoped_joint_velocity_damping(
+    robot: Any,
+    *,
+    joint_index: int,
+    gain: float,
+) -> Any:
+    controller = robot.controller
+    actuator_min = np.asarray(
+        controller.actuator_min, dtype=np.float64
+    )
+    actuator_max = np.asarray(
+        controller.actuator_max, dtype=np.float64
+    )
+    if (
+        joint_index < 0
+        or joint_index >= len(actuator_min)
+        or actuator_min.shape != actuator_max.shape
+        or not np.isfinite(gain)
+        or gain <= 0
+    ):
+        raise RecedingHorizonPilotError(
+            "invalid scoped joint-velocity damping"
+        )
+    if "run_controller" in controller.__dict__:
+        raise RecedingHorizonPilotError(
+            "controller already has a run_controller override"
+        )
+    original_run_controller = controller.run_controller
+    torque_audit: list[dict[str, Any]] = []
+
+    def damped_run_controller(controller_self: Any) -> np.ndarray:
+        nominal = np.asarray(
+            original_run_controller(), dtype=np.float64
+        ).copy()
+        joint_velocity = float(
+            np.asarray(
+                controller_self.joint_vel, dtype=np.float64
+            )[joint_index]
+        )
+        requested_damping = -float(gain) * joint_velocity
+        unclipped = nominal.copy()
+        unclipped[joint_index] += requested_damping
+        applied = np.asarray(
+            controller_self.clip_torques(unclipped),
+            dtype=np.float64,
+        ).copy()
+        controller_self.torques = applied
+        torque_audit.append(
+            {
+                "controller_substep_index": len(torque_audit),
+                "joint_velocity_rad_s": joint_velocity,
+                "nominal_torque": float(nominal[joint_index]),
+                "requested_damping_torque": requested_damping,
+                "unclipped_torque": float(unclipped[joint_index]),
+                "applied_torque": float(applied[joint_index]),
+                "actuator_min": float(actuator_min[joint_index]),
+                "actuator_max": float(actuator_max[joint_index]),
+                "torque_clipped": bool(
+                    not np.array_equal(unclipped, applied)
+                ),
+            }
+        )
+        return applied
+
+    controller.run_controller = MethodType(
+        damped_run_controller, controller
+    )
+    try:
+        yield torque_audit
+    finally:
+        del controller.run_controller
+
+
 def _run_case(
     config: dict[str, Any],
     pair: dict[str, Any],
@@ -641,6 +779,10 @@ def _run_case(
     ] = (),
     controller_nullspace_target_joint_index: int = 1,
     controller_nullspace_target_joint_side: str = "upper",
+    controller_joint_damping_exact_h1_gains: tuple[
+        float, ...
+    ] = (),
+    controller_joint_damping_target_joint_index: int = 1,
     lane_base_seeds: tuple[int, ...] = LANE_BASE_SEEDS,
     row_schema: str = ROW_SCHEMA,
     source_version: str = "v12.11",
@@ -662,6 +804,16 @@ def _run_case(
             not np.isfinite(offset) or offset <= 0
             for offset in controller_nullspace_exact_h1_offsets_rad
         )
+        or any(
+            not np.isfinite(gain) or gain <= 0
+            for gain in controller_joint_damping_exact_h1_gains
+        )
+        or tuple(controller_joint_damping_exact_h1_gains)
+        != tuple(
+            sorted(set(controller_joint_damping_exact_h1_gains))
+        )
+        or controller_joint_damping_target_joint_index < 0
+        or controller_joint_damping_target_joint_index >= 7
         or controller_nullspace_target_joint_side
         not in {"lower", "upper"}
     ):
@@ -773,6 +925,8 @@ def _run_case(
         reset_backup_controller_goal_reset_count = 0
         nullspace_exact_h1_shadow_steps = 0
         nullspace_controller_configuration_count = 0
+        joint_damping_exact_h1_shadow_steps = 0
+        joint_damping_controller_configuration_count = 0
         policy_advance_steps = 0
         for lane_index, base_seed in enumerate(lane_base_seeds):
             restore_identity = (
@@ -830,9 +984,11 @@ def _run_case(
                 reset_exact_h1_fallbacks = []
                 reset_reserve_bridges = []
                 nullspace_exact_h1_fallbacks = []
+                joint_damping_exact_h1_fallbacks = []
                 selected_prefix = None
                 selected_advance_controller_goal_reset = False
                 selected_advance_nullspace_offset = None
+                selected_advance_joint_damping_gain = None
                 selected_advance_minimum_margin_floor = float(
                     config["episode"]["trigger_margin_rad"]
                 )
@@ -1118,6 +1274,168 @@ def _run_case(
                             selected_prefix = prefix
                             selected_advance_nullspace_offset = (
                                 selected_nullspace["offset_rad"]
+                            )
+                            selected_advance_minimum_margin_floor = (
+                                fallback_floor
+                            )
+                            break
+                    if controller_joint_damping_exact_h1_gains:
+                        if one_step_screen is None:
+                            raise RecedingHorizonPilotError(
+                                "missing failed gate for damping fallback"
+                            )
+                        exact_action = tuple(
+                            float(value) for value in prefix[0]
+                        )
+                        candidate_rows = []
+                        fallback_floor = float(
+                            config["recovery"]["safe_margin_rad"]
+                        )
+                        for gain in (
+                            controller_joint_damping_exact_h1_gains
+                        ):
+                            restore_identity = (
+                                restore_identity
+                                and _restore_identity(
+                                    env,
+                                    robot,
+                                    one_step_screen["snapshot"],
+                                )
+                            )
+                            configuration = (
+                                _configure_joint_velocity_damping(
+                                    env=env,
+                                    robot=robot,
+                                    qidx=qidx,
+                                    vidx=vidx,
+                                    joint_index=(
+                                        controller_joint_damping_target_joint_index
+                                    ),
+                                    gain=float(gain),
+                                )
+                            )
+                            joint_damping_controller_configuration_count += (
+                                1
+                            )
+                            if (
+                                not configuration[
+                                    "configuration_qpos_identity"
+                                ]
+                                or not configuration[
+                                    "configuration_qvel_identity"
+                                ]
+                            ):
+                                raise RecedingHorizonPilotError(
+                                    "damping configuration changed qpos/qvel"
+                                )
+                            with _scoped_joint_velocity_damping(
+                                robot,
+                                joint_index=(
+                                    controller_joint_damping_target_joint_index
+                                ),
+                                gain=float(gain),
+                            ) as torque_audit:
+                                (
+                                    _damped_positions,
+                                    damped_margins,
+                                ) = _execute_actions(
+                                    env,
+                                    actions=(exact_action,),
+                                    qidx=qidx,
+                                    limits=limits,
+                                    contacts=contacts,
+                                )
+                            joint_damping_exact_h1_shadow_steps += 1
+                            candidate_rows.append(
+                                {
+                                    "gain": float(gain),
+                                    "configuration": configuration,
+                                    "controller_substep_torque_audit": (
+                                        torque_audit
+                                    ),
+                                    "controller_scope_restored": (
+                                        "run_controller"
+                                        not in robot.controller.__dict__
+                                    ),
+                                    "predicted_minimum_margin_rad": min(
+                                        damped_margins
+                                    ),
+                                    "predicted_terminal_margin_rad": (
+                                        damped_margins[-1]
+                                    ),
+                                    "safe": (
+                                        min(damped_margins)
+                                        >= fallback_floor
+                                        and min(damped_margins) >= 0
+                                    ),
+                                    "selected": False,
+                                }
+                            )
+                        restore_identity = (
+                            restore_identity
+                            and _restore_identity(
+                                env,
+                                robot,
+                                one_step_screen["snapshot"],
+                            )
+                        )
+                        safe_candidates = [
+                            candidate
+                            for candidate in candidate_rows
+                            if candidate["safe"]
+                        ]
+                        safe_candidates.sort(
+                            key=lambda candidate: (
+                                candidate["gain"],
+                                -candidate[
+                                    "predicted_terminal_margin_rad"
+                                ],
+                            )
+                        )
+                        selected_damping = (
+                            safe_candidates[0]
+                            if safe_candidates
+                            else None
+                        )
+                        if selected_damping is not None:
+                            selected_damping["selected"] = True
+                        damping_row = {
+                            "recovery_round": recovery_round,
+                            "policy_seed": attempts[-1][
+                                "policy_seed"
+                            ],
+                            "policy_chunk_sha256": attempts[-1][
+                                "policy_chunk_sha256"
+                            ],
+                            "exact_first_action": exact_action,
+                            "target_joint_index": (
+                                controller_joint_damping_target_joint_index
+                            ),
+                            "minimum_margin_floor_rad": fallback_floor,
+                            "candidate_evaluations": candidate_rows,
+                            "selected_gain": (
+                                selected_damping["gain"]
+                                if selected_damping is not None
+                                else None
+                            ),
+                            "authorized": (
+                                selected_damping is not None
+                            ),
+                            "executed_in_shadow": False,
+                            "exact_action_identity": None,
+                            "execution_configuration": None,
+                            "execution_controller_substep_torque_audit": [],
+                            "execution_controller_scope_restored": None,
+                            "execution_terminal_margin_rad": None,
+                            "prediction_execution_margin_error_rad": None,
+                        }
+                        joint_damping_exact_h1_fallbacks.append(
+                            damping_row
+                        )
+                        if selected_damping is not None:
+                            selected_prefix = prefix
+                            selected_advance_joint_damping_gain = (
+                                selected_damping["gain"]
                             )
                             selected_advance_minimum_margin_floor = (
                                 fallback_floor
@@ -1912,6 +2230,9 @@ def _run_case(
                     "nullspace_exact_h1_fallbacks": (
                         nullspace_exact_h1_fallbacks
                     ),
+                    "joint_damping_exact_h1_fallbacks": (
+                        joint_damping_exact_h1_fallbacks
+                    ),
                     "policy_seed": terminal_attempt["policy_seed"],
                     "clean_frame_sha256": terminal_attempt[
                         "clean_frame_sha256"
@@ -1949,7 +2270,47 @@ def _run_case(
                     break
                 # This is an explicitly isolated shadow advance, not a live
                 # policy dispatch. The transition tuple is discarded.
-                if selected_advance_nullspace_offset is not None:
+                executed_configuration = None
+                execution_torque_audit: list[dict[str, Any]] = []
+                if selected_advance_joint_damping_gain is not None:
+                    executed_configuration = (
+                        _configure_joint_velocity_damping(
+                            env=env,
+                            robot=robot,
+                            qidx=qidx,
+                            vidx=vidx,
+                            joint_index=(
+                                controller_joint_damping_target_joint_index
+                            ),
+                            gain=selected_advance_joint_damping_gain,
+                        )
+                    )
+                    joint_damping_controller_configuration_count += 1
+                    if (
+                        not executed_configuration[
+                            "configuration_qpos_identity"
+                        ]
+                        or not executed_configuration[
+                            "configuration_qvel_identity"
+                        ]
+                    ):
+                        raise RecedingHorizonPilotError(
+                            "executed damping config changed qpos/qvel"
+                        )
+                    with _scoped_joint_velocity_damping(
+                        robot,
+                        joint_index=(
+                            controller_joint_damping_target_joint_index
+                        ),
+                        gain=selected_advance_joint_damping_gain,
+                    ) as execution_torque_audit:
+                        env.step(
+                            np.asarray(
+                                selected_prefix[0],
+                                dtype=np.float64,
+                            )
+                        )
+                elif selected_advance_nullspace_offset is not None:
                     executed_configuration = (
                         _configure_nullspace_retreat(
                             env=env,
@@ -1980,14 +2341,25 @@ def _run_case(
                         raise RecedingHorizonPilotError(
                             "executed nullspace config changed qpos/qvel"
                         )
+                    env.step(
+                        np.asarray(
+                            selected_prefix[0], dtype=np.float64
+                        )
+                    )
                 elif selected_advance_controller_goal_reset:
                     _reset_controller(robot)
                     reset_exact_h1_controller_goal_reset_count += 1
-                env.step(
-                    np.asarray(
-                        selected_prefix[0], dtype=np.float64
+                    env.step(
+                        np.asarray(
+                            selected_prefix[0], dtype=np.float64
+                        )
                     )
-                )
+                else:
+                    env.step(
+                        np.asarray(
+                            selected_prefix[0], dtype=np.float64
+                        )
+                    )
                 contacts.observe(env)
                 policy_advance_steps += 1
                 qpos = np.asarray(
@@ -2059,6 +2431,55 @@ def _run_case(
                         "execution_terminal_margin_rad"
                     ] = advanced_margin
                     executed_nullspace[
+                        "prediction_execution_margin_error_rad"
+                    ] = abs(
+                        advanced_margin
+                        - executed_candidate[
+                            "predicted_terminal_margin_rad"
+                        ]
+                    )
+                if joint_damping_exact_h1_fallbacks:
+                    executed_damping = (
+                        joint_damping_exact_h1_fallbacks[-1]
+                    )
+                    executed_candidate = next(
+                        candidate
+                        for candidate in executed_damping[
+                            "candidate_evaluations"
+                        ]
+                        if candidate["selected"]
+                    )
+                    executed_damping["executed_in_shadow"] = True
+                    executed_damping[
+                        "execution_configuration"
+                    ] = executed_configuration
+                    executed_damping[
+                        "execution_controller_substep_torque_audit"
+                    ] = execution_torque_audit
+                    executed_damping[
+                        "execution_controller_scope_restored"
+                    ] = (
+                        "run_controller"
+                        not in robot.controller.__dict__
+                    )
+                    executed_damping["exact_action_identity"] = bool(
+                        np.array_equal(
+                            np.asarray(
+                                executed_damping[
+                                    "exact_first_action"
+                                ],
+                                dtype=np.float64,
+                            ),
+                            np.asarray(
+                                selected_prefix[0],
+                                dtype=np.float64,
+                            ),
+                        )
+                    )
+                    executed_damping[
+                        "execution_terminal_margin_rad"
+                    ] = advanced_margin
+                    executed_damping[
                         "prediction_execution_margin_error_rad"
                     ] = abs(
                         advanced_margin
@@ -2184,6 +2605,12 @@ def _run_case(
             "controller_nullspace_target_joint_side": (
                 controller_nullspace_target_joint_side
             ),
+            "controller_joint_damping_exact_h1_gains": list(
+                controller_joint_damping_exact_h1_gains
+            ),
+            "controller_joint_damping_target_joint_index": (
+                controller_joint_damping_target_joint_index
+            ),
             "lane_base_seeds": list(lane_base_seeds),
             "recovery_round_seed_stride": (
                 recovery_round_seed_stride
@@ -2239,6 +2666,12 @@ def _run_case(
             ),
             "nullspace_controller_configuration_count": (
                 nullspace_controller_configuration_count
+            ),
+            "joint_damping_exact_h1_shadow_env_step_count": (
+                joint_damping_exact_h1_shadow_steps
+            ),
+            "joint_damping_controller_configuration_count": (
+                joint_damping_controller_configuration_count
             ),
             "full_prefix_shadow_env_step_count": (
                 full_prefix_shadow_steps

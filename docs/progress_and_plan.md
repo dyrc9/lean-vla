@@ -194,6 +194,11 @@ nullspace target offset 也预测 crossing；各 offset terminal margin 只相�
 `−k_d q̇_1`，候选 `k_d=2/5/10/20/40/80`，torque 仍裁剪到 actuator limits；动作结束立即移除
 wrapper。只选最小的0.15-safe gain，配置本身不得改 qpos/qvel，action bytes保持一致并 fresh H3。
 
+该 v12.24 runner 与作用域审计已经实现：每个 controller substep 保存 nominal torque、requested
+damping、clipped torque 与 joint velocity；候选预测和实际 advance 使用同一 wrapper，退出
+action 后验证实例级 override 已移除。13个 receding/H2/H3 定向测试通过，下一步在 clean-tree
+preflight 后执行冻结双 lane 实验。
+
 ## 前一 checkpoint：2026-07-30 v12.5 integrated predictive recovery
 
 fresh policy-prefix shadow 与 typed recovery runtime 的 fixed-trace composition 已完成并终态冻结：

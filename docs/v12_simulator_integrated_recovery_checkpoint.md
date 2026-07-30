@@ -372,6 +372,10 @@ identity，4次 fallback 均选0.05 rad，exact action identity 4/4、prediction
 `2/5/10/20/40/80` 并裁剪 actuator limits，动作后立即撤销 wrapper。候选配置不得改变 qpos/qvel，
 仍执行同一 policy bytes、守0.15 floor并 fresh H3。
 
+v12.24 实现已增加逐 controller-substep torque audit、候选/执行 qpos-qvel identity、exact action
+identity、预测/执行 margin error 与 wrapper scope restore 字段；13个相关定向测试通过。协议在
+执行前冻结，双 lane 结果仍待 clean-tree 实验，不提前报告成功。
+
 冻结产物：
 
 - protocol：`experiments/proofalign_simulator_integrated_predictive_recovery_v12_qualification_protocol.json`

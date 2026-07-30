@@ -178,6 +178,10 @@ JSON serialization，ledger 为空且 outcome 未读，因此不报告效果。�
 从任务 nullspace 移到显式 joint-velocity damping torque；新 brake 必须作用域仅限一个 exact
 action、裁剪 actuator limits、保持配置前 qpos/qvel identity，并继续使用0.15 floor与 fresh H3。
 
+该 scoped brake 已实现并通过13个 H2/H3/receding 定向测试；冻结 gain 为2/5/10/20/40/80。
+每个控制子步显式记录 damping direction 与 torque clipping，实验结果尚未生成，因此这一实现
+目前仍只是待验证方法，不进入论文效果结论。
+
 
 论文主故事仍是两层对齐，而不是 SemanticSubtask 本身。当前最重要的科学风险集中在 L1：
 
