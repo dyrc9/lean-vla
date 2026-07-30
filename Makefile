@@ -164,5 +164,8 @@ v12-policy-shadow-check:
 	$(PYTHON) scripts/freeze_warmstart_policy_prefix_shadow_v12_qualification.py --check
 	$(PYTHON) scripts/run_warmstart_policy_prefix_shadow_v12_qualification.py --validate-results >/dev/null
 	$(PYTHON) scripts/freeze_warmstart_policy_prefix_shadow_v12_terminal.py --check
+	$(PYTHON) scripts/freeze_policy_prefix_shadow_v12_qualification.py --check
+	$(PYTHON) scripts/run_policy_prefix_shadow_v12_qualification.py --validate-results >/dev/null
+	$(PYTHON) scripts/freeze_policy_prefix_shadow_v12_terminal.py --check
 
 check: test lean paper-artifacts-check action-block-check m1-readiness-check semantic-v4-c5-check e1-selector-check e1-fallback-check e2-conditioning-check e3-checker-check e4-no-dispatch-check e5-effect-observer-check e6-resource-smoke-preflight-check e7-perception-preflight-check e8-source-binding-check semantic-post-e5-readiness-check four-arm-v4-check four-arm-v4-exploratory-check v12-contract-check v12-simulator-preflight-check v12-recovery-successor-check v12-policy-shadow-check

@@ -1,10 +1,10 @@
-# v12.4a/v12.4b policy-prefix shadow checkpoint
+# v12.4a/v12.4b/v12.4c policy-prefix shadow checkpoint
 
-> 状态：2026-07-29 terminal。该 checkpoint 只覆盖 no-outcome、fixed-recorded-prefix
-> controller-shadow mechanics；不覆盖 fresh policy inference、clean utility、attacked efficacy、
-> deployment perception 或物理安全，也不授权 clean/attacked rollout。
+> 状态：2026-07-30 terminal。该 checkpoint 覆盖 no-outcome fixed-recorded-prefix mechanics
+> 和 fresh OpenPI π0.5 policy-prefix shadow qualification；不覆盖 clean utility、attacked
+> efficacy、实际 recovery、deployment perception 或物理安全，也不授权 clean/attacked rollout。
 
-## 1. fresh-policy 工程启动为何停止
+## 1. 首次 fresh-policy 工程启动为何停止
 
 原计划是在独立 reset state 上加载冻结 OpenPI π0.5，并对每个 nominal / synthetic-pressure
 observation 生成 fresh 10-step prefix。资源预检选择 policy GPU1、EGL GPU0；checkpoint restore
@@ -18,9 +18,8 @@ observation 生成 fresh 10-step prefix。资源预检选择 policy GPU1、EGL G
 | Simulator case | 0 |
 | Live dispatch / outcome read | 0 / 0 |
 
-终态分类为 `policy_prefix_shadow_v12_policy_load_resource_nonstart`。该结果只说明当前共享 GPU
-资源不足，不是方法 non-pass。失败 manifest 被保留，fresh-policy qualification 在资源 gate
-重新满足前不启动。
+终态分类为 `policy_prefix_shadow_v12_policy_load_resource_nonstart`。该结果只说明当时共享 GPU
+资源不足，不是方法 non-pass，且未被后续成功覆盖或改名。
 
 ## 2. fixed-prefix 机械资格边界
 
@@ -99,20 +98,52 @@ v12.4b 分类为 `warmstart_policy_prefix_shadow_v12_qualification_pass`。full 
 identity 仍为93.33%，最大非机械臂差异仍只有 `2.22e-16`；trusted arm、controller、simulator
 input、clock 和 warm-start identity 全部为100%。
 
-## 6. 当前结论与下一步
+## 6. v12.4c fresh-policy 正式资格
 
-controller-aware fixed-prefix shadow mechanics 已关闭：exact prefix 的 allow/block 决策可绑定，
-30/30 重复轨迹达到容差，合成当前风险全部进入 recovery-required，且没有 live dispatch 或 outcome
-泄漏。
+2026-07-30 GPU0 恢复到约 `0.5 GiB` 占用后，fresh retry 先保留了两个 inference 前工程失败：
 
-但论文仍不能声称 fresh policy-prefix qualification 完成，因为：
+1. EGL GPU3 在配置阶段映射到两个 ordinal，未加载 policy；
+2. policy load 成功后，LIBERO 外层 wrapper 不提供直接 observation getter；在第一次 inference
+   前 fail closed。runner 随后改为从内层 simulator 强制刷新 observation，不读取
+   transition reward/done/info。
 
-1. fixed prefixes 来自 outcome-known 历史 trace；
-2. injected observation 没有重新输入 π0.5；
-3. fresh checkpoint load 因共享 GPU 显存不足尚未启动；
-4. synthetic injection 多次出现 MuJoCo `ncon=5000` warning；
-5. 本轮没有实际 recovery、fresh replan 或任务 outcome。
+第三次工程 pilot 完成6/6 cases：policy load 1、fresh inference 6，nominal allow 3/3、
+synthetic recovery-required 3/3、repeat fidelity 6/6，所有 restore gate 100%，live dispatch
+和 outcome read 为0。formal protocol 在 pilot 之后冻结，使用与 pilot 不重叠的15 pairs。
 
-下一步保持 no-outcome：等待独占/足量 GPU 后，运行已实现的 fresh-policy protocol；要求 policy
-checkpoint load、30次 fresh inference、controller-aware shadow 和 typed recovery/fresh-state
-transaction 同时通过。此前不生成 clean 或 attacked 协议。
+冻结协议：
+`experiments/proofalign_policy_prefix_shadow_v12_qualification_protocol.json`。
+
+| 指标 | 结果 |
+|---|---:|
+| Valid cases | 30/30 |
+| Policy load / fresh inference | 1 / 30 |
+| Nominal exact allow | 15/15 |
+| Worst-suite nominal allow | 5/5 |
+| Synthetic current trigger | 15/15 |
+| Synthetic recovery-required | 15/15 |
+| Shadow/reference risk agreement | 30/30 |
+| Trusted arm / controller / input / clock restore | 100% / 100% / 100% / 100% |
+| `qacc_warmstart` restore | 100% |
+| Repeat trajectory ≤0.02 rad | 29/30 |
+| 最大 repeat qpos 误差 | 0.0249513 rad |
+| Exact allow identity | 100% |
+| Blocked prefix 被授权 | 0 |
+| Live dispatch / outcome read | 0 / 0 |
+
+分类为 `policy_prefix_shadow_v12_qualification_pass`，全部冻结 gate 通过。唯一 repeat 尾部是
+`obstacle_avoidance_human_task8_init17` 的 joint-6 upper synthetic case；两次 replay 都在 step0
+预测 risk 并返回 `recovery_required`，五次 restore assessment 全部 identity，但 dense-contact
+solver 轨迹相差0.02495 rad。正式运行也保留了多次 MuJoCo `ncon=5000` warning。
+
+## 7. 当前结论与下一步
+
+controller-aware policy-prefix shadow qualification 已完成：30个独立 observation 都重新输入
+冻结 π0.5，exact prefix 的 allow/block 决策可绑定，合成当前风险全部进入 recovery-required，
+且没有 live dispatch 或 outcome 泄漏。fixed-recorded-prefix 仍只承担历史 mechanics 证据，
+fresh 结果不从历史 outcome prefix 外推。
+
+该 pass 仍不证明实际 recovery、fresh replan、任务效用或 defense efficacy。下一步继续保持
+no-outcome：把 fresh predictive screen 与已经资格化的 typed recovery transaction 接成一个完整
+runtime gate，验证 trigger 后旧 policy authorization 撤销、one-use recovery、ordered receipts
+和恢复后 fresh-state replan。集成 gate 通过前不生成 clean 或 attacked 协议。

@@ -99,9 +99,11 @@ Phase Q 不创建 outcome rollout，不读取 reward/success/cost/collision，�
 - v12.4a fixed-recorded-prefix shadow 正式30 cases 的 risk agreement 为30/30，repeat tolerance
   为29/30；v12.4b 绑定 `qacc_warmstart` 后，在相同 population 上达到30/30，最大 qpos 误差
   为 `4.44e-16 rad`；
-- fresh OpenPI pilot 在 checkpoint restore 阶段因共享 GPU 显存不足 fail closed，policy inference、
-  simulator case、dispatch 和 outcome read 均为0；因此当前仍不授权 clean 或 outcome rollout。
-  详见 [`v12_recovery_successor_checkpoint.md`](v12_recovery_successor_checkpoint.md) 和
+- 首次 fresh OpenPI pilot 的资源 nonstart 保持不变；资源恢复后的 v12.4c formal qualification
+  完成 policy load 1、fresh inference 30，nominal allow 15/15、synthetic recovery-required
+  15/15、risk agreement 30/30，repeat tolerance 29/30，live dispatch/outcome read 为0；
+- 当前只授权 no-outcome predictive-screen + typed-recovery 集成 gate，仍不授权 clean 或 outcome
+  rollout。详见 [`v12_recovery_successor_checkpoint.md`](v12_recovery_successor_checkpoint.md) 和
   [`v12_policy_prefix_shadow_checkpoint.md`](v12_policy_prefix_shadow_checkpoint.md)。
 
 ### Q1 Sparse-L1 finite corpus
@@ -192,16 +194,15 @@ Holm family。first-hit prevention、post-trigger containment、task utility、o
 
 1. **V12-C1 Sparse L1 decision（已完成）**：将 hard/advisory/replan 分区做成纯函数，保留 exact passthrough。
 2. **V12-C2 Trusted execution state（已完成）**：定义 joint state、limits、epoch 和 source provenance schema。
-3. **V12-C3 Shadow predictor（analytic 与 fixed-prefix mechanics 已完成；fresh policy 待资格）**：
-   只读 cloned state，返回 known/unknown risk assessment；controller cache 与
-   `qacc_warmstart` 已绑定。
+3. **V12-C3 Shadow predictor（fresh policy qualification 已完成）**：只读 cloned state，返回
+   known/unknown risk assessment；controller cache 与 `qacc_warmstart` 已绑定。
 4. **V12-C4 Recovery selector（已完成多关节后继）**：冻结 7D candidate library、margin objective、
    deterministic tie-break 和 shortest-safe-prefix。
 5. **V12-C5 Recovery transaction（已完成 zero-policy gate）**：独立 authorization、receipt、mode
    transition、replay protection 和 fresh-policy state binding。
 6. **V12-C6 Lean successor**：证明 old-policy authorization 在 trigger 后不可消费。
-7. **V12-Q1–Q3 runners（已完成至 v12.4b）**：fresh root、append-only ledger、checksum、terminal
-   validator；fresh π0.5 runner 已实现但资源 gate 未满足。
+7. **V12-Q1–Q3 runners（已完成至 v12.4c）**：fresh root、append-only ledger、checksum、terminal
+   validator；fresh π0.5 的30-case no-outcome qualification 已通过。
 8. **V12-Clean/Attack**：只有资格与前置 gate 通过后才生成 outcome protocol。
 
 ## 7. 停止与审计规则

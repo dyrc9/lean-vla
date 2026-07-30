@@ -1,12 +1,12 @@
 # 当前进展与执行计划
 
-## 最新 checkpoint：2026-07-29 v12.4 policy-prefix shadow
+## 最新 checkpoint：2026-07-30 v12.4c fresh policy-prefix shadow
 
-v12.4a/v12.4b 已完成并终态冻结，但证据范围严格限于 no-outcome controller shadow：
+v12.4a/v12.4b/v12.4c 已完成并终态冻结，证据范围严格限于 no-outcome controller shadow：
 
 - fresh OpenPI π0.5 工程 pilot 在 checkpoint restore 阶段因共享 policy GPU 显存不足 fail closed；
-  policy inference、simulator case、live dispatch 和 outcome read 均为0，因此不能声称 fresh-policy
-  qualification 完成；
+  policy inference、simulator case、live dispatch 和 outcome read 均为0，该历史 resource
+  nonstart 保持不变；
 - 为继续检查执行机制，v12.4a 从冻结 v11 clean trace 中机械提取15个10-step prefix；正式
   nominal/synthetic population 为30 cases，风险判断30/30一致，nominal exact allow 15/15，
   synthetic recovery-required 15/15，旧/blocked prefix 被授权为0；
@@ -16,12 +16,18 @@ v12.4a/v12.4b 已完成并终态冻结，但证据范围严格限于 no-outcome 
   contact/joint-limit dynamics，最大 qpos 误差为 `0.0990581 rad`；
 - 独立 v12.4b 进一步绑定 MuJoCo `qacc_warmstart`，在相同30-case population、相同 tolerance
   下达到30/30，最大误差降至 `4.44e-16 rad`。所有 trusted arm/controller/input/clock/warm-start
-  restore gate 均为100%。
+  restore gate 均为100%；
+- 资源恢复后，fresh π0.5 pilot 6/6 完成，随后冻结的30-case formal qualification terminal pass：
+  policy load 1、fresh inference 30、nominal allow 15/15、synthetic recovery-required 15/15、
+  risk agreement 30/30，所有 trusted restore gate 100%，live dispatch/outcome read 为0；
+- fresh formal repeat fidelity 为29/30，最大误差 `0.0249513 rad`，仍通过冻结的≥95% gate。唯一
+  尾部是 joint-6 upper 的 current-trigger synthetic dense-contact case；两次均判 risk 并要求
+  recovery，运行保留 `ncon=5000` warning。
 
-完整表格、资源 nonstart、claim boundary 和产物位置见
-[`v12_policy_prefix_shadow_checkpoint.md`](v12_policy_prefix_shadow_checkpoint.md)。下一步等待足量
-policy GPU 后运行已经实现的 fresh-prefix qualification；此前不生成 clean/attacked outcome
-协议，也不把固定历史前缀结果写成 task utility 或 defense efficacy。
+完整表格、资源 nonstart、fresh retry 和 claim boundary 见
+[`v12_policy_prefix_shadow_checkpoint.md`](v12_policy_prefix_shadow_checkpoint.md)。下一步只授权
+no-outcome predictive-screen + typed-recovery 集成 transaction gate；此前不生成 clean/attacked
+outcome 协议，也不把 shadow pass 写成 task utility 或 defense efficacy。
 
 ## 前一 checkpoint：2026-07-29 v12.2/v12.3 多关节恢复 successor
 

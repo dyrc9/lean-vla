@@ -64,6 +64,9 @@ fi
 "$PYTHON_BIN" scripts/freeze_warmstart_policy_prefix_shadow_v12_qualification.py --check
 "$PYTHON_BIN" scripts/run_warmstart_policy_prefix_shadow_v12_qualification.py --validate-results >/dev/null
 "$PYTHON_BIN" scripts/freeze_warmstart_policy_prefix_shadow_v12_terminal.py --check
+"$PYTHON_BIN" scripts/freeze_policy_prefix_shadow_v12_qualification.py --check
+"$PYTHON_BIN" scripts/run_policy_prefix_shadow_v12_qualification.py --validate-results >/dev/null
+"$PYTHON_BIN" scripts/freeze_policy_prefix_shadow_v12_terminal.py --check
 "$PYTHON_BIN" scripts/generate_saber_confirmatory_records.py --dry-run >/dev/null
 "$PYTHON_BIN" scripts/run_saber_confirmatory_victim.py --dry-run >/dev/null
 "$PYTHON_BIN" scripts/export_proofalign_fixed_trace.py --dry-run >/dev/null

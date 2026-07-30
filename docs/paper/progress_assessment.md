@@ -33,7 +33,7 @@
 | Typed L2 containment v11 | mechanism pass / efficacy mixed | fresh15 与 held-out scale45 均为 trigger 后旧 policy dispatch 0；scale45 joint-limit burden 显著下降，但 clean Dual−Semantic-only task success `−24.4pp` |
 | Recoverable L2 v12.1 | no-outcome preflight pass / efficacy 未测 | 655-case contract gate 与45-pair simulator-reset recovery gate 通过；只覆盖 joint-5 upper-limit，未加载策略或读取 outcome |
 | Recoverable L2 v12.2/v12.3 | mechanism strengthened / efficacy 未测 | typed runtime 10/10；多关节210-case覆盖209，actual recovery 209/209；v12.2因full-state identity 201/210保持non-pass，v12.3 trusted-arm identity 210/210通过 |
-| Policy-prefix shadow v12.4 | fixed-prefix mechanics pass / fresh policy 未完成 | 30-case risk agreement 30/30；warm-start 后 repeat fidelity 30/30、最大误差 `4.44e-16 rad`；fresh π0.5 checkpoint restore 因显存不足在 inference 前 fail closed |
+| Policy-prefix shadow v12.4 | fresh no-outcome mechanism pass / efficacy 未测 | fixed-prefix warm-start 后 repeat 30/30；fresh π0.5 formal 为30次 inference、risk agreement 30/30、nominal allow 15/15、synthetic recovery-required 15/15，repeat 29/30；dispatch/outcome 为0 |
 | Deployment | 未就绪 | E7 缺少7类 perception supervision；所有正向结果仍限于 privileged simulator geometry |
 
 ## 2026-07-29 终局判断
@@ -64,13 +64,16 @@ authorization/receipt/replay/fresh-state 边界通过。v12.2 的 full-state ide
 `2.22e-16` 的非机械臂诊断状态。它显著增强恢复机制证据，但没有 policy-prefix、clean utility 或
 attacked efficacy，因此不改变上述论文强度判断。
 
-v12.4 又关闭了 controller-aware shadow 的机械复现缺口：固定的10-step policy prefix 在15个
+v12.4a/v12.4b 先关闭了 controller-aware shadow 的机械复现缺口：固定的10-step policy prefix 在15个
 nominal 与15个 synthetic joint-pressure case 上均给出绑定决策和30/30 risk agreement；
 `qacc_warmstart` 后继将 repeat fidelity 从29/30提高到30/30，最大 qpos 误差从
-`0.0990581` 降到 `4.44e-16 rad`。但这些 prefix 来自 outcome-known 历史 trace，且本轮没有重新
-输入 π0.5。fresh policy checkpoint restore 在 inference 前因显存不足停止，所以该结果增强的是
-simulator/controller mechanics，不是 clean utility、task-preserving recovery 或 attacked efficacy。
-因此论文可以增加一项可复算的机制结果，但“现有完整系统论文、尚非强正面 efficacy 论文”的判断不变。
+`0.0990581` 降到 `4.44e-16 rad`。v12.4c 随后在资源恢复后完成独立 fresh π0.5 qualification：
+30个 observation 各做一次 fresh inference，nominal allow 15/15、synthetic recovery-required
+15/15、risk agreement 30/30，repeat fidelity 29/30，所有 trusted restore gate 100%，dispatch
+和 outcome read 为0。唯一尾部处于 current-trigger dense-contact synthetic dynamics，两个 replay
+仍一致要求 recovery。该结果增强的是 simulator/controller/policy-prefix mechanism，不是 clean
+utility、task-preserving recovery 或 attacked efficacy；“完整系统论文、尚非强正面 efficacy
+论文”的判断不变。
 
 
 论文主故事仍是两层对齐，而不是 SemanticSubtask 本身。当前最重要的科学风险集中在 L1：

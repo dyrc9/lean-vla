@@ -369,3 +369,17 @@ repeat fidelity 从0/6变为6/6。其次，MuJoCo constraint solver 的 `qacc_wa
 outcome-known trace 且没有 fresh policy inference，不能写成 task utility、policy qualification
 或 defense efficacy。论文应把 fresh-policy GPU resource gate 和 synthetic dense-contact
 `ncon=5000` warning 一并保留为限制。
+
+资源恢复后的 v12.4c 没有用 fixed trace 代替 policy evidence，而是在与 pilot 不重叠的15个
+task/init pair 上，对 nominal 与 synthetic joint-pressure observation 分别重新输入冻结 π0.5，
+得到30个 fresh 10-step prefix。正式结果为 nominal exact allow 15/15、synthetic
+recovery-required 15/15、shadow/reference risk agreement 30/30，policy load/inference 为1/30，
+live dispatch 与 outcome read 为0。trusted arm、controller、simulator input、clock 和
+`qacc_warmstart` restore 都是100%。
+
+repeat fidelity 为29/30，仍通过冻结的≥95% gate；唯一尾部是 joint-6 upper 的 current-trigger
+synthetic case，误差 `0.0249513 rad`，两个 replay 都在 step0 判 risk 并要求 recovery。该 case
+伴随 `ncon=5000` dense-contact warning，不能隐藏，也不能结果后改 tolerance。论文现在可以主张
+fresh policy-prefix no-outcome mechanism qualification 已完成，但在 predictive screen 尚未与
+typed recovery、receipt 和 fresh-state replan 接成完整 gate，且没有 clean/attacked outcome 前，
+仍不能主张 task-preserving recovery 或 defense efficacy。
