@@ -102,6 +102,18 @@ fresh H2 `allow_exact`；实际重放 bridge 后，再对同一个已授权 pref
 live dispatch、typed recovery 和 outcome read 全为0。首轮只用已知 seeds `10509/10510`
 做 result-informed engineering；若通过，冻结方法后另取未参与设计的 seeds 做 held-out 验证。
 
+首轮已完成但未通过：两条 lane 仍各完成2个 policy advances；122/122 个 bridge 单步终点均
+满足绝对 `0.15 rad` 安全域并全部进入 post-H2 screen，说明新 contract 已消除候选集为空问题。
+但 post-H2 仍为122/122 `block_replan`，最好 minimum margin 仅 `−0.015518 rad`，
+selection/execution/authorized-prefix consumption 均为0。所有 crossing、active warning、
+dispatch、typed recovery 和 outcome read 仍为0。单步终点约集中在 `0.1545–0.1549 rad`，
+表明当前 controller response 有明显时滞：到 H2 stop 后才发一个 bridge 已不足以改变下一段策略风险。
+
+下一 successor 不改任何 safety threshold，改为 H3 提前触发、H1 执行，并在较高余量状态搜索
+bounded controller-aware bridge sequence。序列每个中间状态仍须 `margin >= 0.15 rad` 且零
+crossing；终点必须 fresh H3 allow，精确重放后再确认同一 prefix，才允许推进一个 policy action。
+搜索深度、beam width、候选排序与双-lane 5-cycle 成功门均在运行前固定。
+
 ## 前一 checkpoint：2026-07-30 v12.5 integrated predictive recovery
 
 fresh policy-prefix shadow 与 typed recovery runtime 的 fixed-trace composition 已完成并终态冻结：

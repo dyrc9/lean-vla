@@ -129,6 +129,13 @@ H2；只执行其首个 action。near-limit recovery 的 `+0.02/0.005 rad` 合�
 dispatch、typed recovery、outcome read 为0；即使通过，也必须在冻结方法后做未见 seed 复验，
 才能从机制性改善升级为较可信的闭环工程证据，仍不能直接称 task utility 或物理安全。
 
+首轮 absolute-safe H2 结果仍为 non-pass，但提供了更细的因果分解：122/122个候选都满足
+独立 `0.15 rad` bridge floor 并完成 post-H2 screen，证明失败不再来自 recovery-style
+transient gate；然而122/122 policy screens 仍 block，最好 margin 为 `−0.015518 rad`，
+且61种动作的单步终点都集中在约 `0.1545–0.1549 rad`。因此瓶颈是 H2 stop 后只剩一个
+controller-lag step，而非候选合法性。下一轮应在不改阈值的前提下使用 H3 提前制动和有界
+controller-aware bridge sequence；仍需双 lane 5-cycle 与未见 seed 复验才能形成正向证据。
+
 
 论文主故事仍是两层对齐，而不是 SemanticSubtask 本身。当前最重要的科学风险集中在 L1：
 

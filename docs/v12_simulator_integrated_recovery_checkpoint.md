@@ -284,6 +284,20 @@ near-limit recovery 的5 mrad transient-loss contract，否则候选集结构性
 saturation、live dispatch、typed recovery 和 outcome read 均为0；若该 result-informed pilot
 通过，方法立即冻结并用未见 seeds 做独立复验。
 
+该 pilot 已终态完成但 gate non-pass。独立绝对安全门使122/122个单步 bridge 候选都可进入
+post-H2 policy screen，候选集不再结构性为空；然而122/122仍为 `block_replan`，最好
+post-H2 minimum margin 为 `−0.015518 rad`，bridge selection/execution 均为0，两条 lane
+仍各只完成2/5个 policy cycles。bridge 终点不随61种动作明显分离，约集中于
+`0.1545–0.1549 rad`，定位出 controller response lag：H2 stop 时再发单步 bridge 太晚。
+restore identity 为100%，crossing、active warning、contact saturation、live dispatch、
+typed recovery 和 outcome read 全为0。
+
+下一版冻结为 H3 predictive/H1 advance 的 controller-aware sequence bridge。它在更高余量状态
+提前停止，并用 simulator-shadow beam 搜索有界动作序列；序列每一步都必须保持原绝对
+`0.15 rad` bridge floor 和零 crossing，终点 fresh H3 allow 后还须在精确重放处确认同一
+policy prefix。它仍不是 recovery，不修改 `+0.02/0.005 rad` recovery contract。成功门继续是
+两条 lane 各5个 policy cycles 与所有安全审计计数为0。
+
 冻结产物：
 
 - protocol：`experiments/proofalign_simulator_integrated_predictive_recovery_v12_qualification_protocol.json`
@@ -302,3 +316,4 @@ saturation、live dispatch、typed recovery 和 outcome read 均为0；若该 re
 - adaptive-beam escalation terminal failure：`results/proofalign_adaptive_beam_recovery_escalation_pilot_v12_20260730/`
 - safe bridge：`results/proofalign_safe_bridge_receding_horizon_pilot_v12_20260730/`
 - H2 scaled bridge：`results/proofalign_h2_scaled_bridge_receding_pilot_v12_20260730/`
+- absolute-safe H2 bridge：`results/proofalign_absolute_safe_h2_bridge_pilot_v12_20260730/`
