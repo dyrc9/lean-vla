@@ -838,11 +838,14 @@ def _run_case(
             "receipt_identity": None,
             "recovery_completed": None,
             "recovery_terminal_safe": None,
+            "recovery_terminal_minimum_margin_rad": None,
             "recovery_joint_limit_crossed": None,
             "typed_recovery_env_step_count": 0,
             "post_recovery_policy_inference_count": 0,
             "post_recovery_shadow_verdict": None,
             "post_recovery_shadow_risk_agreement": None,
+            "post_recovery_shadow_minimum_margin_rad": None,
+            "post_recovery_shadow_issues": None,
             "post_recovery_fresh_authorization_allowed": None,
             "substituted_post_state_authorization_allowed": None,
             "policy_load_count": 1,
@@ -948,6 +951,9 @@ def _run_case(
                         config["recovery"]["safe_margin_rad"]
                     )
                 ),
+                "recovery_terminal_minimum_margin_rad": (
+                    post_state.minimum_margin
+                ),
                 "recovery_joint_limit_crossed": (
                     min(replay_margins) < 0
                 ),
@@ -1022,6 +1028,12 @@ def _run_case(
                 ),
                 "post_recovery_shadow_risk_agreement": (
                     post_screen["risk_agreement"]
+                ),
+                "post_recovery_shadow_minimum_margin_rad": (
+                    post_screen["assessment"].minimum_margin
+                ),
+                "post_recovery_shadow_issues": list(
+                    post_screen["decision"].issues
                 ),
                 "post_recovery_fresh_authorization_allowed": (
                     fresh_allowed

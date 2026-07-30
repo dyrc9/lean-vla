@@ -22,7 +22,6 @@ from scripts.freeze_simulator_integrated_predictive_recovery_v12_qualification i
     OUTPUT_ROOT,
     PROTOCOL_ID,
     PROTOCOL_PATH,
-    build_protocol,
 )
 from scripts.run_simulator_integrated_predictive_recovery_v12_qualification import (  # noqa: E402
     ROW_SCHEMA,
@@ -60,7 +59,9 @@ def _canonical(payload: Any) -> str:
 
 
 def build_terminal() -> dict[str, Any]:
-    protocol = build_protocol()
+    # The terminal binds the retained frozen protocol, not the current
+    # successor worktree.
+    protocol = _load(PROTOCOL_PATH)
     summary_path = OUTPUT_ROOT / "summary.json"
     ledger_path = OUTPUT_ROOT / "qualification_ledger.jsonl"
     manifest_path = OUTPUT_ROOT / "run_manifest.json"
