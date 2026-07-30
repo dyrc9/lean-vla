@@ -55,6 +55,9 @@ H1 直接预测越界并在推进前停止，因此5-cycle gate non-pass。相�
 receding horizon 已把可安全活性从0步提高到3步，但还不能持续。下一轮允许每 cycle 最多8次
 fresh H1 replan，仍只推进首个 exact-safe action；不降低阈值，不隐式打开 recovery。
 
+bounded-H1 runner 与测试已完成：每 cycle 最多8次、attempt seed stride=10，状态在失败尝试间
+保持不变。只有首个 H1 exact-safe attempt 被选中并推进，全部失败则停止；代码先独立提交后运行。
+
 ## 前一 checkpoint：2026-07-30 v12.5 integrated predictive recovery
 
 fresh policy-prefix shadow 与 typed recovery runtime 的 fixed-trace composition 已完成并终态冻结：

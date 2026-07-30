@@ -201,6 +201,10 @@ restore identity 为100%。
 action 通过原门才推进，否则继续 fail closed。若 bounded H1 replan 仍失败，再考虑为
 `block_replan` 定义显式 typed recovery route，而不是隐式执行。
 
+bounded-H1 successor 已固定每 cycle 最多8次 fresh inference，attempt seed stride 为10；
+每次都在完全相同的 branch state 上独立做 full-H10 诊断与 H1 gate，首个 H1
+`allow_exact` 才能推进一步。前一轮相同的两条 lane、五周期和 recovery candidate 保持不变。
+
 冻结产物：
 
 - protocol：`experiments/proofalign_simulator_integrated_predictive_recovery_v12_qualification_protocol.json`

@@ -177,7 +177,15 @@ def _run_case(
     runner: Any,
     args: Any,
     warning_audit: base.MujocoWarningAudit,
+    replan_attempts_per_cycle: int = 1,
+    seed_attempt_stride: int = 10,
+    row_schema: str = ROW_SCHEMA,
+    source_version: str = "v12.11",
 ) -> dict[str, Any]:
+    if replan_attempts_per_cycle <= 0 or seed_attempt_stride <= 0:
+        raise RecedingHorizonPilotError(
+            "replan attempts and seed stride must be positive"
+        )
     formal_index = FORMAL_PAIR_INDEX[TARGET_ID]
     case_warning_start = len(warning_audit.messages)
     runtime = runner.load_libero_task_runtime(
@@ -237,7 +245,7 @@ def _run_case(
         trigger_state = trusted_joint_state_from_libero(
             env,
             state_epoch=formal_index * 500,
-            source_id=f"v12.11:{TARGET_ID}:trigger",
+            source_id=f"{source_version}:{TARGET_ID}:trigger",
         )
         initial_screen = base._screen_prefix(
             config,
@@ -246,7 +254,9 @@ def _run_case(
             qidx=qidx,
             state=trigger_state,
             prefix=trigger_prefix,
-            source_id=f"v12.11:{TARGET_ID}:initial-screen",
+            source_id=(
+                f"{source_version}:{TARGET_ID}:initial-screen"
+            ),
             contact_audit=contacts,
         )
         if (
@@ -295,7 +305,8 @@ def _run_case(
                 positions=recovery_positions,
                 margins=recovery_margins,
                 source_id=(
-                    f"v12.11:{TARGET_ID}:lane{lane_index}:recovery"
+                    f"{source_version}:{TARGET_ID}:"
+                    f"lane{lane_index}:recovery"
                 ),
             )
             recovery_selection = select_escape_recovery_candidate(
@@ -311,109 +322,167 @@ def _run_case(
                 env,
                 state_epoch=trigger_state.state_epoch + 1,
                 source_id=(
-                    f"v12.11:{TARGET_ID}:lane{lane_index}:recovered"
+                    f"{source_version}:{TARGET_ID}:"
+                    f"lane{lane_index}:recovered"
                 ),
             )
             cycles = []
             lane_safe = True
             for cycle_index in range(RECEDING_CYCLE_COUNT):
-                policy_seed = (
-                    int(base_seed)
-                    + cycle_index * SEED_CYCLE_STRIDE
-                )
-                prefix, cycle_frame, cycle_chunk = base._infer_prefix(
-                    config,
-                    env=env,
-                    runtime=runtime,
-                    policy=policy,
-                    jax=jax,
-                    image_tools=image_tools,
-                    runner=runner,
-                    args=args,
-                    policy_seed=policy_seed,
-                )
-                inference_count += 1
-                full_screen = base._screen_prefix(
-                    config,
-                    env=env,
-                    robot=robot,
-                    qidx=qidx,
-                    state=branch_state,
-                    prefix=prefix,
-                    source_id=(
-                        f"v12.11:{TARGET_ID}:lane{lane_index}:"
-                        f"cycle{cycle_index}:full"
-                    ),
-                    contact_audit=contacts,
-                )
-                full_prefix_shadow_steps += full_screen[
-                    "shadow_env_step_count"
-                ]
-                one_step_screen = base._screen_prefix(
-                    config,
-                    env=env,
-                    robot=robot,
-                    qidx=qidx,
-                    state=branch_state,
-                    prefix=prefix[:1],
-                    source_id=(
-                        f"v12.11:{TARGET_ID}:lane{lane_index}:"
-                        f"cycle{cycle_index}:h1"
-                    ),
-                    contact_audit=contacts,
-                )
-                one_step_shadow_steps += one_step_screen[
-                    "shadow_env_step_count"
-                ]
-                first_action_safe = (
-                    one_step_screen["decision"].verdict.value
-                    == PolicyPrefixShadowVerdict.ALLOW_EXACT.value
-                    and one_step_screen["risk_agreement"]
-                    and one_step_screen["restore_identity"]
-                )
+                attempts = []
+                selected_prefix = None
+                for attempt_index in range(
+                    replan_attempts_per_cycle
+                ):
+                    policy_seed = (
+                        int(base_seed)
+                        + cycle_index * SEED_CYCLE_STRIDE
+                        + attempt_index * seed_attempt_stride
+                    )
+                    prefix, cycle_frame, cycle_chunk = (
+                        base._infer_prefix(
+                            config,
+                            env=env,
+                            runtime=runtime,
+                            policy=policy,
+                            jax=jax,
+                            image_tools=image_tools,
+                            runner=runner,
+                            args=args,
+                            policy_seed=policy_seed,
+                        )
+                    )
+                    inference_count += 1
+                    full_screen = base._screen_prefix(
+                        config,
+                        env=env,
+                        robot=robot,
+                        qidx=qidx,
+                        state=branch_state,
+                        prefix=prefix,
+                        source_id=(
+                            f"{source_version}:{TARGET_ID}:"
+                            f"lane{lane_index}:cycle{cycle_index}:"
+                            f"attempt{attempt_index}:full"
+                        ),
+                        contact_audit=contacts,
+                    )
+                    full_prefix_shadow_steps += full_screen[
+                        "shadow_env_step_count"
+                    ]
+                    one_step_screen = base._screen_prefix(
+                        config,
+                        env=env,
+                        robot=robot,
+                        qidx=qidx,
+                        state=branch_state,
+                        prefix=prefix[:1],
+                        source_id=(
+                            f"{source_version}:{TARGET_ID}:"
+                            f"lane{lane_index}:cycle{cycle_index}:"
+                            f"attempt{attempt_index}:h1"
+                        ),
+                        contact_audit=contacts,
+                    )
+                    one_step_shadow_steps += one_step_screen[
+                        "shadow_env_step_count"
+                    ]
+                    first_action_safe = (
+                        one_step_screen[
+                            "decision"
+                        ].verdict.value
+                        == PolicyPrefixShadowVerdict.ALLOW_EXACT.value
+                        and one_step_screen["risk_agreement"]
+                        and one_step_screen["restore_identity"]
+                    )
+                    attempt_row = {
+                        "attempt_index": attempt_index,
+                        "policy_seed": policy_seed,
+                        "clean_frame_sha256": cycle_frame[
+                            "clean_frame_sha256"
+                        ],
+                        "policy_chunk_sha256": cycle_chunk,
+                        "full_prefix_verdict": full_screen[
+                            "decision"
+                        ].verdict.value,
+                        "full_prefix_minimum_margin_rad": full_screen[
+                            "assessment"
+                        ].minimum_margin,
+                        "full_prefix_first_risk_step": full_screen[
+                            "assessment"
+                        ].first_risk_step,
+                        "one_step_verdict": one_step_screen[
+                            "decision"
+                        ].verdict.value,
+                        "one_step_minimum_margin_rad": one_step_screen[
+                            "assessment"
+                        ].minimum_margin,
+                        "one_step_risk_agreement": one_step_screen[
+                            "risk_agreement"
+                        ],
+                        "one_step_restore_identity": one_step_screen[
+                            "restore_identity"
+                        ],
+                        "selected_for_shadow_advance": (
+                            first_action_safe
+                        ),
+                    }
+                    attempts.append(attempt_row)
+                    restore_identity = (
+                        restore_identity
+                        and full_screen["restore_identity"]
+                        and one_step_screen["restore_identity"]
+                    )
+                    if first_action_safe:
+                        selected_prefix = prefix
+                        break
+                terminal_attempt = attempts[-1]
                 cycle_row = {
                     "cycle_index": cycle_index,
-                    "policy_seed": policy_seed,
-                    "clean_frame_sha256": cycle_frame[
+                    "attempt_count": len(attempts),
+                    "attempts": attempts,
+                    "policy_seed": terminal_attempt["policy_seed"],
+                    "clean_frame_sha256": terminal_attempt[
                         "clean_frame_sha256"
                     ],
-                    "policy_chunk_sha256": cycle_chunk,
-                    "full_prefix_verdict": full_screen[
-                        "decision"
-                    ].verdict.value,
-                    "full_prefix_minimum_margin_rad": full_screen[
-                        "assessment"
-                    ].minimum_margin,
-                    "full_prefix_first_risk_step": full_screen[
-                        "assessment"
-                    ].first_risk_step,
-                    "one_step_verdict": one_step_screen[
-                        "decision"
-                    ].verdict.value,
-                    "one_step_minimum_margin_rad": one_step_screen[
-                        "assessment"
-                    ].minimum_margin,
-                    "one_step_risk_agreement": one_step_screen[
-                        "risk_agreement"
+                    "policy_chunk_sha256": terminal_attempt[
+                        "policy_chunk_sha256"
                     ],
-                    "one_step_restore_identity": one_step_screen[
-                        "restore_identity"
+                    "full_prefix_verdict": terminal_attempt[
+                        "full_prefix_verdict"
+                    ],
+                    "full_prefix_minimum_margin_rad": terminal_attempt[
+                        "full_prefix_minimum_margin_rad"
+                    ],
+                    "full_prefix_first_risk_step": terminal_attempt[
+                        "full_prefix_first_risk_step"
+                    ],
+                    "one_step_verdict": terminal_attempt[
+                        "one_step_verdict"
+                    ],
+                    "one_step_minimum_margin_rad": terminal_attempt[
+                        "one_step_minimum_margin_rad"
+                    ],
+                    "one_step_risk_agreement": terminal_attempt[
+                        "one_step_risk_agreement"
+                    ],
+                    "one_step_restore_identity": terminal_attempt[
+                        "one_step_restore_identity"
                     ],
                     "first_action_shadow_advanced": False,
                     "advanced_state_minimum_margin_rad": None,
                 }
                 cycles.append(cycle_row)
-                restore_identity = (
-                    restore_identity
-                    and full_screen["restore_identity"]
-                    and one_step_screen["restore_identity"]
-                )
-                if not first_action_safe:
+                if selected_prefix is None:
                     lane_safe = False
                     break
                 # This is an explicitly isolated shadow advance, not a live
                 # policy dispatch. The transition tuple is discarded.
-                env.step(np.asarray(prefix[0], dtype=np.float64))
+                env.step(
+                    np.asarray(
+                        selected_prefix[0], dtype=np.float64
+                    )
+                )
                 contacts.observe(env)
                 policy_advance_steps += 1
                 qpos = np.asarray(
@@ -433,7 +502,8 @@ def _run_case(
                     env,
                     state_epoch=branch_state.state_epoch + 1,
                     source_id=(
-                        f"v12.11:{TARGET_ID}:lane{lane_index}:"
+                        f"{source_version}:{TARGET_ID}:"
+                        f"lane{lane_index}:"
                         f"cycle{cycle_index}:advanced"
                     ),
                 )
@@ -474,7 +544,7 @@ def _run_case(
                 "receding-horizon branch restore identity failed"
             )
         return {
-            "schema": ROW_SCHEMA,
+            "schema": row_schema,
             "case_id": TARGET_ID,
             **{
                 key: pair[key]
@@ -502,6 +572,10 @@ def _run_case(
                 "candidate_id"
             ],
             "recovery_action_ids": list(action_ids),
+            "replan_attempts_per_cycle": (
+                replan_attempts_per_cycle
+            ),
+            "seed_attempt_stride": seed_attempt_stride,
             "lane_results": lane_rows,
             "receding_horizon_success": all(
                 lane["lane_safe"] for lane in lane_rows
