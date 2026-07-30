@@ -113,6 +113,9 @@ predictive `block_replan` 后的显式 recovery escalation。
 显式 escalation 原型确实在第4轮触发，但原13原语从约0.1546 rad 的当前 margin 出发无法找到
 满足额外0.02 rad terminal gain 的候选，selection/execution 为0/2并安全停止。这说明路由方向
 合理但动态恢复库仍不足；后续需把 joint-targeted generator 接入 escalation，而不是降门。
+接入后的 adaptive beam 在首个 safe-state escalation 上仍无 recovery-terminal node 并终态
+fail closed，说明瓶颈并非只在 generator，而是 `block_replan` 状态与 near-limit recovery
+的额外0.02 rad gain contract 类型不匹配。后继需独立的 safe bridge/shield contract。
 
 
 论文主故事仍是两层对齐，而不是 SemanticSubtask 本身。当前最重要的科学风险集中在 L1：

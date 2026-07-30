@@ -235,6 +235,16 @@ joint-targeted beam。beam 第一名还要从相同 snapshot 重新生成 trajec
 `safe=0.15/gain=0.02/transient=0.005` selector，再独立 replay；之后才允许 shadow execution
 与新 round H1 gate。
 
+实际运行在首个 escalation state 终态 fail closed：beam 搜索没有产生 recovery-terminal
+candidate，错误为 `beam search produced no recovery-terminal candidate`。preflight 通过、
+outcome 未观察，且在任何 escalation/policy advance 前停止。该目录保留为不可覆盖的失败记录，
+不把它重跑成 complete。
+
+这里暴露的是 route 类型不匹配：`block_replan` 时当前状态仍约 `0.1546 rad`、已经处于
+safe region；near-limit recovery selector 又要求相对当前状态额外 `+0.02 rad`。此时正确的
+后继不应降低 recovery gain，也不应继续称 recovery，而应定义独立 safe bridge：只允许一个
+满足原 transient/no-crossing/H1 threshold 的保守 action 改变观测，然后重新 fresh H1 gate。
+
 冻结产物：
 
 - protocol：`experiments/proofalign_simulator_integrated_predictive_recovery_v12_qualification_protocol.json`
@@ -250,3 +260,4 @@ joint-targeted beam。beam 第一名还要从相同 snapshot 重新生成 trajec
 - receding horizon：`results/proofalign_receding_horizon_recovery_pilot_v12_20260730/`
 - bounded H1 replan：`results/proofalign_bounded_h1_replan_recovery_pilot_v12_20260730/`
 - predictive escalation：`results/proofalign_predictive_recovery_escalation_pilot_v12_20260730/`
+- adaptive-beam escalation terminal failure：`results/proofalign_adaptive_beam_recovery_escalation_pilot_v12_20260730/`

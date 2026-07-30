@@ -73,6 +73,11 @@ joint-targeted beam 作为动态 escalation generator，生成后仍由原 selec
 adaptive-beam fallback 与测试已实现；它只在默认 selector 无候选时启动，beam 结果仍需原
 selector 与独立 replay 双重通过。实现先提交，再在 clean worktree 上做两 lane × 5-cycle 运行。
 
+运行在首个 escalation state fail closed：beam 也没有满足当前 margin `+0.02 rad` 的
+recovery-terminal node；未执行 escalation/policy、未读 outcome。失败目录保留，不覆盖。
+原因是 safe-state `block_replan` 与 near-limit recovery contract 不匹配。下一版应单独定义
+one-step safe bridge/shield，保持 transient/no-crossing/H1 门，不篡改 recovery gain。
+
 ## 前一 checkpoint：2026-07-30 v12.5 integrated predictive recovery
 
 fresh policy-prefix shadow 与 typed recovery runtime 的 fixed-trace composition 已完成并终态冻结：
