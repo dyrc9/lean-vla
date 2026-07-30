@@ -451,6 +451,7 @@ def _run_case(
     consume_bridge_authorized_prefix: bool = False,
     bridge_candidate_builder: Any | None = None,
     controller_goal_reset_before_bridge: bool = False,
+    controller_reset_exact_h1_fallback: bool = False,
     lane_base_seeds: tuple[int, ...] = LANE_BASE_SEEDS,
     row_schema: str = ROW_SCHEMA,
     source_version: str = "v12.11",
@@ -569,6 +570,8 @@ def _run_case(
         bridge_post_h1_shadow_steps = 0
         bridge_execution_shadow_steps = 0
         bridge_controller_goal_reset_count = 0
+        reset_exact_h1_shadow_steps = 0
+        reset_exact_h1_controller_goal_reset_count = 0
         policy_advance_steps = 0
         for lane_index, base_seed in enumerate(lane_base_seeds):
             restore_identity = (
@@ -623,7 +626,12 @@ def _run_case(
                 attempts = []
                 recovery_escalations = []
                 safe_bridges = []
+                reset_exact_h1_fallbacks = []
                 selected_prefix = None
+                selected_advance_controller_goal_reset = False
+                selected_advance_minimum_margin_floor = float(
+                    config["episode"]["trigger_margin_rad"]
+                )
                 control_round_count = (
                     maximum_recovery_escalations_per_cycle
                     + maximum_safe_bridges_per_cycle
@@ -766,6 +774,81 @@ def _run_case(
                             break
                     if selected_prefix is not None:
                         break
+                    if controller_reset_exact_h1_fallback:
+                        if one_step_screen is None:
+                            raise RecedingHorizonPilotError(
+                                "missing failed gate for exact-H1 fallback"
+                            )
+                        restore_identity = (
+                            restore_identity
+                            and _restore_identity(
+                                env,
+                                robot,
+                                one_step_screen["snapshot"],
+                            )
+                        )
+                        _reset_controller(robot)
+                        reset_exact_h1_controller_goal_reset_count += 1
+                        exact_action = tuple(
+                            float(value) for value in prefix[0]
+                        )
+                        (
+                            _fallback_positions,
+                            fallback_margins,
+                        ) = _execute_actions(
+                            env,
+                            actions=(exact_action,),
+                            qidx=qidx,
+                            limits=limits,
+                            contacts=contacts,
+                        )
+                        reset_exact_h1_shadow_steps += 1
+                        fallback_floor = float(
+                            config["recovery"]["safe_margin_rad"]
+                        )
+                        authorized = (
+                            min(fallback_margins) >= fallback_floor
+                            and min(fallback_margins) >= 0
+                        )
+                        fallback_row = {
+                            "recovery_round": recovery_round,
+                            "policy_seed": attempts[-1][
+                                "policy_seed"
+                            ],
+                            "policy_chunk_sha256": attempts[-1][
+                                "policy_chunk_sha256"
+                            ],
+                            "exact_first_action": exact_action,
+                            "controller_goal_reset": True,
+                            "minimum_margin_floor_rad": fallback_floor,
+                            "predicted_minimum_margin_rad": min(
+                                fallback_margins
+                            ),
+                            "predicted_terminal_margin_rad": (
+                                fallback_margins[-1]
+                            ),
+                            "authorized": authorized,
+                            "executed_in_shadow": False,
+                            "exact_action_identity": None,
+                            "execution_terminal_margin_rad": None,
+                            "prediction_execution_margin_error_rad": None,
+                        }
+                        reset_exact_h1_fallbacks.append(fallback_row)
+                        restore_identity = (
+                            restore_identity
+                            and _restore_identity(
+                                env,
+                                robot,
+                                one_step_screen["snapshot"],
+                            )
+                        )
+                        if authorized:
+                            selected_prefix = prefix
+                            selected_advance_controller_goal_reset = True
+                            selected_advance_minimum_margin_floor = (
+                                fallback_floor
+                            )
+                            break
                     if len(safe_bridges) < maximum_safe_bridges_per_cycle:
                         if one_step_screen is None:
                             raise RecedingHorizonPilotError(
@@ -1251,6 +1334,9 @@ def _run_case(
                     "attempts": attempts,
                     "recovery_escalations": recovery_escalations,
                     "safe_bridges": safe_bridges,
+                    "reset_exact_h1_fallbacks": (
+                        reset_exact_h1_fallbacks
+                    ),
                     "policy_seed": terminal_attempt["policy_seed"],
                     "clean_frame_sha256": terminal_attempt[
                         "clean_frame_sha256"
@@ -1288,6 +1374,9 @@ def _run_case(
                     break
                 # This is an explicitly isolated shadow advance, not a live
                 # policy dispatch. The transition tuple is discarded.
+                if selected_advance_controller_goal_reset:
+                    _reset_controller(robot)
+                    reset_exact_h1_controller_goal_reset_count += 1
                 env.step(
                     np.asarray(
                         selected_prefix[0], dtype=np.float64
@@ -1303,8 +1392,36 @@ def _run_case(
                 cycle_row[
                     "advanced_state_minimum_margin_rad"
                 ] = advanced_margin
-                if advanced_margin <= float(
-                    config["episode"]["trigger_margin_rad"]
+                if reset_exact_h1_fallbacks:
+                    executed_fallback = reset_exact_h1_fallbacks[-1]
+                    executed_fallback["executed_in_shadow"] = True
+                    executed_fallback["exact_action_identity"] = bool(
+                        np.array_equal(
+                            np.asarray(
+                                executed_fallback[
+                                    "exact_first_action"
+                                ],
+                                dtype=np.float64,
+                            ),
+                            np.asarray(
+                                selected_prefix[0],
+                                dtype=np.float64,
+                            ),
+                        )
+                    )
+                    executed_fallback[
+                        "execution_terminal_margin_rad"
+                    ] = advanced_margin
+                    executed_fallback[
+                        "prediction_execution_margin_error_rad"
+                    ] = abs(
+                        advanced_margin
+                        - executed_fallback[
+                            "predicted_terminal_margin_rad"
+                        ]
+                    )
+                if advanced_margin < (
+                    selected_advance_minimum_margin_floor
                 ):
                     lane_safe = False
                     break
@@ -1400,6 +1517,9 @@ def _run_case(
             "controller_goal_reset_before_bridge": (
                 controller_goal_reset_before_bridge
             ),
+            "controller_reset_exact_h1_fallback": (
+                controller_reset_exact_h1_fallback
+            ),
             "lane_base_seeds": list(lane_base_seeds),
             "recovery_round_seed_stride": (
                 recovery_round_seed_stride
@@ -1434,6 +1554,12 @@ def _run_case(
             ),
             "bridge_controller_goal_reset_count": (
                 bridge_controller_goal_reset_count
+            ),
+            "reset_exact_h1_shadow_env_step_count": (
+                reset_exact_h1_shadow_steps
+            ),
+            "reset_exact_h1_controller_goal_reset_count": (
+                reset_exact_h1_controller_goal_reset_count
             ),
             "full_prefix_shadow_env_step_count": (
                 full_prefix_shadow_steps
