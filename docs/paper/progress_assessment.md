@@ -241,6 +241,9 @@ safe expansion，且最佳模式仍是fraction1.0极值控制。16512条边审�
 因此当前只证明“单目标margin retention”失败，不能声称全部平滑depth2状态不可达。v12.33将用
 同一宽度做margin/terminal-velocity各半的冻结diverse frontier；在其结果前不提升论文结论。
 
+v12.33实现与25个相关定向测试已完成；它不增加beam width、controller modes或预测horizon，
+只增加可审计的frontier diversity。正式结果前仍视为未验证方法。
+
 
 论文主故事仍是两层对齐，而不是 SemanticSubtask 本身。当前最重要的科学风险集中在 L1：
 

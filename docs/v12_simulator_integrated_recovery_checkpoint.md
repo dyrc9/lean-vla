@@ -467,6 +467,10 @@ v12.33不扩大计算宽度或修改任何安全门；它将width64固定拆为3
 terminal toward-velocity最小的parent，去重后从原排序补足。这样直接检验低速度depth2 endpoint
 是否保有第三步，而不把4032个被剪枝节点误判为不可达。
 
+实现已完成并保留历史默认排序。新审计逐层记录margin/velocity top-set overlap、retained来源、
+全体与frontier的toward-velocity范围和最低速度序列；25个相关定向测试通过，正式运行仍须clean
+Git preflight。
+
 冻结产物：
 
 - protocol：`experiments/proofalign_simulator_integrated_predictive_recovery_v12_qualification_protocol.json`

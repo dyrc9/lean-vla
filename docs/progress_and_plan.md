@@ -326,6 +326,11 @@ beam retention：固定保留32个原margin-ranked nodes与32个terminal toward-
 去重后按原margin排序补足64。最终full-horizon选择规则、首步消费和fresh replan不变；新增
 frontier来源与速度范围审计。
 
+v12.33 runner已实现，默认`trajectory_margin`路径保持v12.31/v12.32语义；新runner显式冻结
+`margin_velocity_diverse`。每层ledger记录两组top-set overlap、实际保留计数、全部/保留节点
+toward-velocity范围及最低速度序列。覆盖整个H3/controller/receding链的25个定向测试通过，
+正式双lane结果尚未生成。
+
 ## 前一 checkpoint：2026-07-30 v12.5 integrated predictive recovery
 
 fresh policy-prefix shadow 与 typed recovery runtime 的 fixed-trace composition 已完成并终态冻结：

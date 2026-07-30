@@ -1486,6 +1486,143 @@ def _scoped_contact_aware_actuator_vertex_blend(
         del controller.run_controller
 
 
+def _retain_contact_aware_beam(
+    expansions: list[dict[str, Any]],
+    *,
+    beam_width: int,
+    strategy: str,
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    if beam_width <= 0 or strategy not in {
+        "trajectory_margin",
+        "margin_velocity_diverse",
+    }:
+        raise RecedingHorizonPilotError(
+            "invalid contact-aware beam retention"
+        )
+    margin_ranked = sorted(
+        expansions,
+        key=lambda node: (
+            -node["trajectory_minimum_margin_rad"],
+            -node["terminal_target_joint_margin_rad"],
+            node["terminal_toward_limit_velocity_rad_s"],
+            node["sequence"],
+        ),
+    )
+    velocity_ranked = sorted(
+        expansions,
+        key=lambda node: (
+            node["terminal_toward_limit_velocity_rad_s"],
+            -node["trajectory_minimum_margin_rad"],
+            -node["terminal_target_joint_margin_rad"],
+            node["sequence"],
+        ),
+    )
+    margin_quota = (
+        beam_width
+        if strategy == "trajectory_margin"
+        else beam_width // 2
+    )
+    velocity_quota = (
+        0
+        if strategy == "trajectory_margin"
+        else beam_width - margin_quota
+    )
+    retained_sequences: set[tuple[int, ...]] = set()
+    for node in margin_ranked[:margin_quota]:
+        retained_sequences.add(tuple(node["sequence"]))
+    for node in velocity_ranked[:velocity_quota]:
+        retained_sequences.add(tuple(node["sequence"]))
+    for node in margin_ranked:
+        if len(retained_sequences) >= min(
+            len(expansions), beam_width
+        ):
+            break
+        retained_sequences.add(tuple(node["sequence"]))
+    retained = [
+        node
+        for node in margin_ranked
+        if tuple(node["sequence"]) in retained_sequences
+    ][:beam_width]
+    margin_top = {
+        tuple(node["sequence"])
+        for node in margin_ranked[:margin_quota]
+    }
+    velocity_top = {
+        tuple(node["sequence"])
+        for node in velocity_ranked[:velocity_quota]
+    }
+    audit = {
+        "strategy": strategy,
+        "margin_quota": margin_quota,
+        "velocity_quota": velocity_quota,
+        "margin_velocity_top_overlap_count": len(
+            margin_top & velocity_top
+        ),
+        "retained_margin_top_count": sum(
+            tuple(node["sequence"]) in margin_top
+            for node in retained
+        ),
+        "retained_velocity_top_count": sum(
+            tuple(node["sequence"]) in velocity_top
+            for node in retained
+        ),
+        "all_terminal_toward_velocity_min_rad_s": (
+            velocity_ranked[0][
+                "terminal_toward_limit_velocity_rad_s"
+            ]
+            if velocity_ranked
+            else None
+        ),
+        "all_terminal_toward_velocity_max_rad_s": (
+            velocity_ranked[-1][
+                "terminal_toward_limit_velocity_rad_s"
+            ]
+            if velocity_ranked
+            else None
+        ),
+        "retained_terminal_toward_velocity_min_rad_s": (
+            min(
+                node[
+                    "terminal_toward_limit_velocity_rad_s"
+                ]
+                for node in retained
+            )
+            if retained
+            else None
+        ),
+        "retained_terminal_toward_velocity_max_rad_s": (
+            max(
+                node[
+                    "terminal_toward_limit_velocity_rad_s"
+                ]
+                for node in retained
+            )
+            if retained
+            else None
+        ),
+        "best_velocity_sequence": (
+            list(velocity_ranked[0]["sequence"])
+            if velocity_ranked
+            else None
+        ),
+        "best_velocity_terminal_toward_velocity_rad_s": (
+            velocity_ranked[0][
+                "terminal_toward_limit_velocity_rad_s"
+            ]
+            if velocity_ranked
+            else None
+        ),
+        "best_velocity_trajectory_minimum_margin_rad": (
+            velocity_ranked[0][
+                "trajectory_minimum_margin_rad"
+            ]
+            if velocity_ranked
+            else None
+        ),
+    }
+    return retained, audit
+
+
 def _screen_contact_aware_vertex_beam(
     *,
     env: Any,
@@ -1502,6 +1639,7 @@ def _screen_contact_aware_vertex_beam(
     target_joint_side: str,
     minimum_margin_floor_rad: float,
     beam_width: int,
+    retention_strategy: str = "trajectory_margin",
     source_id: str,
 ) -> dict[str, Any]:
     if (
@@ -1509,6 +1647,11 @@ def _screen_contact_aware_vertex_beam(
         or not vertex_ids
         or beam_width <= 0
         or minimum_margin_floor_rad < 0
+        or retention_strategy
+        not in {
+            "trajectory_margin",
+            "margin_velocity_diverse",
+        }
         or any(
             not np.isfinite(fraction)
             or fraction <= 0
@@ -1718,7 +1861,14 @@ def _screen_contact_aware_vertex_beam(
                         "first_step": first_step,
                     }
                 )
-        expansions.sort(
+        beam, retention_audit = _retain_contact_aware_beam(
+            expansions,
+            beam_width=beam_width,
+            strategy=retention_strategy,
+        )
+        retained_count = len(beam)
+        margin_ranked = sorted(
+            expansions,
             key=lambda node: (
                 -node["trajectory_minimum_margin_rad"],
                 -node["terminal_target_joint_margin_rad"],
@@ -1726,9 +1876,8 @@ def _screen_contact_aware_vertex_beam(
                     "terminal_toward_limit_velocity_rad_s"
                 ],
                 node["sequence"],
-            )
+            ),
         )
-        retained_count = min(len(expansions), beam_width)
         depth_summaries.append(
             {
                 "depth": depth + 1,
@@ -1738,20 +1887,20 @@ def _screen_contact_aware_vertex_beam(
                 "safe_expansion_count": len(expansions),
                 "retained_count": retained_count,
                 "best_trajectory_minimum_margin_rad": (
-                    expansions[0][
+                    margin_ranked[0][
                         "trajectory_minimum_margin_rad"
                     ]
-                    if expansions
+                    if margin_ranked
                     else None
                 ),
                 "best_sequence": (
-                    list(expansions[0]["sequence"])
-                    if expansions
+                    list(margin_ranked[0]["sequence"])
+                    if margin_ranked
                     else None
                 ),
+                "retention_audit": retention_audit,
             }
         )
-        beam = expansions[:beam_width]
         if not beam:
             break
     restore_identity = (
@@ -1786,6 +1935,7 @@ def _screen_contact_aware_vertex_beam(
     return {
         "horizon": len(actions),
         "beam_width": beam_width,
+        "retention_strategy": retention_strategy,
         "mode_count": len(modes),
         "blend_fractions": list(blend_fractions),
         "depth_summaries": depth_summaries,
@@ -1868,6 +2018,9 @@ def _run_case(
     contact_aware_vertex_beam_blend_fractions: tuple[
         float, ...
     ] = (),
+    contact_aware_vertex_beam_retention_strategy: str = (
+        "trajectory_margin"
+    ),
     lane_base_seeds: tuple[int, ...] = LANE_BASE_SEEDS,
     row_schema: str = ROW_SCHEMA,
     source_version: str = "v12.11",
@@ -2007,6 +2160,11 @@ def _run_case(
                 set(contact_aware_vertex_beam_blend_fractions)
             )
         )
+        or contact_aware_vertex_beam_retention_strategy
+        not in {
+            "trajectory_margin",
+            "margin_velocity_diverse",
+        }
         or controller_nullspace_target_joint_side
         not in {"lower", "upper"}
     ):
@@ -3366,6 +3524,9 @@ def _run_case(
                                     ),
                                     beam_width=(
                                         contact_aware_vertex_beam_width
+                                    ),
+                                    retention_strategy=(
+                                        contact_aware_vertex_beam_retention_strategy
                                     ),
                                     source_id=(
                                         f"{source_version}:{TARGET_ID}:"
@@ -5866,6 +6027,9 @@ def _run_case(
             ),
             "contact_aware_vertex_beam_blend_fractions": list(
                 contact_aware_vertex_beam_blend_fractions
+            ),
+            "contact_aware_vertex_beam_retention_strategy": (
+                contact_aware_vertex_beam_retention_strategy
             ),
             "lane_base_seeds": list(lane_base_seeds),
             "recovery_round_seed_stride": (
