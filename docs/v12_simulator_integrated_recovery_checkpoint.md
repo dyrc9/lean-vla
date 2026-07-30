@@ -230,6 +230,11 @@ outcome read 均为0。
 branch state 生成轨迹，再用完全相同的 recovery selector 和 replay tolerance 复核。默认库与
 beam 都无候选时仍停止；不能降低 terminal-gain gate。
 
+adaptive-beam escalation runner 已完成：默认原语 selector 先运行；仅在其无候选时启动
+joint-targeted beam。beam 第一名还要从相同 snapshot 重新生成 trajectory、通过原
+`safe=0.15/gain=0.02/transient=0.005` selector，再独立 replay；之后才允许 shadow execution
+与新 round H1 gate。
+
 冻结产物：
 
 - protocol：`experiments/proofalign_simulator_integrated_predictive_recovery_v12_qualification_protocol.json`

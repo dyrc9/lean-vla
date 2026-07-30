@@ -181,6 +181,7 @@ def _run_case(
     seed_attempt_stride: int = 10,
     maximum_recovery_escalations_per_cycle: int = 0,
     recovery_round_seed_stride: int = 1_000,
+    escalation_candidate_builder: Any | None = None,
     row_schema: str = ROW_SCHEMA,
     source_version: str = "v12.11",
 ) -> dict[str, Any]:
@@ -505,6 +506,82 @@ def _run_case(
                         restore_identity and escalation_restore
                     )
                     selected_recovery = escalation_selection.selected
+                    generator_mode = "frozen_primitive_prefix"
+                    generator_diagnostics = None
+                    if (
+                        selected_recovery is None
+                        and escalation_candidate_builder is not None
+                    ):
+                        built = escalation_candidate_builder(
+                            config,
+                            env=env,
+                            robot=robot,
+                            qidx=qidx,
+                            limits=limits,
+                            trigger_state=branch_state,
+                            snapshot=one_step_screen["snapshot"],
+                            contacts=contacts,
+                        )
+                        escalation_candidate_shadow_steps += int(
+                            built["shadow_env_step_count"]
+                        )
+                        restore_identity = (
+                            restore_identity
+                            and bool(built["restore_identity"])
+                        )
+                        generator_mode = "joint_targeted_beam_fallback"
+                        generator_diagnostics = built["diagnostics"]
+                        fallback_specs = tuple(
+                            built["candidate_specs"]
+                        )
+                        if fallback_specs:
+                            fallback_spec = fallback_specs[0]
+                            restore_identity = (
+                                restore_identity
+                                and _restore_identity(
+                                    env,
+                                    robot,
+                                    one_step_screen["snapshot"],
+                                )
+                            )
+                            (
+                                fallback_positions,
+                                fallback_margins,
+                            ) = _execute_actions(
+                                env,
+                                actions=tuple(
+                                    fallback_spec["actions"]
+                                ),
+                                qidx=qidx,
+                                limits=limits,
+                                contacts=contacts,
+                            )
+                            escalation_candidate_shadow_steps += int(
+                                fallback_spec["action_count"]
+                            )
+                            fallback_candidate = _make_candidate(
+                                fallback_spec,
+                                trigger_state=branch_state,
+                                positions=fallback_positions,
+                                margins=fallback_margins,
+                                source_id=(
+                                    f"{source_version}:{TARGET_ID}:"
+                                    f"lane{lane_index}:"
+                                    f"cycle{cycle_index}:"
+                                    f"round{recovery_round}:"
+                                    "beam-fallback"
+                                ),
+                            )
+                            fallback_selection = (
+                                select_escape_recovery_candidate(
+                                    branch_state,
+                                    (fallback_candidate,),
+                                    config=_recovery_config(config),
+                                )
+                            )
+                            selected_recovery = (
+                                fallback_selection.selected
+                            )
                     escalation_row = {
                         "recovery_round": recovery_round,
                         "source_state_minimum_margin_rad": (
@@ -517,6 +594,10 @@ def _run_case(
                             selected_recovery.candidate_id
                             if selected_recovery is not None
                             else None
+                        ),
+                        "generator_mode": generator_mode,
+                        "generator_diagnostics": (
+                            generator_diagnostics
                         ),
                         "executed_in_shadow": False,
                         "replay_max_abs_qpos_error_rad": None,

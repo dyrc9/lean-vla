@@ -70,6 +70,9 @@ recovery；每次 recovery 都重新跑原 selector、replay tolerance 和 cross
 能满足相对当前状态再增益0.02 rad，故 escalation 未执行即 fail closed。下一步把
 joint-targeted beam 作为动态 escalation generator，生成后仍由原 selector 复核，不改门。
 
+adaptive-beam fallback 与测试已实现；它只在默认 selector 无候选时启动，beam 结果仍需原
+selector 与独立 replay 双重通过。实现先提交，再在 clean worktree 上做两 lane × 5-cycle 运行。
+
 ## 前一 checkpoint：2026-07-30 v12.5 integrated predictive recovery
 
 fresh policy-prefix shadow 与 typed recovery runtime 的 fixed-trace composition 已完成并终态冻结：
