@@ -346,6 +346,17 @@ advance；restore identity 100%，crossing、warning、dispatch 和 outcome read
 backup endpoint 仍存在至少一个安全 successor；reserve 本身也必须满足同一 successor viability
 才可选择。枚举仍限定冻结61动作，全部中间状态仍守0.15 floor，每 cycle 最多2个 reserve。
 
+two-step invariant 也 non-pass：两条 lane 各只完成1/5 direct exact advances。初始 reserve
+search 各有56个 two-step viable candidates，`negative_z` 执行后 margin 约 `0.27500 rad`，
+但新状态 two-step viable count 为0；exact fallback viable count 也为0。于是没有 exact fallback
+被错误执行。22814个 candidate shadow steps 的 restore/warning/dispatch/outcome 审计全部正常。
+
+因此高层61动作 backup set 并非控制不变集。下一版改用 joint-limit-aware OSC nullspace brake：
+H3 block 后不改 simulator qpos/qvel，而把内部 `initial_joint[1]` 目标从当前 joint-1 向 lower
+方向偏移固定的 `0.05/0.10/0.20/0.30/0.50 rad`，reset goal 后重放同一个 exact policy
+first action；只选择最小的0.15-safe offset，实际执行时复现相同 controller target 与相同 action
+bytes，然后 fresh H3。成功门仍为每 lane 5个 exact advances。
+
 冻结产物：
 
 - protocol：`experiments/proofalign_simulator_integrated_predictive_recovery_v12_qualification_protocol.json`
@@ -369,3 +380,4 @@ backup endpoint 仍存在至少一个安全 successor；reserve 本身也必须�
 - H3 controller-goal brake：`results/proofalign_h3_controller_goal_brake_pilot_v12_20260730/`
 - H3 reset-guarded exact H1：`results/proofalign_h3_reset_guarded_exact_h1_pilot_v12_20260730/`
 - H3 one-step backup viable exact H1：`results/proofalign_h3_backup_viable_exact_h1_pilot_v12_20260730/`
+- H3 two-step backup exact H1：`results/proofalign_h3_two_step_backup_exact_h1_pilot_v12_20260730/`

@@ -165,6 +165,18 @@ policy advance；identity、restore、warning/dispatch/outcome 边界均保持�
 相同 two-step viability，而不是只按当前 terminal margin。仍每 policy cycle 最多2个 reserve，
 成功只计5个 exact policy advances。
 
+two-step certificate 已终态 non-pass：两条 lane 各仅完成第1个 direct exact action。首轮 reserve
+search 各有56个 two-step viable candidates，选择 `negative_z` 后 terminal margin 约
+`0.27500 rad`；但新状态的 two-step viable set 立即变为0，第二 reserve 无法选择。exact
+fallback 的 two-step viable count 始终0，故没有把不可控 exact action误计为成功。该轮执行
+22814个 backup-candidate shadow steps，所有 warning/dispatch/outcome 仍为0。
+
+这证明冻结高层61动作空间不存在可持续 backup invariant，继续加深 horizon 只会确认空集。
+下一 successor 改变干预层而不改 policy action：H3 block 时，在 restored controller 上把 OSC
+`initial_joint[1]` nullspace target 向远离 upper limit 的方向移动，offset 候选固定为
+`0.05/0.10/0.20/0.30/0.50 rad`，同时 reset goal；逐一重放同一个 exact policy 首动作，
+选择最小的0.15-safe offset。物理 qpos/qvel 不修改，action bytes 不替换，之后立即 fresh H3。
+
 ## 前一 checkpoint：2026-07-30 v12.5 integrated predictive recovery
 
 fresh policy-prefix shadow 与 typed recovery runtime 的 fixed-trace composition 已完成并终态冻结：

@@ -163,6 +163,12 @@ invariant 不能只检查“存在下一步”，还要检查下一步之后仍�
 certificate，并对 exact 与 reserve 使用同一判据；仍不改变0.15 floor或把 reserve算成 policy
 success。
 
+two-step certificate 进一步给出空不变集证据：初始有56个 viable reserve candidates，但执行
+最佳 `negative_z` 后 viable set 变为0；exact fallback 也没有 two-step viable endpoint。
+因此继续在高层61动作上加深 backup horizon不会恢复活性。下一合理干预层是 OSC nullspace target：
+只把 joint-1 内部目标向安全侧偏移，仍执行相同 policy action bytes，并保持0.15 floor与 fresh
+H3；这直接针对已反复出现的 joint-1 upper limiting atom。
+
 
 论文主故事仍是两层对齐，而不是 SemanticSubtask 本身。当前最重要的科学风险集中在 L1：
 
