@@ -118,6 +118,9 @@ fail closed，说明瓶颈并非只在 generator，而是 `block_replan` 状态�
 的额外0.02 rad gain contract 类型不匹配。后继需独立的 safe bridge/shield contract。
 full-scale safe-bridge 后继又显示 H1 推进3步后，13/13下一原语单步都会 crossing；说明H1
 离散 horizon 没有保留制动余量。下一控制设计应使用 H2 预测、H1 执行，而不是在临界状态补救。
+H2/H1 后继确实更早在约0.2728 rad 停止，但122个缩放 bridge 仍全部违反 recovery-style
+5 mrad transient-loss floor；最好下一步约0.1570 rad，仍高于trigger但不满足该专用 contract。
+因此下一论文迭代需把 bridge/brake 形式化为独立类型，不能把 recovery 条件直接复用或事后放宽。
 
 
 论文主故事仍是两层对齐，而不是 SemanticSubtask 本身。当前最重要的科学风险集中在 L1：

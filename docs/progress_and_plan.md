@@ -89,6 +89,11 @@ fresh post-bridge H1 allow；每 cycle 最多2个 bridge。bridge 独立记账�
 H2-scaled-bridge runner 与测试已完成：61个有界 bridge actions，H2 screen/H1 advance，
 post-bridge 仍需 fresh H2 allow。实现先提交后运行。
 
+结果：H2 将两条 lane 的安全 policy advance 固定在2步并更早停止，停止时 margin 约0.2728；
+61×2个 scaled bridges 中 transient-safe 仍为0，因为下一控制步最好只剩约0.1570，
+无法满足 recovery-style `current−0.005` floor。下一阶段先版本化独立 bridge/brake contract
+或 controller-aware braking predictor；不继续对现有门做结果后微调。
+
 ## 前一 checkpoint：2026-07-30 v12.5 integrated predictive recovery
 
 fresh policy-prefix shadow 与 typed recovery runtime 的 fixed-trace composition 已完成并终态冻结：

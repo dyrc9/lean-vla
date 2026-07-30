@@ -264,6 +264,17 @@ H2-scaled-bridge runner 已实现：12个非 hold 方向各取
 但通过后只 shadow advance 第1步；bridge endpoint 也必须 fresh H2 allow。每 cycle 仍最多
 2个 bridge，原 recovery contract 不变。
 
+结果是两条 lane 各安全推进2步，H2 gate 4/4 allow；第3轮 H2 block 时当前 margin 仍约
+`0.2728 rad`，比H1设计停止时的约0.1546显著更早。随后每条 lane 搜索61个缩放 bridge，
+单步 terminal margin 最好约0.1570 rad，虽然仍高于0.1 trigger，却全部低于
+`current−0.005≈0.2678 rad`，因此 transient-safe 0/122、post-H2 screen 0、selection/execution
+0/2。restore identity 100%，active warning、dispatch、outcome read 均为0。
+
+当前优化链给出一个清晰终点：H2 是更合理的制动 horizon，但 bridge 不能直接继承
+near-limit recovery 的5 mrad transient-loss contract，否则候选集结构性为空。下一工作应先
+独立预注册 bridge/brake contract（例如 no crossing、terminal > trigger、post-H2 safe 与
+显式 reserve），或实现 controller-aware braking model；在此之前不再 outcome-informed 调参。
+
 冻结产物：
 
 - protocol：`experiments/proofalign_simulator_integrated_predictive_recovery_v12_qualification_protocol.json`
@@ -281,3 +292,4 @@ H2-scaled-bridge runner 已实现：12个非 hold 方向各取
 - predictive escalation：`results/proofalign_predictive_recovery_escalation_pilot_v12_20260730/`
 - adaptive-beam escalation terminal failure：`results/proofalign_adaptive_beam_recovery_escalation_pilot_v12_20260730/`
 - safe bridge：`results/proofalign_safe_bridge_receding_horizon_pilot_v12_20260730/`
+- H2 scaled bridge：`results/proofalign_h2_scaled_bridge_receding_pilot_v12_20260730/`
