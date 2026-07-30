@@ -272,6 +272,8 @@ default soft limit在0.22 guard下允许终点margin降到约0.1772，因此dept
 更硬且满足timestep安全下限的joint-limit solref/solimp并审计恢复；即使通过也仅是simulator
 virtual-brake机制证据。
 
+v12.37实现与33个相关定向测试已完成，历史soft profile路径不变。正式结果前论文结论不变。
+
 
 论文主故事仍是两层对齐，而不是 SemanticSubtask 本身。当前最重要的科学风险集中在 L1：
 

@@ -38,6 +38,10 @@ class _FakeSim:
             jnt_range=np.column_stack(
                 (np.full(7, -2.0), np.full(7, 2.0))
             ),
+            jnt_solref=np.tile([0.02, 1.0], (7, 1)),
+            jnt_solimp=np.tile(
+                [0.9, 0.95, 0.001, 0.5, 2.0], (7, 1)
+            ),
         )
         self.data = SimpleNamespace(
             qpos=np.zeros(7),

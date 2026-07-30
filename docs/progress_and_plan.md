@@ -396,6 +396,10 @@ physics timestep的2倍安全下限。配置/作用域新增原始与guard solre
 不改contact geom、actuator、qpos/qvel或action。该结果只能比较default-soft与hard virtual stop，
 不能回填真实硬件claim。
 
+v12.37 runner已实现，通用guard runner默认profile仍为None，v12.35/v12.36历史路径不变。
+hard profile的scope enter/exit、range/solref/solimp恢复及配置契约均有定向测试；相关33个测试
+通过，正式双lane结果尚未生成。
+
 ## 前一 checkpoint：2026-07-30 v12.5 integrated predictive recovery
 
 fresh policy-prefix shadow 与 typed recovery runtime 的 fixed-trace composition 已完成并终态冻结：

@@ -1624,6 +1624,11 @@ def _configure_virtual_joint_guard(
     target_joint_index: int,
     target_joint_side: str,
     guard_margin_rad: float,
+    guard_solref: tuple[float, float] | None = None,
+    guard_solimp: tuple[
+        float, float, float, float, float
+    ]
+    | None = None,
 ) -> dict[str, Any]:
     model = env.sim.model
     qpos_address = int(qidx[target_joint_index])
@@ -1634,6 +1639,18 @@ def _configure_virtual_joint_guard(
         len(joint_ids) != 1
         or not np.isfinite(guard_margin_rad)
         or guard_margin_rad <= 0
+        or (guard_solref is None) != (guard_solimp is None)
+        or (
+            guard_solref is not None
+            and (
+                len(guard_solref) != 2
+                or len(guard_solimp) != 5
+                or any(
+                    not np.isfinite(value)
+                    for value in (*guard_solref, *guard_solimp)
+                )
+            )
+        )
     ):
         raise RecedingHorizonPilotError(
             "invalid virtual joint guard configuration"
@@ -1641,6 +1658,12 @@ def _configure_virtual_joint_guard(
     model_joint_id = int(joint_ids[0])
     original_range = np.asarray(
         model.jnt_range[model_joint_id], dtype=np.float64
+    ).copy()
+    original_solref = np.asarray(
+        model.jnt_solref[model_joint_id], dtype=np.float64
+    ).copy()
+    original_solimp = np.asarray(
+        model.jnt_solimp[model_joint_id], dtype=np.float64
     ).copy()
     guarded_range = original_range.copy()
     if target_joint_side == "upper":
@@ -1682,6 +1705,18 @@ def _configure_virtual_joint_guard(
         "guard_margin_rad": float(guard_margin_rad),
         "original_joint_range": original_range.tolist(),
         "guarded_joint_range": guarded_range.tolist(),
+        "original_joint_solref": original_solref.tolist(),
+        "original_joint_solimp": original_solimp.tolist(),
+        "guarded_joint_solref": (
+            list(guard_solref)
+            if guard_solref is not None
+            else None
+        ),
+        "guarded_joint_solimp": (
+            list(guard_solimp)
+            if guard_solimp is not None
+            else None
+        ),
         "configuration_inside_guard_range": inside_guard_range,
         "configuration_qpos_identity": bool(
             np.array_equal(before_qpos, after_qpos)
@@ -1715,11 +1750,43 @@ def _scoped_virtual_joint_guard(
         configuration["guarded_joint_range"],
         dtype=np.float64,
     )
+    original_solref = np.asarray(
+        configuration["original_joint_solref"],
+        dtype=np.float64,
+    )
+    original_solimp = np.asarray(
+        configuration["original_joint_solimp"],
+        dtype=np.float64,
+    )
+    guarded_solref = (
+        np.asarray(
+            configuration["guarded_joint_solref"],
+            dtype=np.float64,
+        )
+        if configuration["guarded_joint_solref"] is not None
+        else None
+    )
+    guarded_solimp = (
+        np.asarray(
+            configuration["guarded_joint_solimp"],
+            dtype=np.float64,
+        )
+        if configuration["guarded_joint_solimp"] is not None
+        else None
+    )
     if (
         "run_controller" in controller.__dict__
         or not np.array_equal(
             np.asarray(model.jnt_range[model_joint_id]),
             original_range,
+        )
+        or not np.array_equal(
+            np.asarray(model.jnt_solref[model_joint_id]),
+            original_solref,
+        )
+        or not np.array_equal(
+            np.asarray(model.jnt_solimp[model_joint_id]),
+            original_solimp,
         )
     ):
         raise RecedingHorizonPilotError(
@@ -1791,6 +1858,9 @@ def _scoped_virtual_joint_guard(
         return raw
 
     model.jnt_range[model_joint_id] = guarded_range
+    if guarded_solref is not None:
+        model.jnt_solref[model_joint_id] = guarded_solref
+        model.jnt_solimp[model_joint_id] = guarded_solimp
     env.sim.forward()
     controller.run_controller = MethodType(
         guarded_run_controller, controller
@@ -1800,6 +1870,8 @@ def _scoped_virtual_joint_guard(
     finally:
         del controller.run_controller
         model.jnt_range[model_joint_id] = original_range
+        model.jnt_solref[model_joint_id] = original_solref
+        model.jnt_solimp[model_joint_id] = original_solimp
         env.sim.forward()
 
 
@@ -1955,6 +2027,11 @@ def _screen_contact_aware_vertex_beam(
     vertex_schedules: tuple[tuple[int, int], ...] = (),
     schedule_switch_substep_index: int = 12,
     virtual_joint_guard_margins_rad: tuple[float, ...] = (),
+    virtual_joint_guard_solref: tuple[float, float] | None = None,
+    virtual_joint_guard_solimp: tuple[
+        float, float, float, float, float
+    ]
+    | None = None,
     target_joint_index: int,
     target_joint_side: str,
     minimum_margin_floor_rad: float,
@@ -2006,6 +2083,8 @@ def _screen_contact_aware_vertex_beam(
             or margin < minimum_margin_floor_rad
             for margin in virtual_joint_guard_margins_rad
         )
+        or (virtual_joint_guard_solref is None)
+        != (virtual_joint_guard_solimp is None)
     ):
         raise RecedingHorizonPilotError(
             "invalid contact-aware beam configuration"
@@ -2122,6 +2201,8 @@ def _screen_contact_aware_vertex_beam(
                         guard_margin_rad=(
                             virtual_joint_guard_margin
                         ),
+                        guard_solref=virtual_joint_guard_solref,
+                        guard_solimp=virtual_joint_guard_solimp,
                     )
                     if virtual_joint_guard_margin is not None
                     else _configure_contact_aware_actuator_vertex_schedule(
@@ -2223,6 +2304,39 @@ def _screen_contact_aware_vertex_beam(
                                     "original_joint_range"
                                 ]
                             ),
+                        )
+                    )
+                    and (
+                        virtual_joint_guard_margin is None
+                        or (
+                            np.array_equal(
+                                np.asarray(
+                                    env.sim.model.jnt_solref[
+                                        configuration[
+                                            "model_joint_id"
+                                        ]
+                                    ]
+                                ),
+                                np.asarray(
+                                    configuration[
+                                        "original_joint_solref"
+                                    ]
+                                ),
+                            )
+                            and np.array_equal(
+                                np.asarray(
+                                    env.sim.model.jnt_solimp[
+                                        configuration[
+                                            "model_joint_id"
+                                        ]
+                                    ]
+                                ),
+                                np.asarray(
+                                    configuration[
+                                        "original_joint_solimp"
+                                    ]
+                                ),
+                            )
                         )
                     )
                 )
@@ -2424,6 +2538,16 @@ def _screen_contact_aware_vertex_beam(
         "virtual_joint_guard_margins_rad": list(
             virtual_joint_guard_margins_rad
         ),
+        "virtual_joint_guard_solref": (
+            list(virtual_joint_guard_solref)
+            if virtual_joint_guard_solref is not None
+            else None
+        ),
+        "virtual_joint_guard_solimp": (
+            list(virtual_joint_guard_solimp)
+            if virtual_joint_guard_solimp is not None
+            else None
+        ),
         "depth_summaries": depth_summaries,
         "selected": selected_payload,
         "restore_identity": restore_identity,
@@ -2511,6 +2635,14 @@ def _run_case(
     contact_aware_vertex_beam_virtual_joint_guard_margins_rad: tuple[
         float, ...
     ] = (),
+    contact_aware_vertex_beam_virtual_joint_guard_solref: tuple[
+        float, float
+    ]
+    | None = None,
+    contact_aware_vertex_beam_virtual_joint_guard_solimp: tuple[
+        float, float, float, float, float
+    ]
+    | None = None,
     contact_aware_vertex_beam_retention_strategy: str = (
         "trajectory_margin"
     ),
@@ -2699,6 +2831,35 @@ def _run_case(
             sorted(
                 set(
                     contact_aware_vertex_beam_virtual_joint_guard_margins_rad
+                )
+            )
+        )
+        or (
+            contact_aware_vertex_beam_virtual_joint_guard_solref
+            is None
+        )
+        != (
+            contact_aware_vertex_beam_virtual_joint_guard_solimp
+            is None
+        )
+        or (
+            contact_aware_vertex_beam_virtual_joint_guard_solref
+            is not None
+            and (
+                len(
+                    contact_aware_vertex_beam_virtual_joint_guard_solref
+                )
+                != 2
+                or len(
+                    contact_aware_vertex_beam_virtual_joint_guard_solimp
+                )
+                != 5
+                or any(
+                    not np.isfinite(value)
+                    for value in (
+                        *contact_aware_vertex_beam_virtual_joint_guard_solref,
+                        *contact_aware_vertex_beam_virtual_joint_guard_solimp,
+                    )
                 )
             )
         )
@@ -4077,6 +4238,12 @@ def _run_case(
                                     ),
                                     virtual_joint_guard_margins_rad=(
                                         contact_aware_vertex_beam_virtual_joint_guard_margins_rad
+                                    ),
+                                    virtual_joint_guard_solref=(
+                                        contact_aware_vertex_beam_virtual_joint_guard_solref
+                                    ),
+                                    virtual_joint_guard_solimp=(
+                                        contact_aware_vertex_beam_virtual_joint_guard_solimp
                                     ),
                                     target_joint_index=target_joint,
                                     target_joint_side=target_side,
@@ -5573,6 +5740,12 @@ def _run_case(
                             guard_margin_rad=(
                                 selected_advance_virtual_joint_guard_margin_rad
                             ),
+                            guard_solref=(
+                                contact_aware_vertex_beam_virtual_joint_guard_solref
+                            ),
+                            guard_solimp=(
+                                contact_aware_vertex_beam_virtual_joint_guard_solimp
+                            ),
                         )
                         if (
                             selected_advance_virtual_joint_guard_margin_rad
@@ -5718,6 +5891,43 @@ def _run_case(
                     ):
                         raise RecedingHorizonPilotError(
                             "executed virtual joint guard range not restored"
+                        )
+                    if (
+                        selected_advance_virtual_joint_guard_margin_rad
+                        is not None
+                        and (
+                            not np.array_equal(
+                                np.asarray(
+                                    env.sim.model.jnt_solref[
+                                        executed_configuration[
+                                            "model_joint_id"
+                                        ]
+                                    ]
+                                ),
+                                np.asarray(
+                                    executed_configuration[
+                                        "original_joint_solref"
+                                    ]
+                                ),
+                            )
+                            or not np.array_equal(
+                                np.asarray(
+                                    env.sim.model.jnt_solimp[
+                                        executed_configuration[
+                                            "model_joint_id"
+                                        ]
+                                    ]
+                                ),
+                                np.asarray(
+                                    executed_configuration[
+                                        "original_joint_solimp"
+                                    ]
+                                ),
+                            )
+                        )
+                    ):
+                        raise RecedingHorizonPilotError(
+                            "executed virtual joint guard profile not restored"
                         )
                     terminal_joint_position = float(
                         env.sim.data.qpos[qidx[target_joint]]
@@ -6495,6 +6705,34 @@ def _run_case(
                                     ]
                                 ),
                             )
+                            and np.array_equal(
+                                np.asarray(
+                                    env.sim.model.jnt_solref[
+                                        executed_configuration[
+                                            "model_joint_id"
+                                        ]
+                                    ]
+                                ),
+                                np.asarray(
+                                    executed_configuration[
+                                        "original_joint_solref"
+                                    ]
+                                ),
+                            )
+                            and np.array_equal(
+                                np.asarray(
+                                    env.sim.model.jnt_solimp[
+                                        executed_configuration[
+                                            "model_joint_id"
+                                        ]
+                                    ]
+                                ),
+                                np.asarray(
+                                    executed_configuration[
+                                        "original_joint_solimp"
+                                    ]
+                                ),
+                            )
                         )
                     )
                     executed_vertex["exact_action_identity"] = bool(
@@ -6761,6 +6999,22 @@ def _run_case(
             ),
             "contact_aware_vertex_beam_virtual_joint_guard_margins_rad": list(
                 contact_aware_vertex_beam_virtual_joint_guard_margins_rad
+            ),
+            "contact_aware_vertex_beam_virtual_joint_guard_solref": (
+                list(
+                    contact_aware_vertex_beam_virtual_joint_guard_solref
+                )
+                if contact_aware_vertex_beam_virtual_joint_guard_solref
+                is not None
+                else None
+            ),
+            "contact_aware_vertex_beam_virtual_joint_guard_solimp": (
+                list(
+                    contact_aware_vertex_beam_virtual_joint_guard_solimp
+                )
+                if contact_aware_vertex_beam_virtual_joint_guard_solimp
+                is not None
+                else None
             ),
             "contact_aware_vertex_beam_retention_strategy": (
                 contact_aware_vertex_beam_retention_strategy

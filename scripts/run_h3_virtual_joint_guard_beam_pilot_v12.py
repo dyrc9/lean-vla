@@ -333,6 +333,11 @@ def _run(
     running_status: str = (
         "running_no_outcome_h3_virtual_joint_guard_beam"
     ),
+    virtual_joint_guard_solref: tuple[float, float] | None = None,
+    virtual_joint_guard_solimp: tuple[
+        float, float, float, float, float
+    ]
+    | None = None,
     error_type: type[RuntimeError] = (
         H3VirtualJointGuardBeamPilotError
     ),
@@ -417,6 +422,12 @@ def _run(
                 ),
                 contact_aware_vertex_beam_virtual_joint_guard_margins_rad=(
                     VIRTUAL_JOINT_GUARD_MARGINS_RAD
+                ),
+                contact_aware_vertex_beam_virtual_joint_guard_solref=(
+                    virtual_joint_guard_solref
+                ),
+                contact_aware_vertex_beam_virtual_joint_guard_solimp=(
+                    virtual_joint_guard_solimp
                 ),
                 contact_aware_vertex_beam_retention_strategy=(
                     RETENTION_STRATEGY

@@ -517,6 +517,9 @@ v12.37逐值复用guard/actions/seeds/floor/beam，只将target joint的临时li
 `solref=[0.004,1]`与`solimp=[0.999,0.9999,0.001,0.5,2]`，并在scope退出恢复原range/solref/
 solimp后forward。该版本检验hard virtual brake，不是actuator-only改进。
 
+runner与三组model参数的逐值恢复审计已实现；默认soft路径保持不变，33个相关定向测试通过。
+正式结果前不计正证据。
+
 冻结产物：
 
 - protocol：`experiments/proofalign_simulator_integrated_predictive_recovery_v12_qualification_protocol.json`
