@@ -420,6 +420,13 @@ margin，但不能满足终点非正速度；200/200 acceleration-term improveme
 
 v12.28 已实现64-vertex真实 shadow 与稳定排序，21个相关定向测试通过；正式双 lane 结果待跑。
 
+v12.28 为1/5 non-pass：128/128审计 identity成立，但无 vertex 达到 qvel≤0。vertex25 跨 lane
+取得约0.2757 margin与`+0.169 rad/s`，显著优于 unshielded约`+0.308`；因此失败来自额外的
+terminal反向速度代理门，而非0.15位置门。
+
+v12.29 只移除该非必要代理门；64-vertex population、排序、动作、seeds、0.15 floor与 fresh
+H3均不变。每一步仍先以真实 contact-aware shadow证明位置安全，下一步再重新筛选。
+
 冻结产物：
 
 - protocol：`experiments/proofalign_simulator_integrated_predictive_recovery_v12_qualification_protocol.json`
@@ -450,3 +457,4 @@ v12.28 已实现64-vertex真实 shadow 与稳定排序，21个相关定向测试
 - H3 joint velocity envelope exact H1：`results/proofalign_h3_joint_velocity_envelope_exact_h1_pilot_v12_20260730/`
 - H3 joint anticipatory brake exact H1：`results/proofalign_h3_joint_anticipatory_brake_exact_h1_pilot_v12_20260730/`
 - H3 coupled inverse-mass brake exact H1：`results/proofalign_h3_coupled_inverse_mass_brake_exact_h1_pilot_v12_20260730/`
+- H3 contact-aware vertex exact H1 strict-terminal pilot：`results/proofalign_h3_contact_aware_vertex_exact_h1_pilot_v12_20260730/`

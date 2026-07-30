@@ -1,0 +1,117 @@
+{
+  "classification": "h3_contact_aware_vertex_exact_h1_v12_engineering_pilot_complete",
+  "completed_at": "2026-07-30T09:31:57.720683+00:00",
+  "created_at": "2026-07-30T09:31:32.641992+00:00",
+  "device": {
+    "cuda_visible_devices": "2,1",
+    "interpreter": "/data0/ldx/uv-python/cpython-3.11.15-linux-x86_64-gnu/bin/python3.11",
+    "jax_cuda_visible_devices": "0",
+    "mapping": [
+      {
+        "cuda_physical_index": 2,
+        "cuda_visible_index": 2,
+        "egl_device_ordinal": 0
+      },
+      {
+        "cuda_physical_index": 2,
+        "cuda_visible_index": 0,
+        "egl_device_ordinal": 1
+      },
+      {
+        "cuda_physical_index": 1,
+        "cuda_visible_index": 1,
+        "egl_device_ordinal": 2
+      },
+      {
+        "cuda_physical_index": 3,
+        "cuda_visible_index": 3,
+        "egl_device_ordinal": 3
+      },
+      {
+        "cuda_physical_index": 4,
+        "cuda_visible_index": 4,
+        "egl_device_ordinal": 4
+      }
+    ],
+    "mapping_source": "EGL_NV_device_cuda",
+    "requested_egl_physical_index": 1,
+    "selected_egl_device_ordinal": 2,
+    "selected_egl_physical_index": 1,
+    "selected_policy_physical_index": 2
+  },
+  "egl_gpu": 1,
+  "outcomes_observed": false,
+  "policy_gpu": 2,
+  "preflight": {
+    "blockers": [],
+    "device": {
+      "interpreter": "/data0/ldx/uv-python/cpython-3.11.15-linux-x86_64-gnu/bin/python3.11",
+      "mapping": [
+        {
+          "cuda_physical_index": 2,
+          "cuda_visible_index": 2,
+          "egl_device_ordinal": 0
+        },
+        {
+          "cuda_physical_index": 0,
+          "cuda_visible_index": 0,
+          "egl_device_ordinal": 1
+        },
+        {
+          "cuda_physical_index": 1,
+          "cuda_visible_index": 1,
+          "egl_device_ordinal": 2
+        },
+        {
+          "cuda_physical_index": 3,
+          "cuda_visible_index": 3,
+          "egl_device_ordinal": 3
+        },
+        {
+          "cuda_physical_index": 4,
+          "cuda_visible_index": 4,
+          "egl_device_ordinal": 4
+        }
+      ],
+      "mapping_source": "EGL_NV_device_cuda",
+      "selected_egl_device_ordinal": 2,
+      "selected_egl_physical_index": 1,
+      "selected_policy_physical_index": 2
+    },
+    "formal": false,
+    "free_disk_gib": 2070.183204650879,
+    "output_root_absent": true,
+    "ready": true,
+    "schema": "proofalign.policy-prefix-shadow-v12-preflight.v1",
+    "selected_egl_gpu": {
+      "driver_version": "570.133.07",
+      "index": 1,
+      "memory_total_mib": 49140,
+      "memory_used_mib": 26539,
+      "name": "NVIDIA RTX 6000 Ada Generation",
+      "uuid": "GPU-9630f0c1-163a-1dc7-564b-8242ac677a1e"
+    },
+    "selected_policy_gpu": {
+      "driver_version": "570.133.07",
+      "index": 2,
+      "memory_total_mib": 49140,
+      "memory_used_mib": 27079,
+      "name": "NVIDIA RTX 6000 Ada Generation",
+      "uuid": "GPU-177e688f-b5f1-1713-0c2e-29d927a058b3"
+    },
+    "worktree_status": []
+  },
+  "runtime_config": {
+    "config": {
+      "assets": "/home/ldx/lean-vla/external/LIBERO-Safety/libero/libero/assets",
+      "bddl_files": "/home/ldx/lean-vla/external/LIBERO-Safety/libero/libero/bddl_files",
+      "benchmark_root": "/home/ldx/lean-vla/external/LIBERO-Safety/libero/libero",
+      "datasets": "/home/ldx/lean-vla/external/LIBERO-Safety/libero/datasets",
+      "init_states": "/home/ldx/lean-vla/external/LIBERO-Safety/libero/libero/init_files"
+    },
+    "directory": "/home/ldx/lean-vla/results/proofalign_h3_contact_aware_vertex_exact_h1_pilot_v12_20260730/runtime/libero_config",
+    "sha256": "8d1cc08bf89c204f7d592bc6b87f4ffebeed91f7e870097b340a858c07741a3c"
+  },
+  "schema": "proofalign.h3-contact-aware-vertex-exact-h1-pilot-v12-summary.v1.run-manifest",
+  "status": "complete"
+}

@@ -258,6 +258,16 @@ v12.28 runner 已实现，逐 candidate 保存固定7轴 vertex、25个 nominal/
 terminal target margin/qvel、scope与configuration identity；21个相关定向测试通过，待
 clean-tree 双 lane 实验。
 
+v12.28 双 lane 为1/5 non-pass，128/128 configuration/scope identity与零 torque/warning/contact
+异常成立，但64 vertices均被 terminal qvel≤0门拒绝。最好且跨 lane 一致的 vertex25 将 qvel
+从 unshielded约`+0.308`降到约`+0.169 rad/s`，同时维持约0.2757 margin；这说明搜索有效，
+而“单步终点必须反向”只是充分条件、并非五步 receding safety目标的必要条件。
+
+v12.29 保留同一64 vertices、0.15 one-step floor、margin-first排序、terminal qvel完整审计与
+fresh H3，但移除 nonpositive-qvel 硬门；下一 cycle 由新的真实 contact-aware screen 直接决定
+能否继续。成功门仍严格要求两 lane各5个 exact policy advances与全程零 crossing/warning/
+contact saturation/outcome read，不因放松代理条件而放松物理 floor。
+
 ## 前一 checkpoint：2026-07-30 v12.5 integrated predictive recovery
 
 fresh policy-prefix shadow 与 typed recovery runtime 的 fixed-trace composition 已完成并终态冻结：

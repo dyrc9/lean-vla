@@ -210,6 +210,10 @@ v12.27 coupled shield 已实现并通过19个相关定向测试；每个子步�
 
 v12.28 contact-aware 64-vertex runner 已通过21个相关定向测试；结果生成前仍不计正证据。
 
+冻结结果为1/5，但 vertex25 将 qvel 降至约`+0.169`且 margin 保持约0.2757。terminal qvel≤0
+不是原五步安全定义的一部分；后继仅移除这一过强代理门，仍以每步真实 contact shadow的0.15
+floor和fresh H3约束全部 advances。
+
 
 论文主故事仍是两层对齐，而不是 SemanticSubtask 本身。当前最重要的科学风险集中在 L1：
 
