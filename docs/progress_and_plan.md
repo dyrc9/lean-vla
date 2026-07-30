@@ -215,6 +215,16 @@ v12.25 runner 已实现，slope 冻结为 `0/0.5/1/2/4/8/16 s⁻¹`；eligible g
 全局 margin ≥0.15 与终点 envelope 成立，再选择最大的可行 slope（最小干预）。15个
 receding/H2/H3 定向测试通过，待 clean-tree preflight 后执行双 lane。
 
+v12.25 结果为双 lane 2/5 non-pass，但 terminal invariant 正确拒绝了不可制动状态。第2 cycle
+选择 slope16 时 envelope 未激活，下一 cycle 七档全部失败；更关键的是 slope0 虽在速度转正后
+连续约18个 substeps 使用 `−80`，终点 qvel 仍为 `+0.305 rad/s`，不能满足 toward velocity≤0。
+28/28配置 identity、2/2 exact action、prediction/execution position 与 velocity error均0。
+
+v12.26 改为 full-action anticipatory torque brake：被 H3 block 后，从第一个 controller substep
+起即对 joint 1 施加 away-limit torque，冻结 actuator-bound fractions `0.25/0.50/0.75/1.00`，
+其余 joints 与 policy action bytes不变。候选须全程 margin≥0.15 且终点 toward-limit qvel≤0，
+选择最小可行 fraction；这直接解决“等速度转正后已来不及制动”的因果缺口。
+
 ## 前一 checkpoint：2026-07-30 v12.5 integrated predictive recovery
 
 fresh policy-prefix shadow 与 typed recovery runtime 的 fixed-trace composition 已完成并终态冻结：

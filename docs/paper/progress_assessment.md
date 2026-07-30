@@ -190,6 +190,10 @@ action、裁剪 actuator limits、保持配置前 qpos/qvel identity，并继续
 v12.25 已将这一判断编码为双重 gate：单步位置 floor 与终点 velocity envelope 必须同时成立，
 并在七档冻结 slope 中选择最大可行值。相关15个定向测试通过；正式双 lane 结果尚未生成。
 
+冻结结果为双 lane 2/5。它没有形成正结果，但给出了新的控制结论：slope0 在速度转正后连续约
+18个 substeps 打满 `−80`，终点仍为 `+0.305 rad/s`，所以反应式 envelope 启动过晚。下一方法
+必须从被拦动作的第一个 substep 预制动，并以终点 toward-limit qvel≤0作为可继续性条件。
+
 
 论文主故事仍是两层对齐，而不是 SemanticSubtask 本身。当前最重要的科学风险集中在 L1：
 

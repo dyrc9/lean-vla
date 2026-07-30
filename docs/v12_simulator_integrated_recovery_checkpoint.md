@@ -390,6 +390,14 @@ v12.25 已冻结 `0/0.5/1/2/4/8/16 s⁻¹` 七档 slope，并把 terminal envelo
 授权门；最大可行 slope 代表最小干预。候选与执行均记录25个 controller substeps、终点 qvel
 及预测/执行误差，15个相关定向测试通过，双 lane 结果待跑。
 
+v12.25 双 lane 结果为2/5 non-pass。终点 gate 揭示 slope0 仍启动太迟：速度转正后连续约18个
+substeps 施加 `−80`，终点仍为约 `+0.305 rad/s`；因此七档在下一 cycle 都不能同时满足位置与
+速度不变量。28/28 configuration identity、2/2 exact action、scope restore及预测/执行一致。
+
+下一 successor 使用 full-action anticipatory torque brake：从 action 第一个 controller substep
+开始应用冻结 `0.25/0.50/0.75/1.00` actuator-bound fraction，授权门要求单步 margin≥0.15 且
+终点 toward-limit qvel≤0，选择最小 fraction。
+
 冻结产物：
 
 - protocol：`experiments/proofalign_simulator_integrated_predictive_recovery_v12_qualification_protocol.json`
@@ -417,3 +425,4 @@ v12.25 已冻结 `0/0.5/1/2/4/8/16 s⁻¹` 七档 slope，并把 terminal envelo
 - H3 nullspace exact H1 terminal serialization failure：`results/proofalign_h3_nullspace_exact_h1_pilot_v12_20260730/`
 - H3 nullspace exact H1 replayfix：`results/proofalign_h3_nullspace_exact_h1_replayfix_v12_20260730/`
 - H3 scoped joint damping exact H1：`results/proofalign_h3_joint_damping_exact_h1_pilot_v12_20260730/`
+- H3 joint velocity envelope exact H1：`results/proofalign_h3_joint_velocity_envelope_exact_h1_pilot_v12_20260730/`
