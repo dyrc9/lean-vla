@@ -189,6 +189,7 @@ def _search_safe_bridge(
     bridge_floor_mode: str = "recovery_transient",
     candidate_builder: Any | None = None,
     blocked_prefix: np.ndarray | None = None,
+    controller_goal_reset_before_sequence: bool = False,
 ) -> dict[str, Any]:
     library = _candidate_library(config)
     if bridge_floor_mode == "recovery_transient":
@@ -203,6 +204,7 @@ def _search_safe_bridge(
         )
     trigger_margin = float(config["episode"]["trigger_margin_rad"])
     restore_identity = True
+    controller_goal_reset_count = 0
     builder_shadow_steps = 0
     builder_diagnostics = None
     if candidate_builder is None:
@@ -240,6 +242,9 @@ def _search_safe_bridge(
             restore_identity
             and _restore_identity(env, robot, snapshot)
         )
+        if controller_goal_reset_before_sequence:
+            _reset_controller(robot)
+            controller_goal_reset_count += 1
         action_ids = tuple(str(value) for value in spec["action_ids"])
         actions = tuple(
             tuple(float(value) for value in action)
@@ -318,6 +323,9 @@ def _search_safe_bridge(
             restore_identity
             and _restore_identity(env, robot, snapshot)
         )
+        if controller_goal_reset_before_sequence:
+            _reset_controller(robot)
+            controller_goal_reset_count += 1
         actions = tuple(
             tuple(float(value) for value in action)
             for action in row["actions"]
@@ -407,6 +415,7 @@ def _search_safe_bridge(
         "selected_prefix": selected_prefix,
         "candidate_evaluations": physical_rows,
         "candidate_builder_diagnostics": builder_diagnostics,
+        "controller_goal_reset_count": controller_goal_reset_count,
         "restore_identity": restore_identity,
         "candidate_builder_shadow_env_step_count": (
             builder_shadow_steps
@@ -441,6 +450,7 @@ def _run_case(
     bridge_floor_mode: str = "recovery_transient",
     consume_bridge_authorized_prefix: bool = False,
     bridge_candidate_builder: Any | None = None,
+    controller_goal_reset_before_bridge: bool = False,
     lane_base_seeds: tuple[int, ...] = LANE_BASE_SEEDS,
     row_schema: str = ROW_SCHEMA,
     source_version: str = "v12.11",
@@ -558,6 +568,7 @@ def _run_case(
         bridge_candidate_shadow_steps = 0
         bridge_post_h1_shadow_steps = 0
         bridge_execution_shadow_steps = 0
+        bridge_controller_goal_reset_count = 0
         policy_advance_steps = 0
         for lane_index, base_seed in enumerate(lane_base_seeds):
             restore_identity = (
@@ -791,9 +802,15 @@ def _run_case(
                             bridge_floor_mode=bridge_floor_mode,
                             candidate_builder=bridge_candidate_builder,
                             blocked_prefix=prefix,
+                            controller_goal_reset_before_sequence=(
+                                controller_goal_reset_before_bridge
+                            ),
                         )
                         inference_count += bridge[
                             "policy_inference_count"
+                        ]
+                        bridge_controller_goal_reset_count += bridge[
+                            "controller_goal_reset_count"
                         ]
                         bridge_candidate_shadow_steps += (
                             bridge[
@@ -819,6 +836,9 @@ def _run_case(
                             "bridge_index": len(safe_bridges),
                             "policy_seed": bridge_seed,
                             "bridge_floor_mode": bridge_floor_mode,
+                            "controller_goal_reset_before_sequence": (
+                                controller_goal_reset_before_bridge
+                            ),
                             "bridge_floor_rad": (
                                 selected_bridge["bridge_floor_rad"]
                                 if selected_bridge is not None
@@ -869,6 +889,9 @@ def _run_case(
                                     one_step_screen["snapshot"],
                                 )
                             )
+                            if controller_goal_reset_before_bridge:
+                                _reset_controller(robot)
+                                bridge_controller_goal_reset_count += 1
                             bridge_actions = tuple(
                                 tuple(
                                     float(value) for value in action
@@ -1374,6 +1397,9 @@ def _run_case(
             "consume_bridge_authorized_prefix": (
                 consume_bridge_authorized_prefix
             ),
+            "controller_goal_reset_before_bridge": (
+                controller_goal_reset_before_bridge
+            ),
             "lane_base_seeds": list(lane_base_seeds),
             "recovery_round_seed_stride": (
                 recovery_round_seed_stride
@@ -1405,6 +1431,9 @@ def _run_case(
             ),
             "bridge_execution_shadow_env_step_count": (
                 bridge_execution_shadow_steps
+            ),
+            "bridge_controller_goal_reset_count": (
+                bridge_controller_goal_reset_count
             ),
             "full_prefix_shadow_env_step_count": (
                 full_prefix_shadow_steps
