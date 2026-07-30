@@ -336,6 +336,16 @@ warning、contact saturation、live dispatch、typed recovery 和 outcome read �
 2个 reserve。成功门仍是每条 lane 5个 exact policy advances，所有 reserve 单独计数，不作为
 policy success。
 
+one-step invariant pilot 仍为 non-pass：每条 lane 只完成2/5 exact advances。4次 exact-endpoint
+viability screens 中2次非空、2次为空；空时各执行一个
+`positive_y_scale0p75` reserve，最低 margin 为 `0.15669 rad`，但 reserve 后新的61候选 backup
+集合为空，因此后续 reserve selection 为null并停止。所有 reserve 都单独记账，未计作 policy
+advance；restore identity 100%，crossing、warning、dispatch 和 outcome read 为0。
+
+下一 successor 使用 two-step backup certificate：exact endpoint 必须存在安全 backup，且该
+backup endpoint 仍存在至少一个安全 successor；reserve 本身也必须满足同一 successor viability
+才可选择。枚举仍限定冻结61动作，全部中间状态仍守0.15 floor，每 cycle 最多2个 reserve。
+
 冻结产物：
 
 - protocol：`experiments/proofalign_simulator_integrated_predictive_recovery_v12_qualification_protocol.json`
@@ -358,3 +368,4 @@ policy success。
 - H3 sequence bridge：`results/proofalign_h3_sequence_bridge_pilot_v12_20260730/`
 - H3 controller-goal brake：`results/proofalign_h3_controller_goal_brake_pilot_v12_20260730/`
 - H3 reset-guarded exact H1：`results/proofalign_h3_reset_guarded_exact_h1_pilot_v12_20260730/`
+- H3 one-step backup viable exact H1：`results/proofalign_h3_backup_viable_exact_h1_pilot_v12_20260730/`

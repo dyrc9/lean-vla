@@ -157,6 +157,12 @@ controller 上验证并执行原 prefix 的首个 exact action，随后立即 fr
 至少一个安全 reset+backup；否则先执行单独记账的 reserve action并 fresh replan。最终正结果仍
 以5个 exact policy advances计，不把 reserve action计作 policy success。
 
+一步 backup viability 进一步阻止了不可恢复的第3个 exact action，但只达到2/5：每条 lane 的
+首个 reserve 虽保持约 `0.15669 rad`，其终点 backup set 已为空。这个负结果说明 control
+invariant 不能只检查“存在下一步”，还要检查下一步之后仍可继续。下一轮冻结为 two-step backup
+certificate，并对 exact 与 reserve 使用同一判据；仍不改变0.15 floor或把 reserve算成 policy
+success。
+
 
 论文主故事仍是两层对齐，而不是 SemanticSubtask 本身。当前最重要的科学风险集中在 L1：
 

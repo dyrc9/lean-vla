@@ -154,6 +154,17 @@ exact policy advances，无 crossing、warning、dispatch、typed recovery 或 o
 replan，仍在同一个 policy cycle 中等待 exact action；每 cycle 最多2个 reserve actions。
 成功仍要求每条 lane 完成5个 exact policy advances，reserve 数量单独披露。
 
+one-step backup-viability 已完成但 non-pass：两条 lane 各完成2/5 exact advances。4次 exact
+endpoint viability screens 中只有2次 backup set 非空，因而只授权2次 reset-exact action；
+之后每条 lane 执行1个 `positive_y_scale0p75` reserve，最低 margin 约 `0.15669 rad`，
+但该 reserve 终点的下一次61动作搜索为空，第二 reserve 无法选择。reserve 2次均未计入
+policy advance；identity、restore、warning/dispatch/outcome 边界均保持。
+
+下一版把 backup certificate 从一步提升为两步，不改动作库或floor：exact action 终点必须存在
+一个安全 reset+backup，且该 backup 终点还至少存在一个安全 reset+successor；reserve 选拔也用
+相同 two-step viability，而不是只按当前 terminal margin。仍每 policy cycle 最多2个 reserve，
+成功只计5个 exact policy advances。
+
 ## 前一 checkpoint：2026-07-30 v12.5 integrated predictive recovery
 
 fresh policy-prefix shadow 与 typed recovery runtime 的 fixed-trace composition 已完成并终态冻结：
