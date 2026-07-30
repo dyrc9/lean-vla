@@ -222,6 +222,10 @@ v12.29 独立 runner 已通过22个相关定向测试；实验结果尚未生成
 
 v12.30 两步viability runner 已通过23个相关定向测试；双 lane 结果尚未生成。
 
+冻结结果为2/5：第一步有64个safe successors，fresh下一状态却不存在two-step viable首步。
+这说明局部successor count不是长程控制不变量；后继以width64、depth4 beam直接覆盖剩余cycles，
+仍只执行首步并fresh replan。
+
 
 论文主故事仍是两层对齐，而不是 SemanticSubtask 本身。当前最重要的科学风险集中在 L1：
 

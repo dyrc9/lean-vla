@@ -284,6 +284,15 @@ exact action枚举同一64-vertex successor set。首步只有在至少一个 su
 v12.30 runner 已实现，successor配置/作用域/torque bounds与margin单独审计，23个相关定向测试
 通过。该搜索量约为每个fallback `64×64` successor branches，正式运行预计明显慢于前版。
 
+v12.30 双 lane 为2/5 non-pass。第一 fallback 的 vertex25各有64个safe successors并被安全执行，
+但 fresh下一 cycle的全部首步都没有safe successor；共16384 successor branches的identity/
+scope/bounds全部成立，最低advanced margin约0.2757。结论是2-step viability horizon仍不足。
+
+v12.31 使用宽度64、最大深度4的 contact-aware beam：从当前prefix按剩余 cycle数取exact actions，
+逐层对每个保留状态扩展64 vertices，仅保留全程margin≥0.15分支，并按trajectory minimum
+margin、terminal target margin、terminal qvel与稳定sequence排序。只有存在覆盖全部剩余cycles
+的序列才授权其第一vertex；实际仍只执行第一exact action并fresh inference/H3。
+
 ## 前一 checkpoint：2026-07-30 v12.5 integrated predictive recovery
 
 fresh policy-prefix shadow 与 typed recovery runtime 的 fixed-trace composition 已完成并终态冻结：

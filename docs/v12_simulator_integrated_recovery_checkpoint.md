@@ -437,6 +437,12 @@ screen；只授权safe successor count>0的首步，并按该count优先排序�
 
 v12.30 已实现独立 successor ledger fields与计数，23个相关定向测试通过；正式双 lane 待跑。
 
+v12.30 为2/5：第一 fallback vertex25有64个safe successors，但fresh下一cycle没有任何
+two-step viable首步。16384 successor branches审计全通过，证明失败是horizon不足而非实现异常。
+
+下一 successor 用width64、max-depth4 beam覆盖全部剩余cycles；按整段最小margin优先，只消费
+最佳完整序列的第一步，随后fresh重规划。
+
 冻结产物：
 
 - protocol：`experiments/proofalign_simulator_integrated_predictive_recovery_v12_qualification_protocol.json`
@@ -469,3 +475,4 @@ v12.30 已实现独立 successor ledger fields与计数，23个相关定向测�
 - H3 coupled inverse-mass brake exact H1：`results/proofalign_h3_coupled_inverse_mass_brake_exact_h1_pilot_v12_20260730/`
 - H3 contact-aware vertex exact H1 strict-terminal pilot：`results/proofalign_h3_contact_aware_vertex_exact_h1_pilot_v12_20260730/`
 - H3 contact-aware vertex receding-floor pilot：`results/proofalign_h3_contact_aware_vertex_receding_floor_pilot_v12_20260730/`
+- H3 contact-aware vertex two-step successor pilot：`results/proofalign_h3_contact_aware_vertex_successor_pilot_v12_20260730/`
