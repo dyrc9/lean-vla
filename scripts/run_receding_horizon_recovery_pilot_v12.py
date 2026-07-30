@@ -429,6 +429,64 @@ def _search_safe_bridge(
     }
 
 
+def _screen_reset_backup_actions(
+    config: dict[str, Any],
+    *,
+    env: Any,
+    robot: Any,
+    qidx: np.ndarray,
+    limits: np.ndarray,
+    snapshot: Any,
+    contacts: base.ContactCapacityAudit,
+) -> dict[str, Any]:
+    floor = float(config["recovery"]["safe_margin_rad"])
+    rows = []
+    restore_identity = True
+    reset_count = 0
+    for action_id, action in _candidate_library(config).items():
+        restore_identity = (
+            restore_identity
+            and _restore_identity(env, robot, snapshot)
+        )
+        _reset_controller(robot)
+        reset_count += 1
+        _positions, margins = _execute_actions(
+            env,
+            actions=(action,),
+            qidx=qidx,
+            limits=limits,
+            contacts=contacts,
+        )
+        rows.append(
+            {
+                "action_id": action_id,
+                "action": action,
+                "minimum_margin_rad": min(margins),
+                "terminal_margin_rad": margins[-1],
+                "safe": min(margins) >= floor and min(margins) >= 0,
+            }
+        )
+    restore_identity = (
+        restore_identity
+        and _restore_identity(env, robot, snapshot)
+    )
+    safe = [row for row in rows if row["safe"]]
+    safe.sort(
+        key=lambda row: (
+            -row["terminal_margin_rad"],
+            -row["minimum_margin_rad"],
+            row["action_id"],
+        )
+    )
+    return {
+        "candidate_evaluations": rows,
+        "selected": safe[0] if safe else None,
+        "restore_identity": restore_identity,
+        "shadow_env_step_count": len(rows),
+        "controller_goal_reset_count": reset_count,
+    }
+
+
 def _run_case(
     config: dict[str, Any],
     pair: dict[str, Any],
@@ -452,6 +510,8 @@ def _run_case(
     bridge_candidate_builder: Any | None = None,
     controller_goal_reset_before_bridge: bool = False,
     controller_reset_exact_h1_fallback: bool = False,
+    reset_exact_h1_require_backup_viability: bool = False,
+    maximum_reset_reserve_bridges_per_cycle: int = 0,
     lane_base_seeds: tuple[int, ...] = LANE_BASE_SEEDS,
     row_schema: str = ROW_SCHEMA,
     source_version: str = "v12.11",
@@ -462,6 +522,7 @@ def _run_case(
         or maximum_recovery_escalations_per_cycle < 0
         or recovery_round_seed_stride <= 0
         or maximum_safe_bridges_per_cycle < 0
+        or maximum_reset_reserve_bridges_per_cycle < 0
         or safe_bridge_seed_stride <= 0
         or gate_horizon_steps <= 0
         or gate_horizon_steps
@@ -572,6 +633,9 @@ def _run_case(
         bridge_controller_goal_reset_count = 0
         reset_exact_h1_shadow_steps = 0
         reset_exact_h1_controller_goal_reset_count = 0
+        reset_backup_candidate_shadow_steps = 0
+        reset_reserve_execution_shadow_steps = 0
+        reset_backup_controller_goal_reset_count = 0
         policy_advance_steps = 0
         for lane_index, base_seed in enumerate(lane_base_seeds):
             restore_identity = (
@@ -627,6 +691,7 @@ def _run_case(
                 recovery_escalations = []
                 safe_bridges = []
                 reset_exact_h1_fallbacks = []
+                reset_reserve_bridges = []
                 selected_prefix = None
                 selected_advance_controller_goal_reset = False
                 selected_advance_minimum_margin_floor = float(
@@ -635,6 +700,7 @@ def _run_case(
                 control_round_count = (
                     maximum_recovery_escalations_per_cycle
                     + maximum_safe_bridges_per_cycle
+                    + maximum_reset_reserve_bridges_per_cycle
                     + 1
                 )
                 for recovery_round in range(
@@ -810,6 +876,54 @@ def _run_case(
                             min(fallback_margins) >= fallback_floor
                             and min(fallback_margins) >= 0
                         )
+                        backup_viability = None
+                        if (
+                            authorized
+                            and reset_exact_h1_require_backup_viability
+                        ):
+                            endpoint_snapshot = (
+                                base.capture_warmstart_policy_shadow_snapshot(
+                                    env,
+                                    robot,
+                                    source_id=(
+                                        f"{source_version}:{TARGET_ID}:"
+                                        f"lane{lane_index}:"
+                                        f"cycle{cycle_index}:"
+                                        f"round{recovery_round}:"
+                                        "exact-h1-endpoint"
+                                    ),
+                                )
+                            )
+                            backup_viability = (
+                                _screen_reset_backup_actions(
+                                    config,
+                                    env=env,
+                                    robot=robot,
+                                    qidx=qidx,
+                                    limits=limits,
+                                    snapshot=endpoint_snapshot,
+                                    contacts=contacts,
+                                )
+                            )
+                            reset_backup_candidate_shadow_steps += (
+                                backup_viability[
+                                    "shadow_env_step_count"
+                                ]
+                            )
+                            reset_backup_controller_goal_reset_count += (
+                                backup_viability[
+                                    "controller_goal_reset_count"
+                                ]
+                            )
+                            restore_identity = (
+                                restore_identity
+                                and backup_viability[
+                                    "restore_identity"
+                                ]
+                            )
+                            authorized = (
+                                backup_viability["selected"] is not None
+                            )
                         fallback_row = {
                             "recovery_round": recovery_round,
                             "policy_seed": attempts[-1][
@@ -826,6 +940,35 @@ def _run_case(
                             ),
                             "predicted_terminal_margin_rad": (
                                 fallback_margins[-1]
+                            ),
+                            "backup_viability_required": (
+                                reset_exact_h1_require_backup_viability
+                            ),
+                            "backup_viability_candidate_evaluations": (
+                                backup_viability[
+                                    "candidate_evaluations"
+                                ]
+                                if backup_viability is not None
+                                else []
+                            ),
+                            "backup_viability_safe_candidate_count": (
+                                sum(
+                                    item["safe"]
+                                    for item in backup_viability[
+                                        "candidate_evaluations"
+                                    ]
+                                )
+                                if backup_viability is not None
+                                else None
+                            ),
+                            "backup_viability_selected_action_id": (
+                                backup_viability["selected"][
+                                    "action_id"
+                                ]
+                                if backup_viability is not None
+                                and backup_viability["selected"]
+                                is not None
+                                else None
                             ),
                             "authorized": authorized,
                             "executed_in_shadow": False,
@@ -849,6 +992,121 @@ def _run_case(
                                 fallback_floor
                             )
                             break
+                        if (
+                            len(reset_reserve_bridges)
+                            < maximum_reset_reserve_bridges_per_cycle
+                        ):
+                            reserve_search = (
+                                _screen_reset_backup_actions(
+                                    config,
+                                    env=env,
+                                    robot=robot,
+                                    qidx=qidx,
+                                    limits=limits,
+                                    snapshot=one_step_screen[
+                                        "snapshot"
+                                    ],
+                                    contacts=contacts,
+                                )
+                            )
+                            reset_backup_candidate_shadow_steps += (
+                                reserve_search[
+                                    "shadow_env_step_count"
+                                ]
+                            )
+                            reset_backup_controller_goal_reset_count += (
+                                reserve_search[
+                                    "controller_goal_reset_count"
+                                ]
+                            )
+                            restore_identity = (
+                                restore_identity
+                                and reserve_search[
+                                    "restore_identity"
+                                ]
+                            )
+                            selected_reserve = reserve_search[
+                                "selected"
+                            ]
+                            reserve_row = {
+                                "reserve_index": len(
+                                    reset_reserve_bridges
+                                ),
+                                "candidate_evaluations": reserve_search[
+                                    "candidate_evaluations"
+                                ],
+                                "selected_action_id": (
+                                    selected_reserve["action_id"]
+                                    if selected_reserve is not None
+                                    else None
+                                ),
+                                "selected_terminal_margin_rad": (
+                                    selected_reserve[
+                                        "terminal_margin_rad"
+                                    ]
+                                    if selected_reserve is not None
+                                    else None
+                                ),
+                                "executed_in_shadow": False,
+                                "execution_terminal_margin_rad": None,
+                                "execution_minimum_margin_rad": None,
+                            }
+                            reset_reserve_bridges.append(reserve_row)
+                            if selected_reserve is not None:
+                                restore_identity = (
+                                    restore_identity
+                                    and _restore_identity(
+                                        env,
+                                        robot,
+                                        one_step_screen["snapshot"],
+                                    )
+                                )
+                                _reset_controller(robot)
+                                reset_backup_controller_goal_reset_count += 1
+                                reserve_action = tuple(
+                                    float(value)
+                                    for value in selected_reserve["action"]
+                                )
+                                (
+                                    _reserve_positions,
+                                    reserve_margins,
+                                ) = _execute_actions(
+                                    env,
+                                    actions=(reserve_action,),
+                                    qidx=qidx,
+                                    limits=limits,
+                                    contacts=contacts,
+                                )
+                                reset_reserve_execution_shadow_steps += 1
+                                if min(reserve_margins) < fallback_floor:
+                                    raise RecedingHorizonPilotError(
+                                        "reset reserve replay failed"
+                                    )
+                                reserve_row[
+                                    "executed_in_shadow"
+                                ] = True
+                                reserve_row[
+                                    "execution_terminal_margin_rad"
+                                ] = reserve_margins[-1]
+                                reserve_row[
+                                    "execution_minimum_margin_rad"
+                                ] = min(reserve_margins)
+                                branch_state = (
+                                    trusted_joint_state_from_libero(
+                                        env,
+                                        state_epoch=(
+                                            branch_state.state_epoch + 1
+                                        ),
+                                        source_id=(
+                                            f"{source_version}:{TARGET_ID}:"
+                                            f"lane{lane_index}:"
+                                            f"cycle{cycle_index}:"
+                                            f"round{recovery_round}:"
+                                            "reset-reserve-executed"
+                                        ),
+                                    )
+                                )
+                                continue
                     if len(safe_bridges) < maximum_safe_bridges_per_cycle:
                         if one_step_screen is None:
                             raise RecedingHorizonPilotError(
@@ -1337,6 +1595,7 @@ def _run_case(
                     "reset_exact_h1_fallbacks": (
                         reset_exact_h1_fallbacks
                     ),
+                    "reset_reserve_bridges": reset_reserve_bridges,
                     "policy_seed": terminal_attempt["policy_seed"],
                     "clean_frame_sha256": terminal_attempt[
                         "clean_frame_sha256"
@@ -1520,6 +1779,12 @@ def _run_case(
             "controller_reset_exact_h1_fallback": (
                 controller_reset_exact_h1_fallback
             ),
+            "reset_exact_h1_require_backup_viability": (
+                reset_exact_h1_require_backup_viability
+            ),
+            "maximum_reset_reserve_bridges_per_cycle": (
+                maximum_reset_reserve_bridges_per_cycle
+            ),
             "lane_base_seeds": list(lane_base_seeds),
             "recovery_round_seed_stride": (
                 recovery_round_seed_stride
@@ -1560,6 +1825,15 @@ def _run_case(
             ),
             "reset_exact_h1_controller_goal_reset_count": (
                 reset_exact_h1_controller_goal_reset_count
+            ),
+            "reset_backup_candidate_shadow_env_step_count": (
+                reset_backup_candidate_shadow_steps
+            ),
+            "reset_reserve_execution_shadow_env_step_count": (
+                reset_reserve_execution_shadow_steps
+            ),
+            "reset_backup_controller_goal_reset_count": (
+                reset_backup_controller_goal_reset_count
             ),
             "full_prefix_shadow_env_step_count": (
                 full_prefix_shadow_steps
