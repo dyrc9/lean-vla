@@ -46,6 +46,10 @@ post-policy margin 反而只有 `−0.01543 rad`。endpoint margin 与 post-poli
 receding-horizon 机制试验：每轮只放行经原 gate 验证的首个 action，然后立即在新状态 replan；
 仍只做 restored shadow，不派发、不读 outcome。
 
+两条 seed lane × 5 cycles 的 runner 与测试已实现；固定使用 beam 中 full-prefix margin 最好的
+三步恢复序列，不在新结果上再次挑 recovery。每 cycle 同时记录 full-H10 verdict 和 H1 gate，
+只有 H1 exact-safe 才推进一个 shadow action。实现先提交，随后在 clean worktree 上运行。
+
 ## 前一 checkpoint：2026-07-30 v12.5 integrated predictive recovery
 
 fresh policy-prefix shadow 与 typed recovery runtime 的 fixed-trace composition 已完成并终态冻结：

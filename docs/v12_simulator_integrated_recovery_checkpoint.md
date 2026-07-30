@@ -183,6 +183,12 @@ step 1–3 达到最小值。这表明 open-loop retreat 已能改变恢复终�
 `allow_exact`。这不是放宽风险阈值；每个实际候选 action 仍必须逐步通过原 predictive gate。
 首轮只做 restored shadow、zero dispatch、zero outcome 的机制试验。
 
+该 receding-horizon pilot 已冻结为两条独立 seed lanes（`10509/10510`），每条最多5个
+cycles，后续 cycle seed 以100为 stride。恢复轨迹固定为 beam 中 full-prefix margin 最好的
+`negative_rx → positive_rx → negative_rx`，避免再次用结果挑候选。每轮同时保留完整10步
+screen 作为诊断，但只在 H=1 为 `allow_exact`、risk agreement 和 restore identity 全部成立时
+推进一个 shadow action；任何一步失败立即停止该 lane。
+
 冻结产物：
 
 - protocol：`experiments/proofalign_simulator_integrated_predictive_recovery_v12_qualification_protocol.json`
