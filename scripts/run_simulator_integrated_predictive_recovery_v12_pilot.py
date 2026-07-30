@@ -71,13 +71,13 @@ OUTPUT_ROOT = (
     REPO_ROOT
     / "results"
     / "proofalign_simulator_integrated_predictive_recovery_v12_"
-    "engineering_pilot_20260730_fresh3"
+    "engineering_pilot_20260730_fresh4"
 )
 SUPERSEDED_PILOT_SUMMARY_PATH = (
     REPO_ROOT
     / "results"
     / "proofalign_simulator_integrated_predictive_recovery_v12_"
-    "engineering_pilot_20260730_fresh2"
+    "engineering_pilot_20260730_fresh3"
     / "summary.json"
 )
 INTEGRATED_TERMINAL_PATH = (
@@ -94,11 +94,11 @@ RECOVERY_PROTOCOL_PATH = (
 )
 ROW_SCHEMA = (
     "proofalign.simulator-integrated-predictive-recovery-v12-"
-    "pilot-row.v3"
+    "pilot-row.v4"
 )
 SUMMARY_SCHEMA = (
     "proofalign.simulator-integrated-predictive-recovery-v12-"
-    "pilot-summary.v3"
+    "pilot-summary.v4"
 )
 
 
@@ -244,7 +244,7 @@ def pilot_config() -> dict[str, Any]:
         superseded.get("classification")
         != (
             "simulator_integrated_predictive_recovery_v12_"
-            "engineering_pilot_fresh2_complete"
+            "engineering_pilot_fresh3_complete"
         )
         or superseded.get("valid_case_count") != 6
     ):
@@ -254,19 +254,19 @@ def pilot_config() -> dict[str, Any]:
     return {
         "schema": (
             "proofalign.simulator-integrated-predictive-recovery-"
-            "v12-pilot-config.v3"
+            "v12-pilot-config.v4"
         ),
-        "protocol_id": "engineering-pilot-fresh3",
+        "protocol_id": "engineering-pilot-fresh4",
         "supersedes": {
             "path": str(
                 SUPERSEDED_PILOT_SUMMARY_PATH.relative_to(REPO_ROOT)
             ),
             "sha256": _sha256(SUPERSEDED_PILOT_SUMMARY_PATH),
             "reason": (
-                "Fresh2 corrected the initialization outcome-query path and "
-                "added point-sampled ncon audits, but low-level MuJoCo "
-                "contact warnings remained outside those samples. Fresh3 "
-                "installs the MuJoCo warning callback for exact accounting."
+                "Fresh3 installed the MuJoCo warning callback and localized "
+                "all contact-capacity warnings to environment construction "
+                "or reset before the frozen init state was bound. Fresh4 "
+                "separately records prebinding and active-state warnings."
             ),
         },
         "predecessor": {
@@ -643,19 +643,34 @@ def _run_case(
     image_tools: Any,
     runner: Any,
     args: Any,
+    warning_audit: MujocoWarningAudit,
 ) -> dict[str, Any]:
+    case_warning_start = len(warning_audit.messages)
+    case_contact_warning_start = (
+        warning_audit.contact_capacity_warning_count
+    )
     runtime = runner.load_libero_task_runtime(
         benchmark_name=pair["suite"],
         task_id=int(pair["task_id"]),
         init_state_id=int(pair["init_state_id"]),
         bddl_file=pair["bddl_path"],
     )
+    prebinding_contact_audit = ContactCapacityAudit()
     env = runner.create_env(runtime, args)
+    prebinding_contact_audit.observe(env)
+    row: dict[str, Any] | None = None
+    active_warning_start: int | None = None
+    active_contact_warning_start: int | None = None
     try:
         contact_audit = ContactCapacityAudit()
         env.reset()
-        contact_audit.observe(env)
+        prebinding_contact_audit.observe(env)
         _set_init_state_without_outcome(env, runtime.init_state)
+        prebinding_contact_audit.observe(env)
+        active_warning_start = len(warning_audit.messages)
+        active_contact_warning_start = (
+            warning_audit.contact_capacity_warning_count
+        )
         contact_audit.observe(env)
         _stabilize(config, env, runner, contact_audit)
         robot, qidx, vidx, limits = _robot_arrays(env)
@@ -752,7 +767,7 @@ def _run_case(
             recovery_selection=selection,
             now_ns=1_000_000 + case_index * 1000,
         )
-        row: dict[str, Any] = {
+        row = {
             "schema": ROW_SCHEMA,
             "case_id": f"{pair['base_pair_id']}:{condition}",
             **{
@@ -840,6 +855,15 @@ def _run_case(
             "live_policy_dispatch_count": 0,
             "outcome_read_count": 0,
             "set_init_state_wrapper_call_count": 0,
+            "prebinding_contact_capacity_observation_count": (
+                prebinding_contact_audit.observation_count
+            ),
+            "prebinding_maximum_observed_contact_count": (
+                prebinding_contact_audit.maximum_ncon
+            ),
+            "prebinding_contact_capacity_saturation_count": (
+                prebinding_contact_audit.saturation_count
+            ),
             "contact_capacity_observation_count": (
                 contact_audit.observation_count
             ),
@@ -1026,6 +1050,30 @@ def _run_case(
         return row
     finally:
         env.close()
+        if (
+            row is not None
+            and active_warning_start is not None
+            and active_contact_warning_start is not None
+        ):
+            row.update(
+                {
+                    "mujoco_prebinding_warning_count": (
+                        active_warning_start - case_warning_start
+                    ),
+                    "mujoco_prebinding_contact_capacity_warning_count": (
+                        active_contact_warning_start
+                        - case_contact_warning_start
+                    ),
+                    "mujoco_active_warning_count": (
+                        len(warning_audit.messages)
+                        - active_warning_start
+                    ),
+                    "mujoco_active_contact_capacity_warning_count": (
+                        warning_audit.contact_capacity_warning_count
+                        - active_contact_warning_start
+                    ),
+                }
+            )
 
 
 def _summarize(rows: list[dict[str, Any]]) -> dict[str, Any]:
@@ -1154,14 +1202,29 @@ def _summarize(rows: list[dict[str, Any]]) -> dict[str, Any]:
         "minimum_contact_capacity": min(
             row["minimum_contact_capacity"] for row in rows
         ),
+        "prebinding_maximum_observed_contact_count": max(
+            row["prebinding_maximum_observed_contact_count"]
+            for row in rows
+        ),
+        "prebinding_contact_capacity_saturation_count": sum(
+            row["prebinding_contact_capacity_saturation_count"]
+            for row in rows
+        ),
         "contact_capacity_saturation_count": sum(
             row["contact_capacity_saturation_count"] for row in rows
         ),
-        "mujoco_warning_count": sum(
-            row["mujoco_warning_count"] for row in rows
+        "mujoco_prebinding_warning_count": sum(
+            row["mujoco_prebinding_warning_count"] for row in rows
         ),
-        "mujoco_contact_capacity_warning_count": sum(
-            row["mujoco_contact_capacity_warning_count"]
+        "mujoco_prebinding_contact_capacity_warning_count": sum(
+            row["mujoco_prebinding_contact_capacity_warning_count"]
+            for row in rows
+        ),
+        "mujoco_active_warning_count": sum(
+            row["mujoco_active_warning_count"] for row in rows
+        ),
+        "mujoco_active_contact_capacity_warning_count": sum(
+            row["mujoco_active_contact_capacity_warning_count"]
             for row in rows
         ),
         "runtime_exception_count": 0,
@@ -1170,7 +1233,7 @@ def _summarize(rows: list[dict[str, Any]]) -> dict[str, Any]:
         "schema": SUMMARY_SCHEMA,
         "classification": (
             "simulator_integrated_predictive_recovery_v12_"
-            "engineering_pilot_fresh3_complete"
+            "engineering_pilot_fresh4_complete"
         ),
         "qualification_pass": None,
         "valid_case_count": metrics["valid_case_count"],
@@ -1263,10 +1326,6 @@ def _run(
                 for condition_index, condition in enumerate(
                     ("nominal", "synthetic_joint_pressure")
                 ):
-                    warning_start = len(warning_audit.messages)
-                    contact_warning_start = (
-                        warning_audit.contact_capacity_warning_count
-                    )
                     row = _run_case(
                         config,
                         pair,
@@ -1278,13 +1337,7 @@ def _run(
                         image_tools=image_tools,
                         runner=runner,
                         args=args,
-                    )
-                    row["mujoco_warning_count"] = (
-                        len(warning_audit.messages) - warning_start
-                    )
-                    row["mujoco_contact_capacity_warning_count"] = (
-                        warning_audit.contact_capacity_warning_count
-                        - contact_warning_start
+                        warning_audit=warning_audit,
                     )
                     rows.append(row)
                     saber_io.append_ledger(ledger_path, row)
