@@ -592,8 +592,8 @@ def _configure_nullspace_retreat(
         env.sim.data.qvel[vidx], dtype=np.float64
     )
     return {
-        "prior_initial_joint": initial_joint,
-        "retreat_initial_joint": target,
+        "prior_initial_joint": initial_joint.tolist(),
+        "retreat_initial_joint": target.tolist(),
         "target_joint_index": joint_index,
         "target_joint_side": joint_side,
         "requested_offset_rad": offset_rad,
