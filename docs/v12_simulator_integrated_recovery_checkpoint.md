@@ -418,6 +418,8 @@ margin，但不能满足终点非正速度；200/200 acceleration-term improveme
 下一 successor 固定 joint 1 away-bound，实际 shadow 枚举其余6轴的64个 actuator-box vertices，
 直接按0.15 floor与 terminal qvel≤0选择 contact-aware torque vertex。
 
+v12.28 已实现64-vertex真实 shadow 与稳定排序，21个相关定向测试通过；正式双 lane 结果待跑。
+
 冻结产物：
 
 - protocol：`experiments/proofalign_simulator_integrated_predictive_recovery_v12_qualification_protocol.json`

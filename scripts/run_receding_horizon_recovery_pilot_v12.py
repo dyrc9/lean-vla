@@ -1249,6 +1249,161 @@ def _scoped_coupled_inverse_mass_brake(
         del controller.run_controller
 
 
+def _contact_aware_actuator_vertex(
+    controller: Any,
+    *,
+    target_joint_index: int,
+    target_joint_side: str,
+    vertex_id: int,
+) -> np.ndarray:
+    actuator_min = np.asarray(
+        controller.actuator_min, dtype=np.float64
+    )
+    actuator_max = np.asarray(
+        controller.actuator_max, dtype=np.float64
+    )
+    other_joints = [
+        index
+        for index in range(len(actuator_min))
+        if index != target_joint_index
+    ]
+    if (
+        target_joint_index < 0
+        or target_joint_index >= len(actuator_min)
+        or actuator_min.shape != actuator_max.shape
+        or len(other_joints) != 6
+        or target_joint_side not in {"lower", "upper"}
+        or vertex_id < 0
+        or vertex_id >= 2 ** len(other_joints)
+    ):
+        raise RecedingHorizonPilotError(
+            "invalid contact-aware actuator vertex"
+        )
+    vertex = np.empty_like(actuator_min)
+    vertex[target_joint_index] = (
+        actuator_min[target_joint_index]
+        if target_joint_side == "upper"
+        else actuator_max[target_joint_index]
+    )
+    for bit_index, joint_index in enumerate(other_joints):
+        vertex[joint_index] = (
+            actuator_max[joint_index]
+            if vertex_id & (1 << bit_index)
+            else actuator_min[joint_index]
+        )
+    return vertex
+
+
+def _configure_contact_aware_actuator_vertex(
+    *,
+    env: Any,
+    robot: Any,
+    qidx: np.ndarray,
+    vidx: np.ndarray,
+    target_joint_index: int,
+    target_joint_side: str,
+    vertex_id: int,
+) -> dict[str, Any]:
+    before_qpos = np.asarray(
+        env.sim.data.qpos[qidx], dtype=np.float64
+    ).copy()
+    before_qvel = np.asarray(
+        env.sim.data.qvel[vidx], dtype=np.float64
+    ).copy()
+    controller = robot.controller
+    controller.update(force=True)
+    controller.reset_goal()
+    vertex = _contact_aware_actuator_vertex(
+        controller,
+        target_joint_index=target_joint_index,
+        target_joint_side=target_joint_side,
+        vertex_id=vertex_id,
+    )
+    after_qpos = np.asarray(
+        env.sim.data.qpos[qidx], dtype=np.float64
+    )
+    after_qvel = np.asarray(
+        env.sim.data.qvel[vidx], dtype=np.float64
+    )
+    return {
+        "target_joint_index": target_joint_index,
+        "target_joint_side": target_joint_side,
+        "vertex_id": vertex_id,
+        "vertex_torque": vertex.tolist(),
+        "controller_goal_reset": True,
+        "configuration_qpos_identity": bool(
+            np.array_equal(before_qpos, after_qpos)
+        ),
+        "configuration_qvel_identity": bool(
+            np.array_equal(before_qvel, after_qvel)
+        ),
+    }
+
+
+@contextmanager
+def _scoped_contact_aware_actuator_vertex(
+    robot: Any,
+    *,
+    target_joint_index: int,
+    target_joint_side: str,
+    vertex_id: int,
+) -> Any:
+    controller = robot.controller
+    if "run_controller" in controller.__dict__:
+        raise RecedingHorizonPilotError(
+            "controller already has a run_controller override"
+        )
+    original_run_controller = controller.run_controller
+    vertex = _contact_aware_actuator_vertex(
+        controller,
+        target_joint_index=target_joint_index,
+        target_joint_side=target_joint_side,
+        vertex_id=vertex_id,
+    )
+    actuator_min = np.asarray(
+        controller.actuator_min, dtype=np.float64
+    )
+    actuator_max = np.asarray(
+        controller.actuator_max, dtype=np.float64
+    )
+    torque_audit: list[dict[str, Any]] = []
+
+    def vertex_run_controller(
+        controller_self: Any,
+    ) -> np.ndarray:
+        nominal = np.asarray(
+            original_run_controller(), dtype=np.float64
+        ).copy()
+        applied = vertex.copy()
+        controller_self.torques = applied
+        joint_velocity = float(
+            np.asarray(
+                controller_self.joint_vel, dtype=np.float64
+            )[target_joint_index]
+        )
+        torque_audit.append(
+            {
+                "controller_substep_index": len(torque_audit),
+                "joint_velocity_rad_s": joint_velocity,
+                "nominal_torque": nominal.tolist(),
+                "applied_vertex_torque": applied.tolist(),
+                "torque_bound_violation": bool(
+                    np.any(applied < actuator_min)
+                    or np.any(applied > actuator_max)
+                ),
+            }
+        )
+        return applied
+
+    controller.run_controller = MethodType(
+        vertex_run_controller, controller
+    )
+    try:
+        yield torque_audit
+    finally:
+        del controller.run_controller
+
+
 def _run_case(
     config: dict[str, Any],
     pair: dict[str, Any],
@@ -1299,6 +1454,11 @@ def _run_case(
     ] = (),
     controller_coupled_inverse_mass_brake_target_joint_index: int = 1,
     controller_coupled_inverse_mass_brake_target_joint_side: str = "upper",
+    controller_contact_aware_vertex_exact_h1_ids: tuple[
+        int, ...
+    ] = (),
+    controller_contact_aware_vertex_target_joint_index: int = 1,
+    controller_contact_aware_vertex_target_joint_side: str = "upper",
     lane_base_seeds: tuple[int, ...] = LANE_BASE_SEEDS,
     row_schema: str = ROW_SCHEMA,
     source_version: str = "v12.11",
@@ -1393,6 +1553,20 @@ def _run_case(
         or controller_coupled_inverse_mass_brake_target_joint_index < 0
         or controller_coupled_inverse_mass_brake_target_joint_index >= 7
         or controller_coupled_inverse_mass_brake_target_joint_side
+        not in {"lower", "upper"}
+        or any(
+            not isinstance(vertex_id, int)
+            or vertex_id < 0
+            or vertex_id >= 64
+            for vertex_id in controller_contact_aware_vertex_exact_h1_ids
+        )
+        or tuple(controller_contact_aware_vertex_exact_h1_ids)
+        != tuple(
+            sorted(set(controller_contact_aware_vertex_exact_h1_ids))
+        )
+        or controller_contact_aware_vertex_target_joint_index < 0
+        or controller_contact_aware_vertex_target_joint_index >= 7
+        or controller_contact_aware_vertex_target_joint_side
         not in {"lower", "upper"}
         or controller_nullspace_target_joint_side
         not in {"lower", "upper"}
@@ -1513,6 +1687,8 @@ def _run_case(
         joint_anticipatory_brake_controller_configuration_count = 0
         coupled_inverse_mass_brake_exact_h1_shadow_steps = 0
         coupled_inverse_mass_brake_controller_configuration_count = 0
+        contact_aware_vertex_exact_h1_shadow_steps = 0
+        contact_aware_vertex_controller_configuration_count = 0
         policy_advance_steps = 0
         for lane_index, base_seed in enumerate(lane_base_seeds):
             restore_identity = (
@@ -1574,6 +1750,7 @@ def _run_case(
                 joint_velocity_envelope_exact_h1_fallbacks = []
                 joint_anticipatory_brake_exact_h1_fallbacks = []
                 coupled_inverse_mass_brake_exact_h1_fallbacks = []
+                contact_aware_vertex_exact_h1_fallbacks = []
                 selected_prefix = None
                 selected_advance_controller_goal_reset = False
                 selected_advance_nullspace_offset = None
@@ -1581,6 +1758,7 @@ def _run_case(
                 selected_advance_joint_velocity_envelope_slope = None
                 selected_advance_joint_anticipatory_brake_fraction = None
                 selected_advance_coupled_inverse_mass_brake_fraction = None
+                selected_advance_contact_aware_vertex_id = None
                 selected_advance_minimum_margin_floor = float(
                     config["episode"]["trigger_margin_rad"]
                 )
@@ -2675,6 +2853,225 @@ def _run_case(
                                 fallback_floor
                             )
                             break
+                    if controller_contact_aware_vertex_exact_h1_ids:
+                        if one_step_screen is None:
+                            raise RecedingHorizonPilotError(
+                                "missing failed gate for contact-aware vertex"
+                            )
+                        exact_action = tuple(
+                            float(value) for value in prefix[0]
+                        )
+                        candidate_rows = []
+                        fallback_floor = float(
+                            config["recovery"]["safe_margin_rad"]
+                        )
+                        target_joint = (
+                            controller_contact_aware_vertex_target_joint_index
+                        )
+                        target_side = (
+                            controller_contact_aware_vertex_target_joint_side
+                        )
+                        target_limit = float(
+                            limits[
+                                target_joint,
+                                1 if target_side == "upper" else 0,
+                            ]
+                        )
+                        for vertex_id in (
+                            controller_contact_aware_vertex_exact_h1_ids
+                        ):
+                            restore_identity = (
+                                restore_identity
+                                and _restore_identity(
+                                    env,
+                                    robot,
+                                    one_step_screen["snapshot"],
+                                )
+                            )
+                            configuration = (
+                                _configure_contact_aware_actuator_vertex(
+                                    env=env,
+                                    robot=robot,
+                                    qidx=qidx,
+                                    vidx=vidx,
+                                    target_joint_index=target_joint,
+                                    target_joint_side=target_side,
+                                    vertex_id=vertex_id,
+                                )
+                            )
+                            contact_aware_vertex_controller_configuration_count += (
+                                1
+                            )
+                            if (
+                                not configuration[
+                                    "configuration_qpos_identity"
+                                ]
+                                or not configuration[
+                                    "configuration_qvel_identity"
+                                ]
+                            ):
+                                raise RecedingHorizonPilotError(
+                                    "contact-aware vertex config changed qpos/qvel"
+                                )
+                            with _scoped_contact_aware_actuator_vertex(
+                                robot,
+                                target_joint_index=target_joint,
+                                target_joint_side=target_side,
+                                vertex_id=vertex_id,
+                            ) as torque_audit:
+                                (
+                                    _vertex_positions,
+                                    vertex_margins,
+                                ) = _execute_actions(
+                                    env,
+                                    actions=(exact_action,),
+                                    qidx=qidx,
+                                    limits=limits,
+                                    contacts=contacts,
+                                )
+                            contact_aware_vertex_exact_h1_shadow_steps += 1
+                            terminal_joint_position = float(
+                                env.sim.data.qpos[qidx[target_joint]]
+                            )
+                            terminal_joint_velocity = float(
+                                env.sim.data.qvel[vidx[target_joint]]
+                            )
+                            if target_side == "upper":
+                                terminal_target_margin = (
+                                    target_limit
+                                    - terminal_joint_position
+                                )
+                                terminal_toward_velocity = (
+                                    terminal_joint_velocity
+                                )
+                            else:
+                                terminal_target_margin = (
+                                    terminal_joint_position
+                                    - target_limit
+                                )
+                                terminal_toward_velocity = (
+                                    -terminal_joint_velocity
+                                )
+                            candidate_rows.append(
+                                {
+                                    "vertex_id": vertex_id,
+                                    "configuration": configuration,
+                                    "controller_substep_torque_audit": (
+                                        torque_audit
+                                    ),
+                                    "controller_scope_restored": (
+                                        "run_controller"
+                                        not in robot.controller.__dict__
+                                    ),
+                                    "predicted_minimum_margin_rad": min(
+                                        vertex_margins
+                                    ),
+                                    "predicted_terminal_margin_rad": (
+                                        vertex_margins[-1]
+                                    ),
+                                    "predicted_terminal_target_joint_margin_rad": (
+                                        terminal_target_margin
+                                    ),
+                                    "predicted_terminal_target_joint_velocity_rad_s": (
+                                        terminal_joint_velocity
+                                    ),
+                                    "predicted_terminal_toward_limit_velocity_rad_s": (
+                                        terminal_toward_velocity
+                                    ),
+                                    "terminal_non_toward_velocity": (
+                                        terminal_toward_velocity <= 1e-9
+                                    ),
+                                    "safe": (
+                                        min(vertex_margins)
+                                        >= fallback_floor
+                                        and min(vertex_margins) >= 0
+                                        and terminal_toward_velocity
+                                        <= 1e-9
+                                        and all(
+                                            not sample[
+                                                "torque_bound_violation"
+                                            ]
+                                            for sample in torque_audit
+                                        )
+                                    ),
+                                    "selected": False,
+                                }
+                            )
+                        restore_identity = (
+                            restore_identity
+                            and _restore_identity(
+                                env,
+                                robot,
+                                one_step_screen["snapshot"],
+                            )
+                        )
+                        safe_candidates = [
+                            candidate
+                            for candidate in candidate_rows
+                            if candidate["safe"]
+                        ]
+                        safe_candidates.sort(
+                            key=lambda candidate: (
+                                -candidate[
+                                    "predicted_terminal_target_joint_margin_rad"
+                                ],
+                                -candidate[
+                                    "predicted_terminal_margin_rad"
+                                ],
+                                candidate["vertex_id"],
+                            )
+                        )
+                        selected_vertex = (
+                            safe_candidates[0]
+                            if safe_candidates
+                            else None
+                        )
+                        if selected_vertex is not None:
+                            selected_vertex["selected"] = True
+                        vertex_row = {
+                            "recovery_round": recovery_round,
+                            "policy_seed": attempts[-1][
+                                "policy_seed"
+                            ],
+                            "policy_chunk_sha256": attempts[-1][
+                                "policy_chunk_sha256"
+                            ],
+                            "exact_first_action": exact_action,
+                            "target_joint_index": target_joint,
+                            "target_joint_side": target_side,
+                            "minimum_margin_floor_rad": fallback_floor,
+                            "candidate_evaluations": candidate_rows,
+                            "selected_vertex_id": (
+                                selected_vertex["vertex_id"]
+                                if selected_vertex is not None
+                                else None
+                            ),
+                            "authorized": selected_vertex is not None,
+                            "executed_in_shadow": False,
+                            "exact_action_identity": None,
+                            "execution_configuration": None,
+                            "execution_controller_substep_torque_audit": [],
+                            "execution_controller_scope_restored": None,
+                            "execution_terminal_margin_rad": None,
+                            "execution_terminal_target_joint_margin_rad": None,
+                            "execution_terminal_target_joint_velocity_rad_s": None,
+                            "execution_terminal_toward_limit_velocity_rad_s": None,
+                            "execution_terminal_non_toward_velocity": None,
+                            "prediction_execution_margin_error_rad": None,
+                            "prediction_execution_target_joint_velocity_error_rad_s": None,
+                        }
+                        contact_aware_vertex_exact_h1_fallbacks.append(
+                            vertex_row
+                        )
+                        if selected_vertex is not None:
+                            selected_prefix = prefix
+                            selected_advance_contact_aware_vertex_id = (
+                                selected_vertex["vertex_id"]
+                            )
+                            selected_advance_minimum_margin_floor = (
+                                fallback_floor
+                            )
+                            break
                     if controller_reset_exact_h1_fallback:
                         if one_step_screen is None:
                             raise RecedingHorizonPilotError(
@@ -3476,6 +3873,9 @@ def _run_case(
                     "coupled_inverse_mass_brake_exact_h1_fallbacks": (
                         coupled_inverse_mass_brake_exact_h1_fallbacks
                     ),
+                    "contact_aware_vertex_exact_h1_fallbacks": (
+                        contact_aware_vertex_exact_h1_fallbacks
+                    ),
                     "policy_seed": terminal_attempt["policy_seed"],
                     "clean_frame_sha256": terminal_attempt[
                         "clean_frame_sha256"
@@ -3518,7 +3918,96 @@ def _run_case(
                 execution_envelope_state = None
                 execution_brake_state = None
                 execution_coupled_brake_state = None
-                if (
+                execution_vertex_state = None
+                if selected_advance_contact_aware_vertex_id is not None:
+                    target_joint = (
+                        controller_contact_aware_vertex_target_joint_index
+                    )
+                    target_side = (
+                        controller_contact_aware_vertex_target_joint_side
+                    )
+                    target_limit = float(
+                        limits[
+                            target_joint,
+                            1 if target_side == "upper" else 0,
+                        ]
+                    )
+                    executed_configuration = (
+                        _configure_contact_aware_actuator_vertex(
+                            env=env,
+                            robot=robot,
+                            qidx=qidx,
+                            vidx=vidx,
+                            target_joint_index=target_joint,
+                            target_joint_side=target_side,
+                            vertex_id=(
+                                selected_advance_contact_aware_vertex_id
+                            ),
+                        )
+                    )
+                    contact_aware_vertex_controller_configuration_count += (
+                        1
+                    )
+                    if (
+                        not executed_configuration[
+                            "configuration_qpos_identity"
+                        ]
+                        or not executed_configuration[
+                            "configuration_qvel_identity"
+                        ]
+                    ):
+                        raise RecedingHorizonPilotError(
+                            "executed contact-aware vertex config changed qpos/qvel"
+                        )
+                    with _scoped_contact_aware_actuator_vertex(
+                        robot,
+                        target_joint_index=target_joint,
+                        target_joint_side=target_side,
+                        vertex_id=(
+                            selected_advance_contact_aware_vertex_id
+                        ),
+                    ) as execution_torque_audit:
+                        env.step(
+                            np.asarray(
+                                selected_prefix[0],
+                                dtype=np.float64,
+                            )
+                        )
+                    terminal_joint_position = float(
+                        env.sim.data.qpos[qidx[target_joint]]
+                    )
+                    terminal_joint_velocity = float(
+                        env.sim.data.qvel[vidx[target_joint]]
+                    )
+                    if target_side == "upper":
+                        terminal_target_margin = (
+                            target_limit - terminal_joint_position
+                        )
+                        terminal_toward_velocity = (
+                            terminal_joint_velocity
+                        )
+                    else:
+                        terminal_target_margin = (
+                            terminal_joint_position - target_limit
+                        )
+                        terminal_toward_velocity = (
+                            -terminal_joint_velocity
+                        )
+                    execution_vertex_state = {
+                        "target_joint_margin_rad": (
+                            terminal_target_margin
+                        ),
+                        "target_joint_velocity_rad_s": (
+                            terminal_joint_velocity
+                        ),
+                        "toward_limit_velocity_rad_s": (
+                            terminal_toward_velocity
+                        ),
+                        "terminal_non_toward_velocity": bool(
+                            terminal_toward_velocity <= 1e-9
+                        ),
+                    }
+                elif (
                     selected_advance_coupled_inverse_mass_brake_fraction
                     is not None
                 ):
@@ -4220,6 +4709,85 @@ def _run_case(
                             "predicted_terminal_target_joint_velocity_rad_s"
                         ]
                     )
+                if contact_aware_vertex_exact_h1_fallbacks:
+                    executed_vertex = (
+                        contact_aware_vertex_exact_h1_fallbacks[-1]
+                    )
+                    executed_candidate = next(
+                        candidate
+                        for candidate in executed_vertex[
+                            "candidate_evaluations"
+                        ]
+                        if candidate["selected"]
+                    )
+                    executed_vertex["executed_in_shadow"] = True
+                    executed_vertex[
+                        "execution_configuration"
+                    ] = executed_configuration
+                    executed_vertex[
+                        "execution_controller_substep_torque_audit"
+                    ] = execution_torque_audit
+                    executed_vertex[
+                        "execution_controller_scope_restored"
+                    ] = (
+                        "run_controller"
+                        not in robot.controller.__dict__
+                    )
+                    executed_vertex["exact_action_identity"] = bool(
+                        np.array_equal(
+                            np.asarray(
+                                executed_vertex[
+                                    "exact_first_action"
+                                ],
+                                dtype=np.float64,
+                            ),
+                            np.asarray(
+                                selected_prefix[0],
+                                dtype=np.float64,
+                            ),
+                        )
+                    )
+                    executed_vertex[
+                        "execution_terminal_margin_rad"
+                    ] = advanced_margin
+                    executed_vertex[
+                        "execution_terminal_target_joint_margin_rad"
+                    ] = execution_vertex_state[
+                        "target_joint_margin_rad"
+                    ]
+                    executed_vertex[
+                        "execution_terminal_target_joint_velocity_rad_s"
+                    ] = execution_vertex_state[
+                        "target_joint_velocity_rad_s"
+                    ]
+                    executed_vertex[
+                        "execution_terminal_toward_limit_velocity_rad_s"
+                    ] = execution_vertex_state[
+                        "toward_limit_velocity_rad_s"
+                    ]
+                    executed_vertex[
+                        "execution_terminal_non_toward_velocity"
+                    ] = execution_vertex_state[
+                        "terminal_non_toward_velocity"
+                    ]
+                    executed_vertex[
+                        "prediction_execution_margin_error_rad"
+                    ] = abs(
+                        advanced_margin
+                        - executed_candidate[
+                            "predicted_terminal_margin_rad"
+                        ]
+                    )
+                    executed_vertex[
+                        "prediction_execution_target_joint_velocity_error_rad_s"
+                    ] = abs(
+                        execution_vertex_state[
+                            "target_joint_velocity_rad_s"
+                        ]
+                        - executed_candidate[
+                            "predicted_terminal_target_joint_velocity_rad_s"
+                        ]
+                    )
                 if advanced_margin < (
                     selected_advance_minimum_margin_floor
                 ) or (
@@ -4235,6 +4803,11 @@ def _run_case(
                 ) or (
                     execution_coupled_brake_state is not None
                     and not execution_coupled_brake_state[
+                        "terminal_non_toward_velocity"
+                    ]
+                ) or (
+                    execution_vertex_state is not None
+                    and not execution_vertex_state[
                         "terminal_non_toward_velocity"
                     ]
                 ):
@@ -4386,6 +4959,15 @@ def _run_case(
             "controller_coupled_inverse_mass_brake_target_joint_side": (
                 controller_coupled_inverse_mass_brake_target_joint_side
             ),
+            "controller_contact_aware_vertex_exact_h1_ids": list(
+                controller_contact_aware_vertex_exact_h1_ids
+            ),
+            "controller_contact_aware_vertex_target_joint_index": (
+                controller_contact_aware_vertex_target_joint_index
+            ),
+            "controller_contact_aware_vertex_target_joint_side": (
+                controller_contact_aware_vertex_target_joint_side
+            ),
             "lane_base_seeds": list(lane_base_seeds),
             "recovery_round_seed_stride": (
                 recovery_round_seed_stride
@@ -4465,6 +5047,12 @@ def _run_case(
             ),
             "coupled_inverse_mass_brake_controller_configuration_count": (
                 coupled_inverse_mass_brake_controller_configuration_count
+            ),
+            "contact_aware_vertex_exact_h1_shadow_env_step_count": (
+                contact_aware_vertex_exact_h1_shadow_steps
+            ),
+            "contact_aware_vertex_controller_configuration_count": (
+                contact_aware_vertex_controller_configuration_count
             ),
             "full_prefix_shadow_env_step_count": (
                 full_prefix_shadow_steps

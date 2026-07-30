@@ -208,6 +208,8 @@ v12.27 coupled shield 已实现并通过19个相关定向测试；每个子步�
 有效而 free-dynamics authority不足。下一步以64个实际 actuator vertices 的 restored shadow
 直接纳入 contact response，再用相同位置/终点速度门筛选。
 
+v12.28 contact-aware 64-vertex runner 已通过21个相关定向测试；结果生成前仍不计正证据。
+
 
 论文主故事仍是两层对齐，而不是 SemanticSubtask 本身。当前最重要的科学风险集中在 L1：
 
