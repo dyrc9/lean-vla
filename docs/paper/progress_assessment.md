@@ -116,6 +116,8 @@ predictive `block_replan` 后的显式 recovery escalation。
 接入后的 adaptive beam 在首个 safe-state escalation 上仍无 recovery-terminal node 并终态
 fail closed，说明瓶颈并非只在 generator，而是 `block_replan` 状态与 near-limit recovery
 的额外0.02 rad gain contract 类型不匹配。后继需独立的 safe bridge/shield contract。
+full-scale safe-bridge 后继又显示 H1 推进3步后，13/13下一原语单步都会 crossing；说明H1
+离散 horizon 没有保留制动余量。下一控制设计应使用 H2 预测、H1 执行，而不是在临界状态补救。
 
 
 论文主故事仍是两层对齐，而不是 SemanticSubtask 本身。当前最重要的科学风险集中在 L1：

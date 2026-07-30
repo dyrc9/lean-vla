@@ -82,6 +82,10 @@ safe-bridge runner 与测试已实现：13个一步原语先过 unchanged transi
 fresh post-bridge H1 allow；每 cycle 最多2个 bridge。bridge 独立记账，不记为 recovery，
 所有执行仍为 restored shadow。
 
+结果为 transient-safe bridge 0/26：H1 允许第3个 policy action 后 margin 只剩约0.1546 rad，
+随后任何 full-scale 原语（含 hold）一步都会 crossing。下一步改用 H2 screen、仍只推进首步，
+提前保留制动余量；bridge 动作增加0.1/0.25/0.5/0.75缩放，但 transient/trigger 门不变。
+
 ## 前一 checkpoint：2026-07-30 v12.5 integrated predictive recovery
 
 fresh policy-prefix shadow 与 typed recovery runtime 的 fixed-trace composition 已完成并终态冻结：

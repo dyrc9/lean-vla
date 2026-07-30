@@ -250,6 +250,15 @@ safe-bridge runner 已冻结：每次搜索先对13个一步原语检查
 endpoint 必须在同一 frozen post-bridge seed 下产生 H1 `allow_exact` 才可 shadow execute。
 每 cycle 最多2个 bridge。它不使用、修改或冒充 recovery gain contract。
 
+实际两条 lane 在第4轮各搜索一次，但13/13 full-scale primitive 的单步 terminal margin 全部
+已经为负（约 `−0.0280` 至 `−0.0154 rad`），所以 transient-safe candidate 0/26，
+post-bridge inference 0、selection/execution 0/2。问题不是 bridge policy ranking，而是H1
+gate 在第3次推进后只剩约0.1546 rad，下一控制步的惯性/控制器响应已无法刹停。
+
+因此 H1 对该状态的 control horizon 太短。下一版应使用 H2 predictive gate、仍只推进第一个
+action；它会在 full-prefix first-risk-step 从3降到1的过程中更早停止，保留制动余量。bridge
+库同时只增加原动作的0.1/0.25/0.5/0.75缩放版本，保持同一 transient/trigger gate。
+
 冻结产物：
 
 - protocol：`experiments/proofalign_simulator_integrated_predictive_recovery_v12_qualification_protocol.json`
@@ -266,3 +275,4 @@ endpoint 必须在同一 frozen post-bridge seed 下产生 H1 `allow_exact` 才�
 - bounded H1 replan：`results/proofalign_bounded_h1_replan_recovery_pilot_v12_20260730/`
 - predictive escalation：`results/proofalign_predictive_recovery_escalation_pilot_v12_20260730/`
 - adaptive-beam escalation terminal failure：`results/proofalign_adaptive_beam_recovery_escalation_pilot_v12_20260730/`
+- safe bridge：`results/proofalign_safe_bridge_receding_horizon_pilot_v12_20260730/`
