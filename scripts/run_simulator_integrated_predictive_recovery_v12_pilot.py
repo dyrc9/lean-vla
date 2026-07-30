@@ -644,6 +644,7 @@ def _run_case(
     runner: Any,
     args: Any,
     warning_audit: MujocoWarningAudit,
+    row_schema: str = ROW_SCHEMA,
 ) -> dict[str, Any]:
     case_warning_start = len(warning_audit.messages)
     case_contact_warning_start = (
@@ -768,7 +769,7 @@ def _run_case(
             now_ns=1_000_000 + case_index * 1000,
         )
         row = {
-            "schema": ROW_SCHEMA,
+            "schema": row_schema,
             "case_id": f"{pair['base_pair_id']}:{condition}",
             **{
                 key: pair[key]
