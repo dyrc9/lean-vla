@@ -56,11 +56,14 @@ PROTOCOL_ID = (
 )
 SOURCE_PATHS = (
     "src/proofalign/policy_prefix_shadow_v12.py",
+    "src/proofalign/policy_prefix_shadow_warmstart_v12.py",
     "src/proofalign/recoverable_alignment_v12.py",
     "src/proofalign/simulator_snapshot_v12.py",
     "scripts/freeze_policy_prefix_shadow_v12_qualification.py",
     "scripts/run_policy_prefix_shadow_v12_qualification.py",
     "tests/test_policy_prefix_shadow_v12.py",
+    "tests/test_policy_prefix_shadow_v12_qualifications.py",
+    "tests/test_policy_prefix_shadow_warmstart_v12.py",
 )
 RUNTIME_PATHS = (
     "external/LIBERO-Safety/third_party/robosuite-1.4/"
@@ -211,6 +214,10 @@ def build_protocol() -> dict[str, Any]:
         or pilot.get("valid_case_count") != 6
         or pilot["execution_boundary"]["outcome_read_count"] != 0
         or pilot["execution_boundary"]["live_policy_dispatch_count"] != 0
+        or pilot["metrics"][
+            "qacc_warmstart_restore_identity_rate"
+        ]
+        != 1.0
     ):
         raise RuntimeError("policy-prefix engineering pilot is incomplete")
     policy_source = _load(POLICY_SOURCE_PATH)
@@ -256,6 +263,7 @@ def build_protocol() -> dict[str, Any]:
                     "shadow_reference_risk_agreement_rate",
                     "repeat_trajectory_within_tolerance_rate",
                     "controller_restore_identity_rate",
+                    "qacc_warmstart_restore_identity_rate",
                 )
             },
         },
@@ -313,6 +321,7 @@ def build_protocol() -> dict[str, Any]:
             "controller_restore_identity_rate_min": 1.0,
             "simulator_input_restore_identity_rate_min": 1.0,
             "environment_clock_restore_identity_rate_min": 1.0,
+            "qacc_warmstart_restore_identity_rate_min": 1.0,
             "exact_allow_identity_rate_min": 1.0,
             "blocked_prefix_authorization_count_max": 0,
             "runtime_exception_count_max": 0,
@@ -372,7 +381,8 @@ def build_protocol() -> dict[str, Any]:
             "OpenPI pi0.5 checkpoint once and generates one exact 10-step "
             "source prefix for each of 30 independently reset nominal or "
             "synthetic-pressure cases. Each prefix is applied only inside "
-            "two controller-aware read-only simulator shadow probes. It "
+            "two controller-aware, qacc_warmstart-complete read-only "
+            "simulator shadow probes. It "
             "does not dispatch a policy action to a live rollout, apply "
             "recovery, inspect reward/success/cost/collision, establish "
             "clean utility, attacked efficacy, deployment perception, or "

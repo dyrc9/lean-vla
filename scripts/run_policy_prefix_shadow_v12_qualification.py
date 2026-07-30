@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
-"""Run the v12.4 controller-aware policy-prefix shadow qualification."""
+"""Run the v12.4 controller-aware policy-prefix shadow qualification.
+
+The fresh-policy qualification is frozen only after the v12.4b fixed-prefix
+successor identified MuJoCo ``qacc_warmstart`` as solver state that is not
+included in ``MjSimState``.  Fresh pilot and formal runs therefore use the
+warm-start-complete snapshot from their first successful launch.
+"""
 
 from __future__ import annotations
 
@@ -30,9 +36,11 @@ from proofalign.escape_recovery_v12 import (  # noqa: E402
 from proofalign.integrity_v4_models import command_digest  # noqa: E402
 from proofalign.policy_prefix_shadow_v12 import (  # noqa: E402
     PolicyPrefixShadowVerdict,
-    capture_policy_shadow_snapshot,
     decide_policy_prefix_shadow,
-    restore_policy_shadow_snapshot,
+)
+from proofalign.policy_prefix_shadow_warmstart_v12 import (  # noqa: E402
+    capture_warmstart_policy_shadow_snapshot,
+    restore_warmstart_policy_shadow_snapshot,
 )
 from proofalign.recoverable_alignment_v12 import (  # noqa: E402
     ShadowJointTrajectory,
@@ -240,6 +248,9 @@ def _snapshot_payload(assessment: Any) -> dict[str, Any]:
         "environment_clock_identity": (
             assessment.environment_clock_identity
         ),
+        "qacc_warmstart_identity": (
+            assessment.qacc_warmstart_identity
+        ),
         "full_simulator_state_max_abs_error": (
             assessment.full_simulator_state_max_abs_error
         ),
@@ -259,7 +270,9 @@ def _replay_prefix(
 ) -> tuple[list[list[float]], list[dict[str, Any]]]:
     restores = [
         _snapshot_payload(
-            restore_policy_shadow_snapshot(env, robot, snapshot)
+            restore_warmstart_policy_shadow_snapshot(
+                env, robot, snapshot
+            )
         )
     ]
     positions = []
@@ -275,7 +288,9 @@ def _replay_prefix(
         )
     restores.append(
         _snapshot_payload(
-            restore_policy_shadow_snapshot(env, robot, snapshot)
+            restore_warmstart_policy_shadow_snapshot(
+                env, robot, snapshot
+            )
         )
     )
     return positions, restores
@@ -368,7 +383,7 @@ def _run_case(
                 f"policy-seed{policy_seed}"
             ),
         )
-        runtime_snapshot = capture_policy_shadow_snapshot(
+        runtime_snapshot = capture_warmstart_policy_shadow_snapshot(
             env,
             robot,
             source_id=(
@@ -422,7 +437,7 @@ def _run_case(
             ),
         )
         final_restore = _snapshot_payload(
-            restore_policy_shadow_snapshot(
+            restore_warmstart_policy_shadow_snapshot(
                 env, robot, runtime_snapshot
             )
         )
@@ -582,7 +597,7 @@ def _aggregate_metrics(
         if row["decision"]["verdict"]
         == PolicyPrefixShadowVerdict.ALLOW_EXACT.value
     ]
-    return {
+    metrics = {
         "valid_case_count": len(valid),
         "finite_source_prefix_rate": sum(
             row["finite_source_prefix"] for row in valid
@@ -676,6 +691,13 @@ def _aggregate_metrics(
         "outcome_read_count": 0,
         "runtime_exception_count": 0,
     }
+    if restores and all(
+        "qacc_warmstart_identity" in row for row in restores
+    ):
+        metrics["qacc_warmstart_restore_identity_rate"] = sum(
+            row["qacc_warmstart_identity"] for row in restores
+        ) / len(restores)
+    return metrics
 
 
 def build_summary(
@@ -780,6 +802,13 @@ def build_summary(
                 metrics["environment_clock_restore_identity_rate"]
                 >= gates[
                     "environment_clock_restore_identity_rate_min"
+                ],
+            ),
+            (
+                "qacc_warmstart_restore_identity",
+                metrics["qacc_warmstart_restore_identity_rate"]
+                >= gates[
+                    "qacc_warmstart_restore_identity_rate_min"
                 ],
             ),
             (

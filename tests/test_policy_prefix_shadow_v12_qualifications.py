@@ -9,6 +9,11 @@ from scripts.freeze_policy_prefix_shadow_v12_resource_failure import (
 from scripts.freeze_warmstart_policy_prefix_shadow_v12_terminal import (
     build_terminal as build_warmstart_terminal,
 )
+from scripts import run_policy_prefix_shadow_v12_qualification as fresh_runner
+from proofalign.policy_prefix_shadow_warmstart_v12 import (
+    capture_warmstart_policy_shadow_snapshot,
+    restore_warmstart_policy_shadow_snapshot,
+)
 
 
 def test_fresh_policy_resource_nonstart_does_not_authorize_rollout() -> None:
@@ -49,3 +54,14 @@ def test_warmstart_successor_closes_repeat_fidelity() -> None:
         == 1.0
     )
     assert terminal["lifecycle"]["clean_rollout_authorized"] is False
+
+
+def test_fresh_policy_runner_uses_warmstart_complete_snapshot() -> None:
+    assert (
+        fresh_runner.capture_warmstart_policy_shadow_snapshot
+        is capture_warmstart_policy_shadow_snapshot
+    )
+    assert (
+        fresh_runner.restore_warmstart_policy_shadow_snapshot
+        is restore_warmstart_policy_shadow_snapshot
+    )
