@@ -529,7 +529,7 @@ def _screen_prefix(
     }
 
 
-def _select_recovery(
+def _shadow_recovery_candidates(
     config: dict[str, Any],
     *,
     env: Any,
@@ -540,7 +540,7 @@ def _select_recovery(
     snapshot: Any,
     source_id: str,
     contact_audit: ContactCapacityAudit,
-):
+) -> tuple[tuple[RecoveryCandidate, ...], int, bool]:
     recovery = config["recovery"]
     horizon = int(recovery["shadow_horizon_steps"])
     candidates = []
@@ -591,6 +591,45 @@ def _select_recovery(
                 ),
             )
         )
+    restored = restore_warmstart_policy_shadow_snapshot(
+        env, robot, snapshot
+    )
+    restore_identity = restore_identity and (
+        restored.trusted_arm_bitwise_identity
+        and restored.controller_state_identity
+        and restored.simulator_input_identity
+        and restored.environment_clock_identity
+        and restored.qacc_warmstart_identity
+    )
+    return tuple(candidates), shadow_steps, restore_identity
+
+
+def _select_recovery(
+    config: dict[str, Any],
+    *,
+    env: Any,
+    robot: Any,
+    qidx: np.ndarray,
+    limits: np.ndarray,
+    state: Any,
+    snapshot: Any,
+    source_id: str,
+    contact_audit: ContactCapacityAudit,
+):
+    candidates, shadow_steps, restore_identity = (
+        _shadow_recovery_candidates(
+            config,
+            env=env,
+            robot=robot,
+            qidx=qidx,
+            limits=limits,
+            state=state,
+            snapshot=snapshot,
+            source_id=source_id,
+            contact_audit=contact_audit,
+        )
+    )
+    recovery = config["recovery"]
     recovery_config = EscapeRecoveryConfig(
         trigger_margin_rad=float(recovery["trigger_margin_rad"]),
         safe_margin_rad=float(recovery["safe_margin_rad"]),
@@ -603,18 +642,8 @@ def _select_recovery(
     )
     selection = select_prefix_escape_recovery_candidate(
         state,
-        tuple(candidates),
+        candidates,
         config=recovery_config,
-    )
-    restored = restore_warmstart_policy_shadow_snapshot(
-        env, robot, snapshot
-    )
-    restore_identity = restore_identity and (
-        restored.trusted_arm_bitwise_identity
-        and restored.controller_state_identity
-        and restored.simulator_input_identity
-        and restored.environment_clock_identity
-        and restored.qacc_warmstart_identity
     )
     return selection, recovery_config, shadow_steps, restore_identity
 
