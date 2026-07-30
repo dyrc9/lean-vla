@@ -408,6 +408,9 @@ constraint coupling淹没。8/8 configuration identity及零运行时异常成�
 下一 successor 按 inverse mass 的 joint-1 row 构造7轴 actuator-bound away-acceleration vertex，
 再以 `0.25/0.50/0.75/1.00` 和 nominal torque 插值；用同一位置/终点速度 gate 选最小干预。
 
+v12.27 已实现完整7轴 torque、mass solve residual、acceleration-term与 actuator-bound审计，
+19个相关定向测试通过；正式双 lane 结果待 clean-tree 实验。
+
 冻结产物：
 
 - protocol：`experiments/proofalign_simulator_integrated_predictive_recovery_v12_qualification_protocol.json`

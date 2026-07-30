@@ -240,6 +240,10 @@ unconstrained acceleration 最小的 torque vertex，再用冻结 fractions `0.2
 与 nominal clipped torque 插值。仍选择满足0.15 floor与终点 toward qvel≤0的最小 fraction，
 保持 source action bytes、one-action scope与 fresh H3。
 
+v12.27 runner 已实现，逐 substep 记录 inverse-mass row、线性求解 residual、nominal/vertex/
+applied 7轴 torques、toward-acceleration term与 bound violation；19个相关定向测试通过。
+clean-tree 后执行双 lane。
+
 ## 前一 checkpoint：2026-07-30 v12.5 integrated predictive recovery
 
 fresh policy-prefix shadow 与 typed recovery runtime 的 fixed-trace composition 已完成并终态冻结：

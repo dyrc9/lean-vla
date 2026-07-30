@@ -1068,6 +1068,187 @@ def _scoped_joint_limit_anticipatory_brake(
         del controller.run_controller
 
 
+def _configure_coupled_inverse_mass_brake(
+    *,
+    env: Any,
+    robot: Any,
+    qidx: np.ndarray,
+    vidx: np.ndarray,
+    limits: np.ndarray,
+    joint_index: int,
+    joint_side: str,
+    blend_fraction: float,
+) -> dict[str, Any]:
+    if (
+        joint_index < 0
+        or joint_index >= len(qidx)
+        or len(qidx) != len(vidx)
+        or limits.shape != (len(qidx), 2)
+        or joint_side not in {"lower", "upper"}
+        or not np.isfinite(blend_fraction)
+        or blend_fraction <= 0
+        or blend_fraction > 1
+    ):
+        raise RecedingHorizonPilotError(
+            "invalid coupled inverse-mass brake configuration"
+        )
+    before_qpos = np.asarray(
+        env.sim.data.qpos[qidx], dtype=np.float64
+    ).copy()
+    before_qvel = np.asarray(
+        env.sim.data.qvel[vidx], dtype=np.float64
+    ).copy()
+    controller = robot.controller
+    controller.update(force=True)
+    controller.reset_goal()
+    after_qpos = np.asarray(
+        env.sim.data.qpos[qidx], dtype=np.float64
+    )
+    after_qvel = np.asarray(
+        env.sim.data.qvel[vidx], dtype=np.float64
+    )
+    return {
+        "target_joint_index": joint_index,
+        "target_joint_side": joint_side,
+        "blend_fraction": float(blend_fraction),
+        "controller_goal_reset": True,
+        "configuration_qpos_identity": bool(
+            np.array_equal(before_qpos, after_qpos)
+        ),
+        "configuration_qvel_identity": bool(
+            np.array_equal(before_qvel, after_qvel)
+        ),
+    }
+
+
+@contextmanager
+def _scoped_coupled_inverse_mass_brake(
+    robot: Any,
+    *,
+    joint_index: int,
+    joint_side: str,
+    blend_fraction: float,
+) -> Any:
+    controller = robot.controller
+    actuator_min = np.asarray(
+        controller.actuator_min, dtype=np.float64
+    )
+    actuator_max = np.asarray(
+        controller.actuator_max, dtype=np.float64
+    )
+    if (
+        joint_index < 0
+        or joint_index >= len(actuator_min)
+        or actuator_min.shape != actuator_max.shape
+        or joint_side not in {"lower", "upper"}
+        or not np.isfinite(blend_fraction)
+        or blend_fraction <= 0
+        or blend_fraction > 1
+    ):
+        raise RecedingHorizonPilotError(
+            "invalid scoped coupled inverse-mass brake"
+        )
+    if "run_controller" in controller.__dict__:
+        raise RecedingHorizonPilotError(
+            "controller already has a run_controller override"
+        )
+    original_run_controller = controller.run_controller
+    torque_audit: list[dict[str, Any]] = []
+
+    def coupled_brake_run_controller(
+        controller_self: Any,
+    ) -> np.ndarray:
+        nominal_raw = np.asarray(
+            original_run_controller(), dtype=np.float64
+        ).copy()
+        nominal = np.asarray(
+            controller_self.clip_torques(nominal_raw),
+            dtype=np.float64,
+        ).copy()
+        mass_matrix = np.asarray(
+            controller_self.mass_matrix, dtype=np.float64
+        )
+        if mass_matrix.shape != (
+            len(actuator_min),
+            len(actuator_min),
+        ):
+            raise RecedingHorizonPilotError(
+                "unexpected controller mass-matrix shape"
+            )
+        basis = np.zeros(len(actuator_min), dtype=np.float64)
+        basis[joint_index] = 1.0
+        inverse_mass_row = np.linalg.solve(mass_matrix, basis)
+        toward_acceleration_row = (
+            inverse_mass_row
+            if joint_side == "upper"
+            else -inverse_mass_row
+        )
+        maximum_away_vertex = np.where(
+            toward_acceleration_row > 0,
+            actuator_min,
+            np.where(
+                toward_acceleration_row < 0,
+                actuator_max,
+                nominal,
+            ),
+        )
+        blended = nominal + float(blend_fraction) * (
+            maximum_away_vertex - nominal
+        )
+        applied = np.asarray(
+            controller_self.clip_torques(blended),
+            dtype=np.float64,
+        ).copy()
+        controller_self.torques = applied
+        joint_velocity = float(
+            np.asarray(
+                controller_self.joint_vel, dtype=np.float64
+            )[joint_index]
+        )
+        torque_audit.append(
+            {
+                "controller_substep_index": len(torque_audit),
+                "joint_velocity_rad_s": joint_velocity,
+                "inverse_mass_row": inverse_mass_row.tolist(),
+                "mass_solve_max_abs_residual": float(
+                    np.max(
+                        np.abs(
+                            mass_matrix @ inverse_mass_row - basis
+                        )
+                    )
+                ),
+                "nominal_clipped_torque": nominal.tolist(),
+                "maximum_away_vertex_torque": (
+                    maximum_away_vertex.tolist()
+                ),
+                "applied_torque": applied.tolist(),
+                "nominal_toward_acceleration_term": float(
+                    toward_acceleration_row @ nominal
+                ),
+                "vertex_toward_acceleration_term": float(
+                    toward_acceleration_row
+                    @ maximum_away_vertex
+                ),
+                "applied_toward_acceleration_term": float(
+                    toward_acceleration_row @ applied
+                ),
+                "torque_bound_violation": bool(
+                    np.any(applied < actuator_min)
+                    or np.any(applied > actuator_max)
+                ),
+            }
+        )
+        return applied
+
+    controller.run_controller = MethodType(
+        coupled_brake_run_controller, controller
+    )
+    try:
+        yield torque_audit
+    finally:
+        del controller.run_controller
+
+
 def _run_case(
     config: dict[str, Any],
     pair: dict[str, Any],
@@ -1113,6 +1294,11 @@ def _run_case(
     ] = (),
     controller_joint_anticipatory_brake_target_joint_index: int = 1,
     controller_joint_anticipatory_brake_target_joint_side: str = "upper",
+    controller_coupled_inverse_mass_brake_exact_h1_fractions: tuple[
+        float, ...
+    ] = (),
+    controller_coupled_inverse_mass_brake_target_joint_index: int = 1,
+    controller_coupled_inverse_mass_brake_target_joint_side: str = "upper",
     lane_base_seeds: tuple[int, ...] = LANE_BASE_SEEDS,
     row_schema: str = ROW_SCHEMA,
     source_version: str = "v12.11",
@@ -1185,6 +1371,28 @@ def _run_case(
         or controller_joint_anticipatory_brake_target_joint_index < 0
         or controller_joint_anticipatory_brake_target_joint_index >= 7
         or controller_joint_anticipatory_brake_target_joint_side
+        not in {"lower", "upper"}
+        or any(
+            not np.isfinite(fraction)
+            or fraction <= 0
+            or fraction > 1
+            for fraction in (
+                controller_coupled_inverse_mass_brake_exact_h1_fractions
+            )
+        )
+        or tuple(
+            controller_coupled_inverse_mass_brake_exact_h1_fractions
+        )
+        != tuple(
+            sorted(
+                set(
+                    controller_coupled_inverse_mass_brake_exact_h1_fractions
+                )
+            )
+        )
+        or controller_coupled_inverse_mass_brake_target_joint_index < 0
+        or controller_coupled_inverse_mass_brake_target_joint_index >= 7
+        or controller_coupled_inverse_mass_brake_target_joint_side
         not in {"lower", "upper"}
         or controller_nullspace_target_joint_side
         not in {"lower", "upper"}
@@ -1303,6 +1511,8 @@ def _run_case(
         joint_velocity_envelope_controller_configuration_count = 0
         joint_anticipatory_brake_exact_h1_shadow_steps = 0
         joint_anticipatory_brake_controller_configuration_count = 0
+        coupled_inverse_mass_brake_exact_h1_shadow_steps = 0
+        coupled_inverse_mass_brake_controller_configuration_count = 0
         policy_advance_steps = 0
         for lane_index, base_seed in enumerate(lane_base_seeds):
             restore_identity = (
@@ -1363,12 +1573,14 @@ def _run_case(
                 joint_damping_exact_h1_fallbacks = []
                 joint_velocity_envelope_exact_h1_fallbacks = []
                 joint_anticipatory_brake_exact_h1_fallbacks = []
+                coupled_inverse_mass_brake_exact_h1_fallbacks = []
                 selected_prefix = None
                 selected_advance_controller_goal_reset = False
                 selected_advance_nullspace_offset = None
                 selected_advance_joint_damping_gain = None
                 selected_advance_joint_velocity_envelope_slope = None
                 selected_advance_joint_anticipatory_brake_fraction = None
+                selected_advance_coupled_inverse_mass_brake_fraction = None
                 selected_advance_minimum_margin_floor = float(
                     config["episode"]["trigger_margin_rad"]
                 )
@@ -2258,6 +2470,211 @@ def _run_case(
                                 fallback_floor
                             )
                             break
+                    if (
+                        controller_coupled_inverse_mass_brake_exact_h1_fractions
+                    ):
+                        if one_step_screen is None:
+                            raise RecedingHorizonPilotError(
+                                "missing failed gate for coupled brake"
+                            )
+                        exact_action = tuple(
+                            float(value) for value in prefix[0]
+                        )
+                        candidate_rows = []
+                        fallback_floor = float(
+                            config["recovery"]["safe_margin_rad"]
+                        )
+                        target_joint = (
+                            controller_coupled_inverse_mass_brake_target_joint_index
+                        )
+                        target_side = (
+                            controller_coupled_inverse_mass_brake_target_joint_side
+                        )
+                        for fraction in (
+                            controller_coupled_inverse_mass_brake_exact_h1_fractions
+                        ):
+                            restore_identity = (
+                                restore_identity
+                                and _restore_identity(
+                                    env,
+                                    robot,
+                                    one_step_screen["snapshot"],
+                                )
+                            )
+                            configuration = (
+                                _configure_coupled_inverse_mass_brake(
+                                    env=env,
+                                    robot=robot,
+                                    qidx=qidx,
+                                    vidx=vidx,
+                                    limits=limits,
+                                    joint_index=target_joint,
+                                    joint_side=target_side,
+                                    blend_fraction=float(fraction),
+                                )
+                            )
+                            coupled_inverse_mass_brake_controller_configuration_count += (
+                                1
+                            )
+                            if (
+                                not configuration[
+                                    "configuration_qpos_identity"
+                                ]
+                                or not configuration[
+                                    "configuration_qvel_identity"
+                                ]
+                            ):
+                                raise RecedingHorizonPilotError(
+                                    "coupled-brake config changed qpos/qvel"
+                                )
+                            with _scoped_coupled_inverse_mass_brake(
+                                robot,
+                                joint_index=target_joint,
+                                joint_side=target_side,
+                                blend_fraction=float(fraction),
+                            ) as torque_audit:
+                                (
+                                    _coupled_positions,
+                                    coupled_margins,
+                                ) = _execute_actions(
+                                    env,
+                                    actions=(exact_action,),
+                                    qidx=qidx,
+                                    limits=limits,
+                                    contacts=contacts,
+                                )
+                            coupled_inverse_mass_brake_exact_h1_shadow_steps += (
+                                1
+                            )
+                            terminal_joint_velocity = float(
+                                env.sim.data.qvel[vidx[target_joint]]
+                            )
+                            terminal_toward_velocity = (
+                                terminal_joint_velocity
+                                if target_side == "upper"
+                                else -terminal_joint_velocity
+                            )
+                            candidate_rows.append(
+                                {
+                                    "blend_fraction": float(
+                                        fraction
+                                    ),
+                                    "configuration": configuration,
+                                    "controller_substep_torque_audit": (
+                                        torque_audit
+                                    ),
+                                    "controller_scope_restored": (
+                                        "run_controller"
+                                        not in robot.controller.__dict__
+                                    ),
+                                    "predicted_minimum_margin_rad": min(
+                                        coupled_margins
+                                    ),
+                                    "predicted_terminal_margin_rad": (
+                                        coupled_margins[-1]
+                                    ),
+                                    "predicted_terminal_target_joint_velocity_rad_s": (
+                                        terminal_joint_velocity
+                                    ),
+                                    "predicted_terminal_toward_limit_velocity_rad_s": (
+                                        terminal_toward_velocity
+                                    ),
+                                    "terminal_non_toward_velocity": (
+                                        terminal_toward_velocity <= 1e-9
+                                    ),
+                                    "safe": (
+                                        min(coupled_margins)
+                                        >= fallback_floor
+                                        and min(coupled_margins) >= 0
+                                        and terminal_toward_velocity
+                                        <= 1e-9
+                                        and all(
+                                            not sample[
+                                                "torque_bound_violation"
+                                            ]
+                                            for sample in torque_audit
+                                        )
+                                    ),
+                                    "selected": False,
+                                }
+                            )
+                        restore_identity = (
+                            restore_identity
+                            and _restore_identity(
+                                env,
+                                robot,
+                                one_step_screen["snapshot"],
+                            )
+                        )
+                        safe_candidates = [
+                            candidate
+                            for candidate in candidate_rows
+                            if candidate["safe"]
+                        ]
+                        safe_candidates.sort(
+                            key=lambda candidate: (
+                                candidate["blend_fraction"],
+                                -candidate[
+                                    "predicted_terminal_margin_rad"
+                                ],
+                            )
+                        )
+                        selected_coupled_brake = (
+                            safe_candidates[0]
+                            if safe_candidates
+                            else None
+                        )
+                        if selected_coupled_brake is not None:
+                            selected_coupled_brake["selected"] = True
+                        coupled_brake_row = {
+                            "recovery_round": recovery_round,
+                            "policy_seed": attempts[-1][
+                                "policy_seed"
+                            ],
+                            "policy_chunk_sha256": attempts[-1][
+                                "policy_chunk_sha256"
+                            ],
+                            "exact_first_action": exact_action,
+                            "target_joint_index": target_joint,
+                            "target_joint_side": target_side,
+                            "minimum_margin_floor_rad": fallback_floor,
+                            "candidate_evaluations": candidate_rows,
+                            "selected_blend_fraction": (
+                                selected_coupled_brake[
+                                    "blend_fraction"
+                                ]
+                                if selected_coupled_brake is not None
+                                else None
+                            ),
+                            "authorized": (
+                                selected_coupled_brake is not None
+                            ),
+                            "executed_in_shadow": False,
+                            "exact_action_identity": None,
+                            "execution_configuration": None,
+                            "execution_controller_substep_torque_audit": [],
+                            "execution_controller_scope_restored": None,
+                            "execution_terminal_margin_rad": None,
+                            "execution_terminal_target_joint_velocity_rad_s": None,
+                            "execution_terminal_toward_limit_velocity_rad_s": None,
+                            "execution_terminal_non_toward_velocity": None,
+                            "prediction_execution_margin_error_rad": None,
+                            "prediction_execution_target_joint_velocity_error_rad_s": None,
+                        }
+                        coupled_inverse_mass_brake_exact_h1_fallbacks.append(
+                            coupled_brake_row
+                        )
+                        if selected_coupled_brake is not None:
+                            selected_prefix = prefix
+                            selected_advance_coupled_inverse_mass_brake_fraction = (
+                                selected_coupled_brake[
+                                    "blend_fraction"
+                                ]
+                            )
+                            selected_advance_minimum_margin_floor = (
+                                fallback_floor
+                            )
+                            break
                     if controller_reset_exact_h1_fallback:
                         if one_step_screen is None:
                             raise RecedingHorizonPilotError(
@@ -3056,6 +3473,9 @@ def _run_case(
                     "joint_anticipatory_brake_exact_h1_fallbacks": (
                         joint_anticipatory_brake_exact_h1_fallbacks
                     ),
+                    "coupled_inverse_mass_brake_exact_h1_fallbacks": (
+                        coupled_inverse_mass_brake_exact_h1_fallbacks
+                    ),
                     "policy_seed": terminal_attempt["policy_seed"],
                     "clean_frame_sha256": terminal_attempt[
                         "clean_frame_sha256"
@@ -3097,7 +3517,79 @@ def _run_case(
                 execution_torque_audit: list[dict[str, Any]] = []
                 execution_envelope_state = None
                 execution_brake_state = None
+                execution_coupled_brake_state = None
                 if (
+                    selected_advance_coupled_inverse_mass_brake_fraction
+                    is not None
+                ):
+                    target_joint = (
+                        controller_coupled_inverse_mass_brake_target_joint_index
+                    )
+                    target_side = (
+                        controller_coupled_inverse_mass_brake_target_joint_side
+                    )
+                    executed_configuration = (
+                        _configure_coupled_inverse_mass_brake(
+                            env=env,
+                            robot=robot,
+                            qidx=qidx,
+                            vidx=vidx,
+                            limits=limits,
+                            joint_index=target_joint,
+                            joint_side=target_side,
+                            blend_fraction=(
+                                selected_advance_coupled_inverse_mass_brake_fraction
+                            ),
+                        )
+                    )
+                    coupled_inverse_mass_brake_controller_configuration_count += (
+                        1
+                    )
+                    if (
+                        not executed_configuration[
+                            "configuration_qpos_identity"
+                        ]
+                        or not executed_configuration[
+                            "configuration_qvel_identity"
+                        ]
+                    ):
+                        raise RecedingHorizonPilotError(
+                            "executed coupled-brake config changed qpos/qvel"
+                        )
+                    with _scoped_coupled_inverse_mass_brake(
+                        robot,
+                        joint_index=target_joint,
+                        joint_side=target_side,
+                        blend_fraction=(
+                            selected_advance_coupled_inverse_mass_brake_fraction
+                        ),
+                    ) as execution_torque_audit:
+                        env.step(
+                            np.asarray(
+                                selected_prefix[0],
+                                dtype=np.float64,
+                            )
+                        )
+                    terminal_joint_velocity = float(
+                        env.sim.data.qvel[vidx[target_joint]]
+                    )
+                    terminal_toward_velocity = (
+                        terminal_joint_velocity
+                        if target_side == "upper"
+                        else -terminal_joint_velocity
+                    )
+                    execution_coupled_brake_state = {
+                        "target_joint_velocity_rad_s": (
+                            terminal_joint_velocity
+                        ),
+                        "toward_limit_velocity_rad_s": (
+                            terminal_toward_velocity
+                        ),
+                        "terminal_non_toward_velocity": bool(
+                            terminal_toward_velocity <= 1e-9
+                        ),
+                    }
+                elif (
                     selected_advance_joint_anticipatory_brake_fraction
                     is not None
                 ):
@@ -3652,6 +4144,82 @@ def _run_case(
                             "predicted_terminal_target_joint_velocity_rad_s"
                         ]
                     )
+                if coupled_inverse_mass_brake_exact_h1_fallbacks:
+                    executed_coupled_brake = (
+                        coupled_inverse_mass_brake_exact_h1_fallbacks[-1]
+                    )
+                    executed_candidate = next(
+                        candidate
+                        for candidate in executed_coupled_brake[
+                            "candidate_evaluations"
+                        ]
+                        if candidate["selected"]
+                    )
+                    executed_coupled_brake["executed_in_shadow"] = True
+                    executed_coupled_brake[
+                        "execution_configuration"
+                    ] = executed_configuration
+                    executed_coupled_brake[
+                        "execution_controller_substep_torque_audit"
+                    ] = execution_torque_audit
+                    executed_coupled_brake[
+                        "execution_controller_scope_restored"
+                    ] = (
+                        "run_controller"
+                        not in robot.controller.__dict__
+                    )
+                    executed_coupled_brake[
+                        "exact_action_identity"
+                    ] = bool(
+                        np.array_equal(
+                            np.asarray(
+                                executed_coupled_brake[
+                                    "exact_first_action"
+                                ],
+                                dtype=np.float64,
+                            ),
+                            np.asarray(
+                                selected_prefix[0],
+                                dtype=np.float64,
+                            ),
+                        )
+                    )
+                    executed_coupled_brake[
+                        "execution_terminal_margin_rad"
+                    ] = advanced_margin
+                    executed_coupled_brake[
+                        "execution_terminal_target_joint_velocity_rad_s"
+                    ] = execution_coupled_brake_state[
+                        "target_joint_velocity_rad_s"
+                    ]
+                    executed_coupled_brake[
+                        "execution_terminal_toward_limit_velocity_rad_s"
+                    ] = execution_coupled_brake_state[
+                        "toward_limit_velocity_rad_s"
+                    ]
+                    executed_coupled_brake[
+                        "execution_terminal_non_toward_velocity"
+                    ] = execution_coupled_brake_state[
+                        "terminal_non_toward_velocity"
+                    ]
+                    executed_coupled_brake[
+                        "prediction_execution_margin_error_rad"
+                    ] = abs(
+                        advanced_margin
+                        - executed_candidate[
+                            "predicted_terminal_margin_rad"
+                        ]
+                    )
+                    executed_coupled_brake[
+                        "prediction_execution_target_joint_velocity_error_rad_s"
+                    ] = abs(
+                        execution_coupled_brake_state[
+                            "target_joint_velocity_rad_s"
+                        ]
+                        - executed_candidate[
+                            "predicted_terminal_target_joint_velocity_rad_s"
+                        ]
+                    )
                 if advanced_margin < (
                     selected_advance_minimum_margin_floor
                 ) or (
@@ -3662,6 +4230,11 @@ def _run_case(
                 ) or (
                     execution_brake_state is not None
                     and not execution_brake_state[
+                        "terminal_non_toward_velocity"
+                    ]
+                ) or (
+                    execution_coupled_brake_state is not None
+                    and not execution_coupled_brake_state[
                         "terminal_non_toward_velocity"
                     ]
                 ):
@@ -3804,6 +4377,15 @@ def _run_case(
             "controller_joint_anticipatory_brake_target_joint_side": (
                 controller_joint_anticipatory_brake_target_joint_side
             ),
+            "controller_coupled_inverse_mass_brake_exact_h1_fractions": list(
+                controller_coupled_inverse_mass_brake_exact_h1_fractions
+            ),
+            "controller_coupled_inverse_mass_brake_target_joint_index": (
+                controller_coupled_inverse_mass_brake_target_joint_index
+            ),
+            "controller_coupled_inverse_mass_brake_target_joint_side": (
+                controller_coupled_inverse_mass_brake_target_joint_side
+            ),
             "lane_base_seeds": list(lane_base_seeds),
             "recovery_round_seed_stride": (
                 recovery_round_seed_stride
@@ -3877,6 +4459,12 @@ def _run_case(
             ),
             "joint_anticipatory_brake_controller_configuration_count": (
                 joint_anticipatory_brake_controller_configuration_count
+            ),
+            "coupled_inverse_mass_brake_exact_h1_shadow_env_step_count": (
+                coupled_inverse_mass_brake_exact_h1_shadow_steps
+            ),
+            "coupled_inverse_mass_brake_controller_configuration_count": (
+                coupled_inverse_mass_brake_controller_configuration_count
             ),
             "full_prefix_shadow_env_step_count": (
                 full_prefix_shadow_steps

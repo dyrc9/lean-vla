@@ -201,6 +201,9 @@ v12.26 已实现四档 full-action actuator-bound fraction，并通过17个相�
 差异极小。这排除了单轴反应时机问题，指向多关节/constraint coupling；下一方法应以 inverse
 mass row 做最小干预的 coupled torque shield，同时保留 exact action bytes 与双重安全 gate。
 
+v12.27 coupled shield 已实现并通过19个相关定向测试；每个子步都能审计 actuator-box vertex
+确实降低 inverse-mass toward-acceleration term。实验结果生成前仍不计作正证据。
+
 
 论文主故事仍是两层对齐，而不是 SemanticSubtask 本身。当前最重要的科学风险集中在 L1：
 
