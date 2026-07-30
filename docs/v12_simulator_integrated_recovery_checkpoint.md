@@ -215,6 +215,11 @@ dispatch、typed recovery 和 outcome read 均为0。
 可在 shadow branch 中推进，恢复后仍须通过 H1 exact gate。该路由必须单独版本化，不能把
 `block_replan` 直接改称 recovery success。
 
+predictive-escalation pilot 已固定为每个 cycle/round 只做1次 fresh H1 attempt，失败后调用
+原13原语、原 threshold 的 recovery selector；每 cycle 最多2次 escalation。恢复候选必须
+shadow replay 与预测逐点一致且不 crossing，恢复后使用 seed `+1000` 的新 round 重新做 H1
+gate。所有 recovery 与 policy advance 仍只在最终可恢复的 shadow lane 中发生。
+
 冻结产物：
 
 - protocol：`experiments/proofalign_simulator_integrated_predictive_recovery_v12_qualification_protocol.json`
