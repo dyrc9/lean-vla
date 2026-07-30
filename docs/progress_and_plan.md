@@ -307,6 +307,13 @@ v12.32 不扩大branching factor：从v12.28跨lane平均terminal target margin�
 nominal→vertex blend `0.25/0.50/0.75/1.00`，仍为64个控制模式。对这64个平滑模式运行同一
 width64、remaining-depth4 beam；目标是避免极值torque在前两步积累导致第三步全空。
 
+v12.32 runner与审计链已实现。每个controller substep先保留原controller计算与goal/cache更新，
+对nominal torque裁剪后按冻结fraction向vertex插值，再按原actuator bounds裁剪；source-policy
+action bytes不变。影子选择出的vertex/fraction由实际隔离advance原样复现，配置前qpos/qvel、
+逐substep nominal/vertex/applied torque、scope restore、bound、exact action identity及
+prediction/execution margin/qvel error均落盘。相关23个定向测试通过；双lane正式结果尚未生成，
+不提前计为正证据。
+
 ## 前一 checkpoint：2026-07-30 v12.5 integrated predictive recovery
 
 fresh policy-prefix shadow 与 typed recovery runtime 的 fixed-trace composition 已完成并终态冻结：

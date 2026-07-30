@@ -452,6 +452,12 @@ min/max torque vertices在第三步前把系统推入不可行区。
 v12.32 冻结跨lane top16 contact patterns，并各加4档 nominal→vertex blend，branching仍为64，
 用相同width64/depth4 beam搜索更平滑的长期控制序列。
 
+v12.32实现已完成：平滑模式严格按
+`clip(nominal)+fraction×(vertex−clip(nominal))`计算并再次裁剪，保留原controller调用以更新其
+内部状态；预测与实际隔离advance使用同一vertex/fraction和完全相同的source action bytes。
+新增ledger覆盖mode ID、fraction、配置qpos/qvel identity、逐substep torque、scope/bounds及
+prediction/execution一致性。相关23个定向测试通过；正式双lane运行前仍要求clean Git preflight。
+
 冻结产物：
 
 - protocol：`experiments/proofalign_simulator_integrated_predictive_recovery_v12_qualification_protocol.json`
@@ -486,3 +492,4 @@ v12.32 冻结跨lane top16 contact patterns，并各加4档 nominal→vertex ble
 - H3 contact-aware vertex receding-floor pilot：`results/proofalign_h3_contact_aware_vertex_receding_floor_pilot_v12_20260730/`
 - H3 contact-aware vertex two-step successor pilot：`results/proofalign_h3_contact_aware_vertex_successor_pilot_v12_20260730/`
 - H3 contact-aware full-horizon extreme-vertex beam：`results/proofalign_h3_contact_aware_vertex_beam_pilot_v12_20260730/`
+- H3 contact-aware smooth 64-mode beam（待运行）：`results/proofalign_h3_contact_aware_vertex_blend_beam_pilot_v12_20260730/`

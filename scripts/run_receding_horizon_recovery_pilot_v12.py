@@ -1404,6 +1404,88 @@ def _scoped_contact_aware_actuator_vertex(
         del controller.run_controller
 
 
+@contextmanager
+def _scoped_contact_aware_actuator_vertex_blend(
+    robot: Any,
+    *,
+    target_joint_index: int,
+    target_joint_side: str,
+    vertex_id: int,
+    blend_fraction: float,
+) -> Any:
+    controller = robot.controller
+    if (
+        "run_controller" in controller.__dict__
+        or not np.isfinite(blend_fraction)
+        or blend_fraction <= 0
+        or blend_fraction > 1
+    ):
+        raise RecedingHorizonPilotError(
+            "invalid contact-aware actuator vertex blend"
+        )
+    original_run_controller = controller.run_controller
+    vertex = _contact_aware_actuator_vertex(
+        controller,
+        target_joint_index=target_joint_index,
+        target_joint_side=target_joint_side,
+        vertex_id=vertex_id,
+    )
+    actuator_min = np.asarray(
+        controller.actuator_min, dtype=np.float64
+    )
+    actuator_max = np.asarray(
+        controller.actuator_max, dtype=np.float64
+    )
+    torque_audit: list[dict[str, Any]] = []
+
+    def blended_vertex_run_controller(
+        controller_self: Any,
+    ) -> np.ndarray:
+        nominal_raw = np.asarray(
+            original_run_controller(), dtype=np.float64
+        ).copy()
+        nominal = np.asarray(
+            controller_self.clip_torques(nominal_raw),
+            dtype=np.float64,
+        ).copy()
+        applied = nominal + float(blend_fraction) * (
+            vertex - nominal
+        )
+        applied = np.asarray(
+            controller_self.clip_torques(applied),
+            dtype=np.float64,
+        ).copy()
+        controller_self.torques = applied
+        joint_velocity = float(
+            np.asarray(
+                controller_self.joint_vel, dtype=np.float64
+            )[target_joint_index]
+        )
+        torque_audit.append(
+            {
+                "controller_substep_index": len(torque_audit),
+                "joint_velocity_rad_s": joint_velocity,
+                "blend_fraction": float(blend_fraction),
+                "nominal_clipped_torque": nominal.tolist(),
+                "vertex_torque": vertex.tolist(),
+                "applied_torque": applied.tolist(),
+                "torque_bound_violation": bool(
+                    np.any(applied < actuator_min)
+                    or np.any(applied > actuator_max)
+                ),
+            }
+        )
+        return applied
+
+    controller.run_controller = MethodType(
+        blended_vertex_run_controller, controller
+    )
+    try:
+        yield torque_audit
+    finally:
+        del controller.run_controller
+
+
 def _screen_contact_aware_vertex_beam(
     *,
     env: Any,
@@ -1415,6 +1497,7 @@ def _screen_contact_aware_vertex_beam(
     contacts: base.ContactCapacityAudit,
     actions: tuple[tuple[float, ...], ...],
     vertex_ids: tuple[int, ...],
+    blend_fractions: tuple[float, ...] = (),
     target_joint_index: int,
     target_joint_side: str,
     minimum_margin_floor_rad: float,
@@ -1426,6 +1509,12 @@ def _screen_contact_aware_vertex_beam(
         or not vertex_ids
         or beam_width <= 0
         or minimum_margin_floor_rad < 0
+        or any(
+            not np.isfinite(fraction)
+            or fraction <= 0
+            or fraction > 1
+            for fraction in blend_fractions
+        )
     ):
         raise RecedingHorizonPilotError(
             "invalid contact-aware beam configuration"
@@ -1435,6 +1524,23 @@ def _screen_contact_aware_vertex_beam(
             target_joint_index,
             1 if target_joint_side == "upper" else 0,
         ]
+    )
+    modes = (
+        tuple(
+            (mode_id, vertex_id, float(fraction))
+            for mode_id, (vertex_id, fraction) in enumerate(
+                (
+                    (vertex_id, fraction)
+                    for vertex_id in vertex_ids
+                    for fraction in blend_fractions
+                )
+            )
+        )
+        if blend_fractions
+        else tuple(
+            (vertex_id, vertex_id, None)
+            for vertex_id in vertex_ids
+        )
     )
     restore_identity = _restore_identity(
         env, robot, snapshot
@@ -1456,7 +1562,7 @@ def _screen_contact_aware_vertex_beam(
     for depth, action in enumerate(actions):
         expansions = []
         for parent_index, parent in enumerate(beam):
-            for vertex_id in vertex_ids:
+            for mode_id, vertex_id, blend_fraction in modes:
                 restore_identity = (
                     restore_identity
                     and _restore_identity(
@@ -1483,12 +1589,23 @@ def _screen_contact_aware_vertex_beam(
                 qvel_identity_count += int(
                     configuration["configuration_qvel_identity"]
                 )
-                with _scoped_contact_aware_actuator_vertex(
-                    robot,
-                    target_joint_index=target_joint_index,
-                    target_joint_side=target_joint_side,
-                    vertex_id=vertex_id,
-                ) as torque_audit:
+                scope = (
+                    _scoped_contact_aware_actuator_vertex_blend(
+                        robot,
+                        target_joint_index=target_joint_index,
+                        target_joint_side=target_joint_side,
+                        vertex_id=vertex_id,
+                        blend_fraction=blend_fraction,
+                    )
+                    if blend_fraction is not None
+                    else _scoped_contact_aware_actuator_vertex(
+                        robot,
+                        target_joint_index=target_joint_index,
+                        target_joint_side=target_joint_side,
+                        vertex_id=vertex_id,
+                    )
+                )
+                with scope as torque_audit:
                     (
                         _positions,
                         margins,
@@ -1546,13 +1663,15 @@ def _screen_contact_aware_vertex_beam(
                         robot,
                         source_id=(
                             f"{source_id}:depth{depth}:"
-                            f"parent{parent_index}:vertex{vertex_id}"
+                            f"parent{parent_index}:mode{mode_id}"
                         ),
                     )
                 )
                 first_step = (
                     {
                         "vertex_id": vertex_id,
+                        "mode_id": mode_id,
+                        "blend_fraction": blend_fraction,
                         "configuration": configuration,
                         "controller_substep_torque_audit": (
                             torque_audit
@@ -1578,7 +1697,7 @@ def _screen_contact_aware_vertex_beam(
                     {
                         "snapshot": endpoint_snapshot,
                         "sequence": (
-                            parent["sequence"] + (vertex_id,)
+                            parent["sequence"] + (mode_id,)
                         ),
                         "trajectory_minimum_margin_rad": min(
                             parent[
@@ -1615,7 +1734,7 @@ def _screen_contact_aware_vertex_beam(
                 "depth": depth + 1,
                 "action": action,
                 "parent_count": len(beam),
-                "expansion_count": len(beam) * len(vertex_ids),
+                "expansion_count": len(beam) * len(modes),
                 "safe_expansion_count": len(expansions),
                 "retained_count": retained_count,
                 "best_trajectory_minimum_margin_rad": (
@@ -1667,6 +1786,8 @@ def _screen_contact_aware_vertex_beam(
     return {
         "horizon": len(actions),
         "beam_width": beam_width,
+        "mode_count": len(modes),
+        "blend_fractions": list(blend_fractions),
         "depth_summaries": depth_summaries,
         "selected": selected_payload,
         "restore_identity": restore_identity,
@@ -1744,6 +1865,9 @@ def _run_case(
     contact_aware_vertex_require_safe_successor: bool = False,
     contact_aware_vertex_beam_width: int = 0,
     contact_aware_vertex_beam_max_horizon: int = 0,
+    contact_aware_vertex_beam_blend_fractions: tuple[
+        float, ...
+    ] = (),
     lane_base_seeds: tuple[int, ...] = LANE_BASE_SEEDS,
     row_schema: str = ROW_SCHEMA,
     source_version: str = "v12.11",
@@ -1869,6 +1993,20 @@ def _run_case(
         )
         or contact_aware_vertex_beam_max_horizon
         > int(config["policy"]["source_prefix_steps"])
+        or any(
+            not np.isfinite(fraction)
+            or fraction <= 0
+            or fraction > 1
+            for fraction in (
+                contact_aware_vertex_beam_blend_fractions
+            )
+        )
+        or tuple(contact_aware_vertex_beam_blend_fractions)
+        != tuple(
+            sorted(
+                set(contact_aware_vertex_beam_blend_fractions)
+            )
+        )
         or controller_nullspace_target_joint_side
         not in {"lower", "upper"}
     ):
@@ -2063,6 +2201,7 @@ def _run_case(
                 selected_advance_joint_anticipatory_brake_fraction = None
                 selected_advance_coupled_inverse_mass_brake_fraction = None
                 selected_advance_contact_aware_vertex_id = None
+                selected_advance_contact_aware_vertex_blend_fraction = None
                 selected_advance_minimum_margin_floor = float(
                     config["episode"]["trigger_margin_rad"]
                 )
@@ -3217,6 +3356,9 @@ def _run_case(
                                     vertex_ids=(
                                         controller_contact_aware_vertex_exact_h1_ids
                                     ),
+                                    blend_fractions=(
+                                        contact_aware_vertex_beam_blend_fractions
+                                    ),
                                     target_joint_index=target_joint,
                                     target_joint_side=target_side,
                                     minimum_margin_floor_rad=(
@@ -3257,6 +3399,12 @@ def _run_case(
                                     {
                                         "vertex_id": first_step[
                                             "vertex_id"
+                                        ],
+                                        "mode_id": first_step[
+                                            "mode_id"
+                                        ],
+                                        "blend_fraction": first_step[
+                                            "blend_fraction"
                                         ],
                                         "configuration": first_step[
                                             "configuration"
@@ -3327,7 +3475,23 @@ def _run_case(
                                 "beam_search": beam_result,
                                 "candidate_evaluations": beam_candidates,
                                 "selected_vertex_id": (
-                                    selected_beam["sequence"][0]
+                                    selected_beam["first_step"][
+                                        "vertex_id"
+                                    ]
+                                    if selected_beam is not None
+                                    else None
+                                ),
+                                "selected_mode_id": (
+                                    selected_beam["first_step"][
+                                        "mode_id"
+                                    ]
+                                    if selected_beam is not None
+                                    else None
+                                ),
+                                "selected_blend_fraction": (
+                                    selected_beam["first_step"][
+                                        "blend_fraction"
+                                    ]
                                     if selected_beam is not None
                                     else None
                                 ),
@@ -3353,7 +3517,14 @@ def _run_case(
                             if selected_beam is not None:
                                 selected_prefix = prefix
                                 selected_advance_contact_aware_vertex_id = (
-                                    selected_beam["sequence"][0]
+                                    selected_beam["first_step"][
+                                        "vertex_id"
+                                    ]
+                                )
+                                selected_advance_contact_aware_vertex_blend_fraction = (
+                                    selected_beam["first_step"][
+                                        "blend_fraction"
+                                    ]
                                 )
                                 selected_advance_minimum_margin_floor = (
                                     fallback_floor
@@ -4636,6 +4807,13 @@ def _run_case(
                         1
                     )
                     if (
+                        selected_advance_contact_aware_vertex_blend_fraction
+                        is not None
+                    ):
+                        executed_configuration["blend_fraction"] = float(
+                            selected_advance_contact_aware_vertex_blend_fraction
+                        )
+                    if (
                         not executed_configuration[
                             "configuration_qpos_identity"
                         ]
@@ -4646,14 +4824,32 @@ def _run_case(
                         raise RecedingHorizonPilotError(
                             "executed contact-aware vertex config changed qpos/qvel"
                         )
-                    with _scoped_contact_aware_actuator_vertex(
-                        robot,
-                        target_joint_index=target_joint,
-                        target_joint_side=target_side,
-                        vertex_id=(
-                            selected_advance_contact_aware_vertex_id
-                        ),
-                    ) as execution_torque_audit:
+                    vertex_scope = (
+                        _scoped_contact_aware_actuator_vertex_blend(
+                            robot,
+                            target_joint_index=target_joint,
+                            target_joint_side=target_side,
+                            vertex_id=(
+                                selected_advance_contact_aware_vertex_id
+                            ),
+                            blend_fraction=(
+                                selected_advance_contact_aware_vertex_blend_fraction
+                            ),
+                        )
+                        if (
+                            selected_advance_contact_aware_vertex_blend_fraction
+                            is not None
+                        )
+                        else _scoped_contact_aware_actuator_vertex(
+                            robot,
+                            target_joint_index=target_joint,
+                            target_joint_side=target_side,
+                            vertex_id=(
+                                selected_advance_contact_aware_vertex_id
+                            ),
+                        )
+                    )
+                    with vertex_scope as execution_torque_audit:
                         env.step(
                             np.asarray(
                                 selected_prefix[0],
@@ -5667,6 +5863,9 @@ def _run_case(
             ),
             "contact_aware_vertex_beam_max_horizon": (
                 contact_aware_vertex_beam_max_horizon
+            ),
+            "contact_aware_vertex_beam_blend_fractions": list(
+                contact_aware_vertex_beam_blend_fractions
             ),
             "lane_base_seeds": list(lane_base_seeds),
             "recovery_round_seed_stride": (
