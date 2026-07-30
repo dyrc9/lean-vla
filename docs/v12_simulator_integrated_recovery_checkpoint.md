@@ -275,6 +275,15 @@ near-limit recovery 的5 mrad transient-loss contract，否则候选集结构性
 独立预注册 bridge/brake contract（例如 no crossing、terminal > trigger、post-H2 safe 与
 显式 reserve），或实现 controller-aware braking model；在此之前不再 outcome-informed 调参。
 
+独立 bridge/brake successor 现已预注册为不同于 recovery 的 controller action：沿用61个有界
+动作，但 bridge 单步重放必须保持 `minimum margin >= 0.15 rad` 且不 crossing；recovery 的
+`+0.02 rad` terminal gain 与 `0.005 rad` transient-loss 条款原样保留且不用于 bridge 选拔。
+在 bridge 终点做 fresh H2 screen，实际重放后还必须对同一个 policy prefix 再确认 H2
+`allow_exact`、risk agreement 与 restore identity，然后才 shadow 推进第一个 policy action。
+成功门固定为 `10509/10510` 两条 lane 各5个 cycles 全部完成，active warning、contact
+saturation、live dispatch、typed recovery 和 outcome read 均为0；若该 result-informed pilot
+通过，方法立即冻结并用未见 seeds 做独立复验。
+
 冻结产物：
 
 - protocol：`experiments/proofalign_simulator_integrated_predictive_recovery_v12_qualification_protocol.json`

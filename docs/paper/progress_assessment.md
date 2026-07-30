@@ -122,6 +122,13 @@ H2/H1 后继确实更早在约0.2728 rad 停止，但122个缩放 bridge 仍全�
 5 mrad transient-loss floor；最好下一步约0.1570 rad，仍高于trigger但不满足该专用 contract。
 因此下一论文迭代需把 bridge/brake 形式化为独立类型，不能把 recovery 条件直接复用或事后放宽。
 
+该独立类型现已冻结为 `absolute-safe H2 bridge` 工程协议：bridge 必须保持绝对
+`0.15 rad` safe margin、零 crossing，并在精确重放后的终点让同一 fresh policy prefix 再次通过
+H2；只执行其首个 action。near-limit recovery 的 `+0.02/0.005 rad` 合同不变且不被 bridge
+冒充。预注册正结果门为两条 result-informed lane 各完成5个 control cycles 且所有 warning、
+dispatch、typed recovery、outcome read 为0；即使通过，也必须在冻结方法后做未见 seed 复验，
+才能从机制性改善升级为较可信的闭环工程证据，仍不能直接称 task utility 或物理安全。
+
 
 论文主故事仍是两层对齐，而不是 SemanticSubtask 本身。当前最重要的科学风险集中在 L1：
 

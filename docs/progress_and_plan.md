@@ -94,6 +94,14 @@ post-bridge 仍需 fresh H2 allow。实现先提交后运行。
 无法满足 recovery-style `current−0.005` floor。下一阶段先版本化独立 bridge/brake contract
 或 controller-aware braking predictor；不继续对现有门做结果后微调。
 
+独立 bridge contract 已在看结果前冻结并实现：bridge 仍取同一61动作库，但单步终点必须
+`margin >= 0.15 rad` 且零 crossing；该绝对 safe-state floor 不复用 recovery 专用的
+`current−0.005` transient floor，也不修改 recovery 的 `+0.02/0.005` 参数。候选终点必须产生
+fresh H2 `allow_exact`；实际重放 bridge 后，再对同一个已授权 prefix 做一次 H2 确认，只推进其
+第一个 policy action。成功标准固定为两条独立 lane 均完成5 cycles，crossing、active warning、
+live dispatch、typed recovery 和 outcome read 全为0。首轮只用已知 seeds `10509/10510`
+做 result-informed engineering；若通过，冻结方法后另取未参与设计的 seeds 做 held-out 验证。
+
 ## 前一 checkpoint：2026-07-30 v12.5 integrated predictive recovery
 
 fresh policy-prefix shadow 与 typed recovery runtime 的 fixed-trace composition 已完成并终态冻结：

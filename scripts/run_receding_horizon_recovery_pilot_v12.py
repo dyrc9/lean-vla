@@ -186,11 +186,19 @@ def _search_safe_bridge(
     policy_seed: int,
     source_id: str,
     gate_horizon_steps: int = 1,
+    bridge_floor_mode: str = "recovery_transient",
 ) -> dict[str, Any]:
     library = _candidate_library(config)
-    transient_floor = branch_state.minimum_margin - float(
-        config["recovery"]["max_transient_margin_loss_rad"]
-    )
+    if bridge_floor_mode == "recovery_transient":
+        bridge_floor = branch_state.minimum_margin - float(
+            config["recovery"]["max_transient_margin_loss_rad"]
+        )
+    elif bridge_floor_mode == "absolute_safe_margin":
+        bridge_floor = float(config["recovery"]["safe_margin_rad"])
+    else:
+        raise RecedingHorizonPilotError(
+            f"unknown bridge floor mode: {bridge_floor_mode}"
+        )
     trigger_margin = float(config["episode"]["trigger_margin_rad"])
     restore_identity = True
     physical_rows = []
@@ -215,7 +223,12 @@ def _search_safe_bridge(
                 "action": action,
                 "terminal_margin_rad": margin,
                 "transient_safe": (
-                    margin >= transient_floor and margin >= trigger_margin
+                    margin >= bridge_floor and margin >= trigger_margin
+                ),
+                "bridge_floor_mode": bridge_floor_mode,
+                "bridge_floor_rad": bridge_floor,
+                "bridge_safe": (
+                    margin >= bridge_floor and margin >= trigger_margin
                 ),
                 "policy_screened": False,
                 "post_h1_verdict": None,
@@ -240,6 +253,7 @@ def _search_safe_bridge(
     h1_shadow_steps = 0
     candidate_replay_steps = 0
     selected = None
+    selected_prefix = None
     for row in eligible:
         restore_identity = (
             restore_identity
@@ -321,12 +335,14 @@ def _search_safe_bridge(
         ):
             row["selected"] = True
             selected = row
+            selected_prefix = prefix
             break
     restore_identity = (
         restore_identity and _restore_identity(env, robot, snapshot)
     )
     return {
         "selected": selected,
+        "selected_prefix": selected_prefix,
         "candidate_evaluations": physical_rows,
         "restore_identity": restore_identity,
         "physical_shadow_env_step_count": physical_steps,
@@ -356,6 +372,9 @@ def _run_case(
     maximum_safe_bridges_per_cycle: int = 0,
     safe_bridge_seed_stride: int = 2_000,
     gate_horizon_steps: int = 1,
+    bridge_floor_mode: str = "recovery_transient",
+    consume_bridge_authorized_prefix: bool = False,
+    lane_base_seeds: tuple[int, ...] = LANE_BASE_SEEDS,
     row_schema: str = ROW_SCHEMA,
     source_version: str = "v12.11",
 ) -> dict[str, Any]:
@@ -369,6 +388,8 @@ def _run_case(
         or gate_horizon_steps <= 0
         or gate_horizon_steps
         > int(config["policy"]["source_prefix_steps"])
+        or not lane_base_seeds
+        or len(set(lane_base_seeds)) != len(lane_base_seeds)
     ):
         raise RecedingHorizonPilotError(
             "invalid replan or recovery-escalation bounds"
@@ -471,7 +492,7 @@ def _run_case(
         bridge_post_h1_shadow_steps = 0
         bridge_execution_shadow_steps = 0
         policy_advance_steps = 0
-        for lane_index, base_seed in enumerate(LANE_BASE_SEEDS):
+        for lane_index, base_seed in enumerate(lane_base_seeds):
             restore_identity = (
                 restore_identity
                 and _restore_identity(
@@ -700,6 +721,7 @@ def _run_case(
                                 f"round{recovery_round}:safe-bridge"
                             ),
                             gate_horizon_steps=gate_horizon_steps,
+                            bridge_floor_mode=bridge_floor_mode,
                         )
                         inference_count += bridge[
                             "policy_inference_count"
@@ -723,6 +745,12 @@ def _run_case(
                         bridge_row = {
                             "bridge_index": len(safe_bridges),
                             "policy_seed": bridge_seed,
+                            "bridge_floor_mode": bridge_floor_mode,
+                            "bridge_floor_rad": (
+                                selected_bridge["bridge_floor_rad"]
+                                if selected_bridge is not None
+                                else None
+                            ),
                             "candidate_evaluations": bridge[
                                 "candidate_evaluations"
                             ],
@@ -739,6 +767,11 @@ def _run_case(
                                 else None
                             ),
                             "executed_in_shadow": False,
+                            "authorized_prefix_consumed": False,
+                            "post_execution_gate_verdict": None,
+                            "post_execution_gate_minimum_margin_rad": None,
+                            "post_execution_gate_risk_agreement": None,
+                            "post_execution_gate_restore_identity": None,
                         }
                         safe_bridges.append(bridge_row)
                         if selected_bridge is not None:
@@ -766,6 +799,12 @@ def _run_case(
                             bridge_execution_shadow_steps += 1
                             if (
                                 min(bridge_margins)
+                                < float(
+                                    selected_bridge[
+                                        "bridge_floor_rad"
+                                    ]
+                                )
+                                or min(bridge_margins)
                                 < float(
                                     config["episode"][
                                         "trigger_margin_rad"
@@ -795,6 +834,86 @@ def _run_case(
                                     ),
                                 )
                             )
+                            if consume_bridge_authorized_prefix:
+                                bridge_prefix = bridge[
+                                    "selected_prefix"
+                                ]
+                                if bridge_prefix is None:
+                                    raise RecedingHorizonPilotError(
+                                        "selected bridge lacks policy prefix"
+                                    )
+                                confirmed_gate = base._screen_prefix(
+                                    config,
+                                    env=env,
+                                    robot=robot,
+                                    qidx=qidx,
+                                    state=branch_state,
+                                    prefix=bridge_prefix[
+                                        :gate_horizon_steps
+                                    ],
+                                    source_id=(
+                                        f"{source_version}:{TARGET_ID}:"
+                                        f"lane{lane_index}:"
+                                        f"cycle{cycle_index}:"
+                                        f"round{recovery_round}:"
+                                        "bridge-confirmation"
+                                    ),
+                                    contact_audit=contacts,
+                                )
+                                bridge_post_h1_shadow_steps += (
+                                    confirmed_gate[
+                                        "shadow_env_step_count"
+                                    ]
+                                )
+                                restore_identity = (
+                                    restore_identity
+                                    and confirmed_gate[
+                                        "restore_identity"
+                                    ]
+                                )
+                                bridge_row.update(
+                                    {
+                                        "post_execution_gate_verdict": (
+                                            confirmed_gate[
+                                                "decision"
+                                            ].verdict.value
+                                        ),
+                                        "post_execution_gate_minimum_margin_rad": (
+                                            confirmed_gate[
+                                                "assessment"
+                                            ].minimum_margin
+                                        ),
+                                        "post_execution_gate_risk_agreement": (
+                                            confirmed_gate[
+                                                "risk_agreement"
+                                            ]
+                                        ),
+                                        "post_execution_gate_restore_identity": (
+                                            confirmed_gate[
+                                                "restore_identity"
+                                            ]
+                                        ),
+                                    }
+                                )
+                                if (
+                                    confirmed_gate[
+                                        "decision"
+                                    ].verdict.value
+                                    == (
+                                        PolicyPrefixShadowVerdict.ALLOW_EXACT.value
+                                    )
+                                    and confirmed_gate[
+                                        "risk_agreement"
+                                    ]
+                                    and confirmed_gate[
+                                        "restore_identity"
+                                    ]
+                                ):
+                                    bridge_row[
+                                        "authorized_prefix_consumed"
+                                    ] = True
+                                    selected_prefix = bridge_prefix
+                                    break
                             continue
                     if (
                         recovery_round
@@ -1158,6 +1277,11 @@ def _run_case(
                 maximum_safe_bridges_per_cycle
             ),
             "gate_horizon_steps": gate_horizon_steps,
+            "bridge_floor_mode": bridge_floor_mode,
+            "consume_bridge_authorized_prefix": (
+                consume_bridge_authorized_prefix
+            ),
+            "lane_base_seeds": list(lane_base_seeds),
             "recovery_round_seed_stride": (
                 recovery_round_seed_stride
             ),
