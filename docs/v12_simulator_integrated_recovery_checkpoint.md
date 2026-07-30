@@ -300,6 +300,19 @@ typed recovery 和 outcome read 全为0。
 recovery，不修改 `+0.02/0.005 rad` recovery contract。成功门继续是两条 lane 各5个 policy
 cycles 与所有安全审计计数为0。
 
+H3 sequence 结果仍 non-pass：两条 lane 各完成1/5个 policy cycles。block 后每条 lane
+depth-1 有69个、depth-2 有4418个绝对安全扩展，最佳两步 terminal margin 约
+`0.18120 rad`；depth-3 的6624个扩展全部违反0.15 floor。合计256个合法序列完成
+post-H3 screen 但全部 block，最好值为 `−0.013973 rad`，selection/execution 为0。
+整个运行共59694个 bridge-candidate shadow steps，restore identity 100%，crossing、active
+warning、contact saturation、dispatch、typed recovery 和 outcome read 均为0。
+
+下一版不再增加 beam depth，而把已定位的 controller lag 变成显式低层干预：在 bridge 前调用
+OSC `update(force=True); reset_goal()`，将 controller goal 重绑定到当前末端位姿，然后只搜索
+原61个一步动作。该 controller-goal brake 不改 qpos/qvel，不冒充 recovery；候选仍须保持
+0.15 floor、零 crossing，并在终点/精确重放后两次通过同一 H3 prefix gate。reset 次数和
+bridge action 分开记账，双-lane 5-cycle 成功门不变。
+
 冻结产物：
 
 - protocol：`experiments/proofalign_simulator_integrated_predictive_recovery_v12_qualification_protocol.json`
@@ -319,3 +332,4 @@ cycles 与所有安全审计计数为0。
 - safe bridge：`results/proofalign_safe_bridge_receding_horizon_pilot_v12_20260730/`
 - H2 scaled bridge：`results/proofalign_h2_scaled_bridge_receding_pilot_v12_20260730/`
 - absolute-safe H2 bridge：`results/proofalign_absolute_safe_h2_bridge_pilot_v12_20260730/`
+- H3 sequence bridge：`results/proofalign_h3_sequence_bridge_pilot_v12_20260730/`

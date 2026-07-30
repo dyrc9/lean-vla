@@ -116,6 +116,19 @@ prefix 首动作与 H3 均值动作的反向 `0.25/0.50/0.75/1.00` 缩放。序�
 `margin >= 0.15 rad` 且零 crossing；终点必须 fresh H3 allow，精确重放后再确认同一 prefix，
 才允许推进一个 policy action。双-lane 5-cycle 成功门不变。
 
+H3 sequence pilot 已完成但 non-pass：H3 让两条 lane 各先安全推进1个 policy action。
+在随后 block 状态，每条 lane 的 depth-1 共有69/69安全节点，depth-2 有4418个安全扩展，
+最佳终点约 `0.18120 rad`；depth-3 的6624个扩展全部跌破0.15 floor。每条 lane 送128个、
+合计256个合法序列终点做 post-H3 screen，仍为256/256 `block_replan`；最好 margin 改善到
+`−0.013973 rad`，但 selection/execution 为0。restore identity 100%，crossing、warning、
+dispatch、typed recovery、outcome read 均为0。
+
+这排除了“只增加高层桥接序列长度”。下一 successor 使用现有 OSC 的 `reset_goal()` 定义独立、
+可审计的 controller-goal brake：在 restored branch 上先把 goal 重绑定到当前末端位姿，再搜索
+原61个一步动作；每个候选仍守0.15 floor/零 crossing/post-H3 exact gate，实际重放时执行同一
+reset+action 并确认同一 prefix。它不清零物理 qvel、不修改 simulator qpos，也不改 recovery
+合同或风险阈值。
+
 ## 前一 checkpoint：2026-07-30 v12.5 integrated predictive recovery
 
 fresh policy-prefix shadow 与 typed recovery runtime 的 fixed-trace composition 已完成并终态冻结：

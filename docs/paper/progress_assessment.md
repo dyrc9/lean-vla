@@ -138,6 +138,13 @@ controller-aware bridge sequence。该轮已预注册为 maximum depth 3、beam 
 post-H3 candidates，并只加入 blocked prefix 的8个反向缩放动作；仍需双 lane 5-cycle 与未见
 seed 复验才能形成正向证据。
 
+H3 sequence 终态依然 non-pass：两条 lane 各推进1步；每条 lane 有4418个安全两步扩展，但
+第三步6624/6624违反0.15 floor，合计256个 post-H3 screens 全部 block，最好 margin 仅改善到
+`−0.013973 rad`。这进一步把失败定位到 OSC 累积 goal/controller lag，而不是高层候选数量。
+下一轮应验证显式 controller-goal reset brake：只重绑低层 goal 到当前位姿，不清零 qvel/qpos，
+随后仍由0.15 floor、零 crossing 和 exact H3 gate约束。若其双-lane 5-cycle 通过，仍需冻结后
+用未见 seeds 复验。
+
 
 论文主故事仍是两层对齐，而不是 SemanticSubtask 本身。当前最重要的科学风险集中在 L1：
 
