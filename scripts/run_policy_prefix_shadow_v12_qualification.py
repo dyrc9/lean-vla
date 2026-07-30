@@ -975,12 +975,12 @@ def _run(
         raise PolicyPrefixShadowQualificationError(
             f"v12.4 preflight failed: {preflight['blockers']}"
         )
+    device = _configure_gpu(policy_gpu, egl_gpu)
     output_root.mkdir(parents=True)
     runtime_config = policy_loader.ensure_libero_runtime_config(
         output_root
     )
     os.environ["LIBERO_CONFIG_PATH"] = runtime_config["directory"]
-    device = _configure_gpu(policy_gpu, egl_gpu)
     args = _args(
         config,
         output_root=output_root,
