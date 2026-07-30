@@ -368,6 +368,18 @@ constraint force与controller torque bounds，退出时恢复原range并forward�
 仍位于guard内的候选，防止通过“把range直接移过当前qpos”制造冲量。相关29个定向测试通过，
 正式双lane结果尚未生成。
 
+v12.35 首次运行终态为审计fail-closed，不形成guard效果结论。8个depth1 guard replay均完成且
+range/config identity恢复，但OSC `run_controller()`返回robot层裁剪前的raw torque，200/200个
+substeps被当前audit错误当成actual actuator violation，全部candidate在margin ranking前拒绝。
+源码确认`SingleArm.control`随后按`self.torque_limits`对这些raw torques执行`np.clip`后才写入
+`sim.data.ctrl`。同时发现depth summary在retention后读取parent count，使空frontier的理论
+expansion count误记为0。
+
+v12.36只做机械replay修复：guard、seeds、actions、margins、beam与成功门全部不变；torque audit
+同时记录raw controller torque、按controller actuator limits得到的downstream-clipped torque及
+是否需要裁剪，actual bound violation只检查clipped值，且仍返回raw值让原robot路径执行唯一真实
+裁剪。depth parent/expansion count在扩展前冻结。不得借此改变任何guard效果参数。
+
 ## 前一 checkpoint：2026-07-30 v12.5 integrated predictive recovery
 
 fresh policy-prefix shadow 与 typed recovery runtime 的 fixed-trace composition 已完成并终态冻结：

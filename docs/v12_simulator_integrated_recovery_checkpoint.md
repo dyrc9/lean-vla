@@ -497,6 +497,15 @@ qpos/qvel配置identity、range restore、constraint activation/force、predicti
 一次forward；逐controller substep保留原torque并审计guard distance、qvel、constraint force和
 actuator bounds。29个相关定向测试通过，正式结果前仍不计正证据。
 
+首轮v12.35在效果判定前因torque audit语义错误fail closed：OSC输出的200个raw torque samples
+都在robot层裁剪前，被误记为actual bound violation；robosuite源码确认实际写ctrl前由
+`SingleArm.control`再次按`torque_limits`裁剪。8个guard scope本身均完成配置/恢复且无warning。
+另有空frontier的depth expansion count在retention后取值而显示0。
+
+v12.36授权的唯一变化是审计replayfix：记录raw与按原actuator limits计算的downstream-clipped
+torque，bound gate作用于后者但返回raw保持真实robot控制链；并在扩展前冻结parent count。所有
+guard和实验参数逐值复用v12.35。
+
 冻结产物：
 
 - protocol：`experiments/proofalign_simulator_integrated_predictive_recovery_v12_qualification_protocol.json`
