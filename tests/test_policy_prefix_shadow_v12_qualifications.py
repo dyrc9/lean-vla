@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from types import SimpleNamespace
+
 from scripts.freeze_fixed_policy_prefix_shadow_v12_terminal import (
     build_terminal as build_fixed_terminal,
 )
@@ -65,3 +67,18 @@ def test_fresh_policy_runner_uses_warmstart_complete_snapshot() -> None:
         fresh_runner.restore_warmstart_policy_shadow_snapshot
         is restore_warmstart_policy_shadow_snapshot
     )
+
+
+def test_fresh_policy_runner_reads_inner_libero_observation() -> None:
+    expected = {"agentview_image": object()}
+
+    class Inner:
+        def _get_observations(
+            self, *, force_update: bool
+        ) -> dict[str, object]:
+            assert force_update is True
+            return expected
+
+    env = SimpleNamespace(env=Inner())
+
+    assert fresh_runner._current_observation(env) is expected

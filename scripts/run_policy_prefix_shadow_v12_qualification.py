@@ -231,6 +231,27 @@ def _minimum_margin(
     )
 
 
+def _current_observation(env: Any) -> dict[str, Any]:
+    """Read sensors without taking an outcome-producing transition."""
+
+    for owner in (env, getattr(env, "env", None)):
+        if owner is None:
+            continue
+        for name in ("get_observation", "_get_observations"):
+            fn = getattr(owner, name, None)
+            if not callable(fn):
+                continue
+            try:
+                obs = fn(force_update=True)
+            except TypeError:
+                obs = fn()
+            if isinstance(obs, dict):
+                return obs
+    raise PolicyPrefixShadowQualificationError(
+        "could not read the current LIBERO observation"
+    )
+
+
 def _snapshot_payload(assessment: Any) -> dict[str, Any]:
     return {
         "full_simulator_state_bitwise_identity": (
@@ -325,9 +346,14 @@ def _run_case(
             else None
         )
         if obs is None:
-            obs = runner.get_observation(env)
+            obs = _current_observation(env)
         for _ in range(int(config["episode"]["stabilization_steps"])):
-            env.step(runner.LIBERO_DUMMY_ACTION)
+            transition = env.step(runner.LIBERO_DUMMY_ACTION)
+            if not isinstance(transition, tuple) or not transition:
+                raise PolicyPrefixShadowQualificationError(
+                    "stabilization step did not return an observation"
+                )
+            obs = transition[0]
         robot, qidx, vidx, limits = _robot_arrays(env)
         _reset_controller(robot)
         injected_joint = None
@@ -350,7 +376,7 @@ def _run_case(
             raise PolicyPrefixShadowQualificationError(
                 f"unexpected policy-prefix condition: {condition}"
             )
-        obs = runner.get_observation(env)
+        obs = _current_observation(env)
         element, _image, frame_audit = runner.prepare_openpi_element(
             obs,
             str(runtime.instruction),
