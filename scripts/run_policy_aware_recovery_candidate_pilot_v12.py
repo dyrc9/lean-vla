@@ -159,11 +159,12 @@ def _recovery_config(config: dict[str, Any]) -> EscapeRecoveryConfig:
     )
 
 
-def _shortest_eligible_prefixes(
+def _eligible_prefixes(
     state: Any,
     candidates: tuple[Any, ...],
     *,
     recovery_config: EscapeRecoveryConfig,
+    all_safe_prefixes: bool = False,
 ) -> tuple[Any, ...]:
     retained = []
     for candidate in candidates:
@@ -174,7 +175,8 @@ def _shortest_eligible_prefixes(
             )
             if selected.selected is not None:
                 retained.append(prefix)
-                break
+                if not all_safe_prefixes:
+                    break
     return tuple(retained)
 
 
@@ -202,6 +204,9 @@ def _run_case(
     runner: Any,
     args: Any,
     warning_audit: base.MujocoWarningAudit,
+    all_safe_prefixes: bool = False,
+    screening_seed_offsets: tuple[int, ...] = SCREENING_SEED_OFFSETS,
+    row_schema: str = ROW_SCHEMA,
 ) -> dict[str, Any]:
     case_warning_start = len(warning_audit.messages)
     runtime = runner.load_libero_task_runtime(
@@ -297,10 +302,11 @@ def _run_case(
         current_selection = select_prefix_escape_recovery_candidate(
             trigger_state, candidates, config=recovery_config
         )
-        retained = _shortest_eligible_prefixes(
+        retained = _eligible_prefixes(
             trigger_state,
             candidates,
             recovery_config=recovery_config,
+            all_safe_prefixes=all_safe_prefixes,
         )
         evaluations = []
         branch_restore_identity = recovery_restore
@@ -335,7 +341,7 @@ def _run_case(
                 ),
             )
             seed_rows = []
-            for seed_offset in SCREENING_SEED_OFFSETS:
+            for seed_offset in screening_seed_offsets:
                 screening_seed = (
                     policy_seed + 10_000 + seed_offset
                 )
@@ -426,7 +432,7 @@ def _run_case(
         )
         selected = eligible[0] if eligible else None
         return {
-            "schema": ROW_SCHEMA,
+            "schema": row_schema,
             "case_id": pair["base_pair_id"],
             **{
                 key: pair[key]
@@ -459,7 +465,13 @@ def _run_case(
                 else None
             ),
             "source_candidate_count": len(candidates),
-            "shortest_safe_candidate_count": len(retained),
+            "candidate_prefix_mode": (
+                "all_safe" if all_safe_prefixes else "shortest_safe"
+            ),
+            "eligible_candidate_prefix_count": len(retained),
+            "shortest_safe_candidate_count": (
+                None if all_safe_prefixes else len(retained)
+            ),
             "candidate_evaluations": evaluations,
             "policy_safe_candidate_count": len(eligible),
             "selected_policy_aware_candidate": selected,
@@ -469,12 +481,12 @@ def _run_case(
             ),
             "candidate_branch_env_step_count": branch_step_count,
             "policy_inference_count": (
-                1 + len(retained) * len(SCREENING_SEED_OFFSETS)
+                1 + len(retained) * len(screening_seed_offsets)
             ),
             "policy_shadow_env_step_count": (
                 initial_screen["shadow_env_step_count"]
                 + len(retained)
-                * len(SCREENING_SEED_OFFSETS)
+                * len(screening_seed_offsets)
                 * int(config["policy"]["source_prefix_steps"])
                 * 2
             ),
