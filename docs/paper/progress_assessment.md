@@ -226,6 +226,8 @@ v12.30 两步viability runner 已通过23个相关定向测试；双 lane 结果
 这说明局部successor count不是长程控制不变量；后继以width64、depth4 beam直接覆盖剩余cycles，
 仍只执行首步并fresh replan。
 
+v12.31 full-remaining-horizon beam runner 已通过24个相关定向测试；正式结果尚未生成。
+
 
 论文主故事仍是两层对齐，而不是 SemanticSubtask 本身。当前最重要的科学风险集中在 L1：
 

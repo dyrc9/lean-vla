@@ -1404,6 +1404,287 @@ def _scoped_contact_aware_actuator_vertex(
         del controller.run_controller
 
 
+def _screen_contact_aware_vertex_beam(
+    *,
+    env: Any,
+    robot: Any,
+    qidx: np.ndarray,
+    vidx: np.ndarray,
+    limits: np.ndarray,
+    snapshot: Any,
+    contacts: base.ContactCapacityAudit,
+    actions: tuple[tuple[float, ...], ...],
+    vertex_ids: tuple[int, ...],
+    target_joint_index: int,
+    target_joint_side: str,
+    minimum_margin_floor_rad: float,
+    beam_width: int,
+    source_id: str,
+) -> dict[str, Any]:
+    if (
+        not actions
+        or not vertex_ids
+        or beam_width <= 0
+        or minimum_margin_floor_rad < 0
+    ):
+        raise RecedingHorizonPilotError(
+            "invalid contact-aware beam configuration"
+        )
+    target_limit = float(
+        limits[
+            target_joint_index,
+            1 if target_joint_side == "upper" else 0,
+        ]
+    )
+    restore_identity = _restore_identity(
+        env, robot, snapshot
+    )
+    beam = [
+        {
+            "snapshot": snapshot,
+            "sequence": (),
+            "trajectory_minimum_margin_rad": float("inf"),
+        }
+    ]
+    depth_summaries = []
+    configuration_count = 0
+    shadow_steps = 0
+    qpos_identity_count = 0
+    qvel_identity_count = 0
+    scope_restore_count = 0
+    torque_bound_violation_count = 0
+    for depth, action in enumerate(actions):
+        expansions = []
+        for parent_index, parent in enumerate(beam):
+            for vertex_id in vertex_ids:
+                restore_identity = (
+                    restore_identity
+                    and _restore_identity(
+                        env,
+                        robot,
+                        parent["snapshot"],
+                    )
+                )
+                configuration = (
+                    _configure_contact_aware_actuator_vertex(
+                        env=env,
+                        robot=robot,
+                        qidx=qidx,
+                        vidx=vidx,
+                        target_joint_index=target_joint_index,
+                        target_joint_side=target_joint_side,
+                        vertex_id=vertex_id,
+                    )
+                )
+                configuration_count += 1
+                qpos_identity_count += int(
+                    configuration["configuration_qpos_identity"]
+                )
+                qvel_identity_count += int(
+                    configuration["configuration_qvel_identity"]
+                )
+                with _scoped_contact_aware_actuator_vertex(
+                    robot,
+                    target_joint_index=target_joint_index,
+                    target_joint_side=target_joint_side,
+                    vertex_id=vertex_id,
+                ) as torque_audit:
+                    (
+                        _positions,
+                        margins,
+                    ) = _execute_actions(
+                        env,
+                        actions=(action,),
+                        qidx=qidx,
+                        limits=limits,
+                        contacts=contacts,
+                    )
+                shadow_steps += 1
+                scope_restored = (
+                    "run_controller"
+                    not in robot.controller.__dict__
+                )
+                scope_restore_count += int(scope_restored)
+                candidate_bound_violations = sum(
+                    sample["torque_bound_violation"]
+                    for sample in torque_audit
+                )
+                torque_bound_violation_count += (
+                    candidate_bound_violations
+                )
+                local_minimum_margin = min(margins)
+                safe = bool(
+                    configuration["configuration_qpos_identity"]
+                    and configuration["configuration_qvel_identity"]
+                    and scope_restored
+                    and candidate_bound_violations == 0
+                    and local_minimum_margin
+                    >= minimum_margin_floor_rad
+                    and local_minimum_margin >= 0
+                )
+                if not safe:
+                    continue
+                terminal_position = float(
+                    env.sim.data.qpos[qidx[target_joint_index]]
+                )
+                terminal_velocity = float(
+                    env.sim.data.qvel[vidx[target_joint_index]]
+                )
+                terminal_target_margin = (
+                    target_limit - terminal_position
+                    if target_joint_side == "upper"
+                    else terminal_position - target_limit
+                )
+                terminal_toward_velocity = (
+                    terminal_velocity
+                    if target_joint_side == "upper"
+                    else -terminal_velocity
+                )
+                endpoint_snapshot = (
+                    base.capture_warmstart_policy_shadow_snapshot(
+                        env,
+                        robot,
+                        source_id=(
+                            f"{source_id}:depth{depth}:"
+                            f"parent{parent_index}:vertex{vertex_id}"
+                        ),
+                    )
+                )
+                first_step = (
+                    {
+                        "vertex_id": vertex_id,
+                        "configuration": configuration,
+                        "controller_substep_torque_audit": (
+                            torque_audit
+                        ),
+                        "minimum_margin_rad": (
+                            local_minimum_margin
+                        ),
+                        "terminal_margin_rad": margins[-1],
+                        "terminal_target_joint_margin_rad": (
+                            terminal_target_margin
+                        ),
+                        "terminal_target_joint_velocity_rad_s": (
+                            terminal_velocity
+                        ),
+                        "terminal_toward_limit_velocity_rad_s": (
+                            terminal_toward_velocity
+                        ),
+                    }
+                    if depth == 0
+                    else parent["first_step"]
+                )
+                expansions.append(
+                    {
+                        "snapshot": endpoint_snapshot,
+                        "sequence": (
+                            parent["sequence"] + (vertex_id,)
+                        ),
+                        "trajectory_minimum_margin_rad": min(
+                            parent[
+                                "trajectory_minimum_margin_rad"
+                            ],
+                            local_minimum_margin,
+                        ),
+                        "terminal_margin_rad": margins[-1],
+                        "terminal_target_joint_margin_rad": (
+                            terminal_target_margin
+                        ),
+                        "terminal_target_joint_velocity_rad_s": (
+                            terminal_velocity
+                        ),
+                        "terminal_toward_limit_velocity_rad_s": (
+                            terminal_toward_velocity
+                        ),
+                        "first_step": first_step,
+                    }
+                )
+        expansions.sort(
+            key=lambda node: (
+                -node["trajectory_minimum_margin_rad"],
+                -node["terminal_target_joint_margin_rad"],
+                node[
+                    "terminal_toward_limit_velocity_rad_s"
+                ],
+                node["sequence"],
+            )
+        )
+        retained_count = min(len(expansions), beam_width)
+        depth_summaries.append(
+            {
+                "depth": depth + 1,
+                "action": action,
+                "parent_count": len(beam),
+                "expansion_count": len(beam) * len(vertex_ids),
+                "safe_expansion_count": len(expansions),
+                "retained_count": retained_count,
+                "best_trajectory_minimum_margin_rad": (
+                    expansions[0][
+                        "trajectory_minimum_margin_rad"
+                    ]
+                    if expansions
+                    else None
+                ),
+                "best_sequence": (
+                    list(expansions[0]["sequence"])
+                    if expansions
+                    else None
+                ),
+            }
+        )
+        beam = expansions[:beam_width]
+        if not beam:
+            break
+    restore_identity = (
+        restore_identity
+        and _restore_identity(env, robot, snapshot)
+    )
+    selected = beam[0] if len(beam) > 0 else None
+    completed_horizon = (
+        len(selected["sequence"]) if selected is not None else 0
+    )
+    selected_payload = None
+    if selected is not None and completed_horizon == len(actions):
+        selected_payload = {
+            "sequence": list(selected["sequence"]),
+            "trajectory_minimum_margin_rad": selected[
+                "trajectory_minimum_margin_rad"
+            ],
+            "terminal_margin_rad": selected[
+                "terminal_margin_rad"
+            ],
+            "terminal_target_joint_margin_rad": selected[
+                "terminal_target_joint_margin_rad"
+            ],
+            "terminal_target_joint_velocity_rad_s": selected[
+                "terminal_target_joint_velocity_rad_s"
+            ],
+            "terminal_toward_limit_velocity_rad_s": selected[
+                "terminal_toward_limit_velocity_rad_s"
+            ],
+            "first_step": selected["first_step"],
+        }
+    return {
+        "horizon": len(actions),
+        "beam_width": beam_width,
+        "depth_summaries": depth_summaries,
+        "selected": selected_payload,
+        "restore_identity": restore_identity,
+        "configuration_count": configuration_count,
+        "shadow_env_step_count": shadow_steps,
+        "configuration_qpos_identity_count": (
+            qpos_identity_count
+        ),
+        "configuration_qvel_identity_count": (
+            qvel_identity_count
+        ),
+        "controller_scope_restore_count": scope_restore_count,
+        "torque_bound_violation_count": (
+            torque_bound_violation_count
+        ),
+    }
+
+
 def _run_case(
     config: dict[str, Any],
     pair: dict[str, Any],
@@ -1461,6 +1742,8 @@ def _run_case(
     controller_contact_aware_vertex_target_joint_side: str = "upper",
     contact_aware_vertex_require_terminal_non_toward_velocity: bool = True,
     contact_aware_vertex_require_safe_successor: bool = False,
+    contact_aware_vertex_beam_width: int = 0,
+    contact_aware_vertex_beam_max_horizon: int = 0,
     lane_base_seeds: tuple[int, ...] = LANE_BASE_SEEDS,
     row_schema: str = ROW_SCHEMA,
     source_version: str = "v12.11",
@@ -1578,6 +1861,14 @@ def _run_case(
             contact_aware_vertex_require_safe_successor,
             bool,
         )
+        or contact_aware_vertex_beam_width < 0
+        or contact_aware_vertex_beam_max_horizon < 0
+        or (
+            (contact_aware_vertex_beam_width == 0)
+            != (contact_aware_vertex_beam_max_horizon == 0)
+        )
+        or contact_aware_vertex_beam_max_horizon
+        > int(config["policy"]["source_prefix_steps"])
         or controller_nullspace_target_joint_side
         not in {"lower", "upper"}
     ):
@@ -1700,6 +1991,8 @@ def _run_case(
         contact_aware_vertex_exact_h1_shadow_steps = 0
         contact_aware_vertex_controller_configuration_count = 0
         contact_aware_vertex_successor_shadow_steps = 0
+        contact_aware_vertex_beam_shadow_steps = 0
+        contact_aware_vertex_beam_screen_count = 0
         policy_advance_steps = 0
         for lane_index, base_seed in enumerate(lane_base_seeds):
             restore_identity = (
@@ -2896,6 +3189,177 @@ def _run_case(
                                 1 if target_side == "upper" else 0,
                             ]
                         )
+                        if contact_aware_vertex_beam_width > 0:
+                            beam_horizon = min(
+                                contact_aware_vertex_beam_max_horizon,
+                                RECEDING_CYCLE_COUNT - cycle_index,
+                                len(prefix),
+                            )
+                            beam_actions = tuple(
+                                tuple(
+                                    float(value)
+                                    for value in prefix[action_index]
+                                )
+                                for action_index in range(beam_horizon)
+                            )
+                            beam_result = (
+                                _screen_contact_aware_vertex_beam(
+                                    env=env,
+                                    robot=robot,
+                                    qidx=qidx,
+                                    vidx=vidx,
+                                    limits=limits,
+                                    snapshot=one_step_screen[
+                                        "snapshot"
+                                    ],
+                                    contacts=contacts,
+                                    actions=beam_actions,
+                                    vertex_ids=(
+                                        controller_contact_aware_vertex_exact_h1_ids
+                                    ),
+                                    target_joint_index=target_joint,
+                                    target_joint_side=target_side,
+                                    minimum_margin_floor_rad=(
+                                        fallback_floor
+                                    ),
+                                    beam_width=(
+                                        contact_aware_vertex_beam_width
+                                    ),
+                                    source_id=(
+                                        f"{source_version}:{TARGET_ID}:"
+                                        f"lane{lane_index}:"
+                                        f"cycle{cycle_index}:"
+                                        f"round{recovery_round}:beam"
+                                    ),
+                                )
+                            )
+                            contact_aware_vertex_beam_screen_count += 1
+                            contact_aware_vertex_beam_shadow_steps += (
+                                beam_result["shadow_env_step_count"]
+                            )
+                            contact_aware_vertex_exact_h1_shadow_steps += (
+                                beam_result["shadow_env_step_count"]
+                            )
+                            contact_aware_vertex_controller_configuration_count += (
+                                beam_result["configuration_count"]
+                            )
+                            restore_identity = (
+                                restore_identity
+                                and beam_result["restore_identity"]
+                            )
+                            selected_beam = beam_result["selected"]
+                            beam_candidates = []
+                            if selected_beam is not None:
+                                first_step = selected_beam[
+                                    "first_step"
+                                ]
+                                beam_candidates.append(
+                                    {
+                                        "vertex_id": first_step[
+                                            "vertex_id"
+                                        ],
+                                        "configuration": first_step[
+                                            "configuration"
+                                        ],
+                                        "controller_substep_torque_audit": (
+                                            first_step[
+                                                "controller_substep_torque_audit"
+                                            ]
+                                        ),
+                                        "controller_scope_restored": True,
+                                        "predicted_minimum_margin_rad": (
+                                            first_step[
+                                                "minimum_margin_rad"
+                                            ]
+                                        ),
+                                        "predicted_terminal_margin_rad": (
+                                            first_step[
+                                                "terminal_margin_rad"
+                                            ]
+                                        ),
+                                        "predicted_terminal_target_joint_margin_rad": (
+                                            first_step[
+                                                "terminal_target_joint_margin_rad"
+                                            ]
+                                        ),
+                                        "predicted_terminal_target_joint_velocity_rad_s": (
+                                            first_step[
+                                                "terminal_target_joint_velocity_rad_s"
+                                            ]
+                                        ),
+                                        "predicted_terminal_toward_limit_velocity_rad_s": (
+                                            first_step[
+                                                "terminal_toward_limit_velocity_rad_s"
+                                            ]
+                                        ),
+                                        "terminal_non_toward_velocity": (
+                                            first_step[
+                                                "terminal_toward_limit_velocity_rad_s"
+                                            ]
+                                            <= 1e-9
+                                        ),
+                                        "terminal_non_toward_velocity_required": False,
+                                        "one_step_safe": True,
+                                        "safe_successor_required": False,
+                                        "successor_exact_action": None,
+                                        "successor_evaluations": [],
+                                        "safe_successor_count": None,
+                                        "successor_restore_identity": None,
+                                        "safe": True,
+                                        "selected": True,
+                                    }
+                                )
+                            vertex_row = {
+                                "recovery_round": recovery_round,
+                                "policy_seed": attempts[-1][
+                                    "policy_seed"
+                                ],
+                                "policy_chunk_sha256": attempts[-1][
+                                    "policy_chunk_sha256"
+                                ],
+                                "exact_first_action": exact_action,
+                                "target_joint_index": target_joint,
+                                "target_joint_side": target_side,
+                                "minimum_margin_floor_rad": fallback_floor,
+                                "terminal_non_toward_velocity_required": False,
+                                "safe_successor_required": False,
+                                "successor_exact_action": None,
+                                "beam_search": beam_result,
+                                "candidate_evaluations": beam_candidates,
+                                "selected_vertex_id": (
+                                    selected_beam["sequence"][0]
+                                    if selected_beam is not None
+                                    else None
+                                ),
+                                "authorized": (
+                                    selected_beam is not None
+                                ),
+                                "executed_in_shadow": False,
+                                "exact_action_identity": None,
+                                "execution_configuration": None,
+                                "execution_controller_substep_torque_audit": [],
+                                "execution_controller_scope_restored": None,
+                                "execution_terminal_margin_rad": None,
+                                "execution_terminal_target_joint_margin_rad": None,
+                                "execution_terminal_target_joint_velocity_rad_s": None,
+                                "execution_terminal_toward_limit_velocity_rad_s": None,
+                                "execution_terminal_non_toward_velocity": None,
+                                "prediction_execution_margin_error_rad": None,
+                                "prediction_execution_target_joint_velocity_error_rad_s": None,
+                            }
+                            contact_aware_vertex_exact_h1_fallbacks.append(
+                                vertex_row
+                            )
+                            if selected_beam is not None:
+                                selected_prefix = prefix
+                                selected_advance_contact_aware_vertex_id = (
+                                    selected_beam["sequence"][0]
+                                )
+                                selected_advance_minimum_margin_floor = (
+                                    fallback_floor
+                                )
+                                break
+                            continue
                         for vertex_id in (
                             controller_contact_aware_vertex_exact_h1_ids
                         ):
@@ -5198,6 +5662,12 @@ def _run_case(
             "contact_aware_vertex_require_safe_successor": (
                 contact_aware_vertex_require_safe_successor
             ),
+            "contact_aware_vertex_beam_width": (
+                contact_aware_vertex_beam_width
+            ),
+            "contact_aware_vertex_beam_max_horizon": (
+                contact_aware_vertex_beam_max_horizon
+            ),
             "lane_base_seeds": list(lane_base_seeds),
             "recovery_round_seed_stride": (
                 recovery_round_seed_stride
@@ -5286,6 +5756,12 @@ def _run_case(
             ),
             "contact_aware_vertex_successor_shadow_env_step_count": (
                 contact_aware_vertex_successor_shadow_steps
+            ),
+            "contact_aware_vertex_beam_shadow_env_step_count": (
+                contact_aware_vertex_beam_shadow_steps
+            ),
+            "contact_aware_vertex_beam_screen_count": (
+                contact_aware_vertex_beam_screen_count
             ),
             "full_prefix_shadow_env_step_count": (
                 full_prefix_shadow_steps

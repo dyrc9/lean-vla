@@ -293,6 +293,10 @@ v12.31 使用宽度64、最大深度4的 contact-aware beam：从当前prefix按
 margin、terminal target margin、terminal qvel与稳定sequence排序。只有存在覆盖全部剩余cycles
 的序列才授权其第一vertex；实际仍只执行第一exact action并fresh inference/H3。
 
+v12.31 runner 已实现，beam每层记录parent/expansion/safe/retained counts、最佳序列与整段最小
+margin，并汇总所有configuration/scope/bound audits；24个相关定向测试通过。正式运行的首个
+fallback预计扩展约`64+3×4096`条边。
+
 ## 前一 checkpoint：2026-07-30 v12.5 integrated predictive recovery
 
 fresh policy-prefix shadow 与 typed recovery runtime 的 fixed-trace composition 已完成并终态冻结：

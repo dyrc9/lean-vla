@@ -443,6 +443,8 @@ two-step viable首步。16384 successor branches审计全通过，证明失败�
 下一 successor 用width64、max-depth4 beam覆盖全部剩余cycles；按整段最小margin优先，只消费
 最佳完整序列的第一步，随后fresh重规划。
 
+v12.31 已实现逐层beam audit与full-horizon authorization，24个相关定向测试通过，双 lane待跑。
+
 冻结产物：
 
 - protocol：`experiments/proofalign_simulator_integrated_predictive_recovery_v12_qualification_protocol.json`
