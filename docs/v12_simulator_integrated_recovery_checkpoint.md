@@ -357,6 +357,11 @@ H3 block 后不改 simulator qpos/qvel，而把内部 `initial_joint[1]` 目标�
 first action；只选择最小的0.15-safe offset，实际执行时复现相同 controller target 与相同 action
 bytes，然后 fresh H3。成功门仍为每 lane 5个 exact advances。
 
+首次 nullspace run 已终态 fail closed，但原因只发生在 case 完成后的 ledger serialization：
+controller target audit 含 NumPy array，`json.dumps` 报错。manifest 的 preflight ready、
+outcomes observed=false，空 ledger 和失败目录永久保留，不把内存中未落盘结果当证据。后继只把
+audit array 转为普通 list，在新 root 重放完全相同的 offsets、seeds、gate 与成功门。
+
 冻结产物：
 
 - protocol：`experiments/proofalign_simulator_integrated_predictive_recovery_v12_qualification_protocol.json`
@@ -381,3 +386,4 @@ bytes，然后 fresh H3。成功门仍为每 lane 5个 exact advances。
 - H3 reset-guarded exact H1：`results/proofalign_h3_reset_guarded_exact_h1_pilot_v12_20260730/`
 - H3 one-step backup viable exact H1：`results/proofalign_h3_backup_viable_exact_h1_pilot_v12_20260730/`
 - H3 two-step backup exact H1：`results/proofalign_h3_two_step_backup_exact_h1_pilot_v12_20260730/`
+- H3 nullspace exact H1 terminal serialization failure：`results/proofalign_h3_nullspace_exact_h1_pilot_v12_20260730/`

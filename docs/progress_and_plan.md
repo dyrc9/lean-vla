@@ -177,6 +177,12 @@ fallback 的 two-step viable count 始终0，故没有把不可控 exact action�
 `0.05/0.10/0.20/0.30/0.50 rad`，同时 reset goal；逐一重放同一个 exact policy 首动作，
 选择最小的0.15-safe offset。物理 qpos/qvel 不修改，action bytes 不替换，之后立即 fresh H3。
 
+首个 nullspace run 在完整 case 返回后、写 ledger 时因
+`TypeError: Object of type ndarray is not JSON serializable` 终态 fail closed。preflight 为
+ready，outcomes observed 为false，ledger 保持0字节；因此该目录不支持任何效果结论，也不覆盖。
+修复严格限于把两段 controller target audit arrays 转成 JSON lists；offset、gate、seeds、
+动作与成功门全部不变，使用新 output root 做 mechanical replay。
+
 ## 前一 checkpoint：2026-07-30 v12.5 integrated predictive recovery
 
 fresh policy-prefix shadow 与 typed recovery runtime 的 fixed-trace composition 已完成并终态冻结：

@@ -169,6 +169,10 @@ two-step certificate 进一步给出空不变集证据：初始有56个 viable r
 只把 joint-1 内部目标向安全侧偏移，仍执行相同 policy action bytes，并保持0.15 floor与 fresh
 H3；这直接针对已反复出现的 joint-1 upper limiting atom。
 
+首次 nullspace 运行只暴露了落盘实现问题：case 返回后 controller target 的 NumPy array 无法
+JSON serialization，ledger 为空且 outcome 未读，因此不报告效果。允许的后继仅做 list 转换并在
+新目录机械重放同一冻结协议，不能借此改 offset 或 gate。
+
 
 论文主故事仍是两层对齐，而不是 SemanticSubtask 本身。当前最重要的科学风险集中在 L1：
 
