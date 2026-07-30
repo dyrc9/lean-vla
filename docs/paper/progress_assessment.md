@@ -228,6 +228,10 @@ v12.30 两步viability runner 已通过23个相关定向测试；双 lane 结果
 
 v12.31 full-remaining-horizon beam runner 已通过24个相关定向测试；正式结果尚未生成。
 
+冻结结果证明 extreme-vertex library到depth3已无路径：前两层仍有数千安全扩展，第三层
+0/4096。下一版不再加深horizon，而把跨lane top16 contact patterns各与nominal torque做四档
+插值，在不增加每层64分支的前提下测试平滑控制是否形成四步安全序列。
+
 
 论文主故事仍是两层对齐，而不是 SemanticSubtask 本身。当前最重要的科学风险集中在 L1：
 

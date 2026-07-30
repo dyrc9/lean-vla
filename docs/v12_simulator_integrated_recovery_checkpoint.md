@@ -445,6 +445,13 @@ two-step viable首步。16384 successor branches审计全通过，证明失败�
 
 v12.31 已实现逐层beam audit与full-horizon authorization，24个相关定向测试通过，双 lane待跑。
 
+v12.31 结果为1/5：depth1 64/64 safe，depth2约3284/4096 safe且最佳`[9,9]`最低margin约
+0.20036，depth3却0/4096；16512条边审计全通过。这排除了greedy与short horizon，证明纯
+min/max torque vertices在第三步前把系统推入不可行区。
+
+v12.32 冻结跨lane top16 contact patterns，并各加4档 nominal→vertex blend，branching仍为64，
+用相同width64/depth4 beam搜索更平滑的长期控制序列。
+
 冻结产物：
 
 - protocol：`experiments/proofalign_simulator_integrated_predictive_recovery_v12_qualification_protocol.json`
@@ -478,3 +485,4 @@ v12.31 已实现逐层beam audit与full-horizon authorization，24个相关定�
 - H3 contact-aware vertex exact H1 strict-terminal pilot：`results/proofalign_h3_contact_aware_vertex_exact_h1_pilot_v12_20260730/`
 - H3 contact-aware vertex receding-floor pilot：`results/proofalign_h3_contact_aware_vertex_receding_floor_pilot_v12_20260730/`
 - H3 contact-aware vertex two-step successor pilot：`results/proofalign_h3_contact_aware_vertex_successor_pilot_v12_20260730/`
+- H3 contact-aware full-horizon extreme-vertex beam：`results/proofalign_h3_contact_aware_vertex_beam_pilot_v12_20260730/`

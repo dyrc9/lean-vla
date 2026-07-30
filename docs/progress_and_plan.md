@@ -297,6 +297,16 @@ v12.31 runner 已实现，beam每层记录parent/expansion/safe/retained counts�
 margin，并汇总所有configuration/scope/bound audits；24个相关定向测试通过。正式运行的首个
 fallback预计扩展约`64+3×4096`条边。
 
+v12.31 双 lane 为1/5 non-pass，但给出完整可达性证据：depth1为64/64 safe，depth2分别
+3283/4096与3285/4096 safe，width64最佳为`[9,9]`且trajectory minimum约0.20036；depth3却
+0/4096 safe，因此不存在当前极值vertex集合内的3步、更不用说4步路径。16512/16512配置/
+scope identity与零bound/warning/contact异常成立。
+
+v12.32 不扩大branching factor：从v12.28跨lane平均terminal target margin排序冻结top16 patterns
+`[25,9,29,13,57,41,27,11,61,45,59,15,31,43,63,47]`，每个加入
+nominal→vertex blend `0.25/0.50/0.75/1.00`，仍为64个控制模式。对这64个平滑模式运行同一
+width64、remaining-depth4 beam；目标是避免极值torque在前两步积累导致第三步全空。
+
 ## 前一 checkpoint：2026-07-30 v12.5 integrated predictive recovery
 
 fresh policy-prefix shadow 与 typed recovery runtime 的 fixed-trace composition 已完成并终态冻结：
