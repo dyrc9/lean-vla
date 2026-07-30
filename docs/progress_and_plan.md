@@ -50,6 +50,11 @@ receding-horizon 机制试验：每轮只放行经原 gate 验证的首个 actio
 三步恢复序列，不在新结果上再次挑 recovery。每 cycle 同时记录 full-H10 verdict 和 H1 gate，
 只有 H1 exact-safe 才推进一个 shadow action。实现先提交，随后在 clean worktree 上运行。
 
+该试验已完成：两条 seed lanes 都连续安全推进3步，H1 gate 前3轮合计6/6 allow；第4轮
+H1 直接预测越界并在推进前停止，因此5-cycle gate non-pass。相较完整H10在每轮都 block，
+receding horizon 已把可安全活性从0步提高到3步，但还不能持续。下一轮允许每 cycle 最多8次
+fresh H1 replan，仍只推进首个 exact-safe action；不降低阈值，不隐式打开 recovery。
+
 ## 前一 checkpoint：2026-07-30 v12.5 integrated predictive recovery
 
 fresh policy-prefix shadow 与 typed recovery runtime 的 fixed-trace composition 已完成并终态冻结：

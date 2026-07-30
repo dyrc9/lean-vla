@@ -189,6 +189,18 @@ cycles，后续 cycle seed 以100为 stride。恢复轨迹固定为 beam 中 ful
 screen 作为诊断，但只在 H=1 为 `allow_exact`、risk agreement 和 restore identity 全部成立时
 推进一个 shadow action；任何一步失败立即停止该 lane。
 
+结果显示两条 lane 都安全推进3个 cycles：完整H10始终0次 allow，而H1前3轮为6/6
+`allow_exact`。推进后的 minimum margin 依次约为 `0.2771 → 0.2728 → 0.1546 rad`。
+第4轮两个 seed 的首个 action 都直接预测越界，H1 margin 分别为 `−0.01555` 和
+`−0.02096 rad`，因此均在推进前停止；5-cycle gate 保持 non-pass。总计6个
+policy-conditioned shadow advances，无 crossing、active warning、dispatch 或 outcome read，
+restore identity 为100%。
+
+这证明一步重规划把原本第2–4步发生的风险延后到3次安全推进之后，但单一 fresh seed 不足以
+跨过第4轮。下一步可在同一状态使用有上限的 H1 fresh-replan attempts；只有某次 exact first
+action 通过原门才推进，否则继续 fail closed。若 bounded H1 replan 仍失败，再考虑为
+`block_replan` 定义显式 typed recovery route，而不是隐式执行。
+
 冻结产物：
 
 - protocol：`experiments/proofalign_simulator_integrated_predictive_recovery_v12_qualification_protocol.json`
@@ -201,3 +213,4 @@ screen 作为诊断，但只在 H=1 为 `allow_exact`、risk agreement 和 resto
 - two-stage policy-aware：`results/proofalign_two_stage_policy_aware_recovery_pilot_v12_20260730/`
 - continuous-blend：`results/proofalign_continuous_blend_recovery_pilot_v12_20260730/`
 - joint-targeted beam：`results/proofalign_joint_targeted_beam_recovery_pilot_v12_20260730/`
+- receding horizon：`results/proofalign_receding_horizon_recovery_pilot_v12_20260730/`
