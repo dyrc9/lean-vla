@@ -244,6 +244,16 @@ v12.27 runner 已实现，逐 substep 记录 inverse-mass row、线性求解 res
 applied 7轴 torques、toward-acceleration term与 bound violation；19个相关定向测试通过。
 clean-tree 后执行双 lane。
 
+v12.27 双 lane 仍为1/5 non-pass。free-dynamics 指标有效：200/200 substeps 的 vertex 都降低
+toward-acceleration term，mass solve residual≤6.7e-16，且无 torque bound violation；full blend
+把终点 qvel 从约`+0.305`降至`+0.205 rad/s`、margin提高到约0.275，但仍未达到非正速度门。
+这说明 contact constraint response 与 free mass-matrix optimum 不同。
+
+v12.28 改为 contact-aware actuator-vertex shadow：joint 1 固定 away-limit bound，枚举其余6轴
+的 `2^6=64` 个 min/max torque vertices，并在真实 restored one-step simulator branch 中直接
+筛选全局 margin≥0.15、terminal toward qvel≤0的候选。选择最大终点 target margin、再最大
+全局 margin、再稳定 lexicographic ID；执行仍是同一 policy action bytes和 one-action scope。
+
 ## 前一 checkpoint：2026-07-30 v12.5 integrated predictive recovery
 
 fresh policy-prefix shadow 与 typed recovery runtime 的 fixed-trace composition 已完成并终态冻结：

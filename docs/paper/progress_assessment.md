@@ -204,6 +204,10 @@ mass row 做最小干预的 coupled torque shield，同时保留 exact action by
 v12.27 coupled shield 已实现并通过19个相关定向测试；每个子步都能审计 actuator-box vertex
 确实降低 inverse-mass toward-acceleration term。实验结果生成前仍不计作正证据。
 
+冻结结果仍为1/5，但 full blend 将 qvel 从约`+0.305`降至`+0.205 rad/s`，证明耦合控制方向
+有效而 free-dynamics authority不足。下一步以64个实际 actuator vertices 的 restored shadow
+直接纳入 contact response，再用相同位置/终点速度门筛选。
+
 
 论文主故事仍是两层对齐，而不是 SemanticSubtask 本身。当前最重要的科学风险集中在 L1：
 

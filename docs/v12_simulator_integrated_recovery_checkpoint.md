@@ -411,6 +411,13 @@ constraint coupling淹没。8/8 configuration identity及零运行时异常成�
 v12.27 已实现完整7轴 torque、mass solve residual、acceleration-term与 actuator-bound审计，
 19个相关定向测试通过；正式双 lane 结果待 clean-tree 实验。
 
+v12.27 结果仍为1/5。full inverse-mass blend 将 qvel 由约`+0.305`改善到`+0.205 rad/s`并提升
+margin，但不能满足终点非正速度；200/200 acceleration-term improvements 与极小 residual
+同时表明算法实现正确、失败来自 contact-constrained response偏离 free dynamics。
+
+下一 successor 固定 joint 1 away-bound，实际 shadow 枚举其余6轴的64个 actuator-box vertices，
+直接按0.15 floor与 terminal qvel≤0选择 contact-aware torque vertex。
+
 冻结产物：
 
 - protocol：`experiments/proofalign_simulator_integrated_predictive_recovery_v12_qualification_protocol.json`
@@ -440,3 +447,4 @@ v12.27 已实现完整7轴 torque、mass solve residual、acceleration-term与 a
 - H3 scoped joint damping exact H1：`results/proofalign_h3_joint_damping_exact_h1_pilot_v12_20260730/`
 - H3 joint velocity envelope exact H1：`results/proofalign_h3_joint_velocity_envelope_exact_h1_pilot_v12_20260730/`
 - H3 joint anticipatory brake exact H1：`results/proofalign_h3_joint_anticipatory_brake_exact_h1_pilot_v12_20260730/`
+- H3 coupled inverse-mass brake exact H1：`results/proofalign_h3_coupled_inverse_mass_brake_exact_h1_pilot_v12_20260730/`
