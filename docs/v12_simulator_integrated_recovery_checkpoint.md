@@ -205,6 +205,16 @@ bounded-H1 successor 已固定每 cycle 最多8次 fresh inference，attempt see
 每次都在完全相同的 branch state 上独立做 full-H10 诊断与 H1 gate，首个 H1
 `allow_exact` 才能推进一步。前一轮相同的两条 lane、五周期和 recovery candidate 保持不变。
 
+运行结果仍在两条 lane 的第4轮停止：前3轮各1次即通过；第4轮各8次，共16个新 seed 的H1
+margin 全部为负，范围约 `−0.01932` 至 `−0.01456 rad`。因此 total attempts 22，
+H1 allow 6、reject 16，安全推进仍为每 lane 3步。restore identity 为100%，active warning、
+dispatch、typed recovery 和 outcome read 均为0。
+
+该结果排除了第4轮单一 seed 偶然性。下一步停止增加 retry 次数，改为显式
+`block_replan → recovery escalation → fresh H1 gate`：只有通过原 recovery selector 的轨迹
+可在 shadow branch 中推进，恢复后仍须通过 H1 exact gate。该路由必须单独版本化，不能把
+`block_replan` 直接改称 recovery success。
+
 冻结产物：
 
 - protocol：`experiments/proofalign_simulator_integrated_predictive_recovery_v12_qualification_protocol.json`
@@ -218,3 +228,4 @@ bounded-H1 successor 已固定每 cycle 最多8次 fresh inference，attempt see
 - continuous-blend：`results/proofalign_continuous_blend_recovery_pilot_v12_20260730/`
 - joint-targeted beam：`results/proofalign_joint_targeted_beam_recovery_pilot_v12_20260730/`
 - receding horizon：`results/proofalign_receding_horizon_recovery_pilot_v12_20260730/`
+- bounded H1 replan：`results/proofalign_bounded_h1_replan_recovery_pilot_v12_20260730/`

@@ -58,6 +58,10 @@ fresh H1 replan，仍只推进首个 exact-safe action；不降低阈值，不�
 bounded-H1 runner 与测试已完成：每 cycle 最多8次、attempt seed stride=10，状态在失败尝试间
 保持不变。只有首个 H1 exact-safe attempt 被选中并推进，全部失败则停止；代码先独立提交后运行。
 
+结果表明第4轮两条 lane 的16个额外 H1 seeds 全部失败，安全推进仍停在3步；继续增加随机
+retry 没有依据。下一步版本化 predictive recovery escalation：bounded H1 replan 耗尽后，
+只允许通过原 selector 的 recovery shadow 轨迹推进，再从新状态重新做 fresh H1 gate。
+
 ## 前一 checkpoint：2026-07-30 v12.5 integrated predictive recovery
 
 fresh policy-prefix shadow 与 typed recovery runtime 的 fixed-trace composition 已完成并终态冻结：
