@@ -185,6 +185,7 @@ def _search_safe_bridge(
     args: Any,
     policy_seed: int,
     source_id: str,
+    gate_horizon_steps: int = 1,
 ) -> dict[str, Any]:
     library = _candidate_library(config)
     transient_floor = branch_state.minimum_margin - float(
@@ -276,7 +277,7 @@ def _search_safe_bridge(
             robot=robot,
             qidx=qidx,
             state=endpoint_state,
-            prefix=prefix[:1],
+            prefix=prefix[:gate_horizon_steps],
             source_id=f"{source_id}:{row['action_id']}:post-h1",
             contact_audit=contacts,
         )
@@ -291,7 +292,14 @@ def _search_safe_bridge(
                 "post_h1_verdict": post_h1[
                     "decision"
                 ].verdict.value,
+                "post_gate_horizon_steps": gate_horizon_steps,
+                "post_gate_verdict": post_h1[
+                    "decision"
+                ].verdict.value,
                 "post_h1_minimum_margin_rad": post_h1[
+                    "assessment"
+                ].minimum_margin,
+                "post_gate_minimum_margin_rad": post_h1[
                     "assessment"
                 ].minimum_margin,
                 "post_h1_risk_agreement": post_h1[
@@ -347,6 +355,7 @@ def _run_case(
     escalation_candidate_builder: Any | None = None,
     maximum_safe_bridges_per_cycle: int = 0,
     safe_bridge_seed_stride: int = 2_000,
+    gate_horizon_steps: int = 1,
     row_schema: str = ROW_SCHEMA,
     source_version: str = "v12.11",
 ) -> dict[str, Any]:
@@ -357,6 +366,9 @@ def _run_case(
         or recovery_round_seed_stride <= 0
         or maximum_safe_bridges_per_cycle < 0
         or safe_bridge_seed_stride <= 0
+        or gate_horizon_steps <= 0
+        or gate_horizon_steps
+        > int(config["policy"]["source_prefix_steps"])
     ):
         raise RecedingHorizonPilotError(
             "invalid replan or recovery-escalation bounds"
@@ -571,7 +583,7 @@ def _run_case(
                             robot=robot,
                             qidx=qidx,
                             state=branch_state,
-                            prefix=prefix[:1],
+                            prefix=prefix[:gate_horizon_steps],
                             source_id=(
                                 f"{source_version}:{TARGET_ID}:"
                                 f"lane{lane_index}:"
@@ -618,7 +630,16 @@ def _run_case(
                             "one_step_verdict": one_step_screen[
                                 "decision"
                             ].verdict.value,
+                            "gate_horizon_steps": gate_horizon_steps,
+                            "gate_verdict": one_step_screen[
+                                "decision"
+                            ].verdict.value,
                             "one_step_minimum_margin_rad": (
+                                one_step_screen[
+                                    "assessment"
+                                ].minimum_margin
+                            ),
+                            "gate_minimum_margin_rad": (
                                 one_step_screen[
                                     "assessment"
                                 ].minimum_margin
@@ -678,6 +699,7 @@ def _run_case(
                                 f"lane{lane_index}:cycle{cycle_index}:"
                                 f"round{recovery_round}:safe-bridge"
                             ),
+                            gate_horizon_steps=gate_horizon_steps,
                         )
                         inference_count += bridge[
                             "policy_inference_count"
@@ -1135,6 +1157,7 @@ def _run_case(
             "maximum_safe_bridges_per_cycle": (
                 maximum_safe_bridges_per_cycle
             ),
+            "gate_horizon_steps": gate_horizon_steps,
             "recovery_round_seed_stride": (
                 recovery_round_seed_stride
             ),

@@ -86,6 +86,9 @@ fresh post-bridge H1 allow；每 cycle 最多2个 bridge。bridge 独立记账�
 随后任何 full-scale 原语（含 hold）一步都会 crossing。下一步改用 H2 screen、仍只推进首步，
 提前保留制动余量；bridge 动作增加0.1/0.25/0.5/0.75缩放，但 transient/trigger 门不变。
 
+H2-scaled-bridge runner 与测试已完成：61个有界 bridge actions，H2 screen/H1 advance，
+post-bridge 仍需 fresh H2 allow。实现先提交后运行。
+
 ## 前一 checkpoint：2026-07-30 v12.5 integrated predictive recovery
 
 fresh policy-prefix shadow 与 typed recovery runtime 的 fixed-trace composition 已完成并终态冻结：

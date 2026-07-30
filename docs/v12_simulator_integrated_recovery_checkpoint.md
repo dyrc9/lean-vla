@@ -259,6 +259,11 @@ gate 在第3次推进后只剩约0.1546 rad，下一控制步的惯性/控制器
 action；它会在 full-prefix first-risk-step 从3降到1的过程中更早停止，保留制动余量。bridge
 库同时只增加原动作的0.1/0.25/0.5/0.75缩放版本，保持同一 transient/trigger gate。
 
+H2-scaled-bridge runner 已实现：12个非 hold 方向各取
+`0.10/0.25/0.50/0.75/1.00`，hold 保留一次，共61个 bridge actions。policy gate 检查前2步，
+但通过后只 shadow advance 第1步；bridge endpoint 也必须 fresh H2 allow。每 cycle 仍最多
+2个 bridge，原 recovery contract 不变。
+
 冻结产物：
 
 - protocol：`experiments/proofalign_simulator_integrated_predictive_recovery_v12_qualification_protocol.json`
