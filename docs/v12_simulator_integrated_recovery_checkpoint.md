@@ -148,6 +148,13 @@ identity 为100%，active warning、contact saturation、typed recovery、dispat
 均为0。分类固定为
 `two_stage_policy_aware_recovery_v12_engineering_pilot_complete`，不是 qualification pass。
 
+下一轮局部连续动作试验据此冻结在最佳结构 `positive_y@h5+positive_z@h1` 周围：
+第二阶段的 z 幅度取 `0.25/0.50/0.75/1.00`，并分别叠加 x/y/rx/ry/rz 单轴
+`±0.25/±0.50/±0.75/±1.00` 扰动，加上无扰动基线，共164个六步组合。动作仍限制在
+`[-1,1]`，恢复安全门与 `10509/10510` policy gate 均不变。新账本会额外记录 post-policy
+逐关节最小 margin、limiting joint/side/step；若局部搜索仍失败，这些诊断直接用于构造
+joint-targeted retreat，而不是继续扩大离散笛卡尔积。
+
 冻结产物：
 
 - protocol：`experiments/proofalign_simulator_integrated_predictive_recovery_v12_qualification_protocol.json`

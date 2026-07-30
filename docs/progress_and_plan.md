@@ -33,6 +33,11 @@ H=1/2/3，共156个组合。65个组合通过原 recovery safety，但全部在�
 typed recovery 和 outcome read 均为0。下一步应先定位被 post-policy prefix 压过边界的具体
 joint/direction，再设计连续动作或显式 joint-space retreat；继续保持原 gate。
 
+当前已实现下一轮局部连续搜索：围绕最好结构 `positive_y@h5+positive_z@h1` 生成164个
+有界混合动作，并在每次 post-policy screen 中记录 limiting joint、side、step 和7个关节各自
+的最小 margin。该轮仍只允许 restored shadow，不修改阈值；代码与测试先形成独立 Git
+checkpoint，资源预检通过后再执行。
+
 ## 前一 checkpoint：2026-07-30 v12.5 integrated predictive recovery
 
 fresh policy-prefix shadow 与 typed recovery runtime 的 fixed-trace composition 已完成并终态冻结：

@@ -506,6 +506,12 @@ def _screen_prefix(
         "decision": decision,
         "assessment": assessment,
         "reference": reference,
+        "first_positions": tuple(
+            tuple(value for value in row) for row in first
+        ),
+        "reference_positions": tuple(
+            tuple(value for value in row) for row in second
+        ),
         "prefix_digest": prefix_digest,
         "repeat_max_abs_qpos_error_rad": error,
         "repeat_within_tolerance": (

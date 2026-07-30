@@ -321,6 +321,9 @@ def _run_case(
     runner: Any,
     args: Any,
     warning_audit: base.MujocoWarningAudit,
+    candidate_specs: tuple[dict[str, Any], ...] | None = None,
+    row_schema: str = ROW_SCHEMA,
+    source_version: str = "v12.8",
 ) -> dict[str, Any]:
     formal_index = FORMAL_PAIR_INDEX[TARGET_ID]
     case_warning_start = len(warning_audit.messages)
@@ -382,7 +385,7 @@ def _run_case(
         trigger_state = trusted_joint_state_from_libero(
             env,
             state_epoch=formal_index * 300,
-            source_id=f"v12.8:{TARGET_ID}:trigger",
+            source_id=f"{source_version}:{TARGET_ID}:trigger",
         )
         initial_screen = base._screen_prefix(
             config,
@@ -391,7 +394,9 @@ def _run_case(
             qidx=qidx,
             state=trigger_state,
             prefix=prefix,
-            source_id=f"v12.8:{TARGET_ID}:initial-screen",
+            source_id=(
+                f"{source_version}:{TARGET_ID}:initial-screen"
+            ),
             contact_audit=contacts,
         )
         if (
@@ -407,7 +412,12 @@ def _run_case(
         candidates: dict[str, RecoveryCandidate] = {}
         specs_by_id = {}
         generation_step_count = 0
-        for spec in composite_specs(config):
+        frozen_specs = (
+            candidate_specs
+            if candidate_specs is not None
+            else composite_specs(config)
+        )
+        for spec in frozen_specs:
             branch_restore_identity = (
                 branch_restore_identity
                 and _restore_identity(
@@ -427,7 +437,7 @@ def _run_case(
                 trigger_state=trigger_state,
                 positions=positions,
                 margins=margins,
-                source_id=f"v12.8:{TARGET_ID}:two-stage",
+                source_id=f"{source_version}:{TARGET_ID}:generator",
             )
             selection = select_escape_recovery_candidate(
                 trigger_state,
@@ -519,7 +529,7 @@ def _run_case(
                 env,
                 state_epoch=trigger_state.state_epoch + 1,
                 source_id=(
-                    f"v12.8:{TARGET_ID}:"
+                    f"{source_version}:{TARGET_ID}:"
                     f"{candidate.candidate_id}:branch"
                 ),
             )
@@ -549,7 +559,7 @@ def _run_case(
                     state=branch_state,
                     prefix=post_prefix,
                     source_id=(
-                        f"v12.8:{TARGET_ID}:"
+                        f"{source_version}:{TARGET_ID}:"
                         f"{candidate.candidate_id}:"
                         f"seed{screening_seed}"
                     ),
@@ -558,6 +568,31 @@ def _run_case(
                 post_shadow_steps += post_screen[
                     "shadow_env_step_count"
                 ]
+                post_positions = np.asarray(
+                    post_screen["first_positions"],
+                    dtype=np.float64,
+                )
+                lower = np.asarray(
+                    trigger_state.joint_lower, dtype=np.float64
+                )
+                upper = np.asarray(
+                    trigger_state.joint_upper, dtype=np.float64
+                )
+                lower_margins = post_positions - lower
+                upper_margins = upper - post_positions
+                joint_margins = np.minimum(
+                    lower_margins, upper_margins
+                )
+                flat_index = int(np.argmin(joint_margins))
+                risk_step, risk_joint = np.unravel_index(
+                    flat_index, joint_margins.shape
+                )
+                risk_side = (
+                    "lower"
+                    if lower_margins[risk_step, risk_joint]
+                    <= upper_margins[risk_step, risk_joint]
+                    else "upper"
+                )
                 seed_row = {
                     "policy_seed": screening_seed,
                     "verdict": post_screen[
@@ -571,6 +606,15 @@ def _run_case(
                     ],
                     "restore_identity": post_screen[
                         "restore_identity"
+                    ],
+                    "minimum_margin_joint_index": int(risk_joint),
+                    "minimum_margin_joint_side": risk_side,
+                    "minimum_margin_step": int(risk_step),
+                    "per_joint_minimum_margin_rad": [
+                        float(value)
+                        for value in np.min(
+                            joint_margins, axis=0
+                        )
                     ],
                 }
                 seed_rows.append(seed_row)
@@ -606,7 +650,7 @@ def _run_case(
                 "candidate branch restore identity failed"
             )
         return {
-            "schema": ROW_SCHEMA,
+            "schema": row_schema,
             "case_id": TARGET_ID,
             **{
                 key: pair[key]
