@@ -1,0 +1,30 @@
+{
+  "claim_boundary": "This 3-pair engineering pilot is not qualification evidence and reads no task outcome.",
+  "classification": "integrated_predictive_recovery_v12_fixed_trace_pilot_complete",
+  "metrics": {
+    "expected_route_rate": 1.0,
+    "fresh_policy_authorization_rate": 1.0,
+    "negative_path_sink_apply_count": 0,
+    "nominal_exact_authorization_rate": 1.0,
+    "old_policy_authorization_accept_count": 0,
+    "outcome_read_count": 0,
+    "policy_action_dispatch_count": 0,
+    "policy_inference_count": 0,
+    "policy_load_count": 0,
+    "prefix_substitution_reject_rate": 1.0,
+    "receipt_identity_rate": 1.0,
+    "recovery_authorization_replay_accept_count": 0,
+    "recovery_completion_rate": 1.0,
+    "recovery_open_rate": 1.0,
+    "recovery_sink_apply_count": 6,
+    "runtime_exception_count": 0,
+    "selection_substitution_reject_rate": 1.0,
+    "simulator_create_count": 0,
+    "source_verdict_match_rate": 1.0,
+    "substituted_fresh_state_accept_count": 0,
+    "valid_case_count": 12
+  },
+  "qualification_pass": null,
+  "schema": "proofalign.integrated-predictive-recovery-v12-fixed-trace-summary.v1",
+  "valid_case_count": 12
+}
