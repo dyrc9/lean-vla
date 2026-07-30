@@ -1459,6 +1459,7 @@ def _run_case(
     ] = (),
     controller_contact_aware_vertex_target_joint_index: int = 1,
     controller_contact_aware_vertex_target_joint_side: str = "upper",
+    contact_aware_vertex_require_terminal_non_toward_velocity: bool = True,
     lane_base_seeds: tuple[int, ...] = LANE_BASE_SEEDS,
     row_schema: str = ROW_SCHEMA,
     source_version: str = "v12.11",
@@ -1568,6 +1569,10 @@ def _run_case(
         or controller_contact_aware_vertex_target_joint_index >= 7
         or controller_contact_aware_vertex_target_joint_side
         not in {"lower", "upper"}
+        or not isinstance(
+            contact_aware_vertex_require_terminal_non_toward_velocity,
+            bool,
+        )
         or controller_nullspace_target_joint_side
         not in {"lower", "upper"}
     ):
@@ -2981,12 +2986,18 @@ def _run_case(
                                     "terminal_non_toward_velocity": (
                                         terminal_toward_velocity <= 1e-9
                                     ),
+                                    "terminal_non_toward_velocity_required": (
+                                        contact_aware_vertex_require_terminal_non_toward_velocity
+                                    ),
                                     "safe": (
                                         min(vertex_margins)
                                         >= fallback_floor
                                         and min(vertex_margins) >= 0
-                                        and terminal_toward_velocity
-                                        <= 1e-9
+                                        and (
+                                            not contact_aware_vertex_require_terminal_non_toward_velocity
+                                            or terminal_toward_velocity
+                                            <= 1e-9
+                                        )
                                         and all(
                                             not sample[
                                                 "torque_bound_violation"
@@ -3040,6 +3051,9 @@ def _run_case(
                             "target_joint_index": target_joint,
                             "target_joint_side": target_side,
                             "minimum_margin_floor_rad": fallback_floor,
+                            "terminal_non_toward_velocity_required": (
+                                contact_aware_vertex_require_terminal_non_toward_velocity
+                            ),
                             "candidate_evaluations": candidate_rows,
                             "selected_vertex_id": (
                                 selected_vertex["vertex_id"]
@@ -4807,6 +4821,7 @@ def _run_case(
                     ]
                 ) or (
                     execution_vertex_state is not None
+                    and contact_aware_vertex_require_terminal_non_toward_velocity
                     and not execution_vertex_state[
                         "terminal_non_toward_velocity"
                     ]
@@ -4967,6 +4982,9 @@ def _run_case(
             ),
             "controller_contact_aware_vertex_target_joint_side": (
                 controller_contact_aware_vertex_target_joint_side
+            ),
+            "contact_aware_vertex_require_terminal_non_toward_velocity": (
+                contact_aware_vertex_require_terminal_non_toward_velocity
             ),
             "lane_base_seeds": list(lane_base_seeds),
             "recovery_round_seed_stride": (

@@ -268,6 +268,9 @@ fresh H3，但移除 nonpositive-qvel 硬门；下一 cycle 由新的真实 cont
 能否继续。成功门仍严格要求两 lane各5个 exact policy advances与全程零 crossing/warning/
 contact saturation/outcome read，不因放松代理条件而放松物理 floor。
 
+v12.29 runner 已实现并通过22个相关定向测试；代码路径只增加一个显式 boolean gate，默认仍
+保持v12.28 strict行为，新 runner 单独冻结为false，避免改变历史结果语义。
+
 ## 前一 checkpoint：2026-07-30 v12.5 integrated predictive recovery
 
 fresh policy-prefix shadow 与 typed recovery runtime 的 fixed-trace composition 已完成并终态冻结：

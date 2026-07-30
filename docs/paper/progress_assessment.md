@@ -214,6 +214,8 @@ v12.28 contact-aware 64-vertex runner 已通过21个相关定向测试；结果�
 不是原五步安全定义的一部分；后继仅移除这一过强代理门，仍以每步真实 contact shadow的0.15
 floor和fresh H3约束全部 advances。
 
+v12.29 独立 runner 已通过22个相关定向测试；实验结果尚未生成，不提前计入正证据。
+
 
 论文主故事仍是两层对齐，而不是 SemanticSubtask 本身。当前最重要的科学风险集中在 L1：
 

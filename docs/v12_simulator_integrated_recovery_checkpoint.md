@@ -427,6 +427,8 @@ terminal反向速度代理门，而非0.15位置门。
 v12.29 只移除该非必要代理门；64-vertex population、排序、动作、seeds、0.15 floor与 fresh
 H3均不变。每一步仍先以真实 contact-aware shadow证明位置安全，下一步再重新筛选。
 
+v12.29 已用独立 runner 和显式 gate 实现，默认 strict路径不变；22个相关定向测试通过。
+
 冻结产物：
 
 - protocol：`experiments/proofalign_simulator_integrated_predictive_recovery_v12_qualification_protocol.json`
