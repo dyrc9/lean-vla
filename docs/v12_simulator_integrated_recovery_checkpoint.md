@@ -484,6 +484,15 @@ v12.34冻结64个两阶段schedule：跨lane top8 vertices组成有序`A→B`，
 schedule pair、12/13 phase切换、scope restore、bounds和prediction/execution identity。27个相关
 定向测试通过，正式结果前仍不计正证据。
 
+v12.34结果仍为1/5：depth2最低toward velocity约`4.32974–4.32987 rad/s`，一次phase切换对
+constant vertex9没有实质改善，depth3仍0/4096；16512条边全部审计通过。这关闭了原actuator
+box内继续做简单schedule枚举的路线。
+
+v12.35另立simulator virtual joint-stop协议：仅在exact action作用域把target joint upper range
+收紧到原limit减去`0.16/0.18/0.20/0.22 rad`之一，退出后精确恢复model range。它必须额外通过
+qpos/qvel配置identity、range restore、constraint activation/force、prediction/execution及所有
+既有zero-anomaly门；不能被表述为原torque shield或真实硬件安全证据。
+
 冻结产物：
 
 - protocol：`experiments/proofalign_simulator_integrated_predictive_recovery_v12_qualification_protocol.json`

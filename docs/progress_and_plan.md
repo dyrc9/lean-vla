@@ -348,6 +348,20 @@ v12.34 runner与预测/执行schedule复现链已实现。配置和逐substep au
 phase、switch index、nominal/applied torque及bound；默认fixed/blend路径不变。覆盖相关历史链与
 新schedule契约的27个定向测试通过，正式双lane结果尚未生成。
 
+v12.34 正式结果经重算验证后仍为双lane 1/5。depth2最低toward velocity仅从v12.33的约
+`4.32946–4.32990`变为约`4.32974–4.32987 rad/s`，没有实质改善，depth3仍0/4096。
+16512/16512 configuration/scope identity与零bound/warning/contact/dispatch/outcome异常成立。
+因此在当前contact state下继续枚举原7轴±80 actuator box内的常量、blend或一次切换模式已无
+信息增益。
+
+v12.35 改为单独命名的 simulator virtual joint-stop/safety-brake pilot，不冒充actuator-only
+successor：在每个exact action期间把target joint的MuJoCo upper range临时收紧到原upper limit减去
+冻结guard margin，action结束立即逐字节恢复model range并forward；配置前后qpos/qvel必须identity，
+shadow/actual使用同一guard，source action bytes不变。guard margins预注册为
+`0.16/0.18/0.20/0.22 rad`，均严格高于0.15 floor；每层只4个mode，width上限仍64、覆盖全部剩余
+cycles。新增joint-limit constraint activation、range restore、constraint force与warning审计。
+即使通过，也只支持simulator virtual-stop机制，不支持原actuator authority、task utility或物理安全。
+
 ## 前一 checkpoint：2026-07-30 v12.5 integrated predictive recovery
 
 fresh policy-prefix shadow 与 typed recovery runtime 的 fixed-trace composition 已完成并终态冻结：

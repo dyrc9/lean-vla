@@ -252,6 +252,11 @@ v12.33实现与25个相关定向测试已完成；它不增加beam width、contr
 v12.34两阶段`8×8=64` schedule runner已实现并通过27个相关定向测试；动作、floor、beam与
 fresh-replan门均未改变。正式双lane结果前仍只是待验证controller parameterization。
 
+正式结果仍为1/5，depth2最低toward velocity约`4.32974–4.32987 rad/s`，与constant vertex9
+无实质差异；所以当前actuator-only simple schedules已穷尽。下一实验是明确分开的simulator
+virtual joint-stop机制，预注册4个大于0.15 floor的guard margins并审计constraint/range restore。
+即使得到正结果，也只能作为虚拟机械刹车的shadow机制证据，不能回填actuator-only或物理安全claim。
+
 
 论文主故事仍是两层对齐，而不是 SemanticSubtask 本身。当前最重要的科学风险集中在 L1：
 
