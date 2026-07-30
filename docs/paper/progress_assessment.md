@@ -9,7 +9,9 @@
 > recovery 后继见
 > [`../v12_recovery_successor_checkpoint.md`](../v12_recovery_successor_checkpoint.md)，controller
 > shadow 后继见
-> [`../v12_policy_prefix_shadow_checkpoint.md`](../v12_policy_prefix_shadow_checkpoint.md)。
+> [`../v12_policy_prefix_shadow_checkpoint.md`](../v12_policy_prefix_shadow_checkpoint.md)，simulator
+> integrated non-pass 与结果后优化见
+> [`../v12_simulator_integrated_recovery_checkpoint.md`](../v12_simulator_integrated_recovery_checkpoint.md)。
 
 | 模块 | 就绪度 | 证据/缺口 |
 |---|---|---|
@@ -35,6 +37,7 @@
 | Recoverable L2 v12.2/v12.3 | mechanism strengthened / efficacy 未测 | typed runtime 10/10；多关节210-case覆盖209，actual recovery 209/209；v12.2因full-state identity 201/210保持non-pass，v12.3 trusted-arm identity 210/210通过 |
 | Policy-prefix shadow v12.4 | fresh no-outcome mechanism pass / efficacy 未测 | fixed-prefix warm-start 后 repeat 30/30；fresh π0.5 formal 为30次 inference、risk agreement 30/30、nominal allow 15/15、synthetic recovery-required 15/15，repeat 29/30；dispatch/outcome 为0 |
 | Integrated recovery v12.5 | fixed-trace composition pass / simulator integration 未测 | 60/60 routes；exact allow 与两类 substitution boundary通过，typed recovery receipt/completion/fresh-state authorization 15/15；policy/simulator/outcome为0 |
+| Simulator-integrated recovery v12.6 | mechanism mostly pass / liveness non-pass | 18/18 valid，recovery/receipt/terminal safe 9/9；恢复后 fresh authorization 6/9，formal non-pass。margin sweep 与8-attempt bounded replan 均未关闭3个 outlier；dispatch/outcome为0 |
 | Deployment | 未就绪 | E7 缺少7类 perception supervision；所有正向结果仍限于 privileged simulator geometry |
 
 ## 2026-07-29 终局判断
@@ -82,6 +85,14 @@ selection-state substitutions 全部符合预期；旧 policy authorization、re
 fresh state 接受均为0。该结果关闭的是 source-digest-bound software composition，使用 in-memory
 sink 且不创建 simulator，因此仍不能表述为实际 task-preserving recovery。它让论文的 transaction
 integrity 证据更完整，但不改变 efficacy 强度判断。
+
+v12.6 把上述链路放进真实 LIBERO simulator state transition，但继续丢弃所有 outcome。正式9-pair
+population 中 nominal allow 9/9，synthetic recovery open/completion/receipt/terminal safe 均9/9，
+active MuJoCo warning、joint crossing、policy dispatch 和 outcome read 均为0；恢复后新 prefix
+只有6/9 `allow_exact`，其余3个被预测屏幕正确地 `block_replan`，因此按冻结 gate 判 non-pass。
+结果后的统一 margin sweep 和每点8次 bounded replan 都未消除全部 outlier。这使论文多了一条
+有价值的系统负结果：state-safe recovery 不等于 next-policy-safe recovery；下一版需要
+policy-aware candidate objective，而不能降低 gate 或把 block 当作成功。
 
 
 论文主故事仍是两层对齐，而不是 SemanticSubtask 本身。当前最重要的科学风险集中在 L1：

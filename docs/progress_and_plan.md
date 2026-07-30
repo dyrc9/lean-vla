@@ -1,6 +1,28 @@
 # 当前进展与执行计划
 
-## 最新 checkpoint：2026-07-30 v12.5 integrated predictive recovery
+## 最新 checkpoint：2026-07-30 v12.6 simulator-integrated recovery
+
+v12.6 已把 fresh policy、controller-aware shadow、typed recovery simulator steps 和恢复后
+fresh-state authorization 接入同一条 no-outcome 链路，并完成独立 formal：
+
+- 初始化已绕开内部调用 `check_success()` 的 LIBERO `set_init_state()` wrapper；测试和账本均锁定
+  wrapper call/outcome read 为0；
+- MuJoCo warning 已按 frozen state 绑定前/后分阶段记账；formal active phase warning 和 contact
+  saturation 均为0；
+- 9个 fresh pairs、18个 cases 全部有效，覆盖全部7个 joints，历史薄弱的 joint1-upper 重复3次；
+- nominal allow 9/9，synthetic recovery open、candidate coverage、completion、terminal safe、
+  receipt identity 均为9/9，joint-limit crossing 为0；
+- 正式 gate 仍为 non-pass：恢复后 fresh prefix 仅6/9 `allow_exact`，3/9 `block_replan`；
+- 结果后 margin sweep 没有找到统一可用阈值：0.18/0.20/0.25/0.30 的 post allow 分别为
+  1/3、2/3、2/3、2/3，0.30 的 candidate coverage 又降为2/3；
+- formal-seed bounded replan 在三个 outlier 上各尝试8个 fresh prefix，仍为0/3 authorized。
+
+完整 formal 表格、outlier、负结果和下一版设计见
+[`v12_simulator_integrated_recovery_checkpoint.md`](v12_simulator_integrated_recovery_checkpoint.md)。
+当前只授权 policy-aware recovery candidate selection 的 no-outcome engineering pilot；不放宽 gate，
+不授权 clean/attacked/outcome rollout。
+
+## 前一 checkpoint：2026-07-30 v12.5 integrated predictive recovery
 
 fresh policy-prefix shadow 与 typed recovery runtime 的 fixed-trace composition 已完成并终态冻结：
 
