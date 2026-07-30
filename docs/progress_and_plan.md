@@ -384,6 +384,18 @@ v12.36 replay runner已实现；v12.35通用执行函数仅增加默认保持原
 参数，历史验证路径不变。raw/clipped返回语义、guard常量和parent count均有单测，相关31个定向
 测试通过。正式机械replay尚未生成结果。
 
+v12.36重算验证后仍为双lane 1/5，但首次给出有效guard效果：56/56 config/scope identities、
+0 downstream-clipped bound violation，depth1 `4/4` safe、depth2 `16/16` safe；最佳guard序列
+`0.16→0.22`把depth2最低toward velocity从actuator-only约`4.329`降到约`2.521 rad/s`，但
+trajectory minimum已降到约`0.1771–0.1772 rad`，depth3 `0/64`。说明range guard有效但MuJoCo
+默认soft limit允许约43 mrad penetration，仍不足以维持0.15 floor。
+
+v12.37保持同四个guard margins和所有实验门，只把virtual brake constraint profile显式冻结为
+`jnt_solref=[0.004,1.0]`、`jnt_solimp=[0.999,0.9999,0.001,0.5,2.0]`；0.004 s为当前0.002 s
+physics timestep的2倍安全下限。配置/作用域新增原始与guard solref/solimp identity及恢复审计，
+不改contact geom、actuator、qpos/qvel或action。该结果只能比较default-soft与hard virtual stop，
+不能回填真实硬件claim。
+
 ## 前一 checkpoint：2026-07-30 v12.5 integrated predictive recovery
 
 fresh policy-prefix shadow 与 typed recovery runtime 的 fixed-trace composition 已完成并终态冻结：

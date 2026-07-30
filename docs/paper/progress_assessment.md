@@ -267,6 +267,11 @@ downstream clipping语义重放同一方法，并修正depth计数时点；不�
 v12.36机械replay实现与31个相关定向测试已完成，所有guard与效果门逐值不变。正式结果前论文
 结论保持不变。
 
+v12.36有效结果仍为1/5，但virtual stop把depth2最低toward velocity从约4.329降到2.521 rad/s；
+default soft limit在0.22 guard下允许终点margin降到约0.1772，因此depth3仍为空。v12.37只冻结
+更硬且满足timestep安全下限的joint-limit solref/solimp并审计恢复；即使通过也仅是simulator
+virtual-brake机制证据。
+
 
 论文主故事仍是两层对齐，而不是 SemanticSubtask 本身。当前最重要的科学风险集中在 L1：
 

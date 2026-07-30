@@ -509,6 +509,14 @@ guard和实验参数逐值复用v12.35。
 replay runner已实现，相关31个定向测试通过；通用runner的默认v12.35入口与历史结果重算保持
 不变。正式结果前不报告guard效果。
 
+v12.36结果为1/5：正确的downstream bound violation为0，depth1 4/4、depth2 16/16均safe，
+`0.16→0.22`将depth2最低toward velocity降到约`2.521 rad/s`，但最小margin仅约0.1772，
+depth3仍0/64。default soft joint limit有制动效果，却允许约43 mrad越过0.22 guard。
+
+v12.37逐值复用guard/actions/seeds/floor/beam，只将target joint的临时limit profile冻结为
+`solref=[0.004,1]`与`solimp=[0.999,0.9999,0.001,0.5,2]`，并在scope退出恢复原range/solref/
+solimp后forward。该版本检验hard virtual brake，不是actuator-only改进。
+
 冻结产物：
 
 - protocol：`experiments/proofalign_simulator_integrated_predictive_recovery_v12_qualification_protocol.json`
