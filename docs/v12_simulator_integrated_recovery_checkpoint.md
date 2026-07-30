@@ -531,6 +531,15 @@ config identities与6/6 range/profile restore成立，全部runtime异常计数�
 held-out runner已实现并独立重算新seed gate；通用执行路径的开发seed默认不变。34个相关定向
 测试通过，正式结果前不提升跨seed结论。
 
+v12.38 frozen held-out同样通过：`20509/20510`各5/5，最低actual advanced margin
+`0.1661158 rad`，6/6 exact action identity、160/160 beam config identity、6/6 range/profile
+restore、prediction/execution error 0，warning/contact saturation/dispatch/typed recovery/
+outcome read全部0。50个substeps激活guard，最大target-DOF constraint force约9985。
+
+因此v12闭环优化链现在有一个经development与未见seed复验的正机制结果，但有效claim严格限定为
+hard simulator virtual joint-stop engineering evidence。它没有恢复actuator-only authority，
+也没有观察task outcome；论文不得将其表述为task-preserving defense或完整物理安全。
+
 冻结产物：
 
 - protocol：`experiments/proofalign_simulator_integrated_predictive_recovery_v12_qualification_protocol.json`
@@ -567,3 +576,4 @@ held-out runner已实现并独立重算新seed gate；通用执行路径的开�
 - H3 contact-aware full-horizon extreme-vertex beam：`results/proofalign_h3_contact_aware_vertex_beam_pilot_v12_20260730/`
 - H3 contact-aware smooth 64-mode beam：`results/proofalign_h3_contact_aware_vertex_blend_beam_pilot_v12_20260730/`
 - H3 hard virtual joint guard known-seed：`results/proofalign_h3_hard_virtual_joint_guard_beam_pilot_v12_20260730/`
+- H3 hard virtual joint guard frozen held-out：`results/proofalign_h3_hard_virtual_joint_guard_beam_heldout_v12_20260730/`

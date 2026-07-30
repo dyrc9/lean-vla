@@ -133,6 +133,9 @@ def _summarize(rows: list[dict[str, Any]]) -> dict[str, Any]:
     inherited.pop(
         "h3_hard_virtual_joint_guard_beam_success"
     )
+    development_seed_one_step_success = inherited.pop(
+        "one_step_receding_floor_success"
+    )
     fallbacks = [
         fallback
         for lane in rows[0]["lane_results"]
@@ -236,6 +239,9 @@ def _summarize(rows: list[dict[str, Any]]) -> dict[str, Any]:
                 "engineering_validation_complete"
             ),
             "development_lane_base_seeds": [10_509, 10_510],
+            "development_seed_one_step_success_before_heldout_recompute": (
+                development_seed_one_step_success
+            ),
             "heldout_lane_base_seeds": list(
                 HELDOUT_LANE_BASE_SEEDS
             ),
@@ -250,6 +256,7 @@ def _summarize(rows: list[dict[str, Any]]) -> dict[str, Any]:
             "h3_hard_virtual_joint_guard_beam_heldout_success": (
                 method_success
             ),
+            "one_step_receding_floor_success": method_success,
             "claim_boundary": pilot_config()["claim_boundary"],
         }
     )

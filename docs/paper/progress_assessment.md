@@ -283,6 +283,17 @@ constraint force约9999，不能回填actuator-only、task utility或物理安�
 v12.38未见seed runner已实现并通过34个相关定向测试；它只替换seed并独立重算全部门。正式结果前
 仍只报告known-seed正结果。
 
+frozen held-out结果也通过：`20509/20510`均5/5，最低actual advanced margin `0.16612 rad`，
+6/6 guard exact action identity、160/160 config identity、0 prediction/execution error和全部
+zero-anomaly门成立。development与held-out合计4条lane、20/20 exact advances；两个split的
+最低margin分别为0.16619/0.16612。最大target-DOF constraint force分别约9999/9985，说明正结果
+依赖高刚度simulator stop。
+
+这足以形成论文中的“可审计闭环失败定位最终导向一个跨seed可复现virtual-brake机制”的正向
+engineering result，增强系统论文完整性；仍不足以声称actuator-only recovery、task utility、
+一般defense efficacy或physical safety。若新增task-outcome实验，必须另行冻结protocol，不能回读
+本轮no-outcome ledger。
+
 
 论文主故事仍是两层对齐，而不是 SemanticSubtask 本身。当前最重要的科学风险集中在 L1：
 

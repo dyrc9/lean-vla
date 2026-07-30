@@ -418,6 +418,26 @@ v12.38 held-out runner已实现，通用runner仅增加默认仍为`10509/10510`
 5/5、margin、action/config/profile identity、完整beam与zero-anomaly门。相关34个定向测试通过，
 正式未见seed结果尚未生成。
 
+v12.38 未见seed验证终态通过并完成checksum/summary重算。`20509/20510`均5/5，最低actual
+advanced margin为`0.1661158 rad`；6/6 guard exact action identity、0 prediction/execution
+margin/qvel error、160/160 config qpos/qvel/scope identity、6/6 range/profile restore与全部
+zero-anomaly门成立。50个执行substeps激活virtual stop，最大target-DOF constraint force约
+`9985.37`。held-out选择序列与development一致为guard modes
+`[0,3,2,1]→[3,2,1]→[2,1]`，实际首guard margins均为`0.16→0.22→0.20`。
+
+当前“好结果”的严格工程目标已达成：
+
+| Evidence | Seeds | Exact advances | Min actual margin | Guard action identity | Beam config identity | Pred/exec max error |
+|---|---|---:|---:|---:|---:|---:|
+| Development | 10509/10510 | 10/10 | 0.1661929 | 6/6 | 160/160 | 0 |
+| Frozen held-out | 20509/20510 | 10/10 | 0.1661158 | 6/6 | 160/160 | 0 |
+
+结论边界固定：这是跨seed可复现的simulator hard virtual joint-stop机制正证据，且完整保留source
+action bytes与transaction/audit边界；它**不是**原actuator-only torque shield成功、任务完成率/
+utility证据、真实部署资格或物理安全证明。约`10k` generalized constraint force必须在论文结果和
+limitation中同时披露。下一科学步骤若继续，应另立task-outcome protocol比较utility，不能在本轮
+no-outcome artifact上补读reward/success。
+
 ## 前一 checkpoint：2026-07-30 v12.5 integrated predictive recovery
 
 fresh policy-prefix shadow 与 typed recovery runtime 的 fixed-trace composition 已完成并终态冻结：
