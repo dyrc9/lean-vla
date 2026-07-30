@@ -293,10 +293,12 @@ restore identity 为100%，crossing、active warning、contact saturation、live
 typed recovery 和 outcome read 全为0。
 
 下一版冻结为 H3 predictive/H1 advance 的 controller-aware sequence bridge。它在更高余量状态
-提前停止，并用 simulator-shadow beam 搜索有界动作序列；序列每一步都必须保持原绝对
-`0.15 rad` bridge floor 和零 crossing，终点 fresh H3 allow 后还须在精确重放处确认同一
-policy prefix。它仍不是 recovery，不修改 `+0.02/0.005 rad` recovery contract。成功门继续是
-两条 lane 各5个 policy cycles 与所有安全审计计数为0。
+提前停止，并用 simulator-shadow beam 搜索最多3步的有界动作序列。beam width 固定96，
+每个 depth 最多64、总计最多192个候选进入 policy screen；除原61动作外只增加 blocked policy
+首动作和 H3 均值动作的4档反向缩放。序列每一步都必须保持原绝对 `0.15 rad` bridge floor
+和零 crossing，终点 fresh H3 allow 后还须在精确重放处确认同一 policy prefix。它仍不是
+recovery，不修改 `+0.02/0.005 rad` recovery contract。成功门继续是两条 lane 各5个 policy
+cycles 与所有安全审计计数为0。
 
 冻结产物：
 

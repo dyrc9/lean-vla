@@ -134,7 +134,9 @@ dispatch、typed recovery、outcome read 为0；即使通过，也必须在冻�
 transient gate；然而122/122 policy screens 仍 block，最好 margin 为 `−0.015518 rad`，
 且61种动作的单步终点都集中在约 `0.1545–0.1549 rad`。因此瓶颈是 H2 stop 后只剩一个
 controller-lag step，而非候选合法性。下一轮应在不改阈值的前提下使用 H3 提前制动和有界
-controller-aware bridge sequence；仍需双 lane 5-cycle 与未见 seed 复验才能形成正向证据。
+controller-aware bridge sequence。该轮已预注册为 maximum depth 3、beam width 96、最多192个
+post-H3 candidates，并只加入 blocked prefix 的8个反向缩放动作；仍需双 lane 5-cycle 与未见
+seed 复验才能形成正向证据。
 
 
 论文主故事仍是两层对齐，而不是 SemanticSubtask 本身。当前最重要的科学风险集中在 L1：

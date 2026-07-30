@@ -187,6 +187,8 @@ def _search_safe_bridge(
     source_id: str,
     gate_horizon_steps: int = 1,
     bridge_floor_mode: str = "recovery_transient",
+    candidate_builder: Any | None = None,
+    blocked_prefix: np.ndarray | None = None,
 ) -> dict[str, Any]:
     library = _candidate_library(config)
     if bridge_floor_mode == "recovery_transient":
@@ -201,34 +203,78 @@ def _search_safe_bridge(
         )
     trigger_margin = float(config["episode"]["trigger_margin_rad"])
     restore_identity = True
+    builder_shadow_steps = 0
+    builder_diagnostics = None
+    if candidate_builder is None:
+        candidate_specs = tuple(
+            {
+                "candidate_id": action_id,
+                "action_ids": (action_id,),
+                "actions": (action,),
+                "policy_rank": None,
+            }
+            for action_id, action in library.items()
+        )
+    else:
+        built = candidate_builder(
+            config,
+            env=env,
+            robot=robot,
+            qidx=qidx,
+            limits=limits,
+            branch_state=branch_state,
+            snapshot=snapshot,
+            contacts=contacts,
+            blocked_prefix=blocked_prefix,
+        )
+        candidate_specs = tuple(built["candidate_specs"])
+        builder_shadow_steps = int(built["shadow_env_step_count"])
+        builder_diagnostics = built["diagnostics"]
+        restore_identity = (
+            restore_identity and bool(built["restore_identity"])
+        )
     physical_rows = []
     physical_steps = 0
-    for action_id, action in library.items():
+    for candidate_index, spec in enumerate(candidate_specs):
         restore_identity = (
             restore_identity
             and _restore_identity(env, robot, snapshot)
         )
+        action_ids = tuple(str(value) for value in spec["action_ids"])
+        actions = tuple(
+            tuple(float(value) for value in action)
+            for action in spec["actions"]
+        )
         positions, margins = _execute_actions(
             env,
-            actions=(action,),
+            actions=actions,
             qidx=qidx,
             limits=limits,
             contacts=contacts,
         )
-        physical_steps += 1
+        physical_steps += len(actions)
         margin = margins[-1]
+        minimum_margin = min(margins)
         physical_rows.append(
             {
-                "action_id": action_id,
-                "action": action,
+                "action_id": str(spec["candidate_id"]),
+                "action_ids": list(action_ids),
+                "action_count": len(actions),
+                "action": actions[0] if len(actions) == 1 else None,
+                "actions": actions,
+                "candidate_order": candidate_index,
+                "policy_rank": spec.get("policy_rank"),
                 "terminal_margin_rad": margin,
+                "minimum_margin_rad": minimum_margin,
                 "transient_safe": (
-                    margin >= bridge_floor and margin >= trigger_margin
+                    minimum_margin >= bridge_floor
+                    and minimum_margin >= trigger_margin
                 ),
                 "bridge_floor_mode": bridge_floor_mode,
                 "bridge_floor_rad": bridge_floor,
                 "bridge_safe": (
-                    margin >= bridge_floor and margin >= trigger_margin
+                    minimum_margin >= bridge_floor
+                    and minimum_margin >= trigger_margin
                 ),
                 "policy_screened": False,
                 "post_h1_verdict": None,
@@ -243,12 +289,25 @@ def _search_safe_bridge(
         restore_identity and _restore_identity(env, robot, snapshot)
     )
     eligible = [row for row in physical_rows if row["transient_safe"]]
-    eligible.sort(
-        key=lambda row: (
-            -row["terminal_margin_rad"],
-            row["action_id"],
+    if any(row["policy_rank"] is not None for row in eligible):
+        eligible.sort(
+            key=lambda row: (
+                (
+                    int(row["policy_rank"])
+                    if row["policy_rank"] is not None
+                    else len(eligible)
+                ),
+                -row["terminal_margin_rad"],
+                row["action_id"],
+            )
         )
-    )
+    else:
+        eligible.sort(
+            key=lambda row: (
+                -row["terminal_margin_rad"],
+                row["action_id"],
+            )
+        )
     inference_count = 0
     h1_shadow_steps = 0
     candidate_replay_steps = 0
@@ -259,15 +318,18 @@ def _search_safe_bridge(
             restore_identity
             and _restore_identity(env, robot, snapshot)
         )
-        action = tuple(float(value) for value in row["action"])
+        actions = tuple(
+            tuple(float(value) for value in action)
+            for action in row["actions"]
+        )
         _positions, replay_margins = _execute_actions(
             env,
-            actions=(action,),
+            actions=actions,
             qidx=qidx,
             limits=limits,
             contacts=contacts,
         )
-        candidate_replay_steps += 1
+        candidate_replay_steps += len(actions)
         endpoint_state = trusted_joint_state_from_libero(
             env,
             state_epoch=branch_state.state_epoch + 1,
@@ -344,7 +406,11 @@ def _search_safe_bridge(
         "selected": selected,
         "selected_prefix": selected_prefix,
         "candidate_evaluations": physical_rows,
+        "candidate_builder_diagnostics": builder_diagnostics,
         "restore_identity": restore_identity,
+        "candidate_builder_shadow_env_step_count": (
+            builder_shadow_steps
+        ),
         "physical_shadow_env_step_count": physical_steps,
         "candidate_replay_shadow_env_step_count": (
             candidate_replay_steps
@@ -374,6 +440,7 @@ def _run_case(
     gate_horizon_steps: int = 1,
     bridge_floor_mode: str = "recovery_transient",
     consume_bridge_authorized_prefix: bool = False,
+    bridge_candidate_builder: Any | None = None,
     lane_base_seeds: tuple[int, ...] = LANE_BASE_SEEDS,
     row_schema: str = ROW_SCHEMA,
     source_version: str = "v12.11",
@@ -722,11 +789,17 @@ def _run_case(
                             ),
                             gate_horizon_steps=gate_horizon_steps,
                             bridge_floor_mode=bridge_floor_mode,
+                            candidate_builder=bridge_candidate_builder,
+                            blocked_prefix=prefix,
                         )
                         inference_count += bridge[
                             "policy_inference_count"
                         ]
                         bridge_candidate_shadow_steps += (
+                            bridge[
+                                "candidate_builder_shadow_env_step_count"
+                            ]
+                            +
                             bridge[
                                 "physical_shadow_env_step_count"
                             ]
@@ -751,11 +824,24 @@ def _run_case(
                                 if selected_bridge is not None
                                 else None
                             ),
+                            "candidate_builder_diagnostics": bridge[
+                                "candidate_builder_diagnostics"
+                            ],
                             "candidate_evaluations": bridge[
                                 "candidate_evaluations"
                             ],
                             "selected_action_id": (
                                 selected_bridge["action_id"]
+                                if selected_bridge is not None
+                                else None
+                            ),
+                            "selected_action_ids": (
+                                selected_bridge["action_ids"]
+                                if selected_bridge is not None
+                                else None
+                            ),
+                            "selected_action_count": (
+                                selected_bridge["action_count"]
                                 if selected_bridge is not None
                                 else None
                             ),
@@ -783,20 +869,24 @@ def _run_case(
                                     one_step_screen["snapshot"],
                                 )
                             )
-                            bridge_action = tuple(
-                                float(value)
-                                for value in selected_bridge["action"]
+                            bridge_actions = tuple(
+                                tuple(
+                                    float(value) for value in action
+                                )
+                                for action in selected_bridge["actions"]
                             )
                             _bridge_positions, bridge_margins = (
                                 _execute_actions(
                                     env,
-                                    actions=(bridge_action,),
+                                    actions=bridge_actions,
                                     qidx=qidx,
                                     limits=limits,
                                     contacts=contacts,
                                 )
                             )
-                            bridge_execution_shadow_steps += 1
+                            bridge_execution_shadow_steps += len(
+                                bridge_actions
+                            )
                             if (
                                 min(bridge_margins)
                                 < float(
@@ -819,6 +909,9 @@ def _run_case(
                             bridge_row[
                                 "execution_terminal_margin_rad"
                             ] = bridge_margins[-1]
+                            bridge_row[
+                                "execution_minimum_margin_rad"
+                            ] = min(bridge_margins)
                             branch_state = (
                                 trusted_joint_state_from_libero(
                                     env,

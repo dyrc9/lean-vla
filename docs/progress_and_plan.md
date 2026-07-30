@@ -110,9 +110,11 @@ dispatch、typed recovery 和 outcome read 仍为0。单步终点约集中在 `0
 表明当前 controller response 有明显时滞：到 H2 stop 后才发一个 bridge 已不足以改变下一段策略风险。
 
 下一 successor 不改任何 safety threshold，改为 H3 提前触发、H1 执行，并在较高余量状态搜索
-bounded controller-aware bridge sequence。序列每个中间状态仍须 `margin >= 0.15 rad` 且零
-crossing；终点必须 fresh H3 allow，精确重放后再确认同一 prefix，才允许推进一个 policy action。
-搜索深度、beam width、候选排序与双-lane 5-cycle 成功门均在运行前固定。
+bounded controller-aware bridge sequence。搜索固定 maximum depth=3、beam width=96，每个
+depth 最多送64个候选、总计最多192个进入 policy screen；动作库为原61个缩放原语，加上 blocked
+prefix 首动作与 H3 均值动作的反向 `0.25/0.50/0.75/1.00` 缩放。序列每个中间状态仍须
+`margin >= 0.15 rad` 且零 crossing；终点必须 fresh H3 allow，精确重放后再确认同一 prefix，
+才允许推进一个 policy action。双-lane 5-cycle 成功门不变。
 
 ## 前一 checkpoint：2026-07-30 v12.5 integrated predictive recovery
 
