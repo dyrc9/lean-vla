@@ -220,6 +220,8 @@ v12.29 独立 runner 已通过22个相关定向测试；实验结果尚未生成
 因此 contact-aware control有局部效果，剩余缺口是选择规则未维护下一步viability；后继增加
 第二个source-policy action上的vertex successor存在性门，不消费该预测动作。
 
+v12.30 两步viability runner 已通过23个相关定向测试；双 lane 结果尚未生成。
+
 
 论文主故事仍是两层对齐，而不是 SemanticSubtask 本身。当前最重要的科学风险集中在 L1：
 

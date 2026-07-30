@@ -281,6 +281,9 @@ exact action枚举同一64-vertex successor set。首步只有在至少一个 su
 才 eligible；排序先最大 safe-successor count，再最大首步 target/global margin与稳定ID。
 执行后仍fresh inference/H3，successor只作保守viability证据、不被实际消费。
 
+v12.30 runner 已实现，successor配置/作用域/torque bounds与margin单独审计，23个相关定向测试
+通过。该搜索量约为每个fallback `64×64` successor branches，正式运行预计明显慢于前版。
+
 ## 前一 checkpoint：2026-07-30 v12.5 integrated predictive recovery
 
 fresh policy-prefix shadow 与 typed recovery runtime 的 fixed-trace composition 已完成并终态冻结：

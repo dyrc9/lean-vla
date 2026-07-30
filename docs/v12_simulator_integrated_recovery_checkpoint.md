@@ -435,6 +435,8 @@ v12.29 结果为3/5：两 lane均安全执行 vertex25→vertex9，最低margin�
 v12.30 在每个首步候选endpoint上，以同一policy chunk的第二个exact action做64-vertex successor
 screen；只授权safe successor count>0的首步，并按该count优先排序，实际仍只执行首步并fresh H3。
 
+v12.30 已实现独立 successor ledger fields与计数，23个相关定向测试通过；正式双 lane 待跑。
+
 冻结产物：
 
 - protocol：`experiments/proofalign_simulator_integrated_predictive_recovery_v12_qualification_protocol.json`

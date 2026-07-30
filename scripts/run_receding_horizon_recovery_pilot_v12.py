@@ -1460,6 +1460,7 @@ def _run_case(
     controller_contact_aware_vertex_target_joint_index: int = 1,
     controller_contact_aware_vertex_target_joint_side: str = "upper",
     contact_aware_vertex_require_terminal_non_toward_velocity: bool = True,
+    contact_aware_vertex_require_safe_successor: bool = False,
     lane_base_seeds: tuple[int, ...] = LANE_BASE_SEEDS,
     row_schema: str = ROW_SCHEMA,
     source_version: str = "v12.11",
@@ -1571,6 +1572,10 @@ def _run_case(
         not in {"lower", "upper"}
         or not isinstance(
             contact_aware_vertex_require_terminal_non_toward_velocity,
+            bool,
+        )
+        or not isinstance(
+            contact_aware_vertex_require_safe_successor,
             bool,
         )
         or controller_nullspace_target_joint_side
@@ -1694,6 +1699,7 @@ def _run_case(
         coupled_inverse_mass_brake_controller_configuration_count = 0
         contact_aware_vertex_exact_h1_shadow_steps = 0
         contact_aware_vertex_controller_configuration_count = 0
+        contact_aware_vertex_successor_shadow_steps = 0
         policy_advance_steps = 0
         for lane_index, base_seed in enumerate(lane_base_seeds):
             restore_identity = (
@@ -2866,6 +2872,14 @@ def _run_case(
                         exact_action = tuple(
                             float(value) for value in prefix[0]
                         )
+                        successor_exact_action = (
+                            tuple(
+                                float(value)
+                                for value in prefix[1]
+                            )
+                            if contact_aware_vertex_require_safe_successor
+                            else None
+                        )
                         candidate_rows = []
                         fallback_floor = float(
                             config["recovery"]["safe_margin_rad"]
@@ -2989,7 +3003,7 @@ def _run_case(
                                     "terminal_non_toward_velocity_required": (
                                         contact_aware_vertex_require_terminal_non_toward_velocity
                                     ),
-                                    "safe": (
+                                    "one_step_safe": (
                                         min(vertex_margins)
                                         >= fallback_floor
                                         and min(vertex_margins) >= 0
@@ -3005,8 +3019,191 @@ def _run_case(
                                             for sample in torque_audit
                                         )
                                     ),
+                                    "safe_successor_required": (
+                                        contact_aware_vertex_require_safe_successor
+                                    ),
+                                    "successor_exact_action": (
+                                        successor_exact_action
+                                    ),
+                                    "successor_evaluations": [],
+                                    "safe_successor_count": None,
+                                    "successor_restore_identity": None,
+                                    "safe": False,
                                     "selected": False,
                                 }
+                            )
+                            candidate_row = candidate_rows[-1]
+                            if (
+                                candidate_row["one_step_safe"]
+                                and contact_aware_vertex_require_safe_successor
+                            ):
+                                endpoint_snapshot = (
+                                    base.capture_warmstart_policy_shadow_snapshot(
+                                        env,
+                                        robot,
+                                        source_id=(
+                                            f"{source_version}:{TARGET_ID}:"
+                                            f"lane{lane_index}:"
+                                            f"cycle{cycle_index}:"
+                                            f"round{recovery_round}:"
+                                            f"vertex{vertex_id}:endpoint"
+                                        ),
+                                    )
+                                )
+                                successor_rows = []
+                                successor_restore_identity = True
+                                for successor_vertex_id in (
+                                    controller_contact_aware_vertex_exact_h1_ids
+                                ):
+                                    successor_restore_identity = (
+                                        successor_restore_identity
+                                        and _restore_identity(
+                                            env,
+                                            robot,
+                                            endpoint_snapshot,
+                                        )
+                                    )
+                                    successor_configuration = (
+                                        _configure_contact_aware_actuator_vertex(
+                                            env=env,
+                                            robot=robot,
+                                            qidx=qidx,
+                                            vidx=vidx,
+                                            target_joint_index=target_joint,
+                                            target_joint_side=target_side,
+                                            vertex_id=(
+                                                successor_vertex_id
+                                            ),
+                                        )
+                                    )
+                                    contact_aware_vertex_controller_configuration_count += (
+                                        1
+                                    )
+                                    with _scoped_contact_aware_actuator_vertex(
+                                        robot,
+                                        target_joint_index=target_joint,
+                                        target_joint_side=target_side,
+                                        vertex_id=successor_vertex_id,
+                                    ) as successor_torque_audit:
+                                        (
+                                            _successor_positions,
+                                            successor_margins,
+                                        ) = _execute_actions(
+                                            env,
+                                            actions=(
+                                                successor_exact_action,
+                                            ),
+                                            qidx=qidx,
+                                            limits=limits,
+                                            contacts=contacts,
+                                        )
+                                    contact_aware_vertex_successor_shadow_steps += (
+                                        1
+                                    )
+                                    successor_terminal_velocity = float(
+                                        env.sim.data.qvel[
+                                            vidx[target_joint]
+                                        ]
+                                    )
+                                    successor_safe = bool(
+                                        successor_configuration[
+                                            "configuration_qpos_identity"
+                                        ]
+                                        and successor_configuration[
+                                            "configuration_qvel_identity"
+                                        ]
+                                        and (
+                                            "run_controller"
+                                            not in robot.controller.__dict__
+                                        )
+                                        and min(successor_margins)
+                                        >= fallback_floor
+                                        and min(successor_margins) >= 0
+                                        and all(
+                                            not sample[
+                                                "torque_bound_violation"
+                                            ]
+                                            for sample in (
+                                                successor_torque_audit
+                                            )
+                                        )
+                                    )
+                                    successor_rows.append(
+                                        {
+                                            "vertex_id": (
+                                                successor_vertex_id
+                                            ),
+                                            "configuration": (
+                                                successor_configuration
+                                            ),
+                                            "controller_scope_restored": (
+                                                "run_controller"
+                                                not in robot.controller.__dict__
+                                            ),
+                                            "controller_substep_count": len(
+                                                successor_torque_audit
+                                            ),
+                                            "torque_bound_violation_count": sum(
+                                                sample[
+                                                    "torque_bound_violation"
+                                                ]
+                                                for sample in (
+                                                    successor_torque_audit
+                                                )
+                                            ),
+                                            "minimum_margin_rad": min(
+                                                successor_margins
+                                            ),
+                                            "terminal_margin_rad": (
+                                                successor_margins[-1]
+                                            ),
+                                            "terminal_target_joint_velocity_rad_s": (
+                                                successor_terminal_velocity
+                                            ),
+                                            "safe": successor_safe,
+                                        }
+                                    )
+                                successor_restore_identity = (
+                                    successor_restore_identity
+                                    and _restore_identity(
+                                        env,
+                                        robot,
+                                        endpoint_snapshot,
+                                    )
+                                )
+                                restore_identity = (
+                                    restore_identity
+                                    and successor_restore_identity
+                                )
+                                candidate_row[
+                                    "successor_evaluations"
+                                ] = successor_rows
+                                candidate_row[
+                                    "safe_successor_count"
+                                ] = sum(
+                                    row["safe"]
+                                    for row in successor_rows
+                                )
+                                candidate_row[
+                                    "successor_restore_identity"
+                                ] = successor_restore_identity
+                            elif candidate_row["one_step_safe"]:
+                                candidate_row[
+                                    "safe_successor_count"
+                                ] = None
+                            else:
+                                candidate_row[
+                                    "safe_successor_count"
+                                ] = 0
+                            candidate_row["safe"] = bool(
+                                candidate_row["one_step_safe"]
+                                and (
+                                    not contact_aware_vertex_require_safe_successor
+                                    or candidate_row[
+                                        "safe_successor_count"
+                                    ]
+                                    > 0
+                                )
                             )
                         restore_identity = (
                             restore_identity
@@ -3023,6 +3220,12 @@ def _run_case(
                         ]
                         safe_candidates.sort(
                             key=lambda candidate: (
+                                -(
+                                    candidate[
+                                        "safe_successor_count"
+                                    ]
+                                    or 0
+                                ),
                                 -candidate[
                                     "predicted_terminal_target_joint_margin_rad"
                                 ],
@@ -3053,6 +3256,12 @@ def _run_case(
                             "minimum_margin_floor_rad": fallback_floor,
                             "terminal_non_toward_velocity_required": (
                                 contact_aware_vertex_require_terminal_non_toward_velocity
+                            ),
+                            "safe_successor_required": (
+                                contact_aware_vertex_require_safe_successor
+                            ),
+                            "successor_exact_action": (
+                                successor_exact_action
                             ),
                             "candidate_evaluations": candidate_rows,
                             "selected_vertex_id": (
@@ -4986,6 +5195,9 @@ def _run_case(
             "contact_aware_vertex_require_terminal_non_toward_velocity": (
                 contact_aware_vertex_require_terminal_non_toward_velocity
             ),
+            "contact_aware_vertex_require_safe_successor": (
+                contact_aware_vertex_require_safe_successor
+            ),
             "lane_base_seeds": list(lane_base_seeds),
             "recovery_round_seed_stride": (
                 recovery_round_seed_stride
@@ -5071,6 +5283,9 @@ def _run_case(
             ),
             "contact_aware_vertex_controller_configuration_count": (
                 contact_aware_vertex_controller_configuration_count
+            ),
+            "contact_aware_vertex_successor_shadow_env_step_count": (
+                contact_aware_vertex_successor_shadow_steps
             ),
             "full_prefix_shadow_env_step_count": (
                 full_prefix_shadow_steps
