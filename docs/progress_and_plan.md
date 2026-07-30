@@ -199,6 +199,18 @@ damping、clipped torque 与 joint velocity；候选预测和实际 advance 使�
 action 后验证实例级 override 已移除。13个 receding/H2/H3 定向测试通过，下一步在 clean-tree
 preflight 后执行冻结双 lane 实验。
 
+v12.24 双 lane 已完成但仍为3/5 non-pass。36/36 candidate configurations 保持 qpos/qvel
+identity，4/4授权执行保持 exact action identity，prediction/execution error 0，wrapper
+scope restore 40/40，且 warning/contact/outcome 均为0。失败点揭示了更严格的动力学原因：
+第4 cycle 开始时 joint 1 已有约 `+5.47 rad/s` 速度，名义 torque 约 `−583` 至 `−515`，
+所有 gain 在25/25 controller substeps 都裁剪为 actuator lower limit `−80`，终点仍 crossing。
+
+因此增大 damping gain 不再是有效后继。v12.25 改为提前介入的 one-sided joint-limit velocity
+envelope：在 margin 接近0.15 floor 时限制朝 upper limit 的允许正速度；一旦实测 qvel 超过
+envelope，joint 1 使用最大可用负 torque，其余 joints 与 source-policy action bytes 不变。
+候选只改变冻结的 envelope slope，仍按最小干预、one-step floor、fresh H3 与完整 scope audit
+选择，目标是避免上一动作把不可制动的高速状态带入下一 cycle。
+
 ## 前一 checkpoint：2026-07-30 v12.5 integrated predictive recovery
 
 fresh policy-prefix shadow 与 typed recovery runtime 的 fixed-trace composition 已完成并终态冻结：

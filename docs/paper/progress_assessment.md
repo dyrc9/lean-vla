@@ -182,6 +182,11 @@ action、裁剪 actuator limits、保持配置前 qpos/qvel identity，并继续
 每个控制子步显式记录 damping direction 与 torque clipping，实验结果尚未生成，因此这一实现
 目前仍只是待验证方法，不进入论文效果结论。
 
+冻结实验结果仍为双 lane 3/5。其价值是排除了“增益不够”：第4 cycle 开始 qvel 已约
+`+5.47 rad/s`，此后25/25 substeps 的 torque 对所有 gain 都饱和在 `−80`，仍发生 crossing。
+因此论文方法若要恢复活性，必须表述为提前保持可制动性的 joint-limit velocity envelope，而不是
+事后阻尼。后继仍保持 exact source action bytes，但在进入不可制动状态前约束 joint-1 正速度。
+
 
 论文主故事仍是两层对齐，而不是 SemanticSubtask 本身。当前最重要的科学风险集中在 L1：
 

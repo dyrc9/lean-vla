@@ -376,6 +376,16 @@ v12.24 实现已增加逐 controller-substep torque audit、候选/执行 qpos-q
 identity、预测/执行 margin error 与 wrapper scope restore 字段；13个相关定向测试通过。协议在
 执行前冻结，双 lane 结果仍待 clean-tree 实验，不提前报告成功。
 
+v12.24 结果为双 lane 3/5 non-pass，但审计全部成立：36/36 configuration identity、4/4 exact
+action identity、prediction/execution error 0、40/40 scope restore，且无 warning、contact
+saturation 或 outcome read。第4 cycle 的关键事实是 qvel 已约 `+5.47 rad/s`；名义制动力矩绝对值
+超过500，所有 gain 的 joint-1 applied torque 在25/25 substeps 都饱和到 `−80`，仍无法在单步内
+停车。因此后继必须在前一动作提前限制 toward-limit velocity。
+
+下一冻结 successor 是 one-sided joint-limit velocity envelope：用距0.15 floor的剩余 margin
+定义允许正速度，超过 envelope 时把 joint-1 torque 置为 actuator minimum；只搜索冻结 slope，
+按最小干预且 one-step safe 选择，并继续执行完全相同的 policy action bytes。
+
 冻结产物：
 
 - protocol：`experiments/proofalign_simulator_integrated_predictive_recovery_v12_qualification_protocol.json`
@@ -402,3 +412,4 @@ identity、预测/执行 margin error 与 wrapper scope restore 字段；13个�
 - H3 two-step backup exact H1：`results/proofalign_h3_two_step_backup_exact_h1_pilot_v12_20260730/`
 - H3 nullspace exact H1 terminal serialization failure：`results/proofalign_h3_nullspace_exact_h1_pilot_v12_20260730/`
 - H3 nullspace exact H1 replayfix：`results/proofalign_h3_nullspace_exact_h1_replayfix_v12_20260730/`
+- H3 scoped joint damping exact H1：`results/proofalign_h3_joint_damping_exact_h1_pilot_v12_20260730/`
