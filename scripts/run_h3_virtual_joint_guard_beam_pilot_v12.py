@@ -300,10 +300,12 @@ def _preflight(
     *,
     policy_gpu: int,
     egl_gpu: int,
+    output_root: Path = OUTPUT_ROOT,
+    clean_worktree_label: str = "virtual joint-guard pilot",
 ) -> dict[str, Any]:
     payload = base.fresh._preflight(
         config,
-        output_root=OUTPUT_ROOT,
+        output_root=output_root,
         policy_gpu=policy_gpu,
         egl_gpu=egl_gpu,
         formal=False,
@@ -311,39 +313,59 @@ def _preflight(
     status = base._git_status()
     if status:
         payload["blockers"].append(
-            "virtual joint-guard pilot requires a clean worktree"
+            f"{clean_worktree_label} requires a clean worktree"
         )
         payload["ready"] = False
         payload["worktree_status"] = status.splitlines()
     return payload
 
 
-def _run(*, policy_gpu: int, egl_gpu: int) -> dict[str, Any]:
-    config = pilot_config()
+def _run(
+    *,
+    policy_gpu: int,
+    egl_gpu: int,
+    config_builder: Any = pilot_config,
+    summarize: Any = _summarize,
+    output_root: Path = OUTPUT_ROOT,
+    row_schema: str = ROW_SCHEMA,
+    summary_schema: str = SUMMARY_SCHEMA,
+    source_version: str = "v12.35",
+    running_status: str = (
+        "running_no_outcome_h3_virtual_joint_guard_beam"
+    ),
+    error_type: type[RuntimeError] = (
+        H3VirtualJointGuardBeamPilotError
+    ),
+) -> dict[str, Any]:
+    config = config_builder()
     preflight = _preflight(
-        config, policy_gpu=policy_gpu, egl_gpu=egl_gpu
+        config,
+        policy_gpu=policy_gpu,
+        egl_gpu=egl_gpu,
+        output_root=output_root,
+        clean_worktree_label=running_status,
     )
     if not preflight["ready"]:
-        raise H3VirtualJointGuardBeamPilotError(
+        raise error_type(
             f"pilot preflight failed: {preflight['blockers']}"
         )
     device = base.fresh._configure_gpu(policy_gpu, egl_gpu)
-    OUTPUT_ROOT.mkdir(parents=True)
+    output_root.mkdir(parents=True)
     runtime_config = base.policy_loader.ensure_libero_runtime_config(
-        OUTPUT_ROOT
+        output_root
     )
     os.environ["LIBERO_CONFIG_PATH"] = runtime_config["directory"]
     args = base.fresh._args(
         config,
-        output_root=OUTPUT_ROOT,
+        output_root=output_root,
         render_gpu_device_id=int(
             device["selected_egl_device_ordinal"]
         ),
     )
-    manifest_path = OUTPUT_ROOT / "run_manifest.json"
-    ledger_path = OUTPUT_ROOT / "qualification_ledger.jsonl"
+    manifest_path = output_root / "run_manifest.json"
+    ledger_path = output_root / "qualification_ledger.jsonl"
     manifest = {
-        "schema": SUMMARY_SCHEMA + ".run-manifest",
+        "schema": summary_schema + ".run-manifest",
         "status": "loading_policy",
         "created_at": saber_io.utc_now(),
         "policy_gpu": policy_gpu,
@@ -363,9 +385,7 @@ def _run(*, policy_gpu: int, egl_gpu: int) -> dict[str, Any]:
         previous_warning_callback = mujoco.get_mju_user_warning()
         warning_audit = base.MujocoWarningAudit()
         mujoco.set_mju_user_warning(warning_audit)
-        manifest["status"] = (
-            "running_no_outcome_h3_virtual_joint_guard_beam"
-        )
+        manifest["status"] = running_status
         saber_io.atomic_json(manifest_path, manifest)
         try:
             row = _run_case(
@@ -402,26 +422,26 @@ def _run(*, policy_gpu: int, egl_gpu: int) -> dict[str, Any]:
                     RETENTION_STRATEGY
                 ),
                 lane_base_seeds=LANE_BASE_SEEDS,
-                row_schema=ROW_SCHEMA,
-                source_version="v12.35",
+                row_schema=row_schema,
+                source_version=source_version,
             )
             saber_io.append_ledger(ledger_path, row)
         finally:
             mujoco.set_mju_user_warning(previous_warning_callback)
-        summary = _summarize([row])
-        saber_io.atomic_json(OUTPUT_ROOT / "summary.json", summary)
+        summary = summarize([row])
+        saber_io.atomic_json(output_root / "summary.json", summary)
         manifest["status"] = "complete"
         manifest["classification"] = summary["classification"]
         manifest["completed_at"] = saber_io.utc_now()
         saber_io.atomic_json(manifest_path, manifest)
-        base.policy_loader.write_checksums(OUTPUT_ROOT)
+        base.policy_loader.write_checksums(output_root)
         return summary
     except BaseException as exc:
         manifest["status"] = "terminal_failed_closed"
         manifest["error"] = f"{type(exc).__name__}: {exc}"
         manifest["completed_at"] = saber_io.utc_now()
         saber_io.atomic_json(manifest_path, manifest)
-        base.policy_loader.write_checksums(OUTPUT_ROOT)
+        base.policy_loader.write_checksums(output_root)
         raise
 
 

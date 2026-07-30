@@ -506,6 +506,9 @@ v12.36授权的唯一变化是审计replayfix：记录raw与按原actuator limit
 torque，bound gate作用于后者但返回raw保持真实robot控制链；并在扩展前冻结parent count。所有
 guard和实验参数逐值复用v12.35。
 
+replay runner已实现，相关31个定向测试通过；通用runner的默认v12.35入口与历史结果重算保持
+不变。正式结果前不报告guard效果。
+
 冻结产物：
 
 - protocol：`experiments/proofalign_simulator_integrated_predictive_recovery_v12_qualification_protocol.json`

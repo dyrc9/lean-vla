@@ -380,6 +380,10 @@ v12.36只做机械replay修复：guard、seeds、actions、margins、beam与成�
 是否需要裁剪，actual bound violation只检查clipped值，且仍返回raw值让原robot路径执行唯一真实
 裁剪。depth parent/expansion count在扩展前冻结。不得借此改变任何guard效果参数。
 
+v12.36 replay runner已实现；v12.35通用执行函数仅增加默认保持原行为的显式output/schema/source
+参数，历史验证路径不变。raw/clipped返回语义、guard常量和parent count均有单测，相关31个定向
+测试通过。正式机械replay尚未生成结果。
+
 ## 前一 checkpoint：2026-07-30 v12.5 integrated predictive recovery
 
 fresh policy-prefix shadow 与 typed recovery runtime 的 fixed-trace composition 已完成并终态冻结：

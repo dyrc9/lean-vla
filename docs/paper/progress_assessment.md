@@ -264,6 +264,9 @@ exact action与原controller torque。正式结果及冻结后未见seed复验�
 为actual bound violation，guard效果尚未进入排序。v12.36仅按已核对的`SingleArm.control`
 downstream clipping语义重放同一方法，并修正depth计数时点；不得把该工程错误当成正负效果。
 
+v12.36机械replay实现与31个相关定向测试已完成，所有guard与效果门逐值不变。正式结果前论文
+结论保持不变。
+
 
 论文主故事仍是两层对齐，而不是 SemanticSubtask 本身。当前最重要的科学风险集中在 L1：
 

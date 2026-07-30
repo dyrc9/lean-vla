@@ -1737,8 +1737,12 @@ def _scoped_virtual_joint_guard(
     def guarded_run_controller(
         controller_self: Any,
     ) -> np.ndarray:
-        applied = np.asarray(
+        raw = np.asarray(
             original_run_controller(), dtype=np.float64
+        ).copy()
+        downstream_clipped = np.asarray(
+            controller_self.clip_torques(raw),
+            dtype=np.float64,
         ).copy()
         position = float(
             env.sim.data.qpos[
@@ -1771,14 +1775,20 @@ def _scoped_virtual_joint_guard(
                 "target_dof_constraint_force": float(
                     env.sim.data.qfrc_constraint[dof_address]
                 ),
-                "applied_controller_torque": applied.tolist(),
+                "raw_controller_torque": raw.tolist(),
+                "downstream_clipped_controller_torque": (
+                    downstream_clipped.tolist()
+                ),
+                "downstream_clipping_required": bool(
+                    not np.array_equal(raw, downstream_clipped)
+                ),
                 "torque_bound_violation": bool(
-                    np.any(applied < actuator_min)
-                    or np.any(applied > actuator_max)
+                    np.any(downstream_clipped < actuator_min)
+                    or np.any(downstream_clipped > actuator_max)
                 ),
             }
         )
-        return applied
+        return raw
 
     model.jnt_range[model_joint_id] = guarded_range
     env.sim.forward()
@@ -2084,6 +2094,7 @@ def _screen_contact_aware_vertex_beam(
     scope_restore_count = 0
     torque_bound_violation_count = 0
     for depth, action in enumerate(actions):
+        parent_count = len(beam)
         expansions = []
         for parent_index, parent in enumerate(beam):
             for (
@@ -2346,8 +2357,8 @@ def _screen_contact_aware_vertex_beam(
             {
                 "depth": depth + 1,
                 "action": action,
-                "parent_count": len(beam),
-                "expansion_count": len(beam) * len(modes),
+                "parent_count": parent_count,
+                "expansion_count": parent_count * len(modes),
                 "safe_expansion_count": len(expansions),
                 "retained_count": retained_count,
                 "best_trajectory_minimum_margin_rad": (

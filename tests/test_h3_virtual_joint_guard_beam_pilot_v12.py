@@ -25,6 +25,11 @@ class _FakeController:
         self.torques = np.zeros(7)
         return self.torques
 
+    def clip_torques(self, torques: np.ndarray) -> np.ndarray:
+        return np.clip(
+            torques, self.actuator_min, self.actuator_max
+        )
+
 
 class _FakeSim:
     def __init__(self) -> None:
