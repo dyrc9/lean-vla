@@ -322,6 +322,8 @@ def _run_case(
     args: Any,
     warning_audit: base.MujocoWarningAudit,
     candidate_specs: tuple[dict[str, Any], ...] | None = None,
+    candidate_spec_builder: Any | None = None,
+    candidate_rank_mode: str = "default",
     row_schema: str = ROW_SCHEMA,
     source_version: str = "v12.8",
 ) -> dict[str, Any]:
@@ -412,11 +414,38 @@ def _run_case(
         candidates: dict[str, RecoveryCandidate] = {}
         specs_by_id = {}
         generation_step_count = 0
-        frozen_specs = (
-            candidate_specs
-            if candidate_specs is not None
-            else composite_specs(config)
-        )
+        generator_search_step_count = 0
+        generator_diagnostics = None
+        if candidate_specs is not None and candidate_spec_builder is not None:
+            raise TwoStagePilotError(
+                "provide candidate specs or a builder, not both"
+            )
+        if candidate_spec_builder is not None:
+            built = candidate_spec_builder(
+                config,
+                env=env,
+                robot=robot,
+                qidx=qidx,
+                limits=limits,
+                trigger_state=trigger_state,
+                snapshot=initial_screen["snapshot"],
+                contacts=contacts,
+            )
+            frozen_specs = tuple(built["candidate_specs"])
+            generator_search_step_count = int(
+                built["shadow_env_step_count"]
+            )
+            generator_diagnostics = built["diagnostics"]
+            branch_restore_identity = (
+                branch_restore_identity
+                and bool(built["restore_identity"])
+            )
+        else:
+            frozen_specs = (
+                candidate_specs
+                if candidate_specs is not None
+                else composite_specs(config)
+            )
         for spec in frozen_specs:
             branch_restore_identity = (
                 branch_restore_identity
@@ -447,6 +476,21 @@ def _run_case(
             evaluation = selection.evaluations[0]
             candidates[candidate.candidate_id] = candidate
             specs_by_id[candidate.candidate_id] = spec
+            target_joint = spec.get("target_joint_index")
+            target_side = spec.get("target_joint_side")
+            target_margins = None
+            if target_joint is not None:
+                target_joint = int(target_joint)
+                target_margins = tuple(
+                    (
+                        position[target_joint]
+                        - limits[target_joint, 0]
+                        if target_side == "lower"
+                        else limits[target_joint, 1]
+                        - position[target_joint]
+                    )
+                    for position in positions
+                )
             physical_rows.append(
                 {
                     "candidate_id": candidate.candidate_id,
@@ -460,10 +504,23 @@ def _run_case(
                         "second_stage_horizon"
                     ],
                     "action_count": spec["action_count"],
+                    "action_ids": spec.get("action_ids"),
                     "eligible": evaluation.eligible,
                     "rejection_reasons": list(evaluation.reasons),
                     "minimum_recovery_margin_rad": min(margins),
                     "terminal_recovery_margin_rad": margins[-1],
+                    "target_joint_index": target_joint,
+                    "target_joint_side": target_side,
+                    "minimum_target_joint_margin_rad": (
+                        min(target_margins)
+                        if target_margins is not None
+                        else None
+                    ),
+                    "terminal_target_joint_margin_rad": (
+                        target_margins[-1]
+                        if target_margins is not None
+                        else None
+                    ),
                     "joint_limit_crossed": min(margins) < 0,
                     "replay_max_abs_qpos_error_rad": None,
                     "replay_within_tolerance": None,
@@ -473,14 +530,29 @@ def _run_case(
                 }
             )
         ranked = [row for row in physical_rows if row["eligible"]]
-        ranked.sort(
-            key=lambda row: (
-                row["action_count"],
-                -row["terminal_recovery_margin_rad"],
-                -row["minimum_recovery_margin_rad"],
-                row["candidate_id"],
+        if candidate_rank_mode == "target_joint":
+            ranked.sort(
+                key=lambda row: (
+                    -float(row["terminal_target_joint_margin_rad"]),
+                    row["action_count"],
+                    -row["terminal_recovery_margin_rad"],
+                    -row["minimum_recovery_margin_rad"],
+                    row["candidate_id"],
+                )
             )
-        )
+        elif candidate_rank_mode == "default":
+            ranked.sort(
+                key=lambda row: (
+                    row["action_count"],
+                    -row["terminal_recovery_margin_rad"],
+                    -row["minimum_recovery_margin_rad"],
+                    row["candidate_id"],
+                )
+            )
+        else:
+            raise TwoStagePilotError(
+                f"unknown candidate rank mode: {candidate_rank_mode}"
+            )
         inference_count = 1
         post_shadow_steps = 0
         replay_step_count = 0
@@ -692,6 +764,10 @@ def _run_case(
             "candidate_generation_shadow_env_step_count": (
                 generation_step_count
             ),
+            "generator_search_shadow_env_step_count": (
+                generator_search_step_count
+            ),
+            "generator_diagnostics": generator_diagnostics,
             "candidate_replay_shadow_env_step_count": (
                 replay_step_count
             ),
