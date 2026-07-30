@@ -8,7 +8,14 @@ from hashlib import sha256
 import json
 import os
 from pathlib import Path
+import sys
 from typing import Any
+
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+for root in (REPO_ROOT / "src", REPO_ROOT):
+    if str(root) not in sys.path:
+        sys.path.insert(0, str(root))
 
 
 from scripts import run_simulator_integrated_predictive_recovery_v12_pilot as base
