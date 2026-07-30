@@ -398,6 +398,9 @@ substeps 施加 `−80`，终点仍为约 `+0.305 rad/s`；因此七档在下一
 开始应用冻结 `0.25/0.50/0.75/1.00` actuator-bound fraction，授权门要求单步 margin≥0.15 且
 终点 toward-limit qvel≤0，选择最小 fraction。
 
+v12.26 已实现并通过17个相关定向测试；逐 substep audit 证明 brake 从 index0 开始、只覆盖一个
+exact action且结束后移除。正式双 lane 结果仍待 clean-tree 实验。
+
 冻结产物：
 
 - protocol：`experiments/proofalign_simulator_integrated_predictive_recovery_v12_qualification_protocol.json`

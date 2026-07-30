@@ -225,6 +225,10 @@ v12.26 改为 full-action anticipatory torque brake：被 H3 block 后，从第�
 其余 joints 与 policy action bytes不变。候选须全程 margin≥0.15 且终点 toward-limit qvel≤0，
 选择最小可行 fraction；这直接解决“等速度转正后已来不及制动”的因果缺口。
 
+v12.26 runner 与逐 substep torque audit 已实现，17个相关定向测试通过；候选/执行仍验证
+qpos-qvel configuration identity、exact action identity、scope restore以及位置/速度双重
+prediction-execution error。下一步 clean-tree 后跑冻结双 lane。
+
 ## 前一 checkpoint：2026-07-30 v12.5 integrated predictive recovery
 
 fresh policy-prefix shadow 与 typed recovery runtime 的 fixed-trace composition 已完成并终态冻结：

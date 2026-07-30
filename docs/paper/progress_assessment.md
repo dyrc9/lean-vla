@@ -194,6 +194,9 @@ v12.25 已将这一判断编码为双重 gate：单步位置 floor 与终点 vel
 18个 substeps 打满 `−80`，终点仍为 `+0.305 rad/s`，所以反应式 envelope 启动过晚。下一方法
 必须从被拦动作的第一个 substep 预制动，并以终点 toward-limit qvel≤0作为可继续性条件。
 
+v12.26 已实现四档 full-action actuator-bound fraction，并通过17个相关定向测试。该方法仍只
+是待验证 engineering pilot；在双 lane 结果和未见 seeds 复验完成前不提升论文结论。
+
 
 论文主故事仍是两层对齐，而不是 SemanticSubtask 本身。当前最重要的科学风险集中在 L1：
 
