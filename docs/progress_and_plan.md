@@ -229,6 +229,17 @@ v12.26 runner 与逐 substep torque audit 已实现，17个相关定向测试通
 qpos-qvel configuration identity、exact action identity、scope restore以及位置/速度双重
 prediction-execution error。下一步 clean-tree 后跑冻结双 lane。
 
+v12.26 结果为双 lane 1/5 non-pass，严格 gate 未授权任何 brake advance。即使从 substep0 到24
+固定 joint-1 torque=`−80`，终点 qvel 仍约 `+0.305 rad/s`，且0.25–1.00 fractions 仅产生
+约5e-4 rad/s的分离；这证明其它关节 torque/约束耦合主导了 joint-1 acceleration，单轴 actuator
+已无足够 authority。8/8配置 identity，zero warning/contact/outcome，结果可信但方法无效。
+
+v12.27 使用 coupled inverse-mass torque shield：每个 substep 从 controller mass matrix 取
+joint-1 的 inverse-dynamics row，在全部7个 arm actuator bounds 上构造使 toward-limit
+unconstrained acceleration 最小的 torque vertex，再用冻结 fractions `0.25/0.50/0.75/1.00`
+与 nominal clipped torque 插值。仍选择满足0.15 floor与终点 toward qvel≤0的最小 fraction，
+保持 source action bytes、one-action scope与 fresh H3。
+
 ## 前一 checkpoint：2026-07-30 v12.5 integrated predictive recovery
 
 fresh policy-prefix shadow 与 typed recovery runtime 的 fixed-trace composition 已完成并终态冻结：

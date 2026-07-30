@@ -197,6 +197,10 @@ v12.25 已将这一判断编码为双重 gate：单步位置 floor 与终点 vel
 v12.26 已实现四档 full-action actuator-bound fraction，并通过17个相关定向测试。该方法仍只
 是待验证 engineering pilot；在双 lane 结果和未见 seeds 复验完成前不提升论文结论。
 
+冻结结果降为1/5：full joint-1 `−80` 从substep0施加仍以约`+0.305 rad/s`结束，各 fraction
+差异极小。这排除了单轴反应时机问题，指向多关节/constraint coupling；下一方法应以 inverse
+mass row 做最小干预的 coupled torque shield，同时保留 exact action bytes 与双重安全 gate。
+
 
 论文主故事仍是两层对齐，而不是 SemanticSubtask 本身。当前最重要的科学风险集中在 L1：
 

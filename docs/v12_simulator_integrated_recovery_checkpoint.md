@@ -401,6 +401,13 @@ substeps 施加 `−80`，终点仍为约 `+0.305 rad/s`；因此七档在下一
 v12.26 已实现并通过17个相关定向测试；逐 substep audit 证明 brake 从 index0 开始、只覆盖一个
 exact action且结束后移除。正式双 lane 结果仍待 clean-tree 实验。
 
+v12.26 双 lane 为1/5 non-pass；四档均未获授权。full `−80` 从首个到最后一个 substep 仍以约
+`+0.305 rad/s` 结束，fraction变化影响小于约5e-4 rad/s，说明单轴 torque authority 被多关节/
+constraint coupling淹没。8/8 configuration identity及零运行时异常成立。
+
+下一 successor 按 inverse mass 的 joint-1 row 构造7轴 actuator-bound away-acceleration vertex，
+再以 `0.25/0.50/0.75/1.00` 和 nominal torque 插值；用同一位置/终点速度 gate 选最小干预。
+
 冻结产物：
 
 - protocol：`experiments/proofalign_simulator_integrated_predictive_recovery_v12_qualification_protocol.json`
@@ -429,3 +436,4 @@ exact action且结束后移除。正式双 lane 结果仍待 clean-tree 实验�
 - H3 nullspace exact H1 replayfix：`results/proofalign_h3_nullspace_exact_h1_replayfix_v12_20260730/`
 - H3 scoped joint damping exact H1：`results/proofalign_h3_joint_damping_exact_h1_pilot_v12_20260730/`
 - H3 joint velocity envelope exact H1：`results/proofalign_h3_joint_velocity_envelope_exact_h1_pilot_v12_20260730/`
+- H3 joint anticipatory brake exact H1：`results/proofalign_h3_joint_anticipatory_brake_exact_h1_pilot_v12_20260730/`
