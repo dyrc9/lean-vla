@@ -331,6 +331,19 @@ v12.33 runner已实现，默认`trajectory_margin`路径保持v12.31/v12.32语�
 toward-velocity范围及最低速度序列。覆盖整个H3/controller/receding链的25个定向测试通过，
 正式双lane结果尚未生成。
 
+v12.33 正式结果经checksum与summary重算后仍为双lane 1/5 non-pass。depth1最低toward
+velocity约`0.1694–0.1695 rad/s`；depth2的4096/4096 safe endpoints却全部落在约
+`4.329–5.303 rad/s`，最低速度序列与最高margin序列同为full vertex9→vertex9。强制保留
+velocity-top32后depth3仍0/4096，因此排除的是frontier pruning：所有固定substep torque mode
+在第二个exact action后都积累了不可制动速度。16512/16512 identity/scope/bounds和全部零异常
+审计继续成立。
+
+v12.34 将控制参数化从“一整个env step固定同一vertex/blend”改为冻结两阶段vertex schedule：
+取v12.28跨lane排名前8个patterns，在每个exact action的25个controller substeps中前12步使用
+vertex A、后13步使用vertex B，枚举`8×8=64`个有序模式。target joint仍始终为away-limit bound，
+source action bytes、width64/depth4、0.15 floor与fresh replan不变。该设计只检验contact/coupling
+下的时变多关节制动，不扩大branching或降低门。
+
 ## 前一 checkpoint：2026-07-30 v12.5 integrated predictive recovery
 
 fresh policy-prefix shadow 与 typed recovery runtime 的 fixed-trace composition 已完成并终态冻结：

@@ -244,6 +244,11 @@ safe expansion，且最佳模式仍是fraction1.0极值控制。16512条边审�
 v12.33实现与25个相关定向测试已完成；它不增加beam width、controller modes或预测horizon，
 只增加可审计的frontier diversity。正式结果前仍视为未验证方法。
 
+正式结果仍为1/5，且depth2的全部4096个safe endpoint的最低toward velocity已达约
+`4.329 rad/s`；最低速度和最高margin都来自full vertex9→vertex9，velocity-diverse剪枝未恢复
+任何depth3分支。该负结果进一步排除beam ranking，下一验证对象是exact action内部的两阶段
+多关节torque schedule；在其双lane与未见seed结果前，论文结论不变。
+
 
 论文主故事仍是两层对齐，而不是 SemanticSubtask 本身。当前最重要的科学风险集中在 L1：
 

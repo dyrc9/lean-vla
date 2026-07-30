@@ -471,6 +471,15 @@ terminal toward-velocity最小的parent，去重后从原排序补足。这样�
 全体与frontier的toward-velocity范围和最低速度序列；25个相关定向测试通过，正式运行仍须clean
 Git preflight。
 
+v12.33结果仍为1/5。depth2全部4096个safe endpoint的toward velocity范围为
+`4.329–5.303 rad/s`，最低速度节点也正是原margin最佳的full vertex9→vertex9；diverse
+frontier保留velocity-top32后depth3仍0/4096。由此固定整步torque vector和beam剪枝均被排除，
+瓶颈缩小为单个exact action内部的contact-coupled速度积累。
+
+v12.34冻结64个两阶段schedule：跨lane top8 vertices组成有序`A→B`，25个controller substeps
+按12/13切换。其余动作、门、beam、审计和成功定义全部保持不变；每步记录实际phase/vertex和
+切换位置，预测与执行必须复现同一schedule。
+
 冻结产物：
 
 - protocol：`experiments/proofalign_simulator_integrated_predictive_recovery_v12_qualification_protocol.json`
