@@ -110,6 +110,9 @@ generator 转移到闭环控制时域：需要逐 action safety/replan，而不�
 预注册5-cycle gate，仍是机制性局部改善而非 task utility 或 efficacy。第4轮再做每 lane
 8次 bounded fresh H1 replan 仍为16/16 reject，排除了单一 seed 偶然性，并把下一设计点明确为
 predictive `block_replan` 后的显式 recovery escalation。
+显式 escalation 原型确实在第4轮触发，但原13原语从约0.1546 rad 的当前 margin 出发无法找到
+满足额外0.02 rad terminal gain 的候选，selection/execution 为0/2并安全停止。这说明路由方向
+合理但动态恢复库仍不足；后续需把 joint-targeted generator 接入 escalation，而不是降门。
 
 
 论文主故事仍是两层对齐，而不是 SemanticSubtask 本身。当前最重要的科学风险集中在 L1：

@@ -66,6 +66,10 @@ predictive-escalation runner 与测试已实现：每 round 一次 H1 inference�
 recovery；每次 recovery 都重新跑原 selector、replay tolerance 和 crossing gate，之后再用
 独立 seed round 做 H1。仍为 restored shadow、zero dispatch、zero outcome。
 
+结果为 selection 0/2：两条 lane 在第4轮的状态 margin 约0.1546 rad，原13原语没有任何轨迹
+能满足相对当前状态再增益0.02 rad，故 escalation 未执行即 fail closed。下一步把
+joint-targeted beam 作为动态 escalation generator，生成后仍由原 selector 复核，不改门。
+
 ## 前一 checkpoint：2026-07-30 v12.5 integrated predictive recovery
 
 fresh policy-prefix shadow 与 typed recovery runtime 的 fixed-trace composition 已完成并终态冻结：

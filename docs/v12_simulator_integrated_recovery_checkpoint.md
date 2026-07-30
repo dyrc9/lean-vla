@@ -220,6 +220,16 @@ predictive-escalation pilot 已固定为每个 cycle/round 只做1次 fresh H1 a
 shadow replay 与预测逐点一致且不 crossing，恢复后使用 seed `+1000` 的新 round 重新做 H1
 gate。所有 recovery 与 policy advance 仍只在最终可恢复的 shadow lane 中发生。
 
+两条 lane 都在第4轮触发 escalation，当时 minimum margin 分别为 `0.15461/0.15456 rad`。
+原13个固定原语在各自130个 candidate-shadow steps 后都没有候选能同时满足相对当前状态的
+`+0.02 rad` terminal gain 与其他恢复门，因此 selection 0/2、execution 0/2，并在状态改变前
+fail closed。restore identity 为100%，active warning、dispatch、typed live recovery、
+outcome read 均为0。
+
+下一 successor 只替换 escalation candidate generator：调用已有 joint-targeted beam 从当前
+branch state 生成轨迹，再用完全相同的 recovery selector 和 replay tolerance 复核。默认库与
+beam 都无候选时仍停止；不能降低 terminal-gain gate。
+
 冻结产物：
 
 - protocol：`experiments/proofalign_simulator_integrated_predictive_recovery_v12_qualification_protocol.json`
@@ -234,3 +244,4 @@ gate。所有 recovery 与 policy advance 仍只在最终可恢复的 shadow lan
 - joint-targeted beam：`results/proofalign_joint_targeted_beam_recovery_pilot_v12_20260730/`
 - receding horizon：`results/proofalign_receding_horizon_recovery_pilot_v12_20260730/`
 - bounded H1 replan：`results/proofalign_bounded_h1_replan_recovery_pilot_v12_20260730/`
+- predictive escalation：`results/proofalign_predictive_recovery_escalation_pilot_v12_20260730/`
