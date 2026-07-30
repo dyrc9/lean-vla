@@ -249,6 +249,9 @@ v12.33实现与25个相关定向测试已完成；它不增加beam width、contr
 任何depth3分支。该负结果进一步排除beam ranking，下一验证对象是exact action内部的两阶段
 多关节torque schedule；在其双lane与未见seed结果前，论文结论不变。
 
+v12.34两阶段`8×8=64` schedule runner已实现并通过27个相关定向测试；动作、floor、beam与
+fresh-replan门均未改变。正式双lane结果前仍只是待验证controller parameterization。
+
 
 论文主故事仍是两层对齐，而不是 SemanticSubtask 本身。当前最重要的科学风险集中在 L1：
 

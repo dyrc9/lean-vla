@@ -344,6 +344,10 @@ vertex A、后13步使用vertex B，枚举`8×8=64`个有序模式。target join
 source action bytes、width64/depth4、0.15 floor与fresh replan不变。该设计只检验contact/coupling
 下的时变多关节制动，不扩大branching或降低门。
 
+v12.34 runner与预测/执行schedule复现链已实现。配置和逐substep audit明确记录`A/B`、
+phase、switch index、nominal/applied torque及bound；默认fixed/blend路径不变。覆盖相关历史链与
+新schedule契约的27个定向测试通过，正式双lane结果尚未生成。
+
 ## 前一 checkpoint：2026-07-30 v12.5 integrated predictive recovery
 
 fresh policy-prefix shadow 与 typed recovery runtime 的 fixed-trace composition 已完成并终态冻结：

@@ -1486,6 +1486,136 @@ def _scoped_contact_aware_actuator_vertex_blend(
         del controller.run_controller
 
 
+def _configure_contact_aware_actuator_vertex_schedule(
+    *,
+    env: Any,
+    robot: Any,
+    qidx: np.ndarray,
+    vidx: np.ndarray,
+    target_joint_index: int,
+    target_joint_side: str,
+    first_vertex_id: int,
+    second_vertex_id: int,
+    switch_substep_index: int,
+) -> dict[str, Any]:
+    configuration = _configure_contact_aware_actuator_vertex(
+        env=env,
+        robot=robot,
+        qidx=qidx,
+        vidx=vidx,
+        target_joint_index=target_joint_index,
+        target_joint_side=target_joint_side,
+        vertex_id=first_vertex_id,
+    )
+    controller = robot.controller
+    second_vertex = _contact_aware_actuator_vertex(
+        controller,
+        target_joint_index=target_joint_index,
+        target_joint_side=target_joint_side,
+        vertex_id=second_vertex_id,
+    )
+    configuration.update(
+        {
+            "vertex_id": first_vertex_id,
+            "schedule_vertex_ids": [
+                first_vertex_id,
+                second_vertex_id,
+            ],
+            "switch_substep_index": switch_substep_index,
+            "second_vertex_torque": second_vertex.tolist(),
+        }
+    )
+    return configuration
+
+
+@contextmanager
+def _scoped_contact_aware_actuator_vertex_schedule(
+    robot: Any,
+    *,
+    target_joint_index: int,
+    target_joint_side: str,
+    first_vertex_id: int,
+    second_vertex_id: int,
+    switch_substep_index: int,
+) -> Any:
+    controller = robot.controller
+    if (
+        "run_controller" in controller.__dict__
+        or switch_substep_index <= 0
+    ):
+        raise RecedingHorizonPilotError(
+            "invalid contact-aware actuator vertex schedule"
+        )
+    original_run_controller = controller.run_controller
+    vertices = (
+        _contact_aware_actuator_vertex(
+            controller,
+            target_joint_index=target_joint_index,
+            target_joint_side=target_joint_side,
+            vertex_id=first_vertex_id,
+        ),
+        _contact_aware_actuator_vertex(
+            controller,
+            target_joint_index=target_joint_index,
+            target_joint_side=target_joint_side,
+            vertex_id=second_vertex_id,
+        ),
+    )
+    actuator_min = np.asarray(
+        controller.actuator_min, dtype=np.float64
+    )
+    actuator_max = np.asarray(
+        controller.actuator_max, dtype=np.float64
+    )
+    torque_audit: list[dict[str, Any]] = []
+
+    def scheduled_vertex_run_controller(
+        controller_self: Any,
+    ) -> np.ndarray:
+        nominal = np.asarray(
+            original_run_controller(), dtype=np.float64
+        ).copy()
+        substep_index = len(torque_audit)
+        phase_index = int(
+            substep_index >= switch_substep_index
+        )
+        applied = vertices[phase_index].copy()
+        controller_self.torques = applied
+        joint_velocity = float(
+            np.asarray(
+                controller_self.joint_vel, dtype=np.float64
+            )[target_joint_index]
+        )
+        torque_audit.append(
+            {
+                "controller_substep_index": substep_index,
+                "schedule_phase_index": phase_index,
+                "applied_vertex_id": (
+                    first_vertex_id
+                    if phase_index == 0
+                    else second_vertex_id
+                ),
+                "switch_substep_index": switch_substep_index,
+                "joint_velocity_rad_s": joint_velocity,
+                "nominal_torque": nominal.tolist(),
+                "applied_vertex_torque": applied.tolist(),
+                "torque_bound_violation": bool(
+                    np.any(applied < actuator_min)
+                    or np.any(applied > actuator_max)
+                ),
+            }
+        )
+        return applied
+
+    controller.run_controller = MethodType(
+        scheduled_vertex_run_controller, controller
+    )
+    try:
+        yield torque_audit
+    finally:
+        del controller.run_controller
+
+
 def _retain_contact_aware_beam(
     expansions: list[dict[str, Any]],
     *,
@@ -1635,6 +1765,8 @@ def _screen_contact_aware_vertex_beam(
     actions: tuple[tuple[float, ...], ...],
     vertex_ids: tuple[int, ...],
     blend_fractions: tuple[float, ...] = (),
+    vertex_schedules: tuple[tuple[int, int], ...] = (),
+    schedule_switch_substep_index: int = 12,
     target_joint_index: int,
     target_joint_side: str,
     minimum_margin_floor_rad: float,
@@ -1652,6 +1784,18 @@ def _screen_contact_aware_vertex_beam(
             "trajectory_margin",
             "margin_velocity_diverse",
         }
+        or (blend_fractions and vertex_schedules)
+        or schedule_switch_substep_index <= 0
+        or any(
+            len(schedule) != 2
+            or any(
+                not isinstance(vertex_id, int)
+                or vertex_id < 0
+                or vertex_id >= 64
+                for vertex_id in schedule
+            )
+            for schedule in vertex_schedules
+        )
         or any(
             not np.isfinite(fraction)
             or fraction <= 0
@@ -1670,7 +1814,7 @@ def _screen_contact_aware_vertex_beam(
     )
     modes = (
         tuple(
-            (mode_id, vertex_id, float(fraction))
+            (mode_id, vertex_id, float(fraction), None)
             for mode_id, (vertex_id, fraction) in enumerate(
                 (
                     (vertex_id, fraction)
@@ -1680,9 +1824,24 @@ def _screen_contact_aware_vertex_beam(
             )
         )
         if blend_fractions
-        else tuple(
-            (vertex_id, vertex_id, None)
-            for vertex_id in vertex_ids
+        else (
+            tuple(
+                (
+                    mode_id,
+                    first_vertex_id,
+                    None,
+                    second_vertex_id,
+                )
+                for mode_id, (
+                    first_vertex_id,
+                    second_vertex_id,
+                ) in enumerate(vertex_schedules)
+            )
+            if vertex_schedules
+            else tuple(
+                (vertex_id, vertex_id, None, None)
+                for vertex_id in vertex_ids
+            )
         )
     )
     restore_identity = _restore_identity(
@@ -1705,7 +1864,12 @@ def _screen_contact_aware_vertex_beam(
     for depth, action in enumerate(actions):
         expansions = []
         for parent_index, parent in enumerate(beam):
-            for mode_id, vertex_id, blend_fraction in modes:
+            for (
+                mode_id,
+                vertex_id,
+                blend_fraction,
+                second_vertex_id,
+            ) in modes:
                 restore_identity = (
                     restore_identity
                     and _restore_identity(
@@ -1715,7 +1879,21 @@ def _screen_contact_aware_vertex_beam(
                     )
                 )
                 configuration = (
-                    _configure_contact_aware_actuator_vertex(
+                    _configure_contact_aware_actuator_vertex_schedule(
+                        env=env,
+                        robot=robot,
+                        qidx=qidx,
+                        vidx=vidx,
+                        target_joint_index=target_joint_index,
+                        target_joint_side=target_joint_side,
+                        first_vertex_id=vertex_id,
+                        second_vertex_id=second_vertex_id,
+                        switch_substep_index=(
+                            schedule_switch_substep_index
+                        ),
+                    )
+                    if second_vertex_id is not None
+                    else _configure_contact_aware_actuator_vertex(
                         env=env,
                         robot=robot,
                         qidx=qidx,
@@ -1733,7 +1911,18 @@ def _screen_contact_aware_vertex_beam(
                     configuration["configuration_qvel_identity"]
                 )
                 scope = (
-                    _scoped_contact_aware_actuator_vertex_blend(
+                    _scoped_contact_aware_actuator_vertex_schedule(
+                        robot,
+                        target_joint_index=target_joint_index,
+                        target_joint_side=target_joint_side,
+                        first_vertex_id=vertex_id,
+                        second_vertex_id=second_vertex_id,
+                        switch_substep_index=(
+                            schedule_switch_substep_index
+                        ),
+                    )
+                    if second_vertex_id is not None
+                    else _scoped_contact_aware_actuator_vertex_blend(
                         robot,
                         target_joint_index=target_joint_index,
                         target_joint_side=target_joint_side,
@@ -1815,6 +2004,16 @@ def _screen_contact_aware_vertex_beam(
                         "vertex_id": vertex_id,
                         "mode_id": mode_id,
                         "blend_fraction": blend_fraction,
+                        "schedule_vertex_ids": (
+                            [vertex_id, second_vertex_id]
+                            if second_vertex_id is not None
+                            else None
+                        ),
+                        "schedule_switch_substep_index": (
+                            schedule_switch_substep_index
+                            if second_vertex_id is not None
+                            else None
+                        ),
                         "configuration": configuration,
                         "controller_substep_torque_audit": (
                             torque_audit
@@ -1938,6 +2137,14 @@ def _screen_contact_aware_vertex_beam(
         "retention_strategy": retention_strategy,
         "mode_count": len(modes),
         "blend_fractions": list(blend_fractions),
+        "vertex_schedules": [
+            list(schedule) for schedule in vertex_schedules
+        ],
+        "schedule_switch_substep_index": (
+            schedule_switch_substep_index
+            if vertex_schedules
+            else None
+        ),
         "depth_summaries": depth_summaries,
         "selected": selected_payload,
         "restore_identity": restore_identity,
@@ -2018,6 +2225,10 @@ def _run_case(
     contact_aware_vertex_beam_blend_fractions: tuple[
         float, ...
     ] = (),
+    contact_aware_vertex_beam_vertex_schedules: tuple[
+        tuple[int, int], ...
+    ] = (),
+    contact_aware_vertex_beam_schedule_switch_substep_index: int = 12,
     contact_aware_vertex_beam_retention_strategy: str = (
         "trajectory_margin"
     ),
@@ -2160,6 +2371,28 @@ def _run_case(
                 set(contact_aware_vertex_beam_blend_fractions)
             )
         )
+        or (
+            contact_aware_vertex_beam_blend_fractions
+            and contact_aware_vertex_beam_vertex_schedules
+        )
+        or any(
+            len(schedule) != 2
+            or any(
+                not isinstance(vertex_id, int)
+                or vertex_id < 0
+                or vertex_id >= 64
+                for vertex_id in schedule
+            )
+            for schedule in (
+                contact_aware_vertex_beam_vertex_schedules
+            )
+        )
+        or len(
+            set(contact_aware_vertex_beam_vertex_schedules)
+        )
+        != len(contact_aware_vertex_beam_vertex_schedules)
+        or contact_aware_vertex_beam_schedule_switch_substep_index
+        <= 0
         or contact_aware_vertex_beam_retention_strategy
         not in {
             "trajectory_margin",
@@ -2360,6 +2593,12 @@ def _run_case(
                 selected_advance_coupled_inverse_mass_brake_fraction = None
                 selected_advance_contact_aware_vertex_id = None
                 selected_advance_contact_aware_vertex_blend_fraction = None
+                selected_advance_contact_aware_vertex_schedule_second_id = (
+                    None
+                )
+                selected_advance_contact_aware_vertex_schedule_switch_substep_index = (
+                    None
+                )
                 selected_advance_minimum_margin_floor = float(
                     config["episode"]["trigger_margin_rad"]
                 )
@@ -3517,6 +3756,12 @@ def _run_case(
                                     blend_fractions=(
                                         contact_aware_vertex_beam_blend_fractions
                                     ),
+                                    vertex_schedules=(
+                                        contact_aware_vertex_beam_vertex_schedules
+                                    ),
+                                    schedule_switch_substep_index=(
+                                        contact_aware_vertex_beam_schedule_switch_substep_index
+                                    ),
                                     target_joint_index=target_joint,
                                     target_joint_side=target_side,
                                     minimum_margin_floor_rad=(
@@ -3566,6 +3811,12 @@ def _run_case(
                                         ],
                                         "blend_fraction": first_step[
                                             "blend_fraction"
+                                        ],
+                                        "schedule_vertex_ids": first_step[
+                                            "schedule_vertex_ids"
+                                        ],
+                                        "schedule_switch_substep_index": first_step[
+                                            "schedule_switch_substep_index"
                                         ],
                                         "configuration": first_step[
                                             "configuration"
@@ -3656,6 +3907,20 @@ def _run_case(
                                     if selected_beam is not None
                                     else None
                                 ),
+                                "selected_schedule_vertex_ids": (
+                                    selected_beam["first_step"][
+                                        "schedule_vertex_ids"
+                                    ]
+                                    if selected_beam is not None
+                                    else None
+                                ),
+                                "selected_schedule_switch_substep_index": (
+                                    selected_beam["first_step"][
+                                        "schedule_switch_substep_index"
+                                    ]
+                                    if selected_beam is not None
+                                    else None
+                                ),
                                 "authorized": (
                                     selected_beam is not None
                                 ),
@@ -3687,6 +3952,18 @@ def _run_case(
                                         "blend_fraction"
                                     ]
                                 )
+                                selected_schedule = selected_beam[
+                                    "first_step"
+                                ]["schedule_vertex_ids"]
+                                if selected_schedule is not None:
+                                    selected_advance_contact_aware_vertex_schedule_second_id = (
+                                        selected_schedule[1]
+                                    )
+                                    selected_advance_contact_aware_vertex_schedule_switch_substep_index = (
+                                        selected_beam["first_step"][
+                                            "schedule_switch_substep_index"
+                                        ]
+                                    )
                                 selected_advance_minimum_margin_floor = (
                                     fallback_floor
                                 )
@@ -4952,7 +5229,28 @@ def _run_case(
                         ]
                     )
                     executed_configuration = (
-                        _configure_contact_aware_actuator_vertex(
+                        _configure_contact_aware_actuator_vertex_schedule(
+                            env=env,
+                            robot=robot,
+                            qidx=qidx,
+                            vidx=vidx,
+                            target_joint_index=target_joint,
+                            target_joint_side=target_side,
+                            first_vertex_id=(
+                                selected_advance_contact_aware_vertex_id
+                            ),
+                            second_vertex_id=(
+                                selected_advance_contact_aware_vertex_schedule_second_id
+                            ),
+                            switch_substep_index=(
+                                selected_advance_contact_aware_vertex_schedule_switch_substep_index
+                            ),
+                        )
+                        if (
+                            selected_advance_contact_aware_vertex_schedule_second_id
+                            is not None
+                        )
+                        else _configure_contact_aware_actuator_vertex(
                             env=env,
                             robot=robot,
                             qidx=qidx,
@@ -4986,7 +5284,25 @@ def _run_case(
                             "executed contact-aware vertex config changed qpos/qvel"
                         )
                     vertex_scope = (
-                        _scoped_contact_aware_actuator_vertex_blend(
+                        _scoped_contact_aware_actuator_vertex_schedule(
+                            robot,
+                            target_joint_index=target_joint,
+                            target_joint_side=target_side,
+                            first_vertex_id=(
+                                selected_advance_contact_aware_vertex_id
+                            ),
+                            second_vertex_id=(
+                                selected_advance_contact_aware_vertex_schedule_second_id
+                            ),
+                            switch_substep_index=(
+                                selected_advance_contact_aware_vertex_schedule_switch_substep_index
+                            ),
+                        )
+                        if (
+                            selected_advance_contact_aware_vertex_schedule_second_id
+                            is not None
+                        )
+                        else _scoped_contact_aware_actuator_vertex_blend(
                             robot,
                             target_joint_index=target_joint,
                             target_joint_side=target_side,
@@ -6027,6 +6343,17 @@ def _run_case(
             ),
             "contact_aware_vertex_beam_blend_fractions": list(
                 contact_aware_vertex_beam_blend_fractions
+            ),
+            "contact_aware_vertex_beam_vertex_schedules": [
+                list(schedule)
+                for schedule in (
+                    contact_aware_vertex_beam_vertex_schedules
+                )
+            ],
+            "contact_aware_vertex_beam_schedule_switch_substep_index": (
+                contact_aware_vertex_beam_schedule_switch_substep_index
+                if contact_aware_vertex_beam_vertex_schedules
+                else None
             ),
             "contact_aware_vertex_beam_retention_strategy": (
                 contact_aware_vertex_beam_retention_strategy

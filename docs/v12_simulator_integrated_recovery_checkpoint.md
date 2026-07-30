@@ -480,6 +480,10 @@ v12.34冻结64个两阶段schedule：跨lane top8 vertices组成有序`A→B`，
 按12/13切换。其余动作、门、beam、审计和成功定义全部保持不变；每步记录实际phase/vertex和
 切换位置，预测与执行必须复现同一schedule。
 
+实现已完成，历史fixed/blend默认路径保持不变；新runner的configuration与torque ledger可重算
+schedule pair、12/13 phase切换、scope restore、bounds和prediction/execution identity。27个相关
+定向测试通过，正式结果前仍不计正证据。
+
 冻结产物：
 
 - protocol：`experiments/proofalign_simulator_integrated_predictive_recovery_v12_qualification_protocol.json`
