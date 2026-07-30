@@ -528,6 +528,9 @@ config identities与6/6 range/profile restore成立，全部runtime异常计数�
 方法与参数已冻结。下一run仅替换为未见`20509/20510` seeds；若同样双lane 5/5并通过所有门，
 才形成可保留的跨seed simulator机制正证据。
 
+held-out runner已实现并独立重算新seed gate；通用执行路径的开发seed默认不变。34个相关定向
+测试通过，正式结果前不提升跨seed结论。
+
 冻结产物：
 
 - protocol：`experiments/proofalign_simulator_integrated_predictive_recovery_v12_qualification_protocol.json`

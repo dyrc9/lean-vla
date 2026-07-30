@@ -413,6 +413,11 @@ hard solref/solimp、beam/retention、H3/H1、0.15 floor、action与所有成功
 结果修改参数；held-out仍须两lane 5/5和全部identity/zero-anomaly门通过，才能称为稳定的
 simulator engineering正结果。
 
+v12.38 held-out runner已实现，通用runner仅增加默认仍为`10509/10510`的显式lane-seed参数；
+历史入口不变。held-out summary不继承known-seed success boolean，而按`20509/20510`独立重算
+5/5、margin、action/config/profile identity、完整beam与zero-anomaly门。相关34个定向测试通过，
+正式未见seed结果尚未生成。
+
 ## 前一 checkpoint：2026-07-30 v12.5 integrated predictive recovery
 
 fresh policy-prefix shadow 与 typed recovery runtime 的 fixed-trace composition 已完成并终态冻结：

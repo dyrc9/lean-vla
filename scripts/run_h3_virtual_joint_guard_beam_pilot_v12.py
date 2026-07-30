@@ -338,6 +338,7 @@ def _run(
         float, float, float, float, float
     ]
     | None = None,
+    lane_base_seeds: tuple[int, ...] = LANE_BASE_SEEDS,
     error_type: type[RuntimeError] = (
         H3VirtualJointGuardBeamPilotError
     ),
@@ -432,7 +433,7 @@ def _run(
                 contact_aware_vertex_beam_retention_strategy=(
                     RETENTION_STRATEGY
                 ),
-                lane_base_seeds=LANE_BASE_SEEDS,
+                lane_base_seeds=lane_base_seeds,
                 row_schema=row_schema,
                 source_version=source_version,
             )

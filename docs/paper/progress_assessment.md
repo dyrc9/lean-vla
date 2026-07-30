@@ -280,6 +280,9 @@ advanced margin `0.16619 rad`，6/6 guard action identity和预测/执行一致�
 constraint force约9999，不能回填actuator-only、task utility或物理安全claim。方法现冻结，
 必须在未见`20509/20510`复验后才能称为稳定simulator机制证据。
 
+v12.38未见seed runner已实现并通过34个相关定向测试；它只替换seed并独立重算全部门。正式结果前
+仍只报告known-seed正结果。
+
 
 论文主故事仍是两层对齐，而不是 SemanticSubtask 本身。当前最重要的科学风险集中在 L1：
 
