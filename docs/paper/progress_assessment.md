@@ -92,7 +92,10 @@ active MuJoCo warning、joint crossing、policy dispatch 和 outcome read 均为
 只有6/9 `allow_exact`，其余3个被预测屏幕正确地 `block_replan`，因此按冻结 gate 判 non-pass。
 结果后的统一 margin sweep 和每点8次 bounded replan 都未消除全部 outlier。这使论文多了一条
 有价值的系统负结果：state-safe recovery 不等于 next-policy-safe recovery；下一版需要
-policy-aware candidate objective，而不能降低 gate 或把 block 当作成功。
+policy-aware candidate objective，而不能降低 gate 或把 block 当作成功。结果后的 policy-aware
+branch screen 已在 shortest/all-safe-prefix 两阶段为3个 outlier 中的2个找到双-seed安全候选；
+最后一个 case 在冻结13原语×H10库的65个 safe prefixes 中仍为0，进一步把剩余缺口定位为
+recovery generator 容量，而非 margin、seed retry 或候选排序。
 
 
 论文主故事仍是两层对齐，而不是 SemanticSubtask 本身。当前最重要的科学风险集中在 L1：

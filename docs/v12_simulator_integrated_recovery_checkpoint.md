@@ -90,17 +90,39 @@ recovered state 上最多再做7次 fresh inference + shadow。三个 case 的8�
 
 这排除了“单次随机 seed 不走运”作为主要解释。
 
+### 4.3 Policy-aware recovery candidate screen
+
+后继先对13个原语各自的 shortest-safe prefix 做恢复后双-seed policy shadow：
+
+| Case | Shortest-safe candidates | 双-seed policy-safe | 选择 |
+|---|---:|---:|---|
+| `obstacle_avoidance_task14_init8` | 8 | 6 | `positive_z@h2` |
+| `human_safety_task13_init22` | 5 | 0 | — |
+| `obstacle_avoidance_human_task14_init46` | 13 | 0 | — |
+
+这证明原 selector 选择的 `positive_x@h2` 并非第一个 case 的最佳恢复终点。随后对剩余两个
+case 扩展到冻结 H=10 轨迹中的全部 recovery-safe prefixes：
+
+| Case | 全部 safe prefixes | 双-seed policy-safe | 选择 |
+|---|---:|---:|---|
+| `human_safety_task13_init22` | 29 | 8 | `negative_rx@h4` |
+| `obstacle_avoidance_human_task14_init46` | 65 | 0 | — |
+
+全部 branch restore identity 为100%，joint crossing、active warning、policy dispatch、typed live
+recovery 和 outcome read 均为0。最后一个 case 的最佳 worst post-prefix margin 仍为
+`−0.01246 rad`，说明现有13个单原语×H10库没有表达出可用恢复终点。
+
 ## 5. 结论与下一步
 
 v12.6 的正向结论是：fresh screen、typed recovery、receipt、replay protection、state binding
 和 simulator active-phase integrity 已在一条 no-outcome 链路中贯通。负向结论是：当前
 shortest-safe-prefix selector 只优化当前 joint margin，不优化恢复后 policy prefix 的预测风险。
 
-下一版不放宽 `allow_exact` gate，也不继续盲目增加 margin/replan 次数。工程方向改为
-policy-aware recovery candidate selection：对多个 state-bound recovery 分支分别做恢复后
-fresh-prefix shadow，只允许同时满足 recovery safety 与 post-policy safety 的候选进入 typed
-runtime。该设计先在三个已知 outlier 上做 result-informed pilot；任何新 formal 必须另取 fresh
-population。
+下一版不放宽 `allow_exact` gate，也不继续盲目增加 margin/replan 次数。policy-aware screen
+已在已知 outlier 上把候选可用率从0/3提高到2/3，但最后一点证明 frozen generator 容量不足。
+下一步应版本化 recovery generator，优先比较两阶段原语组合或显式 joint-space retreat；每个新候选
+仍必须同时通过 recovery safety 与 post-policy safety。generator pilot 只能复用已知 outlier 做
+result-informed 设计，任何新 formal 必须另取 fresh population。
 
 冻结产物：
 
@@ -109,4 +131,5 @@ population。
 - formal result：`results/proofalign_simulator_integrated_predictive_recovery_v12_qualification_20260730_fresh1/`
 - margin sweep：`results/proofalign_simulator_recovery_margin_sweep_v12_20260730/`
 - bounded replan：`results/proofalign_simulator_recovery_bounded_replan_pilot_v12_20260730/`
-
+- shortest policy-aware：`results/proofalign_policy_aware_recovery_candidate_pilot_v12_20260730/`
+- all-prefix policy-aware：`results/proofalign_policy_aware_recovery_all_prefix_pilot_v12_20260730/`

@@ -16,11 +16,15 @@ fresh-state authorization 接入同一条 no-outcome 链路，并完成独立 fo
 - 结果后 margin sweep 没有找到统一可用阈值：0.18/0.20/0.25/0.30 的 post allow 分别为
   1/3、2/3、2/3、2/3，0.30 的 candidate coverage 又降为2/3；
 - formal-seed bounded replan 在三个 outlier 上各尝试8个 fresh prefix，仍为0/3 authorized。
+- policy-aware branch screen 随后在 shortest-safe candidates 上解决1/3；扩展到全部 H≤10
+  recovery-safe prefixes 后再解决1/2，累计为2/3 known outliers 找到双-seed安全候选；
+- 最后一个 `obstacle_avoidance_human_task14_init46` 在65个 safe prefixes 中仍为0个可用，
+  表明冻结13原语×H10 generator 容量不足，而不是 selector 排序或单一 margin 问题。
 
 完整 formal 表格、outlier、负结果和下一版设计见
 [`v12_simulator_integrated_recovery_checkpoint.md`](v12_simulator_integrated_recovery_checkpoint.md)。
-当前只授权 policy-aware recovery candidate selection 的 no-outcome engineering pilot；不放宽 gate，
-不授权 clean/attacked/outcome rollout。
+当前下一步是版本化两阶段/关节空间 recovery generator 的 no-outcome engineering pilot；不放宽
+gate，不授权 clean/attacked/outcome rollout。
 
 ## 前一 checkpoint：2026-07-30 v12.5 integrated predictive recovery
 
