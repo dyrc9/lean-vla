@@ -493,6 +493,10 @@ v12.35另立simulator virtual joint-stop协议：仅在exact action作用域把t
 qpos/qvel配置identity、range restore、constraint activation/force、prediction/execution及所有
 既有zero-anomaly门；不能被表述为原torque shield或真实硬件安全证据。
 
+实现已完成：不允许当前qpos已越过guard的candidate进入shadow，scope前后range逐值核验并各做
+一次forward；逐controller substep保留原torque并审计guard distance、qvel、constraint force和
+actuator bounds。29个相关定向测试通过，正式结果前仍不计正证据。
+
 冻结产物：
 
 - protocol：`experiments/proofalign_simulator_integrated_predictive_recovery_v12_qualification_protocol.json`

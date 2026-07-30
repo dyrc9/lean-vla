@@ -1616,6 +1616,183 @@ def _scoped_contact_aware_actuator_vertex_schedule(
         del controller.run_controller
 
 
+def _configure_virtual_joint_guard(
+    *,
+    env: Any,
+    qidx: np.ndarray,
+    vidx: np.ndarray,
+    target_joint_index: int,
+    target_joint_side: str,
+    guard_margin_rad: float,
+) -> dict[str, Any]:
+    model = env.sim.model
+    qpos_address = int(qidx[target_joint_index])
+    joint_ids = np.flatnonzero(
+        np.asarray(model.jnt_qposadr) == qpos_address
+    )
+    if (
+        len(joint_ids) != 1
+        or not np.isfinite(guard_margin_rad)
+        or guard_margin_rad <= 0
+    ):
+        raise RecedingHorizonPilotError(
+            "invalid virtual joint guard configuration"
+        )
+    model_joint_id = int(joint_ids[0])
+    original_range = np.asarray(
+        model.jnt_range[model_joint_id], dtype=np.float64
+    ).copy()
+    guarded_range = original_range.copy()
+    if target_joint_side == "upper":
+        guarded_range[1] = (
+            original_range[1] - guard_margin_rad
+        )
+    elif target_joint_side == "lower":
+        guarded_range[0] = (
+            original_range[0] + guard_margin_rad
+        )
+    else:
+        raise RecedingHorizonPilotError(
+            "invalid virtual joint guard side"
+        )
+    before_qpos = np.asarray(
+        env.sim.data.qpos[qidx], dtype=np.float64
+    ).copy()
+    before_qvel = np.asarray(
+        env.sim.data.qvel[vidx], dtype=np.float64
+    ).copy()
+    target_position = float(before_qpos[target_joint_index])
+    inside_guard_range = bool(
+        target_position <= guarded_range[1]
+        if target_joint_side == "upper"
+        else target_position >= guarded_range[0]
+    )
+    after_qpos = np.asarray(
+        env.sim.data.qpos[qidx], dtype=np.float64
+    )
+    after_qvel = np.asarray(
+        env.sim.data.qvel[vidx], dtype=np.float64
+    )
+    return {
+        "target_joint_index": target_joint_index,
+        "target_joint_side": target_joint_side,
+        "model_joint_id": model_joint_id,
+        "qpos_address": qpos_address,
+        "dof_address": int(vidx[target_joint_index]),
+        "guard_margin_rad": float(guard_margin_rad),
+        "original_joint_range": original_range.tolist(),
+        "guarded_joint_range": guarded_range.tolist(),
+        "configuration_inside_guard_range": inside_guard_range,
+        "configuration_qpos_identity": bool(
+            np.array_equal(before_qpos, after_qpos)
+        ),
+        "configuration_qvel_identity": bool(
+            np.array_equal(before_qvel, after_qvel)
+        ),
+    }
+
+
+@contextmanager
+def _scoped_virtual_joint_guard(
+    env: Any,
+    robot: Any,
+    *,
+    configuration: dict[str, Any],
+) -> Any:
+    controller = robot.controller
+    model = env.sim.model
+    model_joint_id = int(configuration["model_joint_id"])
+    dof_address = int(configuration["dof_address"])
+    target_joint_index = int(
+        configuration["target_joint_index"]
+    )
+    target_joint_side = str(configuration["target_joint_side"])
+    original_range = np.asarray(
+        configuration["original_joint_range"],
+        dtype=np.float64,
+    )
+    guarded_range = np.asarray(
+        configuration["guarded_joint_range"],
+        dtype=np.float64,
+    )
+    if (
+        "run_controller" in controller.__dict__
+        or not np.array_equal(
+            np.asarray(model.jnt_range[model_joint_id]),
+            original_range,
+        )
+    ):
+        raise RecedingHorizonPilotError(
+            "invalid virtual joint guard scope"
+        )
+    original_run_controller = controller.run_controller
+    actuator_min = np.asarray(
+        controller.actuator_min, dtype=np.float64
+    )
+    actuator_max = np.asarray(
+        controller.actuator_max, dtype=np.float64
+    )
+    guard_audit: list[dict[str, Any]] = []
+
+    def guarded_run_controller(
+        controller_self: Any,
+    ) -> np.ndarray:
+        applied = np.asarray(
+            original_run_controller(), dtype=np.float64
+        ).copy()
+        position = float(
+            env.sim.data.qpos[
+                int(configuration["qpos_address"])
+            ]
+        )
+        velocity = float(
+            env.sim.data.qvel[dof_address]
+        )
+        guarded_limit = float(
+            guarded_range[
+                1 if target_joint_side == "upper" else 0
+            ]
+        )
+        guard_distance = (
+            guarded_limit - position
+            if target_joint_side == "upper"
+            else position - guarded_limit
+        )
+        guard_audit.append(
+            {
+                "controller_substep_index": len(guard_audit),
+                "target_joint_index": target_joint_index,
+                "target_joint_position_rad": position,
+                "target_joint_velocity_rad_s": velocity,
+                "guard_distance_rad": guard_distance,
+                "guard_constraint_near_or_active": bool(
+                    guard_distance <= 1e-5
+                ),
+                "target_dof_constraint_force": float(
+                    env.sim.data.qfrc_constraint[dof_address]
+                ),
+                "applied_controller_torque": applied.tolist(),
+                "torque_bound_violation": bool(
+                    np.any(applied < actuator_min)
+                    or np.any(applied > actuator_max)
+                ),
+            }
+        )
+        return applied
+
+    model.jnt_range[model_joint_id] = guarded_range
+    env.sim.forward()
+    controller.run_controller = MethodType(
+        guarded_run_controller, controller
+    )
+    try:
+        yield guard_audit
+    finally:
+        del controller.run_controller
+        model.jnt_range[model_joint_id] = original_range
+        env.sim.forward()
+
+
 def _retain_contact_aware_beam(
     expansions: list[dict[str, Any]],
     *,
@@ -1767,6 +1944,7 @@ def _screen_contact_aware_vertex_beam(
     blend_fractions: tuple[float, ...] = (),
     vertex_schedules: tuple[tuple[int, int], ...] = (),
     schedule_switch_substep_index: int = 12,
+    virtual_joint_guard_margins_rad: tuple[float, ...] = (),
     target_joint_index: int,
     target_joint_side: str,
     minimum_margin_floor_rad: float,
@@ -1776,7 +1954,10 @@ def _screen_contact_aware_vertex_beam(
 ) -> dict[str, Any]:
     if (
         not actions
-        or not vertex_ids
+        or (
+            not vertex_ids
+            and not virtual_joint_guard_margins_rad
+        )
         or beam_width <= 0
         or minimum_margin_floor_rad < 0
         or retention_strategy
@@ -1784,7 +1965,15 @@ def _screen_contact_aware_vertex_beam(
             "trajectory_margin",
             "margin_velocity_diverse",
         }
-        or (blend_fractions and vertex_schedules)
+        or sum(
+            bool(modes)
+            for modes in (
+                blend_fractions,
+                vertex_schedules,
+                virtual_joint_guard_margins_rad,
+            )
+        )
+        > 1
         or schedule_switch_substep_index <= 0
         or any(
             len(schedule) != 2
@@ -1802,6 +1991,11 @@ def _screen_contact_aware_vertex_beam(
             or fraction > 1
             for fraction in blend_fractions
         )
+        or any(
+            not np.isfinite(margin)
+            or margin < minimum_margin_floor_rad
+            for margin in virtual_joint_guard_margins_rad
+        )
     ):
         raise RecedingHorizonPilotError(
             "invalid contact-aware beam configuration"
@@ -1814,7 +2008,13 @@ def _screen_contact_aware_vertex_beam(
     )
     modes = (
         tuple(
-            (mode_id, vertex_id, float(fraction), None)
+            (
+                mode_id,
+                vertex_id,
+                float(fraction),
+                None,
+                None,
+            )
             for mode_id, (vertex_id, fraction) in enumerate(
                 (
                     (vertex_id, fraction)
@@ -1831,6 +2031,7 @@ def _screen_contact_aware_vertex_beam(
                     first_vertex_id,
                     None,
                     second_vertex_id,
+                    None,
                 )
                 for mode_id, (
                     first_vertex_id,
@@ -1838,9 +2039,30 @@ def _screen_contact_aware_vertex_beam(
                 ) in enumerate(vertex_schedules)
             )
             if vertex_schedules
-            else tuple(
-                (vertex_id, vertex_id, None, None)
-                for vertex_id in vertex_ids
+            else (
+                tuple(
+                    (
+                        mode_id,
+                        None,
+                        None,
+                        None,
+                        float(guard_margin),
+                    )
+                    for mode_id, guard_margin in enumerate(
+                        virtual_joint_guard_margins_rad
+                    )
+                )
+                if virtual_joint_guard_margins_rad
+                else tuple(
+                    (
+                        vertex_id,
+                        vertex_id,
+                        None,
+                        None,
+                        None,
+                    )
+                    for vertex_id in vertex_ids
+                )
             )
         )
     )
@@ -1869,6 +2091,7 @@ def _screen_contact_aware_vertex_beam(
                 vertex_id,
                 blend_fraction,
                 second_vertex_id,
+                virtual_joint_guard_margin,
             ) in modes:
                 restore_identity = (
                     restore_identity
@@ -1879,7 +2102,18 @@ def _screen_contact_aware_vertex_beam(
                     )
                 )
                 configuration = (
-                    _configure_contact_aware_actuator_vertex_schedule(
+                    _configure_virtual_joint_guard(
+                        env=env,
+                        qidx=qidx,
+                        vidx=vidx,
+                        target_joint_index=target_joint_index,
+                        target_joint_side=target_joint_side,
+                        guard_margin_rad=(
+                            virtual_joint_guard_margin
+                        ),
+                    )
+                    if virtual_joint_guard_margin is not None
+                    else _configure_contact_aware_actuator_vertex_schedule(
                         env=env,
                         robot=robot,
                         qidx=qidx,
@@ -1903,6 +2137,13 @@ def _screen_contact_aware_vertex_beam(
                         vertex_id=vertex_id,
                     )
                 )
+                if (
+                    virtual_joint_guard_margin is not None
+                    and not configuration[
+                        "configuration_inside_guard_range"
+                    ]
+                ):
+                    continue
                 configuration_count += 1
                 qpos_identity_count += int(
                     configuration["configuration_qpos_identity"]
@@ -1911,7 +2152,13 @@ def _screen_contact_aware_vertex_beam(
                     configuration["configuration_qvel_identity"]
                 )
                 scope = (
-                    _scoped_contact_aware_actuator_vertex_schedule(
+                    _scoped_virtual_joint_guard(
+                        env,
+                        robot,
+                        configuration=configuration,
+                    )
+                    if virtual_joint_guard_margin is not None
+                    else _scoped_contact_aware_actuator_vertex_schedule(
                         robot,
                         target_joint_index=target_joint_index,
                         target_joint_side=target_joint_side,
@@ -1952,6 +2199,21 @@ def _screen_contact_aware_vertex_beam(
                 scope_restored = (
                     "run_controller"
                     not in robot.controller.__dict__
+                    and (
+                        virtual_joint_guard_margin is None
+                        or np.array_equal(
+                            np.asarray(
+                                env.sim.model.jnt_range[
+                                    configuration["model_joint_id"]
+                                ]
+                            ),
+                            np.asarray(
+                                configuration[
+                                    "original_joint_range"
+                                ]
+                            ),
+                        )
+                    )
                 )
                 scope_restore_count += int(scope_restored)
                 candidate_bound_violations = sum(
@@ -2013,6 +2275,9 @@ def _screen_contact_aware_vertex_beam(
                             schedule_switch_substep_index
                             if second_vertex_id is not None
                             else None
+                        ),
+                        "virtual_joint_guard_margin_rad": (
+                            virtual_joint_guard_margin
                         ),
                         "configuration": configuration,
                         "controller_substep_torque_audit": (
@@ -2145,6 +2410,9 @@ def _screen_contact_aware_vertex_beam(
             if vertex_schedules
             else None
         ),
+        "virtual_joint_guard_margins_rad": list(
+            virtual_joint_guard_margins_rad
+        ),
         "depth_summaries": depth_summaries,
         "selected": selected_payload,
         "restore_identity": restore_identity,
@@ -2229,6 +2497,9 @@ def _run_case(
         tuple[int, int], ...
     ] = (),
     contact_aware_vertex_beam_schedule_switch_substep_index: int = 12,
+    contact_aware_vertex_beam_virtual_joint_guard_margins_rad: tuple[
+        float, ...
+    ] = (),
     contact_aware_vertex_beam_retention_strategy: str = (
         "trajectory_margin"
     ),
@@ -2375,6 +2646,15 @@ def _run_case(
             contact_aware_vertex_beam_blend_fractions
             and contact_aware_vertex_beam_vertex_schedules
         )
+        or sum(
+            bool(modes)
+            for modes in (
+                contact_aware_vertex_beam_blend_fractions,
+                contact_aware_vertex_beam_vertex_schedules,
+                contact_aware_vertex_beam_virtual_joint_guard_margins_rad,
+            )
+        )
+        > 1
         or any(
             len(schedule) != 2
             or any(
@@ -2393,6 +2673,24 @@ def _run_case(
         != len(contact_aware_vertex_beam_vertex_schedules)
         or contact_aware_vertex_beam_schedule_switch_substep_index
         <= 0
+        or any(
+            not np.isfinite(margin)
+            or margin
+            < float(config["recovery"]["safe_margin_rad"])
+            for margin in (
+                contact_aware_vertex_beam_virtual_joint_guard_margins_rad
+            )
+        )
+        or tuple(
+            contact_aware_vertex_beam_virtual_joint_guard_margins_rad
+        )
+        != tuple(
+            sorted(
+                set(
+                    contact_aware_vertex_beam_virtual_joint_guard_margins_rad
+                )
+            )
+        )
         or contact_aware_vertex_beam_retention_strategy
         not in {
             "trajectory_margin",
@@ -2599,6 +2897,7 @@ def _run_case(
                 selected_advance_contact_aware_vertex_schedule_switch_substep_index = (
                     None
                 )
+                selected_advance_virtual_joint_guard_margin_rad = None
                 selected_advance_minimum_margin_floor = float(
                     config["episode"]["trigger_margin_rad"]
                 )
@@ -3693,7 +3992,10 @@ def _run_case(
                                 fallback_floor
                             )
                             break
-                    if controller_contact_aware_vertex_exact_h1_ids:
+                    if (
+                        controller_contact_aware_vertex_exact_h1_ids
+                        or contact_aware_vertex_beam_virtual_joint_guard_margins_rad
+                    ):
                         if one_step_screen is None:
                             raise RecedingHorizonPilotError(
                                 "missing failed gate for contact-aware vertex"
@@ -3762,6 +4064,9 @@ def _run_case(
                                     schedule_switch_substep_index=(
                                         contact_aware_vertex_beam_schedule_switch_substep_index
                                     ),
+                                    virtual_joint_guard_margins_rad=(
+                                        contact_aware_vertex_beam_virtual_joint_guard_margins_rad
+                                    ),
                                     target_joint_index=target_joint,
                                     target_joint_side=target_side,
                                     minimum_margin_floor_rad=(
@@ -3817,6 +4122,9 @@ def _run_case(
                                         ],
                                         "schedule_switch_substep_index": first_step[
                                             "schedule_switch_substep_index"
+                                        ],
+                                        "virtual_joint_guard_margin_rad": first_step[
+                                            "virtual_joint_guard_margin_rad"
                                         ],
                                         "configuration": first_step[
                                             "configuration"
@@ -3921,6 +4229,13 @@ def _run_case(
                                     if selected_beam is not None
                                     else None
                                 ),
+                                "selected_virtual_joint_guard_margin_rad": (
+                                    selected_beam["first_step"][
+                                        "virtual_joint_guard_margin_rad"
+                                    ]
+                                    if selected_beam is not None
+                                    else None
+                                ),
                                 "authorized": (
                                     selected_beam is not None
                                 ),
@@ -3964,6 +4279,11 @@ def _run_case(
                                             "schedule_switch_substep_index"
                                         ]
                                     )
+                                selected_advance_virtual_joint_guard_margin_rad = (
+                                    selected_beam["first_step"][
+                                        "virtual_joint_guard_margin_rad"
+                                    ]
+                                )
                                 selected_advance_minimum_margin_floor = (
                                     fallback_floor
                                 )
@@ -5215,7 +5535,11 @@ def _run_case(
                 execution_brake_state = None
                 execution_coupled_brake_state = None
                 execution_vertex_state = None
-                if selected_advance_contact_aware_vertex_id is not None:
+                if (
+                    selected_advance_contact_aware_vertex_id is not None
+                    or selected_advance_virtual_joint_guard_margin_rad
+                    is not None
+                ):
                     target_joint = (
                         controller_contact_aware_vertex_target_joint_index
                     )
@@ -5229,7 +5553,21 @@ def _run_case(
                         ]
                     )
                     executed_configuration = (
-                        _configure_contact_aware_actuator_vertex_schedule(
+                        _configure_virtual_joint_guard(
+                            env=env,
+                            qidx=qidx,
+                            vidx=vidx,
+                            target_joint_index=target_joint,
+                            target_joint_side=target_side,
+                            guard_margin_rad=(
+                                selected_advance_virtual_joint_guard_margin_rad
+                            ),
+                        )
+                        if (
+                            selected_advance_virtual_joint_guard_margin_rad
+                            is not None
+                        )
+                        else _configure_contact_aware_actuator_vertex_schedule(
                             env=env,
                             robot=robot,
                             qidx=qidx,
@@ -5279,12 +5617,28 @@ def _run_case(
                         or not executed_configuration[
                             "configuration_qvel_identity"
                         ]
+                        or (
+                            selected_advance_virtual_joint_guard_margin_rad
+                            is not None
+                            and not executed_configuration[
+                                "configuration_inside_guard_range"
+                            ]
+                        )
                     ):
                         raise RecedingHorizonPilotError(
                             "executed contact-aware vertex config changed qpos/qvel"
                         )
                     vertex_scope = (
-                        _scoped_contact_aware_actuator_vertex_schedule(
+                        _scoped_virtual_joint_guard(
+                            env,
+                            robot,
+                            configuration=executed_configuration,
+                        )
+                        if (
+                            selected_advance_virtual_joint_guard_margin_rad
+                            is not None
+                        )
+                        else _scoped_contact_aware_actuator_vertex_schedule(
                             robot,
                             target_joint_index=target_joint,
                             target_joint_side=target_side,
@@ -5332,6 +5686,27 @@ def _run_case(
                                 selected_prefix[0],
                                 dtype=np.float64,
                             )
+                        )
+                    if (
+                        selected_advance_virtual_joint_guard_margin_rad
+                        is not None
+                        and not np.array_equal(
+                            np.asarray(
+                                env.sim.model.jnt_range[
+                                    executed_configuration[
+                                        "model_joint_id"
+                                    ]
+                                ]
+                            ),
+                            np.asarray(
+                                executed_configuration[
+                                    "original_joint_range"
+                                ]
+                            ),
+                        )
+                    ):
+                        raise RecedingHorizonPilotError(
+                            "executed virtual joint guard range not restored"
                         )
                     terminal_joint_position = float(
                         env.sim.data.qpos[qidx[target_joint]]
@@ -6092,6 +6467,24 @@ def _run_case(
                     ] = (
                         "run_controller"
                         not in robot.controller.__dict__
+                        and (
+                            "model_joint_id"
+                            not in executed_configuration
+                            or np.array_equal(
+                                np.asarray(
+                                    env.sim.model.jnt_range[
+                                        executed_configuration[
+                                            "model_joint_id"
+                                        ]
+                                    ]
+                                ),
+                                np.asarray(
+                                    executed_configuration[
+                                        "original_joint_range"
+                                    ]
+                                ),
+                            )
+                        )
                     )
                     executed_vertex["exact_action_identity"] = bool(
                         np.array_equal(
@@ -6354,6 +6747,9 @@ def _run_case(
                 contact_aware_vertex_beam_schedule_switch_substep_index
                 if contact_aware_vertex_beam_vertex_schedules
                 else None
+            ),
+            "contact_aware_vertex_beam_virtual_joint_guard_margins_rad": list(
+                contact_aware_vertex_beam_virtual_joint_guard_margins_rad
             ),
             "contact_aware_vertex_beam_retention_strategy": (
                 contact_aware_vertex_beam_retention_strategy

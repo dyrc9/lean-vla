@@ -257,6 +257,9 @@ fresh-replan门均未改变。正式双lane结果前仍只是待验证controller
 virtual joint-stop机制，预注册4个大于0.15 floor的guard margins并审计constraint/range restore。
 即使得到正结果，也只能作为虚拟机械刹车的shadow机制证据，不能回填actuator-only或物理安全claim。
 
+v12.35实现和29个相关定向测试已完成；它拒绝任何起点已在临时guard之外的candidate，并保留
+exact action与原controller torque。正式结果及冻结后未见seed复验前不提升结论。
+
 
 论文主故事仍是两层对齐，而不是 SemanticSubtask 本身。当前最重要的科学风险集中在 L1：
 

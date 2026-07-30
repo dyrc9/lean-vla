@@ -362,6 +362,12 @@ shadow/actual使用同一guard，source action bytes不变。guard margins预注
 cycles。新增joint-limit constraint activation、range restore、constraint force与warning审计。
 即使通过，也只支持simulator virtual-stop机制，不支持原actuator authority、task utility或物理安全。
 
+v12.35 runner已实现。guard配置只解析target hinge joint并构造临时range，不改变qpos/qvel；
+作用域内保留原controller和exact action，逐substep记录guard distance、target qvel、generalized
+constraint force与controller torque bounds，退出时恢复原range并forward。beam只扩展当前状态
+仍位于guard内的候选，防止通过“把range直接移过当前qpos”制造冲量。相关29个定向测试通过，
+正式双lane结果尚未生成。
+
 ## 前一 checkpoint：2026-07-30 v12.5 integrated predictive recovery
 
 fresh policy-prefix shadow 与 typed recovery runtime 的 fixed-trace composition 已完成并终态冻结：
