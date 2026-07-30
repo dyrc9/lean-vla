@@ -26,6 +26,11 @@ fresh-state authorization 接入同一条 no-outcome 链路，并完成独立 fo
 当前下一步是版本化两阶段/关节空间 recovery generator 的 no-outcome engineering pilot；不放宽
 gate，不授权 clean/attacked/outcome rollout。
 
+两阶段 pilot 的实现与单测已冻结：只对最后一个 outlier 搜索4个证据驱动 parent prefix ×
+13个原动作 × H=1/2/3，共156个组合；保持原恢复阈值，并固定用 `10509/10510` 双种子
+policy gate。所有搜索动作均为 restored shadow branch。若找到候选，下一步才允许单独执行
+typed recovery，并用未参与选择的 `10511` 做 held-out post-recovery 检查。
+
 ## 前一 checkpoint：2026-07-30 v12.5 integrated predictive recovery
 
 fresh policy-prefix shadow 与 typed recovery runtime 的 fixed-trace composition 已完成并终态冻结：

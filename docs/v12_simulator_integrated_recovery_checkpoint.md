@@ -124,6 +124,21 @@ shortest-safe-prefix selector 只优化当前 joint margin，不优化恢复后 
 仍必须同时通过 recovery safety 与 post-policy safety。generator pilot 只能复用已知 outlier 做
 result-informed 设计，任何新 formal 必须另取 fresh population。
 
+### 5.1 已冻结的两阶段工程试验
+
+当前 successor 固定只处理最后一个已知 outlier
+`obstacle_avoidance_human_task14_init46`。第一阶段取上一轮 worst post-prefix margin 最接近
+放行的4个前缀：`positive_y@h5`、`hold@h5`、`positive_x@h6`、
+`negative_ry@h3`；第二阶段遍历原13个动作，每个只取 H=1/2/3，共156个组合。每个组合仍使用
+原 `0.15 rad` safe margin、`0.02 rad` terminal gain 和 `0.005 rad` 最大 transient loss，
+不修改恢复门。
+
+候选先按恢复安全性筛选，再按总步数、terminal margin、minimum margin 和 ID 做确定性排序。
+策略筛选固定使用 formal 后继 seeds `10509/10510`；任一种子出现非 `allow_exact`、
+risk disagreement 或 restore failure 即淘汰。整个搜索只做 restored shadow branch，typed live
+recovery、policy dispatch 和 outcome read 均保持0。若找到双-seed候选，必须另开一次执行试验，
+用未参与选择的 seed `10511` 做 held-out 恢复后检查；本轮结果本身不构成 qualification。
+
 冻结产物：
 
 - protocol：`experiments/proofalign_simulator_integrated_predictive_recovery_v12_qualification_protocol.json`
@@ -133,3 +148,4 @@ result-informed 设计，任何新 formal 必须另取 fresh population。
 - bounded replan：`results/proofalign_simulator_recovery_bounded_replan_pilot_v12_20260730/`
 - shortest policy-aware：`results/proofalign_policy_aware_recovery_candidate_pilot_v12_20260730/`
 - all-prefix policy-aware：`results/proofalign_policy_aware_recovery_all_prefix_pilot_v12_20260730/`
+- two-stage runner：`scripts/run_two_stage_policy_aware_recovery_pilot_v12.py`
