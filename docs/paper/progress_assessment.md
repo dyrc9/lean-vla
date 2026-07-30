@@ -37,7 +37,7 @@
 | Recoverable L2 v12.2/v12.3 | mechanism strengthened / efficacy 未测 | typed runtime 10/10；多关节210-case覆盖209，actual recovery 209/209；v12.2因full-state identity 201/210保持non-pass，v12.3 trusted-arm identity 210/210通过 |
 | Policy-prefix shadow v12.4 | fresh no-outcome mechanism pass / efficacy 未测 | fixed-prefix warm-start 后 repeat 30/30；fresh π0.5 formal 为30次 inference、risk agreement 30/30、nominal allow 15/15、synthetic recovery-required 15/15，repeat 29/30；dispatch/outcome 为0 |
 | Integrated recovery v12.5 | fixed-trace composition pass / simulator integration 未测 | 60/60 routes；exact allow 与两类 substitution boundary通过，typed recovery receipt/completion/fresh-state authorization 15/15；policy/simulator/outcome为0 |
-| Simulator-integrated recovery v12.6 | mechanism mostly pass / liveness non-pass | 18/18 valid，recovery/receipt/terminal safe 9/9；恢复后 fresh authorization 6/9，formal non-pass。margin sweep 与8-attempt bounded replan 均未关闭3个 outlier；dispatch/outcome为0 |
+| Simulator-integrated recovery v12.6 | mechanism mostly pass / liveness non-pass | 18/18 valid，recovery/receipt/terminal safe 9/9；恢复后 fresh authorization 6/9，formal non-pass。后继 policy-aware 单前缀关闭2/3 known outliers；最后一个 outlier 的156个两阶段组合中65个 recovery-safe，但 seed10509 全部 block；dispatch/outcome为0 |
 | Deployment | 未就绪 | E7 缺少7类 perception supervision；所有正向结果仍限于 privileged simulator geometry |
 
 ## 2026-07-29 终局判断
@@ -95,7 +95,10 @@ active MuJoCo warning、joint crossing、policy dispatch 和 outcome read 均为
 policy-aware candidate objective，而不能降低 gate 或把 block 当作成功。结果后的 policy-aware
 branch screen 已在 shortest/all-safe-prefix 两阶段为3个 outlier 中的2个找到双-seed安全候选；
 最后一个 case 在冻结13原语×H10库的65个 safe prefixes 中仍为0，进一步把剩余缺口定位为
-recovery generator 容量，而非 margin、seed retry 或候选排序。
+recovery generator 容量，而非 margin、seed retry 或候选排序。继续扩展的156个两阶段组合中
+65个通过原 recovery safety，但在 seed10509 下仍全部 `block_replan`；最好 post-policy
+margin 只从单前缀的 `−0.01246` 改善到 `−0.01194 rad`。这进一步排除了简单串联离散原语，
+下一步需要诊断具体 joint/direction 后再构造连续或 joint-space generator。
 
 
 论文主故事仍是两层对齐，而不是 SemanticSubtask 本身。当前最重要的科学风险集中在 L1：

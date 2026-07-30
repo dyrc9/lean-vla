@@ -126,7 +126,7 @@ result-informed 设计，任何新 formal 必须另取 fresh population。
 
 ### 5.1 已冻结的两阶段工程试验
 
-当前 successor 固定只处理最后一个已知 outlier
+该 successor 固定只处理最后一个已知 outlier
 `obstacle_avoidance_human_task14_init46`。第一阶段取上一轮 worst post-prefix margin 最接近
 放行的4个前缀：`positive_y@h5`、`hold@h5`、`positive_x@h6`、
 `negative_ry@h3`；第二阶段遍历原13个动作，每个只取 H=1/2/3，共156个组合。每个组合仍使用
@@ -139,6 +139,15 @@ risk disagreement 或 restore failure 即淘汰。整个搜索只做 restored sh
 recovery、policy dispatch 和 outcome read 均保持0。若找到双-seed候选，必须另开一次执行试验，
 用未参与选择的 seed `10511` 做 held-out 恢复后检查；本轮结果本身不构成 qualification。
 
+试验已完成并得到负结果：156个组合中65个通过原 recovery safety，91个因 joint crossing
+被拒；65个安全候选在 seed `10509` 下全部为 `block_replan`，因此均未进入第二 seed。
+最接近放行的是 `positive_y@h5+positive_z@h1`，恢复 terminal margin 为
+`0.16751 rad`，但 post-policy minimum margin 仍为 `−0.01194 rad`。相比单原语最好值
+`−0.01246 rad` 只有小幅改善，不足以改变 verdict。所有 replay error 为0，branch restore
+identity 为100%，active warning、contact saturation、typed recovery、dispatch 和 outcome read
+均为0。分类固定为
+`two_stage_policy_aware_recovery_v12_engineering_pilot_complete`，不是 qualification pass。
+
 冻结产物：
 
 - protocol：`experiments/proofalign_simulator_integrated_predictive_recovery_v12_qualification_protocol.json`
@@ -148,4 +157,4 @@ recovery、policy dispatch 和 outcome read 均保持0。若找到双-seed候选
 - bounded replan：`results/proofalign_simulator_recovery_bounded_replan_pilot_v12_20260730/`
 - shortest policy-aware：`results/proofalign_policy_aware_recovery_candidate_pilot_v12_20260730/`
 - all-prefix policy-aware：`results/proofalign_policy_aware_recovery_all_prefix_pilot_v12_20260730/`
-- two-stage runner：`scripts/run_two_stage_policy_aware_recovery_pilot_v12.py`
+- two-stage policy-aware：`results/proofalign_two_stage_policy_aware_recovery_pilot_v12_20260730/`
