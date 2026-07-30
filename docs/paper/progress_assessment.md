@@ -236,6 +236,11 @@ v12.32 smooth-mode beam已完成实现和23个相关定向测试。它只改变�
 不改变source-policy action bytes、0.15 floor、width64/depth4或fresh-replan规则；正式双lane
 结果尚未生成，因此当前论文结论仍维持negative efficacy与failure-localization边界。
 
+正式结果仍为1/5：depth2的4096个expansions全部safe，但margin-ranked width64在depth3没有
+safe expansion，且最佳模式仍是fraction1.0极值控制。16512条边审计完整且无runtime异常。
+因此当前只证明“单目标margin retention”失败，不能声称全部平滑depth2状态不可达。v12.33将用
+同一宽度做margin/terminal-velocity各半的冻结diverse frontier；在其结果前不提升论文结论。
+
 
 论文主故事仍是两层对齐，而不是 SemanticSubtask 本身。当前最重要的科学风险集中在 L1：
 

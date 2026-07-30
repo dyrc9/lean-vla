@@ -458,6 +458,15 @@ v12.32实现已完成：平滑模式严格按
 新增ledger覆盖mode ID、fraction、配置qpos/qvel identity、逐substep torque、scope/bounds及
 prediction/execution一致性。相关23个定向测试通过；正式双lane运行前仍要求clean Git preflight。
 
+v12.32正式结果经独立重算验证后仍为1/5：depth1 `64/64`、depth2 `4096/4096`均safe，但
+margin-ranked width64 frontier的depth3为`0/4096`。最佳序列仍使用fraction1.0的极值模式，
+表明平滑候选虽然存在，却被当前单目标retention剪除。全部16512条边的identity/scope/bound审计
+通过，且所有runtime安全计数为0。
+
+v12.33不扩大计算宽度或修改任何安全门；它将width64固定拆为32个trajectory-margin最优与32个
+terminal toward-velocity最小的parent，去重后从原排序补足。这样直接检验低速度depth2 endpoint
+是否保有第三步，而不把4032个被剪枝节点误判为不可达。
+
 冻结产物：
 
 - protocol：`experiments/proofalign_simulator_integrated_predictive_recovery_v12_qualification_protocol.json`
@@ -492,4 +501,4 @@ prediction/execution一致性。相关23个定向测试通过；正式双lane运
 - H3 contact-aware vertex receding-floor pilot：`results/proofalign_h3_contact_aware_vertex_receding_floor_pilot_v12_20260730/`
 - H3 contact-aware vertex two-step successor pilot：`results/proofalign_h3_contact_aware_vertex_successor_pilot_v12_20260730/`
 - H3 contact-aware full-horizon extreme-vertex beam：`results/proofalign_h3_contact_aware_vertex_beam_pilot_v12_20260730/`
-- H3 contact-aware smooth 64-mode beam（待运行）：`results/proofalign_h3_contact_aware_vertex_blend_beam_pilot_v12_20260730/`
+- H3 contact-aware smooth 64-mode beam：`results/proofalign_h3_contact_aware_vertex_blend_beam_pilot_v12_20260730/`

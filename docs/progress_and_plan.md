@@ -314,6 +314,18 @@ action bytes不变。影子选择出的vertex/fraction由实际隔离advance原�
 prediction/execution margin/qvel error均落盘。相关23个定向测试通过；双lane正式结果尚未生成，
 不提前计为正证据。
 
+v12.32 双lane正式结果为1/5 non-pass，且已通过checksum与summary重算。depth1为64/64 safe，
+depth2为4096/4096 safe，但按trajectory minimum margin保留的64个parent在depth3上仍为
+0/4096 safe；最佳mode从vertex25/fraction1.0转为连续两个vertex9/fraction1.0，说明单一margin
+排序仍把full-vertex极值路径排在最前，平滑模式未进入长期frontier。16512/16512配置的qpos/qvel/
+scope identity成立，bound/warning/contact saturation/dispatch/typed recovery/outcome read均为0。
+
+这一结果只排除了“平滑mode library + 单一margin排序”，不能排除depth2其余4032个safe endpoints
+中存在低toward-velocity后继。v12.33保持相同64 modes、width64、depth4与0.15 floor，只修改
+beam retention：固定保留32个原margin-ranked nodes与32个terminal toward-velocity最小nodes，
+去重后按原margin排序补足64。最终full-horizon选择规则、首步消费和fresh replan不变；新增
+frontier来源与速度范围审计。
+
 ## 前一 checkpoint：2026-07-30 v12.5 integrated predictive recovery
 
 fresh policy-prefix shadow 与 typed recovery runtime 的 fixed-trace composition 已完成并终态冻结：
