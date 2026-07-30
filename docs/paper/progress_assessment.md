@@ -173,6 +173,11 @@ H3；这直接针对已反复出现的 joint-1 upper limiting atom。
 JSON serialization，ledger 为空且 outcome 未读，因此不报告效果。允许的后继仅做 list 转换并在
 新目录机械重放同一冻结协议，不能借此改 offset 或 gate。
 
+机械 replay 表明 nullspace offset 本身无效：4次 exact fallback 都选择0.05 rad并复现一致，但
+第4 cycle 的0.05–0.50 rad候选全部 crossing，各档 terminal margin 几乎没有分离。这支持把干预
+从任务 nullspace 移到显式 joint-velocity damping torque；新 brake 必须作用域仅限一个 exact
+action、裁剪 actuator limits、保持配置前 qpos/qvel identity，并继续使用0.15 floor与 fresh H3。
+
 
 论文主故事仍是两层对齐，而不是 SemanticSubtask 本身。当前最重要的科学风险集中在 L1：
 

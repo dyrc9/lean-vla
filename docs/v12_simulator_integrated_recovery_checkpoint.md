@@ -362,6 +362,16 @@ controller target audit 含 NumPy array，`json.dumps` 报错。manifest 的 pre
 outcomes observed=false，空 ledger 和失败目录永久保留，不把内存中未落盘结果当证据。后继只把
 audit array 转为普通 list，在新 root 重放完全相同的 offsets、seeds、gate 与成功门。
 
+replayfix 已正常落盘但仍为3/5 non-pass：30/30 candidate configurations 保持 qpos/qvel bitwise
+identity，4次 fallback 均选0.05 rad，exact action identity 4/4、prediction/execution error 0。
+第4 cycle 的5档 offsets 全部预测 crossing，且0.05–0.50 rad的 terminal margin 基本不分离，
+表明默认 nullspace gain 经任务 Jacobian 投影后无法制动 joint 1。
+
+下一 controller 层 successor 使用 scoped direct joint-velocity damping：仅在一个 exact action
+的 controller substeps 中对 joint 1 torque 添加 `−k_d q̇_1`，gain 固定
+`2/5/10/20/40/80` 并裁剪 actuator limits，动作后立即撤销 wrapper。候选配置不得改变 qpos/qvel，
+仍执行同一 policy bytes、守0.15 floor并 fresh H3。
+
 冻结产物：
 
 - protocol：`experiments/proofalign_simulator_integrated_predictive_recovery_v12_qualification_protocol.json`
@@ -387,3 +397,4 @@ audit array 转为普通 list，在新 root 重放完全相同的 offsets、seed
 - H3 one-step backup viable exact H1：`results/proofalign_h3_backup_viable_exact_h1_pilot_v12_20260730/`
 - H3 two-step backup exact H1：`results/proofalign_h3_two_step_backup_exact_h1_pilot_v12_20260730/`
 - H3 nullspace exact H1 terminal serialization failure：`results/proofalign_h3_nullspace_exact_h1_pilot_v12_20260730/`
+- H3 nullspace exact H1 replayfix：`results/proofalign_h3_nullspace_exact_h1_replayfix_v12_20260730/`

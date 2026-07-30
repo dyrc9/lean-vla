@@ -183,6 +183,17 @@ ready，outcomes observed 为false，ledger 保持0字节；因此该目录不�
 修复严格限于把两段 controller target audit arrays 转成 JSON lists；offset、gate、seeds、
 动作与成功门全部不变，使用新 output root 做 mechanical replay。
 
+mechanical replay 已正常完成但仍为3/5 non-pass。两条 lane 共30个 offset candidates 的
+configuration qpos/qvel identity 均30/30；4次授权与执行全部选最小 `0.05 rad`，exact action
+identity 4/4、prediction/execution error 0。到第4个 policy cycle 时，即使 `0.50 rad`
+nullspace target offset 也预测 crossing；各 offset terminal margin 只相差约微弧度，说明默认
+`joint_kp=10` 的 nullspace torque 经投影后对该受约束 joint 几乎无控制权。
+
+下一版改为显式、单步、可撤销的 direct joint-velocity damping brake：H3 block 后 reset EE goal，
+在同一个 exact policy action 的 controller substeps 上给 joint 1 叠加
+`−k_d q̇_1`，候选 `k_d=2/5/10/20/40/80`，torque 仍裁剪到 actuator limits；动作结束立即移除
+wrapper。只选最小的0.15-safe gain，配置本身不得改 qpos/qvel，action bytes保持一致并 fresh H3。
+
 ## 前一 checkpoint：2026-07-30 v12.5 integrated predictive recovery
 
 fresh policy-prefix shadow 与 typed recovery runtime 的 fixed-trace composition 已完成并终态冻结：
