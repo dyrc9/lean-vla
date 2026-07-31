@@ -1,8 +1,8 @@
 # 最终实验图表与 Lean 边界
 
 本页图表由 [`../../scripts/plot_final_paper_results.py`](../../scripts/plot_final_paper_results.py)
-直接读取冻结的 v11/v12 JSON 汇总生成。v12 ledger 明确不读取 task outcome，因此不能从该实验
-推断 task success。
+直接读取冻结的 v11/v12 JSON 汇总生成；v13 终态表读取独立 checksum-bound terminal summary。
+v12 ledger 明确不读取 task outcome，因此不能从该实验推断 task success。
 
 ## 1. Lean 用在什么地方
 
@@ -69,7 +69,25 @@ force 分别约为 `9999` 和 `9985`，因此结果只支持 hard simulator virt
 
 矢量版：[PDF](figures/v12_final_engineering_validation.pdf)。
 
-## 4. v11 containment–utility tradeoff
+## 4. v13 task-outcome 与 attacked terminal
+
+| Condition | VLA | Execution | Semantic | Dual | Trigger / intervention / deadlock |
+|---|---:|---:|---:|---:|---:|
+| Clean task success | 36/45 | 36/45 | 32/45 | 31/45 | 1 / 0 / 1 |
+| Attacked task success | 35/45 | 35/45 | 28/45 | 28/45 | 2 / 1 / 1 |
+| Attacked official unsafe | 1/45 | 1/45 | 0/45 | 1/45 | — |
+| Attacked joint-limit steps | 528 | 489 | 614 | 385 | — |
+
+clean两个`−20pp` paired non-inferiority gate通过。attacked中Execution−VLA与Dual−Semantic的
+success差都为0，但Dual unsafe nonincrease失败。唯一active intervention把未防护预测margin
+`0.136171`保持到实际`0.159981 rad`，下一步无安全candidate而停止。L2 arms仍有874个全机械臂
+joint-limit steps且与joint-1-upper trigger重合为0，因此该表支持data completeness和target-joint
+mechanism，不支持总体efficacy或whole-robot safety。
+
+终态来源：
+[`../../experiments/proofalign_predictive_virtual_brake_v13_attacked_terminal_summary.json`](../../experiments/proofalign_predictive_virtual_brake_v13_attacked_terminal_summary.json)。
+
+## 5. v11 containment–utility tradeoff
 
 ![v11 containment utility tradeoff](figures/v11_containment_utility_tradeoff.png)
 
@@ -79,7 +97,7 @@ containment 和 utility tradeoff，不支持 first-hit prevention 或完整 defe
 
 矢量版：[PDF](figures/v11_containment_utility_tradeoff.pdf)。
 
-## 5. 重现
+## 6. 重现
 
 ```bash
 .venv/bin/python scripts/plot_final_paper_results.py

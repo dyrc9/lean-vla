@@ -4,6 +4,44 @@
 [`current_status_and_roadmap.md`](current_status_and_roadmap.md) 为准。本页保留完整时间线和所有
 结果后 successor，不再作为快速状态入口。
 
+## 最新 checkpoint：2026-07-31 v13 task-outcome、shadow 与 attacked 终态
+
+v13 Fresh3 clean 已完成45 workloads × 4 arms=`180/180`。VLA-only、Execution-only、
+Semantic-only、Dual task success 为`36/45、36/45、32/45、31/45`；Execution−VLA 与
+Dual−Semantic 的 paired bootstrap 95%区间分别为`[-8.89pp,+8.89pp]`与
+`[-15.56pp,+11.11pp]`，均高于冻结`−20pp` non-inferiority margin。official unsafe 为
+`1/1/2/2`，不是零风险。该 clean population 只有1次 joint-1-upper trigger，因无安全候选
+fail closed；active intervention 为0。
+
+同一45 workloads/seeds/order 的 clean shadow-only ablation 也完成`180/180`。任务成功和 official
+unsafe 与 full brake 完全相同。唯一 full-brake trigger 对应的 shadow episode继续运行到
+max steps；full brake少执行250个 policy steps，少225个 model-defined joint-limit steps、
+41个 target-margin<0.15 steps和2个 target-margin<0 steps。这是一个保守 containment case，
+不是总体 safety efficacy。
+
+冻结的 instruction-attacked stage 随后完成`180/180`，攻击使`180/180`首个 ActionBlock 相对
+paired clean 改变。原 retained evidence 因 wrapper nesting 顺序让 v11 legacy metric hook 覆盖
+v13 hook，故保留`predictive_virtual_brake_v13_attacked_incomplete`和两个不适用 legacy gate
+failure。终态 successor 不重跑、不修改任何 episode/manifest/checksum，只在内层 context 恢复已冻结
+的v13 metric hook并从183条 checksum entries机械重建；修正后所有数据完整性 gate 通过。
+
+attacked task success 为`35/45、35/45、28/45、28/45`，official unsafe 为`1/1/0/1`。
+Execution−VLA 与 Dual−Semantic 的 paired success difference 都是0，95%区间均为
+`[-11.11pp,+11.11pp]`；但 Dual official unsafe nonincrease 相对 Semantic-only 失败。
+一个 Dual episode产生2次target trigger：第一次0.16-rad hard guard把 unguarded predicted
+`0.136171 rad`保持为actual `0.159981 rad`，prediction/execution error为0；下一步无安全候选并
+deadlock。全population仍有2016个全机械臂 joint-limit violation steps，其中L2 arms为874，
+与target trigger重合为0。结果因此支持“一次exact active simulator containment”，不支持总体
+attacked efficacy、recovery、全关节安全或确认性结论。
+
+终态可复算入口为
+[`../scripts/freeze_predictive_virtual_brake_v13_attacked_terminal.py`](../scripts/freeze_predictive_virtual_brake_v13_attacked_terminal.py)
+和
+[`../experiments/proofalign_predictive_virtual_brake_v13_attacked_terminal_summary.json`](../experiments/proofalign_predictive_virtual_brake_v13_attacked_terminal_summary.json)。
+下一步先冻结同攻击shadow-only因果对照，再实现全7关节/双侧margin audit与trigger-rich
+no-guard/reactive/shadow/predictive压力测试；development完成后必须另取未见workload/init/seeds做
+outcome-blind qualification。
+
 ## 最新 checkpoint：2026-07-30 v12.38 frozen held-out hard virtual joint stop
 
 v12.37 development 与 v12.38 frozen held-out 已完成方法冻结前后的跨 seed 验证：4条 lane 合计

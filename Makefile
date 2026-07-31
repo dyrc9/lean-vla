@@ -196,6 +196,7 @@ v13-followup-check:
 	fi
 	@if [ -f results/proofalign_predictive_virtual_brake_v13_attacked_20260731_fresh1/pilot_evidence.json ]; then \
 		$(PYTHON) scripts/run_predictive_virtual_brake_v13_attacked.py --validate-results >/dev/null; \
+		$(PYTHON) scripts/freeze_predictive_virtual_brake_v13_attacked_terminal.py --check; \
 	else \
 		echo "Skipping v13 attacked result check: frozen rollout evidence is absent"; \
 	fi

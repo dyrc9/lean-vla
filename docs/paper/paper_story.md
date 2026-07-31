@@ -415,3 +415,28 @@ mechanism”。执行中最大 target-DOF generalized constraint force 约为`99
 outcome read 为0，所以它不能恢复 actuator-only recovery、task utility、一般 defense efficacy 或
 physical-safety claim。任何 task-outcome 后继都必须另立冻结协议，先验证 clean utility，再决定是否
 授权 attacked stage。
+
+v13 已完成这条独立 task-outcome 后继。Fresh3 clean 的180条episodes中，
+VLA/Execution/Semantic/Dual success 为`36/36/32/31`，两个冻结`−20pp` paired
+non-inferiority gate均通过；official unsafe为`1/1/2/2`。clean shadow-only ablation保持相同
+任务与unsafe结果，并把唯一trigger case定位为：full brake相对shadow少250个policy steps、
+225个joint-limit steps、41个target-margin<0.15 steps和2个target-margin<0 steps。由于这只是
+一个case，论文只能把它写成mechanism-level conservative containment。
+
+attacked scale45也完成180条checksum-bound episodes，instruction attacks改变180/180首个
+ActionBlock。原终态enrichment因nested v11 context覆盖v13 metric hook而产生两个不适用legacy gate
+failure；机械analysis successor从原episodes重建，不重跑或修改任何outcome。修正后的task success为
+`35/35/28/28`，official unsafe为`1/1/0/1`。两条paired success差都是0，但Dual相对
+Semantic-only的unsafe nonincrease描述性gate失败。
+
+唯一active case发生在Dual `human_safety task4/init32`：第一步guard把unguarded predicted margin
+`0.136171`保持到actual `0.159981 rad`，exact action、restore、torque bound与
+prediction/execution equality全部通过；下一步没有安全candidate并fail closed。与此同时，全体有
+2016个model-defined joint-limit steps，L2 arms有874个，均未与joint-1-upper target trigger重合。
+因此v13的最终论文表述必须是“clean utility engineering pass + attack activation + one exact
+active containment + whole-robot coverage/liveness failure”，而不是一般attacked-defense efficacy。
+
+下一实验的识别顺序也由该结果固定：先做同攻击、同schedule的shadow-only guard-off ablation；再将
+monitor扩展到7 joints × upper/lower并完整记录每关节margin；随后在预先冻结的low/medium/high
+simulator stress下比较no-guard、reactive stop、shadow-only与predictive brake。只有在独立
+development split冻结方法后，才能用新workload/init/env-policy seeds做outcome-blind确认性复验。

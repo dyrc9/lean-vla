@@ -19,8 +19,9 @@ ProofAlign 已形成可复现的研究原型，核心贡献是：
 4. 保留所有冻结 gate 的 non-pass 和结果后 successor，使失败机制可以复算。
 
 当前证据足以支持“形式化执行事务 + 可审计失败定位 + containment–utility tradeoff +
-simulator virtual-brake engineering validation”的系统论文。它不支持一般 defense efficacy、
-clean non-inferiority、actuator-only recovery、真实部署或物理安全证明。
+simulator virtual-brake engineering validation”的系统论文。v13 在 outcome-informed 的45-pair
+population 上通过了 clean task-success non-inferiority，但 attacked 阶段没有建立总体 safety
+efficacy；它仍不支持确认性一般防御、任意关节安全、actuator-only recovery、真实部署或物理安全证明。
 
 ## 2. 证据状态
 
@@ -34,6 +35,9 @@ clean non-inferiority、actuator-only recovery、真实部署或物理安全证�
 | recoverable/predictive L2 v12.1–v12.6 | mechanism strengthened / liveness non-pass | contract、snapshot、fresh prefix、typed recovery 和 integrated route 已关闭；首次 simulator-integrated formal 的 fresh authorization 为 `6/9` |
 | hard virtual joint stop v12.37 | development pass | seeds `10509/10510`：`10/10` exact advances，最低 actual margin `0.1661929 rad` |
 | frozen held-out v12.38 | held-out pass | seeds `20509/20510`：`10/10` exact advances，最低 actual margin `0.1661158 rad` |
+| v13 clean outcome Fresh3 | engineering utility pass | 180/180 complete；VLA/Execution/Semantic/Dual success `36/36/32/31`，两个冻结 `−0.20` paired non-inferiority gate 通过；仅1次 trigger、0 intervention、1 deadlock |
+| v13 clean shadow-only | causal-path ablation complete | 180/180 complete；任务与 official unsafe 和 full brake 相同；唯一 full-brake case 少执行250 steps并避免225个 joint-limit steps，但样本只有1例 |
+| v13 attacked scale45 | data complete / efficacy non-pass | 180/180 checksum-bound episodes；攻击改变180/180首块；2次 trigger、1次 active intervention、随后1次 deadlock；Dual unsafe nonincrease 描述性 gate 未过 |
 | deployment perception E7 | blocked | 当前数据缺7类 supervision，不能资格化 camera-only deployment |
 
 v12.37/v12.38 两个 split 的 guard action identity、beam configuration identity 和
@@ -52,7 +56,10 @@ typed recovery 和 outcome read 均为0。最大 target-DOF generalized constrai
 5. risk-selective L1 与 v11 containment–utility tradeoff；
 6. v12 从 state-safe recovery 到 next-policy-safe recovery 的失败定位；
 7. v12.37 development 与 v12.38 frozen held-out virtual-brake 正机制结果；
-8. deployment perception、约 `10k` constraint force、无 task outcome 和无硬件证据等限制。
+8. v13 clean utility、shadow-only causal-path ablation 与 attacked scale45；
+9. attacked 中唯一 active guard 的一步 containment、下一步 deadlock，以及2016个全机械臂
+   joint-limit exposure steps 对单 joint-1-upper monitor 的 coverage failure；
+10. deployment perception、约 `10k` constraint force、无硬件证据等限制。
 
 论文不得将 v11/v12 写成 first-hit prevention、一般 attacked-defense efficacy、task-preserving
 recovery 或完整物理安全。
@@ -65,27 +72,34 @@ recovery 或完整物理安全。
 - 将 v12.37/v12.38 checksum 与 summary 重算接入 `make check` / `scripts/check_all.sh`；
 - 任何新实验都使用新 output root 和新冻结 protocol，不覆盖历史 artifact。
 
-### G1：独立 task-outcome protocol
+### G1：独立 task-outcome protocol（已完成）
 
-这是唯一合理的近期科学 successor。必须在运行前冻结：
+v13 clean、shadow-only 与 attacked 三阶段均已完成。clean 180条通过冻结 utility gate；attacked
+180条在机械分析修正后数据完整。原 `pilot_evidence.json` 因 nested hook 顺序保留
+`incomplete`，终态脚本从原 checksum-bound episodes 重建 v13 metrics，不修改 rollout、
+episode、manifest 或 checksum。修正后的结果仍是 efficacy non-pass，而不是把分析 bug 当作方法成功。
 
-- 与 v12.37/v12.38 不重叠的 development/qualification workload 与 seed；
-- virtual-brake arm、无 virtual-brake control 和必要的 L1/L2 开关；
-- task success、time-to-completion、joint-limit exposure、trigger/intervention、constraint force、
-  latency、unknown/deadlock 和 official cost/collision；
-- clean utility gate、配对估计量、停止规则和多重比较；
-- 禁止读取当前 no-outcome ledger 的 reward/success 来选任务、阈值或 guard。
+### G2：多关节风险效应 successor
 
-先完成 clean utility gate。未通过时停止，不启动 attacked stage；通过后才可冻结独立 attacked
-protocol。
+当前最优先的科学 successor 必须同时关闭 coverage 与因果识别：
 
-### G2：论文与复现包
+- 先运行 exact attacked shadow-only，使唯一 intervention case 有同攻击、同 runner 的 guard-off
+  对照；
+- 将每步14个 joint-side margins 全量记账，并把 online monitor 从 joint-1-upper 扩展到全7关节
+  upper/lower；
+- 另立 trigger-rich generalized-force / near-limit simulator stress development split，预先冻结
+  low/medium/high dose、no-guard、reactive-stop、shadow-only 和 predictive-brake 条件；
+- 方法冻结后用新 workload、init、environment/policy seeds 做 outcome-blind qualification；
+- 主终点为 crossing、minimum margin、joint-limit exposure、official unsafe、task success、
+  deadlock/recovery 和 latency，禁止用 development outcome 选择确认集。
+
+### G3：论文与复现包
 
 - 以系统论文而非“全面防御成功”组织正文；
 - 固化图表生成、artifact inventory、环境版本和一键检查输出；
 - 主文同时报告正结果、non-pass、效用代价和 claim boundary。
 
-### G3：部署与硬件后继
+### G4：部署与硬件后继
 
 E7 需要新的 outcome-blind perception supervision 数据，至少补齐 camera intrinsics/extrinsics、
 target localization、destination geometry、visibility/occlusion、held/contact state 和独立
@@ -102,6 +116,8 @@ PATH="$PWD/.tools/lean-4.24.0-linux/bin:$PATH" \
   --validate-results
 .venv/bin/python scripts/run_h3_hard_virtual_joint_guard_beam_heldout_v12.py \
   --validate-results
+.venv/bin/python scripts/freeze_predictive_virtual_brake_v13_attacked_terminal.py \
+  --check
 bash scripts/check_all.sh
 ```
 
