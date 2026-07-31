@@ -16,7 +16,11 @@ for root in (REPO_ROOT / "src", REPO_ROOT):
         sys.path.insert(0, str(root))
 
 from proofalign.benchmark.confirmatory import load_json_object  # noqa: E402
+from proofalign.benchmark.confirmatory import file_sha256  # noqa: E402
 from proofalign.benchmark.four_arm_v4 import canonical_text  # noqa: E402
+from scripts.run_contact_phase_pick_up_clean_pilot import (  # noqa: E402
+    schedule_sha256,
+)
 from scripts import run_joint_limit_containment_v11_attacked_scale45 as attacker  # noqa: E402
 from scripts import run_l2_predictive_virtual_brake_v13_shadow_only as online  # noqa: E402
 from scripts import run_predictive_virtual_brake_v13_clean as clean  # noqa: E402
@@ -41,8 +45,106 @@ DEFAULT_PROTOCOL = (
     / "proofalign_predictive_virtual_brake_v13_"
     "attacked_shadow_only_protocol.json"
 )
+PARENT_PROTOCOL = (
+    REPO_ROOT
+    / "experiments"
+    / "proofalign_predictive_virtual_brake_v13_attacked_protocol.json"
+)
 _BASE_VALIDATE_PROTOCOL = attacker.validate_protocol
 _BASE_ATTACK_ENRICH = attacker.inherited._enrich
+
+
+class PredictiveVirtualBrakeAttackedShadowError(RuntimeError):
+    """Raised when the attacked shadow study leaves its compact scope."""
+
+
+def _derived_schedule(
+    parent: Mapping[str, Any],
+) -> list[dict[str, Any]]:
+    prefix = f"{parent['stage']}_"
+    rows = []
+    for source in parent["schedule"]:
+        episode_id = str(source["episode_id"])
+        if not episode_id.startswith(prefix):
+            raise PredictiveVirtualBrakeAttackedShadowError(
+                "parent attacked episode identity differs"
+            )
+        row = dict(source)
+        row["episode_id"] = (
+            f"{STAGE}_{episode_id[len(prefix):]}"
+        )
+        row["sequence_index"] = len(rows)
+        rows.append(row)
+    return rows
+
+
+def materialize_protocol(
+    compact: Mapping[str, Any],
+    *,
+    protocol_path: Path,
+) -> dict[str, Any]:
+    """Expand the SHA-bound parent instead of copying attack records."""
+
+    if (
+        compact.get("schema") != PROTOCOL_SCHEMA
+        or compact.get("status") != AUTHORIZED_STATUS
+        or compact.get("stage") != STAGE
+        or protocol_path.resolve() != DEFAULT_PROTOCOL.resolve()
+    ):
+        raise PredictiveVirtualBrakeAttackedShadowError(
+            "unsupported attacked shadow-only compact protocol"
+        )
+    binding = compact.get("parent_attacked_protocol")
+    if not isinstance(binding, Mapping):
+        raise PredictiveVirtualBrakeAttackedShadowError(
+            "parent attacked protocol binding is absent"
+        )
+    parent_path = REPO_ROOT / str(binding["path"])
+    if (
+        parent_path.resolve() != PARENT_PROTOCOL.resolve()
+        or not parent_path.is_file()
+        or file_sha256(parent_path) != binding.get("sha256")
+    ):
+        raise PredictiveVirtualBrakeAttackedShadowError(
+            "parent attacked protocol binding differs"
+        )
+    parent = load_json_object(parent_path)
+    schedule = _derived_schedule(parent)
+    if (
+        len(schedule) != 180
+        or schedule_sha256(schedule)
+        != compact.get("derived_schedule_sha256")
+    ):
+        raise PredictiveVirtualBrakeAttackedShadowError(
+            "derived attacked shadow schedule differs"
+        )
+    successor_bindings = compact.get(
+        "successor_required_bindings"
+    )
+    if not isinstance(successor_bindings, list):
+        raise PredictiveVirtualBrakeAttackedShadowError(
+            "successor required bindings are absent"
+        )
+    return {
+        **parent,
+        **compact,
+        "schedule": schedule,
+        "schedule_sha256": schedule_sha256(schedule),
+        "attack_records": parent["attack_records"],
+        "design": {
+            **parent["design"],
+            **compact["design"],
+        },
+        "analysis": {
+            **parent["analysis"],
+            **compact["analysis"],
+        },
+        "required_bindings": [
+            *parent["required_bindings"],
+            *successor_bindings,
+        ],
+        "materialized_from_parent_attacked_protocol": True,
+    }
 
 
 def _attacked_shadow_metrics(
@@ -85,6 +187,11 @@ def validate_protocol(
     *,
     protocol_path: Path,
 ) -> None:
+    if "attack_records" not in protocol:
+        protocol = materialize_protocol(
+            protocol,
+            protocol_path=protocol_path,
+        )
     originals = (
         attacker.PROTOCOL_SCHEMA,
         attacker.AUTHORIZED_STATUS,
@@ -164,9 +271,13 @@ def preflight(
     policy_gpu: int | None,
     egl_gpu: int | None,
 ) -> dict[str, Any]:
+    materialized = materialize_protocol(
+        protocol,
+        protocol_path=protocol_path,
+    )
     with _patched_attacker():
         report = attacker.preflight(
-            protocol,
+            materialized,
             protocol_path=protocol_path,
             policy_gpu=policy_gpu,
             egl_gpu=egl_gpu,
@@ -208,9 +319,13 @@ def execute(
             "v13 attacked shadow-only rollout requires "
             "external/openpi/.venv/bin/python"
         )
+    materialized = materialize_protocol(
+        protocol,
+        protocol_path=protocol_path,
+    )
     with _patched_attacker():
         return attacker.execute(
-            protocol,
+            materialized,
             protocol_path=protocol_path,
             policy_gpu=policy_gpu,
             egl_gpu=egl_gpu,
@@ -222,9 +337,13 @@ def validate_results(
     *,
     protocol_path: Path,
 ) -> dict[str, Any]:
+    materialized = materialize_protocol(
+        protocol,
+        protocol_path=protocol_path,
+    )
     with _patched_attacker():
         return attacker.validate_results(
-            protocol,
+            materialized,
             protocol_path=protocol_path,
         )
 

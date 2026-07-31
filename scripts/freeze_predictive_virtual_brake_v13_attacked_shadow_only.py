@@ -23,13 +23,12 @@ from proofalign.benchmark.four_arm_v4 import canonical_text  # noqa: E402
 from scripts.freeze_predictive_virtual_brake_v13_clean import (  # noqa: E402
     _binding,
 )
-from scripts.run_contact_phase_pick_up_clean_pilot import (  # noqa: E402
-    schedule_sha256,
-)
+from scripts.run_contact_phase_pick_up_clean_pilot import schedule_sha256  # noqa: E402
 from scripts.run_predictive_virtual_brake_v13_attacked_shadow_only import (  # noqa: E402
     AUTHORIZED_STATUS,
     PROTOCOL_SCHEMA,
     STAGE,
+    _derived_schedule,
 )
 
 
@@ -103,24 +102,6 @@ def _git(*args: str) -> str:
     return completed.stdout.strip()
 
 
-def _schedule(attacked: dict[str, Any]) -> list[dict[str, Any]]:
-    prefix = f"{attacked['stage']}_"
-    rows = []
-    for source in attacked["schedule"]:
-        episode_id = str(source["episode_id"])
-        if not episode_id.startswith(prefix):
-            raise PredictiveVirtualBrakeAttackedShadowFreezeError(
-                "attacked episode identity does not match its stage"
-            )
-        row = dict(source)
-        row["episode_id"] = (
-            f"{STAGE}_{episode_id[len(prefix):]}"
-        )
-        row["sequence_index"] = len(rows)
-        rows.append(row)
-    return rows
-
-
 def build_protocol(
     *,
     created_at: str = CREATED_AT,
@@ -148,11 +129,10 @@ def build_protocol(
         raise PredictiveVirtualBrakeAttackedShadowFreezeError(
             "attacked terminal does not require shadow-only ablation"
         )
-    schedule = _schedule(attacked)
+    schedule = _derived_schedule(attacked)
     bound_commit = source_commit or _git("rev-parse", "HEAD")
     _git("merge-base", "--is-ancestor", bound_commit, "HEAD")
     protocol = {
-        **attacked,
         "schema": PROTOCOL_SCHEMA,
         "protocol_id": PROTOCOL_ID,
         "status": AUTHORIZED_STATUS,
@@ -170,10 +150,11 @@ def build_protocol(
             "results/proofalign_predictive_virtual_brake_v13_"
             "attacked_shadow_only_20260731_fresh1"
         ),
-        "schedule": schedule,
-        "schedule_sha256": schedule_sha256(schedule),
+        "parent_attacked_protocol": _binding(
+            ATTACKED_PROTOCOL_PATH
+        ),
+        "derived_schedule_sha256": schedule_sha256(schedule),
         "design": {
-            **attacked["design"],
             "condition": "instruction_attacked_shadow_and_restore_only",
             "study_role": (
                 "outcome-disclosed attacked causal execution-path "
@@ -201,7 +182,6 @@ def build_protocol(
             ],
         },
         "analysis": {
-            **attacked["analysis"],
             "outcome_gates_are_descriptive_only": True,
             "full_attacked_brake_reference_path": (
                 ATTACKED_TERMINAL_PATH.relative_to(
@@ -224,9 +204,7 @@ def build_protocol(
             "clean_rollout": False,
             "confirmatory_claim": False,
         },
-        "required_bindings": [
-            *attacked["required_bindings"],
-            _binding(ATTACKED_PROTOCOL_PATH),
+        "successor_required_bindings": [
             _binding(
                 ATTACKED_TERMINAL_PATH,
                 classification=(
