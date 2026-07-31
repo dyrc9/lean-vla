@@ -112,6 +112,14 @@ if [[ -f results/proofalign_predictive_virtual_brake_v14_multijoint_clean_202607
 else
     echo "Skipping v14 multijoint clean result check: local-only rollout evidence is absent"
 fi
+"$PYTHON_BIN" scripts/freeze_predictive_virtual_brake_v14_multijoint_shadow_only.py --check
+if [[ -f results/proofalign_predictive_virtual_brake_v14_multijoint_shadow_only_20260731_causal1/pilot_evidence.json ]]; then
+    "$PYTHON_BIN" scripts/run_predictive_virtual_brake_v14_multijoint_shadow_only.py --validate-results >/dev/null
+    "$PYTHON_BIN" scripts/freeze_predictive_virtual_brake_v14_multijoint_shadow_only_terminal.py --check
+    "$PYTHON_BIN" scripts/freeze_predictive_virtual_brake_v14_multijoint_shadow_only_diagnostic.py --check
+else
+    echo "Skipping v14 multijoint shadow-only result check: local-only rollout evidence is absent"
+fi
 "$PYTHON_BIN" scripts/generate_saber_confirmatory_records.py --dry-run >/dev/null
 "$PYTHON_BIN" scripts/run_saber_confirmatory_victim.py --dry-run >/dev/null
 "$PYTHON_BIN" scripts/export_proofalign_fixed_trace.py --dry-run >/dev/null

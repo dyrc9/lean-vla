@@ -4,7 +4,42 @@
 [`current_status_and_roadmap.md`](current_status_and_roadmap.md) 为准。本页保留完整时间线和所有
 结果后 successor，不再作为快速状态入口。
 
-## 最新 checkpoint：2026-07-31 v14 全关节 clean development 终态
+## 最新 checkpoint：2026-07-31 v14 同 schedule shadow-only 因果消融终态
+
+v14 shadow-only 在新的 causal1 root 完成与 Fresh2 完全相同的45 workloads × 4 arms=`180/180`。
+Execution-only和Dual仍在每个policy step执行一次exact-action shadow与warm-start restore，但从不
+评估guard candidate、不施加virtual guard、不替换source action，也不合成brake deadlock；
+VLA-only和Semantic-only保持直接执行与14侧post-state审计。
+
+在线合同全部通过：共`50,484`个policy steps、`24,395`个L2 shadow steps，intervention与deadlock
+均为0，restore和exact-action mismatch均为0。Shadow-only的L2 arms产生`2733`个
+margin `<0.15 rad`侧值和`1442`个crossing，而Full brake对应均为0。Execution-only分别是
+`2108/1277`，Dual为`625/165`。Full/Shadow的L2 task success合计为`60/67`，unknown/deadlock为
+`17/0`；逐臂task success为Execution `32/36`、Dual `28/31`，official unsafe保持
+Execution `1/1`、Dual `2/2`。
+
+冻结终端比较给出了强身份检查。90个disabled-arm episodes的action digest、逐步margin、trace长度和
+outcome完全一致；73个没有Full trigger的L2 episodes也完全一致。其余17个首trigger episodes在
+分叉前共比较`20,963`个policy steps，source action、risk-side identity、current/unguarded
+prediction及此前actual margin的最大跨运行误差均为0。Full共29次trigger、12次intervention和
+17次deadlock。因此本development population上的`1442 -> 0` crossing与`2733 -> 0`低余量差异
+可一致地解释为授予brake authority的结果，同时必须报告`67 -> 60`任务成功与`0 -> 17`
+deadlock代价。
+
+注册结论仍是non-pass。预先冻结的shadow prediction/execution逐侧容差为`0.002 rad`，实际最大
+`0.004651 rad`，是门限的`2.326×`；唯一失败gate为calibration。后验diagnostic将该注册non-pass
+与完全通过的pre-divergence causal identity分轴记录，但明确不修订注册分类、不授权确认性结论。
+冻结文件为
+[`../experiments/proofalign_predictive_virtual_brake_v14_multijoint_shadow_only_causal_terminal_summary.json`](../experiments/proofalign_predictive_virtual_brake_v14_multijoint_shadow_only_causal_terminal_summary.json)
+和
+[`../experiments/proofalign_predictive_virtual_brake_v14_multijoint_shadow_only_causal_terminal_diagnostic.json`](../experiments/proofalign_predictive_virtual_brake_v14_multijoint_shadow_only_causal_terminal_diagnostic.json)。
+
+下一步不再重跑同一outcome-disclosed schedule以追逐门限，而是冻结trigger-rich
+low/medium/high stress development，比较no-guard、reactive-stop、shadow-only与predictive
+brake，并把deadlock recovery作为独立因子。方法冻结后，必须用新workload/init/env-policy seeds
+执行outcome-blind qualification。
+
+## 前一 checkpoint：2026-07-31 v14 全关节 clean development 终态
 
 v14 将 v13 的单一 `joint-1 upper` monitor 扩展为每步7个arm joints × lower/upper共14个margin，
 并对同一步所有at-risk joints联合施加最弱可行的 simulator hard guards。development1 在完成前两条
@@ -32,8 +67,8 @@ official unsafe仍为`1/1/2/2`，没有显示总体改善。
 
 冻结终态见
 [`../experiments/proofalign_predictive_virtual_brake_v14_multijoint_clean_terminal_summary.json`](../experiments/proofalign_predictive_virtual_brake_v14_multijoint_clean_terminal_summary.json)。
-下一步是同schedule全关节shadow-only guard-off消融，随后才冻结trigger-rich
-no-guard/reactive/shadow/predictive压力测试；确认性复验必须使用新workloads/init/seeds。
+同schedule全关节shadow-only guard-off消融已按上节完成；下一步冻结trigger-rich
+no-guard/reactive/shadow/predictive压力测试，确认性复验必须使用新workloads/init/seeds。
 
 ## 前一 checkpoint：2026-07-31 v13 task-outcome、shadow 与 attacked 终态
 

@@ -22,8 +22,12 @@ ProofAlign 已形成可复现的研究原型，核心贡献是：
 simulator virtual-brake engineering validation”的系统论文。v13 在 outcome-informed 的45-pair
 population 上通过了 clean task-success non-inferiority，但 attacked 阶段没有建立总体 safety
 efficacy。v14 development 把 monitor 扩展到全7关节双侧并显著增加风险覆盖，但以17次deadlock和
-未通过的任务效用非劣门为代价；它仍不支持确认性一般防御、actuator-only recovery、真实部署或
-物理安全证明。
+未通过的任务效用非劣门为代价。同 schedule shadow-only 对照进一步确认：首次 Full trigger 前
+20,963 个 policy steps、动作摘要、风险侧和14侧余量完全一致；授予 brake authority 后，L2
+crossing 从1,442降至0，但增加17个deadlock并少7个任务成功。该对照仍因预注册
+`0.002 rad` shadow prediction/execution门被`0.004651 rad`超过而保持 calibration non-pass，
+所以它是 outcome-disclosed causal diagnostic，不是确认性一般防御证据。项目仍不支持
+actuator-only recovery、真实部署或物理安全证明。
 
 ## 2. 证据状态
 
@@ -42,6 +46,7 @@ efficacy。v14 development 把 monitor 扩展到全7关节双侧并显著增加�
 | v13 attacked scale45 | data complete / efficacy non-pass | 180/180 checksum-bound episodes；攻击改变180/180首块；2次 trigger、1次 active intervention、随后1次 deadlock；Dual unsafe nonincrease 描述性 gate 未过 |
 | v13 attacked shadow-only | causal tradeoff complete | 180/180 complete；full/shadow仅1条episode结局不同；full避免7个joint-limit steps和23个低余量steps，但把shadow的成功任务变成deadlock失败 |
 | v14 all-joint clean development | data complete / calibration and utility non-pass | 180/180、每步7关节×双侧审计；29 triggers、12 interventions、17 deadlocks；L2实际低余量/crossing均为0，disabled arms为3306/1455；严格`1e-9 rad`全侧校准门和两条描述性效用非劣门未过 |
+| v14 same-schedule shadow-only | registered calibration non-pass / causal identity diagnostic complete | 180/180；90个disabled-arm episode逐步完全一致；首次Full trigger前20,963 steps的action/risk/margin完全一致；Full/Shadow L2低余量为`0/2733`、crossing为`0/1442`，task success为`60/67`、deadlock/unknown为`17/0`；注册`0.002 rad`校准门未过，不改写为pass |
 | deployment perception E7 | blocked | 当前数据缺7类 supervision，不能资格化 camera-only deployment |
 
 v12.37/v12.38 两个 split 的 guard action identity、beam configuration identity 和
@@ -66,6 +71,8 @@ typed recovery 和 outcome read 均为0。最大 target-DOF generalized constrai
 10. deployment perception、约 `10k` constraint force、无硬件证据等限制。
 11. v14 全关节 clean development 的 coverage 增益、零L2低余量/crossing、17次deadlock、
     task-utility non-pass 与全侧 calibration non-pass。
+12. v14 同schedule shadow-only 的exact pre-divergence identity、`1442 -> 0` crossing containment、
+    `67 -> 60`任务成功与`0 -> 17` deadlock代价，以及注册 calibration non-pass。
 
 论文不得将 v11/v12 写成 first-hit prevention、一般 attacked-defense efficacy、task-preserving
 recovery 或完整物理安全。
@@ -93,8 +100,11 @@ episode、manifest 或 checksum。修正后的结果仍是 efficacy non-pass，�
   unguarded prediction完全一致；只有该episode结局不同；
 - 全关节 clean development 已完成：每步14个 joint-side margins 全量记账，29次trigger覆盖
   joint3/5/6 upper；L2实际低余量/crossing为0，但17次deadlock导致utility gate未过；
-- 下一步先做同schedule全关节shadow-only，识别12次active guard、17次fail-closed与3306个
-  disabled-arm低余量暴露之间的因果差异；
+- 同schedule全关节shadow-only已完成：90个disabled-arm episodes逐步完全一致，73个无trigger
+  L2 episodes结局完全一致；17个首trigger episodes在分叉前action/risk/margin零误差。Full相对
+  Shadow避免2733个低余量侧值和1442个crossing，但增加17个deadlock并少7个任务成功；
+- 注册shadow校准门仍non-pass：最大prediction/execution逐侧误差`0.004651 rad`超过
+  `0.002 rad`门。后验诊断只分离“causal identity complete”，不修订注册结论；
 - 另立 trigger-rich generalized-force / near-limit simulator stress development split，预先冻结
   low/medium/high dose、no-guard、reactive-stop、shadow-only 和 predictive-brake 条件；
 - 方法冻结后用新 workload、init、environment/policy seeds 做 outcome-blind qualification；
@@ -129,6 +139,10 @@ PATH="$PWD/.tools/lean-4.24.0-linux/bin:$PATH" \
 .venv/bin/python scripts/freeze_predictive_virtual_brake_v13_attacked_shadow_terminal.py \
   --check
 .venv/bin/python scripts/freeze_predictive_virtual_brake_v14_multijoint_clean_terminal.py \
+  --check
+.venv/bin/python scripts/freeze_predictive_virtual_brake_v14_multijoint_shadow_only_terminal.py \
+  --check
+.venv/bin/python scripts/freeze_predictive_virtual_brake_v14_multijoint_shadow_only_diagnostic.py \
   --check
 bash scripts/check_all.sh
 ```

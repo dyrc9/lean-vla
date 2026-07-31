@@ -113,7 +113,31 @@ recovery。逐侧校准的冻结`1e-9 rad`门也未过：非干预最大误差`0
 终态来源：
 [`../../experiments/proofalign_predictive_virtual_brake_v14_multijoint_clean_terminal_summary.json`](../../experiments/proofalign_predictive_virtual_brake_v14_multijoint_clean_terminal_summary.json)。
 
-## 6. v11 containment–utility tradeoff
+## 6. v14 同 schedule shadow-only 因果消融
+
+| L2 arm | Full / Shadow task success | Full / Shadow unknown or deadlock | Full / Shadow margin <0.15 | Full / Shadow crossing |
+|---|---:|---:|---:|---:|
+| Execution-only | 32 / 36 | 10 / 0 | 0 / 2108 | 0 / 1277 |
+| Dual | 28 / 31 | 7 / 0 | 0 / 625 | 0 / 165 |
+| 合计 | 60 / 67 | 17 / 0 | 0 / 2733 | 0 / 1442 |
+
+90个disabled-arm episodes逐步完全一致；73个无Full trigger的L2 episodes也保持完整trace/outcome
+identity。其余17个首trigger episodes在分叉前共比较20,963个policy steps，source action、
+risk-side identity和14侧margin最大误差均为0。Execution的Full−Shadow每episode crossing差为
+`−28.38`，paired bootstrap 95%区间`[−51.56,−9.29]`；Dual为`−3.67`，
+区间`[−7.58,−0.67]`。这支持固定development schedule上的brake-authority
+containment–availability因果解释，同时显示7个任务成功和17个deadlock的代价。
+
+注册结果没有通过：shadow prediction/execution最大逐侧误差`0.004651 rad`超过冻结
+`0.002 rad`门。后验diagnostic只记录causal identity完整，不修订calibration non-pass，也不授权
+确认性或物理安全结论。
+
+注册终态：
+[`../../experiments/proofalign_predictive_virtual_brake_v14_multijoint_shadow_only_causal_terminal_summary.json`](../../experiments/proofalign_predictive_virtual_brake_v14_multijoint_shadow_only_causal_terminal_summary.json)。
+分轴diagnostic：
+[`../../experiments/proofalign_predictive_virtual_brake_v14_multijoint_shadow_only_causal_terminal_diagnostic.json`](../../experiments/proofalign_predictive_virtual_brake_v14_multijoint_shadow_only_causal_terminal_diagnostic.json)。
+
+## 7. v11 containment–utility tradeoff
 
 ![v11 containment utility tradeoff](figures/v11_containment_utility_tradeoff.png)
 
@@ -123,7 +147,7 @@ containment 和 utility tradeoff，不支持 first-hit prevention 或完整 defe
 
 矢量版：[PDF](figures/v11_containment_utility_tradeoff.pdf)。
 
-## 7. 重现
+## 8. 重现
 
 ```bash
 .venv/bin/python scripts/plot_final_paper_results.py

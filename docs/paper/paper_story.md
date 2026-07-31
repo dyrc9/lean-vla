@@ -462,3 +462,24 @@ non-inferiority下界为`−20.06pp/−24.44pp`，均未通过；17个deadlock�
 `0.001187 rad`，尽管false-safe风险决策为0、干预逐侧最大误差仅`4.24e-6 rad`、最低margin误差
 仅`2.53e-9 rad`。论文必须同时报告“全关节安全代理覆盖显著增强”和“校准/任务效用未过”，并在
 同schedule shadow-only之后才能把低余量减少归因到active guard。
+
+该同schedule shadow-only现已完成。它复用全部180条schedule，并在L2 arms保留每步一次
+exact-action shadow与restore，但彻底移除candidate evaluation、guard authority和deadlock
+synthesis。90个disabled-arm episodes逐步完全一致；73个没有Full trigger的L2 episodes也保持
+trace与outcome完全一致。17个首trigger episodes在分叉前共比较20,963个policy steps，source
+action digest、risk-side identity、current/unguarded margins及此前actual margins的跨运行最大
+误差均为0。这关闭了“差异可能来自shadow/restore或不同source action”的主要替代解释。
+
+在L2 arms中，Shadow-only产生2733个`margin <0.15 rad`侧值和1442个crossing，Full均为0；
+paired episode bootstrap中Execution的Full−Shadow crossing均值为`−28.38`
+（95%区间`[−51.56,−9.29]`），Dual为`−3.67`（`[−7.58,−0.67]`）。代价同样清楚：
+Execution task success从36降至32，Dual从31降至28；Full增加17个unknown/deadlock。论文应把
+这写成“在固定development schedule上可识别的joint-limit-proxy containment–availability
+tradeoff”，不能只保留安全代理的正差异。
+
+该实验的注册状态仍是calibration non-pass：冻结`0.002 rad` shadow prediction/execution门被
+`0.004651 rad`最大逐侧误差超过。后验diagnostic仅把“注册calibration non-pass”和“首次分叉前
+causal identity complete”分轴报告，不修订原门，也不把outcome-disclosed对照升级成确认性结论。
+下一实验因此转向预冻结的trigger-rich low/medium/high stress ×
+no-guard/reactive-stop/shadow/predictive-brake矩阵，并显式加入deadlock recovery；最终主张仍需
+新population和新seeds的outcome-blind qualification。
