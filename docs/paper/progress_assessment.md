@@ -1,5 +1,8 @@
 # 论文就绪度评估
 
+最终图表与 Lean claim boundary 见
+[`final_results_figures.md`](final_results_figures.md)。
+
 > 2026-07-29 更新：本页原 support45 评估保留为历史诊断；最新 outcome checkpoint 已推进到
 > v11 unchanged-method held-out scale45。终局结果和不可覆盖边界见
 > [`../v11_terminal_checkpoint.md`](../v11_terminal_checkpoint.md)，后继优化见
