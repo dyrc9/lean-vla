@@ -172,7 +172,12 @@ def build_protocol(
             "protocol_id": PROTOCOL_ID,
             "status": AUTHORIZED_STATUS,
             "created_at": created_at,
-            "stage": "same_schedule_shadow_only_causal_development",
+            # The inherited runner derives episode_id from this stage.
+            # Retain it exactly so the full/shadow schedules share identity.
+            "stage": full["stage"],
+            "causal_stage": (
+                "same_schedule_shadow_only_causal_development"
+            ),
             "complete_classification": (
                 "predictive_virtual_brake_v14_multijoint_shadow_only_"
                 "causal_development_data_complete"

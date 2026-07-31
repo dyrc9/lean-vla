@@ -302,6 +302,11 @@ def test_shadow_only_freezer_preserves_exact_full_schedule(
     assert protocol["schedule_sha256"] == full["schedule_sha256"]
     assert protocol["workloads"] == full["workloads"]
     assert protocol["episode_constants"] == full["episode_constants"]
+    assert protocol["stage"] == full["stage"]
+    assert (
+        protocol["causal_stage"]
+        == "same_schedule_shadow_only_causal_development"
+    )
     assert protocol["fresh_output_root"].endswith("causal1")
     assert (
         protocol["shadow_only_execution_contract"][
