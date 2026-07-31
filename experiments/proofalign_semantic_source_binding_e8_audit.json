@@ -14,7 +14,7 @@
       "exists": true,
       "git_status": "clean",
       "path": "Makefile",
-      "sha256": "2d64f3a94d7963601d6464e153341b669147a1ca8cbe1bf955e6e2722f80d607",
+      "sha256": "cad9acc3a6c1ad967531967869eec0e1d5ce215c79e2a56f07f18de6872299b6",
       "tracked": true
     },
     {
@@ -22,7 +22,7 @@
       "exists": true,
       "git_status": "clean",
       "path": "README.md",
-      "sha256": "a486b18764414554999540598a4aa3939a1eb85c0b4443d6a32426ef76d520d9",
+      "sha256": "54382c9a6647088039922a9fb4623f17139e0979b752ff4cb1e2153b6342b494",
       "tracked": true
     },
     {
@@ -70,7 +70,7 @@
       "exists": true,
       "git_status": "clean",
       "path": "docs/paper/paper_story.md",
-      "sha256": "00b1c2ea7c974db8a31b2d296180ceaf6e59286c8cdbb35a8d437c452afd3c85",
+      "sha256": "0588af7f6f5f142f40c3630605208b286affcfa05365e05af2a10e836c8e9c6a",
       "tracked": true
     },
     {
@@ -78,7 +78,7 @@
       "exists": true,
       "git_status": "clean",
       "path": "docs/progress_and_plan.md",
-      "sha256": "1bfd51133d6e55c7407ab45d2a6a9f594f668313db9b922173e88532840381a6",
+      "sha256": "45fc69096edd34f2bc2c89523045d6f955205d17d9f1ca33480521ce34b3dfc6",
       "tracked": true
     },
     {
@@ -134,7 +134,7 @@
       "exists": true,
       "git_status": "clean",
       "path": "scripts/check_all.sh",
-      "sha256": "baa210de3660adf74764b6a3e8a5cf57638c5c0dc8741848e425a5d6f3c4b42b",
+      "sha256": "d08b26caaccb192fec4f4dc899a1f5663ce445187471a8eab727351254b8867c",
       "tracked": true
     },
     {
@@ -2190,7 +2190,7 @@
       "exists": true,
       "git_status": "clean",
       "path": "experiments/proofalign_semantic_v4_c5_readiness_packet_v1.json",
-      "sha256": "6c7157d0ec659145be69e2f32078dd2afa8086c93e220fa8d1e6bc8c6b580298",
+      "sha256": "09a8648714bca737ab969cac54de2ae0a43ebed35a05b83b18c3b503527024ef",
       "tracked": true
     },
     {
@@ -2473,8 +2473,8 @@
   "policy_loaded": false,
   "repository_binding_semantics": "latest commit that changed the frozen semantic commit scope; later commits may contain only out-of-scope protocols or audit packets",
   "repository_fully_clean": true,
-  "repository_head_commit": "ff4974e0340e3f77f7b19eb8112c99d7d41ffaa0",
-  "repository_head_tree": "4aeb19c802a6cdee5bb972dda0e38dfb92bffcb1",
+  "repository_head_commit": "5c7c7d84a988c5be526889976e81b36a8b30b585",
+  "repository_head_tree": "e85fb6741ad6e8f7d2ddf5b8edac736b835617c9",
   "repository_status_row_count": 0,
   "schema": "proofalign.semantic-source-binding-e8-audit.v1",
   "simulator_created": false
