@@ -8,6 +8,7 @@ import pytest
 
 from scripts import run_l2_predictive_virtual_brake_v13 as core
 from scripts import run_l2_predictive_virtual_brake_v13_shadow_only as runner
+from scripts import freeze_predictive_virtual_brake_v13_shadow_only as freezer
 from scripts import run_predictive_virtual_brake_v13_shadow_only as study
 
 
@@ -201,3 +202,26 @@ def test_shadow_clean_patch_is_scoped() -> None:
         study.clean._v13_metrics,
         study.clean._enrich,
     ) == original
+
+
+def test_shadow_protocol_uses_clean_runner_authorization(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    original_git = freezer._git
+
+    def clean_status_git(*args: str) -> str:
+        if args[:2] == ("status", "--porcelain=v1"):
+            return ""
+        return original_git(*args)
+
+    monkeypatch.setattr(freezer, "_git", clean_status_git)
+    protocol = freezer.build_protocol()
+
+    assert protocol["execution_authorization"] == {
+        "clean_exploratory_pilot": True,
+        "action_dispatch": True,
+        "task_outcome_observation": True,
+        "attacked_rollout": False,
+        "confirmatory_claim": False,
+    }
+    assert protocol["design"]["guard_intervention_enabled"] is False

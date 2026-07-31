@@ -205,7 +205,7 @@ def build_protocol(
             "exact_action_mismatch_count_max": 0,
         },
         "execution_authorization": {
-            "clean_shadow_only_ablation": True,
+            "clean_exploratory_pilot": True,
             "action_dispatch": True,
             "task_outcome_observation": True,
             "attacked_rollout": False,
