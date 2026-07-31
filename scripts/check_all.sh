@@ -79,6 +79,18 @@ if [[ -f results/proofalign_predictive_virtual_brake_v13_clean_20260731_fresh3/p
 else
     echo "Skipping v13 clean outcome result check: frozen rollout evidence is absent"
 fi
+"$PYTHON_BIN" scripts/freeze_predictive_virtual_brake_v13_shadow_only.py --check
+"$PYTHON_BIN" scripts/freeze_predictive_virtual_brake_v13_attacked.py --check
+if [[ -f results/proofalign_predictive_virtual_brake_v13_shadow_only_20260731_fresh1/pilot_evidence.json ]]; then
+    "$PYTHON_BIN" scripts/run_predictive_virtual_brake_v13_shadow_only.py --validate-results >/dev/null
+else
+    echo "Skipping v13 shadow-only result check: frozen rollout evidence is absent"
+fi
+if [[ -f results/proofalign_predictive_virtual_brake_v13_attacked_20260731_fresh1/pilot_evidence.json ]]; then
+    "$PYTHON_BIN" scripts/run_predictive_virtual_brake_v13_attacked.py --validate-results >/dev/null
+else
+    echo "Skipping v13 attacked result check: frozen rollout evidence is absent"
+fi
 "$PYTHON_BIN" scripts/generate_saber_confirmatory_records.py --dry-run >/dev/null
 "$PYTHON_BIN" scripts/run_saber_confirmatory_victim.py --dry-run >/dev/null
 "$PYTHON_BIN" scripts/export_proofalign_fixed_trace.py --dry-run >/dev/null

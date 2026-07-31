@@ -1,4 +1,4 @@
-.PHONY: sync test lean paper-artifacts paper-artifacts-check action-block-check m1-readiness-check semantic-v4-c5-check e1-selector-check e1-fallback-check e2-conditioning-check e3-checker-check e4-no-dispatch-check e5-effect-observer-check e6-resource-smoke-preflight-check e7-perception-preflight-check semantic-post-e5-readiness-check l2-interface-check four-arm-v4-check four-arm-v4-exploratory-check v12-contract-check v12-simulator-preflight-check v12-recovery-successor-check v12-policy-shadow-check v12-integrated-recovery-check v12-hard-guard-check v13-clean-outcome-check check
+.PHONY: sync test lean paper-artifacts paper-artifacts-check action-block-check m1-readiness-check semantic-v4-c5-check e1-selector-check e1-fallback-check e2-conditioning-check e3-checker-check e4-no-dispatch-check e5-effect-observer-check e6-resource-smoke-preflight-check e7-perception-preflight-check semantic-post-e5-readiness-check l2-interface-check four-arm-v4-check four-arm-v4-exploratory-check v12-contract-check v12-simulator-preflight-check v12-recovery-successor-check v12-policy-shadow-check v12-integrated-recovery-check v12-hard-guard-check v13-clean-outcome-check v13-followup-check check
 
 PYTHON ?= .venv/bin/python
 UV ?= uv
@@ -186,4 +186,18 @@ v13-clean-outcome-check:
 		echo "Skipping v13 clean outcome result check: frozen rollout evidence is absent"; \
 	fi
 
-check: test lean paper-artifacts-check action-block-check m1-readiness-check semantic-v4-c5-check e1-selector-check e1-fallback-check e2-conditioning-check e3-checker-check e4-no-dispatch-check e5-effect-observer-check e6-resource-smoke-preflight-check e7-perception-preflight-check e8-source-binding-check semantic-post-e5-readiness-check four-arm-v4-check four-arm-v4-exploratory-check v12-contract-check v12-simulator-preflight-check v12-recovery-successor-check v12-policy-shadow-check v12-integrated-recovery-check v12-hard-guard-check v13-clean-outcome-check
+v13-followup-check:
+	$(PYTHON) scripts/freeze_predictive_virtual_brake_v13_shadow_only.py --check
+	$(PYTHON) scripts/freeze_predictive_virtual_brake_v13_attacked.py --check
+	@if [ -f results/proofalign_predictive_virtual_brake_v13_shadow_only_20260731_fresh1/pilot_evidence.json ]; then \
+		$(PYTHON) scripts/run_predictive_virtual_brake_v13_shadow_only.py --validate-results >/dev/null; \
+	else \
+		echo "Skipping v13 shadow-only result check: frozen rollout evidence is absent"; \
+	fi
+	@if [ -f results/proofalign_predictive_virtual_brake_v13_attacked_20260731_fresh1/pilot_evidence.json ]; then \
+		$(PYTHON) scripts/run_predictive_virtual_brake_v13_attacked.py --validate-results >/dev/null; \
+	else \
+		echo "Skipping v13 attacked result check: frozen rollout evidence is absent"; \
+	fi
+
+check: test lean paper-artifacts-check action-block-check m1-readiness-check semantic-v4-c5-check e1-selector-check e1-fallback-check e2-conditioning-check e3-checker-check e4-no-dispatch-check e5-effect-observer-check e6-resource-smoke-preflight-check e7-perception-preflight-check e8-source-binding-check semantic-post-e5-readiness-check four-arm-v4-check four-arm-v4-exploratory-check v12-contract-check v12-simulator-preflight-check v12-recovery-successor-check v12-policy-shadow-check v12-integrated-recovery-check v12-hard-guard-check v13-clean-outcome-check v13-followup-check
