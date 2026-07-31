@@ -72,9 +72,9 @@ fi
 "$PYTHON_BIN" scripts/freeze_integrated_predictive_recovery_v12_terminal.py --check
 "$PYTHON_BIN" scripts/run_h3_hard_virtual_joint_guard_beam_pilot_v12.py --validate-results >/dev/null
 "$PYTHON_BIN" scripts/run_h3_hard_virtual_joint_guard_beam_heldout_v12.py --validate-results >/dev/null
-"$PYTHON_BIN" scripts/freeze_predictive_virtual_brake_v13_clean.py --check
-if [[ -f results/proofalign_predictive_virtual_brake_v13_clean_20260731_fresh2/pilot_evidence.json ]]; then
-    "$PYTHON_BIN" scripts/run_predictive_virtual_brake_v13_clean.py --validate-results >/dev/null
+"$PYTHON_BIN" scripts/freeze_predictive_virtual_brake_v13_clean_fresh3.py --check
+if [[ -f results/proofalign_predictive_virtual_brake_v13_clean_20260731_fresh3/pilot_evidence.json ]]; then
+    "$PYTHON_BIN" scripts/run_predictive_virtual_brake_v13_clean_fresh3.py --validate-results >/dev/null
 else
     echo "Skipping v13 clean outcome result check: frozen rollout evidence is absent"
 fi
