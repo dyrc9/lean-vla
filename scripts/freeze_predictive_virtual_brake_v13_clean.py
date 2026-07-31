@@ -101,6 +101,9 @@ PROTOCOL_ID = (
     "proofalign-predictive-virtual-brake-v13-clean-outcome-fresh2-"
     "20260731"
 )
+SCHEDULE_DESIGN_ID = (
+    "proofalign-predictive-virtual-brake-v13-clean-outcome-20260731"
+)
 STAGE = "predictive_virtual_brake_v13_clean_outcome_fresh2"
 CREATED_AT = "2026-07-31T11:40:00+08:00"
 INIT_SELECTION_SALT = (
@@ -229,7 +232,7 @@ def build_schedule(
         workloads,
         key=lambda row: sha256(
             (
-                f"{PROTOCOL_ID}:{row['base_pair_id']}:"
+                f"{SCHEDULE_DESIGN_ID}:{row['base_pair_id']}:"
                 f"{SCHEDULE_SALT}:unit"
             ).encode("utf-8")
         ).digest(),
@@ -238,7 +241,7 @@ def build_schedule(
     for workload in ordered:
         digest = sha256(
             (
-                f"{PROTOCOL_ID}:{workload['base_pair_id']}:"
+                f"{SCHEDULE_DESIGN_ID}:{workload['base_pair_id']}:"
                 f"{SCHEDULE_SALT}:arm"
             ).encode("utf-8")
         ).digest()

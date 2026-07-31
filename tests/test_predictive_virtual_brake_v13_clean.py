@@ -20,6 +20,7 @@ def test_outcome_blind_population_is_fresh_and_complete() -> None:
 
     workloads = freezer.derive_workloads(source, v11)
     schedule = freezer.build_schedule(workloads)
+    fresh1 = load_json_object(freezer.FRESH1_PROTOCOL_PATH)
 
     assert len(workloads) == 45
     assert len(schedule) == 180
@@ -52,6 +53,22 @@ def test_outcome_blind_population_is_fresh_and_complete() -> None:
         }
         for arms in by_pair.values()
     )
+    stable_fields = (
+        "arm",
+        "base_pair_id",
+        "suite",
+        "task_id",
+        "init_state_id",
+        "environment_seed",
+        "policy_seed",
+    )
+    assert [
+        tuple(row[field] for field in stable_fields)
+        for row in schedule
+    ] == [
+        tuple(row[field] for field in stable_fields)
+        for row in fresh1["schedule"]
+    ]
 
 
 def test_execute_rejects_validator_only_interpreter(
