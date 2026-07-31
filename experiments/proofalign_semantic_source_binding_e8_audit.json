@@ -2472,10 +2472,10 @@
   "outcomes_observed_or_generated": false,
   "policy_loaded": false,
   "repository_binding_semantics": "latest commit that changed the frozen semantic commit scope; later commits may contain only out-of-scope protocols or audit packets",
-  "repository_fully_clean": false,
+  "repository_fully_clean": true,
   "repository_head_commit": "6c0521b33704bca9f2384131779fcb0e11956a2f",
   "repository_head_tree": "12969b01f34493b81936fb161cbf3e7d361b6253",
-  "repository_status_row_count": 1,
+  "repository_status_row_count": 0,
   "schema": "proofalign.semantic-source-binding-e8-audit.v1",
   "simulator_created": false
 }
