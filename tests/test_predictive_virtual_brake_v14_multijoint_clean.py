@@ -262,3 +262,17 @@ def test_v14_freezer_reuses_exact_v13_schedule(
     assert protocol["outcomes_observed_for_selection"] is True
     assert protocol["execution_authorization"]["attacked_rollout"] is False
     assert protocol["execution_authorization"]["confirmatory_claim"] is False
+
+
+def test_v14_frozen_protocol_is_current_when_present() -> None:
+    if not freezer.OUTPUT_PATH.is_file():
+        return
+    retained = load_json_object(freezer.OUTPUT_PATH)
+    rebuilt = freezer.build_protocol(
+        created_at=str(retained["created_at"]),
+        source_commit=str(retained["source"]["repository_commit"]),
+    )
+
+    assert freezer.OUTPUT_PATH.read_text(
+        encoding="utf-8"
+    ) == freezer.canonical_text(rebuilt)
