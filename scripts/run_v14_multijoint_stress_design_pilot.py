@@ -54,7 +54,7 @@ OUTPUT_ROOT = (
 DEFAULT_OUTPUT = OUTPUT_ROOT / "pilot_evidence.json"
 CHECKSUMS_PATH = OUTPUT_ROOT / "SHA256SUMS"
 PILOT_IDENTITY = {
-    "suite": "human_safety",
+    "benchmark_name": "human_safety",
     "task_id": 0,
     "init_state_id": 2,
 }
