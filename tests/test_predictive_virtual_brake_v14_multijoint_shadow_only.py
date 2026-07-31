@@ -304,7 +304,7 @@ def test_shadow_only_freezer_preserves_exact_full_schedule(
     assert protocol["episode_constants"] == full["episode_constants"]
     assert protocol["fresh_output_root"].endswith("causal1")
     assert (
-        protocol["execution_authorization"][
+        protocol["shadow_only_execution_contract"][
             "intervention_authority_enabled"
         ]
         is False

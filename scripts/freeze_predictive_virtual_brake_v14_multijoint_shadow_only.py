@@ -237,8 +237,10 @@ def build_protocol(
                 "pre_divergence_margin_tolerance_rad": 1e-8,
                 "disabled_arm_margin_tolerance_rad": 1e-8,
             },
-            "execution_authorization": {
-                **full["execution_authorization"],
+            "execution_authorization": full[
+                "execution_authorization"
+            ],
+            "shadow_only_execution_contract": {
                 "authorized_runner": (
                     "scripts/run_predictive_virtual_brake_v14_"
                     "multijoint_shadow_only.py"
