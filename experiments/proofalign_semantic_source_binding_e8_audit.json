@@ -14,7 +14,7 @@
       "exists": true,
       "git_status": "clean",
       "path": "Makefile",
-      "sha256": "df7d719375571d5f89ed1f128740587996b647a6a9758a904bae04a88d7a6ab5",
+      "sha256": "e42870ef9f7c8a543418cd754d6fa0a1775e0246c23aab72da0fee62bdf30df3",
       "tracked": true
     },
     {
@@ -70,7 +70,7 @@
       "exists": true,
       "git_status": "clean",
       "path": "docs/paper/paper_story.md",
-      "sha256": "11192374ed37d5502494dbc91ecede753592ae4948edca7ff94bbb0fa2c679e1",
+      "sha256": "5161b25f94c351e28acdd16043c00e3b5ad3d3ab39ba736b327ec0ec60ed979d",
       "tracked": true
     },
     {
@@ -78,7 +78,7 @@
       "exists": true,
       "git_status": "clean",
       "path": "docs/progress_and_plan.md",
-      "sha256": "bcb90c485f376a202cb9fb2469707d0b288277c18b93539ed50e801dc564e33f",
+      "sha256": "1a22c01e4aa0cc004608c8df285ade5bd1910fe7e8e4e82b915b53daca0bce27",
       "tracked": true
     },
     {
@@ -134,7 +134,7 @@
       "exists": true,
       "git_status": "clean",
       "path": "scripts/check_all.sh",
-      "sha256": "f1e450f985439190bac42e347ef32f0f62ea7c85ae1ab9e8f279a945dc3c9b54",
+      "sha256": "618416444ab853bae5c63fbd3fa595213dea9be1d9a93799773df1faa7367b41",
       "tracked": true
     },
     {
@@ -2473,8 +2473,8 @@
   "policy_loaded": false,
   "repository_binding_semantics": "latest commit that changed the frozen semantic commit scope; later commits may contain only out-of-scope protocols or audit packets",
   "repository_fully_clean": true,
-  "repository_head_commit": "6c0521b33704bca9f2384131779fcb0e11956a2f",
-  "repository_head_tree": "12969b01f34493b81936fb161cbf3e7d361b6253",
+  "repository_head_commit": "977f272ff845b06621099a38d13cd1f88ec274f5",
+  "repository_head_tree": "5633cb2be27e3b114d21b0007378a1a82a753269",
   "repository_status_row_count": 0,
   "schema": "proofalign.semantic-source-binding-e8-audit.v1",
   "simulator_created": false
