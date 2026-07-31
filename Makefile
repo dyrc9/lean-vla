@@ -181,6 +181,7 @@ v13-clean-outcome-check:
 	$(PYTHON) scripts/freeze_predictive_virtual_brake_v13_clean_fresh3.py --check
 	@if [ -f results/proofalign_predictive_virtual_brake_v13_clean_20260731_fresh3/pilot_evidence.json ]; then \
 		$(PYTHON) scripts/run_predictive_virtual_brake_v13_clean_fresh3.py --validate-results >/dev/null; \
+		$(PYTHON) scripts/freeze_predictive_virtual_brake_v13_clean_terminal.py --check; \
 	else \
 		echo "Skipping v13 clean outcome result check: frozen rollout evidence is absent"; \
 	fi
