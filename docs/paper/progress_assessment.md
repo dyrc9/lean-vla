@@ -41,6 +41,7 @@
 | Policy-prefix shadow v12.4 | fresh no-outcome mechanism pass / efficacy 未测 | fixed-prefix warm-start 后 repeat 30/30；fresh π0.5 formal 为30次 inference、risk agreement 30/30、nominal allow 15/15、synthetic recovery-required 15/15，repeat 29/30；dispatch/outcome 为0 |
 | Integrated recovery v12.5 | fixed-trace composition pass / simulator integration 未测 | 60/60 routes；exact allow 与两类 substitution boundary通过，typed recovery receipt/completion/fresh-state authorization 15/15；policy/simulator/outcome为0 |
 | Simulator-integrated recovery v12.6 | mechanism mostly pass / liveness non-pass | 18/18 valid，recovery/receipt/terminal safe 9/9；恢复后 fresh authorization 6/9，formal non-pass。后继 policy-aware 单前缀关闭2/3 known outliers；最后一个 outlier 的156个两阶段组合中65个 recovery-safe，但 seed10509 全部 block；dispatch/outcome为0 |
+| Hard virtual joint stop v12.37/v12.38 | development + frozen held-out mechanism pass / efficacy 未测 | 两个 split 合计4条 lane、20/20 exact advances，最低 actual margin `0.16619/0.16612 rad`，identity 与 zero-anomaly 门通过；约`10k` constraint force且 outcome read为0，只支持simulator virtual-brake工程证据 |
 | Deployment | 未就绪 | E7 缺少7类 perception supervision；所有正向结果仍限于 privileged simulator geometry |
 
 ## 2026-07-29 终局判断

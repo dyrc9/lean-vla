@@ -3,37 +3,43 @@
 主线阅读顺序：
 
 1. [`method.md`](method.md)：两层定义、threat model、四臂和 Lean claim boundary；
-2. [`paper/final_results_figures.md`](paper/final_results_figures.md)：最终 v11/v12 图表、原始数据入口和
+2. [`current_status_and_roadmap.md`](current_status_and_roadmap.md)：当前终局、claim boundary 和
+   gate 化下一里程碑；
+3. [`paper/final_results_figures.md`](paper/final_results_figures.md)：最终 v11/v12 图表、原始数据入口和
    Lean 证明边界；
-3. [`trusted_semantic_boundary.md`](trusted_semantic_boundary.md)：可信 `Z_t` 的 TCB、双视图和注入覆盖边界；
-4. [`semantic_subtask_hierarchy.md`](semantic_subtask_hierarchy.md)：零训练 `Z_t`、task graph、绑定和 probe；
-5. [`semantic_subtask_pilot.md`](semantic_subtask_pilot.md)：冻结 checkpoint 的首轮 GPU probe 与限制；
-6. [`action_block_assessment.md`](action_block_assessment.md)：`Z_t -> ActionBlock` 局部评估和资格化；
-7. [`experiments.md`](experiments.md)：M1/M2/fixed-trace/closed-loop gate；
-8. [`implementation_and_experiment_readiness.md`](implementation_and_experiment_readiness.md)：下一批代码接口、
+4. [`trusted_semantic_boundary.md`](trusted_semantic_boundary.md)：可信 `Z_t` 的 TCB、双视图和注入覆盖边界；
+5. [`semantic_subtask_hierarchy.md`](semantic_subtask_hierarchy.md)：零训练 `Z_t`、task graph、绑定和 probe；
+6. [`semantic_subtask_pilot.md`](semantic_subtask_pilot.md)：冻结 checkpoint 的首轮 GPU probe 与限制；
+7. [`action_block_assessment.md`](action_block_assessment.md)：`Z_t -> ActionBlock` 局部评估和资格化；
+8. [`experiments.md`](experiments.md)：M1/M2/fixed-trace/closed-loop gate；
+9. [`implementation_and_experiment_readiness.md`](implementation_and_experiment_readiness.md)：下一批代码接口、
    测试、artifact 与实验停止条件；
-9. [`paper/paper_story.md`](paper/paper_story.md)：以双层对齐为主线的完整论文叙事；
-10. [`paper/related_work.md`](paper/related_work.md)：与 VLA hierarchy、world model、shielding、benchmark 和
+10. [`paper/paper_story.md`](paper/paper_story.md)：以双层对齐为主线的完整论文叙事；
+11. [`paper/related_work.md`](paper/related_work.md)：与 VLA hierarchy、world model、shielding、benchmark 和
    formal methods 的逐层关系；
-11. [`experiment_reuse.md`](experiment_reuse.md)：P0b/R9 的逐项复用、迁移步骤与禁止边界；
-12. [`v11_terminal_checkpoint.md`](v11_terminal_checkpoint.md)：不可覆盖的 v11/scale45 终局结果与 claim boundary；
-13. [`v12_recoverable_alignment_plan.md`](v12_recoverable_alignment_plan.md)：稀疏 L1、predictive/recoverable
+12. [`experiment_reuse.md`](experiment_reuse.md)：P0b/R9 的逐项复用、迁移步骤与禁止边界；
+13. [`v11_terminal_checkpoint.md`](v11_terminal_checkpoint.md)：不可覆盖的 v11/scale45 终局结果与 claim boundary；
+14. [`v12_recoverable_alignment_plan.md`](v12_recoverable_alignment_plan.md)：稀疏 L1、predictive/recoverable
     L2、资格 gate 与后续实验计划；
-14. [`v12_qualification_checkpoint.md`](v12_qualification_checkpoint.md)：v12 contract 与 v12.1
+15. [`v12_qualification_checkpoint.md`](v12_qualification_checkpoint.md)：v12 contract 与 v12.1
     simulator-reset 无 outcome 资格结果；
-15. [`v12_recovery_successor_checkpoint.md`](v12_recovery_successor_checkpoint.md)：v12.2 多关节
+16. [`v12_recovery_successor_checkpoint.md`](v12_recovery_successor_checkpoint.md)：v12.2 多关节
     typed recovery 与 v12.3 snapshot-boundary 资格结果；
-16. [`v12_policy_prefix_shadow_checkpoint.md`](v12_policy_prefix_shadow_checkpoint.md)：v12.4
+17. [`v12_policy_prefix_shadow_checkpoint.md`](v12_policy_prefix_shadow_checkpoint.md)：v12.4
     policy-load resource nonstart、fixed-prefix controller shadow 与 warm-start 后继；
-17. [`v12_integrated_predictive_recovery_checkpoint.md`](v12_integrated_predictive_recovery_checkpoint.md)：
+18. [`v12_integrated_predictive_recovery_checkpoint.md`](v12_integrated_predictive_recovery_checkpoint.md)：
     v12.5 fresh-shadow 与 typed-recovery fixed-trace composition；
-18. [`progress_and_plan.md`](progress_and_plan.md)：当前 blocker、历史复用和下一步；
-19. [`remote_execution.md`](remote_execution.md)：执行授权与远程运行规则。
+19. [`v12_simulator_integrated_recovery_checkpoint.md`](v12_simulator_integrated_recovery_checkpoint.md)：
+    v12.6–v12.38 simulator-integrated 优化、负结果与最终 frozen held-out pass；
+20. [`progress_and_plan.md`](progress_and_plan.md)：完整实验时间线、历史复用和停止边界；
+21. [`remote_execution.md`](remote_execution.md)：执行授权与远程运行规则。
 
 论文组织：
 
 - [`paper/paper_story.md`](paper/paper_story.md)
 - [`paper/progress_assessment.md`](paper/progress_assessment.md)
+- [`paper/final_results_figures.md`](paper/final_results_figures.md)
+- [`current_status_and_roadmap.md`](current_status_and_roadmap.md)
 - [`paper/confirmatory_preregistration.md`](paper/confirmatory_preregistration.md)
 - [`v11_terminal_checkpoint.md`](v11_terminal_checkpoint.md)
 - [`v12_recoverable_alignment_plan.md`](v12_recoverable_alignment_plan.md)
@@ -41,6 +47,7 @@
 - [`v12_recovery_successor_checkpoint.md`](v12_recovery_successor_checkpoint.md)
 - [`v12_policy_prefix_shadow_checkpoint.md`](v12_policy_prefix_shadow_checkpoint.md)
 - [`v12_integrated_predictive_recovery_checkpoint.md`](v12_integrated_predictive_recovery_checkpoint.md)
+- [`v12_simulator_integrated_recovery_checkpoint.md`](v12_simulator_integrated_recovery_checkpoint.md)
 
 审计原则：
 

@@ -396,3 +396,22 @@ action records，没有加载 policy、创建 simulator、dispatch policy action
 软件 transaction 组合没有把“shadow pass”和“recovery pass”之间留成未绑定的缝，但还不是
 simulator-integrated recovery。后续只有 no-outcome simulator pilot 可以升级该边界；在此之前
 clean utility、attacked efficacy 和 physical safety 仍不成立。
+
+v12.6 将 fresh policy、controller-aware shadow、typed recovery simulator steps 和恢复后的
+fresh-state authorization 放进同一条真实 LIBERO simulator、no-outcome 链路。recovery、receipt 与
+terminal-safe 为9/9，但 fresh authorization 只有6/9，因此 formal 按冻结 gate non-pass。后续
+successor 没有覆盖这一结论，而是逐层定位剩余活性缺口：离散/连续 recovery generator、随机 replan、
+高层 backup set、OSC nullspace、单轴/耦合 actuator torque、contact-aware vertices、beam horizon 和
+soft virtual stop 都不能在0.15 rad floor下完成两条 lane 各5次 exact advances。
+
+v12.37 最终把方法明确改名为 simulator hard virtual joint stop，而不冒充 actuator-only shield。
+development seeds `10509/10510` 均完成5/5 exact advances，最低 actual advanced-state margin 为
+`0.1661929 rad`。方法和阈值冻结后，v12.38 只替换为未见 seeds `20509/20510`，同样完成5/5，
+最低 margin 为 `0.1661158 rad`。两个 split 合计20/20 exact advances；guard action/config/profile
+identity、prediction/execution equality 和全部 zero-anomaly 门通过。
+
+这个正结果为论文增加的是“可审计失败定位最终导向跨 seed 可复现的 simulator virtual-brake
+mechanism”。执行中最大 target-DOF generalized constraint force 约为`9999/9985`，且整个实验
+outcome read 为0，所以它不能恢复 actuator-only recovery、task utility、一般 defense efficacy 或
+physical-safety claim。任何 task-outcome 后继都必须另立冻结协议，先验证 clean utility，再决定是否
+授权 attacked stage。

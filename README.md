@@ -41,7 +41,23 @@ phase-gating theorem，而不是事后附加的形式化说明。
 
 冻结 runtime 中的 `intent_only` / `intent_action_enabled` 只是 Semantic-only 的兼容 schema 名称。
 
-## 当前证据边界
+## 当前状态（2026-07-31）
+
+- 工程与证据链已形成可复现研究原型；顶层 Python、Lean、冻结协议和 artifact 校验由
+  `scripts/check_all.sh` 统一执行。
+- v11 held-out scale45 支持 typed L2 post-trigger containment，但同时暴露明确的 clean
+  task-utility 代价，因此终局是 mixed evidence，不是一般 defense efficacy。
+- v12.37 development 与 v12.38 frozen held-out 均完成 `10/10` exact advances，最低 actual
+  margin 分别为 `0.1661929/0.1661158 rad`，全部 identity 与 zero-anomaly 门通过。
+- v12 正结果依赖约 `10k` generalized constraint force 的 hard simulator virtual joint stop，
+  且没有读取 task outcome；它不支持 actuator-only authority、task utility、真实部署或物理安全。
+- 当前唯一合理的近期科学 successor 是另立 task-outcome protocol，先过 clean utility gate，再决定
+  是否授权 attacked stage；E7 deployment perception 仍未资格化。
+
+简明状态、claim boundary 和 gate 化路线图见
+[`docs/current_status_and_roadmap.md`](docs/current_status_and_roadmap.md)。
+
+## 详细证据边界（按时间）
 
 - 2026-07-27 semantic qualification 与工程 smoke：
   - raw π0.5 selector 未通过（500 snapshots，coverage `0.822`，known legal-frontier
@@ -182,8 +198,14 @@ Dual 已验证。旧结果可复用为：
 10. v12.5 integrated fixed trace 已完成：在15个 fresh source pairs 上运行60条 composition
     paths，exact allow、prefix substitution、typed recovery 和 recovery-selection substitution
     全部符合预期。旧授权/recovery replay/substituted fresh state 接受均为0，receipt、completion
-    和 fresh-state authorization 均为15/15；policy/simulator/outcome均为0。下一步只进入
-    no-outcome simulator-integrated pilot。
+    和 fresh-state authorization 均为15/15；policy/simulator/outcome均为0。
+11. v12.6 simulator-integrated formal 的 recovery/receipt/terminal safe 为9/9，但恢复后 fresh
+    authorization 仅6/9，因此按冻结 gate non-pass。v12.7–v12.36 依次排除了固定原语、局部连续
+    blend、随机 replan、high-level backup、nullspace、单轴/耦合 actuator torque、contact-aware
+    vertex 与 soft virtual stop 等路线。
+12. v12.37 hard virtual joint stop 在 development seeds 上通过，方法冻结后的 v12.38 unseen-seed
+    validation 也通过；两个 split 合计20/20 exact advances。该结果只支持 simulator
+    virtual-brake engineering mechanism，下一 task-outcome 实验必须另立协议。
 
 入口文档：
 
@@ -197,6 +219,7 @@ Dual 已验证。旧结果可复用为：
 - [相关工作](docs/paper/related_work.md)
 - [论文故事](docs/paper/paper_story.md)
 - [代码与实验准备清单](docs/implementation_and_experiment_readiness.md)
+- [当前状态与路线图](docs/current_status_and_roadmap.md)
 - [进展与下一步](docs/progress_and_plan.md)
 - [v11 终局 checkpoint](docs/v11_terminal_checkpoint.md)
 - [v12 稀疏 L1 与可恢复 L2 计划](docs/v12_recoverable_alignment_plan.md)
@@ -204,6 +227,7 @@ Dual 已验证。旧结果可复用为：
 - [v12.2/v12.3 多关节恢复 checkpoint](docs/v12_recovery_successor_checkpoint.md)
 - [v12.4 policy-prefix shadow checkpoint](docs/v12_policy_prefix_shadow_checkpoint.md)
 - [v12.5 integrated predictive-recovery checkpoint](docs/v12_integrated_predictive_recovery_checkpoint.md)
+- [v12.6–v12.38 simulator-integrated checkpoint](docs/v12_simulator_integrated_recovery_checkpoint.md)
 
 常用检查：
 
@@ -217,8 +241,7 @@ bash scripts/check_all.sh
 
 冻结的旧协议、旧结果和废弃路线只用于审计，不授权新 rollout。
 
-当前 post-E5 packet 已确认 benchmark privileged-geometry no-outcome stack 完整；opt-in 在线 LIBERO
-runtime 已接入资格化的 deterministic selector、analytic executable-prefix checker、fresh one-use
-authorization、ordered receipts 和 analytic effect observer。E6 离线资源/延迟 smoke 已通过；剩余
-blocker 是 deployment perception、E8 所报告的 clean-commit binding 与明确 outcome 授权。E7 已机器
-确认当前 RLDS supervision 不足；当前没有新 efficacy rollout。
+当前 benchmark privileged-geometry stack、fresh one-use authorization、ordered receipts、
+analytic effect observer、predictive shadow 与 typed recovery transaction 已形成完整审计链。
+E8 clean-commit source binding 已关闭；E7 deployment perception 和新的 task-outcome protocol 仍是
+主要 blocker。当前没有被授权的新 efficacy rollout。

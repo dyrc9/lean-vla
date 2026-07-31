@@ -1,6 +1,21 @@
 # 当前进展与执行计划
 
-## 最新 checkpoint：2026-07-30 v12.6 simulator-integrated recovery
+简明当前状态、可主张边界和 gate 化下一步以
+[`current_status_and_roadmap.md`](current_status_and_roadmap.md) 为准。本页保留完整时间线和所有
+结果后 successor，不再作为快速状态入口。
+
+## 最新 checkpoint：2026-07-30 v12.38 frozen held-out hard virtual joint stop
+
+v12.37 development 与 v12.38 frozen held-out 已完成方法冻结前后的跨 seed 验证：4条 lane 合计
+20/20 exact advances，最低 actual advanced-state margin 分别为 `0.1661929/0.1661158 rad`，
+action/config/profile identity、prediction/execution equality 与全部 zero-anomaly 门通过。该结果严格
+限定为 hard simulator virtual-joint-stop engineering evidence；约 `10k` generalized constraint
+force、zero task-outcome read、无 actuator-only authority 和无部署证据必须同时披露。
+
+下一科学步骤只允许另立 task-outcome protocol，先验证 clean utility；不能回读本轮 no-outcome ledger
+选择 workload、guard 或阈值。以下从 v12.6 开始保留完整优化时间线。
+
+### v12.6 simulator-integrated recovery 起点
 
 v12.6 已把 fresh policy、controller-aware shadow、typed recovery simulator steps 和恢复后
 fresh-state authorization 接入同一条 no-outcome 链路，并完成独立 formal：
