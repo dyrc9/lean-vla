@@ -45,6 +45,11 @@ BRAKE_AUDIT_SCHEMA = (
 )
 JOINT_COUNT = 7
 JOINT_SIDES = ("lower", "upper")
+# Compatibility fields used by the inherited v13 outcome analyzer.  A v14
+# episode has no distinguished target joint or side; protocol-level checks
+# additionally require the explicit fourteen-side scope metadata below.
+TARGET_JOINT_INDEX = None
+TARGET_JOINT_SIDE = None
 BRAKE_MARGINS_RAD = core.BRAKE_MARGINS_RAD
 TRIGGER_MARGIN_RAD = core.TRIGGER_MARGIN_RAD
 SAFE_MARGIN_FLOOR_RAD = core.SAFE_MARGIN_FLOOR_RAD

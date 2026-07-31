@@ -15,6 +15,7 @@ from scripts.run_l2_predictive_virtual_brake_v14_multijoint import (
     _joint_side_margins,
     _margin_rows,
     _risk_sides,
+    _scoped_multi_joint_guards,
 )
 
 
@@ -289,3 +290,106 @@ def test_multijoint_trigger_jointly_guards_two_sides(
     assert audit["prediction_execution_margin_error_rad"] == 0.0
     assert audit["maximum_abs_guarded_constraint_force"] == 12.0
     assert audit["exact_action_identity"] is True
+
+
+def test_multijoint_guard_scope_modifies_and_restores_every_joint() -> None:
+    class Controller:
+        actuator_min = np.full(7, -1.0)
+        actuator_max = np.full(7, 1.0)
+
+        def run_controller(self) -> np.ndarray:
+            return np.linspace(-0.5, 0.5, 7)
+
+        def clip_torques(self, values: np.ndarray) -> np.ndarray:
+            return np.clip(values, self.actuator_min, self.actuator_max)
+
+    class Simulation:
+        def __init__(self) -> None:
+            self.forward_count = 0
+            self.model = SimpleNamespace(
+                jnt_range=np.column_stack(
+                    (np.full(7, -2.0), np.full(7, 2.0))
+                ),
+                jnt_solref=np.tile([0.02, 1.0], (7, 1)),
+                jnt_solimp=np.tile(
+                    [0.9, 0.95, 0.001, 0.5, 2.0],
+                    (7, 1),
+                ),
+            )
+            self.data = SimpleNamespace(
+                qpos=np.array(
+                    [-1.83, 0.0, 0.0, 0.0, 0.0, 1.83, 0.0]
+                ),
+                qvel=np.zeros(7),
+                qfrc_constraint=np.array(
+                    [-4.0, 0.0, 0.0, 0.0, 0.0, 8.0, 0.0]
+                ),
+            )
+
+        def forward(self) -> None:
+            self.forward_count += 1
+
+    simulation = Simulation()
+    env = SimpleNamespace(sim=simulation)
+    robot = SimpleNamespace(controller=Controller())
+    configurations = []
+    for joint_index, side in ((0, "lower"), (5, "upper")):
+        guarded_range = [-2.0, 2.0]
+        guarded_range[0 if side == "lower" else 1] = (
+            -1.84 if side == "lower" else 1.84
+        )
+        configurations.append(
+            {
+                "model_joint_id": joint_index,
+                "qpos_address": joint_index,
+                "dof_address": joint_index,
+                "target_joint_index": joint_index,
+                "target_joint_side": side,
+                "original_joint_range": [-2.0, 2.0],
+                "guarded_joint_range": guarded_range,
+                "original_joint_solref": [0.02, 1.0],
+                "original_joint_solimp": [
+                    0.9,
+                    0.95,
+                    0.001,
+                    0.5,
+                    2.0,
+                ],
+                "guarded_joint_solref": [0.004, 1.0],
+                "guarded_joint_solimp": [
+                    0.999,
+                    0.9999,
+                    0.001,
+                    0.5,
+                    2.0,
+                ],
+            }
+        )
+
+    with _scoped_multi_joint_guards(
+        env,
+        robot,
+        configurations=configurations,
+    ) as audit:
+        assert simulation.model.jnt_range[0, 0] == -1.84
+        assert simulation.model.jnt_range[5, 1] == 1.84
+        assert "run_controller" in robot.controller.__dict__
+        returned = robot.controller.run_controller()
+        assert np.array_equal(
+            returned,
+            np.linspace(-0.5, 0.5, 7),
+        )
+        assert len(audit) == 1
+        assert [
+            (row["joint_index"], row["side"])
+            for row in audit[0]["guarded_sides"]
+        ] == [(0, "lower"), (5, "upper")]
+
+    assert "run_controller" not in robot.controller.__dict__
+    assert np.array_equal(
+        simulation.model.jnt_range,
+        np.column_stack(
+            (np.full(7, -2.0), np.full(7, 2.0))
+        ),
+    )
+    assert simulation.forward_count == 2
