@@ -246,10 +246,18 @@ def build_protocol(
             "joint_count": 7,
             "joint_sides": ["lower", "upper"],
             "joint_side_count_per_environment": 14,
-            "doses": [dict(row) for row in development.pilot.DOSES],
-            "baselines": list(development.pilot.BASELINES),
-            "horizon_steps": development.pilot.HORIZON_STEPS,
-            "hold_action": development.pilot.HOLD_ACTION.tolist(),
+            "doses": [
+                dict(row) for row in runner.development.pilot.DOSES
+            ],
+            "baselines": list(
+                runner.development.pilot.BASELINES
+            ),
+            "horizon_steps": (
+                runner.development.pilot.HORIZON_STEPS
+            ),
+            "hold_action": (
+                runner.development.pilot.HOLD_ACTION.tolist()
+            ),
             "method_frozen_from_development": True,
         },
         "analysis": {
