@@ -63,10 +63,22 @@ V12_HELDOUT_ROOT = (
     / "proofalign_h3_hard_virtual_joint_guard_beam_"
     "heldout_v12_20260730"
 )
-OUTPUT_PATH = (
+FRESH1_PROTOCOL_PATH = (
     REPO_ROOT
     / "experiments"
     / "proofalign_predictive_virtual_brake_v13_clean_protocol.json"
+)
+FRESH1_FAILURE_PATH = (
+    REPO_ROOT
+    / "experiments"
+    / "proofalign_predictive_virtual_brake_v13_"
+    "fresh1_resource_failure.json"
+)
+OUTPUT_PATH = (
+    REPO_ROOT
+    / "experiments"
+    / "proofalign_predictive_virtual_brake_v13_clean_"
+    "fresh2_protocol.json"
 )
 SELF_PATH = (
     REPO_ROOT
@@ -86,10 +98,11 @@ SOURCE_PATHS = (
     "tests/test_predictive_virtual_brake_v13_clean.py",
 )
 PROTOCOL_ID = (
-    "proofalign-predictive-virtual-brake-v13-clean-outcome-20260731"
+    "proofalign-predictive-virtual-brake-v13-clean-outcome-fresh2-"
+    "20260731"
 )
-STAGE = "predictive_virtual_brake_v13_clean_outcome"
-CREATED_AT = "2026-07-31T10:30:00+08:00"
+STAGE = "predictive_virtual_brake_v13_clean_outcome_fresh2"
+CREATED_AT = "2026-07-31T11:40:00+08:00"
 INIT_SELECTION_SALT = (
     "proofalign-v13-clean-outcome-blind-init-selection-v1"
 )
@@ -295,6 +308,7 @@ def build_protocol(
     v12_heldout = load_json_object(
         V12_HELDOUT_ROOT / "summary.json"
     )
+    fresh1_failure = load_json_object(FRESH1_FAILURE_PATH)
     if (
         len(
             population_source["qualification_population"][
@@ -313,6 +327,14 @@ def build_protocol(
         )
         is not True
         or v12_heldout.get("outcome_read_count") != 0
+        or fresh1_failure.get("classification")
+        != (
+            "predictive_virtual_brake_v13_fresh1_"
+            "pre_outcome_resource_failure"
+        )
+        or fresh1_failure["failure"]["policy_loaded"] is not False
+        or fresh1_failure["failure"]["simulator_step_count"] != 0
+        or fresh1_failure["failure"]["task_outcome_read_count"] != 0
     ):
         raise PredictiveVirtualBrakeV13FreezeError(
             "v13 predecessor population or mechanism binding differs"
@@ -359,7 +381,7 @@ def build_protocol(
             ),
             "fresh_output_root": (
                 "results/proofalign_predictive_virtual_brake_v13_"
-                "clean_20260731_fresh1"
+                "clean_20260731_fresh2"
             ),
             "workloads": workloads,
             "schedule": schedule,
@@ -383,6 +405,9 @@ def build_protocol(
                 "environment_seed": ENVIRONMENT_SEED,
                 "policy_seed": POLICY_SEED,
                 "seed_overlap_with_v12_37_or_v12_38": False,
+                "fresh1_pre_outcome_resource_failure_observed": True,
+                "fresh1_task_outcome_read_count": 0,
+                "fresh2_scientific_design_changed_after_fresh1": False,
             },
             "execution_authorization": {
                 "clean_exploratory_pilot": True,
@@ -397,6 +422,13 @@ def build_protocol(
                     "all_45_fresh_tasks_hash_order_with_per_task_"
                     "rotated_four_arm_order_v13"
                 ),
+            },
+            "runtime_dependency": {
+                **v11_protocol["runtime_dependency"],
+                "required_interpreter": (
+                    "external/openpi/.venv/bin/python"
+                ),
+                "fresh1_interpreter_failure_fixed": True,
             },
             "design": {
                 "condition": "clean",
@@ -512,6 +544,14 @@ def build_protocol(
                 "guard_or_threshold_changes_after_outcome_read": False,
             },
             "required_bindings": [
+                _binding(FRESH1_PROTOCOL_PATH),
+                _binding(
+                    FRESH1_FAILURE_PATH,
+                    classification=(
+                        "predictive_virtual_brake_v13_fresh1_"
+                        "pre_outcome_resource_failure"
+                    ),
+                ),
                 _binding(POPULATION_SOURCE_PATH),
                 _binding(V12_PREFLIGHT_PATH),
                 _binding(V11_CLEAN_SCALE45_PROTOCOL_PATH),
@@ -548,6 +588,12 @@ def build_protocol(
             "outcomes_observed_for_selection": False,
             "outcome_conditioned_engineering_regression": True,
             "claim_boundary": (
+                "Fresh1 stopped before policy load, simulator creation, "
+                "dispatch, or outcome read because the validator-only "
+                "Python environment lacked JAX. Fresh2 changes only the "
+                "required interpreter, output root, and run identity; the "
+                "workloads, seeds, guard, thresholds, estimands, and gates "
+                "remain unchanged. "
                 "This protocol is outcome-blind for its 45 selected "
                 "task/init workloads and new seeds, but the target joint, "
                 "guard family, solver profile, and thresholds were "

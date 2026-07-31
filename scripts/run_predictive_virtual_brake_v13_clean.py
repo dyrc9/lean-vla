@@ -39,7 +39,10 @@ AUTHORIZED_STATUS = (
 DEFAULT_PROTOCOL = (
     REPO_ROOT
     / "experiments"
-    / "proofalign_predictive_virtual_brake_v13_clean_protocol.json"
+    / "proofalign_predictive_virtual_brake_v13_clean_fresh2_protocol.json"
+)
+REQUIRED_INTERPRETER = (
+    REPO_ROOT / "external" / "openpi" / ".venv" / "bin" / "python"
 )
 _BASE_V10_METRICS = inherited._v10_metrics
 _BASE_ENRICH = risk._enrich
@@ -557,12 +560,30 @@ def preflight(
     egl_gpu: int | None,
 ) -> dict[str, Any]:
     with _patched_inherited():
-        return inherited.preflight(
+        report = inherited.preflight(
             protocol,
             protocol_path=protocol_path,
             policy_gpu=policy_gpu,
             egl_gpu=egl_gpu,
         )
+    observed = Path(sys.executable).resolve()
+    required = REQUIRED_INTERPRETER.resolve()
+    interpreter_ready = observed == required
+    blockers = list(report["blockers"])
+    if not interpreter_ready:
+        blockers.append(
+            "v13 outcome rollout requires "
+            "external/openpi/.venv/bin/python"
+        )
+    return {
+        **report,
+        "ready": not blockers,
+        "required_interpreter": str(REQUIRED_INTERPRETER),
+        "required_interpreter_resolved": str(required),
+        "observed_interpreter_resolved": str(observed),
+        "interpreter_ready": interpreter_ready,
+        "blockers": blockers,
+    }
 
 
 def execute(
@@ -572,6 +593,11 @@ def execute(
     policy_gpu: int,
     egl_gpu: int,
 ) -> dict[str, Any]:
+    if Path(sys.executable).resolve() != REQUIRED_INTERPRETER.resolve():
+        raise PredictiveVirtualBrakeCleanError(
+            "v13 outcome rollout requires "
+            "external/openpi/.venv/bin/python"
+        )
     with _patched_inherited():
         return inherited.execute(
             protocol,

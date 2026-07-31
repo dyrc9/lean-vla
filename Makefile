@@ -179,7 +179,7 @@ v12-hard-guard-check:
 
 v13-clean-outcome-check:
 	$(PYTHON) scripts/freeze_predictive_virtual_brake_v13_clean.py --check
-	@if [ -f results/proofalign_predictive_virtual_brake_v13_clean_20260731_fresh1/pilot_evidence.json ]; then \
+	@if [ -f results/proofalign_predictive_virtual_brake_v13_clean_20260731_fresh2/pilot_evidence.json ]; then \
 		$(PYTHON) scripts/run_predictive_virtual_brake_v13_clean.py --validate-results >/dev/null; \
 	else \
 		echo "Skipping v13 clean outcome result check: frozen rollout evidence is absent"; \

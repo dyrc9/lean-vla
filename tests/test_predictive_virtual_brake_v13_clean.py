@@ -54,6 +54,28 @@ def test_outcome_blind_population_is_fresh_and_complete() -> None:
     )
 
 
+def test_execute_rejects_validator_only_interpreter(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    monkeypatch.setattr(
+        clean,
+        "REQUIRED_INTERPRETER",
+        tmp_path / "missing-openpi-python",
+    )
+
+    with pytest.raises(
+        clean.PredictiveVirtualBrakeCleanError,
+        match="external/openpi/.venv/bin/python",
+    ):
+        clean.execute(
+            {},
+            protocol_path=tmp_path / "protocol.json",
+            policy_gpu=1,
+            egl_gpu=2,
+        )
+
+
 def _audit(*, enabled: bool, intervention: bool = False) -> dict[str, Any]:
     return {
         "schema": online.BRAKE_AUDIT_SCHEMA,
