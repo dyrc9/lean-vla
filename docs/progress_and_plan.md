@@ -4,7 +4,38 @@
 [`current_status_and_roadmap.md`](current_status_and_roadmap.md) 为准。本页保留完整时间线和所有
 结果后 successor，不再作为快速状态入口。
 
-## 最新 checkpoint：2026-07-31 v13 task-outcome、shadow 与 attacked 终态
+## 最新 checkpoint：2026-07-31 v14 全关节 clean development 终态
+
+v14 将 v13 的单一 `joint-1 upper` monitor 扩展为每步7个arm joints × lower/upper共14个margin，
+并对同一步所有at-risk joints联合施加最弱可行的 simulator hard guards。development1 在完成前两条
+L2 outcome后，于首条disabled arm暴露继承的v13单目标审计依赖；该root以4条checksum entries封存，
+不复用。Fresh2只移除disabled-arm的单目标依赖，保持180条schedule、workload/init、env/policy
+seeds、arm order、guard、阈值、estimands和gates不变，并在新root完成`180/180`。
+
+终态共有`47,130`个policy steps、`21,041`个L2 screen steps、29次trigger、12次active
+intervention和17次fail-closed deadlock。trigger分别来自joint3/5/6 upper的`17/4/8`次，
+intervention为`7/2/3`次。Execution-only和Dual的所有实际14侧值中，margin `<0.15 rad`与
+crossing均为0；VLA-only和Semantic-only合计分别为`3306`和`1455`。所有restore、scope、exact
+action、torque-bound和intervention-floor异常计数均为0。
+
+该正coverage结果伴随明确代价。task success为VLA/Execution/Semantic/Dual
+`36/32/32/28`，Execution−VLA与Dual−Semantic均为`−8.89pp`，冻结`−20pp` paired
+non-inferiority下界分别为`−20.06pp`和`−24.44pp`，两门均未过；17个L2 deadlock是主要活性缺口。
+official unsafe仍为`1/1/2/2`，没有显示总体改善。
+
+严格的`1e-9 rad`全侧 prediction/execution calibration gate也按冻结规则non-pass。最大误差
+`0.001187 rad`来自非干预且远离风险边界的joint side；非干预p99为`9.74e-6 rad`。12次干预的
+168个逐侧误差最大`4.24e-6 rad`，最低margin预测误差最大`2.53e-9 rad`；false-safe风险决策为0。
+因此终态分类为
+`predictive_virtual_brake_v14_multijoint_clean_development_fresh2_data_complete_calibration_nonpass`，
+不能结果后放宽原门。
+
+冻结终态见
+[`../experiments/proofalign_predictive_virtual_brake_v14_multijoint_clean_terminal_summary.json`](../experiments/proofalign_predictive_virtual_brake_v14_multijoint_clean_terminal_summary.json)。
+下一步是同schedule全关节shadow-only guard-off消融，随后才冻结trigger-rich
+no-guard/reactive/shadow/predictive压力测试；确认性复验必须使用新workloads/init/seeds。
+
+## 前一 checkpoint：2026-07-31 v13 task-outcome、shadow 与 attacked 终态
 
 v13 Fresh3 clean 已完成45 workloads × 4 arms=`180/180`。VLA-only、Execution-only、
 Semantic-only、Dual task success 为`36/45、36/45、32/45、31/45`；Execution−VLA 与

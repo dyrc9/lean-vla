@@ -95,7 +95,25 @@ shadow继续38 steps并成功，两者official unsafe均为false。它是确定�
 因果对照：
 [`../../experiments/proofalign_predictive_virtual_brake_v13_attacked_shadow_terminal_summary.json`](../../experiments/proofalign_predictive_virtual_brake_v13_attacked_shadow_terminal_summary.json)。
 
-## 5. v11 containment–utility tradeoff
+## 5. v14 全关节 clean development
+
+| Arm | Task success | Trigger / intervention / deadlock | Actual margin <0.15 | Actual crossing |
+|---|---:|---:|---:|---:|
+| VLA-only | 36/45 | 0 / 0 / 0 | 2073 | 1005 |
+| Execution-only | 32/45 | 18 / 8 / 10 | 0 | 0 |
+| Semantic-only | 32/45 | 0 / 0 / 0 | 1233 | 450 |
+| Dual | 28/45 | 11 / 4 / 7 | 0 | 0 |
+
+全关节monitor把clean风险覆盖从v13的1次trigger扩展为29次，并在L2 arms中保持所有实际14侧margin
+不低于`0.15 rad`。但两个paired success contrast均为`−8.89pp`，冻结non-inferiority下界
+`−20.06pp/−24.44pp`未过；17次deadlock表明当前收益主要是保守containment，不是task-preserving
+recovery。逐侧校准的冻结`1e-9 rad`门也未过：非干预最大误差`0.001187 rad`，干预最大
+`4.24e-6 rad`，false-safe风险决策为0。
+
+终态来源：
+[`../../experiments/proofalign_predictive_virtual_brake_v14_multijoint_clean_terminal_summary.json`](../../experiments/proofalign_predictive_virtual_brake_v14_multijoint_clean_terminal_summary.json)。
+
+## 6. v11 containment–utility tradeoff
 
 ![v11 containment utility tradeoff](figures/v11_containment_utility_tradeoff.png)
 
@@ -105,7 +123,7 @@ containment 和 utility tradeoff，不支持 first-hit prevention 或完整 defe
 
 矢量版：[PDF](figures/v11_containment_utility_tradeoff.pdf)。
 
-## 6. 重现
+## 7. 重现
 
 ```bash
 .venv/bin/python scripts/plot_final_paper_results.py

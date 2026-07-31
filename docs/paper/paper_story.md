@@ -449,3 +449,16 @@ margin降至`0.061217 rad`、产生25次counterfactual trigger，但最终任务
 论文应把这个结果写成“predictive hard stop的可识别safety–liveness tradeoff”，而不是把proxy改善
 单独写成安全收益。它也直接说明下一方法贡献应是多关节coverage与safe recovery/backup controller，
 不是继续在单关节上提高制动力。
+
+v14 已完成第一步多关节 successor。它在同一outcome-disclosed 45-pair clean population上，把在线
+审计扩展到7 joints × lower/upper，并联合保护同一步所有at-risk joints。180条Fresh2 episodes中，
+29次trigger覆盖joint3/5/6 upper，12次执行exact-action hard guard，17次因没有安全candidate而
+fail closed。L2两臂的实际14侧margin共有294,574个值，`<0.15 rad`和crossing均为0；两个disabled
+arms对应为3306和1455。该结果解决了v13的单关节coverage失败，但没有解决liveness。
+
+任务成功为VLA/Execution/Semantic/Dual `36/32/32/28`。两个L2对照均下降`8.89pp`，冻结
+non-inferiority下界为`−20.06pp/−24.44pp`，均未通过；17个deadlock不能隐藏为安全成功。另一个
+冻结non-pass是全14侧`1e-9 rad`校准门：非干预远离边界的最大shadow/replay漂移为
+`0.001187 rad`，尽管false-safe风险决策为0、干预逐侧最大误差仅`4.24e-6 rad`、最低margin误差
+仅`2.53e-9 rad`。论文必须同时报告“全关节安全代理覆盖显著增强”和“校准/任务效用未过”，并在
+同schedule shadow-only之后才能把低余量减少归因到active guard。

@@ -99,6 +99,19 @@ if [[ -f results/proofalign_predictive_virtual_brake_v13_attacked_shadow_only_20
 else
     echo "Skipping v13 attacked shadow-only result check: frozen rollout evidence is absent"
 fi
+"$PYTHON_BIN" scripts/freeze_predictive_virtual_brake_v14_multijoint_clean.py --check
+"$PYTHON_BIN" scripts/freeze_predictive_virtual_brake_v14_multijoint_clean_fresh2.py --check
+if [[ -f results/proofalign_predictive_virtual_brake_v14_multijoint_clean_20260731_development1/run_manifest.json ]]; then
+    "$PYTHON_BIN" scripts/freeze_predictive_virtual_brake_v14_multijoint_development1_failure.py --check
+else
+    echo "Skipping v14 development1 failure check: local-only failed root is absent"
+fi
+if [[ -f results/proofalign_predictive_virtual_brake_v14_multijoint_clean_20260731_development2/pilot_evidence.json ]]; then
+    "$PYTHON_BIN" scripts/run_predictive_virtual_brake_v14_multijoint_clean_fresh2.py --validate-results >/dev/null
+    "$PYTHON_BIN" scripts/freeze_predictive_virtual_brake_v14_multijoint_clean_terminal.py --check
+else
+    echo "Skipping v14 multijoint clean result check: local-only rollout evidence is absent"
+fi
 "$PYTHON_BIN" scripts/generate_saber_confirmatory_records.py --dry-run >/dev/null
 "$PYTHON_BIN" scripts/run_saber_confirmatory_victim.py --dry-run >/dev/null
 "$PYTHON_BIN" scripts/export_proofalign_fixed_trace.py --dry-run >/dev/null
