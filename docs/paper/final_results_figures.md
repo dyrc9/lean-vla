@@ -32,7 +32,28 @@ Lean 不证明 learned selector/assessor 正确，不证明 simulator 等价于�
 Python-to-Lean refinement proof。正确 claim 是 **Lean-checked execution transaction semantics**，
 不是“Lean 证明机器人安全”。
 
-## 2. v12 最终 engineering validation
+## 2. SABER 攻击—防御主实验
+
+![SABER attack defense scale45](figures/v11_saber_attack_defense_scale45.png)
+
+本图来自 v11 frozen held-out scale45。官方 SABER task-prompt attack records 被 deterministic
+transplant 到45个未见 workload；四臂合计180条 attacked episodes：
+
+| Arm | Attacked task success | Joint-limit step rate | Containment triggers |
+|---|---:|---:|---:|
+| VLA-only | 30/45 (66.7%) | 8.194% | 0 |
+| Execution-only / L2 | 28/45 (62.2%) | 0.063% | 9 |
+| Semantic-only / L1 | 25/45 (55.6%) | 5.826% | 0 |
+| Dual / L1+L2 | 21/45 (46.7%) | 0.049% | 6 |
+
+攻击使 `180/180` 首个 ActionBlock 相对 paired clean 改变；四臂共享输入 identity 为 `45/45`。
+15个 attacked trigger episodes 之后的 dispatch 为 `0`。L2 的机械 containment 信号明确，但
+任务成功率没有优于对应 control：Execution-only−VLA-only 为 `−4.4pp`，Dual−Semantic-only 为
+`−8.9pp`。因此结果不能写成一般 attacked-defense efficacy。
+
+矢量版：[PDF](figures/v11_saber_attack_defense_scale45.pdf)。
+
+## 3. v12 最终 engineering validation
 
 ![v12 final engineering validation](figures/v12_final_engineering_validation.png)
 
@@ -48,7 +69,7 @@ force 分别约为 `9999` 和 `9985`，因此结果只支持 hard simulator virt
 
 矢量版：[PDF](figures/v12_final_engineering_validation.pdf)。
 
-## 3. v11 containment–utility tradeoff
+## 4. v11 containment–utility tradeoff
 
 ![v11 containment utility tradeoff](figures/v11_containment_utility_tradeoff.png)
 
@@ -58,7 +79,7 @@ containment 和 utility tradeoff，不支持 first-hit prevention 或完整 defe
 
 矢量版：[PDF](figures/v11_containment_utility_tradeoff.pdf)。
 
-## 4. 重现
+## 5. 重现
 
 ```bash
 .venv/bin/python scripts/plot_final_paper_results.py

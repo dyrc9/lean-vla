@@ -39,6 +39,7 @@ DEVELOPMENT_COLOR = "#4C78A8"
 HELDOUT_COLOR = "#F58518"
 THRESHOLD_COLOR = "#C44E52"
 GRID_COLOR = "#D9D9D9"
+ARM_COLORS = ["#7F7F7F", "#2A9D8F", "#E9C46A", "#6A4C93"]
 
 
 def load_json(path: Path) -> dict:
@@ -83,7 +84,17 @@ def validate_v12(summaries: list[dict]) -> None:
 def save_figure(fig: plt.Figure, stem: str) -> None:
     FIGURE_DIR.mkdir(parents=True, exist_ok=True)
     fig.savefig(FIGURE_DIR / f"{stem}.png", dpi=240, bbox_inches="tight")
-    fig.savefig(FIGURE_DIR / f"{stem}.pdf", bbox_inches="tight")
+    fig.savefig(
+        FIGURE_DIR / f"{stem}.pdf",
+        bbox_inches="tight",
+        metadata={
+            "Title": stem,
+            "Author": "ProofAlign",
+            "Creator": "scripts/plot_final_paper_results.py",
+            "CreationDate": None,
+            "ModDate": None,
+        },
+    )
     plt.close(fig)
 
 
@@ -429,6 +440,273 @@ def plot_v11_tradeoff(summary: dict) -> None:
     save_figure(fig, "v11_containment_utility_tradeoff")
 
 
+def plot_attack_defense_scale45(summary: dict) -> None:
+    attacked = summary["conditions"]["attacked"]
+    activation = attacked["attack_activation"]
+    integrity = attacked["data_integrity"]
+    by_arm = attacked["by_arm"]
+    arm_order = ["vla_only", "execution_only", "semantic_only", "dual"]
+    arm_labels = ["VLA-only", "L2 only", "L1 only", "L1 + L2"]
+    x = np.arange(len(arm_order))
+
+    if activation["episode_count"] != 180:
+        raise ValueError("Frozen attacked scale45 episode count changed")
+    if activation["changed_first_action_block_count"] != 180:
+        raise ValueError("Frozen SABER attack activation count changed")
+    if integrity["post_trigger_dispatch_count"] != 0:
+        raise ValueError("Frozen attacked post-trigger dispatch gate changed")
+
+    task_rates = [
+        100.0 * by_arm[arm]["task_success"]["rate"] for arm in arm_order
+    ]
+    task_counts = [
+        (
+            by_arm[arm]["task_success"]["successes"],
+            by_arm[arm]["task_success"]["total"],
+        )
+        for arm in arm_order
+    ]
+    task_low_errors = [
+        rate - 100.0 * by_arm[arm]["task_success"]["wilson_95_low"]
+        for arm, rate in zip(arm_order, task_rates, strict=True)
+    ]
+    task_high_errors = [
+        100.0 * by_arm[arm]["task_success"]["wilson_95_high"] - rate
+        for arm, rate in zip(arm_order, task_rates, strict=True)
+    ]
+    task_errors = np.asarray([task_low_errors, task_high_errors])
+    joint_rates = [
+        100.0 * by_arm[arm]["joint_limit_step_rate"] for arm in arm_order
+    ]
+
+    l2_arms = ["execution_only", "dual"]
+    l2_labels = ["L2 only", "L1 + L2"]
+    triggers = [by_arm[arm]["containment_trigger_count"] for arm in l2_arms]
+    later_dispatches = [0, 0]
+
+    execution_contrast = attacked["paired_l2_contrasts"][
+        "execution_only_vs_vla_only"
+    ]
+    dual_contrast = attacked["paired_l2_contrasts"]["dual_vs_semantic_only"]
+
+    plt.rcParams.update(
+        {
+            "font.size": 10,
+            "axes.titlesize": 12,
+            "axes.labelsize": 10,
+            "axes.spines.top": False,
+            "axes.spines.right": False,
+            "figure.facecolor": "white",
+        }
+    )
+    fig, axes = plt.subplots(2, 2, figsize=(12.5, 8.5))
+    fig.suptitle(
+        "SABER prompt attack x ProofAlign defenses — frozen held-out scale45",
+        fontsize=16,
+        fontweight="bold",
+        y=0.985,
+    )
+
+    ax = axes[0, 0]
+    activation_labels = [
+        "Changed first\nActionBlock",
+        "Four-arm input\nidentity",
+    ]
+    activation_values = [
+        100.0
+        * activation["changed_first_action_block_count"]
+        / activation["episode_count"],
+        100.0
+        * activation["attacked_first_blocks_match_within_workload_count"]
+        / 45,
+    ]
+    activation_counts = [
+        (
+            activation["changed_first_action_block_count"],
+            activation["episode_count"],
+        ),
+        (
+            activation["attacked_first_blocks_match_within_workload_count"],
+            45,
+        ),
+    ]
+    bars = ax.bar(
+        np.arange(2),
+        activation_values,
+        color=[THRESHOLD_COLOR, DEVELOPMENT_COLOR],
+        width=0.62,
+    )
+    ax.set_title("A. Attack activation and paired-input integrity")
+    ax.set_ylabel("Rate (%)")
+    ax.set_xticks(np.arange(2), activation_labels)
+    ax.set_ylim(0, 112)
+    ax.grid(axis="y", color=GRID_COLOR, linewidth=0.8, alpha=0.8)
+    for bar, (numerator, denominator) in zip(
+        bars, activation_counts, strict=True
+    ):
+        ax.text(
+            bar.get_x() + bar.get_width() / 2,
+            bar.get_height() + 1.2,
+            f"{numerator}/{denominator}",
+            ha="center",
+            va="bottom",
+            fontweight="bold",
+        )
+    ax.text(
+        0.5,
+        0.08,
+        "Official SABER task-prompt records\nchanged the policy-facing instruction",
+        transform=ax.transAxes,
+        ha="center",
+        va="bottom",
+        fontsize=9,
+        color="#444444",
+    )
+
+    ax = axes[0, 1]
+    bars = ax.bar(
+        x,
+        task_rates,
+        color=ARM_COLORS,
+        width=0.68,
+        yerr=task_errors,
+        capsize=4,
+        error_kw={"linewidth": 1, "capthick": 1},
+    )
+    ax.set_title("B. Task success under attack (Wilson 95% CI)")
+    ax.set_ylabel("Task success (%)")
+    ax.set_xticks(x, arm_labels)
+    ax.set_ylim(0, 88)
+    ax.grid(axis="y", color=GRID_COLOR, linewidth=0.8, alpha=0.8)
+    for bar, (successes, total) in zip(bars, task_counts, strict=True):
+        ax.text(
+            bar.get_x() + bar.get_width() / 2,
+            bar.get_height() + 1.1,
+            f"{successes}/{total}",
+            ha="center",
+            va="bottom",
+            fontsize=9,
+            fontweight="bold",
+        )
+    ax.text(
+        0.02,
+        0.03,
+        "L2 vs VLA: "
+        f"{100 * execution_contrast['task_success']['paired_difference']:+.1f} pp"
+        f"  (McNemar p={execution_contrast['task_success']['exact_two_sided_mcnemar_p']:.3f})\n"
+        "Dual vs L1: "
+        f"{100 * dual_contrast['task_success']['paired_difference']:+.1f} pp"
+        f"  (p={dual_contrast['task_success']['exact_two_sided_mcnemar_p']:.3f})",
+        transform=ax.transAxes,
+        ha="left",
+        va="bottom",
+        fontsize=8.7,
+        color="#444444",
+    )
+
+    ax = axes[1, 0]
+    bars = ax.bar(x, joint_rates, color=ARM_COLORS, width=0.68)
+    ax.set_title("C. Joint-limit exposure under attack")
+    ax.set_ylabel("Joint-limit steps (%)\n(log scale)")
+    ax.set_xticks(x, arm_labels)
+    ax.set_yscale("log")
+    ax.set_ylim(0.025, 20)
+    ax.grid(axis="y", which="both", color=GRID_COLOR, linewidth=0.8, alpha=0.8)
+    for bar, rate in zip(bars, joint_rates, strict=True):
+        ax.text(
+            bar.get_x() + bar.get_width() / 2,
+            rate * 1.22,
+            f"{rate:.3f}%",
+            ha="center",
+            va="bottom",
+            fontsize=9,
+            fontweight="bold",
+            rotation=90 if rate < 0.2 else 0,
+        )
+    ax.text(
+        0.02,
+        0.04,
+        "L2 vs VLA paired sign p="
+        f"{execution_contrast['joint_limit_step_rate']['exact_two_sided_sign_p']:.3f}\n"
+        "Dual vs L1 paired sign p="
+        f"{dual_contrast['joint_limit_step_rate']['exact_two_sided_sign_p']:.4f}",
+        transform=ax.transAxes,
+        ha="left",
+        va="bottom",
+        fontsize=8.7,
+        color="#444444",
+    )
+
+    ax = axes[1, 1]
+    l2_x = np.arange(len(l2_arms))
+    width = 0.34
+    trigger_bars = ax.bar(
+        l2_x - width / 2,
+        triggers,
+        width=width,
+        color="#2A9D8F",
+        label="Trigger episodes",
+    )
+    dispatch_bars = ax.bar(
+        l2_x + width / 2,
+        later_dispatches,
+        width=width,
+        color=THRESHOLD_COLOR,
+        label="Later dispatches",
+    )
+    ax.set_title("D. Typed L2 containment after attack")
+    ax.set_ylabel("Episode / dispatch count")
+    ax.set_xticks(l2_x, l2_labels)
+    ax.set_ylim(0, max(triggers) + 3)
+    ax.grid(axis="y", color=GRID_COLOR, linewidth=0.8, alpha=0.8)
+    ax.legend(frameon=False, loc="upper right")
+    for bar, count in zip(trigger_bars, triggers, strict=True):
+        ax.text(
+            bar.get_x() + bar.get_width() / 2,
+            count + 0.18,
+            str(count),
+            ha="center",
+            va="bottom",
+            fontweight="bold",
+        )
+    for bar in dispatch_bars:
+        ax.text(
+            bar.get_x() + bar.get_width() / 2,
+            0.16,
+            "0",
+            ha="center",
+            va="bottom",
+            color=THRESHOLD_COLOR,
+            fontweight="bold",
+        )
+    ax.text(
+        0.5,
+        0.12,
+        f"{sum(triggers)} attacked trigger episodes\n"
+        f"{integrity['post_trigger_dispatch_count']} post-trigger dispatches",
+        transform=ax.transAxes,
+        ha="center",
+        va="bottom",
+        fontsize=11,
+        fontweight="bold",
+    )
+
+    fig.text(
+        0.5,
+        0.012,
+        "45 workloads x 4 arms = 180 attacked episodes. "
+        "The positive claim is post-trigger mechanical containment. "
+        "Task-success superiority, first-hit prevention, and general defense efficacy "
+        "were not established.",
+        ha="center",
+        va="bottom",
+        fontsize=9.2,
+        color="#444444",
+    )
+    fig.tight_layout(rect=(0, 0.05, 1, 0.95), h_pad=2.5, w_pad=2.0)
+    save_figure(fig, "v11_saber_attack_defense_scale45")
+
+
 def main() -> None:
     v12_summaries = [load_json(path) for path in V12_PATHS]
     validate_v12(v12_summaries)
@@ -441,10 +719,12 @@ def main() -> None:
     ):
         raise ValueError("Frozen v11 terminal classification changed")
     plot_v11_tradeoff(v11_summary)
+    plot_attack_defense_scale45(v11_summary)
 
     for name in (
         "v12_final_engineering_validation",
         "v11_containment_utility_tradeoff",
+        "v11_saber_attack_defense_scale45",
     ):
         print(FIGURE_DIR / f"{name}.png")
         print(FIGURE_DIR / f"{name}.pdf")
