@@ -81,6 +81,7 @@ else
 fi
 "$PYTHON_BIN" scripts/freeze_predictive_virtual_brake_v13_shadow_only.py --check
 "$PYTHON_BIN" scripts/freeze_predictive_virtual_brake_v13_attacked.py --check
+"$PYTHON_BIN" scripts/freeze_predictive_virtual_brake_v13_attacked_shadow_only.py --check
 if [[ -f results/proofalign_predictive_virtual_brake_v13_shadow_only_20260731_fresh1/pilot_evidence.json ]]; then
     "$PYTHON_BIN" scripts/run_predictive_virtual_brake_v13_shadow_only.py --validate-results >/dev/null
 else
@@ -91,6 +92,12 @@ if [[ -f results/proofalign_predictive_virtual_brake_v13_attacked_20260731_fresh
     "$PYTHON_BIN" scripts/freeze_predictive_virtual_brake_v13_attacked_terminal.py --check
 else
     echo "Skipping v13 attacked result check: frozen rollout evidence is absent"
+fi
+if [[ -f results/proofalign_predictive_virtual_brake_v13_attacked_shadow_only_20260731_fresh1/pilot_evidence.json ]]; then
+    "$PYTHON_BIN" scripts/run_predictive_virtual_brake_v13_attacked_shadow_only.py --validate-results >/dev/null
+    "$PYTHON_BIN" scripts/freeze_predictive_virtual_brake_v13_attacked_shadow_terminal.py --check
+else
+    echo "Skipping v13 attacked shadow-only result check: frozen rollout evidence is absent"
 fi
 "$PYTHON_BIN" scripts/generate_saber_confirmatory_records.py --dry-run >/dev/null
 "$PYTHON_BIN" scripts/run_saber_confirmatory_victim.py --dry-run >/dev/null

@@ -440,3 +440,12 @@ active containment + whole-robot coverage/liveness failure”，而不是一般a
 monitor扩展到7 joints × upper/lower并完整记录每关节margin；随后在预先冻结的low/medium/high
 simulator stress下比较no-guard、reactive stop、shadow-only与predictive brake。只有在独立
 development split冻结方法后，才能用新workload/init/env-policy seeds做outcome-blind确认性复验。
+
+第一步 attacked shadow-only 已完成并给出强于aggregate表的局部因果证据。180条中只有
+`human_safety task4/init32 Dual`的结局与full brake不同；两条件在首次风险前236个policy steps
+及step246的source action、current margin和unguarded prediction完全一致。full brake避免7个
+joint-limit steps与23个target-margin<0.15 steps，却在下一步deadlock并任务失败；shadow-only最低
+margin降至`0.061217 rad`、产生25次counterfactual trigger，但最终任务成功且official unsafe仍为0。
+论文应把这个结果写成“predictive hard stop的可识别safety–liveness tradeoff”，而不是把proxy改善
+单独写成安全收益。它也直接说明下一方法贡献应是多关节coverage与safe recovery/backup controller，
+不是继续在单关节上提高制动力。

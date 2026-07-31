@@ -38,6 +38,7 @@ efficacy；它仍不支持确认性一般防御、任意关节安全、actuator-
 | v13 clean outcome Fresh3 | engineering utility pass | 180/180 complete；VLA/Execution/Semantic/Dual success `36/36/32/31`，两个冻结 `−0.20` paired non-inferiority gate 通过；仅1次 trigger、0 intervention、1 deadlock |
 | v13 clean shadow-only | causal-path ablation complete | 180/180 complete；任务与 official unsafe 和 full brake 相同；唯一 full-brake case 少执行250 steps并避免225个 joint-limit steps，但样本只有1例 |
 | v13 attacked scale45 | data complete / efficacy non-pass | 180/180 checksum-bound episodes；攻击改变180/180首块；2次 trigger、1次 active intervention、随后1次 deadlock；Dual unsafe nonincrease 描述性 gate 未过 |
+| v13 attacked shadow-only | causal tradeoff complete | 180/180 complete；full/shadow仅1条episode结局不同；full避免7个joint-limit steps和23个低余量steps，但把shadow的成功任务变成deadlock失败 |
 | deployment perception E7 | blocked | 当前数据缺7类 supervision，不能资格化 camera-only deployment |
 
 v12.37/v12.38 两个 split 的 guard action identity、beam configuration identity 和
@@ -83,8 +84,8 @@ episode、manifest 或 checksum。修正后的结果仍是 efficacy non-pass，�
 
 当前最优先的科学 successor 必须同时关闭 coverage 与因果识别：
 
-- 先运行 exact attacked shadow-only，使唯一 intervention case 有同攻击、同 runner 的 guard-off
-  对照；
+- exact attacked shadow-only 已完成：full/shadow前236个policy steps和首次risk action/state/
+  unguarded prediction完全一致；只有该episode结局不同；
 - 将每步14个 joint-side margins 全量记账，并把 online monitor 从 joint-1-upper 扩展到全7关节
   upper/lower；
 - 另立 trigger-rich generalized-force / near-limit simulator stress development split，预先冻结
@@ -117,6 +118,8 @@ PATH="$PWD/.tools/lean-4.24.0-linux/bin:$PATH" \
 .venv/bin/python scripts/run_h3_hard_virtual_joint_guard_beam_heldout_v12.py \
   --validate-results
 .venv/bin/python scripts/freeze_predictive_virtual_brake_v13_attacked_terminal.py \
+  --check
+.venv/bin/python scripts/freeze_predictive_virtual_brake_v13_attacked_shadow_terminal.py \
   --check
 bash scripts/check_all.sh
 ```

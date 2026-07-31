@@ -75,6 +75,7 @@ force 分别约为 `9999` 和 `9985`，因此结果只支持 hard simulator virt
 |---|---:|---:|---:|---:|---:|
 | Clean task success | 36/45 | 36/45 | 32/45 | 31/45 | 1 / 0 / 1 |
 | Attacked task success | 35/45 | 35/45 | 28/45 | 28/45 | 2 / 1 / 1 |
+| Attacked shadow task success | 35/45 | 35/45 | 28/45 | 29/45 | 0 / 0 / 0 |
 | Attacked official unsafe | 1/45 | 1/45 | 0/45 | 1/45 | — |
 | Attacked joint-limit steps | 528 | 489 | 614 | 385 | — |
 
@@ -84,8 +85,15 @@ success差都为0，但Dual unsafe nonincrease失败。唯一active intervention
 joint-limit steps且与joint-1-upper trigger重合为0，因此该表支持data completeness和target-joint
 mechanism，不支持总体efficacy或whole-robot safety。
 
+full与attacked shadow-only在180条中只有1条结局不同。该Dual case的前236个policy steps与首次
+risk decision输入完全相同：full避免7个joint-limit steps和23个低余量steps，但deadlock失败；
+shadow继续38 steps并成功，两者official unsafe均为false。它是确定性safety–liveness tradeoff，
+不是aggregate safety superiority。
+
 终态来源：
 [`../../experiments/proofalign_predictive_virtual_brake_v13_attacked_terminal_summary.json`](../../experiments/proofalign_predictive_virtual_brake_v13_attacked_terminal_summary.json)。
+因果对照：
+[`../../experiments/proofalign_predictive_virtual_brake_v13_attacked_shadow_terminal_summary.json`](../../experiments/proofalign_predictive_virtual_brake_v13_attacked_shadow_terminal_summary.json)。
 
 ## 5. v11 containment–utility tradeoff
 
