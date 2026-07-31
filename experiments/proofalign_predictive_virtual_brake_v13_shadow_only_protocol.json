@@ -103,7 +103,7 @@
   "execution_authorization": {
     "action_dispatch": true,
     "attacked_rollout": false,
-    "clean_shadow_only_ablation": true,
+    "clean_exploratory_pilot": true,
     "confirmatory_claim": false,
     "task_outcome_observation": true
   },
@@ -2778,11 +2778,11 @@
   },
   "source": {
     "freezer": "scripts/freeze_predictive_virtual_brake_v13_shadow_only.py",
-    "freezer_sha256": "a21acfbf70cae3f2b5c58b3b8d07fb8ebc685d5d6d63d9397af0f14524846416",
-    "repository_commit": "74f663ed712b4ef8b047349a1f089e7c266fffda",
-    "repository_tree": "1ec930d32946acb198dd9bb4674615569f05d86f",
+    "freezer_sha256": "12444bdf72c9ad11a192d78ba13aa4c20df823f463ee81b642cf404613005728",
+    "repository_commit": "dd4b3bd626e004d43092e4d2a4206d3f829ccdf2",
+    "repository_tree": "c6dc89e26e85741e73fe52cf9361c083375fcf47",
     "sha256": {
-      "scripts/freeze_predictive_virtual_brake_v13_shadow_only.py": "a21acfbf70cae3f2b5c58b3b8d07fb8ebc685d5d6d63d9397af0f14524846416",
+      "scripts/freeze_predictive_virtual_brake_v13_shadow_only.py": "12444bdf72c9ad11a192d78ba13aa4c20df823f463ee81b642cf404613005728",
       "scripts/run_l2_predictive_virtual_brake_v13.py": "1640e38361ce6310c048ab2531698ad9d43a10e0cbfa27782672f9e3b2f65721",
       "scripts/run_l2_predictive_virtual_brake_v13_fresh3.py": "89324f38ca23fea5bd87cbf16508fd4f424895d60299c5856ac217bed451059e",
       "scripts/run_l2_predictive_virtual_brake_v13_shadow_only.py": "501778ee43cb6b4919ec66810e5cc28b381a5b16fbbe380940e0919321a4f825",
@@ -2791,7 +2791,7 @@
       "src/proofalign/policy_prefix_shadow_v12.py": "f3baa00a917e3c6a4f5ad35f3fd8f591f988b117f64289ba1a7d448c0a088c71",
       "src/proofalign/policy_prefix_shadow_warmstart_v12.py": "bbcea47cfd739757e68027afbef48ff740b0dec35bc50979bed13ac27224025d",
       "tests/test_l2_predictive_virtual_brake_v13.py": "926c7a4319a65a322b7b36ebf4b2640ac4b89dd66feec22297203b3488fbb6b6",
-      "tests/test_predictive_virtual_brake_v13_shadow_only.py": "2679345df129a841bc0e34ea47e9f2278ea555fc2d13f652bd0accb0903e7215"
+      "tests/test_predictive_virtual_brake_v13_shadow_only.py": "107521b57d93deaf1d46b03fd7e8561b6c292cef0916ae60b3f12b7e7d5f70f3"
     }
   },
   "stage": "predictive_virtual_brake_v13_shadow_only_clean_ablation",
