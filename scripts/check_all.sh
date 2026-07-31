@@ -120,6 +120,28 @@ if [[ -f results/proofalign_predictive_virtual_brake_v14_multijoint_shadow_only_
 else
     echo "Skipping v14 multijoint shadow-only result check: local-only rollout evidence is absent"
 fi
+"$PYTHON_BIN" -m pytest -q \
+    tests/test_v14_multijoint_stress_design_pilot.py \
+    tests/test_v14_multijoint_stress_design_freezer.py \
+    tests/test_v14_multijoint_stress_development.py \
+    tests/test_v14_multijoint_stress_development_terminal.py \
+    tests/test_v14_multijoint_stress_qualification.py \
+    tests/test_v14_multijoint_stress_qualification_terminal.py
+"$PYTHON_BIN" scripts/freeze_v14_multijoint_stress_design_pilot.py --check
+"$PYTHON_BIN" scripts/freeze_v14_multijoint_stress_development.py --check
+if [[ -f results/proofalign_predictive_virtual_brake_v14_multijoint_stress_development_20260731_fresh1/pilot_evidence.json ]]; then
+    "$PYTHON_BIN" scripts/run_v14_multijoint_stress_development.py --validate-results >/dev/null
+    "$PYTHON_BIN" scripts/freeze_v14_multijoint_stress_development_terminal.py --check
+else
+    echo "Skipping v14 stress development result check: local-only evidence is absent"
+fi
+"$PYTHON_BIN" scripts/freeze_v14_multijoint_stress_qualification.py --check
+if [[ -f results/proofalign_predictive_virtual_brake_v14_multijoint_stress_qualification_20260731_fresh1/qualification_evidence.json ]]; then
+    "$PYTHON_BIN" scripts/run_v14_multijoint_stress_qualification.py --validate-results >/dev/null
+    "$PYTHON_BIN" scripts/freeze_v14_multijoint_stress_qualification_terminal.py --check
+else
+    echo "Skipping v14 stress qualification result check: local-only evidence is absent"
+fi
 "$PYTHON_BIN" scripts/generate_saber_confirmatory_records.py --dry-run >/dev/null
 "$PYTHON_BIN" scripts/run_saber_confirmatory_victim.py --dry-run >/dev/null
 "$PYTHON_BIN" scripts/export_proofalign_fixed_trace.py --dry-run >/dev/null

@@ -483,3 +483,21 @@ causal identity complete”分轴报告，不修订原门，也不把outcome-dis
 下一实验因此转向预冻结的trigger-rich low/medium/high stress ×
 no-guard/reactive-stop/shadow/predictive-brake矩阵，并显式加入deadlock recovery；最终主张仍需
 新population和新seeds的outcome-blind qualification。
+
+该trigger-rich矩阵现已完成development与held-out qualification。12环境development中，Shadow与
+No-guard均有528个crossing/1236个低余量侧值，Reactive为0/264，Predictive为0/0；Predictive同时
+有240/504 deadlock lanes。注册`0.001 rad` all-side identity门因最大`0.047551 rad`误差未过，
+但35,280个配对侧值在全部风险阈值上零分类分歧。这个diagnostic不能修订development non-pass。
+
+held-out阶段使用18个未见task/init pair和新environment seed。Shadow有818个crossing、1884个低余量
+值，Reactive为2/402，Predictive仍为0/0。环境cluster bootstrap下，Predictive−Shadow每lane
+crossing差为`−1.082`，95%区间`[−1.132,−1.048]`；Predictive−Reactive每lane低余量差为
+`−0.532`，区间`[−0.544,−0.524]`。active阶段contact audit无warning/saturation，p95 screening
+latency `38.32ms`，50ms miss为60/2934=`2.045%`。与此同时，Predictive deadlock lane rate为
+48.41%（environment-cluster 95%区间`[47.62%,49.60%]`），最大constraint force约`8048.8`。
+
+资格总体仍是non-pass，而不是确认性pass：预注册low negative-control在两个未见human-safety
+joint-1-upper lanes上因约`30k`原生constraint force意外crossing。Predictive在两条都fail closed并
+避免实际crossing，但不能结果后把low重标为stress。论文应同时写“所有完整性、核心containment、
+availability与timing轴通过”和“冻结合取因low-control失败而overall non-pass”。下一主实验必须
+转向task-outcome utility与deadlock recovery，不能继续在同一stress evidence上重定义成功。

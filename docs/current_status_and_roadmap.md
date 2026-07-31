@@ -27,7 +27,12 @@ efficacy。v14 development 把 monitor 扩展到全7关节双侧并显著增加�
 crossing 从1,442降至0，但增加17个deadlock并少7个任务成功。该对照仍因预注册
 `0.002 rad` shadow prediction/execution门被`0.004651 rad`超过而保持 calibration non-pass，
 所以它是 outcome-disclosed causal diagnostic，不是确认性一般防御证据。项目仍不支持
-actuator-only recovery、真实部署或物理安全证明。
+actuator-only recovery、真实部署或物理安全证明。随后冻结的trigger-rich四基线实验把机制比较
+扩展到12个development环境和18个未见task/init qualification环境。held-out中predictive相对
+shadow将crossing从`818`降至`0`、低余量侧值从`1884`降至`0`；reactive虽几乎阻止crossing，仍有
+`402`个post-step低余量值。资格实验因252条low-dose lane中2条意外crossing而保持注册non-pass，
+不能改写为总体pass；其余完整性、核心机制和时限gate均通过，但48.41% predictive lane deadlock、
+2.045%的50ms deadline miss和约`8049`最大constraint force仍是主要系统代价。
 
 ## 2. 证据状态
 
@@ -47,6 +52,8 @@ actuator-only recovery、真实部署或物理安全证明。
 | v13 attacked shadow-only | causal tradeoff complete | 180/180 complete；full/shadow仅1条episode结局不同；full避免7个joint-limit steps和23个低余量steps，但把shadow的成功任务变成deadlock失败 |
 | v14 all-joint clean development | data complete / calibration and utility non-pass | 180/180、每步7关节×双侧审计；29 triggers、12 interventions、17 deadlocks；L2实际低余量/crossing均为0，disabled arms为3306/1455；严格`1e-9 rad`全侧校准门和两条描述性效用非劣门未过 |
 | v14 same-schedule shadow-only | registered calibration non-pass / causal identity diagnostic complete | 180/180；90个disabled-arm episode逐步完全一致；首次Full trigger前20,963 steps的action/risk/margin完全一致；Full/Shadow L2低余量为`0/2733`、crossing为`0/1442`，task success为`60/67`、deadlock/unknown为`17/0`；注册`0.002 rad`校准门未过，不改写为pass |
+| v14 trigger-rich stress development | registered identity non-pass / threshold diagnostic complete | 12环境、504 stress lanes、2016 baseline lanes；Predictive/Shadow crossing为`0/528`、低余量为`0/1236`，Reactive低余量264；all-side max identity error `0.04755 rad`未过`0.001`门，但35,280个侧值在0/0.15/0.16/0.22/0.30阈值分类分歧均为0 |
+| v14 held-out stress qualification | registered low-control non-pass / core axes complete | 18个未见task/init、756 stress lanes、3024 baseline lanes；Predictive/Shadow crossing `0/818`、低余量`0/1884`，Reactive crossing/低余量`2/402`；唯一失败gate是2条low negative-control crossing；active contact、identity、containment、availability和timing gate通过，整体仍不改写为pass |
 | deployment perception E7 | blocked | 当前数据缺7类 supervision，不能资格化 camera-only deployment |
 
 v12.37/v12.38 两个 split 的 guard action identity、beam configuration identity 和
@@ -73,6 +80,10 @@ typed recovery 和 outcome read 均为0。最大 target-DOF generalized constrai
     task-utility non-pass 与全侧 calibration non-pass。
 12. v14 同schedule shadow-only 的exact pre-divergence identity、`1442 -> 0` crossing containment、
     `67 -> 60`任务成功与`0 -> 17` deadlock代价，以及注册 calibration non-pass。
+13. v14 trigger-rich development四基线比较、注册all-side identity non-pass与零threshold-classification
+    disagreement诊断。
+14. v14 held-out stress qualification的唯一low-control non-pass、核心机制/时限分轴结果、48.41%
+    deadlock、2.045% deadline miss、active contact-capacity零异常和高constraint-force限制。
 
 论文不得将 v11/v12 写成 first-hit prevention、一般 attacked-defense efficacy、task-preserving
 recovery 或完整物理安全。
@@ -105,9 +116,12 @@ episode、manifest 或 checksum。修正后的结果仍是 efficacy non-pass，�
   Shadow避免2733个低余量侧值和1442个crossing，但增加17个deadlock并少7个任务成功；
 - 注册shadow校准门仍non-pass：最大prediction/execution逐侧误差`0.004651 rad`超过
   `0.002 rad`门。后验诊断只分离“causal identity complete”，不修订注册结论；
-- 另立 trigger-rich generalized-force / near-limit simulator stress development split，预先冻结
-  low/medium/high dose、no-guard、reactive-stop、shadow-only 和 predictive-brake 条件；
-- 方法冻结后用新 workload、init、environment/policy seeds 做 outcome-blind qualification；
+- trigger-rich generalized-force / near-limit stress development已完成；注册all-side identity门未过，
+  但所有风险阈值分类相同，四基线描述性差异已冻结；
+- 新task/init与environment seed的outcome-blind mechanism qualification已完成；唯一失败gate是2条
+  low negative-control crossing，整体保持non-pass，核心mechanism/timing轴单独完整；
+- 下一步不再重标low dose或追逐同一gate，而是冻结独立task-outcome utility qualification，并将
+  deadlock recovery/backup controller作为明确因子；
 - 主终点为 crossing、minimum margin、joint-limit exposure、official unsafe、task success、
   deadlock/recovery 和 latency，禁止用 development outcome 选择确认集。
 
@@ -144,6 +158,8 @@ PATH="$PWD/.tools/lean-4.24.0-linux/bin:$PATH" \
   --check
 .venv/bin/python scripts/freeze_predictive_virtual_brake_v14_multijoint_shadow_only_diagnostic.py \
   --check
+.venv/bin/python scripts/freeze_v14_multijoint_stress_development_terminal.py --check
+.venv/bin/python scripts/freeze_v14_multijoint_stress_qualification_terminal.py --check
 bash scripts/check_all.sh
 ```
 

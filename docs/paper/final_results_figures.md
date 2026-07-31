@@ -137,7 +137,32 @@ containment–availability因果解释，同时显示7个任务成功和17个dea
 分轴diagnostic：
 [`../../experiments/proofalign_predictive_virtual_brake_v14_multijoint_shadow_only_causal_terminal_diagnostic.json`](../../experiments/proofalign_predictive_virtual_brake_v14_multijoint_shadow_only_causal_terminal_diagnostic.json)。
 
-## 7. v11 containment–utility tradeoff
+## 7. v14 trigger-rich strong-baseline qualification
+
+| Baseline | Crossing | Margin <0.15 | Executed-step availability | Deadlock lane rate | Screening p95 |
+|---|---:|---:|---:|---:|---:|
+| No guard | 818 | 1884 | 100% | 0% | — |
+| Reactive stop | 2 | 402 | 60.85% | 0% | — |
+| Shadow only | 818 | 1884 | 100% | 0% | 26.42ms |
+| Predictive brake | 0 | 0 | 67.94% | 48.41% | 38.32ms |
+
+该表来自18个未见task/init pair、756条stress lanes和3024条baseline lanes。Predictive相对Shadow
+每lane crossing差为`−1.082`（environment-cluster bootstrap 95%区间
+`[−1.132,−1.048]`）；相对Reactive每lane低余量差为`−0.532`
+（`[−0.544,−0.524]`），执行步可用性高`7.09pp`。active阶段19,654次contact audit最大
+`107/5000`且零warning/saturation；Predictive有60/2934=`2.045%`次screen超过50ms，最大约
+`105.4ms`，最大constraint force约`8048.8`。
+
+注册总分类仍是non-pass：252条low negative-control lanes中有2条因环境原生约`30k` constraint
+force发生crossing，唯一失败gate为`low_negative_control`。Predictive在两条均fail closed并避免
+crossing，但不能结果后重标dose。完整性、核心mechanism和timing分轴全部通过不等于总体pass。
+
+development终态：
+[`../../experiments/proofalign_predictive_virtual_brake_v14_multijoint_stress_development_terminal_summary.json`](../../experiments/proofalign_predictive_virtual_brake_v14_multijoint_stress_development_terminal_summary.json)。
+held-out终态：
+[`../../experiments/proofalign_predictive_virtual_brake_v14_multijoint_stress_qualification_terminal_summary.json`](../../experiments/proofalign_predictive_virtual_brake_v14_multijoint_stress_qualification_terminal_summary.json)。
+
+## 8. v11 containment–utility tradeoff
 
 ![v11 containment utility tradeoff](figures/v11_containment_utility_tradeoff.png)
 
@@ -147,7 +172,7 @@ containment 和 utility tradeoff，不支持 first-hit prevention 或完整 defe
 
 矢量版：[PDF](figures/v11_containment_utility_tradeoff.pdf)。
 
-## 8. 重现
+## 9. 重现
 
 ```bash
 .venv/bin/python scripts/plot_final_paper_results.py

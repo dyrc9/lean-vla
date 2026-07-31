@@ -4,7 +4,38 @@
 [`current_status_and_roadmap.md`](current_status_and_roadmap.md) 为准。本页保留完整时间线和所有
 结果后 successor，不再作为快速状态入口。
 
-## 最新 checkpoint：2026-07-31 v14 同 schedule shadow-only 因果消融终态
+## 最新 checkpoint：2026-07-31 v14 trigger-rich stress development 与 held-out qualification
+
+单环境pilot冻结low/medium/high dose后，12环境development按3 suites × 4 environments ×
+14 joint-sides × 3 doses完成`504`条stress lanes和四基线`2016`条执行。no-guard/shadow均产生
+`528`个crossing和`1236`个低余量侧值；reactive-stop将crossing降为0，但在停止前仍观察264个
+低余量值；predictive-brake将两者均降为0，同时产生240个deadlock lanes。Predictive相对Reactive
+执行步可用性高`7.14pp`，但p95 screening latency为`45.13ms`、33/1968次超过50ms，最大
+constraint force约`4689.7`。
+
+development注册终态仍是non-pass：no-guard/shadow所有侧最大数值差`0.047551 rad`超过冻结
+`0.001 rad`。后验诊断没有放宽门，只确认35,280个配对侧值在crossing以及
+`0.15/0.16/0.22/0.30 rad`阈值上的分类分歧均为0。终态见
+[`../experiments/proofalign_predictive_virtual_brake_v14_multijoint_stress_development_terminal_summary.json`](../experiments/proofalign_predictive_virtual_brake_v14_multijoint_stress_development_terminal_summary.json)。
+
+随后在旧45个精确task/init pair之外，确定性选择三套任务各6个不同task id与新init，并将environment
+seed改为`1509`。held-out qualification完成18环境、`756` stress lanes和`3024` baseline lanes。
+Shadow产生`818` crossing与`1884`低余量值，Predictive均为0；Reactive为`2/402`。18个完整性、
+核心机制、active-contact和timing gate通过：active阶段19,654次contact observations最大
+`ncon=107/5000`且无warning/saturation，p95为`38.32ms`，60/2934=`2.045%`超过50ms，低于
+冻结2.5%门。Predictive相对Reactive执行可用性高`7.09pp`，但366/756=`48.41%` lanes deadlock，
+最大constraint force约`8048.8`。
+
+资格总体仍为注册non-pass。唯一失败的`low_negative_control`来自两个未见human-safety环境的
+joint-1-upper low lanes：原生constraint force约`30k`使no-guard在第二步crossing；Predictive
+在两条均提前deadlock并保持实际crossing为0。该意外结果不能事后把low重标为stress。终态将总体
+non-pass与完整的core axes分开记录，见
+[`../experiments/proofalign_predictive_virtual_brake_v14_multijoint_stress_qualification_terminal_summary.json`](../experiments/proofalign_predictive_virtual_brake_v14_multijoint_stress_qualification_terminal_summary.json)。
+
+下一实验是独立task-outcome utility qualification，并把deadlock recovery/backup controller作为
+独立因子；不得从本轮无outcome stress ledger选择确认性任务或改写dose/gate。
+
+## 前一 checkpoint：2026-07-31 v14 同 schedule shadow-only 因果消融终态
 
 v14 shadow-only 在新的 causal1 root 完成与 Fresh2 完全相同的45 workloads × 4 arms=`180/180`。
 Execution-only和Dual仍在每个policy step执行一次exact-action shadow与warm-start restore，但从不
