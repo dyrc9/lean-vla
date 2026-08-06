@@ -1,0 +1,104 @@
+{
+  "completed_episode_ids": [],
+  "device_mapping": {
+    "cuda_visible_devices": "2,0,1",
+    "jax_cuda_visible_devices": "0",
+    "mapping": [
+      {
+        "cuda_physical_index": 2,
+        "cuda_visible_index": 0,
+        "egl_device_ordinal": 0
+      },
+      {
+        "cuda_physical_index": 0,
+        "cuda_visible_index": 1,
+        "egl_device_ordinal": 1
+      }
+    ],
+    "mapping_source": "EGL_NV_device_cuda",
+    "requested_egl_physical_index": 0,
+    "selected_egl_device_ordinal": 1
+  },
+  "error": "V15BoundedStateTriggeredTaskUtilityError: task-runtime bounded-core diagnostic: {'missing_key': \"'bounded_guarded_candidate_rollout_count'\", 'runtime_audit': {'wait_step_count': 10, 'policy_core_bind_count': 1, 'bounded_core_call_count': 0, 'bounded_policy_audit_count': 0}, 'observation_count': 1, 'last_schema': 'proofalign.predictive-hard-virtual-brake.v15.10.rolling-prebound-observed-force-recovery.step', 'last_keys': ['actual_joint_side_margins', 'actual_minimum_margin_rad', 'actual_target_margin_rad', 'actual_worst_margin_rad', 'adaptive_extended_recovery_evaluated', 'adaptive_extended_recovery_selected', 'adaptive_fallback_profile_evaluated', 'adaptive_fallback_profile_selected', 'adaptive_force_recovery_active', 'adaptive_proactive_trigger_margin_rad', 'adaptive_recovery_ladder_active', 'base_safety_eligible_candidate_count', 'candidate_count', 'candidate_post_force_prediction_active', 'candidate_restore_identity', 'candidates', 'current_edge_priority_recovery_active', 'current_edge_recovery_active', 'current_edge_recovery_attempted', 'current_edge_recovery_configured_margin_rad', 'current_edge_recovery_eligible', 'current_edge_recovery_epsilon_rad', 'current_edge_recovery_selected', 'current_joint_side_margins', 'current_target_margin_rad', 'deadlock', 'deadlock_reason', 'dynamic_motion_generator_count', 'dynamic_state_restore_assessment_count', 'dynamic_state_restore_identity', 'dynamic_state_shadow_active', 'dynamic_state_snapshot_changes_source_action', 'dynamic_state_snapshot_physical_authority_claim', 'dynamic_state_snapshot_task_outcome_informed', 'eligible_candidate_count', 'enabled', 'exact_action_identity', 'executed_action_digest', 'floor_guard_recovery_active', 'floor_guard_recovery_attempted', 'floor_guard_recovery_eligible', 'floor_guard_recovery_margin_rad', 'floor_guard_recovery_prevented_deadlock', 'floor_guard_recovery_selected', 'floor_or_current_edge_recovery_prevented_deadlock', 'floor_or_current_edge_recovery_selected', 'force_attribution_active', 'force_attribution_changes_mechanism', 'force_attribution_physical_authority_claim', 'force_attribution_risk_joint_indices', 'force_attribution_units', 'force_constrained_guard_solref', 'force_constrained_recovery_active', 'force_constraints_change_source_action', 'force_constraints_physical_authority_claim', 'force_constraints_task_outcome_informed', 'force_feasible_candidate_count', 'force_rejected_base_eligible_candidate_count', 'guard_scope_controller_substep_count', 'guard_scope_joint_peak_constraint_force', 'guard_scope_legacy_force_recomputed_identity', 'guard_scope_max_envelope_increment_over_pre_step', 'guard_scope_maximum_positive_joint_increment_over_pre_step', 'guard_scope_reported_maximum_abs_risk_constraint_force', 'guard_scope_restored', 'incremental_adaptive_force_recovery_active', 'incremental_extended_candidate_evaluated_count', 'incremental_extended_recovery_force_attribution_bound', 'incremental_extended_recovery_force_attribution_identity', 'incremental_extended_search_active', 'incremental_extended_search_short_circuit_identity', 'incremental_search_change_source_action', 'incremental_search_task_outcome_informed', 'intervened', 'joint_side_scope_count', 'maximum_abs_guarded_constraint_force', 'maximum_abs_target_constraint_force', 'multi_joint_audit', 'post_step_gripper_current_action', 'post_step_joint_constraint_force', 'post_step_max_envelope_increment_over_pre_step', 'post_step_max_envelope_reduction_from_pre_step', 'post_step_maximum_abs_risk_constraint_force', 'post_step_maximum_positive_joint_increment_over_pre_step', 'pre_step_gripper_current_action', 'pre_step_joint_constraint_force', 'pre_step_maximum_abs_risk_constraint_force', 'pre_step_shadow_bind_identity', 'pre_step_shadow_calibration_active', 'pre_step_shadow_calibration_change_source_action', 'pre_step_shadow_calibration_latency_seconds', 'pre_step_shadow_calibration_outside_action_critical_path', 'pre_step_shadow_calibration_reused', 'pre_step_shadow_calibration_task_outcome_informed', 'pre_step_shadow_minimum_residual_candidate_count', 'pre_step_shadow_model_bank_candidate_count', 'pre_step_shadow_selected_candidate_id', 'pre_step_shadow_selected_residual', 'prediction_execution_margin_error_rad', 'recovery_candidate_priority', 'recovery_selected_for_force_attribution', 'risk_sides', 'rolling_prebound_change_source_action', 'rolling_prebound_next_generation', 'rolling_prebound_next_selected_candidate_id', 'rolling_prebound_next_selected_residual', 'rolling_prebound_shadow_calibration_active', 'rolling_prebound_task_outcome_informed', 'rolling_prebound_update_latency_seconds', 'rolling_prebound_update_outside_action_screen', 'rolling_prebound_used_generation', 'runner_step_id', 'schema', 'screen_latency_seconds', 'screen_performed', 'selected_candidate_profile_id', 'selected_force_feasible', 'selected_guard_margin_rad', 'selected_post_force_prediction_execution_identity', 'selected_predicted_joint_side_margins', 'selected_predicted_minimum_margin_rad', 'selected_predicted_target_margin_rad', 'shadow_env_step_count', 'shadow_restore_identity', 'source_action_digest', 'task_runtime_actual_parameter_read_by_selector', 'task_runtime_model_mismatch_injected', 'task_runtime_same_model_identity_adapter_active', 'task_runtime_task_outcome_read', 'torque_bound_violation_count', 'triggered', 'unguarded_predicted_joint_side_margins', 'unguarded_predicted_minimum_margin_rad', 'unguarded_predicted_target_margin_rad', 'v14_baseline_eligible_candidate_count', 'v14_baseline_would_deadlock']}",
+  "preflight": {
+    "blockers": [],
+    "checkpoint": {
+      "assets/lerobot/norm_stats.json": {
+        "expected": "53dc57ad2582dc95bc9b056e9425d9057141aec4850547b58fa34c81f8b9977a",
+        "matches": true,
+        "observed": "53dc57ad2582dc95bc9b056e9425d9057141aec4850547b58fa34c81f8b9977a"
+      },
+      "params/_METADATA": {
+        "expected": "6d5a6eefc73215c59bea485f1e480cef98dd6f07583e41ff1ae0d6ca35effd7e",
+        "matches": true,
+        "observed": "6d5a6eefc73215c59bea485f1e480cef98dd6f07583e41ff1ae0d6ca35effd7e"
+      },
+      "params/_sharding": {
+        "expected": "0aa89c2ac0ba6f33fd71c0a934a1b0e30b2a223619ef8ed916dfdf82f0899ae1",
+        "matches": true,
+        "observed": "0aa89c2ac0ba6f33fd71c0a934a1b0e30b2a223619ef8ed916dfdf82f0899ae1"
+      },
+      "params/manifest.ocdbt": {
+        "expected": "8970a323095c8d7d576c8ec6162c0ca62cf1961b698efeff08d9180953d0e964",
+        "matches": true,
+        "observed": "8970a323095c8d7d576c8ec6162c0ca62cf1961b698efeff08d9180953d0e964"
+      }
+    },
+    "episode_count": 72,
+    "external_checkouts": {
+      "libero_safety": {
+        "commit": "ef0f79b70fc50c5fb612a1bbc1cf8b6c033a702a",
+        "path": "/home/ldx/lean-vla/external/LIBERO-Safety",
+        "tracked_clean": true
+      },
+      "openpi": {
+        "commit": "15a9616a00943ada6c20a0f158e3adb39df2ccac",
+        "path": "/home/ldx/lean-vla/external/openpi",
+        "tracked_clean": true
+      },
+      "saber": {
+        "commit": "22ad50642a2aec11d00d43b9c0f36d2788bd487f",
+        "path": "/home/ldx/lean-vla/external/SABER",
+        "tracked_clean": true
+      }
+    },
+    "free_disk_gib": 1906.058479309082,
+    "output_root_absent": true,
+    "protocol_sha256": "64fc1eab87044c39c0ac680ff0f7a6169b93b951010e3d58733f39a5075335c4",
+    "read_only": true,
+    "ready": true,
+    "schema": "proofalign.contact-phase-pick-up-clean-pilot-preflight.v1",
+    "selected_gpu": {
+      "egl": {
+        "driver_version": "570.133.07",
+        "index": 0,
+        "memory_total_mib": 49140,
+        "memory_used_mib": 34583,
+        "name": "NVIDIA RTX 6000 Ada Generation",
+        "uuid": "GPU-7ad5c3eb-adf0-f70a-e670-8438701a553e"
+      },
+      "policy": {
+        "driver_version": "570.133.07",
+        "index": 2,
+        "memory_total_mib": 49140,
+        "memory_used_mib": 34583,
+        "name": "NVIDIA RTX 6000 Ada Generation",
+        "uuid": "GPU-177e688f-b5f1-1713-0c2e-29d927a058b3"
+      }
+    }
+  },
+  "protocol_sha256": "64fc1eab87044c39c0ac680ff0f7a6169b93b951010e3d58733f39a5075335c4",
+  "runtime": {
+    "config": {
+      "assets": "/home/ldx/lean-vla/external/LIBERO-Safety/libero/libero/assets",
+      "bddl_files": "/home/ldx/lean-vla/external/LIBERO-Safety/libero/libero/bddl_files",
+      "benchmark_root": "/home/ldx/lean-vla/external/LIBERO-Safety/libero/libero",
+      "datasets": "/home/ldx/lean-vla/external/LIBERO-Safety/libero/datasets",
+      "init_states": "/home/ldx/lean-vla/external/LIBERO-Safety/libero/libero/init_files"
+    },
+    "directory": "/home/ldx/lean-vla/results/proofalign_predictive_virtual_brake_v15_11_bounded_state_triggered_task_utility_qualification_20260806_fresh5/runtime/libero_config",
+    "sha256": "8d1cc08bf89c204f7d592bc6b87f4ffebeed91f7e870097b340a858c07741a3c"
+  },
+  "schema": "proofalign.contact-phase-pick-up-clean-pilot-run.v1",
+  "status": "terminal_failed_closed"
+}

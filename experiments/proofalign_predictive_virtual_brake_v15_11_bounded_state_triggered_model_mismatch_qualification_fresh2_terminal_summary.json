@@ -1,0 +1,33 @@
+{
+  "schema": "proofalign.predictive-virtual-brake-v15.11-bounded-state-triggered-model-mismatch-qualification-terminal-summary.v1",
+  "classification": "predictive_virtual_brake_v15_11_bounded_state_triggered_model_mismatch_qualification_nonpass",
+  "model_mismatch_qualification_pass": false,
+  "protocol_path": "experiments/proofalign_predictive_virtual_brake_v15_11_bounded_state_triggered_model_mismatch_qualification_protocol_fresh2.json",
+  "protocol_sha256": "d1d7cc5c5f3119b1539f93698b0693cdb011dea09cd6c96b591e2f7ef9291cd8",
+  "evidence_path": "results/proofalign_predictive_virtual_brake_v15_11_bounded_state_triggered_model_mismatch_qualification_20260805_fresh2/model_mismatch_qualification_evidence.json",
+  "evidence_sha256": "23c1357017c261b1bf5bf54f53d32dcf4670668cf636a53857e720f62e6fc617",
+  "core_outcome_metrics": {
+    "stress_lane_count": 5292,
+    "policy_step_count": 26460,
+    "residual_deadlock_lane_count": 0,
+    "crossing_count": 0,
+    "below_floor_count": 0,
+    "minimum_margin_rad": 0.15236626550149324,
+    "maximum_abs_constraint_force": 8279.636784041053,
+    "maximum_prediction_execution_error_rad": 0.0011515114026798834,
+    "maximum_screen_latency_seconds": 0.05273836408741772,
+    "maximum_condition_screen_latency_p95_seconds": 0.02977801462402562,
+    "screen_latency_100ms_miss_count": 0,
+    "screen_latency_sample_count": 26460
+  },
+  "formal_failed_gates": [
+    "model_mismatch_parameter_identity",
+    "model_mismatch_step_model_identity",
+    "physics_parameter_identity",
+    "v15_11_extended_recovery_evaluated",
+    "v15_11_incremental_extended_candidate_bound",
+    "v15_5_dynamic_motion_generator_activated"
+  ],
+  "root_cause": "The bounded candidate callsite was classified as actual rather than shadow by the registered model-role controller; extended-candidate compatibility metrics counted placeholders instead of screened candidates; the inherited dynamic-motion minimum was proportional to the predecessor's larger shadow rollout count.",
+  "successor_rule": "Fresh3 must exclude all fresh2 pairs, restore registered shadow role dispatch, count only screened ladder candidates, and preregister a positive dynamic-motion activation gate without changing safety, force, prediction-error, or latency thresholds."
+}

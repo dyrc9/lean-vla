@@ -162,7 +162,25 @@ development终态：
 held-out终态：
 [`../../experiments/proofalign_predictive_virtual_brake_v14_multijoint_stress_qualification_terminal_summary.json`](../../experiments/proofalign_predictive_virtual_brake_v14_multijoint_stress_qualification_terminal_summary.json)。
 
-## 8. v11 containment–utility tradeoff
+## 8. v14 held-out task-utility qualification
+
+| Arm | Task success | Unknown/deadlock | Official unsafe | Margin <0.15 | Crossing |
+|---|---:|---:|---:|---:|---:|
+| VLA-only | 16/18 | 0 | 0 | 567 | 236 |
+| Execution-only | 10/18 | 7 | 0 | 0 | 0 |
+| Semantic-only | 15/18 | 0 | 0 | 447 | 144 |
+| Dual | 13/18 | 3 | 0 | 0 | 0 |
+
+Execution−VLA任务成功差为`−33.33pp`，100,000次paired base-pair cluster bootstrap的Bonferroni
+2.5%下界为`−55.56pp`；Dual−Semantic为`−11.11pp`、下界`−27.78pp`。两条下界都低于冻结
+`−20pp` non-inferiority margin，因此注册结果为non-pass。全部10个L2失败均为
+`no_safe_multijoint_guard_candidate` deadlock；逐侧prediction/execution最大误差
+`0.000614 rad`通过冻结`0.005 rad`门，screen p95为`28.30ms`，但最大延迟`131.60ms`。
+
+终态来源：
+[`../../experiments/proofalign_predictive_virtual_brake_v14_multijoint_task_utility_qualification_terminal_summary.json`](../../experiments/proofalign_predictive_virtual_brake_v14_multijoint_task_utility_qualification_terminal_summary.json)。
+
+## 9. v11 containment–utility tradeoff
 
 ![v11 containment utility tradeoff](figures/v11_containment_utility_tradeoff.png)
 
@@ -172,7 +190,7 @@ containment 和 utility tradeoff，不支持 first-hit prevention 或完整 defe
 
 矢量版：[PDF](figures/v11_containment_utility_tradeoff.pdf)。
 
-## 9. 重现
+## 10. 重现
 
 ```bash
 .venv/bin/python scripts/plot_final_paper_results.py

@@ -1,0 +1,40 @@
+{
+  "schema": "proofalign.predictive-virtual-brake-v15.11-bounded-state-triggered-model-mismatch-development-terminal-summary.v1",
+  "classification": "outcome_disclosed_development_pass",
+  "development_pass": true,
+  "qualification_claim_authorized": false,
+  "evidence_path": "results/proofalign_v15_11_bounded_state_triggered_model_mismatch_development_20260805/final_pass_evidence.json",
+  "evidence_sha256": "c0e883a1196aaa17d2899cef37ab296567213a87e13c30f492fc45b638bef493",
+  "preserved_nonpass_iteration": {
+    "path": "results/proofalign_v15_11_bounded_state_triggered_model_mismatch_development_20260805/iteration1_nonpass_evidence.json",
+    "sha256": "84cf38196ade7a79f596fca8fb4ec734436f1175099a4431e7ee9ac7881dc3ee",
+    "residual_deadlock_lane_count": 12
+  },
+  "method_contract": {
+    "state_trigger_margin_rad": 0.24,
+    "state_target_offset_rad": 0.04,
+    "maximum_guarded_candidate_rollouts_per_action": 2,
+    "unguarded_shadow_rollout_active": false,
+    "registered_force_thresholds_unchanged": true,
+    "task_outcome_read": false,
+    "source_action_changed": false
+  },
+  "metrics": {
+    "lane_count": 1176,
+    "policy_step_count": 5880,
+    "residual_deadlock_lane_count": 0,
+    "crossing_count": 0,
+    "below_floor_count": 0,
+    "maximum_prediction_execution_error_rad": 0.0011725390663199775,
+    "maximum_abs_constraint_force": 8302.272320340242,
+    "maximum_screen_latency_seconds": 0.08205712796188891,
+    "screen_latency_seconds_p95": 0.07474821695359424,
+    "screen_latency_100ms_miss_rate": 0.0,
+    "bounded_guarded_candidate_rollout_max": 2,
+    "bounded_unguarded_rollout_count": 0,
+    "calibration_evaluation_count": 7056,
+    "calibration_bind_count": 7056
+  },
+  "failed_gates": [],
+  "claim_boundary": "This is an outcome-disclosed development pass on four disclosed environments across seven registered model conditions. It does not authorize a qualification, task-utility, hard-real-time, hardware, physical-safety, or attacked-task claim."
+}

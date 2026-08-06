@@ -1,5 +1,8 @@
 # 论文就绪度评估
 
+> 历史归档：本页主体停留在v11/v12阶段，不再作为当前进度入口。当前论文主线和v15状态统一见
+> [`../current_status_and_roadmap.md`](../current_status_and_roadmap.md)。保留本页仅用于追溯早期论文判断。
+
 最终图表与 Lean claim boundary 见
 [`final_results_figures.md`](final_results_figures.md)。
 

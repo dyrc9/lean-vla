@@ -1,10 +1,41 @@
-# 当前进展与执行计划
+# 历史实验时间线（归档）
 
-简明当前状态、可主张边界和 gate 化下一步以
+> 本文件保留完整实验时间线、失败successor和停止边界，仅用于论文审计与复现。
+> 它不再是当前项目进度入口。日常状态统一见
+> [`current_status_and_roadmap.md`](current_status_and_roadmap.md)，默认无需读取本文件其余内容。
+
+当前主线、可主张边界和下一步以
 [`current_status_and_roadmap.md`](current_status_and_roadmap.md) 为准。本页保留完整时间线和所有
 结果后 successor，不再作为快速状态入口。
 
-## 最新 checkpoint：2026-07-31 v14 trigger-rich stress development 与 held-out qualification
+## 最新 checkpoint：2026-07-31 v14 held-out task-outcome utility qualification
+
+在held-out stress协议执行前即冻结的18个task/init pair上，使用全新environment seed `2509`与
+policy seed `1251`完成四臂配对task-outcome qualification，共`18 × 4 = 72/72` episodes。所有
+18个pair完整保留，没有按stress结果筛选；冻结协议前没有读取这些pair的task success、done、reward、
+cost或collision outcome。
+
+任务成功数为VLA/Execution/Semantic/Dual `16/10/15/13`。Execution−VLA的配对差为`−33.33pp`，
+100,000次base-pair cluster bootstrap的Bonferroni 2.5%下界为`−55.56pp`；Dual−Semantic为
+`−11.11pp`，下界`−27.78pp`。两者都低于冻结`−20pp` non-inferiority margin，所以资格分类严格
+保持`predictive_virtual_brake_v14_multijoint_task_utility_qualification_nonpass`。四臂official
+unsafe/collision计数均为0，对应unsafe nonincrease gates通过，但不能抵消utility gate失败。
+
+独立逐episode轨迹扫描确认Execution有7次、Dual有3次
+`no_safe_multijoint_guard_candidate` deadlock。L2-enabled两臂的全部实际14侧值中，margin
+`<0.15 rad`与crossing均为0；disabled两臂分别累计1014个低余量值和380个crossing。共有4次active
+intervention，逐侧prediction/execution最大误差`0.000614 rad`，通过冻结`0.005 rad`校准门；screen
+latency p95 `28.30ms`、p99 `36.12ms`、最大`131.60ms`，最大constraint force约`1035.17`。运行
+控制台出现contact-capacity warning，但日志没有注册可复算计数，终结件只披露观察事实，不补写
+数值。
+
+终态见
+[`../experiments/proofalign_predictive_virtual_brake_v14_multijoint_task_utility_qualification_terminal_summary.json`](../experiments/proofalign_predictive_virtual_brake_v14_multijoint_task_utility_qualification_terminal_summary.json)。
+它保留原non-pass并固定全部75条checksum entries。下一步只在outcome-disclosed development失败
+上设计recovery因子；方法与参数冻结后，必须使用新的task/init population和env-policy seeds做
+stress containment与task utility资格复验，不能在本轮18 pair上追逐门限。
+
+## 前一 checkpoint：2026-07-31 v14 trigger-rich stress development 与 held-out qualification
 
 单环境pilot冻结low/medium/high dose后，12环境development按3 suites × 4 environments ×
 14 joint-sides × 3 doses完成`504`条stress lanes和四基线`2016`条执行。no-guard/shadow均产生
@@ -32,8 +63,9 @@ joint-1-upper low lanes：原生constraint force约`30k`使no-guard在第二步c
 non-pass与完整的core axes分开记录，见
 [`../experiments/proofalign_predictive_virtual_brake_v14_multijoint_stress_qualification_terminal_summary.json`](../experiments/proofalign_predictive_virtual_brake_v14_multijoint_stress_qualification_terminal_summary.json)。
 
-下一实验是独立task-outcome utility qualification，并把deadlock recovery/backup controller作为
-独立因子；不得从本轮无outcome stress ledger选择确认性任务或改写dose/gate。
+独立task-outcome utility qualification已按上节完成并因10次deadlock保持non-pass。下一实验将
+deadlock recovery/backup controller作为独立因子；不得从本轮结果选择后续确认性任务或改写
+dose/gate。
 
 ## 前一 checkpoint：2026-07-31 v14 同 schedule shadow-only 因果消融终态
 
@@ -1180,3 +1212,160 @@ Evidence naming 固定为：
 
 这项 successor 不授权修改历史 frozen artifact，也不授权把 L2 case-study 结果称为标准化 benchmark、
 一般物理安全或完整硬件 attestation。
+
+## 9. 2026-08-06：v15.11最终clean四臂fresh1封口与fresh2适配
+
+最终clean fresh1协议已冻结并启动。运行完成VLA-only和Semantic-only各1条后，首个L2-enabled episode
+在环境包装初始化阶段触发`PreStepCalibratedRecoveryError`并fail closed。根因是v15.8–v15.11的
+model-mismatch资格链由专用实验控制器注入`proofalign_shadow_model_calibrator`，标准LIBERO任务环境
+没有该接口；这不是运行中的安全gate non-pass，也不是v15.11 bounded brake核心产生deadlock。
+
+审计处理如下：
+
+- fresh1保持`terminal_failed_closed`，2条已完成episode、manifest、运行配置和checksums原样保留；
+- 不覆盖fresh1输出，不复用其协议ID或输出目录；
+- fresh2仅在最终任务运行器增加same-model nominal identity adapter，明确记录candidate count为1、
+  model mismatch未注入、selector未读真实参数且未读task outcome，不宣称执行七模型bank calibration；
+- fresh2从prior population中排除fresh1协议冻结的全部18个task/init pairs，保持结果未观察的全新population；
+- same-model adapter与既有calibration/prebound链相关测试共`16/16`通过；fresh2协议仍需单独冻结后才能执行。
+
+fresh2随后已冻结：18个全新pair、72个episodes，排除437个历史task/init组合，与fresh1冻结pair零
+重叠；协议SHA-256为`13d21817ff6290527d6fea1854ed43f12d65e1cb9df71d0940ad957a9e14bfe4`。
+冻结时未读取fresh2 task outcome。
+
+fresh2运行同样完成2条非L2 episode；首个L2 episode已越过setup calibration，证明same-model adapter
+接入有效，随后在10个pre-policy dummy wait steps中触发v15.7 incremental enrichment的空审计索引。
+该层缺少“observation count未增加则直接返回”的保护，而其父类已有该保护。fresh2按fail-closed封口并
+保留manifest和episode。fresh3 task-runtime adapter只在`call_index < wait_steps`时直接调用已有父类路径，
+policy step仍调用原v15.7/v15.11路径；同时记录wait-step count并新增coverage gate。fresh3还必须排除
+fresh1和fresh2协议冻结的全部pair。
+
+fresh3已冻结：18个全新pair、72个episodes，排除455个历史task/init组合，分别与fresh1和fresh2零
+重叠；协议SHA-256为`8730e54742c1bac5b11bd204cf633cd29a93011bcb6afbe010faa080fec0fdc7`。
+
+fresh3首个arm为L2-only。运行越过10个wait steps并进入policy action，但v15.11最外层在读取
+`bounded_guarded_candidate_rollout_count`时发现该字段不存在，说明嵌套的模块级core patch在真实继承链
+中没有形成稳定身份绑定；运行在0个完整episode时fail closed。fresh4在incremental调用点显式、作用域化
+绑定`_bounded_state_triggered_core_step`，计数每次core调用和每条policy audit，并要求core调用数等于
+wait-step数加policy-step数；任何覆盖差异继续fail closed。前三版冻结pair全部进入fresh4排除集。
+
+fresh4已冻结：18个全新pair、72个episodes，排除473个历史task/init组合；协议SHA-256为
+`214c4e482fa8f514dcd7029806469dd90f769f22af456b5e1d34f9b4bd9680c4`。冻结时未读取task outcome。
+
+fresh4首个arm为Dual。下层episode显示10条wait trace、0条policy trace，semantic dispatch issue保留了
+内部`KeyError: bounded_guarded_candidate_rollout_count`；因此v13最终报告的trace/audit count mismatch只是
+二次错误，不是根因。fresh5在不吞掉异常的task-runtime顶层记录bounded core调用计数、observation count、
+last audit schema与完整keys后继续fail closed，用于精确定位真实继承链的core identity。
+
+fresh5已冻结：18个全新pair、72个episodes，排除491个历史task/init组合；协议SHA-256为
+`64fc1eab87044c39c0ac680ff0f7a6169b93b951010e3d58733f39a5075335c4`。
+
+fresh5诊断结果为：`wait_step_count=10`、`policy_core_bind_count=1`、
+`bounded_core_call_count=0`、`bounded_policy_audit_count=0`，最后schema为v15.10 rolling prebound。
+这证明模块global patch不是稳定的真实task-runtime绑定。fresh6直接作用域化替换v15.6 adaptive class的
+`step`：父类调用前把v14 core指向v15.11 bounded core，返回后执行与冻结v15.6逐字段相同的adaptive
+enrichment，再交还v15.7 incremental、v15.10 rolling和v15.11顶层；core调用与policy audit继续计数。
+
+fresh6已冻结：18个全新pair、72个episodes，排除509个历史task/init组合；协议SHA-256为
+`9be1d52e567270e8cea77697e1b49dcb9cb28033c169d9d52ec51cf6630db0e2`。
+
+fresh6的direct adaptive标记已进入audit，但bounded core调用仍为0。原因是多层runner context在运行时
+会把v14模块的`MultiJointPredictiveVirtualBrakeEnvironment`变量替换成外层wrapper；adaptive adapter
+在运行中按模块变量取类，修改的是被替换对象，而真实MRO最终仍调用导入时的v14 base class。fresh7在
+所有嵌套context启动前捕获原始class对象，并在adaptive step内只通过该稳定引用临时替换`step`。
+
+fresh7已冻结：18个全新pair、72个episodes，排除527个历史task/init组合；协议SHA-256为
+`498eafeafb710e51d45cbdc283c065a571a53b7f72ae19823994952553297a1b`。
+
+fresh7已命中原始v14 class，但v15.11 bounded core的wait分支通过
+`v14.core.PredictiveVirtualBrakeEnvironment`模块变量调用v13 base；该变量此时也已被外层context替换，
+因此重新进入顶层wrapper并递归。fresh8在context前同时捕获原始v14与v13 class，bounded core调用期
+临时把v13模块变量恢复为捕获引用，返回后原样恢复运行时context。
+
+fresh8已冻结：18个全新pair、72个episodes，排除545个历史task/init组合；协议SHA-256为
+`baf0d7dbaa60736fbdaa7f615952acbb3f87d21eb4227ff14dc3ea74d4c5b5bd`。
+
+fresh8已进入bounded core并越过双基类绑定，随后在复制的v15.6 adaptive enrichment中因selected
+post-force prediction/execution不是`1e-12`位级一致而fail closed。最终v15.11资格协议并未把该旧identity
+作为gate，而是约束最大constraint force、margin prediction/execution error、deadlock、crossing与latency。
+fresh9继续记录两项force absolute error和identity divergence count，但明确停用旧identity gate，仍由
+v15.11注册的`force <= 10000`和`margin error <= 0.01 rad`正式门判定。
+
+fresh9已冻结：18个全新pair、72个episodes，排除563个历史task/init组合；协议SHA-256为
+`0f14ee7a207a71a1ecc57f9a6723dc9611b778598e0fc001ff2469108849243b`。
+
+fresh9完成72/72并独立validate。四臂clean success为VLA-only 10/18、L1-only 11/18、L2-only 9/18、
+Dual 12/18；clean utility gate通过。v15.11正式机制指标为0 deadlock、L2内0 crossing/0 joint-limit、
+最大constraint force 1349.47、最大selected margin prediction error约`1e-12 rad`、最大screen latency
+33.26ms，均通过。唯一false gate是继承的`v9_v14_prediction_execution_calibration`：v15.11删除
+unguarded rollout后，兼容字段明确保存当前状态而非下一步预测，旧gate比较当前状态与下一状态得到
+0.089rad差值。fresh9不得结果后改判，保持non-pass。fresh10在新population上预注册停用这个不适用的
+旧gate，并用zero unguarded rollout加selected prediction error正式门替代。
+
+fresh10已冻结：18个全新pair、72个episodes，排除581个历史task/init组合；协议SHA-256为
+`2ba4120226098e2e128bb16075c67894881bdb397d4ea72b54086cf37ee836ad`。
+
+fresh10运行到10/72已完成episodes后，在第11个execution-only episode按预注册规则fail closed：
+`runner_step_id=580`时当前minimum margin为`0.1209137574 rad`，risk side count为1，5个候选均不能
+满足`0.15 rad`安全底线。该结果表明`0.24 rad`固定状态触发阈值在部分任务轨迹上介入过晚，是方法问题，
+不能通过放宽floor或事后改判处理。协议、10个完成episode、manifest和checksums均保留。
+
+基于fresh9完整轨迹和fresh10的fail-closed诊断，v15.12 task-trigger successor将状态触发阈值从
+`0.24`提前到`0.30 rad`；`0.15 rad`安全floor、最多2次guarded candidate rollout以及force、margin、
+latency gates保持不变。该修改明确标注为outcome-informed method design，并在排除599个历史pair后选择
+18个未读取结果的新pair。v15.12 clean fresh1已冻结为72个episodes，协议SHA-256为
+`ec9556b02d24b1ffd572e921cd2587f2e958cbd0baef6a4f6f0736e307b3e506`。
+
+v15.12 clean fresh1已完成72/72并通过独立`--validate-results`重算，checksums 75/75通过。四臂
+VLA/L1/L2/Dual success为15/13/13/12，unsafe均为0；L2内0 crossing、0 joint-limit，最大force
+1838.10、最大selected margin prediction error约`4.94e-9 rad`、最大screen latency 40.31ms、p95
+16.56ms，100ms miss为0。正式false gates只有`v15_11_zero_deadlock`和
+`v9_execution_only_task_success_noninferiority`：Dual在task1/init25末端有1次deadlock；L2-VLA差为
+-2/18，bootstrap下界-0.2778低于-0.20门。v15.12保持non-pass，attacked不获授权。
+
+deadlock诊断显示当前minimum margin为0.15837rad，两个screened candidate的预测minimum margin分别为
+0.15836和0.15731，均满足0.15 floor，但其transient attributable recovery force分别为1838.10和
+1682.35，超过旧1250 recovery专用子限额，尽管都远低于正式10000 force envelope。下一版只考虑将
+该recovery子限额提高到2000，并保留0.30 trigger、0.15 floor、2次rollout预算和所有正式门；这是基于
+v15.12结果的outcome-informed successor，必须使用新pair重新验证。
+
+v15.13 recovery-force successor已冻结：18个全新pair、72个episodes，排除617个历史task/init组合；
+协议SHA-256为`3a9c483d982531a9c9419772c9e8117137c9d79fa39284a8e4c0d31f52552022`。
+代码级诊断测试确认同一个1838.10 recovery candidate在旧1250子限额下被拒绝、在v15.13的2000子限额
+下可行；该测试不替代全新population的task-outcome结果。
+
+v15.13 clean完成72/72并独立validate，checksums 75/75通过。VLA/L1/L2/Dual success为11/12/11/11，
+四臂unsafe各1，clean utility全部正式门通过；L2内0 crossing、0 joint-limit，最大force 2438.64、
+最大selected margin prediction error约`5.27e-9 rad`、最大screen latency34.72ms、p95 18.00ms。
+唯一false gate是zero-deadlock：两次execution-only deadlock的current minimum margin分别为0.15250和
+0.15998，screened候选预测minimum margin均高于0.15 floor，post-step risk force均为0.1，但transient
+force为2162.99–2438.64，超过2000 recovery专用子限额。
+
+由于连续两版deadlock均只由额外recovery子限额造成，下一版不再按观测最大值逐次调高任意小门；它将
+recovery force feasibility统一到已注册的10000全局force envelope。0.30 trigger、0.15 floor、两次
+rollout预算、实际最大force、prediction error与latency正式门不变。该设计仍明确标注outcome-informed，
+并必须排除v15.13全部pair重新验证。
+
+v15.14 unified-force-envelope clean已冻结：18个全新pair、72个episodes，排除635个历史task/init组合；
+协议SHA-256为`bcc39b02d7bb57c6fd928261afb3f5792ef460cb00e35aaff79f6b75f0652342`。
+代码级诊断确认v15.13观测到的最大2438.64候选在旧2000子限额下被拒绝，在统一10000 envelope下
+可行；正式实际force仍由同一个10000 gate裁决。
+
+v15.14 clean完成72/72并独立validate，checksums 75/75通过，正式qualification pass。VLA/L1/L2/Dual
+success均为13/18；unsafe分别为0/1/0/1，两个paired success contrast均为0。机制指标为0 deadlock、
+L2内0 crossing/0 joint-limit、最大force 6568.13、最大selected margin prediction error
+`7.77e-5 rad`、最大screen latency44.73ms、p95 25.57ms、100ms miss 0。所有gate为true，
+`attacked_stage_authorized=true`；下一步按clean同pair、同environment/policy seeds冻结SABER-attacked四臂。
+
+v15.14 SABER-attacked fresh1按clean同18 pair、同seeds完成72/72，但完整性门判non-pass：只有36个L2-on
+episodes收到冻结攻击prompt，VLA/L1的disabled-L2 runner仍收到clean prompt。重算得到first-block change
+36/72、metadata mismatch 144、prompt digest mismatch 1044；checksums 76/76通过。该批只作为攻击接线
+失败审计保留，不解释为方法效果。
+
+fresh2只修复disabled-L2 runner的attack-record转发，任务、方法、seeds、schedule和18条攻击文本不变，
+并在协议中绑定fresh1 non-pass。fresh2完成72/72，独立validate与checksums 76/76通过，全部正式gate为
+true。clean四臂success均13/18；attacked VLA/L1/L2/Dual success为11/13/11/13。attacked中至少一次
+joint-limit violation或actual crossing的episode数为4/1/0/0，对应22.22%/5.56%/0%/0%；crossing steps
+为28/295/0/0，joint-limit steps为175/317/0/0。L2与Dual 0 deadlock，最大force 6438.20，最大selected
+margin prediction error约2.69e-13rad，最大latency39.79ms、p95 18.30ms、100ms miss 0。论文主线模拟器
+实验至此完成。

@@ -1,0 +1,913 @@
+{
+  "analysis_role": "checksum_bound_posthoc_descriptive_systems_overhead_analysis",
+  "bindings": {
+    "attacked_evidence": {
+      "path": "results/proofalign_predictive_virtual_brake_v15_3_force_attributed_recovery_attacked_task_utility_qualification_20260801_fresh1/attacked_qualification_evidence.json",
+      "sha256": "3794b60d1d217b7a4c97734b5dd81d25045954d1ad0be915ea1167246e36b05a"
+    },
+    "attacked_terminal": {
+      "path": "experiments/proofalign_predictive_virtual_brake_v15_force_attributed_recovery_attacked_task_utility_qualification_terminal_summary.json",
+      "sha256": "7dee0baf831bfb9efba4f2c1f74446abcda75f6dfb0c0a3cdbdf861d6a8f9df1"
+    },
+    "clean_evidence": {
+      "path": "results/proofalign_predictive_virtual_brake_v15_3_force_attributed_recovery_task_utility_qualification_20260731_fresh1/pilot_evidence.json",
+      "sha256": "37865da48c100dc8c3186b7e4c3f2bd66c54e5e0fb96eea84b11516c8f302ca6"
+    },
+    "clean_terminal": {
+      "path": "experiments/proofalign_predictive_virtual_brake_v15_force_attributed_recovery_task_utility_qualification_terminal_summary.json",
+      "sha256": "594454b1b277b3ee546c317af20336bc510f41b214286e622de86fc577b44832"
+    },
+    "generator": {
+      "path": "scripts/generate_v15_system_overhead_analysis.py",
+      "sha256": "e7f9b82fb734aa80ccc0b03502b07f2a6d2027ba454f14a042edd6f2363b2a4a"
+    }
+  },
+  "claim_boundary": "This artifact is a checksum-bound post-hoc descriptive analysis of the frozen clean and attacked task rollouts. It supports research-simulator screening-cost, deadline-miss, intervention-category, candidate-count, and shadow-step reporting. The four arms follow different trajectories, so cross-arm wall-time differences are not causal overhead estimates. The 50 ms result is diagnostic; the registered task protocols use a 100 ms screening budget. This artifact does not change the attacked qualification nonpass and does not establish hard real-time, hardware, arbitrary-attack, actuator-authority, or physical-safety claims.",
+  "conditions": {
+    "attacked": {
+      "by_arm": {
+        "dual": {
+          "candidate_count_per_enabled_screen": {
+            "count": 6522,
+            "maximum": 6.0,
+            "mean": 0.01609935602575897,
+            "p50": 0.0,
+            "p95": 0.0,
+            "p99": 0.0
+          },
+          "control_period_50ms_deadline": {
+            "miss_count": 1,
+            "miss_rate": 0.00015332720024532353,
+            "registered_gate": false,
+            "threshold_seconds": 0.05
+          },
+          "disabled_policy_audit_count": 0,
+          "enabled_policy_audit_count": 6522,
+          "episode_count": 18,
+          "exact_action_mismatch_count": 0,
+          "l2_enabled": true,
+          "metadata_or_enablement_mismatch_count": 0,
+          "registered_100ms_latency_budget": {
+            "miss_count": 0,
+            "miss_rate": 0.0,
+            "threshold_seconds": 0.1
+          },
+          "risk_side_count_per_enabled_screen": {
+            "count": 6522,
+            "maximum": 1.0,
+            "mean": 0.0027598896044158236,
+            "p50": 0.0,
+            "p95": 0.0,
+            "p99": 0.0
+          },
+          "screen_category_counts": {
+            "recovery_intervention": 15,
+            "standard_intervention": 3,
+            "untriggered": 6504
+          },
+          "screen_latency_by_category_seconds": {
+            "recovery_intervention": {
+              "count": 15,
+              "maximum": 0.04872757801786065,
+              "mean": 0.04264922766791036,
+              "p50": 0.04014787299092859,
+              "p95": 0.04833523497218266,
+              "p99": 0.04864910940872505
+            },
+            "standard_intervention": {
+              "count": 3,
+              "maximum": 0.051885870983824134,
+              "mean": 0.04424071564183881,
+              "p50": 0.04068534297402948,
+              "p95": 0.05076581818284467,
+              "p99": 0.05166186042362824
+            },
+            "untriggered": {
+              "count": 6504,
+              "maximum": 0.043151288002263755,
+              "mean": 0.01930896534196161,
+              "p50": 0.016934508515987545,
+              "p95": 0.029687638941686585,
+              "p99": 0.035983201026101606
+            }
+          },
+          "screen_latency_seconds": {
+            "count": 6522,
+            "maximum": 0.051885870983824134,
+            "mean": 0.019374113944505132,
+            "p50": 0.016952698002569377,
+            "p95": 0.029944783874088894,
+            "p99": 0.03646378656791057
+          },
+          "screen_seconds_per_episode": {
+            "count": 18,
+            "maximum": 17.197895463730674,
+            "mean": 7.01988728589236,
+            "p50": 5.658560623560334,
+            "p95": 16.893234151799696,
+            "p99": 17.13696320134448
+          },
+          "screen_to_trace_env_step_ratio_diagnostic": {
+            "count": 6522,
+            "maximum": 0.8148989356122429,
+            "mean": 0.5446399654324025,
+            "p50": 0.5434228998368258,
+            "p95": 0.5668531448237117,
+            "p99": 0.5799657973912651
+          },
+          "shadow_env_step_count_per_enabled_screen": {
+            "count": 6522,
+            "maximum": 4.0,
+            "mean": 1.005673106409077,
+            "p50": 1.0,
+            "p95": 1.0,
+            "p99": 1.0
+          },
+          "shadow_restore_mismatch_count": 0,
+          "task_success_count": 11,
+          "trace_env_step_wall_seconds": {
+            "count": 6702,
+            "maximum": 0.08347157598473132,
+            "mean": 0.035273108448837326,
+            "p50": 0.03095635148929432,
+            "p95": 0.056109342016861775,
+            "p99": 0.06903470784891394
+          },
+          "trace_policy_wall_seconds": {
+            "count": 6702,
+            "maximum": 0.07716602401342243,
+            "mean": 0.007101970900860939,
+            "p50": 0.0,
+            "p95": 0.07254463054414373,
+            "p99": 0.0730382983351592
+          },
+          "unsafe_count": 0,
+          "verified_episode_artifact_count": 18
+        },
+        "execution_only": {
+          "candidate_count_per_enabled_screen": {
+            "count": 7305,
+            "maximum": 6.0,
+            "mean": 0.09117043121149897,
+            "p50": 0.0,
+            "p95": 0.0,
+            "p99": 6.0
+          },
+          "control_period_50ms_deadline": {
+            "miss_count": 85,
+            "miss_rate": 0.01163586584531143,
+            "registered_gate": false,
+            "threshold_seconds": 0.05
+          },
+          "disabled_policy_audit_count": 0,
+          "enabled_policy_audit_count": 7305,
+          "episode_count": 18,
+          "exact_action_mismatch_count": 0,
+          "l2_enabled": true,
+          "metadata_or_enablement_mismatch_count": 0,
+          "registered_100ms_latency_budget": {
+            "miss_count": 0,
+            "miss_rate": 0.0,
+            "threshold_seconds": 0.1
+          },
+          "risk_side_count_per_enabled_screen": {
+            "count": 7305,
+            "maximum": 1.0,
+            "mean": 0.015331964407939767,
+            "p50": 0.0,
+            "p95": 0.0,
+            "p99": 1.0
+          },
+          "screen_category_counts": {
+            "recovery_intervention": 106,
+            "standard_intervention": 6,
+            "untriggered": 7193
+          },
+          "screen_latency_by_category_seconds": {
+            "recovery_intervention": {
+              "count": 106,
+              "maximum": 0.06142413098132238,
+              "mean": 0.04805804017265679,
+              "p50": 0.04993197799194604,
+              "p95": 0.05516631773207337,
+              "p99": 0.0579554101015674
+            },
+            "standard_intervention": {
+              "count": 6,
+              "maximum": 0.06879782699979842,
+              "mean": 0.053362044835618384,
+              "p50": 0.05133927150745876,
+              "p95": 0.0672963887482183,
+              "p99": 0.0684975393494824
+            },
+            "untriggered": {
+              "count": 7193,
+              "maximum": 0.06788299500476569,
+              "mean": 0.019583367580728483,
+              "p50": 0.017067309003323317,
+              "p95": 0.03051375660579651,
+              "p99": 0.039406984376255415
+            }
+          },
+          "screen_latency_seconds": {
+            "count": 7305,
+            "maximum": 0.06879782699979842,
+            "mean": 0.0200242967194381,
+            "p50": 0.017193623003549874,
+            "p95": 0.033501686807721795,
+            "p99": 0.0501891137775965
+          },
+          "screen_seconds_per_episode": {
+            "count": 18,
+            "maximum": 16.908898961904924,
+            "mean": 8.126527085305295,
+            "p50": 6.468680352496449,
+            "p95": 16.200735527664072,
+            "p99": 16.767266275056752
+          },
+          "screen_to_trace_env_step_ratio_diagnostic": {
+            "count": 7305,
+            "maximum": 0.8163464234687132,
+            "mean": 0.5488874044883044,
+            "p50": 0.5453837388765662,
+            "p95": 0.5720297975176466,
+            "p99": 0.7646052715983089
+          },
+          "shadow_env_step_count_per_enabled_screen": {
+            "count": 7305,
+            "maximum": 4.0,
+            "mean": 1.0310746064339493,
+            "p50": 1.0,
+            "p95": 1.0,
+            "p99": 3.0
+          },
+          "shadow_restore_mismatch_count": 0,
+          "task_success_count": 11,
+          "trace_env_step_wall_seconds": {
+            "count": 7485,
+            "maximum": 0.13283314800355583,
+            "mean": 0.036104853485227836,
+            "p50": 0.031150173977948725,
+            "p95": 0.061118713987525546,
+            "p99": 0.07562538757221772
+          },
+          "trace_policy_wall_seconds": {
+            "count": 7485,
+            "maximum": 0.07575353601714596,
+            "mean": 0.007033133780105946,
+            "p50": 0.0,
+            "p95": 0.07169030521763489,
+            "p99": 0.07227902974700555
+          },
+          "unsafe_count": 0,
+          "verified_episode_artifact_count": 18
+        },
+        "semantic_only": {
+          "candidate_count_per_enabled_screen": {
+            "count": 0,
+            "maximum": null,
+            "mean": null,
+            "p50": null,
+            "p95": null,
+            "p99": null
+          },
+          "control_period_50ms_deadline": {
+            "miss_count": 0,
+            "miss_rate": null,
+            "registered_gate": false,
+            "threshold_seconds": 0.05
+          },
+          "disabled_policy_audit_count": 5797,
+          "enabled_policy_audit_count": 0,
+          "episode_count": 18,
+          "exact_action_mismatch_count": 0,
+          "l2_enabled": false,
+          "metadata_or_enablement_mismatch_count": 0,
+          "registered_100ms_latency_budget": {
+            "miss_count": 0,
+            "miss_rate": null,
+            "threshold_seconds": 0.1
+          },
+          "risk_side_count_per_enabled_screen": {
+            "count": 0,
+            "maximum": null,
+            "mean": null,
+            "p50": null,
+            "p95": null,
+            "p99": null
+          },
+          "screen_category_counts": {},
+          "screen_latency_by_category_seconds": {},
+          "screen_latency_seconds": {
+            "count": 0,
+            "maximum": null,
+            "mean": null,
+            "p50": null,
+            "p95": null,
+            "p99": null
+          },
+          "screen_seconds_per_episode": {
+            "count": 0,
+            "maximum": null,
+            "mean": null,
+            "p50": null,
+            "p95": null,
+            "p99": null
+          },
+          "screen_to_trace_env_step_ratio_diagnostic": {
+            "count": 0,
+            "maximum": null,
+            "mean": null,
+            "p50": null,
+            "p95": null,
+            "p99": null
+          },
+          "shadow_env_step_count_per_enabled_screen": {
+            "count": 0,
+            "maximum": null,
+            "mean": null,
+            "p50": null,
+            "p95": null,
+            "p99": null
+          },
+          "shadow_restore_mismatch_count": 0,
+          "task_success_count": 12,
+          "trace_env_step_wall_seconds": {
+            "count": 5977,
+            "maximum": 0.043743795016780496,
+            "mean": 0.015696603099702812,
+            "p50": 0.013028289016801864,
+            "p95": 0.027579029998742035,
+            "p99": 0.03450256267096847
+          },
+          "trace_policy_wall_seconds": {
+            "count": 5977,
+            "maximum": 2.518653320032172,
+            "mean": 0.007507735976383482,
+            "p50": 0.0,
+            "p95": 0.07251425281865523,
+            "p99": 0.07309515301603824
+          },
+          "unsafe_count": 0,
+          "verified_episode_artifact_count": 18
+        },
+        "vla_only": {
+          "candidate_count_per_enabled_screen": {
+            "count": 0,
+            "maximum": null,
+            "mean": null,
+            "p50": null,
+            "p95": null,
+            "p99": null
+          },
+          "control_period_50ms_deadline": {
+            "miss_count": 0,
+            "miss_rate": null,
+            "registered_gate": false,
+            "threshold_seconds": 0.05
+          },
+          "disabled_policy_audit_count": 7179,
+          "enabled_policy_audit_count": 0,
+          "episode_count": 18,
+          "exact_action_mismatch_count": 0,
+          "l2_enabled": false,
+          "metadata_or_enablement_mismatch_count": 0,
+          "registered_100ms_latency_budget": {
+            "miss_count": 0,
+            "miss_rate": null,
+            "threshold_seconds": 0.1
+          },
+          "risk_side_count_per_enabled_screen": {
+            "count": 0,
+            "maximum": null,
+            "mean": null,
+            "p50": null,
+            "p95": null,
+            "p99": null
+          },
+          "screen_category_counts": {},
+          "screen_latency_by_category_seconds": {},
+          "screen_latency_seconds": {
+            "count": 0,
+            "maximum": null,
+            "mean": null,
+            "p50": null,
+            "p95": null,
+            "p99": null
+          },
+          "screen_seconds_per_episode": {
+            "count": 0,
+            "maximum": null,
+            "mean": null,
+            "p50": null,
+            "p95": null,
+            "p99": null
+          },
+          "screen_to_trace_env_step_ratio_diagnostic": {
+            "count": 0,
+            "maximum": null,
+            "mean": null,
+            "p50": null,
+            "p95": null,
+            "p99": null
+          },
+          "shadow_env_step_count_per_enabled_screen": {
+            "count": 0,
+            "maximum": null,
+            "mean": null,
+            "p50": null,
+            "p95": null,
+            "p99": null
+          },
+          "shadow_restore_mismatch_count": 0,
+          "task_success_count": 11,
+          "trace_env_step_wall_seconds": {
+            "count": 7359,
+            "maximum": 0.055291560012847185,
+            "mean": 0.015696262495367853,
+            "p50": 0.013289143971633166,
+            "p95": 0.027358231903053757,
+            "p99": 0.03864387359120884
+          },
+          "trace_policy_wall_seconds": {
+            "count": 7359,
+            "maximum": 0.0769437970011495,
+            "mean": 0.007045670280997484,
+            "p50": 0.0,
+            "p95": 0.0716780150833074,
+            "p99": 0.07229201754438691
+          },
+          "unsafe_count": 0,
+          "verified_episode_artifact_count": 18
+        }
+      },
+      "combined_l2_screen_latency_seconds": {
+        "count": 13827,
+        "maximum": 0.06879782699979842,
+        "mean": 0.01971761471624776,
+        "p50": 0.017046242021024227,
+        "p95": 0.03089242872083557,
+        "p99": 0.04712048488669097
+      },
+      "episode_count": 72,
+      "verified_episode_artifact_count": 72
+    },
+    "clean": {
+      "by_arm": {
+        "dual": {
+          "candidate_count_per_enabled_screen": {
+            "count": 5785,
+            "maximum": 6.0,
+            "mean": 0.22938634399308558,
+            "p50": 0.0,
+            "p95": 0.0,
+            "p99": 6.0
+          },
+          "control_period_50ms_deadline": {
+            "miss_count": 47,
+            "miss_rate": 0.008124459809853069,
+            "registered_gate": false,
+            "threshold_seconds": 0.05
+          },
+          "disabled_policy_audit_count": 0,
+          "enabled_policy_audit_count": 5785,
+          "episode_count": 18,
+          "exact_action_mismatch_count": 0,
+          "l2_enabled": true,
+          "metadata_or_enablement_mismatch_count": 0,
+          "registered_100ms_latency_budget": {
+            "miss_count": 0,
+            "miss_rate": 0.0,
+            "threshold_seconds": 0.1
+          },
+          "risk_side_count_per_enabled_screen": {
+            "count": 5785,
+            "maximum": 2.0,
+            "mean": 0.042005185825410546,
+            "p50": 0.0,
+            "p95": 0.0,
+            "p99": 1.0
+          },
+          "screen_category_counts": {
+            "recovery_intervention": 207,
+            "standard_intervention": 17,
+            "untriggered": 5561
+          },
+          "screen_latency_by_category_seconds": {
+            "recovery_intervention": {
+              "count": 207,
+              "maximum": 0.06271960196318105,
+              "mean": 0.0423272255760874,
+              "p50": 0.0453912119846791,
+              "p95": 0.04716475768946111,
+              "p99": 0.05217323357239365
+            },
+            "standard_intervention": {
+              "count": 17,
+              "maximum": 0.07899842300685123,
+              "mean": 0.04734158670694074,
+              "p50": 0.04573107900796458,
+              "p95": 0.06642599819460883,
+              "p99": 0.07648393804440275
+            },
+            "untriggered": {
+              "count": 5561,
+              "maximum": 0.05871191498590633,
+              "mean": 0.017838243231028447,
+              "p50": 0.015914892021100968,
+              "p95": 0.03231180500006303,
+              "p99": 0.04730502337915822
+            }
+          },
+          "screen_latency_seconds": {
+            "count": 5785,
+            "maximum": 0.07899842300685123,
+            "mean": 0.01880121232083272,
+            "p50": 0.015997631999198347,
+            "p95": 0.03672141822753475,
+            "p99": 0.048117102435789996
+          },
+          "screen_seconds_per_episode": {
+            "count": 18,
+            "maximum": 12.62624950602185,
+            "mean": 6.042500737556515,
+            "p50": 5.520231930975569,
+            "p95": 10.645636106387244,
+            "p99": 12.230126826094924
+          },
+          "screen_to_trace_env_step_ratio_diagnostic": {
+            "count": 5785,
+            "maximum": 0.8676491067982752,
+            "mean": 0.5564805408839697,
+            "p50": 0.548134689297815,
+            "p95": 0.5782545293739874,
+            "p99": 0.7683929948988492
+          },
+          "shadow_env_step_count_per_enabled_screen": {
+            "count": 5785,
+            "maximum": 6.0,
+            "mean": 1.0788245462402766,
+            "p50": 1.0,
+            "p95": 1.0,
+            "p99": 3.0
+          },
+          "shadow_restore_mismatch_count": 0,
+          "task_success_count": 12,
+          "trace_env_step_wall_seconds": {
+            "count": 5965,
+            "maximum": 0.11447039298946038,
+            "mean": 0.03315630800318877,
+            "p50": 0.02919488400220871,
+            "p95": 0.061707638623192916,
+            "p99": 0.09095508058322589
+          },
+          "trace_policy_wall_seconds": {
+            "count": 5965,
+            "maximum": 0.07820915797492489,
+            "mean": 0.007074477595063621,
+            "p50": 0.0,
+            "p95": 0.07248121940065175,
+            "p99": 0.07304191656177864
+          },
+          "unsafe_count": 0,
+          "verified_episode_artifact_count": 18
+        },
+        "execution_only": {
+          "candidate_count_per_enabled_screen": {
+            "count": 6016,
+            "maximum": 6.0,
+            "mean": 0.5182845744680851,
+            "p50": 0.0,
+            "p95": 6.0,
+            "p99": 6.0
+          },
+          "control_period_50ms_deadline": {
+            "miss_count": 104,
+            "miss_rate": 0.017287234042553192,
+            "registered_gate": false,
+            "threshold_seconds": 0.05
+          },
+          "disabled_policy_audit_count": 0,
+          "enabled_policy_audit_count": 6016,
+          "episode_count": 18,
+          "exact_action_mismatch_count": 0,
+          "l2_enabled": true,
+          "metadata_or_enablement_mismatch_count": 0,
+          "registered_100ms_latency_budget": {
+            "miss_count": 0,
+            "miss_rate": 0.0,
+            "threshold_seconds": 0.1
+          },
+          "risk_side_count_per_enabled_screen": {
+            "count": 6016,
+            "maximum": 1.0,
+            "mean": 0.08660239361702128,
+            "p50": 0.0,
+            "p95": 1.0,
+            "p99": 1.0
+          },
+          "screen_category_counts": {
+            "deadlock": 1,
+            "recovery_intervention": 512,
+            "standard_intervention": 8,
+            "untriggered": 5495
+          },
+          "screen_latency_by_category_seconds": {
+            "deadlock": {
+              "count": 1,
+              "maximum": 0.04056662798393518,
+              "mean": 0.04056662798393518,
+              "p50": 0.04056662798393518,
+              "p95": 0.04056662798393518,
+              "p99": 0.04056662798393518
+            },
+            "recovery_intervention": {
+              "count": 512,
+              "maximum": 0.0659230729797855,
+              "mean": 0.03864055043038661,
+              "p50": 0.03565971500938758,
+              "p95": 0.05357904327393043,
+              "p99": 0.058688991218223234
+            },
+            "standard_intervention": {
+              "count": 8,
+              "maximum": 0.0632042310317047,
+              "mean": 0.05037478575104615,
+              "p50": 0.04910624850890599,
+              "p95": 0.060941350102075374,
+              "p99": 0.06275165484577883
+            },
+            "untriggered": {
+              "count": 5495,
+              "maximum": 0.06342899898299947,
+              "mean": 0.01771742591752609,
+              "p50": 0.01548723696032539,
+              "p95": 0.032351658277912074,
+              "p99": 0.05089619970298376
+            }
+          },
+          "screen_latency_seconds": {
+            "count": 6016,
+            "maximum": 0.0659230729797855,
+            "mean": 0.019545342777785257,
+            "p50": 0.015665068000089377,
+            "p95": 0.03929804552171845,
+            "p99": 0.054312657966511343
+          },
+          "screen_seconds_per_episode": {
+            "count": 18,
+            "maximum": 14.438924932328518,
+            "mean": 6.53248789728645,
+            "p50": 5.22870962851448,
+            "p95": 12.00160283563891,
+            "p99": 13.951460512990593
+          },
+          "screen_to_trace_env_step_ratio_diagnostic": {
+            "count": 6016,
+            "maximum": 0.9933161915285377,
+            "mean": 0.5705670739408019,
+            "p50": 0.5545001885445586,
+            "p95": 0.7709302013322334,
+            "p99": 0.7735526526800574
+          },
+          "shadow_env_step_count_per_enabled_screen": {
+            "count": 6016,
+            "maximum": 4.0,
+            "mean": 1.1735372340425532,
+            "p50": 1.0,
+            "p95": 3.0,
+            "p99": 3.0
+          },
+          "shadow_restore_mismatch_count": 0,
+          "task_success_count": 11,
+          "trace_env_step_wall_seconds": {
+            "count": 6196,
+            "maximum": 0.1234065389726311,
+            "mean": 0.03343268229735357,
+            "p50": 0.02834159549092874,
+            "p95": 0.0628599739720812,
+            "p99": 0.09681394168874251
+          },
+          "trace_policy_wall_seconds": {
+            "count": 6196,
+            "maximum": 0.07779030001256615,
+            "mean": 0.006981971610950461,
+            "p50": 0.0,
+            "p95": 0.07159438145754393,
+            "p99": 0.07215625526150689
+          },
+          "unsafe_count": 0,
+          "verified_episode_artifact_count": 18
+        },
+        "semantic_only": {
+          "candidate_count_per_enabled_screen": {
+            "count": 0,
+            "maximum": null,
+            "mean": null,
+            "p50": null,
+            "p95": null,
+            "p99": null
+          },
+          "control_period_50ms_deadline": {
+            "miss_count": 0,
+            "miss_rate": null,
+            "registered_gate": false,
+            "threshold_seconds": 0.05
+          },
+          "disabled_policy_audit_count": 6051,
+          "enabled_policy_audit_count": 0,
+          "episode_count": 18,
+          "exact_action_mismatch_count": 0,
+          "l2_enabled": false,
+          "metadata_or_enablement_mismatch_count": 0,
+          "registered_100ms_latency_budget": {
+            "miss_count": 0,
+            "miss_rate": null,
+            "threshold_seconds": 0.1
+          },
+          "risk_side_count_per_enabled_screen": {
+            "count": 0,
+            "maximum": null,
+            "mean": null,
+            "p50": null,
+            "p95": null,
+            "p99": null
+          },
+          "screen_category_counts": {},
+          "screen_latency_by_category_seconds": {},
+          "screen_latency_seconds": {
+            "count": 0,
+            "maximum": null,
+            "mean": null,
+            "p50": null,
+            "p95": null,
+            "p99": null
+          },
+          "screen_seconds_per_episode": {
+            "count": 0,
+            "maximum": null,
+            "mean": null,
+            "p50": null,
+            "p95": null,
+            "p99": null
+          },
+          "screen_to_trace_env_step_ratio_diagnostic": {
+            "count": 0,
+            "maximum": null,
+            "mean": null,
+            "p50": null,
+            "p95": null,
+            "p99": null
+          },
+          "shadow_env_step_count_per_enabled_screen": {
+            "count": 0,
+            "maximum": null,
+            "mean": null,
+            "p50": null,
+            "p95": null,
+            "p99": null
+          },
+          "shadow_restore_mismatch_count": 0,
+          "task_success_count": 11,
+          "trace_env_step_wall_seconds": {
+            "count": 6231,
+            "maximum": 0.0645088060409762,
+            "mean": 0.014394098254831072,
+            "p50": 0.01214873295975849,
+            "p95": 0.02797980696777813,
+            "p99": 0.04304791989852674
+          },
+          "trace_policy_wall_seconds": {
+            "count": 6231,
+            "maximum": 2.6058043040102348,
+            "mean": 0.007514564676725269,
+            "p50": 0.0,
+            "p95": 0.07244364652433433,
+            "p99": 0.07311896846513263
+          },
+          "unsafe_count": 1,
+          "verified_episode_artifact_count": 18
+        },
+        "vla_only": {
+          "candidate_count_per_enabled_screen": {
+            "count": 0,
+            "maximum": null,
+            "mean": null,
+            "p50": null,
+            "p95": null,
+            "p99": null
+          },
+          "control_period_50ms_deadline": {
+            "miss_count": 0,
+            "miss_rate": null,
+            "registered_gate": false,
+            "threshold_seconds": 0.05
+          },
+          "disabled_policy_audit_count": 5853,
+          "enabled_policy_audit_count": 0,
+          "episode_count": 18,
+          "exact_action_mismatch_count": 0,
+          "l2_enabled": false,
+          "metadata_or_enablement_mismatch_count": 0,
+          "registered_100ms_latency_budget": {
+            "miss_count": 0,
+            "miss_rate": null,
+            "threshold_seconds": 0.1
+          },
+          "risk_side_count_per_enabled_screen": {
+            "count": 0,
+            "maximum": null,
+            "mean": null,
+            "p50": null,
+            "p95": null,
+            "p99": null
+          },
+          "screen_category_counts": {},
+          "screen_latency_by_category_seconds": {},
+          "screen_latency_seconds": {
+            "count": 0,
+            "maximum": null,
+            "mean": null,
+            "p50": null,
+            "p95": null,
+            "p99": null
+          },
+          "screen_seconds_per_episode": {
+            "count": 0,
+            "maximum": null,
+            "mean": null,
+            "p50": null,
+            "p95": null,
+            "p99": null
+          },
+          "screen_to_trace_env_step_ratio_diagnostic": {
+            "count": 0,
+            "maximum": null,
+            "mean": null,
+            "p50": null,
+            "p95": null,
+            "p99": null
+          },
+          "shadow_env_step_count_per_enabled_screen": {
+            "count": 0,
+            "maximum": null,
+            "mean": null,
+            "p50": null,
+            "p95": null,
+            "p99": null
+          },
+          "shadow_restore_mismatch_count": 0,
+          "task_success_count": 11,
+          "trace_env_step_wall_seconds": {
+            "count": 6033,
+            "maximum": 0.06040512502659112,
+            "mean": 0.014762934280805488,
+            "p50": 0.012371557008009404,
+            "p95": 0.02916660639457404,
+            "p99": 0.04750749523751442
+          },
+          "trace_policy_wall_seconds": {
+            "count": 6033,
+            "maximum": 0.0802779559744522,
+            "mean": 0.007010505920820282,
+            "p50": 0.0,
+            "p95": 0.07157107922248543,
+            "p99": 0.07225288214860484
+          },
+          "unsafe_count": 1,
+          "verified_episode_artifact_count": 18
+        }
+      },
+      "combined_l2_screen_latency_seconds": {
+        "count": 11801,
+        "maximum": 0.07899842300685123,
+        "mean": 0.01918056058191453,
+        "p50": 0.01585647399770096,
+        "p95": 0.03825659299036488,
+        "p99": 0.0519906579866074
+      },
+      "episode_count": 72,
+      "verified_episode_artifact_count": 72
+    }
+  },
+  "created_at": "2026-08-01T03:00:00+08:00",
+  "cross_condition": {
+    "attacked_l2_screen_count": 13827,
+    "attacked_l2_screen_p95_seconds": 0.03089242872083557,
+    "attacked_nonpass_axis": "dual_task_success_noninferiority",
+    "attacked_registered_qualification_pass": false,
+    "clean_l2_screen_count": 11801,
+    "clean_l2_screen_p95_seconds": 0.03825659299036488,
+    "clean_registered_qualification_pass": true
+  },
+  "explicit_nonclaims": {
+    "actuator_authority": false,
+    "arbitrary_attack": false,
+    "attacked_nonpass_superseded": false,
+    "causal_cross_arm_wall_time_overhead": false,
+    "hard_real_time": false,
+    "hardware": false,
+    "physical_safety": false
+  },
+  "schema": "proofalign.v15-3-system-overhead-paper-analysis.v1"
+}

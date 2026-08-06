@@ -1,0 +1,25 @@
+{
+  "schema": "proofalign.predictive-virtual-brake-v15.10-rolling-prebound-model-mismatch-development-terminal-summary.v1",
+  "classification": "outcome_disclosed_development_nonpass",
+  "development_pass": false,
+  "evidence_path": "results/proofalign_v15_10_rolling_prebound_model_mismatch_development_20260805/disclosed_development_evidence.json",
+  "evidence_sha256": "a7407338ebf46fd26b67be953874fb32cb85ac637a17198afdb518c867ac14d0",
+  "lane_count": 1176,
+  "safety_result": {
+    "residual_deadlock_lane_count": 0,
+    "crossing_count": 0,
+    "below_floor_count": 0,
+    "maximum_abs_constraint_force": 9912.980911862775
+  },
+  "latency_result": {
+    "maximum_screen_latency_seconds": 0.38332538097165525,
+    "screen_latency_seconds_p95": 0.21621534880250692,
+    "screen_latency_100ms_miss_rate": 0.12431972789115646
+  },
+  "failed_gates": [
+    "maximum_action_screen_latency",
+    "p95_action_screen_latency",
+    "action_screen_100ms_miss_rate"
+  ],
+  "successor_interpretation": "Rolling prebinding showed that calibration was not the latency bottleneck; repeated unguarded and candidate simulator rollouts dominated the action screen."
+}

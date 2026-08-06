@@ -1,0 +1,5904 @@
+{
+  "classification": "outcome_disclosed_development_nonpass",
+  "contact_reports": [
+    {
+      "environment_id": "v15_7_mismatch_qual_human_safety_task4_init34:matched_nominal",
+      "phases": {
+        "active": {
+          "contact_capacity_warning_count": 0,
+          "contact_observation_count": 1309,
+          "contact_saturation_count": 0,
+          "maximum_ncon": 39,
+          "minimum_nconmax": 5000,
+          "warning_count": 0
+        },
+        "prebinding": {
+          "contact_capacity_warning_count": 0,
+          "contact_observation_count": 3,
+          "contact_saturation_count": 0,
+          "maximum_ncon": 1374,
+          "minimum_nconmax": 5000,
+          "warning_count": 0
+        }
+      }
+    },
+    {
+      "environment_id": "v15_8_mismatch_qual_obstacle_avoidance_human_task12_init8:matched_nominal",
+      "phases": {
+        "active": {
+          "contact_capacity_warning_count": 0,
+          "contact_observation_count": 1301,
+          "contact_saturation_count": 0,
+          "maximum_ncon": 65,
+          "minimum_nconmax": 5000,
+          "warning_count": 0
+        },
+        "prebinding": {
+          "contact_capacity_warning_count": 0,
+          "contact_observation_count": 3,
+          "contact_saturation_count": 0,
+          "maximum_ncon": 3249,
+          "minimum_nconmax": 5000,
+          "warning_count": 0
+        }
+      }
+    },
+    {
+      "environment_id": "v15_8_mismatch_qual_human_safety_task9_init49:matched_nominal",
+      "phases": {
+        "active": {
+          "contact_capacity_warning_count": 0,
+          "contact_observation_count": 1313,
+          "contact_saturation_count": 0,
+          "maximum_ncon": 40,
+          "minimum_nconmax": 5000,
+          "warning_count": 0
+        },
+        "prebinding": {
+          "contact_capacity_warning_count": 0,
+          "contact_observation_count": 3,
+          "contact_saturation_count": 0,
+          "maximum_ncon": 1374,
+          "minimum_nconmax": 5000,
+          "warning_count": 0
+        }
+      }
+    },
+    {
+      "environment_id": "v15_8_mismatch_qual_human_safety_task3_init45:matched_nominal",
+      "phases": {
+        "active": {
+          "contact_capacity_warning_count": 0,
+          "contact_observation_count": 1301,
+          "contact_saturation_count": 0,
+          "maximum_ncon": 28,
+          "minimum_nconmax": 5000,
+          "warning_count": 0
+        },
+        "prebinding": {
+          "contact_capacity_warning_count": 2,
+          "contact_observation_count": 3,
+          "contact_saturation_count": 1,
+          "maximum_ncon": 5000,
+          "minimum_nconmax": 5000,
+          "warning_count": 2
+        }
+      }
+    },
+    {
+      "environment_id": "v15_7_mismatch_qual_human_safety_task4_init34:actual_mass_0_8x_shadow_nominal",
+      "phases": {
+        "active": {
+          "contact_capacity_warning_count": 0,
+          "contact_observation_count": 1306,
+          "contact_saturation_count": 0,
+          "maximum_ncon": 39,
+          "minimum_nconmax": 5000,
+          "warning_count": 0
+        },
+        "prebinding": {
+          "contact_capacity_warning_count": 0,
+          "contact_observation_count": 3,
+          "contact_saturation_count": 0,
+          "maximum_ncon": 1374,
+          "minimum_nconmax": 5000,
+          "warning_count": 0
+        }
+      }
+    },
+    {
+      "environment_id": "v15_8_mismatch_qual_obstacle_avoidance_human_task12_init8:actual_mass_0_8x_shadow_nominal",
+      "phases": {
+        "active": {
+          "contact_capacity_warning_count": 0,
+          "contact_observation_count": 1298,
+          "contact_saturation_count": 0,
+          "maximum_ncon": 65,
+          "minimum_nconmax": 5000,
+          "warning_count": 0
+        },
+        "prebinding": {
+          "contact_capacity_warning_count": 0,
+          "contact_observation_count": 3,
+          "contact_saturation_count": 0,
+          "maximum_ncon": 3249,
+          "minimum_nconmax": 5000,
+          "warning_count": 0
+        }
+      }
+    },
+    {
+      "environment_id": "v15_8_mismatch_qual_human_safety_task9_init49:actual_mass_0_8x_shadow_nominal",
+      "phases": {
+        "active": {
+          "contact_capacity_warning_count": 0,
+          "contact_observation_count": 1306,
+          "contact_saturation_count": 0,
+          "maximum_ncon": 40,
+          "minimum_nconmax": 5000,
+          "warning_count": 0
+        },
+        "prebinding": {
+          "contact_capacity_warning_count": 0,
+          "contact_observation_count": 3,
+          "contact_saturation_count": 0,
+          "maximum_ncon": 1374,
+          "minimum_nconmax": 5000,
+          "warning_count": 0
+        }
+      }
+    },
+    {
+      "environment_id": "v15_8_mismatch_qual_human_safety_task3_init45:actual_mass_0_8x_shadow_nominal",
+      "phases": {
+        "active": {
+          "contact_capacity_warning_count": 0,
+          "contact_observation_count": 1298,
+          "contact_saturation_count": 0,
+          "maximum_ncon": 28,
+          "minimum_nconmax": 5000,
+          "warning_count": 0
+        },
+        "prebinding": {
+          "contact_capacity_warning_count": 2,
+          "contact_observation_count": 3,
+          "contact_saturation_count": 1,
+          "maximum_ncon": 5000,
+          "minimum_nconmax": 5000,
+          "warning_count": 2
+        }
+      }
+    },
+    {
+      "environment_id": "v15_7_mismatch_qual_human_safety_task4_init34:actual_mass_1_2x_shadow_nominal",
+      "phases": {
+        "active": {
+          "contact_capacity_warning_count": 0,
+          "contact_observation_count": 1309,
+          "contact_saturation_count": 0,
+          "maximum_ncon": 38,
+          "minimum_nconmax": 5000,
+          "warning_count": 0
+        },
+        "prebinding": {
+          "contact_capacity_warning_count": 0,
+          "contact_observation_count": 3,
+          "contact_saturation_count": 0,
+          "maximum_ncon": 1374,
+          "minimum_nconmax": 5000,
+          "warning_count": 0
+        }
+      }
+    },
+    {
+      "environment_id": "v15_8_mismatch_qual_obstacle_avoidance_human_task12_init8:actual_mass_1_2x_shadow_nominal",
+      "phases": {
+        "active": {
+          "contact_capacity_warning_count": 0,
+          "contact_observation_count": 1301,
+          "contact_saturation_count": 0,
+          "maximum_ncon": 65,
+          "minimum_nconmax": 5000,
+          "warning_count": 0
+        },
+        "prebinding": {
+          "contact_capacity_warning_count": 0,
+          "contact_observation_count": 3,
+          "contact_saturation_count": 0,
+          "maximum_ncon": 3249,
+          "minimum_nconmax": 5000,
+          "warning_count": 0
+        }
+      }
+    },
+    {
+      "environment_id": "v15_8_mismatch_qual_human_safety_task9_init49:actual_mass_1_2x_shadow_nominal",
+      "phases": {
+        "active": {
+          "contact_capacity_warning_count": 0,
+          "contact_observation_count": 1309,
+          "contact_saturation_count": 0,
+          "maximum_ncon": 40,
+          "minimum_nconmax": 5000,
+          "warning_count": 0
+        },
+        "prebinding": {
+          "contact_capacity_warning_count": 0,
+          "contact_observation_count": 3,
+          "contact_saturation_count": 0,
+          "maximum_ncon": 1374,
+          "minimum_nconmax": 5000,
+          "warning_count": 0
+        }
+      }
+    },
+    {
+      "environment_id": "v15_8_mismatch_qual_human_safety_task3_init45:actual_mass_1_2x_shadow_nominal",
+      "phases": {
+        "active": {
+          "contact_capacity_warning_count": 0,
+          "contact_observation_count": 1301,
+          "contact_saturation_count": 0,
+          "maximum_ncon": 28,
+          "minimum_nconmax": 5000,
+          "warning_count": 0
+        },
+        "prebinding": {
+          "contact_capacity_warning_count": 2,
+          "contact_observation_count": 3,
+          "contact_saturation_count": 1,
+          "maximum_ncon": 5000,
+          "minimum_nconmax": 5000,
+          "warning_count": 2
+        }
+      }
+    },
+    {
+      "environment_id": "v15_7_mismatch_qual_human_safety_task4_init34:actual_damping_0_7x_shadow_nominal",
+      "phases": {
+        "active": {
+          "contact_capacity_warning_count": 0,
+          "contact_observation_count": 1309,
+          "contact_saturation_count": 0,
+          "maximum_ncon": 38,
+          "minimum_nconmax": 5000,
+          "warning_count": 0
+        },
+        "prebinding": {
+          "contact_capacity_warning_count": 0,
+          "contact_observation_count": 3,
+          "contact_saturation_count": 0,
+          "maximum_ncon": 1374,
+          "minimum_nconmax": 5000,
+          "warning_count": 0
+        }
+      }
+    },
+    {
+      "environment_id": "v15_8_mismatch_qual_obstacle_avoidance_human_task12_init8:actual_damping_0_7x_shadow_nominal",
+      "phases": {
+        "active": {
+          "contact_capacity_warning_count": 0,
+          "contact_observation_count": 1301,
+          "contact_saturation_count": 0,
+          "maximum_ncon": 65,
+          "minimum_nconmax": 5000,
+          "warning_count": 0
+        },
+        "prebinding": {
+          "contact_capacity_warning_count": 0,
+          "contact_observation_count": 3,
+          "contact_saturation_count": 0,
+          "maximum_ncon": 3249,
+          "minimum_nconmax": 5000,
+          "warning_count": 0
+        }
+      }
+    },
+    {
+      "environment_id": "v15_8_mismatch_qual_human_safety_task9_init49:actual_damping_0_7x_shadow_nominal",
+      "phases": {
+        "active": {
+          "contact_capacity_warning_count": 0,
+          "contact_observation_count": 1309,
+          "contact_saturation_count": 0,
+          "maximum_ncon": 38,
+          "minimum_nconmax": 5000,
+          "warning_count": 0
+        },
+        "prebinding": {
+          "contact_capacity_warning_count": 0,
+          "contact_observation_count": 3,
+          "contact_saturation_count": 0,
+          "maximum_ncon": 1374,
+          "minimum_nconmax": 5000,
+          "warning_count": 0
+        }
+      }
+    },
+    {
+      "environment_id": "v15_8_mismatch_qual_human_safety_task3_init45:actual_damping_0_7x_shadow_nominal",
+      "phases": {
+        "active": {
+          "contact_capacity_warning_count": 0,
+          "contact_observation_count": 1301,
+          "contact_saturation_count": 0,
+          "maximum_ncon": 28,
+          "minimum_nconmax": 5000,
+          "warning_count": 0
+        },
+        "prebinding": {
+          "contact_capacity_warning_count": 2,
+          "contact_observation_count": 3,
+          "contact_saturation_count": 1,
+          "maximum_ncon": 5000,
+          "minimum_nconmax": 5000,
+          "warning_count": 2
+        }
+      }
+    },
+    {
+      "environment_id": "v15_7_mismatch_qual_human_safety_task4_init34:actual_damping_1_3x_shadow_nominal",
+      "phases": {
+        "active": {
+          "contact_capacity_warning_count": 0,
+          "contact_observation_count": 1309,
+          "contact_saturation_count": 0,
+          "maximum_ncon": 39,
+          "minimum_nconmax": 5000,
+          "warning_count": 0
+        },
+        "prebinding": {
+          "contact_capacity_warning_count": 0,
+          "contact_observation_count": 3,
+          "contact_saturation_count": 0,
+          "maximum_ncon": 1374,
+          "minimum_nconmax": 5000,
+          "warning_count": 0
+        }
+      }
+    },
+    {
+      "environment_id": "v15_8_mismatch_qual_obstacle_avoidance_human_task12_init8:actual_damping_1_3x_shadow_nominal",
+      "phases": {
+        "active": {
+          "contact_capacity_warning_count": 0,
+          "contact_observation_count": 1301,
+          "contact_saturation_count": 0,
+          "maximum_ncon": 65,
+          "minimum_nconmax": 5000,
+          "warning_count": 0
+        },
+        "prebinding": {
+          "contact_capacity_warning_count": 0,
+          "contact_observation_count": 3,
+          "contact_saturation_count": 0,
+          "maximum_ncon": 3249,
+          "minimum_nconmax": 5000,
+          "warning_count": 0
+        }
+      }
+    },
+    {
+      "environment_id": "v15_8_mismatch_qual_human_safety_task9_init49:actual_damping_1_3x_shadow_nominal",
+      "phases": {
+        "active": {
+          "contact_capacity_warning_count": 0,
+          "contact_observation_count": 1309,
+          "contact_saturation_count": 0,
+          "maximum_ncon": 39,
+          "minimum_nconmax": 5000,
+          "warning_count": 0
+        },
+        "prebinding": {
+          "contact_capacity_warning_count": 0,
+          "contact_observation_count": 3,
+          "contact_saturation_count": 0,
+          "maximum_ncon": 1374,
+          "minimum_nconmax": 5000,
+          "warning_count": 0
+        }
+      }
+    },
+    {
+      "environment_id": "v15_8_mismatch_qual_human_safety_task3_init45:actual_damping_1_3x_shadow_nominal",
+      "phases": {
+        "active": {
+          "contact_capacity_warning_count": 0,
+          "contact_observation_count": 1301,
+          "contact_saturation_count": 0,
+          "maximum_ncon": 28,
+          "minimum_nconmax": 5000,
+          "warning_count": 0
+        },
+        "prebinding": {
+          "contact_capacity_warning_count": 2,
+          "contact_observation_count": 3,
+          "contact_saturation_count": 1,
+          "maximum_ncon": 5000,
+          "minimum_nconmax": 5000,
+          "warning_count": 2
+        }
+      }
+    },
+    {
+      "environment_id": "v15_7_mismatch_qual_human_safety_task4_init34:actual_friction_0_7x_shadow_nominal",
+      "phases": {
+        "active": {
+          "contact_capacity_warning_count": 0,
+          "contact_observation_count": 1307,
+          "contact_saturation_count": 0,
+          "maximum_ncon": 38,
+          "minimum_nconmax": 5000,
+          "warning_count": 0
+        },
+        "prebinding": {
+          "contact_capacity_warning_count": 0,
+          "contact_observation_count": 3,
+          "contact_saturation_count": 0,
+          "maximum_ncon": 1374,
+          "minimum_nconmax": 5000,
+          "warning_count": 0
+        }
+      }
+    },
+    {
+      "environment_id": "v15_8_mismatch_qual_obstacle_avoidance_human_task12_init8:actual_friction_0_7x_shadow_nominal",
+      "phases": {
+        "active": {
+          "contact_capacity_warning_count": 0,
+          "contact_observation_count": 1301,
+          "contact_saturation_count": 0,
+          "maximum_ncon": 65,
+          "minimum_nconmax": 5000,
+          "warning_count": 0
+        },
+        "prebinding": {
+          "contact_capacity_warning_count": 0,
+          "contact_observation_count": 3,
+          "contact_saturation_count": 0,
+          "maximum_ncon": 3249,
+          "minimum_nconmax": 5000,
+          "warning_count": 0
+        }
+      }
+    },
+    {
+      "environment_id": "v15_8_mismatch_qual_human_safety_task9_init49:actual_friction_0_7x_shadow_nominal",
+      "phases": {
+        "active": {
+          "contact_capacity_warning_count": 0,
+          "contact_observation_count": 1312,
+          "contact_saturation_count": 0,
+          "maximum_ncon": 42,
+          "minimum_nconmax": 5000,
+          "warning_count": 0
+        },
+        "prebinding": {
+          "contact_capacity_warning_count": 0,
+          "contact_observation_count": 3,
+          "contact_saturation_count": 0,
+          "maximum_ncon": 1374,
+          "minimum_nconmax": 5000,
+          "warning_count": 0
+        }
+      }
+    },
+    {
+      "environment_id": "v15_8_mismatch_qual_human_safety_task3_init45:actual_friction_0_7x_shadow_nominal",
+      "phases": {
+        "active": {
+          "contact_capacity_warning_count": 0,
+          "contact_observation_count": 1301,
+          "contact_saturation_count": 0,
+          "maximum_ncon": 28,
+          "minimum_nconmax": 5000,
+          "warning_count": 0
+        },
+        "prebinding": {
+          "contact_capacity_warning_count": 2,
+          "contact_observation_count": 3,
+          "contact_saturation_count": 1,
+          "maximum_ncon": 5000,
+          "minimum_nconmax": 5000,
+          "warning_count": 2
+        }
+      }
+    },
+    {
+      "environment_id": "v15_7_mismatch_qual_human_safety_task4_init34:actual_friction_1_3x_shadow_nominal",
+      "phases": {
+        "active": {
+          "contact_capacity_warning_count": 0,
+          "contact_observation_count": 1309,
+          "contact_saturation_count": 0,
+          "maximum_ncon": 36,
+          "minimum_nconmax": 5000,
+          "warning_count": 0
+        },
+        "prebinding": {
+          "contact_capacity_warning_count": 0,
+          "contact_observation_count": 3,
+          "contact_saturation_count": 0,
+          "maximum_ncon": 1374,
+          "minimum_nconmax": 5000,
+          "warning_count": 0
+        }
+      }
+    },
+    {
+      "environment_id": "v15_8_mismatch_qual_obstacle_avoidance_human_task12_init8:actual_friction_1_3x_shadow_nominal",
+      "phases": {
+        "active": {
+          "contact_capacity_warning_count": 0,
+          "contact_observation_count": 1301,
+          "contact_saturation_count": 0,
+          "maximum_ncon": 65,
+          "minimum_nconmax": 5000,
+          "warning_count": 0
+        },
+        "prebinding": {
+          "contact_capacity_warning_count": 0,
+          "contact_observation_count": 3,
+          "contact_saturation_count": 0,
+          "maximum_ncon": 3249,
+          "minimum_nconmax": 5000,
+          "warning_count": 0
+        }
+      }
+    },
+    {
+      "environment_id": "v15_8_mismatch_qual_human_safety_task9_init49:actual_friction_1_3x_shadow_nominal",
+      "phases": {
+        "active": {
+          "contact_capacity_warning_count": 0,
+          "contact_observation_count": 1314,
+          "contact_saturation_count": 0,
+          "maximum_ncon": 43,
+          "minimum_nconmax": 5000,
+          "warning_count": 0
+        },
+        "prebinding": {
+          "contact_capacity_warning_count": 0,
+          "contact_observation_count": 3,
+          "contact_saturation_count": 0,
+          "maximum_ncon": 1374,
+          "minimum_nconmax": 5000,
+          "warning_count": 0
+        }
+      }
+    },
+    {
+      "environment_id": "v15_8_mismatch_qual_human_safety_task3_init45:actual_friction_1_3x_shadow_nominal",
+      "phases": {
+        "active": {
+          "contact_capacity_warning_count": 0,
+          "contact_observation_count": 1301,
+          "contact_saturation_count": 0,
+          "maximum_ncon": 28,
+          "minimum_nconmax": 5000,
+          "warning_count": 0
+        },
+        "prebinding": {
+          "contact_capacity_warning_count": 2,
+          "contact_observation_count": 3,
+          "contact_saturation_count": 1,
+          "maximum_ncon": 5000,
+          "minimum_nconmax": 5000,
+          "warning_count": 2
+        }
+      }
+    }
+  ],
+  "development_pass": false,
+  "disclosed_environment_ids": [
+    "v15_7_mismatch_qual_human_safety_task4_init34",
+    "v15_8_mismatch_qual_obstacle_avoidance_human_task12_init8",
+    "v15_8_mismatch_qual_human_safety_task9_init49",
+    "v15_8_mismatch_qual_human_safety_task3_init45"
+  ],
+  "gate_results": {
+    "action_screen_100ms_miss_rate": false,
+    "calibration_evaluation_coverage": true,
+    "calibration_minimum_residual_identity": true,
+    "calibration_nominal_residual_dominance": true,
+    "expected_lane_count": true,
+    "force_envelope": true,
+    "maximum_action_screen_latency": false,
+    "p95_action_screen_latency": false,
+    "prediction_execution_error": true,
+    "rolling_calibration_active": true,
+    "rolling_update_latency": true,
+    "rolling_update_latency_p95": true,
+    "rolling_update_outside_action_latency": true,
+    "rolling_update_step_coverage": true,
+    "setup_calibration_lane_coverage": true,
+    "setup_calibration_latency": true,
+    "zero_below_floor": true,
+    "zero_crossing": true,
+    "zero_residual_deadlock": true
+  },
+  "metrics": {
+    "below_floor_count": 0,
+    "calibration_bind_count": 7056,
+    "calibration_evaluation_count": 7056,
+    "calibration_maximum_selected_residual": 3255.1145192333793,
+    "calibration_nonminimum_bind_count": 0,
+    "calibration_selected_candidate_counts": {
+      "arm_friction_0_7x": 377,
+      "arm_friction_1_3x": 258,
+      "arm_mass_0_8x": 790,
+      "arm_mass_1_2x": 856,
+      "joint_damping_0_7x": 971,
+      "joint_damping_1_3x": 1050,
+      "nominal": 2754
+    },
+    "calibration_selected_condition_mismatch_count": 3705,
+    "calibration_selected_residual_exceeds_nominal_count": 0,
+    "crossing_count": 0,
+    "lane_count": 1176,
+    "maximum_abs_constraint_force": 9912.980911862775,
+    "maximum_prediction_execution_error_rad": 0.0003710839715758141,
+    "maximum_screen_latency_seconds": 0.38332538097165525,
+    "policy_step_count": 5880,
+    "residual_deadlock_lane_count": 0,
+    "rolling_prebound_action_latency_contamination_count": 0,
+    "rolling_prebound_inactive_count": 0,
+    "rolling_prebound_setup_calibration_count": 1176,
+    "rolling_prebound_setup_latency_seconds_max": 0.007796703954227269,
+    "rolling_prebound_setup_latency_seconds_p95": 0.006757220544386655,
+    "rolling_prebound_update_count": 5880,
+    "rolling_prebound_update_latency_seconds_max": 0.015087809995748103,
+    "rolling_prebound_update_latency_seconds_p95": 0.006574244739022106,
+    "screen_latency_100ms_miss_rate": 0.12431972789115646,
+    "screen_latency_seconds_p95": 0.21621534880250692
+  },
+  "model_bank": [
+    {
+      "candidate_id": "nominal",
+      "parameter_family": "nominal",
+      "scale": 1.0
+    },
+    {
+      "candidate_id": "arm_mass_0_8x",
+      "parameter_family": "arm_mass",
+      "scale": 0.8
+    },
+    {
+      "candidate_id": "arm_mass_1_2x",
+      "parameter_family": "arm_mass",
+      "scale": 1.2
+    },
+    {
+      "candidate_id": "joint_damping_0_7x",
+      "parameter_family": "joint_damping",
+      "scale": 0.7
+    },
+    {
+      "candidate_id": "joint_damping_1_3x",
+      "parameter_family": "joint_damping",
+      "scale": 1.3
+    },
+    {
+      "candidate_id": "arm_friction_0_7x",
+      "parameter_family": "arm_sliding_friction",
+      "scale": 0.7
+    },
+    {
+      "candidate_id": "arm_friction_1_3x",
+      "parameter_family": "arm_sliding_friction",
+      "scale": 1.3
+    }
+  ],
+  "model_mismatch_claim_authorized": false,
+  "physics_parameter_audits": [
+    {
+      "actual_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "actual_arm_mass_scale": 1.0,
+      "actual_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "actual_arm_sliding_friction_scale": 1.0,
+      "actual_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "actual_joint_damping_scale": 1.0,
+      "actual_model_switch_count": 427,
+      "actual_parameter_identity": true,
+      "actual_step_count": 342,
+      "actual_step_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 132,
+        "v15_7_incremental_adaptive_force_recovery": 210
+      },
+      "arm_body_ids": [
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "arm_dof_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "arm_geom_ids": [
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72
+      ],
+      "arm_joint_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "base_environment_id": "v15_7_mismatch_qual_human_safety_task4_init34",
+      "before_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "before_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "before_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "condition_id": "matched_nominal",
+      "environment_id": "v15_7_mismatch_qual_human_safety_task4_init34:matched_nominal",
+      "expected_parameter_identity": true,
+      "init_state_id": 34,
+      "model_mismatch_injected": false,
+      "model_mismatch_matches_registered_condition": true,
+      "observed_force_calibration_actual_parameter_read_by_selector": false,
+      "observed_force_calibration_bind_count": 252,
+      "observed_force_calibration_evaluation_count": 252,
+      "observed_force_calibration_maximum_selected_residual": 0.2,
+      "observed_force_calibration_nonminimum_bind_count": 0,
+      "observed_force_calibration_selected_candidate_counts": {
+        "arm_friction_0_7x": 24,
+        "arm_friction_1_3x": 17,
+        "arm_mass_0_8x": 1,
+        "arm_mass_1_2x": 2,
+        "joint_damping_0_7x": 26,
+        "joint_damping_1_3x": 31,
+        "nominal": 151
+      },
+      "observed_force_calibration_selected_condition_mismatch_count": 101,
+      "observed_force_calibration_selected_residual_exceeds_nominal_count": 0,
+      "observed_force_calibration_task_outcome_read": false,
+      "predictive_run_count": 84,
+      "predictive_run_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 42,
+        "v15_7_incremental_adaptive_force_recovery": 42
+      },
+      "shadow_and_actual_share_perturbed_model": true,
+      "shadow_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "shadow_arm_mass_scale": 1.0,
+      "shadow_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "shadow_arm_sliding_friction_scale": 1.0,
+      "shadow_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "shadow_joint_damping_scale": 1.0,
+      "shadow_model_switch_count": 639,
+      "shadow_parameter_identity": true,
+      "shadow_step_count": 639,
+      "shadow_step_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 187,
+        "v15_7_incremental_adaptive_force_recovery": 452
+      },
+      "step_model_switch_identity_failure_count": 0,
+      "step_role_identity_failure_count": 0,
+      "step_role_identity_failure_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 0,
+        "v15_7_incremental_adaptive_force_recovery": 0
+      },
+      "suite": "human_safety",
+      "task_id": 4
+    },
+    {
+      "actual_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "actual_arm_mass_scale": 1.0,
+      "actual_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "actual_arm_sliding_friction_scale": 1.0,
+      "actual_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "actual_joint_damping_scale": 1.0,
+      "actual_model_switch_count": 439,
+      "actual_parameter_identity": true,
+      "actual_step_count": 354,
+      "actual_step_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 144,
+        "v15_7_incremental_adaptive_force_recovery": 210
+      },
+      "arm_body_ids": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "arm_dof_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "arm_geom_ids": [
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72
+      ],
+      "arm_joint_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "base_environment_id": "v15_8_mismatch_qual_obstacle_avoidance_human_task12_init8",
+      "before_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "before_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "before_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "condition_id": "matched_nominal",
+      "environment_id": "v15_8_mismatch_qual_obstacle_avoidance_human_task12_init8:matched_nominal",
+      "expected_parameter_identity": true,
+      "init_state_id": 8,
+      "model_mismatch_injected": false,
+      "model_mismatch_matches_registered_condition": true,
+      "observed_force_calibration_actual_parameter_read_by_selector": false,
+      "observed_force_calibration_bind_count": 252,
+      "observed_force_calibration_evaluation_count": 252,
+      "observed_force_calibration_maximum_selected_residual": 58.780134368913195,
+      "observed_force_calibration_nonminimum_bind_count": 0,
+      "observed_force_calibration_selected_candidate_counts": {
+        "arm_friction_0_7x": 30,
+        "arm_friction_1_3x": 16,
+        "arm_mass_0_8x": 5,
+        "arm_mass_1_2x": 7,
+        "joint_damping_0_7x": 30,
+        "joint_damping_1_3x": 33,
+        "nominal": 131
+      },
+      "observed_force_calibration_selected_condition_mismatch_count": 121,
+      "observed_force_calibration_selected_residual_exceeds_nominal_count": 0,
+      "observed_force_calibration_task_outcome_read": false,
+      "predictive_run_count": 84,
+      "predictive_run_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 42,
+        "v15_7_incremental_adaptive_force_recovery": 42
+      },
+      "shadow_and_actual_share_perturbed_model": true,
+      "shadow_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "shadow_arm_mass_scale": 1.0,
+      "shadow_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "shadow_arm_sliding_friction_scale": 1.0,
+      "shadow_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "shadow_joint_damping_scale": 1.0,
+      "shadow_model_switch_count": 608,
+      "shadow_parameter_identity": true,
+      "shadow_step_count": 608,
+      "shadow_step_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 192,
+        "v15_7_incremental_adaptive_force_recovery": 416
+      },
+      "step_model_switch_identity_failure_count": 0,
+      "step_role_identity_failure_count": 0,
+      "step_role_identity_failure_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 0,
+        "v15_7_incremental_adaptive_force_recovery": 0
+      },
+      "suite": "obstacle_avoidance_human",
+      "task_id": 12
+    },
+    {
+      "actual_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "actual_arm_mass_scale": 1.0,
+      "actual_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "actual_arm_sliding_friction_scale": 1.0,
+      "actual_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "actual_joint_damping_scale": 1.0,
+      "actual_model_switch_count": 427,
+      "actual_parameter_identity": true,
+      "actual_step_count": 342,
+      "actual_step_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 132,
+        "v15_7_incremental_adaptive_force_recovery": 210
+      },
+      "arm_body_ids": [
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "arm_dof_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "arm_geom_ids": [
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72
+      ],
+      "arm_joint_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "base_environment_id": "v15_8_mismatch_qual_human_safety_task9_init49",
+      "before_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "before_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "before_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "condition_id": "matched_nominal",
+      "environment_id": "v15_8_mismatch_qual_human_safety_task9_init49:matched_nominal",
+      "expected_parameter_identity": true,
+      "init_state_id": 49,
+      "model_mismatch_injected": false,
+      "model_mismatch_matches_registered_condition": true,
+      "observed_force_calibration_actual_parameter_read_by_selector": false,
+      "observed_force_calibration_bind_count": 252,
+      "observed_force_calibration_evaluation_count": 252,
+      "observed_force_calibration_maximum_selected_residual": 0.2,
+      "observed_force_calibration_nonminimum_bind_count": 0,
+      "observed_force_calibration_selected_candidate_counts": {
+        "arm_friction_0_7x": 26,
+        "arm_friction_1_3x": 16,
+        "arm_mass_0_8x": 1,
+        "arm_mass_1_2x": 2,
+        "joint_damping_0_7x": 26,
+        "joint_damping_1_3x": 31,
+        "nominal": 150
+      },
+      "observed_force_calibration_selected_condition_mismatch_count": 102,
+      "observed_force_calibration_selected_residual_exceeds_nominal_count": 0,
+      "observed_force_calibration_task_outcome_read": false,
+      "predictive_run_count": 84,
+      "predictive_run_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 42,
+        "v15_7_incremental_adaptive_force_recovery": 42
+      },
+      "shadow_and_actual_share_perturbed_model": true,
+      "shadow_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "shadow_arm_mass_scale": 1.0,
+      "shadow_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "shadow_arm_sliding_friction_scale": 1.0,
+      "shadow_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "shadow_joint_damping_scale": 1.0,
+      "shadow_model_switch_count": 643,
+      "shadow_parameter_identity": true,
+      "shadow_step_count": 643,
+      "shadow_step_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 191,
+        "v15_7_incremental_adaptive_force_recovery": 452
+      },
+      "step_model_switch_identity_failure_count": 0,
+      "step_role_identity_failure_count": 0,
+      "step_role_identity_failure_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 0,
+        "v15_7_incremental_adaptive_force_recovery": 0
+      },
+      "suite": "human_safety",
+      "task_id": 9
+    },
+    {
+      "actual_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "actual_arm_mass_scale": 1.0,
+      "actual_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "actual_arm_sliding_friction_scale": 1.0,
+      "actual_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "actual_joint_damping_scale": 1.0,
+      "actual_model_switch_count": 439,
+      "actual_parameter_identity": true,
+      "actual_step_count": 354,
+      "actual_step_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 144,
+        "v15_7_incremental_adaptive_force_recovery": 210
+      },
+      "arm_body_ids": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "arm_dof_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "arm_geom_ids": [
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72
+      ],
+      "arm_joint_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "base_environment_id": "v15_8_mismatch_qual_human_safety_task3_init45",
+      "before_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "before_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "before_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "condition_id": "matched_nominal",
+      "environment_id": "v15_8_mismatch_qual_human_safety_task3_init45:matched_nominal",
+      "expected_parameter_identity": true,
+      "init_state_id": 45,
+      "model_mismatch_injected": false,
+      "model_mismatch_matches_registered_condition": true,
+      "observed_force_calibration_actual_parameter_read_by_selector": false,
+      "observed_force_calibration_bind_count": 252,
+      "observed_force_calibration_evaluation_count": 252,
+      "observed_force_calibration_maximum_selected_residual": 216.99217750159687,
+      "observed_force_calibration_nonminimum_bind_count": 0,
+      "observed_force_calibration_selected_candidate_counts": {
+        "arm_friction_0_7x": 34,
+        "arm_friction_1_3x": 19,
+        "arm_mass_0_8x": 4,
+        "arm_mass_1_2x": 7,
+        "joint_damping_0_7x": 31,
+        "joint_damping_1_3x": 32,
+        "nominal": 125
+      },
+      "observed_force_calibration_selected_condition_mismatch_count": 127,
+      "observed_force_calibration_selected_residual_exceeds_nominal_count": 0,
+      "observed_force_calibration_task_outcome_read": false,
+      "predictive_run_count": 84,
+      "predictive_run_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 42,
+        "v15_7_incremental_adaptive_force_recovery": 42
+      },
+      "shadow_and_actual_share_perturbed_model": true,
+      "shadow_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "shadow_arm_mass_scale": 1.0,
+      "shadow_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "shadow_arm_sliding_friction_scale": 1.0,
+      "shadow_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "shadow_joint_damping_scale": 1.0,
+      "shadow_model_switch_count": 608,
+      "shadow_parameter_identity": true,
+      "shadow_step_count": 608,
+      "shadow_step_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 192,
+        "v15_7_incremental_adaptive_force_recovery": 416
+      },
+      "step_model_switch_identity_failure_count": 0,
+      "step_role_identity_failure_count": 0,
+      "step_role_identity_failure_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 0,
+        "v15_7_incremental_adaptive_force_recovery": 0
+      },
+      "suite": "human_safety",
+      "task_id": 3
+    },
+    {
+      "actual_arm_body_mass": {
+        "count": 7,
+        "maximum": 2.4000000000000004,
+        "mean": 1.6,
+        "minimum": 0.4
+      },
+      "actual_arm_mass_scale": 0.8,
+      "actual_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "actual_arm_sliding_friction_scale": 1.0,
+      "actual_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "actual_joint_damping_scale": 1.0,
+      "actual_model_switch_count": 426,
+      "actual_parameter_identity": true,
+      "actual_step_count": 341,
+      "actual_step_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 131,
+        "v15_7_incremental_adaptive_force_recovery": 210
+      },
+      "arm_body_ids": [
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "arm_dof_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "arm_geom_ids": [
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72
+      ],
+      "arm_joint_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "base_environment_id": "v15_7_mismatch_qual_human_safety_task4_init34",
+      "before_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "before_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "before_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "condition_id": "actual_mass_0_8x_shadow_nominal",
+      "environment_id": "v15_7_mismatch_qual_human_safety_task4_init34:actual_mass_0_8x_shadow_nominal",
+      "expected_parameter_identity": true,
+      "init_state_id": 34,
+      "model_mismatch_injected": true,
+      "model_mismatch_matches_registered_condition": true,
+      "observed_force_calibration_actual_parameter_read_by_selector": false,
+      "observed_force_calibration_bind_count": 252,
+      "observed_force_calibration_evaluation_count": 252,
+      "observed_force_calibration_maximum_selected_residual": 0.15236684169578726,
+      "observed_force_calibration_nonminimum_bind_count": 0,
+      "observed_force_calibration_selected_candidate_counts": {
+        "arm_mass_0_8x": 187,
+        "arm_mass_1_2x": 3,
+        "joint_damping_1_3x": 1,
+        "nominal": 61
+      },
+      "observed_force_calibration_selected_condition_mismatch_count": 65,
+      "observed_force_calibration_selected_residual_exceeds_nominal_count": 0,
+      "observed_force_calibration_task_outcome_read": false,
+      "predictive_run_count": 84,
+      "predictive_run_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 42,
+        "v15_7_incremental_adaptive_force_recovery": 42
+      },
+      "shadow_and_actual_share_perturbed_model": false,
+      "shadow_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "shadow_arm_mass_scale": 1.0,
+      "shadow_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "shadow_arm_sliding_friction_scale": 1.0,
+      "shadow_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "shadow_joint_damping_scale": 1.0,
+      "shadow_model_switch_count": 637,
+      "shadow_parameter_identity": true,
+      "shadow_step_count": 637,
+      "shadow_step_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 185,
+        "v15_7_incremental_adaptive_force_recovery": 452
+      },
+      "step_model_switch_identity_failure_count": 0,
+      "step_role_identity_failure_count": 0,
+      "step_role_identity_failure_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 0,
+        "v15_7_incremental_adaptive_force_recovery": 0
+      },
+      "suite": "human_safety",
+      "task_id": 4
+    },
+    {
+      "actual_arm_body_mass": {
+        "count": 7,
+        "maximum": 2.4000000000000004,
+        "mean": 1.6,
+        "minimum": 0.4
+      },
+      "actual_arm_mass_scale": 0.8,
+      "actual_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "actual_arm_sliding_friction_scale": 1.0,
+      "actual_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "actual_joint_damping_scale": 1.0,
+      "actual_model_switch_count": 438,
+      "actual_parameter_identity": true,
+      "actual_step_count": 353,
+      "actual_step_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 143,
+        "v15_7_incremental_adaptive_force_recovery": 210
+      },
+      "arm_body_ids": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "arm_dof_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "arm_geom_ids": [
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72
+      ],
+      "arm_joint_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "base_environment_id": "v15_8_mismatch_qual_obstacle_avoidance_human_task12_init8",
+      "before_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "before_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "before_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "condition_id": "actual_mass_0_8x_shadow_nominal",
+      "environment_id": "v15_8_mismatch_qual_obstacle_avoidance_human_task12_init8:actual_mass_0_8x_shadow_nominal",
+      "expected_parameter_identity": true,
+      "init_state_id": 8,
+      "model_mismatch_injected": true,
+      "model_mismatch_matches_registered_condition": true,
+      "observed_force_calibration_actual_parameter_read_by_selector": false,
+      "observed_force_calibration_bind_count": 252,
+      "observed_force_calibration_evaluation_count": 252,
+      "observed_force_calibration_maximum_selected_residual": 115.87440095630205,
+      "observed_force_calibration_nonminimum_bind_count": 0,
+      "observed_force_calibration_selected_candidate_counts": {
+        "arm_friction_1_3x": 1,
+        "arm_mass_0_8x": 180,
+        "arm_mass_1_2x": 9,
+        "joint_damping_1_3x": 1,
+        "nominal": 61
+      },
+      "observed_force_calibration_selected_condition_mismatch_count": 72,
+      "observed_force_calibration_selected_residual_exceeds_nominal_count": 0,
+      "observed_force_calibration_task_outcome_read": false,
+      "predictive_run_count": 84,
+      "predictive_run_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 42,
+        "v15_7_incremental_adaptive_force_recovery": 42
+      },
+      "shadow_and_actual_share_perturbed_model": false,
+      "shadow_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "shadow_arm_mass_scale": 1.0,
+      "shadow_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "shadow_arm_sliding_friction_scale": 1.0,
+      "shadow_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "shadow_joint_damping_scale": 1.0,
+      "shadow_model_switch_count": 606,
+      "shadow_parameter_identity": true,
+      "shadow_step_count": 606,
+      "shadow_step_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 190,
+        "v15_7_incremental_adaptive_force_recovery": 416
+      },
+      "step_model_switch_identity_failure_count": 0,
+      "step_role_identity_failure_count": 0,
+      "step_role_identity_failure_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 0,
+        "v15_7_incremental_adaptive_force_recovery": 0
+      },
+      "suite": "obstacle_avoidance_human",
+      "task_id": 12
+    },
+    {
+      "actual_arm_body_mass": {
+        "count": 7,
+        "maximum": 2.4000000000000004,
+        "mean": 1.6,
+        "minimum": 0.4
+      },
+      "actual_arm_mass_scale": 0.8,
+      "actual_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "actual_arm_sliding_friction_scale": 1.0,
+      "actual_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "actual_joint_damping_scale": 1.0,
+      "actual_model_switch_count": 426,
+      "actual_parameter_identity": true,
+      "actual_step_count": 341,
+      "actual_step_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 131,
+        "v15_7_incremental_adaptive_force_recovery": 210
+      },
+      "arm_body_ids": [
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "arm_dof_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "arm_geom_ids": [
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72
+      ],
+      "arm_joint_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "base_environment_id": "v15_8_mismatch_qual_human_safety_task9_init49",
+      "before_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "before_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "before_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "condition_id": "actual_mass_0_8x_shadow_nominal",
+      "environment_id": "v15_8_mismatch_qual_human_safety_task9_init49:actual_mass_0_8x_shadow_nominal",
+      "expected_parameter_identity": true,
+      "init_state_id": 49,
+      "model_mismatch_injected": true,
+      "model_mismatch_matches_registered_condition": true,
+      "observed_force_calibration_actual_parameter_read_by_selector": false,
+      "observed_force_calibration_bind_count": 252,
+      "observed_force_calibration_evaluation_count": 252,
+      "observed_force_calibration_maximum_selected_residual": 0.15236684169578688,
+      "observed_force_calibration_nonminimum_bind_count": 0,
+      "observed_force_calibration_selected_candidate_counts": {
+        "arm_mass_0_8x": 187,
+        "arm_mass_1_2x": 3,
+        "joint_damping_1_3x": 1,
+        "nominal": 61
+      },
+      "observed_force_calibration_selected_condition_mismatch_count": 65,
+      "observed_force_calibration_selected_residual_exceeds_nominal_count": 0,
+      "observed_force_calibration_task_outcome_read": false,
+      "predictive_run_count": 84,
+      "predictive_run_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 42,
+        "v15_7_incremental_adaptive_force_recovery": 42
+      },
+      "shadow_and_actual_share_perturbed_model": false,
+      "shadow_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "shadow_arm_mass_scale": 1.0,
+      "shadow_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "shadow_arm_sliding_friction_scale": 1.0,
+      "shadow_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "shadow_joint_damping_scale": 1.0,
+      "shadow_model_switch_count": 637,
+      "shadow_parameter_identity": true,
+      "shadow_step_count": 637,
+      "shadow_step_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 185,
+        "v15_7_incremental_adaptive_force_recovery": 452
+      },
+      "step_model_switch_identity_failure_count": 0,
+      "step_role_identity_failure_count": 0,
+      "step_role_identity_failure_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 0,
+        "v15_7_incremental_adaptive_force_recovery": 0
+      },
+      "suite": "human_safety",
+      "task_id": 9
+    },
+    {
+      "actual_arm_body_mass": {
+        "count": 7,
+        "maximum": 2.4000000000000004,
+        "mean": 1.6,
+        "minimum": 0.4
+      },
+      "actual_arm_mass_scale": 0.8,
+      "actual_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "actual_arm_sliding_friction_scale": 1.0,
+      "actual_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "actual_joint_damping_scale": 1.0,
+      "actual_model_switch_count": 438,
+      "actual_parameter_identity": true,
+      "actual_step_count": 353,
+      "actual_step_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 143,
+        "v15_7_incremental_adaptive_force_recovery": 210
+      },
+      "arm_body_ids": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "arm_dof_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "arm_geom_ids": [
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72
+      ],
+      "arm_joint_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "base_environment_id": "v15_8_mismatch_qual_human_safety_task3_init45",
+      "before_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "before_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "before_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "condition_id": "actual_mass_0_8x_shadow_nominal",
+      "environment_id": "v15_8_mismatch_qual_human_safety_task3_init45:actual_mass_0_8x_shadow_nominal",
+      "expected_parameter_identity": true,
+      "init_state_id": 45,
+      "model_mismatch_injected": true,
+      "model_mismatch_matches_registered_condition": true,
+      "observed_force_calibration_actual_parameter_read_by_selector": false,
+      "observed_force_calibration_bind_count": 252,
+      "observed_force_calibration_evaluation_count": 252,
+      "observed_force_calibration_maximum_selected_residual": 59.35038504595991,
+      "observed_force_calibration_nonminimum_bind_count": 0,
+      "observed_force_calibration_selected_candidate_counts": {
+        "arm_mass_0_8x": 180,
+        "arm_mass_1_2x": 10,
+        "joint_damping_1_3x": 1,
+        "nominal": 61
+      },
+      "observed_force_calibration_selected_condition_mismatch_count": 72,
+      "observed_force_calibration_selected_residual_exceeds_nominal_count": 0,
+      "observed_force_calibration_task_outcome_read": false,
+      "predictive_run_count": 84,
+      "predictive_run_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 42,
+        "v15_7_incremental_adaptive_force_recovery": 42
+      },
+      "shadow_and_actual_share_perturbed_model": false,
+      "shadow_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "shadow_arm_mass_scale": 1.0,
+      "shadow_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "shadow_arm_sliding_friction_scale": 1.0,
+      "shadow_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "shadow_joint_damping_scale": 1.0,
+      "shadow_model_switch_count": 606,
+      "shadow_parameter_identity": true,
+      "shadow_step_count": 606,
+      "shadow_step_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 190,
+        "v15_7_incremental_adaptive_force_recovery": 416
+      },
+      "step_model_switch_identity_failure_count": 0,
+      "step_role_identity_failure_count": 0,
+      "step_role_identity_failure_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 0,
+        "v15_7_incremental_adaptive_force_recovery": 0
+      },
+      "suite": "human_safety",
+      "task_id": 3
+    },
+    {
+      "actual_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.5999999999999996,
+        "mean": 2.4,
+        "minimum": 0.6
+      },
+      "actual_arm_mass_scale": 1.2,
+      "actual_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "actual_arm_sliding_friction_scale": 1.0,
+      "actual_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "actual_joint_damping_scale": 1.0,
+      "actual_model_switch_count": 427,
+      "actual_parameter_identity": true,
+      "actual_step_count": 342,
+      "actual_step_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 132,
+        "v15_7_incremental_adaptive_force_recovery": 210
+      },
+      "arm_body_ids": [
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "arm_dof_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "arm_geom_ids": [
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72
+      ],
+      "arm_joint_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "base_environment_id": "v15_7_mismatch_qual_human_safety_task4_init34",
+      "before_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "before_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "before_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "condition_id": "actual_mass_1_2x_shadow_nominal",
+      "environment_id": "v15_7_mismatch_qual_human_safety_task4_init34:actual_mass_1_2x_shadow_nominal",
+      "expected_parameter_identity": true,
+      "init_state_id": 34,
+      "model_mismatch_injected": true,
+      "model_mismatch_matches_registered_condition": true,
+      "observed_force_calibration_actual_parameter_read_by_selector": false,
+      "observed_force_calibration_bind_count": 252,
+      "observed_force_calibration_evaluation_count": 252,
+      "observed_force_calibration_maximum_selected_residual": 0.06746488772623335,
+      "observed_force_calibration_nonminimum_bind_count": 0,
+      "observed_force_calibration_selected_candidate_counts": {
+        "arm_mass_1_2x": 188,
+        "joint_damping_0_7x": 1,
+        "nominal": 63
+      },
+      "observed_force_calibration_selected_condition_mismatch_count": 64,
+      "observed_force_calibration_selected_residual_exceeds_nominal_count": 0,
+      "observed_force_calibration_task_outcome_read": false,
+      "predictive_run_count": 84,
+      "predictive_run_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 42,
+        "v15_7_incremental_adaptive_force_recovery": 42
+      },
+      "shadow_and_actual_share_perturbed_model": false,
+      "shadow_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "shadow_arm_mass_scale": 1.0,
+      "shadow_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "shadow_arm_sliding_friction_scale": 1.0,
+      "shadow_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "shadow_joint_damping_scale": 1.0,
+      "shadow_model_switch_count": 639,
+      "shadow_parameter_identity": true,
+      "shadow_step_count": 639,
+      "shadow_step_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 187,
+        "v15_7_incremental_adaptive_force_recovery": 452
+      },
+      "step_model_switch_identity_failure_count": 0,
+      "step_role_identity_failure_count": 0,
+      "step_role_identity_failure_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 0,
+        "v15_7_incremental_adaptive_force_recovery": 0
+      },
+      "suite": "human_safety",
+      "task_id": 4
+    },
+    {
+      "actual_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.5999999999999996,
+        "mean": 2.4,
+        "minimum": 0.6
+      },
+      "actual_arm_mass_scale": 1.2,
+      "actual_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "actual_arm_sliding_friction_scale": 1.0,
+      "actual_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "actual_joint_damping_scale": 1.0,
+      "actual_model_switch_count": 439,
+      "actual_parameter_identity": true,
+      "actual_step_count": 354,
+      "actual_step_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 144,
+        "v15_7_incremental_adaptive_force_recovery": 210
+      },
+      "arm_body_ids": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "arm_dof_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "arm_geom_ids": [
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72
+      ],
+      "arm_joint_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "base_environment_id": "v15_8_mismatch_qual_obstacle_avoidance_human_task12_init8",
+      "before_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "before_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "before_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "condition_id": "actual_mass_1_2x_shadow_nominal",
+      "environment_id": "v15_8_mismatch_qual_obstacle_avoidance_human_task12_init8:actual_mass_1_2x_shadow_nominal",
+      "expected_parameter_identity": true,
+      "init_state_id": 8,
+      "model_mismatch_injected": true,
+      "model_mismatch_matches_registered_condition": true,
+      "observed_force_calibration_actual_parameter_read_by_selector": false,
+      "observed_force_calibration_bind_count": 252,
+      "observed_force_calibration_evaluation_count": 252,
+      "observed_force_calibration_maximum_selected_residual": 295.4026597385771,
+      "observed_force_calibration_nonminimum_bind_count": 0,
+      "observed_force_calibration_selected_candidate_counts": {
+        "arm_mass_0_8x": 2,
+        "arm_mass_1_2x": 185,
+        "joint_damping_0_7x": 2,
+        "nominal": 63
+      },
+      "observed_force_calibration_selected_condition_mismatch_count": 67,
+      "observed_force_calibration_selected_residual_exceeds_nominal_count": 0,
+      "observed_force_calibration_task_outcome_read": false,
+      "predictive_run_count": 84,
+      "predictive_run_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 42,
+        "v15_7_incremental_adaptive_force_recovery": 42
+      },
+      "shadow_and_actual_share_perturbed_model": false,
+      "shadow_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "shadow_arm_mass_scale": 1.0,
+      "shadow_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "shadow_arm_sliding_friction_scale": 1.0,
+      "shadow_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "shadow_joint_damping_scale": 1.0,
+      "shadow_model_switch_count": 608,
+      "shadow_parameter_identity": true,
+      "shadow_step_count": 608,
+      "shadow_step_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 192,
+        "v15_7_incremental_adaptive_force_recovery": 416
+      },
+      "step_model_switch_identity_failure_count": 0,
+      "step_role_identity_failure_count": 0,
+      "step_role_identity_failure_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 0,
+        "v15_7_incremental_adaptive_force_recovery": 0
+      },
+      "suite": "obstacle_avoidance_human",
+      "task_id": 12
+    },
+    {
+      "actual_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.5999999999999996,
+        "mean": 2.4,
+        "minimum": 0.6
+      },
+      "actual_arm_mass_scale": 1.2,
+      "actual_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "actual_arm_sliding_friction_scale": 1.0,
+      "actual_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "actual_joint_damping_scale": 1.0,
+      "actual_model_switch_count": 427,
+      "actual_parameter_identity": true,
+      "actual_step_count": 342,
+      "actual_step_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 132,
+        "v15_7_incremental_adaptive_force_recovery": 210
+      },
+      "arm_body_ids": [
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "arm_dof_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "arm_geom_ids": [
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72
+      ],
+      "arm_joint_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "base_environment_id": "v15_8_mismatch_qual_human_safety_task9_init49",
+      "before_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "before_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "before_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "condition_id": "actual_mass_1_2x_shadow_nominal",
+      "environment_id": "v15_8_mismatch_qual_human_safety_task9_init49:actual_mass_1_2x_shadow_nominal",
+      "expected_parameter_identity": true,
+      "init_state_id": 49,
+      "model_mismatch_injected": true,
+      "model_mismatch_matches_registered_condition": true,
+      "observed_force_calibration_actual_parameter_read_by_selector": false,
+      "observed_force_calibration_bind_count": 252,
+      "observed_force_calibration_evaluation_count": 252,
+      "observed_force_calibration_maximum_selected_residual": 0.06746488772623346,
+      "observed_force_calibration_nonminimum_bind_count": 0,
+      "observed_force_calibration_selected_candidate_counts": {
+        "arm_mass_1_2x": 188,
+        "joint_damping_0_7x": 1,
+        "nominal": 63
+      },
+      "observed_force_calibration_selected_condition_mismatch_count": 64,
+      "observed_force_calibration_selected_residual_exceeds_nominal_count": 0,
+      "observed_force_calibration_task_outcome_read": false,
+      "predictive_run_count": 84,
+      "predictive_run_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 42,
+        "v15_7_incremental_adaptive_force_recovery": 42
+      },
+      "shadow_and_actual_share_perturbed_model": false,
+      "shadow_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "shadow_arm_mass_scale": 1.0,
+      "shadow_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "shadow_arm_sliding_friction_scale": 1.0,
+      "shadow_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "shadow_joint_damping_scale": 1.0,
+      "shadow_model_switch_count": 639,
+      "shadow_parameter_identity": true,
+      "shadow_step_count": 639,
+      "shadow_step_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 187,
+        "v15_7_incremental_adaptive_force_recovery": 452
+      },
+      "step_model_switch_identity_failure_count": 0,
+      "step_role_identity_failure_count": 0,
+      "step_role_identity_failure_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 0,
+        "v15_7_incremental_adaptive_force_recovery": 0
+      },
+      "suite": "human_safety",
+      "task_id": 9
+    },
+    {
+      "actual_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.5999999999999996,
+        "mean": 2.4,
+        "minimum": 0.6
+      },
+      "actual_arm_mass_scale": 1.2,
+      "actual_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "actual_arm_sliding_friction_scale": 1.0,
+      "actual_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "actual_joint_damping_scale": 1.0,
+      "actual_model_switch_count": 439,
+      "actual_parameter_identity": true,
+      "actual_step_count": 354,
+      "actual_step_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 144,
+        "v15_7_incremental_adaptive_force_recovery": 210
+      },
+      "arm_body_ids": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "arm_dof_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "arm_geom_ids": [
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72
+      ],
+      "arm_joint_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "base_environment_id": "v15_8_mismatch_qual_human_safety_task3_init45",
+      "before_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "before_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "before_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "condition_id": "actual_mass_1_2x_shadow_nominal",
+      "environment_id": "v15_8_mismatch_qual_human_safety_task3_init45:actual_mass_1_2x_shadow_nominal",
+      "expected_parameter_identity": true,
+      "init_state_id": 45,
+      "model_mismatch_injected": true,
+      "model_mismatch_matches_registered_condition": true,
+      "observed_force_calibration_actual_parameter_read_by_selector": false,
+      "observed_force_calibration_bind_count": 252,
+      "observed_force_calibration_evaluation_count": 252,
+      "observed_force_calibration_maximum_selected_residual": 222.25381682633906,
+      "observed_force_calibration_nonminimum_bind_count": 0,
+      "observed_force_calibration_selected_candidate_counts": {
+        "arm_friction_1_3x": 1,
+        "arm_mass_0_8x": 5,
+        "arm_mass_1_2x": 182,
+        "joint_damping_0_7x": 1,
+        "nominal": 63
+      },
+      "observed_force_calibration_selected_condition_mismatch_count": 70,
+      "observed_force_calibration_selected_residual_exceeds_nominal_count": 0,
+      "observed_force_calibration_task_outcome_read": false,
+      "predictive_run_count": 84,
+      "predictive_run_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 42,
+        "v15_7_incremental_adaptive_force_recovery": 42
+      },
+      "shadow_and_actual_share_perturbed_model": false,
+      "shadow_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "shadow_arm_mass_scale": 1.0,
+      "shadow_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "shadow_arm_sliding_friction_scale": 1.0,
+      "shadow_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "shadow_joint_damping_scale": 1.0,
+      "shadow_model_switch_count": 608,
+      "shadow_parameter_identity": true,
+      "shadow_step_count": 608,
+      "shadow_step_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 192,
+        "v15_7_incremental_adaptive_force_recovery": 416
+      },
+      "step_model_switch_identity_failure_count": 0,
+      "step_role_identity_failure_count": 0,
+      "step_role_identity_failure_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 0,
+        "v15_7_incremental_adaptive_force_recovery": 0
+      },
+      "suite": "human_safety",
+      "task_id": 3
+    },
+    {
+      "actual_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "actual_arm_mass_scale": 1.0,
+      "actual_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "actual_arm_sliding_friction_scale": 1.0,
+      "actual_joint_damping": {
+        "count": 7,
+        "maximum": 0.06999999999999999,
+        "mean": 0.052,
+        "minimum": 0.006999999999999999
+      },
+      "actual_joint_damping_scale": 0.7,
+      "actual_model_switch_count": 427,
+      "actual_parameter_identity": true,
+      "actual_step_count": 342,
+      "actual_step_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 132,
+        "v15_7_incremental_adaptive_force_recovery": 210
+      },
+      "arm_body_ids": [
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "arm_dof_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "arm_geom_ids": [
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72
+      ],
+      "arm_joint_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "base_environment_id": "v15_7_mismatch_qual_human_safety_task4_init34",
+      "before_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "before_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "before_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "condition_id": "actual_damping_0_7x_shadow_nominal",
+      "environment_id": "v15_7_mismatch_qual_human_safety_task4_init34:actual_damping_0_7x_shadow_nominal",
+      "expected_parameter_identity": true,
+      "init_state_id": 34,
+      "model_mismatch_injected": true,
+      "model_mismatch_matches_registered_condition": true,
+      "observed_force_calibration_actual_parameter_read_by_selector": false,
+      "observed_force_calibration_bind_count": 252,
+      "observed_force_calibration_evaluation_count": 252,
+      "observed_force_calibration_maximum_selected_residual": 0.2,
+      "observed_force_calibration_nonminimum_bind_count": 0,
+      "observed_force_calibration_selected_candidate_counts": {
+        "arm_mass_0_8x": 1,
+        "arm_mass_1_2x": 2,
+        "joint_damping_0_7x": 135,
+        "joint_damping_1_3x": 31,
+        "nominal": 83
+      },
+      "observed_force_calibration_selected_condition_mismatch_count": 117,
+      "observed_force_calibration_selected_residual_exceeds_nominal_count": 0,
+      "observed_force_calibration_task_outcome_read": false,
+      "predictive_run_count": 84,
+      "predictive_run_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 42,
+        "v15_7_incremental_adaptive_force_recovery": 42
+      },
+      "shadow_and_actual_share_perturbed_model": false,
+      "shadow_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "shadow_arm_mass_scale": 1.0,
+      "shadow_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "shadow_arm_sliding_friction_scale": 1.0,
+      "shadow_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "shadow_joint_damping_scale": 1.0,
+      "shadow_model_switch_count": 639,
+      "shadow_parameter_identity": true,
+      "shadow_step_count": 639,
+      "shadow_step_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 187,
+        "v15_7_incremental_adaptive_force_recovery": 452
+      },
+      "step_model_switch_identity_failure_count": 0,
+      "step_role_identity_failure_count": 0,
+      "step_role_identity_failure_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 0,
+        "v15_7_incremental_adaptive_force_recovery": 0
+      },
+      "suite": "human_safety",
+      "task_id": 4
+    },
+    {
+      "actual_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "actual_arm_mass_scale": 1.0,
+      "actual_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "actual_arm_sliding_friction_scale": 1.0,
+      "actual_joint_damping": {
+        "count": 7,
+        "maximum": 0.06999999999999999,
+        "mean": 0.052,
+        "minimum": 0.006999999999999999
+      },
+      "actual_joint_damping_scale": 0.7,
+      "actual_model_switch_count": 439,
+      "actual_parameter_identity": true,
+      "actual_step_count": 354,
+      "actual_step_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 144,
+        "v15_7_incremental_adaptive_force_recovery": 210
+      },
+      "arm_body_ids": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "arm_dof_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "arm_geom_ids": [
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72
+      ],
+      "arm_joint_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "base_environment_id": "v15_8_mismatch_qual_obstacle_avoidance_human_task12_init8",
+      "before_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "before_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "before_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "condition_id": "actual_damping_0_7x_shadow_nominal",
+      "environment_id": "v15_8_mismatch_qual_obstacle_avoidance_human_task12_init8:actual_damping_0_7x_shadow_nominal",
+      "expected_parameter_identity": true,
+      "init_state_id": 8,
+      "model_mismatch_injected": true,
+      "model_mismatch_matches_registered_condition": true,
+      "observed_force_calibration_actual_parameter_read_by_selector": false,
+      "observed_force_calibration_bind_count": 252,
+      "observed_force_calibration_evaluation_count": 252,
+      "observed_force_calibration_maximum_selected_residual": 34.96027939113628,
+      "observed_force_calibration_nonminimum_bind_count": 0,
+      "observed_force_calibration_selected_candidate_counts": {
+        "arm_mass_0_8x": 3,
+        "arm_mass_1_2x": 9,
+        "joint_damping_0_7x": 123,
+        "joint_damping_1_3x": 34,
+        "nominal": 83
+      },
+      "observed_force_calibration_selected_condition_mismatch_count": 129,
+      "observed_force_calibration_selected_residual_exceeds_nominal_count": 0,
+      "observed_force_calibration_task_outcome_read": false,
+      "predictive_run_count": 84,
+      "predictive_run_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 42,
+        "v15_7_incremental_adaptive_force_recovery": 42
+      },
+      "shadow_and_actual_share_perturbed_model": false,
+      "shadow_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "shadow_arm_mass_scale": 1.0,
+      "shadow_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "shadow_arm_sliding_friction_scale": 1.0,
+      "shadow_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "shadow_joint_damping_scale": 1.0,
+      "shadow_model_switch_count": 608,
+      "shadow_parameter_identity": true,
+      "shadow_step_count": 608,
+      "shadow_step_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 192,
+        "v15_7_incremental_adaptive_force_recovery": 416
+      },
+      "step_model_switch_identity_failure_count": 0,
+      "step_role_identity_failure_count": 0,
+      "step_role_identity_failure_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 0,
+        "v15_7_incremental_adaptive_force_recovery": 0
+      },
+      "suite": "obstacle_avoidance_human",
+      "task_id": 12
+    },
+    {
+      "actual_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "actual_arm_mass_scale": 1.0,
+      "actual_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "actual_arm_sliding_friction_scale": 1.0,
+      "actual_joint_damping": {
+        "count": 7,
+        "maximum": 0.06999999999999999,
+        "mean": 0.052,
+        "minimum": 0.006999999999999999
+      },
+      "actual_joint_damping_scale": 0.7,
+      "actual_model_switch_count": 427,
+      "actual_parameter_identity": true,
+      "actual_step_count": 342,
+      "actual_step_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 132,
+        "v15_7_incremental_adaptive_force_recovery": 210
+      },
+      "arm_body_ids": [
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "arm_dof_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "arm_geom_ids": [
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72
+      ],
+      "arm_joint_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "base_environment_id": "v15_8_mismatch_qual_human_safety_task9_init49",
+      "before_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "before_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "before_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "condition_id": "actual_damping_0_7x_shadow_nominal",
+      "environment_id": "v15_8_mismatch_qual_human_safety_task9_init49:actual_damping_0_7x_shadow_nominal",
+      "expected_parameter_identity": true,
+      "init_state_id": 49,
+      "model_mismatch_injected": true,
+      "model_mismatch_matches_registered_condition": true,
+      "observed_force_calibration_actual_parameter_read_by_selector": false,
+      "observed_force_calibration_bind_count": 252,
+      "observed_force_calibration_evaluation_count": 252,
+      "observed_force_calibration_maximum_selected_residual": 0.2,
+      "observed_force_calibration_nonminimum_bind_count": 0,
+      "observed_force_calibration_selected_candidate_counts": {
+        "arm_mass_0_8x": 1,
+        "arm_mass_1_2x": 2,
+        "joint_damping_0_7x": 135,
+        "joint_damping_1_3x": 31,
+        "nominal": 83
+      },
+      "observed_force_calibration_selected_condition_mismatch_count": 117,
+      "observed_force_calibration_selected_residual_exceeds_nominal_count": 0,
+      "observed_force_calibration_task_outcome_read": false,
+      "predictive_run_count": 84,
+      "predictive_run_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 42,
+        "v15_7_incremental_adaptive_force_recovery": 42
+      },
+      "shadow_and_actual_share_perturbed_model": false,
+      "shadow_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "shadow_arm_mass_scale": 1.0,
+      "shadow_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "shadow_arm_sliding_friction_scale": 1.0,
+      "shadow_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "shadow_joint_damping_scale": 1.0,
+      "shadow_model_switch_count": 639,
+      "shadow_parameter_identity": true,
+      "shadow_step_count": 639,
+      "shadow_step_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 187,
+        "v15_7_incremental_adaptive_force_recovery": 452
+      },
+      "step_model_switch_identity_failure_count": 0,
+      "step_role_identity_failure_count": 0,
+      "step_role_identity_failure_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 0,
+        "v15_7_incremental_adaptive_force_recovery": 0
+      },
+      "suite": "human_safety",
+      "task_id": 9
+    },
+    {
+      "actual_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "actual_arm_mass_scale": 1.0,
+      "actual_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "actual_arm_sliding_friction_scale": 1.0,
+      "actual_joint_damping": {
+        "count": 7,
+        "maximum": 0.06999999999999999,
+        "mean": 0.052,
+        "minimum": 0.006999999999999999
+      },
+      "actual_joint_damping_scale": 0.7,
+      "actual_model_switch_count": 439,
+      "actual_parameter_identity": true,
+      "actual_step_count": 354,
+      "actual_step_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 144,
+        "v15_7_incremental_adaptive_force_recovery": 210
+      },
+      "arm_body_ids": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "arm_dof_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "arm_geom_ids": [
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72
+      ],
+      "arm_joint_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "base_environment_id": "v15_8_mismatch_qual_human_safety_task3_init45",
+      "before_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "before_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "before_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "condition_id": "actual_damping_0_7x_shadow_nominal",
+      "environment_id": "v15_8_mismatch_qual_human_safety_task3_init45:actual_damping_0_7x_shadow_nominal",
+      "expected_parameter_identity": true,
+      "init_state_id": 45,
+      "model_mismatch_injected": true,
+      "model_mismatch_matches_registered_condition": true,
+      "observed_force_calibration_actual_parameter_read_by_selector": false,
+      "observed_force_calibration_bind_count": 252,
+      "observed_force_calibration_evaluation_count": 252,
+      "observed_force_calibration_maximum_selected_residual": 117.29984239025161,
+      "observed_force_calibration_nonminimum_bind_count": 0,
+      "observed_force_calibration_selected_candidate_counts": {
+        "arm_friction_1_3x": 1,
+        "arm_mass_0_8x": 4,
+        "arm_mass_1_2x": 8,
+        "joint_damping_0_7x": 123,
+        "joint_damping_1_3x": 33,
+        "nominal": 83
+      },
+      "observed_force_calibration_selected_condition_mismatch_count": 129,
+      "observed_force_calibration_selected_residual_exceeds_nominal_count": 0,
+      "observed_force_calibration_task_outcome_read": false,
+      "predictive_run_count": 84,
+      "predictive_run_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 42,
+        "v15_7_incremental_adaptive_force_recovery": 42
+      },
+      "shadow_and_actual_share_perturbed_model": false,
+      "shadow_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "shadow_arm_mass_scale": 1.0,
+      "shadow_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "shadow_arm_sliding_friction_scale": 1.0,
+      "shadow_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "shadow_joint_damping_scale": 1.0,
+      "shadow_model_switch_count": 608,
+      "shadow_parameter_identity": true,
+      "shadow_step_count": 608,
+      "shadow_step_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 192,
+        "v15_7_incremental_adaptive_force_recovery": 416
+      },
+      "step_model_switch_identity_failure_count": 0,
+      "step_role_identity_failure_count": 0,
+      "step_role_identity_failure_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 0,
+        "v15_7_incremental_adaptive_force_recovery": 0
+      },
+      "suite": "human_safety",
+      "task_id": 3
+    },
+    {
+      "actual_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "actual_arm_mass_scale": 1.0,
+      "actual_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "actual_arm_sliding_friction_scale": 1.0,
+      "actual_joint_damping": {
+        "count": 7,
+        "maximum": 0.13,
+        "mean": 0.09657142857142857,
+        "minimum": 0.013000000000000001
+      },
+      "actual_joint_damping_scale": 1.3,
+      "actual_model_switch_count": 427,
+      "actual_parameter_identity": true,
+      "actual_step_count": 342,
+      "actual_step_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 132,
+        "v15_7_incremental_adaptive_force_recovery": 210
+      },
+      "arm_body_ids": [
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "arm_dof_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "arm_geom_ids": [
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72
+      ],
+      "arm_joint_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "base_environment_id": "v15_7_mismatch_qual_human_safety_task4_init34",
+      "before_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "before_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "before_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "condition_id": "actual_damping_1_3x_shadow_nominal",
+      "environment_id": "v15_7_mismatch_qual_human_safety_task4_init34:actual_damping_1_3x_shadow_nominal",
+      "expected_parameter_identity": true,
+      "init_state_id": 34,
+      "model_mismatch_injected": true,
+      "model_mismatch_matches_registered_condition": true,
+      "observed_force_calibration_actual_parameter_read_by_selector": false,
+      "observed_force_calibration_bind_count": 252,
+      "observed_force_calibration_evaluation_count": 252,
+      "observed_force_calibration_maximum_selected_residual": 0.2,
+      "observed_force_calibration_nonminimum_bind_count": 0,
+      "observed_force_calibration_selected_candidate_counts": {
+        "arm_mass_0_8x": 1,
+        "arm_mass_1_2x": 2,
+        "joint_damping_0_7x": 26,
+        "joint_damping_1_3x": 140,
+        "nominal": 83
+      },
+      "observed_force_calibration_selected_condition_mismatch_count": 112,
+      "observed_force_calibration_selected_residual_exceeds_nominal_count": 0,
+      "observed_force_calibration_task_outcome_read": false,
+      "predictive_run_count": 84,
+      "predictive_run_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 42,
+        "v15_7_incremental_adaptive_force_recovery": 42
+      },
+      "shadow_and_actual_share_perturbed_model": false,
+      "shadow_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "shadow_arm_mass_scale": 1.0,
+      "shadow_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "shadow_arm_sliding_friction_scale": 1.0,
+      "shadow_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "shadow_joint_damping_scale": 1.0,
+      "shadow_model_switch_count": 639,
+      "shadow_parameter_identity": true,
+      "shadow_step_count": 639,
+      "shadow_step_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 187,
+        "v15_7_incremental_adaptive_force_recovery": 452
+      },
+      "step_model_switch_identity_failure_count": 0,
+      "step_role_identity_failure_count": 0,
+      "step_role_identity_failure_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 0,
+        "v15_7_incremental_adaptive_force_recovery": 0
+      },
+      "suite": "human_safety",
+      "task_id": 4
+    },
+    {
+      "actual_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "actual_arm_mass_scale": 1.0,
+      "actual_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "actual_arm_sliding_friction_scale": 1.0,
+      "actual_joint_damping": {
+        "count": 7,
+        "maximum": 0.13,
+        "mean": 0.09657142857142857,
+        "minimum": 0.013000000000000001
+      },
+      "actual_joint_damping_scale": 1.3,
+      "actual_model_switch_count": 439,
+      "actual_parameter_identity": true,
+      "actual_step_count": 354,
+      "actual_step_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 144,
+        "v15_7_incremental_adaptive_force_recovery": 210
+      },
+      "arm_body_ids": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "arm_dof_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "arm_geom_ids": [
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72
+      ],
+      "arm_joint_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "base_environment_id": "v15_8_mismatch_qual_obstacle_avoidance_human_task12_init8",
+      "before_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "before_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "before_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "condition_id": "actual_damping_1_3x_shadow_nominal",
+      "environment_id": "v15_8_mismatch_qual_obstacle_avoidance_human_task12_init8:actual_damping_1_3x_shadow_nominal",
+      "expected_parameter_identity": true,
+      "init_state_id": 8,
+      "model_mismatch_injected": true,
+      "model_mismatch_matches_registered_condition": true,
+      "observed_force_calibration_actual_parameter_read_by_selector": false,
+      "observed_force_calibration_bind_count": 252,
+      "observed_force_calibration_evaluation_count": 252,
+      "observed_force_calibration_maximum_selected_residual": 186.38152172887345,
+      "observed_force_calibration_nonminimum_bind_count": 0,
+      "observed_force_calibration_selected_candidate_counts": {
+        "arm_friction_1_3x": 1,
+        "arm_mass_0_8x": 5,
+        "arm_mass_1_2x": 8,
+        "joint_damping_0_7x": 29,
+        "joint_damping_1_3x": 126,
+        "nominal": 83
+      },
+      "observed_force_calibration_selected_condition_mismatch_count": 126,
+      "observed_force_calibration_selected_residual_exceeds_nominal_count": 0,
+      "observed_force_calibration_task_outcome_read": false,
+      "predictive_run_count": 84,
+      "predictive_run_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 42,
+        "v15_7_incremental_adaptive_force_recovery": 42
+      },
+      "shadow_and_actual_share_perturbed_model": false,
+      "shadow_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "shadow_arm_mass_scale": 1.0,
+      "shadow_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "shadow_arm_sliding_friction_scale": 1.0,
+      "shadow_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "shadow_joint_damping_scale": 1.0,
+      "shadow_model_switch_count": 608,
+      "shadow_parameter_identity": true,
+      "shadow_step_count": 608,
+      "shadow_step_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 192,
+        "v15_7_incremental_adaptive_force_recovery": 416
+      },
+      "step_model_switch_identity_failure_count": 0,
+      "step_role_identity_failure_count": 0,
+      "step_role_identity_failure_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 0,
+        "v15_7_incremental_adaptive_force_recovery": 0
+      },
+      "suite": "obstacle_avoidance_human",
+      "task_id": 12
+    },
+    {
+      "actual_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "actual_arm_mass_scale": 1.0,
+      "actual_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "actual_arm_sliding_friction_scale": 1.0,
+      "actual_joint_damping": {
+        "count": 7,
+        "maximum": 0.13,
+        "mean": 0.09657142857142857,
+        "minimum": 0.013000000000000001
+      },
+      "actual_joint_damping_scale": 1.3,
+      "actual_model_switch_count": 427,
+      "actual_parameter_identity": true,
+      "actual_step_count": 342,
+      "actual_step_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 132,
+        "v15_7_incremental_adaptive_force_recovery": 210
+      },
+      "arm_body_ids": [
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "arm_dof_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "arm_geom_ids": [
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72
+      ],
+      "arm_joint_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "base_environment_id": "v15_8_mismatch_qual_human_safety_task9_init49",
+      "before_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "before_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "before_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "condition_id": "actual_damping_1_3x_shadow_nominal",
+      "environment_id": "v15_8_mismatch_qual_human_safety_task9_init49:actual_damping_1_3x_shadow_nominal",
+      "expected_parameter_identity": true,
+      "init_state_id": 49,
+      "model_mismatch_injected": true,
+      "model_mismatch_matches_registered_condition": true,
+      "observed_force_calibration_actual_parameter_read_by_selector": false,
+      "observed_force_calibration_bind_count": 252,
+      "observed_force_calibration_evaluation_count": 252,
+      "observed_force_calibration_maximum_selected_residual": 0.2,
+      "observed_force_calibration_nonminimum_bind_count": 0,
+      "observed_force_calibration_selected_candidate_counts": {
+        "arm_mass_0_8x": 1,
+        "arm_mass_1_2x": 2,
+        "joint_damping_0_7x": 26,
+        "joint_damping_1_3x": 140,
+        "nominal": 83
+      },
+      "observed_force_calibration_selected_condition_mismatch_count": 112,
+      "observed_force_calibration_selected_residual_exceeds_nominal_count": 0,
+      "observed_force_calibration_task_outcome_read": false,
+      "predictive_run_count": 84,
+      "predictive_run_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 42,
+        "v15_7_incremental_adaptive_force_recovery": 42
+      },
+      "shadow_and_actual_share_perturbed_model": false,
+      "shadow_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "shadow_arm_mass_scale": 1.0,
+      "shadow_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "shadow_arm_sliding_friction_scale": 1.0,
+      "shadow_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "shadow_joint_damping_scale": 1.0,
+      "shadow_model_switch_count": 639,
+      "shadow_parameter_identity": true,
+      "shadow_step_count": 639,
+      "shadow_step_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 187,
+        "v15_7_incremental_adaptive_force_recovery": 452
+      },
+      "step_model_switch_identity_failure_count": 0,
+      "step_role_identity_failure_count": 0,
+      "step_role_identity_failure_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 0,
+        "v15_7_incremental_adaptive_force_recovery": 0
+      },
+      "suite": "human_safety",
+      "task_id": 9
+    },
+    {
+      "actual_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "actual_arm_mass_scale": 1.0,
+      "actual_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "actual_arm_sliding_friction_scale": 1.0,
+      "actual_joint_damping": {
+        "count": 7,
+        "maximum": 0.13,
+        "mean": 0.09657142857142857,
+        "minimum": 0.013000000000000001
+      },
+      "actual_joint_damping_scale": 1.3,
+      "actual_model_switch_count": 439,
+      "actual_parameter_identity": true,
+      "actual_step_count": 354,
+      "actual_step_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 144,
+        "v15_7_incremental_adaptive_force_recovery": 210
+      },
+      "arm_body_ids": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "arm_dof_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "arm_geom_ids": [
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72
+      ],
+      "arm_joint_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "base_environment_id": "v15_8_mismatch_qual_human_safety_task3_init45",
+      "before_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "before_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "before_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "condition_id": "actual_damping_1_3x_shadow_nominal",
+      "environment_id": "v15_8_mismatch_qual_human_safety_task3_init45:actual_damping_1_3x_shadow_nominal",
+      "expected_parameter_identity": true,
+      "init_state_id": 45,
+      "model_mismatch_injected": true,
+      "model_mismatch_matches_registered_condition": true,
+      "observed_force_calibration_actual_parameter_read_by_selector": false,
+      "observed_force_calibration_bind_count": 252,
+      "observed_force_calibration_evaluation_count": 252,
+      "observed_force_calibration_maximum_selected_residual": 294.74560015146835,
+      "observed_force_calibration_nonminimum_bind_count": 0,
+      "observed_force_calibration_selected_candidate_counts": {
+        "arm_mass_0_8x": 3,
+        "arm_mass_1_2x": 9,
+        "joint_damping_0_7x": 30,
+        "joint_damping_1_3x": 127,
+        "nominal": 83
+      },
+      "observed_force_calibration_selected_condition_mismatch_count": 125,
+      "observed_force_calibration_selected_residual_exceeds_nominal_count": 0,
+      "observed_force_calibration_task_outcome_read": false,
+      "predictive_run_count": 84,
+      "predictive_run_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 42,
+        "v15_7_incremental_adaptive_force_recovery": 42
+      },
+      "shadow_and_actual_share_perturbed_model": false,
+      "shadow_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "shadow_arm_mass_scale": 1.0,
+      "shadow_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "shadow_arm_sliding_friction_scale": 1.0,
+      "shadow_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "shadow_joint_damping_scale": 1.0,
+      "shadow_model_switch_count": 608,
+      "shadow_parameter_identity": true,
+      "shadow_step_count": 608,
+      "shadow_step_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 192,
+        "v15_7_incremental_adaptive_force_recovery": 416
+      },
+      "step_model_switch_identity_failure_count": 0,
+      "step_role_identity_failure_count": 0,
+      "step_role_identity_failure_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 0,
+        "v15_7_incremental_adaptive_force_recovery": 0
+      },
+      "suite": "human_safety",
+      "task_id": 3
+    },
+    {
+      "actual_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "actual_arm_mass_scale": 1.0,
+      "actual_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 0.7,
+        "mean": 0.7,
+        "minimum": 0.7
+      },
+      "actual_arm_sliding_friction_scale": 0.7,
+      "actual_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "actual_joint_damping_scale": 1.0,
+      "actual_model_switch_count": 427,
+      "actual_parameter_identity": true,
+      "actual_step_count": 342,
+      "actual_step_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 132,
+        "v15_7_incremental_adaptive_force_recovery": 210
+      },
+      "arm_body_ids": [
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "arm_dof_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "arm_geom_ids": [
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72
+      ],
+      "arm_joint_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "base_environment_id": "v15_7_mismatch_qual_human_safety_task4_init34",
+      "before_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "before_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "before_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "condition_id": "actual_friction_0_7x_shadow_nominal",
+      "environment_id": "v15_7_mismatch_qual_human_safety_task4_init34:actual_friction_0_7x_shadow_nominal",
+      "expected_parameter_identity": true,
+      "init_state_id": 34,
+      "model_mismatch_injected": true,
+      "model_mismatch_matches_registered_condition": true,
+      "observed_force_calibration_actual_parameter_read_by_selector": false,
+      "observed_force_calibration_bind_count": 252,
+      "observed_force_calibration_evaluation_count": 252,
+      "observed_force_calibration_maximum_selected_residual": 0.2,
+      "observed_force_calibration_nonminimum_bind_count": 0,
+      "observed_force_calibration_selected_candidate_counts": {
+        "arm_friction_0_7x": 42,
+        "arm_friction_1_3x": 17,
+        "arm_mass_0_8x": 1,
+        "arm_mass_1_2x": 2,
+        "joint_damping_0_7x": 26,
+        "joint_damping_1_3x": 31,
+        "nominal": 133
+      },
+      "observed_force_calibration_selected_condition_mismatch_count": 210,
+      "observed_force_calibration_selected_residual_exceeds_nominal_count": 0,
+      "observed_force_calibration_task_outcome_read": false,
+      "predictive_run_count": 84,
+      "predictive_run_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 42,
+        "v15_7_incremental_adaptive_force_recovery": 42
+      },
+      "shadow_and_actual_share_perturbed_model": false,
+      "shadow_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "shadow_arm_mass_scale": 1.0,
+      "shadow_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "shadow_arm_sliding_friction_scale": 1.0,
+      "shadow_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "shadow_joint_damping_scale": 1.0,
+      "shadow_model_switch_count": 638,
+      "shadow_parameter_identity": true,
+      "shadow_step_count": 638,
+      "shadow_step_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 187,
+        "v15_7_incremental_adaptive_force_recovery": 451
+      },
+      "step_model_switch_identity_failure_count": 0,
+      "step_role_identity_failure_count": 0,
+      "step_role_identity_failure_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 0,
+        "v15_7_incremental_adaptive_force_recovery": 0
+      },
+      "suite": "human_safety",
+      "task_id": 4
+    },
+    {
+      "actual_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "actual_arm_mass_scale": 1.0,
+      "actual_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 0.7,
+        "mean": 0.7,
+        "minimum": 0.7
+      },
+      "actual_arm_sliding_friction_scale": 0.7,
+      "actual_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "actual_joint_damping_scale": 1.0,
+      "actual_model_switch_count": 439,
+      "actual_parameter_identity": true,
+      "actual_step_count": 354,
+      "actual_step_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 144,
+        "v15_7_incremental_adaptive_force_recovery": 210
+      },
+      "arm_body_ids": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "arm_dof_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "arm_geom_ids": [
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72
+      ],
+      "arm_joint_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "base_environment_id": "v15_8_mismatch_qual_obstacle_avoidance_human_task12_init8",
+      "before_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "before_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "before_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "condition_id": "actual_friction_0_7x_shadow_nominal",
+      "environment_id": "v15_8_mismatch_qual_obstacle_avoidance_human_task12_init8:actual_friction_0_7x_shadow_nominal",
+      "expected_parameter_identity": true,
+      "init_state_id": 8,
+      "model_mismatch_injected": true,
+      "model_mismatch_matches_registered_condition": true,
+      "observed_force_calibration_actual_parameter_read_by_selector": false,
+      "observed_force_calibration_bind_count": 252,
+      "observed_force_calibration_evaluation_count": 252,
+      "observed_force_calibration_maximum_selected_residual": 58.780134368913195,
+      "observed_force_calibration_nonminimum_bind_count": 0,
+      "observed_force_calibration_selected_candidate_counts": {
+        "arm_friction_0_7x": 30,
+        "arm_friction_1_3x": 16,
+        "arm_mass_0_8x": 5,
+        "arm_mass_1_2x": 7,
+        "joint_damping_0_7x": 30,
+        "joint_damping_1_3x": 33,
+        "nominal": 131
+      },
+      "observed_force_calibration_selected_condition_mismatch_count": 222,
+      "observed_force_calibration_selected_residual_exceeds_nominal_count": 0,
+      "observed_force_calibration_task_outcome_read": false,
+      "predictive_run_count": 84,
+      "predictive_run_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 42,
+        "v15_7_incremental_adaptive_force_recovery": 42
+      },
+      "shadow_and_actual_share_perturbed_model": false,
+      "shadow_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "shadow_arm_mass_scale": 1.0,
+      "shadow_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "shadow_arm_sliding_friction_scale": 1.0,
+      "shadow_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "shadow_joint_damping_scale": 1.0,
+      "shadow_model_switch_count": 608,
+      "shadow_parameter_identity": true,
+      "shadow_step_count": 608,
+      "shadow_step_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 192,
+        "v15_7_incremental_adaptive_force_recovery": 416
+      },
+      "step_model_switch_identity_failure_count": 0,
+      "step_role_identity_failure_count": 0,
+      "step_role_identity_failure_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 0,
+        "v15_7_incremental_adaptive_force_recovery": 0
+      },
+      "suite": "obstacle_avoidance_human",
+      "task_id": 12
+    },
+    {
+      "actual_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "actual_arm_mass_scale": 1.0,
+      "actual_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 0.7,
+        "mean": 0.7,
+        "minimum": 0.7
+      },
+      "actual_arm_sliding_friction_scale": 0.7,
+      "actual_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "actual_joint_damping_scale": 1.0,
+      "actual_model_switch_count": 427,
+      "actual_parameter_identity": true,
+      "actual_step_count": 342,
+      "actual_step_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 132,
+        "v15_7_incremental_adaptive_force_recovery": 210
+      },
+      "arm_body_ids": [
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "arm_dof_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "arm_geom_ids": [
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72
+      ],
+      "arm_joint_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "base_environment_id": "v15_8_mismatch_qual_human_safety_task9_init49",
+      "before_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "before_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "before_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "condition_id": "actual_friction_0_7x_shadow_nominal",
+      "environment_id": "v15_8_mismatch_qual_human_safety_task9_init49:actual_friction_0_7x_shadow_nominal",
+      "expected_parameter_identity": true,
+      "init_state_id": 49,
+      "model_mismatch_injected": true,
+      "model_mismatch_matches_registered_condition": true,
+      "observed_force_calibration_actual_parameter_read_by_selector": false,
+      "observed_force_calibration_bind_count": 252,
+      "observed_force_calibration_evaluation_count": 252,
+      "observed_force_calibration_maximum_selected_residual": 0.2,
+      "observed_force_calibration_nonminimum_bind_count": 0,
+      "observed_force_calibration_selected_candidate_counts": {
+        "arm_friction_0_7x": 44,
+        "arm_friction_1_3x": 16,
+        "arm_mass_0_8x": 1,
+        "arm_mass_1_2x": 2,
+        "joint_damping_0_7x": 26,
+        "joint_damping_1_3x": 31,
+        "nominal": 132
+      },
+      "observed_force_calibration_selected_condition_mismatch_count": 208,
+      "observed_force_calibration_selected_residual_exceeds_nominal_count": 0,
+      "observed_force_calibration_task_outcome_read": false,
+      "predictive_run_count": 84,
+      "predictive_run_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 42,
+        "v15_7_incremental_adaptive_force_recovery": 42
+      },
+      "shadow_and_actual_share_perturbed_model": false,
+      "shadow_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "shadow_arm_mass_scale": 1.0,
+      "shadow_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "shadow_arm_sliding_friction_scale": 1.0,
+      "shadow_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "shadow_joint_damping_scale": 1.0,
+      "shadow_model_switch_count": 643,
+      "shadow_parameter_identity": true,
+      "shadow_step_count": 643,
+      "shadow_step_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 191,
+        "v15_7_incremental_adaptive_force_recovery": 452
+      },
+      "step_model_switch_identity_failure_count": 0,
+      "step_role_identity_failure_count": 0,
+      "step_role_identity_failure_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 0,
+        "v15_7_incremental_adaptive_force_recovery": 0
+      },
+      "suite": "human_safety",
+      "task_id": 9
+    },
+    {
+      "actual_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "actual_arm_mass_scale": 1.0,
+      "actual_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 0.7,
+        "mean": 0.7,
+        "minimum": 0.7
+      },
+      "actual_arm_sliding_friction_scale": 0.7,
+      "actual_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "actual_joint_damping_scale": 1.0,
+      "actual_model_switch_count": 439,
+      "actual_parameter_identity": true,
+      "actual_step_count": 354,
+      "actual_step_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 144,
+        "v15_7_incremental_adaptive_force_recovery": 210
+      },
+      "arm_body_ids": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "arm_dof_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "arm_geom_ids": [
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72
+      ],
+      "arm_joint_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "base_environment_id": "v15_8_mismatch_qual_human_safety_task3_init45",
+      "before_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "before_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "before_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "condition_id": "actual_friction_0_7x_shadow_nominal",
+      "environment_id": "v15_8_mismatch_qual_human_safety_task3_init45:actual_friction_0_7x_shadow_nominal",
+      "expected_parameter_identity": true,
+      "init_state_id": 45,
+      "model_mismatch_injected": true,
+      "model_mismatch_matches_registered_condition": true,
+      "observed_force_calibration_actual_parameter_read_by_selector": false,
+      "observed_force_calibration_bind_count": 252,
+      "observed_force_calibration_evaluation_count": 252,
+      "observed_force_calibration_maximum_selected_residual": 216.99217750159687,
+      "observed_force_calibration_nonminimum_bind_count": 0,
+      "observed_force_calibration_selected_candidate_counts": {
+        "arm_friction_0_7x": 34,
+        "arm_friction_1_3x": 19,
+        "arm_mass_0_8x": 4,
+        "arm_mass_1_2x": 7,
+        "joint_damping_0_7x": 31,
+        "joint_damping_1_3x": 32,
+        "nominal": 125
+      },
+      "observed_force_calibration_selected_condition_mismatch_count": 218,
+      "observed_force_calibration_selected_residual_exceeds_nominal_count": 0,
+      "observed_force_calibration_task_outcome_read": false,
+      "predictive_run_count": 84,
+      "predictive_run_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 42,
+        "v15_7_incremental_adaptive_force_recovery": 42
+      },
+      "shadow_and_actual_share_perturbed_model": false,
+      "shadow_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "shadow_arm_mass_scale": 1.0,
+      "shadow_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "shadow_arm_sliding_friction_scale": 1.0,
+      "shadow_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "shadow_joint_damping_scale": 1.0,
+      "shadow_model_switch_count": 608,
+      "shadow_parameter_identity": true,
+      "shadow_step_count": 608,
+      "shadow_step_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 192,
+        "v15_7_incremental_adaptive_force_recovery": 416
+      },
+      "step_model_switch_identity_failure_count": 0,
+      "step_role_identity_failure_count": 0,
+      "step_role_identity_failure_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 0,
+        "v15_7_incremental_adaptive_force_recovery": 0
+      },
+      "suite": "human_safety",
+      "task_id": 3
+    },
+    {
+      "actual_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "actual_arm_mass_scale": 1.0,
+      "actual_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.3,
+        "mean": 1.2999999999999998,
+        "minimum": 1.3
+      },
+      "actual_arm_sliding_friction_scale": 1.3,
+      "actual_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "actual_joint_damping_scale": 1.0,
+      "actual_model_switch_count": 429,
+      "actual_parameter_identity": true,
+      "actual_step_count": 344,
+      "actual_step_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 134,
+        "v15_7_incremental_adaptive_force_recovery": 210
+      },
+      "arm_body_ids": [
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "arm_dof_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "arm_geom_ids": [
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72
+      ],
+      "arm_joint_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "base_environment_id": "v15_7_mismatch_qual_human_safety_task4_init34",
+      "before_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "before_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "before_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "condition_id": "actual_friction_1_3x_shadow_nominal",
+      "environment_id": "v15_7_mismatch_qual_human_safety_task4_init34:actual_friction_1_3x_shadow_nominal",
+      "expected_parameter_identity": true,
+      "init_state_id": 34,
+      "model_mismatch_injected": true,
+      "model_mismatch_matches_registered_condition": true,
+      "observed_force_calibration_actual_parameter_read_by_selector": false,
+      "observed_force_calibration_bind_count": 252,
+      "observed_force_calibration_evaluation_count": 252,
+      "observed_force_calibration_maximum_selected_residual": 3255.1145192333793,
+      "observed_force_calibration_nonminimum_bind_count": 0,
+      "observed_force_calibration_selected_candidate_counts": {
+        "arm_friction_0_7x": 24,
+        "arm_friction_1_3x": 35,
+        "arm_mass_0_8x": 1,
+        "arm_mass_1_2x": 2,
+        "joint_damping_0_7x": 26,
+        "joint_damping_1_3x": 31,
+        "nominal": 133
+      },
+      "observed_force_calibration_selected_condition_mismatch_count": 217,
+      "observed_force_calibration_selected_residual_exceeds_nominal_count": 0,
+      "observed_force_calibration_task_outcome_read": false,
+      "predictive_run_count": 84,
+      "predictive_run_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 42,
+        "v15_7_incremental_adaptive_force_recovery": 42
+      },
+      "shadow_and_actual_share_perturbed_model": false,
+      "shadow_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "shadow_arm_mass_scale": 1.0,
+      "shadow_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "shadow_arm_sliding_friction_scale": 1.0,
+      "shadow_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "shadow_joint_damping_scale": 1.0,
+      "shadow_model_switch_count": 636,
+      "shadow_parameter_identity": true,
+      "shadow_step_count": 636,
+      "shadow_step_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 191,
+        "v15_7_incremental_adaptive_force_recovery": 445
+      },
+      "step_model_switch_identity_failure_count": 0,
+      "step_role_identity_failure_count": 0,
+      "step_role_identity_failure_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 0,
+        "v15_7_incremental_adaptive_force_recovery": 0
+      },
+      "suite": "human_safety",
+      "task_id": 4
+    },
+    {
+      "actual_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "actual_arm_mass_scale": 1.0,
+      "actual_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.3,
+        "mean": 1.2999999999999998,
+        "minimum": 1.3
+      },
+      "actual_arm_sliding_friction_scale": 1.3,
+      "actual_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "actual_joint_damping_scale": 1.0,
+      "actual_model_switch_count": 439,
+      "actual_parameter_identity": true,
+      "actual_step_count": 354,
+      "actual_step_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 144,
+        "v15_7_incremental_adaptive_force_recovery": 210
+      },
+      "arm_body_ids": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "arm_dof_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "arm_geom_ids": [
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72
+      ],
+      "arm_joint_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "base_environment_id": "v15_8_mismatch_qual_obstacle_avoidance_human_task12_init8",
+      "before_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "before_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "before_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "condition_id": "actual_friction_1_3x_shadow_nominal",
+      "environment_id": "v15_8_mismatch_qual_obstacle_avoidance_human_task12_init8:actual_friction_1_3x_shadow_nominal",
+      "expected_parameter_identity": true,
+      "init_state_id": 8,
+      "model_mismatch_injected": true,
+      "model_mismatch_matches_registered_condition": true,
+      "observed_force_calibration_actual_parameter_read_by_selector": false,
+      "observed_force_calibration_bind_count": 252,
+      "observed_force_calibration_evaluation_count": 252,
+      "observed_force_calibration_maximum_selected_residual": 173.7745470220168,
+      "observed_force_calibration_nonminimum_bind_count": 0,
+      "observed_force_calibration_selected_candidate_counts": {
+        "arm_friction_0_7x": 29,
+        "arm_friction_1_3x": 24,
+        "arm_mass_0_8x": 2,
+        "arm_mass_1_2x": 3,
+        "joint_damping_0_7x": 30,
+        "joint_damping_1_3x": 35,
+        "nominal": 129
+      },
+      "observed_force_calibration_selected_condition_mismatch_count": 228,
+      "observed_force_calibration_selected_residual_exceeds_nominal_count": 0,
+      "observed_force_calibration_task_outcome_read": false,
+      "predictive_run_count": 84,
+      "predictive_run_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 42,
+        "v15_7_incremental_adaptive_force_recovery": 42
+      },
+      "shadow_and_actual_share_perturbed_model": false,
+      "shadow_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "shadow_arm_mass_scale": 1.0,
+      "shadow_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "shadow_arm_sliding_friction_scale": 1.0,
+      "shadow_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "shadow_joint_damping_scale": 1.0,
+      "shadow_model_switch_count": 608,
+      "shadow_parameter_identity": true,
+      "shadow_step_count": 608,
+      "shadow_step_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 192,
+        "v15_7_incremental_adaptive_force_recovery": 416
+      },
+      "step_model_switch_identity_failure_count": 0,
+      "step_role_identity_failure_count": 0,
+      "step_role_identity_failure_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 0,
+        "v15_7_incremental_adaptive_force_recovery": 0
+      },
+      "suite": "obstacle_avoidance_human",
+      "task_id": 12
+    },
+    {
+      "actual_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "actual_arm_mass_scale": 1.0,
+      "actual_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.3,
+        "mean": 1.2999999999999998,
+        "minimum": 1.3
+      },
+      "actual_arm_sliding_friction_scale": 1.3,
+      "actual_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "actual_joint_damping_scale": 1.0,
+      "actual_model_switch_count": 429,
+      "actual_parameter_identity": true,
+      "actual_step_count": 344,
+      "actual_step_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 134,
+        "v15_7_incremental_adaptive_force_recovery": 210
+      },
+      "arm_body_ids": [
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "arm_dof_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "arm_geom_ids": [
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72
+      ],
+      "arm_joint_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "base_environment_id": "v15_8_mismatch_qual_human_safety_task9_init49",
+      "before_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "before_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "before_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "condition_id": "actual_friction_1_3x_shadow_nominal",
+      "environment_id": "v15_8_mismatch_qual_human_safety_task9_init49:actual_friction_1_3x_shadow_nominal",
+      "expected_parameter_identity": true,
+      "init_state_id": 49,
+      "model_mismatch_injected": true,
+      "model_mismatch_matches_registered_condition": true,
+      "observed_force_calibration_actual_parameter_read_by_selector": false,
+      "observed_force_calibration_bind_count": 252,
+      "observed_force_calibration_evaluation_count": 252,
+      "observed_force_calibration_maximum_selected_residual": 1427.415088456814,
+      "observed_force_calibration_nonminimum_bind_count": 0,
+      "observed_force_calibration_selected_candidate_counts": {
+        "arm_friction_0_7x": 26,
+        "arm_friction_1_3x": 34,
+        "arm_mass_0_8x": 1,
+        "arm_mass_1_2x": 2,
+        "joint_damping_0_7x": 26,
+        "joint_damping_1_3x": 31,
+        "nominal": 132
+      },
+      "observed_force_calibration_selected_condition_mismatch_count": 218,
+      "observed_force_calibration_selected_residual_exceeds_nominal_count": 0,
+      "observed_force_calibration_task_outcome_read": false,
+      "predictive_run_count": 84,
+      "predictive_run_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 42,
+        "v15_7_incremental_adaptive_force_recovery": 42
+      },
+      "shadow_and_actual_share_perturbed_model": false,
+      "shadow_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "shadow_arm_mass_scale": 1.0,
+      "shadow_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "shadow_arm_sliding_friction_scale": 1.0,
+      "shadow_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "shadow_joint_damping_scale": 1.0,
+      "shadow_model_switch_count": 641,
+      "shadow_parameter_identity": true,
+      "shadow_step_count": 641,
+      "shadow_step_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 195,
+        "v15_7_incremental_adaptive_force_recovery": 446
+      },
+      "step_model_switch_identity_failure_count": 0,
+      "step_role_identity_failure_count": 0,
+      "step_role_identity_failure_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 0,
+        "v15_7_incremental_adaptive_force_recovery": 0
+      },
+      "suite": "human_safety",
+      "task_id": 9
+    },
+    {
+      "actual_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "actual_arm_mass_scale": 1.0,
+      "actual_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.3,
+        "mean": 1.2999999999999998,
+        "minimum": 1.3
+      },
+      "actual_arm_sliding_friction_scale": 1.3,
+      "actual_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "actual_joint_damping_scale": 1.0,
+      "actual_model_switch_count": 439,
+      "actual_parameter_identity": true,
+      "actual_step_count": 354,
+      "actual_step_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 144,
+        "v15_7_incremental_adaptive_force_recovery": 210
+      },
+      "arm_body_ids": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "arm_dof_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "arm_geom_ids": [
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72
+      ],
+      "arm_joint_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "base_environment_id": "v15_8_mismatch_qual_human_safety_task3_init45",
+      "before_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "before_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "before_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "condition_id": "actual_friction_1_3x_shadow_nominal",
+      "environment_id": "v15_8_mismatch_qual_human_safety_task3_init45:actual_friction_1_3x_shadow_nominal",
+      "expected_parameter_identity": true,
+      "init_state_id": 45,
+      "model_mismatch_injected": true,
+      "model_mismatch_matches_registered_condition": true,
+      "observed_force_calibration_actual_parameter_read_by_selector": false,
+      "observed_force_calibration_bind_count": 252,
+      "observed_force_calibration_evaluation_count": 252,
+      "observed_force_calibration_maximum_selected_residual": 177.39778554737958,
+      "observed_force_calibration_nonminimum_bind_count": 0,
+      "observed_force_calibration_selected_candidate_counts": {
+        "arm_friction_0_7x": 34,
+        "arm_friction_1_3x": 25,
+        "arm_mass_0_8x": 4,
+        "arm_mass_1_2x": 3,
+        "joint_damping_0_7x": 31,
+        "joint_damping_1_3x": 33,
+        "nominal": 122
+      },
+      "observed_force_calibration_selected_condition_mismatch_count": 227,
+      "observed_force_calibration_selected_residual_exceeds_nominal_count": 0,
+      "observed_force_calibration_task_outcome_read": false,
+      "predictive_run_count": 84,
+      "predictive_run_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 42,
+        "v15_7_incremental_adaptive_force_recovery": 42
+      },
+      "shadow_and_actual_share_perturbed_model": false,
+      "shadow_arm_body_mass": {
+        "count": 7,
+        "maximum": 3.0,
+        "mean": 2.0,
+        "minimum": 0.5
+      },
+      "shadow_arm_mass_scale": 1.0,
+      "shadow_arm_sliding_friction": {
+        "count": 44,
+        "maximum": 1.0,
+        "mean": 1.0,
+        "minimum": 1.0
+      },
+      "shadow_arm_sliding_friction_scale": 1.0,
+      "shadow_joint_damping": {
+        "count": 7,
+        "maximum": 0.1,
+        "mean": 0.07428571428571429,
+        "minimum": 0.01
+      },
+      "shadow_joint_damping_scale": 1.0,
+      "shadow_model_switch_count": 608,
+      "shadow_parameter_identity": true,
+      "shadow_step_count": 608,
+      "shadow_step_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 192,
+        "v15_7_incremental_adaptive_force_recovery": 416
+      },
+      "step_model_switch_identity_failure_count": 0,
+      "step_role_identity_failure_count": 0,
+      "step_role_identity_failure_count_by_baseline": {
+        "v14_dynamic_state_predictive_brake": 0,
+        "v15_7_incremental_adaptive_force_recovery": 0
+      },
+      "suite": "human_safety",
+      "task_id": 3
+    }
+  ],
+  "policy_loaded": false,
+  "qualification_claim_authorized": false,
+  "registered_force_thresholds_unchanged": true,
+  "schema": "proofalign.predictive-virtual-brake-v15.10-rolling-prebound-model-mismatch-development-evidence.v1",
+  "source_protocols": [
+    "experiments/proofalign_predictive_virtual_brake_v15_incremental_adaptive_force_model_mismatch_qualification_protocol.json",
+    "experiments/proofalign_predictive_virtual_brake_v15_observed_force_calibrated_model_mismatch_qualification_protocol.json"
+  ],
+  "task_outcome_read": false,
+  "task_utility_claim_authorized": false
+}

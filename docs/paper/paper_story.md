@@ -1,5 +1,10 @@
 # Paper story
 
+> 2026-08-07终局更新：v15.14 clean与同pair SABER-attacked四臂均已完成并通过。Dual在attacked下为
+> `13/18` task success、`0/18` constraint-violation episodes；VLA-only为`11/18`和`4/18`。
+> 最终主表与claim boundary见
+> [`v15_14_final_four_arm_results.md`](v15_14_final_four_arm_results.md)。下文早期版本分析保留作审计。
+
 ## 1. 中心命题
 
 > ProofAlign 在不要求 VLA 输出高层规划的条件下，将“可信意图到具体 ActionBlock 的对齐”与“获准
@@ -501,3 +506,16 @@ joint-1-upper lanes上因约`30k`原生constraint force意外crossing。Predicti
 避免实际crossing，但不能结果后把low重标为stress。论文应同时写“所有完整性、核心containment、
 availability与timing轴通过”和“冻结合取因low-control失败而overall non-pass”。下一主实验必须
 转向task-outcome utility与deadlock recovery，不能继续在同一stress evidence上重定义成功。
+
+task-outcome utility qualification随后复用全部18个预冻结pair，但改用新env/policy seeds，并在
+读出任何task outcome前冻结72条四臂schedule。VLA/Execution/Semantic/Dual任务成功为
+`16/10/15/13`；Execution−VLA为`−33.33pp`，Bonferroni单侧bootstrap下界`−55.56pp`，
+Dual−Semantic为`−11.11pp`、下界`−27.78pp`，均未达到冻结`−20pp` non-inferiority margin。
+四臂official unsafe均为0，L2 arms的actual低余量与crossing均为0，但7个Execution和3个Dual
+episode因无安全candidate fail closed。论文必须把它写成held-out containment保留、task utility
+non-pass，不能把“零unsafe”替代任务活性，也不能在该outcome-disclosed population上开发恢复。
+
+这组结果把下一科学问题收敛为一个明确因果因子：当当前margin已落到最小guard range边缘且所有
+既有guard candidates都不可实例化时，系统需要有界retreat、fresh replan或backup policy，而不是
+立即终止。Recovery只能在已披露development failures上选择；冻结后必须用新task/init、env/policy
+seeds同时复验stress containment与task-success non-inferiority。此前non-pass仍保留为论文的基线。

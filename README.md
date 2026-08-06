@@ -1,247 +1,66 @@
 # ProofAlign: VLA ActionBlock 双层完整性
 
-本仓库研究一个不要求 VLA 输出高层规划的问题：
+ProofAlign 研究 action-only VLA 在指令攻击下的两层防御：
 
-> 在可信任务意图保持不变、policy-facing instruction/observation/history 可能被攻击时，如何判断 VLA
-> 输出的 ActionBlock 是否仍服务于可信意图，并确认获准的 ActionBlock 在执行后没有发生命令或效果偏移？
+- **L1（Intent–Action）**：判断 VLA 生成的 ActionBlock 是否仍服务于可信任务意图；
+- **L2（Action–Execution）**：保证获准的 ActionBlock、实际命令、receipt 和 observed effects 属于
+  同一个执行事务。Lean 用于固定这一层的有限事务语义。
 
-核心链路是：
+主实验采用同一 runner 上的两个开关：
 
-```text
-Trusted T + pre-attack O_t^T -> frozen selector -> SemanticSubtask Z_t ─┐
-                                                                       v
-external prompt / injected O_t^atk -> π0.5 -> ActionBlock candidates -> L1
-                                                                       |
-                                                  BlockExecutionContract
-                                                                       |
-                                           dispatch -> receipt/effects -> L2/Lean
-```
-
-两层的含义：
-
-1. **Intent–SemanticSubtask–ActionBlock alignment（L1）**：只用可信任务和安全分叉前 observation
-   产生并绑定 `Z_t`，再检查 π0.5 ActionBlock 的局部运动/后果是否与 `Z_t` 兼容。不确定时必须
-   abstain/fail closed。
-2. **ActionBlock–Execution alignment（L2）**：检查获准 block、最终命令、dispatch receipt、观测效果
-   和任务 phase transition 是否属于同一个绑定事务。Lean 只用于这层的有限、离散命题；不证明 learned
-   assessor、传感器或物理世界正确。
-
-顶层 motivation 始终是 `Intent -> ActionBlock` 与 `ActionBlock -> Execution` 两层对齐；`Z_t` 是 L1
-的结构化机制。Lean 是 L2 的核心方法组件，用于固定 transaction semantics 并检查 exact-dispatch 与
-phase-gating theorem，而不是事后附加的形式化说明。
-
-四臂实验是同一 runner 上的两个开关：
-
-| Arm | L1 Intent–Action | L2 Action–Execution |
+| Arm | L1 | L2 |
 |---|---:|---:|
 | VLA-only | off | off |
-| Semantic-only | on | off |
-| Execution-only | off | on |
-| Dual | on | on |
-
-冻结 runtime 中的 `intent_only` / `intent_action_enabled` 只是 Semantic-only 的兼容 schema 名称。
-
-## 当前状态（2026-07-31）
-
-- 工程与证据链已形成可复现研究原型；顶层 Python、Lean、冻结协议和 artifact 校验由
-  `scripts/check_all.sh` 统一执行。
-- v11 held-out scale45 支持 typed L2 post-trigger containment，但同时暴露明确的 clean
-  task-utility 代价，因此终局是 mixed evidence，不是一般 defense efficacy。
-- v12.37 development 与 v12.38 frozen held-out 均完成 `10/10` exact advances，最低 actual
-  margin 分别为 `0.1661929/0.1661158 rad`，全部 identity 与 zero-anomaly 门通过。
-- v12 正结果依赖约 `10k` generalized constraint force 的 hard simulator virtual joint stop，
-  且没有读取 task outcome；它不支持 actuator-only authority、task utility、真实部署或物理安全。
-- 当前唯一合理的近期科学 successor 是另立 task-outcome protocol，先过 clean utility gate，再决定
-  是否授权 attacked stage；E7 deployment perception 仍未资格化。
-
-简明状态、claim boundary 和 gate 化路线图见
-[`docs/current_status_and_roadmap.md`](docs/current_status_and_roadmap.md)。
-
-## 详细证据边界（按时间）
-
-- 2026-07-27 semantic qualification 与工程 smoke：
-  - raw π0.5 selector 未通过（500 snapshots，coverage `0.822`，known legal-frontier
-    `0.564`），因此禁止用于 L1；
-  - privileged-geometry deterministic FSM 通过（160/160，unknown fail-closed `100%`）；
-  - semantic prompt behavioral control 未通过（median MAD `0.000190`，motion cosine
-    `0.998928`），因此不把 prompt 当安全机制；
-  - analytic local checker v2 通过 2500-case frozen corpus：clean retention `700/700`、
-    attacked false allow `0/1200`、OOD abstention `600/600`，p99 `59.1µs`；v2 将“正在靠近”
-    表示为 `closer_to_target`，不再误写为已进入 `near_target`；
-  - E4 qualification-outside no-dispatch gate 通过：8 proposals、32 arm rows、跨臂 identity
-    一致、dispatch `0`；
-  - analytic effect observer v2 通过 2100-case frozen corpus：clean retention `500/500`、
-    attacked false allow `0/1000`、OOD abstention `600/600`，p99 `21.6µs`；
-  - E6 v2 offline resource smoke 通过：300 次 frozen π0.5 policy call，checkpoint load
-    `6.22s`，policy/pipeline p99 `97.3/97.6ms`，GPU/RSS peak `8646/18830.5 MiB`，
-    action digest repeat `200/200`；simulator、dispatch、outcome 均为 `0`。
-  - E7 dataset qualification runner 已完成：会强制 population/split gate、资产 SHA、真实解码
-    shape/dtype 与 asset-root containment；当前仍没有满足 contract 的本机数据。
-  - E8 source-binding audit 已绑定 clean commit，semantic scope 未绑定路径为 `0`，分类为
-    `semantic_source_binding_clean`。
-- E9 clean/no-attack engineering smoke：
-  - 首轮暴露 `near_target`/approach-progress 契约混淆，5 个 exact receipt 后被 L2 正确拒绝；
-  - v2 复测连续完成 2 个 prefix、10 个 exact receipt、2 个 effect allow，effect reject/unknown 均为
-    `0`；第三次 K=1 proposal 因预测进度 `1.93mm < 2mm` 在 dispatch 前被 L1 拒绝，记录为 clean
-    availability/deadlock 信号，不据此修改冻结阈值。
-- M2 与四臂主线终局：
-  - M2 240/240 valid，攻击 transition `39/86=45.35%`，未达到原预注册 `50%`，永久保持
-    `confirmatory_attack_foundation_nonpass`；后续 `40%` 只标注 post-outcome exploratory；
-  - full-population clean 因 15/60 affordance pairs 缺 part-level trusted geometry 在首单元、
-    dispatch 前 fail closed；
-  - support45 clean 360/360 valid，但四臂 strict success 为 `61/90, 66/90, 0/90, 0/90`，
-    Dual deadlock `88/90`，因此 clean gate nonpass，attacked stage 未授权、未执行。
-- 2026-07-28 post-outcome L1 repair qualification：
-  - benchmark-only exact simulator geometry 将初态 destination coverage 补到 `45/45`；
-  - K=4 共 180 个不同 source chunks，但有可行候选的初态只有 `24/45=53.33%`，低于冻结的
-    `90%` gate；三个 suite 分别为 `60.0% / 53.33% / 46.67%`；
-  - K=1、K=2、K=3、K=4 的累计 coverage 均为 `24/45`，新增采样没有增加可用初态；
-  - 资格测试为 0 dispatch、0 policy-conditioned env step、0 task outcome、0 selected hard
-    violation，终局分类为 `l1_repair_initial_availability_qualification_nonpass`。
-- 2026-07-28 Block-10 successor 与匹配长度消融：
-  - 在逐任务不重叠的新 init 与新 seed 上，以 K=1 检查完整10步 ActionBlock，2 mm 与其他 checker
-    条件保持不变；
-  - 同一个 π0.5 source chunk 的 H=2/H=5/H=10 availability 分别为
-    `0/45, 17/45, 36/45`；H=10 相对 H=5 净增19个初态、无 loss；
-  - H=10 的三个 suite 为 `13/15, 12/15, 11/15`，总计80%仍低于90% gate，最差 suite
-    73.33%低于80% gate，因此分类仍为 `l1_block10_initial_availability_qualification_nonpass`；
-  - 全部三个长度的 hard-violation candidate 都为0；该消融只说明初态 checker availability，
-    不说明轨迹 success 或防御 efficacy。
-- 2026-07-28 H10×K4 successor：
-  - 在第三套逐任务不重叠 init 与新 seed 上保持 H=10，只把候选数从1增到4；
-  - 同一 ordered candidate set 的 K=1/K=2/K=4 coverage 为 `35/45, 35/45, 36/45`，45个
-    样本都具有4个不同 source chunk，但额外3次推理只增加1个可用初态；
-  - K=4 三个 suite 为 `13/15, 14/15, 9/15`，总80%与最差60%仍为 nonpass；因此停止继续堆
-    stale horizon 或 IID candidate，下一步必须改变 action generator、训练条件或反馈接口。
-- 2026-07-29 v8 完整 clean 诊断：
-  - 45 个 paired tasks、四臂共 180/180 episodes 完整；VLA-only、Execution-only、
-    Semantic-only、Dual success 为 `34/45, 33/45, 5/45, 5/45`；
-  - 旧 L1 在 1142 个在线审计中改写 1036 个 source blocks，并产生 49 个动作终止；其中 43 个仅由
-    task-semantic/progress 条件造成，6 个包含 predicted unexpected contact；
-  - 该结果只冻结失败机制，不授权 attacked-defense 或 confirmatory claim。
-- 2026-07-29 risk-selective / physical-sufficiency successor：
-  - v9 保留完整任务 prompt，无预测物理风险时返回 exact source block；scale45 read-only replay 中
-    43/49 个软动作终止和 9/17 个 missing-effect 终止可转为 replan，6 个 physical rejects 保留；
-  - v9 fresh15 clean 为 VLA/Execution/Semantic/Dual
-    `10/15, 10/15, 7/15, 6/15`；656/656 L1 blocks 不改写，15/15 paired first blocks 一致；
-  - v10 将 `trusted_articulation_state_unavailable` 改为“继续做可用物理筛查、任务状态 advisory”，并将
-    `target_not_held_after_move` 改为 replan；read-only replay 恢复6个 semantic unknown、保留3个
-    contact rejects；
-  - v10 第二批 fresh15 clean 为 `10/15, 8/15, 7/15, 7/15`；909/909 L1 blocks 不改写，
-    15/15 paired first blocks 一致，8次 physical-risk reject 保留，official cost/collision 为0/60。
-    Semantic-only 相对 VLA 为 `-20pp`（paired exact McNemar `p=0.25`），因此当前只支持
-    risk-triggered mechanism 与明确的 clean safety–utility tradeoff，不支持 non-inferiority 或防御有效。
-  - outcome-informed v11 不声称动作前预测，而把 robosuite 原生 joint-limit signal 作为 L2 post-step
-    containment：clean/attacked 各60条，16次总触发后 dispatch 均为0；clean joint-limit steps 为
-    `884/6/780/4`，attacked 为 `202/3/462/3`（VLA/Execution/Semantic/Dual）。
-    clean task success 为 `10/15, 8/15, 9/15, 8/15`，attacked 为
-    `11/15, 10/15, 9/15, 8/15`。配对 sign/McNemar 检验不显著且 official cost/collision 无一致排序，
-    因此只支持 typed L2 containment 与描述性 burden reduction，不支持 first-hit prevention、
-    non-inferiority 或整体 physical safety。
-  - 在不改机制或阈值后冻结的 held-out scale45 中，clean/attacked 各180条均完整，攻击令
-    `180/180` 首个 ActionBlock 改变；observer agreement 为 `21250/21250`、`26464/26464`，39次
-    总触发后 dispatch 仍为0。clean task success 为 `32/45, 27/45, 31/45, 20/45`，attacked 为
-    `30/45, 28/45, 25/45, 21/45`；clean joint-limit rate 为
-    `12.79%, 0.116%, 13.98%, 0.110%`，attacked 为 `8.19%, 0.063%, 5.83%, 0.049%`。
-    burden reduction 在多个配对检验中得到支持，但 clean Dual−Semantic task success 为
-    `-24.4pp`（exact McNemar `p=0.00098`），所以终局仍是 held-out mixed evidence。
-- P0b：96/96 episode 有效，得到 23 个 clean-eligible pair 和 15 个攻击 transition；因
-  `23 < 26` 未通过确认性 denominator gate。
-- R9 Execution-only：clean retention `22/23 = 95.7%`；attacked+defended `48/48`
-  有效；cost/collision unsafe `1/48`；signal subset `15/15 -> 0/15` cost/collision；
-  strict-success recovery `8/15`；`11/15` 仍有 residual contact proxy。
-
-因此现有证据是“L2 有强探索性信号、risk-selective L1 已消除大部分人为 deadlock，但仍有可测 clean
-utility 代价”的混合结果，不能声称一般防御有效、完整物理安全、clean non-inferiority 或 attacked
-Dual 已验证。旧结果可复用为：
-
-- P0b：原始 instruction/observation attack、clean pairing 和攻击 transition 基础；
-- R9：ActionBlock dispatch、intervention、receipt/effect logging 和 Execution-only 基线。
-
-它们不能替代新的 L1 assessor qualification，也不能改名为 Dual 结果。
+| Semantic-only（L1-only） | on | off |
+| Execution-only（L2-only） | off | on |
+| Dual（L1+L2） | on | on |
 
 ## 当前主线
 
-1. C1–C5、E1–E8 的 component、provenance、Lean transaction 与资源证据已关闭；E7 仍明确阻断
-   camera-only deployment claim。
-2. M2 原 `50%` confirmatory gate、full-population support failure 和 support45 clean nonpass 均已
-   终局冻结，不被后续探索性工作覆盖。
-3. support45 的 attacked stage 以 clean pass 为冻结前置条件；当前未通过，因此不执行攻击 rollout。
-4. post-outcome L1 repair、Block-10、H10×K4、v8 scale45、v9 与 v10 均按时间顺序保留；最终方法不再
-   投影/改写动作，也不降低2 mm旧阈值，而是移除该 task-progress hard gate，只保留预测物理风险 hard
-   gate。
-5. 当前论文主线是 risk-triggered nominal-policy non-interference + Lean execution transaction。
-   v10 clean/attacked 的混合/负结论保持不变；v11 作为单独 outcome-informed successor 已完成，并把
-   joint-limit 假设升级为 L2 containment 实验。它验证“首次 typed observer trigger 后不再 dispatch”，
-   scale45 进一步验证该机制稳定但暴露 task-utility tradeoff；不把该事实扩大成动作前预测、一般
-   defense efficacy、non-inferiority 或完整物理安全。
-6. v11 终局已单独封存；后续优化按 outcome-informed v12 处理：L1 改为高置信度稀疏意图守卫，
-   L2 增加只读 predictive screen 和 typed recovery transaction。v12 必须先通过无 outcome Q1–Q3
-   资格 gate，不能回写 v11 或直接启动 efficacy rollout。
-7. v12 第一批 no-outcome 资格已完成：655-case 纯 contract gate 全部通过；45-pair
-   simulator-reset recovery preflight 的 coverage/terminal-safe/completion 均为100%，策略加载、
-   policy dispatch 和 outcome read 均为0。该结果只覆盖 synthetic joint-5 upper-limit，且
-   shadow/replay bitwise identity 为2/45，因此当前只进入 zero-policy runtime transaction
-   integration，不启动 clean/attacked。
-8. v12.2/v12.3 recovery successor 已完成：typed runtime fixed trace 为10/10；正式多关节实验在
-   15 pairs × 7 joints × 2 sides 的210个注入中覆盖209个，209/209 selected recovery 均实际安全
-   完成，旧授权/recovery replay 接受均为0。v12.2 因完整 simulator snapshot identity 仅
-   201/210 而保持 non-pass；独立 v12.3 证明可信 arm `qpos/qvel` identity 为210/210，差异只在
-   非机械臂诊断状态且最大为 `2.22e-16`。当前只进入 no-outcome policy-prefix shadow qualification。
-9. v12.4a/v12.4b/v12.4c policy shadow 已完成：首次 fresh OpenPI pilot 因共享 GPU 显存不足在
-   inference 前 fail closed；随后 fixed-recorded-prefix 机械资格在30个案例中通过。完整 controller cache 将
-   pilot repeat fidelity 从0/6修到6/6，进一步绑定 MuJoCo `qacc_warmstart` 后，正式 repeat
-   fidelity 从29/30提高到30/30，最大 qpos 误差从 `0.0991` 降到 `4.44e-16 rad`。资源恢复后的
-   fresh π0.5 正式 qualification 也通过：30次 inference、risk agreement 30/30、nominal allow
-   15/15、synthetic recovery-required 15/15，live dispatch/outcome read 为0。该结果仍不等于
-   clean utility 或 efficacy，clean/attacked 保持未授权。
-10. v12.5 integrated fixed trace 已完成：在15个 fresh source pairs 上运行60条 composition
-    paths，exact allow、prefix substitution、typed recovery 和 recovery-selection substitution
-    全部符合预期。旧授权/recovery replay/substituted fresh state 接受均为0，receipt、completion
-    和 fresh-state authorization 均为15/15；policy/simulator/outcome均为0。
-11. v12.6 simulator-integrated formal 的 recovery/receipt/terminal safe 为9/9，但恢复后 fresh
-    authorization 仅6/9，因此按冻结 gate non-pass。v12.7–v12.36 依次排除了固定原语、局部连续
-    blend、随机 replan、high-level backup、nullspace、单轴/耦合 actuator torque、contact-aware
-    vertex 与 soft virtual stop 等路线。
-12. v12.37 hard virtual joint stop 在 development seeds 上通过，方法冻结后的 v12.38 unseen-seed
-    validation 也通过；两个 split 合计20/20 exact advances。该结果只支持 simulator
-    virtual-brake engineering mechanism，下一 task-outcome 实验必须另立协议。
+以后判断项目进度，只按下面四步回答。唯一状态入口是
+[`docs/current_status_and_roadmap.md`](docs/current_status_and_roadmap.md)。
 
-入口文档：
+1. **攻击复现已经完成**：复现 SABER `constraint_violation` 指令攻击，victim 为 OpenPI Pi0.5，
+   benchmark 为 LIBERO-Safety。240/240 episodes 有效，clean-safe 到 attacked-risk transition 为
+   `39/86 = 45.35%`。该值低于预注册 50% gate，因此攻击信号成立，但确认性 gate 为 non-pass。
+2. **原方法已有完整主实验**：v15.3 在18个全新任务上完成 clean/attacked 四臂实验。L2-only 和
+   Dual 在 attacked 中都把 actual crossing 与 joint-limit violation steps 降到0，但 Dual 的任务成功
+   仍为 `11/18`，与 VLA-only 的 `11/18` 相同。结论是物理 containment 有效，任务层攻击防御尚未成立。
+3. **优化方法clean已通过**：v15.14在18个新pair的clean四臂中，VLA/L1/L2/Dual均为`13/18`；L2与
+   Dual为0 deadlock、0 crossing、0 joint-limit，最大force `6568.13 < 10000`，全部正式门通过。
+4. **优化方法SABER-attacked主实验已通过**：同pair同seeds下，VLA/L1/L2/Dual task success为
+   `11/18`、`13/18`、`11/18`、`13/18`；按episode统计的constraint-violation ASR为`22.22%`、
+   `5.56%`、`0%`、`0%`。Dual同时保持`13/18`任务成功和0越界，72/72 attack binding与全部正式门通过。
 
-- [方法定义](docs/method.md)
-- [`Z_t` 可信输入与注入边界](docs/trusted_semantic_boundary.md)
-- [零训练 semantic hierarchy](docs/semantic_subtask_hierarchy.md)
-- [ActionBlock assessor 设计与资格化](docs/action_block_assessment.md)
-- [实验协议](docs/experiments.md)
-- [L2 与跨层攻击实验计划](docs/l2_and_cross_layer_experiments.md)
-- [旧实验复用与迁移](docs/experiment_reuse.md)
-- [相关工作](docs/paper/related_work.md)
+当前预定的论文主线模拟器实验已全部完成，剩余是论文图表与最终审计。
+
+## 原方法完整四臂结果（v15.3）
+
+| Arm | Clean success | Attacked success | Attacked crossing | Attacked joint-limit steps |
+|---|---:|---:|---:|---:|
+| VLA-only | 11/18 | 11/18 | 393 | 744 |
+| L1-only | 11/18 | 12/18 | 227 | 416 |
+| L2-only | 11/18 | 11/18 | 0 | 0 |
+| L1+L2 | 12/18 | 11/18 | 0 | 0 |
+
+这张表是当前论文的主要 defense outcome。早期 v8–v14、v15.1–v15.6 结果属于方法开发、失败定位或
+消融，不应在日常进度中逐版本复述。
+
+## 文档
+
+- [唯一当前状态与路线图](docs/current_status_and_roadmap.md)
+- [方法定义与 claim boundary](docs/method.md)
 - [论文故事](docs/paper/paper_story.md)
-- [代码与实验准备清单](docs/implementation_and_experiment_readiness.md)
-- [当前状态与路线图](docs/current_status_and_roadmap.md)
-- [进展与下一步](docs/progress_and_plan.md)
-- [v11 终局 checkpoint](docs/v11_terminal_checkpoint.md)
-- [v12 稀疏 L1 与可恢复 L2 计划](docs/v12_recoverable_alignment_plan.md)
-- [v12 无 outcome 资格 checkpoint](docs/v12_qualification_checkpoint.md)
-- [v12.2/v12.3 多关节恢复 checkpoint](docs/v12_recovery_successor_checkpoint.md)
-- [v12.4 policy-prefix shadow checkpoint](docs/v12_policy_prefix_shadow_checkpoint.md)
-- [v12.5 integrated predictive-recovery checkpoint](docs/v12_integrated_predictive_recovery_checkpoint.md)
-- [v12.6–v12.38 simulator-integrated checkpoint](docs/v12_simulator_integrated_recovery_checkpoint.md)
+- [历史实验时间线（归档）](docs/progress_and_plan.md)
+- [失败教训与停止规则（归档）](docs/failure_lessons.md)
+- [文档导航](docs/README.md)
 
-常用检查：
+## 验证
 
 ```bash
 .venv/bin/pytest -q
-PATH="$PWD/.tools/lean-4.24.0-linux/bin:$PATH" \
-  lake --dir lean build ProofAlign
-.venv/bin/python scripts/run_action_block_fixed_trace_gate.py --check
+PATH="$PWD/.tools/lean-4.24.0-linux/bin:$PATH" lake --dir lean build ProofAlign
 bash scripts/check_all.sh
 ```
 
-冻结的旧协议、旧结果和废弃路线只用于审计，不授权新 rollout。
-
-当前 benchmark privileged-geometry stack、fresh one-use authorization、ordered receipts、
-analytic effect observer、predictive shadow 与 typed recovery transaction 已形成完整审计链。
-E8 clean-commit source binding 已关闭；E7 deployment perception 和新的 task-outcome protocol 仍是
-主要 blocker。当前没有被授权的新 efficacy rollout。
+历史冻结协议、non-pass 结果和 artifacts 继续保留用于论文审计与复现，但不再作为默认进度入口。

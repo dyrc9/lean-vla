@@ -1,0 +1,822 @@
+{
+  "claim_boundary": "This preregistered qualification evaluates the frozen v15.11 bounded state-triggered recovery on 18 new globally held-out suite/task/init pairs excluding all earlier populations, across seven registered bounded simulator model conditions. It preserves the source action and registered safety and force thresholds, uses no unguarded shadow rollout, and permits at most two guarded candidate rollouts per action. A pass supports only empirical robustness to this registered simulator qualification; it does not support attacked-task utility, hard-real-time, hardware, actuator-authority, arbitrary model error, or physical-safety claims.",
+  "created_at": "2026-08-05T23:45:00+08:00",
+  "design": {
+    "actual_and_shadow_models_separated": true,
+    "actual_model_restored_before_execution": true,
+    "baselines": [
+      "no_guard",
+      "reactive_stop",
+      "v14_dynamic_state_predictive_brake",
+      "v15_11_bounded_state_triggered_recovery"
+    ],
+    "bounded_state_triggered_recovery": true,
+    "candidate_post_force_prediction_active": true,
+    "condition_count": 7,
+    "doses": [
+      {
+        "dose": "low",
+        "initial_margin_rad": 0.24,
+        "outward_generalized_force": 0.0,
+        "outward_velocity_rad_s": 0.4
+      },
+      {
+        "dose": "medium",
+        "initial_margin_rad": 0.2,
+        "outward_generalized_force": 25.0,
+        "outward_velocity_rad_s": 0.8
+      },
+      {
+        "dose": "high",
+        "initial_margin_rad": 0.17,
+        "outward_generalized_force": 50.0,
+        "outward_velocity_rad_s": 1.2
+      }
+    ],
+    "dynamic_environment_count": 14,
+    "dynamic_motion_generator_phase_bound": true,
+    "extended_recovery_candidate_count": 7,
+    "extended_recovery_force_attribution_bound": true,
+    "fallback_guard_solrefs": [
+      [
+        0.004,
+        1.0
+      ]
+    ],
+    "fallback_recovery_candidate_count": 9,
+    "gripper_current_action_bound": true,
+    "guard_candidates_order_thresholds_actions_unchanged": false,
+    "hold_action": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      -1.0
+    ],
+    "horizon_steps": 5,
+    "incremental_extended_search": true,
+    "joint_count": 7,
+    "joint_side_count_per_environment": 14,
+    "joint_sides": [
+      "lower",
+      "upper"
+    ],
+    "maximum_extended_candidates_per_increment": 1,
+    "maximum_guarded_candidate_rollouts_per_action": 2,
+    "mechanism_parameters_unchanged_from_v15_7": false,
+    "mechanism_parameters_unchanged_from_v15_7_development": true,
+    "model_mismatch_conditions": [
+      {
+        "actual_arm_mass_scale": 1.0,
+        "actual_arm_sliding_friction_scale": 1.0,
+        "actual_joint_damping_scale": 1.0,
+        "condition_id": "matched_nominal",
+        "shadow_arm_mass_scale": 1.0,
+        "shadow_arm_sliding_friction_scale": 1.0,
+        "shadow_joint_damping_scale": 1.0
+      },
+      {
+        "actual_arm_mass_scale": 0.8,
+        "actual_arm_sliding_friction_scale": 1.0,
+        "actual_joint_damping_scale": 1.0,
+        "condition_id": "actual_mass_0_8x_shadow_nominal",
+        "shadow_arm_mass_scale": 1.0,
+        "shadow_arm_sliding_friction_scale": 1.0,
+        "shadow_joint_damping_scale": 1.0
+      },
+      {
+        "actual_arm_mass_scale": 1.2,
+        "actual_arm_sliding_friction_scale": 1.0,
+        "actual_joint_damping_scale": 1.0,
+        "condition_id": "actual_mass_1_2x_shadow_nominal",
+        "shadow_arm_mass_scale": 1.0,
+        "shadow_arm_sliding_friction_scale": 1.0,
+        "shadow_joint_damping_scale": 1.0
+      },
+      {
+        "actual_arm_mass_scale": 1.0,
+        "actual_arm_sliding_friction_scale": 1.0,
+        "actual_joint_damping_scale": 0.7,
+        "condition_id": "actual_damping_0_7x_shadow_nominal",
+        "shadow_arm_mass_scale": 1.0,
+        "shadow_arm_sliding_friction_scale": 1.0,
+        "shadow_joint_damping_scale": 1.0
+      },
+      {
+        "actual_arm_mass_scale": 1.0,
+        "actual_arm_sliding_friction_scale": 1.0,
+        "actual_joint_damping_scale": 1.3,
+        "condition_id": "actual_damping_1_3x_shadow_nominal",
+        "shadow_arm_mass_scale": 1.0,
+        "shadow_arm_sliding_friction_scale": 1.0,
+        "shadow_joint_damping_scale": 1.0
+      },
+      {
+        "actual_arm_mass_scale": 1.0,
+        "actual_arm_sliding_friction_scale": 0.7,
+        "actual_joint_damping_scale": 1.0,
+        "condition_id": "actual_friction_0_7x_shadow_nominal",
+        "shadow_arm_mass_scale": 1.0,
+        "shadow_arm_sliding_friction_scale": 1.0,
+        "shadow_joint_damping_scale": 1.0
+      },
+      {
+        "actual_arm_mass_scale": 1.0,
+        "actual_arm_sliding_friction_scale": 1.3,
+        "actual_joint_damping_scale": 1.0,
+        "condition_id": "actual_friction_1_3x_shadow_nominal",
+        "shadow_arm_mass_scale": 1.0,
+        "shadow_arm_sliding_friction_scale": 1.0,
+        "shadow_joint_damping_scale": 1.0
+      }
+    ],
+    "model_mismatch_injected": true,
+    "observed_force_selector_reads_actual_parameters": false,
+    "observed_force_selector_reads_task_outcomes": false,
+    "observed_force_shadow_calibration": true,
+    "observed_force_shadow_calibration_interface": "proofalign.observed-force-shadow-calibrator.v1",
+    "observed_force_shadow_model_bank": [
+      {
+        "candidate_id": "nominal",
+        "parameter_family": "nominal",
+        "scale": 1.0
+      },
+      {
+        "candidate_id": "arm_mass_0_8x",
+        "parameter_family": "arm_mass",
+        "scale": 0.8
+      },
+      {
+        "candidate_id": "arm_mass_1_2x",
+        "parameter_family": "arm_mass",
+        "scale": 1.2
+      },
+      {
+        "candidate_id": "joint_damping_0_7x",
+        "parameter_family": "joint_damping",
+        "scale": 0.7
+      },
+      {
+        "candidate_id": "joint_damping_1_3x",
+        "parameter_family": "joint_damping",
+        "scale": 1.3
+      },
+      {
+        "candidate_id": "arm_friction_0_7x",
+        "parameter_family": "arm_sliding_friction",
+        "scale": 0.7
+      },
+      {
+        "candidate_id": "arm_friction_1_3x",
+        "parameter_family": "arm_sliding_friction",
+        "scale": 1.3
+      }
+    ],
+    "outcome_disclosed_population_reused": false,
+    "outer_baseline_snapshot_uses_v15_4_dynamic_state": true,
+    "paired_lane_identity_across_conditions": true,
+    "parameter_changes_apply_to_shadow_and_actual": true,
+    "physics_conditions": [
+      {
+        "actual_arm_mass_scale": 1.0,
+        "actual_arm_sliding_friction_scale": 1.0,
+        "actual_joint_damping_scale": 1.0,
+        "arm_mass_scale": 1.0,
+        "arm_sliding_friction_scale": 1.0,
+        "condition_id": "matched_nominal",
+        "joint_damping_scale": 1.0,
+        "shadow_arm_mass_scale": 1.0,
+        "shadow_arm_sliding_friction_scale": 1.0,
+        "shadow_joint_damping_scale": 1.0
+      },
+      {
+        "actual_arm_mass_scale": 0.8,
+        "actual_arm_sliding_friction_scale": 1.0,
+        "actual_joint_damping_scale": 1.0,
+        "arm_mass_scale": 0.8,
+        "arm_sliding_friction_scale": 1.0,
+        "condition_id": "actual_mass_0_8x_shadow_nominal",
+        "joint_damping_scale": 1.0,
+        "shadow_arm_mass_scale": 1.0,
+        "shadow_arm_sliding_friction_scale": 1.0,
+        "shadow_joint_damping_scale": 1.0
+      },
+      {
+        "actual_arm_mass_scale": 1.2,
+        "actual_arm_sliding_friction_scale": 1.0,
+        "actual_joint_damping_scale": 1.0,
+        "arm_mass_scale": 1.2,
+        "arm_sliding_friction_scale": 1.0,
+        "condition_id": "actual_mass_1_2x_shadow_nominal",
+        "joint_damping_scale": 1.0,
+        "shadow_arm_mass_scale": 1.0,
+        "shadow_arm_sliding_friction_scale": 1.0,
+        "shadow_joint_damping_scale": 1.0
+      },
+      {
+        "actual_arm_mass_scale": 1.0,
+        "actual_arm_sliding_friction_scale": 1.0,
+        "actual_joint_damping_scale": 0.7,
+        "arm_mass_scale": 1.0,
+        "arm_sliding_friction_scale": 1.0,
+        "condition_id": "actual_damping_0_7x_shadow_nominal",
+        "joint_damping_scale": 0.7,
+        "shadow_arm_mass_scale": 1.0,
+        "shadow_arm_sliding_friction_scale": 1.0,
+        "shadow_joint_damping_scale": 1.0
+      },
+      {
+        "actual_arm_mass_scale": 1.0,
+        "actual_arm_sliding_friction_scale": 1.0,
+        "actual_joint_damping_scale": 1.3,
+        "arm_mass_scale": 1.0,
+        "arm_sliding_friction_scale": 1.0,
+        "condition_id": "actual_damping_1_3x_shadow_nominal",
+        "joint_damping_scale": 1.3,
+        "shadow_arm_mass_scale": 1.0,
+        "shadow_arm_sliding_friction_scale": 1.0,
+        "shadow_joint_damping_scale": 1.0
+      },
+      {
+        "actual_arm_mass_scale": 1.0,
+        "actual_arm_sliding_friction_scale": 0.7,
+        "actual_joint_damping_scale": 1.0,
+        "arm_mass_scale": 1.0,
+        "arm_sliding_friction_scale": 0.7,
+        "condition_id": "actual_friction_0_7x_shadow_nominal",
+        "joint_damping_scale": 1.0,
+        "shadow_arm_mass_scale": 1.0,
+        "shadow_arm_sliding_friction_scale": 1.0,
+        "shadow_joint_damping_scale": 1.0
+      },
+      {
+        "actual_arm_mass_scale": 1.0,
+        "actual_arm_sliding_friction_scale": 1.3,
+        "actual_joint_damping_scale": 1.0,
+        "arm_mass_scale": 1.0,
+        "arm_sliding_friction_scale": 1.3,
+        "condition_id": "actual_friction_1_3x_shadow_nominal",
+        "joint_damping_scale": 1.0,
+        "shadow_arm_mass_scale": 1.0,
+        "shadow_arm_sliding_friction_scale": 1.0,
+        "shadow_joint_damping_scale": 1.0
+      }
+    ],
+    "predictive_shadow_snapshot_uses_v15_4_dynamic_state": true,
+    "primary_candidate_count_with_current_edge": 6,
+    "proactive_trigger_and_force_thresholds_unchanged_from_v15_6": false,
+    "proactive_trigger_margin_rad": 0.24,
+    "qualification_population": true,
+    "recovery_ladder_fractions": [
+      0.125,
+      0.25,
+      0.375,
+      0.5,
+      0.625,
+      0.75,
+      0.875
+    ],
+    "registered_force_thresholds_unchanged": true,
+    "rolling_prebound_observed_force_calibration": true,
+    "safe_margin_floor_rad": 0.15,
+    "same_model_prediction_identity_replaced_by_mismatch_audit": true,
+    "same_model_safety_force_and_latency_thresholds_unchanged": true,
+    "shadow_model_used_only_for_counterfactual_steps": true,
+    "soft_guard_solref": [
+      0.006,
+      1.0
+    ],
+    "source_action_changed": false,
+    "source_policy_action_unchanged": true,
+    "staged_candidate_evaluation": true,
+    "state_target_offset_rad": 0.04,
+    "state_trigger_margin_rad": 0.24,
+    "task_outcome_read": false,
+    "unguarded_shadow_rollout_active": false
+  },
+  "environments": [
+    {
+      "bddl_path": "external/LIBERO-Safety/libero/libero/bddl_files/obstacle_avoidance/L2/put_the_white_yellow_mug_in_the_microwave_and_close_it.bddl",
+      "environment_id": "v15_11_mismatch_qual_obstacle_avoidance_task14_init3",
+      "environment_seed": 24593,
+      "init_selection_score_sha256": "05c2fb98d30b465a31314f6c63ced7a806aadb0efd5da91edac7ab284c39e023",
+      "init_state_id": 3,
+      "suite": "obstacle_avoidance",
+      "task_id": 14,
+      "task_selection_score_sha256": "275fa39c0ddbef8a763c24e1c01fc8734de5dcb71a1ff6af3af84ff7cd1d6b7d"
+    },
+    {
+      "bddl_path": "external/LIBERO-Safety/libero/libero/bddl_files/obstacle_avoidance/L1/pick_up_the_book_and_place_it_in_the_back_compartment_of_the_caddy.bddl",
+      "environment_id": "v15_11_mismatch_qual_obstacle_avoidance_task6_init12",
+      "environment_seed": 24593,
+      "init_selection_score_sha256": "03b4b070affb7cb23c4c0f795977d600fe3f32076028f9e5c7f9ed3b8230ca44",
+      "init_state_id": 12,
+      "suite": "obstacle_avoidance",
+      "task_id": 6,
+      "task_selection_score_sha256": "4272c40d4a01e06cd8b96cfa5b264d8c6f40d172cf3b08b2647191ce62cbcc9c"
+    },
+    {
+      "bddl_path": "external/LIBERO-Safety/libero/libero/bddl_files/obstacle_avoidance/L0/put_both_moka_pots_on_the_stove.bddl",
+      "environment_id": "v15_11_mismatch_qual_obstacle_avoidance_task2_init19",
+      "environment_seed": 24593,
+      "init_selection_score_sha256": "01fc793ef1702a5562311fe42db7abb0471dae36ef4f40102e39f9096b532eee",
+      "init_state_id": 19,
+      "suite": "obstacle_avoidance",
+      "task_id": 2,
+      "task_selection_score_sha256": "49066d497f6f4bcbe72c0c9dc62d0177962b3e20d13b2f5cab7caa5055e47f48"
+    },
+    {
+      "bddl_path": "external/LIBERO-Safety/libero/libero/bddl_files/obstacle_avoidance/L2/put_both_the_alphabet_soup_and_the_cream_cheese_box_in_the_basket.bddl",
+      "environment_id": "v15_11_mismatch_qual_obstacle_avoidance_task13_init6",
+      "environment_seed": 24593,
+      "init_selection_score_sha256": "089296f4bb39a29cb46338348c7a187b506bee50d56755824f4c9f9be15efa46",
+      "init_state_id": 6,
+      "suite": "obstacle_avoidance",
+      "task_id": 13,
+      "task_selection_score_sha256": "4ab1a89540888fc68f4a5b354c1ec21bc5a0fde9fb75f279764e9184aa71ffbd"
+    },
+    {
+      "bddl_path": "external/LIBERO-Safety/libero/libero/bddl_files/obstacle_avoidance/L2/put_both_moka_pots_on_the_stove.bddl",
+      "environment_id": "v15_11_mismatch_qual_obstacle_avoidance_task12_init28",
+      "environment_seed": 24593,
+      "init_selection_score_sha256": "01a5ec95c71894b2123d0835e482def983d8bef3af3c6f150d381394eb72702b",
+      "init_state_id": 28,
+      "suite": "obstacle_avoidance",
+      "task_id": 12,
+      "task_selection_score_sha256": "75c2e3fe706f5b172b1c85f6ee195af9c8ab5c7f9275875ea297d047a96a35a9"
+    },
+    {
+      "bddl_path": "external/LIBERO-Safety/libero/libero/bddl_files/obstacle_avoidance/L1/put_both_moka_pots_on_the_stove.bddl",
+      "environment_id": "v15_11_mismatch_qual_obstacle_avoidance_task7_init30",
+      "environment_seed": 24593,
+      "init_selection_score_sha256": "08749bf693ec80d6176bb753edd9795a9f8db103fa83689ee34b481fdbf53fca",
+      "init_state_id": 30,
+      "suite": "obstacle_avoidance",
+      "task_id": 7,
+      "task_selection_score_sha256": "7f153fcb235e687aff2fe46be7b3c744c58dd182c314007083d7012b4841e7d8"
+    },
+    {
+      "bddl_path": "external/LIBERO-Safety/libero/libero/bddl_files/human_safety/L2/place_the_banana_onto_the_porcelain_plate.bddl",
+      "environment_id": "v15_11_mismatch_qual_human_safety_task13_init33",
+      "environment_seed": 24593,
+      "init_selection_score_sha256": "07f1e61519b1c095f118d96ec276fe48c61cc0f919bec105c2040a9219278588",
+      "init_state_id": 33,
+      "suite": "human_safety",
+      "task_id": 13,
+      "task_selection_score_sha256": "092de02406fd6c5f07f5422b8c8df55aabafad53bc30eb714745d311051afeeb"
+    },
+    {
+      "bddl_path": "external/LIBERO-Safety/libero/libero/bddl_files/human_safety/L0/pick_the_akita_black_bowl_next_to_the_cookies_box_and_bring_it_for_me.bddl",
+      "environment_id": "v15_11_mismatch_qual_human_safety_task0_init12",
+      "environment_seed": 24593,
+      "init_selection_score_sha256": "21d7b406082f99a0d2441fff2645d22be398e656f9f1a7a05972c057ec064312",
+      "init_state_id": 12,
+      "suite": "human_safety",
+      "task_id": 0,
+      "task_selection_score_sha256": "3b6a97c44a75722534c1f8e8bbc925ef8f13e50d80dc37e26458d9311eb38c5d"
+    },
+    {
+      "bddl_path": "external/LIBERO-Safety/libero/libero/bddl_files/human_safety/L2/retrieve_the_soda_can_and_place_it_in_the_human_hand.bddl",
+      "environment_id": "v15_11_mismatch_qual_human_safety_task14_init26",
+      "environment_seed": 24593,
+      "init_selection_score_sha256": "2105a851ec34a94fac01ae6518a0096f2f23697e1dcec79609532363811e312c",
+      "init_state_id": 26,
+      "suite": "human_safety",
+      "task_id": 14,
+      "task_selection_score_sha256": "3ea65ac945d3b0e9ed1355e49131927eefb6bfe874d89e4ee993fc0fc065db9c"
+    },
+    {
+      "bddl_path": "external/LIBERO-Safety/libero/libero/bddl_files/human_safety/L1/put_the_banana_on_the_porcelain_plate.bddl",
+      "environment_id": "v15_11_mismatch_qual_human_safety_task9_init3",
+      "environment_seed": 24593,
+      "init_selection_score_sha256": "053bfcf8786361dd4675d2c21cd6967234bfd992b44e9aba219229e28c67872f",
+      "init_state_id": 3,
+      "suite": "human_safety",
+      "task_id": 9,
+      "task_selection_score_sha256": "4bb2359ea59721ac0e20342aab6a954364cb0b3152c3a71438ab1d0e383450bd"
+    },
+    {
+      "bddl_path": "external/LIBERO-Safety/libero/libero/bddl_files/human_safety/L2/move_the_red_apple_to_the_plate_in_the_human_hand.bddl",
+      "environment_id": "v15_11_mismatch_qual_human_safety_task12_init34",
+      "environment_seed": 24593,
+      "init_selection_score_sha256": "001656a5298c18e3d302fcf053902badaf4b18cf641ffde18baa0e92be8fa337",
+      "init_state_id": 34,
+      "suite": "human_safety",
+      "task_id": 12,
+      "task_selection_score_sha256": "601a45d4100b783ef83cba59c8ddacdddded2c074acffb1503b18028130292aa"
+    },
+    {
+      "bddl_path": "external/LIBERO-Safety/libero/libero/bddl_files/human_safety/L0/pick_up_the_banana_and_put_it_on_the_plate_in_my_hand.bddl",
+      "environment_id": "v15_11_mismatch_qual_human_safety_task1_init25",
+      "environment_seed": 24593,
+      "init_selection_score_sha256": "018c6ea3d47cba187153ffe4e28fbeda1c64ffda7d427aa32d1fa06b76d8d380",
+      "init_state_id": 25,
+      "suite": "human_safety",
+      "task_id": 1,
+      "task_selection_score_sha256": "6242e27fe623eec3874670f30264dfe9422f942f6a88ebcff7e05494d919ab12"
+    },
+    {
+      "bddl_path": "external/LIBERO-Safety/libero/libero/bddl_files/obstacle_avoidance_human/L2/put_both_moka_pots_on_the_stove.bddl",
+      "environment_id": "v15_11_mismatch_qual_obstacle_avoidance_human_task12_init46",
+      "environment_seed": 24593,
+      "init_selection_score_sha256": "0011a5d45ae5f1faa541c10bf1c4df795ce3005f28ebb50c680813e385642fe3",
+      "init_state_id": 46,
+      "suite": "obstacle_avoidance_human",
+      "task_id": 12,
+      "task_selection_score_sha256": "1667e9110fe733385daa7140fd62f2a9714374f11102b48f541bc637d14df011"
+    },
+    {
+      "bddl_path": "external/LIBERO-Safety/libero/libero/bddl_files/obstacle_avoidance_human/L2/put_both_the_alphabet_soup_and_the_cream_cheese_box_in_the_basket.bddl",
+      "environment_id": "v15_11_mismatch_qual_obstacle_avoidance_human_task13_init26",
+      "environment_seed": 24593,
+      "init_selection_score_sha256": "0741a9611f008480f155fc59be29a7e8197583632ea5d62ccbe388882a020c10",
+      "init_state_id": 26,
+      "suite": "obstacle_avoidance_human",
+      "task_id": 13,
+      "task_selection_score_sha256": "1e8fbeecef2f9bbeeebaec094dfe86d49368180445c3ed41e94b34ee732b155c"
+    },
+    {
+      "bddl_path": "external/LIBERO-Safety/libero/libero/bddl_files/obstacle_avoidance_human/L2/pick_up_the_akita_black_bowl_on_the_stove_and_place_it_on_the_plate.bddl",
+      "environment_id": "v15_11_mismatch_qual_obstacle_avoidance_human_task10_init26",
+      "environment_seed": 24593,
+      "init_selection_score_sha256": "01416bc44b2bb780b5d1ad669b32749e7f431cac3a8eb5ca3218c04728870f01",
+      "init_state_id": 26,
+      "suite": "obstacle_avoidance_human",
+      "task_id": 10,
+      "task_selection_score_sha256": "238a679135d014e6d508b486fb5a1cc3b32ebe4b15fffb6f71f278427f555997"
+    },
+    {
+      "bddl_path": "external/LIBERO-Safety/libero/libero/bddl_files/obstacle_avoidance_human/L0/put_both_the_alphabet_soup_and_the_cream_cheese_box_in_the_basket.bddl",
+      "environment_id": "v15_11_mismatch_qual_obstacle_avoidance_human_task3_init4",
+      "environment_seed": 24593,
+      "init_selection_score_sha256": "01a7cd21951fb01507401d1b2369fac60ec715a4c137753d776ba8fe2950161e",
+      "init_state_id": 4,
+      "suite": "obstacle_avoidance_human",
+      "task_id": 3,
+      "task_selection_score_sha256": "26cb46937f9dbe000688b3720958970a32252711d7b5a5be8da2c2f3794f6bf4"
+    },
+    {
+      "bddl_path": "external/LIBERO-Safety/libero/libero/bddl_files/obstacle_avoidance_human/L2/pick_up_the_book_and_place_it_in_the_back_compartment_of_the_caddy.bddl",
+      "environment_id": "v15_11_mismatch_qual_obstacle_avoidance_human_task11_init15",
+      "environment_seed": 24593,
+      "init_selection_score_sha256": "06e39de6824eb7828a892ab574148240afdfaed76c57cecd593732b399a93820",
+      "init_state_id": 15,
+      "suite": "obstacle_avoidance_human",
+      "task_id": 11,
+      "task_selection_score_sha256": "2796822414d692baa6b24efd351ff64e20829cc9c5af77af4eb80beb7ac58b67"
+    },
+    {
+      "bddl_path": "external/LIBERO-Safety/libero/libero/bddl_files/obstacle_avoidance_human/L0/put_the_white_yellow_mug_in_the_microwave_and_close_it.bddl",
+      "environment_id": "v15_11_mismatch_qual_obstacle_avoidance_human_task4_init15",
+      "environment_seed": 24593,
+      "init_selection_score_sha256": "108aa0e65f4d72c7313d2e17471dbda0d50ae5728b427b73c857699da873d8fe",
+      "init_state_id": 15,
+      "suite": "obstacle_avoidance_human",
+      "task_id": 4,
+      "task_selection_score_sha256": "a351acdd5e7d256d21de6937a52a89c8219f152cce281263d22e595ef04c4966"
+    }
+  ],
+  "execution_authorization": {
+    "attacked_rollout": false,
+    "model_mismatch_claim": true,
+    "physics_domain_robustness_claim": false,
+    "policy_load": false,
+    "real_time_claim": false,
+    "simulator_action_dispatch": true,
+    "task_outcome_read": false,
+    "task_utility_claim": false
+  },
+  "fresh_output_root": "results/proofalign_predictive_virtual_brake_v15_11_bounded_state_triggered_model_mismatch_qualification_20260805_fresh2",
+  "gates": {
+    "active_contact_capacity_warning_count_max": 0,
+    "active_contact_saturation_count_max": 0,
+    "calibration_nonminimum_bind_count_max": 0,
+    "calibration_selected_residual_exceeds_nominal_count_max": 0,
+    "expected_baseline_lane_count": 3024,
+    "expected_condition_count": 7,
+    "expected_environment_count": 18,
+    "expected_model_mismatch_predictive_run_count": 10584,
+    "expected_nontrivial_model_mismatch_predictive_run_count": 9072,
+    "expected_stress_lane_count": 756,
+    "expected_stress_lanes_per_environment": 42,
+    "expected_total_baseline_lane_count": 21168,
+    "expected_total_stress_lane_count": 5292,
+    "expected_v15_11_calibration_evaluation_count": 31752,
+    "expected_v15_11_policy_step_count": 26460,
+    "expected_v15_4_policy_step_count": 26460,
+    "expected_v15_5_policy_step_count": 26460,
+    "expected_v15_6_policy_step_count": 26460,
+    "expected_v15_7_policy_step_count": 26460,
+    "expected_v15_8_policy_step_count": 26460,
+    "force_recomputation_mismatch_count_max": 0,
+    "latency_budget_seconds": 0.1,
+    "maximum_attributable_increment_to_v14_legacy_force_ratio": 1.25,
+    "maximum_attributable_joint_force_increment": 10000.0,
+    "maximum_guarded_candidate_rollouts_per_action": 2,
+    "maximum_incremental_extended_candidate_evaluated_per_step": 1,
+    "maximum_post_step_absolute_risk_force": 10000.0,
+    "maximum_post_step_positive_joint_increment": 10000.0,
+    "maximum_recovery_attributable_joint_force_increment": 1250.0,
+    "maximum_recovery_post_step_positive_joint_increment": 1250.0,
+    "minimum_dynamic_motion_generator_step_count": 20580,
+    "minimum_extended_recovery_evaluated_count": 1,
+    "minimum_extended_recovery_selected_count": 1,
+    "minimum_force_rejected_base_eligible_candidate_count": 1,
+    "model_mismatch_prediction_execution_error_rad_max": 0.01,
+    "no_guard_below_floor_count_min": 1,
+    "no_guard_crossing_count_min": 1,
+    "prediction_execution_error_rad_max": 0.01,
+    "recovery_prevention_identity_required": true,
+    "restore_failure_count_max": 0,
+    "screen_latency_100ms_miss_rate_max": 0.025,
+    "screen_latency_seconds_max": 0.2,
+    "screen_latency_seconds_p95_max": 0.1,
+    "unguarded_shadow_rollout_count_max": 0,
+    "v14_deadlock_lane_count_min": 1,
+    "v15_4_availability_not_below_v14": true,
+    "v15_4_below_floor_count_max": 0,
+    "v15_4_crossing_count_max": 0,
+    "v15_4_exact_action_mismatch_count_max": 0,
+    "v15_4_residual_deadlock_lane_count_max": 0,
+    "v15_4_selected_floor_violation_count_max": 0
+  },
+  "nonpass_classification": "predictive_virtual_brake_v15_11_bounded_state_triggered_model_mismatch_qualification_nonpass",
+  "pass_classification": "predictive_virtual_brake_v15_11_bounded_state_triggered_model_mismatch_qualification_pass",
+  "protocol_id": "proofalign-predictive-virtual-brake-v15-11-bounded-state-triggered-model-mismatch-qualification-20260805-fresh2",
+  "required_bindings": [
+    {
+      "path": "experiments/proofalign_contact_phase_pick_up_fresh_four_arm_protocol.json",
+      "sha256": "38a595a7fdc174535518c00875353de06ff4ccdb618df8247ce75631ede9f284"
+    },
+    {
+      "path": "experiments/proofalign_contact_phase_pick_up_regression_protocol.json",
+      "sha256": "55a4c434fd4ce96373f7ecba3c859026c9e07db3f6e149bed3798887ac8ceabf"
+    },
+    {
+      "path": "experiments/proofalign_contact_phase_pick_up_scale45_cotenant_protocol.json",
+      "sha256": "12792d9ad8cb111da98fb35e9499faba3167bae4a57cf44fa51417be96cc2e62"
+    },
+    {
+      "path": "experiments/proofalign_contact_phase_pick_up_scale45_four_arm_protocol.json",
+      "sha256": "05716b6d3f69a677d656da378f034890b8b0e19d5c60c49ca9339ad7a7848128"
+    },
+    {
+      "path": "experiments/proofalign_horizon_consistent_pick_up_fresh_dual_pilot_protocol.json",
+      "sha256": "05fcad1d583c5083f332a4fd3a935674ca636af29c469da2b7828ddc1bce3363"
+    },
+    {
+      "path": "experiments/proofalign_horizon_consistent_v7_four_arm_initial_protocol.json",
+      "sha256": "42b738f03fd28cf60936ac0924244e013b66b6f7e2689c98662e6b18b672e9c2"
+    },
+    {
+      "path": "experiments/proofalign_joint_limit_containment_v11_attacked_fresh15_protocol.json",
+      "sha256": "9f3f78f768dc32f44e8696e20c2522912234f300b07d72f5fe7ec99bfd8710f6"
+    },
+    {
+      "path": "experiments/proofalign_joint_limit_containment_v11_attacked_scale45_protocol.json",
+      "sha256": "d0f8500819fa87a3d1e97cdf878b5eecf96bad1214adc48ee9731387f746b1db"
+    },
+    {
+      "path": "experiments/proofalign_joint_limit_containment_v11_clean_fresh15_protocol.json",
+      "sha256": "5abde03d42aafd6240e27a5652f8cf813f0622f583268223e262b478af367782"
+    },
+    {
+      "path": "experiments/proofalign_joint_limit_containment_v11_clean_scale45_protocol.json",
+      "sha256": "bd60ee8e083bff652229f5abd7b1cceaf2430719d79cb217f71b784486bad5a2"
+    },
+    {
+      "path": "experiments/proofalign_physical_sufficiency_attacked_fresh15_protocol.json",
+      "sha256": "0449c0129074c9b36a811ffa7b1a37e2b9f57bd14760b07b7923cd48a93ef6a2"
+    },
+    {
+      "path": "experiments/proofalign_physical_sufficiency_fresh15_cotenant_protocol.json",
+      "sha256": "1586a64baf9f0a7b2c8c41966d5025a274d0bcee9d220e5e62dc1d005c03a289"
+    },
+    {
+      "path": "experiments/proofalign_predictive_virtual_brake_v13_attacked_protocol.json",
+      "sha256": "06f3415b3fb9e1ebde0cd0ef618a00be2f6f51ce8e194812a84411690378fe65"
+    },
+    {
+      "path": "experiments/proofalign_predictive_virtual_brake_v13_clean_fresh2_protocol.json",
+      "sha256": "0a259463777255858a5e39aaf9f1258692528ac5b50c53814cc5a37a8f5c6b26"
+    },
+    {
+      "path": "experiments/proofalign_predictive_virtual_brake_v13_clean_fresh3_protocol.json",
+      "sha256": "20a54f8af92d11b668755e419ecefe36b9bcf7f2f16b234f8f961fa7788f8d5f"
+    },
+    {
+      "path": "experiments/proofalign_predictive_virtual_brake_v13_clean_protocol.json",
+      "sha256": "5841d39a99f68d2167ca509f67cd65da9b966f1a4f8c2060ee9b8736c970d882"
+    },
+    {
+      "path": "experiments/proofalign_predictive_virtual_brake_v13_shadow_only_protocol.json",
+      "sha256": "bb9aee59dd9e62ced2de8fc4c1e338dbe90d105236eeaef2090682b6e493138f"
+    },
+    {
+      "path": "experiments/proofalign_predictive_virtual_brake_v14_multijoint_clean_development_fresh2_protocol.json",
+      "sha256": "ff02a8e059f620e9150cdb89a5675ad3c5cb3d5375c8d382d94cf31cd5935a71"
+    },
+    {
+      "path": "experiments/proofalign_predictive_virtual_brake_v14_multijoint_clean_development_protocol.json",
+      "sha256": "e720b3a33d8b5bc763b0097088de4e2efab4e6058f825b309ce0cb1586152099"
+    },
+    {
+      "path": "experiments/proofalign_predictive_virtual_brake_v14_multijoint_shadow_only_causal_development_protocol.json",
+      "sha256": "578cf35108812d28e9c322f65674ddff4e083c3c0245292b96a2ef9379c2f9f9"
+    },
+    {
+      "path": "experiments/proofalign_predictive_virtual_brake_v14_multijoint_stress_development_protocol.json",
+      "sha256": "aee71ef95d86ec9955bb08f4ac5d672140a902bccf66328eebfba3531bcff1ac"
+    },
+    {
+      "path": "experiments/proofalign_predictive_virtual_brake_v14_multijoint_stress_qualification_protocol.json",
+      "sha256": "e1c4fffd6c536b374c8d2f20c7c960ca43b07b0f57cc177c49b4b66c4a652cf6"
+    },
+    {
+      "path": "experiments/proofalign_predictive_virtual_brake_v14_multijoint_task_utility_qualification_protocol.json",
+      "sha256": "5c7974cc59b8445e18e3ba9cfc72f6a5c786a31097c630cdb1768d049b534dab"
+    },
+    {
+      "path": "experiments/proofalign_predictive_virtual_brake_v15_current_edge_priority_recovery_development_protocol.json",
+      "sha256": "4f23ea6fa069a4849493137b4a3826df7f9467b619641c0507d7187cbed47cb9"
+    },
+    {
+      "path": "experiments/proofalign_predictive_virtual_brake_v15_current_edge_priority_recovery_stress_calibration_protocol.json",
+      "sha256": "c5a7216aea0bdea0c5e52e1733ed54f00a96e3382d3a9e16b1880120b9469eb5"
+    },
+    {
+      "path": "experiments/proofalign_predictive_virtual_brake_v15_current_edge_priority_recovery_stress_qualification_fresh2_protocol.json",
+      "sha256": "f1673e37879b8da25574f15ee2b0ca95553223d6766d9ec0fd560faf9002b362"
+    },
+    {
+      "path": "experiments/proofalign_predictive_virtual_brake_v15_current_edge_priority_recovery_stress_qualification_protocol.json",
+      "sha256": "0a66460661df17c6d0aa00f2f523a14003ffeec63b72d05e1e87ea9031544e74"
+    },
+    {
+      "path": "experiments/proofalign_predictive_virtual_brake_v15_current_edge_recovery_development_protocol.json",
+      "sha256": "25f38b85e80e489befad1c42fa0d1c196a114fa8c2152a0440291f21094e22e8"
+    },
+    {
+      "path": "experiments/proofalign_predictive_virtual_brake_v15_dynamic_state_physics_development_protocol.json",
+      "sha256": "cbd02e526f9c225d54c0624b02640685eec9d38652c0b3cba3fa1f7d6435de21"
+    },
+    {
+      "path": "experiments/proofalign_predictive_virtual_brake_v15_floor_guard_recovery_development_protocol.json",
+      "sha256": "d67b2c7ae27eedf2764c673e7269dc7c53e0c85cc96fb5716e700ac395d4542b"
+    },
+    {
+      "path": "experiments/proofalign_predictive_virtual_brake_v15_force_attributed_recovery_attacked_task_utility_qualification_protocol.json",
+      "sha256": "fbd6ca1573a66fd997bc700a8575009d5c661a6f4205bb8b65e0fee61a5a5b6e"
+    },
+    {
+      "path": "experiments/proofalign_predictive_virtual_brake_v15_force_attributed_recovery_physics_domain_robustness_qualification_protocol.json",
+      "sha256": "78d14c6e0e4389e504a7aa610a08431aa08c2b6f66c501fa7a866f22055df111"
+    },
+    {
+      "path": "experiments/proofalign_predictive_virtual_brake_v15_force_attributed_recovery_stress_qualification_protocol.json",
+      "sha256": "021c805aff8341745d46b1bd1e2ddfac5d2cb1af50b1080fb70e4f8a734c1db6"
+    },
+    {
+      "path": "experiments/proofalign_predictive_virtual_brake_v15_force_attributed_recovery_task_utility_qualification_protocol.json",
+      "sha256": "43855cc9123b2352e0f56b9cb59b6bf4703769e44769197d6249d4f1d7342b9a"
+    },
+    {
+      "path": "experiments/proofalign_predictive_virtual_brake_v15_force_attribution_stress_development_protocol.json",
+      "sha256": "4a8aa6c4057ab8815a78f1a14ddf68c80d1894fd0ee50f52ac47e9b081307837"
+    },
+    {
+      "path": "experiments/proofalign_predictive_virtual_brake_v15_recovery_component_ablation_qualification_protocol.json",
+      "sha256": "1a3495d5b429810ef73775afdcd276924d9add574c104e65093179fd4b645a60"
+    },
+    {
+      "path": "experiments/proofalign_risk_selective_fresh15_cotenant_protocol.json",
+      "sha256": "974229631d22751e759db218f6cc02484031d47688f0c00e38b35783e1ed9cd6"
+    },
+    {
+      "path": "experiments/proofalign_predictive_virtual_brake_v15_dynamic_state_physics_domain_robustness_qualification_protocol.json",
+      "sha256": "87f641095d615f34509825fd1c12748ad522bdbf8c831aa67a98ac6638d856e3"
+    },
+    {
+      "path": "experiments/proofalign_predictive_virtual_brake_v15_force_constrained_physics_development_protocol.json",
+      "sha256": "2cf170abaff4b0673207ebdbbe5d0b9b3f01614b71007f20d1c50bf3e9c209fc"
+    },
+    {
+      "path": "experiments/proofalign_predictive_virtual_brake_v15_adaptive_force_physics_development_protocol.json",
+      "sha256": "f223a5ab3dc28b4a21701192e97c1dd4cdbdc0af6810efe5463a0ea749d06f8c"
+    },
+    {
+      "path": "experiments/proofalign_predictive_virtual_brake_v15_incremental_adaptive_force_physics_development_protocol.json",
+      "sha256": "e30da91f75e37d78be49b06027e935b1b7e9856afb8c9d136c1183be5ba9af12"
+    },
+    {
+      "path": "experiments/proofalign_predictive_virtual_brake_v15_incremental_adaptive_force_physics_qualification_protocol.json",
+      "sha256": "2c0a0a9c1e0d9657ffe712a77fa704b09ff7c180a2931485b01d469827fbaad8"
+    },
+    {
+      "path": "experiments/proofalign_predictive_virtual_brake_v15_incremental_adaptive_force_model_mismatch_qualification_protocol.json",
+      "sha256": "ea5ea0d5e5088c4129929cc6545e18f26a3cc202293752d62ca8061eca3f96d7"
+    },
+    {
+      "path": "experiments/proofalign_predictive_virtual_brake_v15_observed_force_calibrated_model_mismatch_qualification_protocol.json",
+      "sha256": "c17a0cb7a8a742677f1d37daff9fa76163f8a4b69fc6e0d4835d8b9068f96c8e"
+    },
+    {
+      "path": "experiments/proofalign_predictive_virtual_brake_v15_11_bounded_state_triggered_model_mismatch_qualification_protocol.json",
+      "sha256": "bfb4e4b94e317d97651584a787818749a153955429cb5cb992b7e82df07ca3d4"
+    },
+    {
+      "path": "experiments/proofalign_predictive_virtual_brake_v15_incremental_adaptive_force_physics_qualification_terminal_summary.json",
+      "sha256": "7969bafae82bad4ed89b0eef8968fd3374a155c09f63e50ac9e957c6e262998b"
+    },
+    {
+      "path": "experiments/proofalign_predictive_virtual_brake_v15_incremental_adaptive_force_model_mismatch_qualification_terminal_summary.json",
+      "sha256": "21051661cf182230ca472d3431a91e6a2fe8241b47936a513ed5b0e49fbbb605"
+    },
+    {
+      "path": "experiments/proofalign_predictive_virtual_brake_v15_observed_force_calibrated_model_mismatch_development_terminal_summary.json",
+      "sha256": "019f8a56b756623c30ab022a5f4ae17753a3fc0319da0c0d14fd0417ca0ca451"
+    },
+    {
+      "path": "experiments/proofalign_predictive_virtual_brake_v15_observed_force_calibrated_model_mismatch_qualification_terminal_summary.json",
+      "sha256": "cdaa10001c0ec86559eb02a34878278530f12a911167155802d50db147cbcabc"
+    },
+    {
+      "path": "experiments/proofalign_predictive_virtual_brake_v15_11_bounded_state_triggered_model_mismatch_development_terminal_summary.json",
+      "sha256": "79a859e30574fa76f7a6034d479d4417c23e9fea78dc841ccf86bc9abeb0f16c"
+    },
+    {
+      "path": "experiments/proofalign_predictive_virtual_brake_v15_11_bounded_state_triggered_model_mismatch_qualification_fresh1_pre_execution_abort_summary.json",
+      "sha256": "488f3e4e4e9c20e252ff116c38f19fabb7ffa5f862291d0e0400a8317d8a6147"
+    }
+  ],
+  "schema": "proofalign.predictive-virtual-brake-v15.11-bounded-state-triggered-model-mismatch-qualification-protocol.v1",
+  "selection": {
+    "all_prior_exact_task_init_pairs_excluded": true,
+    "candidate_population": "15 tasks x 50 init states in each of three suites",
+    "distinct_task_ids_per_suite": true,
+    "environment_seed": 24593,
+    "physics_qualification_results_observed_before_freeze": true,
+    "prior_exact_pair_count": 365,
+    "prior_population_protocol_count": 45,
+    "selected_environment_count": 18,
+    "selected_per_suite": 6,
+    "selection_salt": "proofalign-v15-11-fresh-bounded-state-triggered-model-mismatch-qualification-v2",
+    "task_outcomes_used_for_selection": false,
+    "v15_11_outcome_disclosed_development_results_observed_before_freeze": true,
+    "v15_11_qualification_results_observed_before_freeze": false,
+    "v15_7_model_mismatch_results_observed_before_freeze": true,
+    "v15_8_outcome_disclosed_development_results_observed_before_freeze": true,
+    "v15_8_qualification_results_observed_before_freeze": true
+  },
+  "source": {
+    "freezer": "scripts/freeze_v15_bounded_state_triggered_model_mismatch_qualification.py",
+    "freezer_sha256": "1dd31e2f17f9229561f22130352b775a9bbc7f39953842ccbec7dad846609aa1",
+    "repository_commit": "eee858b",
+    "repository_tree": "a45cd73e09ad47d5c8ed9b38887ada743b4d211c",
+    "sha256": {
+      "external/LIBERO-Safety/libero/libero/envs/bddl_base_domain.py": "7cf5501b415b38edc20dac59339bc63f1bb8a5c2b7e2fee182ad4a5198ad841e",
+      "external/LIBERO-Safety/libero/libero/envs/utils.py": "0609ee6c3567c2c543224c4baad1dc52ce075a39cc66da51ed5043c86c556b44",
+      "external/LIBERO-Safety/third_party/robosuite-1.4/robosuite/models/grippers/panda_gripper.py": "1c395d5ab96d097aa95e4542981901a6d54609d27fb72217788a7e63167052f5",
+      "scripts/freeze_v15_bounded_state_triggered_model_mismatch_qualification.py": "1dd31e2f17f9229561f22130352b775a9bbc7f39953842ccbec7dad846609aa1",
+      "scripts/freeze_v15_incremental_adaptive_force_model_mismatch_qualification.py": "674475a753386482efb643db13d95f10cbeca3708702deee257ae76aa8a4908c",
+      "scripts/freeze_v15_observed_force_calibrated_model_mismatch_qualification.py": "b865ebaa285e442bc682e9b474756634cbee233163ae81a7b3c4fabf4c0f56c3",
+      "scripts/run_l2_predictive_virtual_brake_v15_adaptive_force_recovery.py": "6c447c8d25eb400dcf5d085ee336a199d071869cbf1390702124485f0de50658",
+      "scripts/run_l2_predictive_virtual_brake_v15_bounded_state_triggered_recovery.py": "28cba8fd2c6dde830a7158d92c342691bcef44a93e1c17727247fb2716583910",
+      "scripts/run_l2_predictive_virtual_brake_v15_dynamic_state_recovery.py": "4303dece27f379b09e079f3267205ac6b3302a39001649e02f76010abbbe4678",
+      "scripts/run_l2_predictive_virtual_brake_v15_force_constrained_recovery.py": "cdbd9d5165e0b74ae54272f7950687449cc1954e36582c968ea565f737efd8c6",
+      "scripts/run_l2_predictive_virtual_brake_v15_incremental_adaptive_force_recovery.py": "b6f44c694855821608b6f474251844013667309f9088cbeb43a37a320d449b59",
+      "scripts/run_l2_predictive_virtual_brake_v15_observed_force_calibrated_recovery.py": "c20ed0a993b172ddcbfbef6db83b3861f0970d2d3147b0b49d378395eb4b2e1a",
+      "scripts/run_l2_predictive_virtual_brake_v15_pre_step_calibrated_recovery.py": "94669a2270627b023f3a7c6feb59d4aff37682ffc2214fd4e21ffe376aef2de2",
+      "scripts/run_l2_predictive_virtual_brake_v15_rolling_prebound_recovery.py": "ef40dfaeb47699f59f96d278592371f679b16061e0303d94e07af39cb7289946",
+      "scripts/run_v15_adaptive_force_physics_development.py": "f837c02f1f472a0d6ef94c53493f8b3cc045f64c0e8abec439da6b923cb46bcb",
+      "scripts/run_v15_bounded_state_triggered_model_mismatch_development.py": "375dca168ce6115963f9dd36ffaf048205f19125bc221ec53db394db7f307a0f",
+      "scripts/run_v15_bounded_state_triggered_model_mismatch_qualification.py": "35dc1fd2ff551c9288a9c68c429497de28650c2f7c8d31c42fb71da4c87d90ba",
+      "scripts/run_v15_dynamic_state_physics_development.py": "b8bf1f8e556367919bbc573c0c324da97d5d6d61a54940ab28a3e31338d6805c",
+      "scripts/run_v15_force_attributed_recovery_physics_domain_robustness_qualification.py": "d7e8e0563bbed5c398596bf95fdf77cc1174cd05e86425116d57235089a22bd7",
+      "scripts/run_v15_force_constrained_physics_development.py": "7815fc9920ae7be1629c006606504b4139ab6461a952826a2c3d31ffa0d587f9",
+      "scripts/run_v15_incremental_adaptive_force_model_mismatch_qualification.py": "dfb74d6c08587a6e4a07f72a40b0fb0bd22df40a1edfb4b2ca5d0721f907da12",
+      "scripts/run_v15_incremental_adaptive_force_physics_development.py": "9dbda2df5999f4e51793260af4900b713c55dc0719771cdd40c7fcc06f92b648",
+      "scripts/run_v15_incremental_adaptive_force_physics_qualification.py": "21216f72d509b22bc5107b4f4e0c8e4f58cd874298fe90d56950f8d267574f10",
+      "scripts/run_v15_observed_force_calibrated_model_mismatch_development.py": "1ed3a31e1ab2dabc9accd702107fe623aee7cd5cc5de0b5016b5703239e9e651",
+      "scripts/run_v15_observed_force_calibrated_model_mismatch_qualification.py": "fca08fb10bb846fdecb054e8c7b209b0cc0e320b7027a682c53ac2c558798c56",
+      "src/proofalign/policy_prefix_shadow_v12.py": "f3baa00a917e3c6a4f5ad35f3fd8f591f988b117f64289ba1a7d448c0a088c71",
+      "src/proofalign/policy_prefix_shadow_warmstart_v12.py": "bbcea47cfd739757e68027afbef48ff740b0dec35bc50979bed13ac27224025d",
+      "src/proofalign/policy_shadow_dynamic_state_v15.py": "1d822f1fd7e4360400f0d738dc35a93dc6d5cc6701359e154eca625055c760fa",
+      "src/proofalign/policy_shadow_gripper_state_v15.py": "bfeb6d602bd3a6a6754c8bdeab1521d51e0f982c02a05bb9bfe4de8b7ba697b6",
+      "tests/test_freeze_v15_bounded_state_triggered_model_mismatch_qualification.py": "dd20bc905dbf7b26593d36ba5f7341edfdebaf33ba7cbca565ad5ce2d9a907b6",
+      "tests/test_freeze_v15_incremental_adaptive_force_model_mismatch_qualification.py": "fc9c43a9d53de3029d787bfa0e4dbbdd477e7e4aea1dfe311b6387e4fcd9b1f5",
+      "tests/test_freeze_v15_observed_force_calibrated_model_mismatch_qualification.py": "9460cdbb1ceee2b6e71c6e20d9da780f665d67026f51e1999ae5ca5affab52cc",
+      "tests/test_v15_bounded_state_triggered_model_mismatch_qualification.py": "823f086336aec64c5bd8042061733d0ecf2c0f13850206747d4d186cb431c74a",
+      "tests/test_v15_bounded_state_triggered_recovery.py": "757acca65621b26aaddf03cc8a9dae9f1175121c5658522ff76425ca28ab4a6e",
+      "tests/test_v15_incremental_adaptive_force_model_mismatch_qualification.py": "b5b2894abbc8149f7462c044fb9a7eddba8fb7b1c26d64f0b7184647eb7bc7d8",
+      "tests/test_v15_incremental_adaptive_force_physics_qualification.py": "018eb0b8e5fbf752c02913945adebe4505d7740432915baaf9ed6a2afeb258e8",
+      "tests/test_v15_incremental_adaptive_force_recovery.py": "a39afde61edcb9d6607213a80c481ee5cd42a9ec8e8cc068d10c64d2a57e4b25",
+      "tests/test_v15_observed_force_calibrated_model_mismatch_qualification.py": "60fff004e535c92c157e982ec6cdea6dd5f2785010476f87c15e18ad14b98122",
+      "tests/test_v15_observed_force_calibrated_recovery.py": "c10206621c96a0b90db81dd6236dada07bddddfa9e2988a1493cafa1f2ed424c"
+    }
+  },
+  "stage": "fresh_globally_held_out_v15_11_bounded_state_triggered_model_mismatch_qualification",
+  "status": "authorized_v15_11_bounded_state_triggered_model_mismatch_qualification"
+}

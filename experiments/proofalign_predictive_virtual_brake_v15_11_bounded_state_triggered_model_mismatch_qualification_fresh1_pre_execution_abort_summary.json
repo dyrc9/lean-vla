@@ -1,0 +1,13 @@
+{
+  "schema": "proofalign.predictive-virtual-brake-v15.11-bounded-state-triggered-model-mismatch-qualification-pre-execution-abort-summary.v1",
+  "classification": "qualification_pre_execution_aborted",
+  "protocol_path": "experiments/proofalign_predictive_virtual_brake_v15_11_bounded_state_triggered_model_mismatch_qualification_protocol.json",
+  "protocol_sha256": "bfb4e4b94e317d97651584a787818749a153955429cb5cb992b7e82df07ca3d4",
+  "environment_count": 18,
+  "environment_execution_started": false,
+  "qualification_outcome_observed": false,
+  "output_root_created": false,
+  "reason": "The qualification runtime wrapper recursively called its patched calibrated-runtime context and raised RecursionError before environment configuration or rollout execution.",
+  "population_reuse_authorized": false,
+  "successor_rule": "Fresh2 must exclude all 18 exact suite/task/init pairs disclosed by this aborted protocol in addition to every earlier population."
+}

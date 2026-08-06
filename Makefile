@@ -1,4 +1,4 @@
-.PHONY: sync test lean paper-artifacts paper-artifacts-check action-block-check m1-readiness-check semantic-v4-c5-check e1-selector-check e1-fallback-check e2-conditioning-check e3-checker-check e4-no-dispatch-check e5-effect-observer-check e6-resource-smoke-preflight-check e7-perception-preflight-check semantic-post-e5-readiness-check l2-interface-check four-arm-v4-check four-arm-v4-exploratory-check v12-contract-check v12-simulator-preflight-check v12-recovery-successor-check v12-policy-shadow-check v12-integrated-recovery-check v12-hard-guard-check v13-clean-outcome-check v13-followup-check v14-multijoint-clean-check v14-multijoint-shadow-check v14-multijoint-stress-check check
+.PHONY: sync test lean paper-artifacts paper-artifacts-check action-block-check m1-readiness-check semantic-v4-c5-check e1-selector-check e1-fallback-check e2-conditioning-check e3-checker-check e4-no-dispatch-check e5-effect-observer-check e6-resource-smoke-preflight-check e7-perception-preflight-check semantic-post-e5-readiness-check l2-interface-check four-arm-v4-check four-arm-v4-exploratory-check v12-contract-check v12-simulator-preflight-check v12-recovery-successor-check v12-policy-shadow-check v12-integrated-recovery-check v12-hard-guard-check v13-clean-outcome-check v13-followup-check v14-multijoint-clean-check v14-multijoint-shadow-check v14-multijoint-stress-check v14-task-utility-check check
 
 PYTHON ?= .venv/bin/python
 UV ?= uv
@@ -251,4 +251,14 @@ v14-multijoint-stress-check:
 		echo "Skipping v14 stress qualification result check: local-only evidence is absent"; \
 	fi
 
-check: test lean paper-artifacts-check action-block-check m1-readiness-check semantic-v4-c5-check e1-selector-check e1-fallback-check e2-conditioning-check e3-checker-check e4-no-dispatch-check e5-effect-observer-check e6-resource-smoke-preflight-check e7-perception-preflight-check e8-source-binding-check semantic-post-e5-readiness-check four-arm-v4-check four-arm-v4-exploratory-check v12-contract-check v12-simulator-preflight-check v12-recovery-successor-check v12-policy-shadow-check v12-integrated-recovery-check v12-hard-guard-check v13-clean-outcome-check v13-followup-check v14-multijoint-clean-check v14-multijoint-shadow-check v14-multijoint-stress-check
+v14-task-utility-check:
+	$(PYTHON) -m pytest tests/test_v14_multijoint_task_utility_qualification.py tests/test_v14_multijoint_task_utility_qualification_terminal.py
+	$(PYTHON) scripts/freeze_v14_multijoint_task_utility_qualification.py --check
+	@if [ -f results/proofalign_predictive_virtual_brake_v14_multijoint_task_utility_qualification_20260731_fresh1/pilot_evidence.json ]; then \
+		$(PYTHON) scripts/run_v14_multijoint_task_utility_qualification.py --validate-results >/dev/null; \
+		$(PYTHON) scripts/freeze_v14_multijoint_task_utility_qualification_terminal.py --check; \
+	else \
+		echo "Skipping v14 task-utility result check: local-only evidence is absent"; \
+	fi
+
+check: test lean paper-artifacts-check action-block-check m1-readiness-check semantic-v4-c5-check e1-selector-check e1-fallback-check e2-conditioning-check e3-checker-check e4-no-dispatch-check e5-effect-observer-check e6-resource-smoke-preflight-check e7-perception-preflight-check e8-source-binding-check semantic-post-e5-readiness-check four-arm-v4-check four-arm-v4-exploratory-check v12-contract-check v12-simulator-preflight-check v12-recovery-successor-check v12-policy-shadow-check v12-integrated-recovery-check v12-hard-guard-check v13-clean-outcome-check v13-followup-check v14-multijoint-clean-check v14-multijoint-shadow-check v14-multijoint-stress-check v14-task-utility-check
