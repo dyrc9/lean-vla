@@ -1,0 +1,25 @@
+{
+  "schema": "proofalign.predictive-virtual-brake-v15.9-pre-step-calibrated-model-mismatch-development-terminal-summary.v1",
+  "classification": "outcome_disclosed_development_nonpass",
+  "development_pass": false,
+  "evidence_path": "results/proofalign_v15_9_pre_step_calibrated_model_mismatch_development_20260805/disclosed_development_evidence.json",
+  "evidence_sha256": "6ed8b0d2f463554bcd597dac1212c087f29ddc471c5acf15e71d6febb1a31349",
+  "lane_count": 1176,
+  "safety_result": {
+    "residual_deadlock_lane_count": 0,
+    "crossing_count": 0,
+    "below_floor_count": 0,
+    "maximum_abs_constraint_force": 9949.814843013926
+  },
+  "latency_result": {
+    "maximum_screen_latency_seconds": 0.3805294290650636,
+    "screen_latency_seconds_p95": 0.21364336705883033,
+    "screen_latency_100ms_miss_rate": 0.12414965986394558
+  },
+  "failed_gates": [
+    "maximum_action_screen_latency",
+    "p95_action_screen_latency",
+    "action_screen_100ms_miss_rate"
+  ],
+  "successor_interpretation": "Moving calibration outside the action screen preserved safety and force results but did not remove repeated predictive rollout latency."
+}

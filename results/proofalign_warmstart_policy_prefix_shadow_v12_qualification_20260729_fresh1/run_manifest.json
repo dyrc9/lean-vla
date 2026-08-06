@@ -1,0 +1,41 @@
+{
+  "classification": "warmstart_policy_prefix_shadow_v12_qualification_pass",
+  "completed_at": "2026-07-29T11:13:34.902111+00:00",
+  "created_at": "2026-07-29T11:11:16.680220+00:00",
+  "formal": true,
+  "gpu": 1,
+  "outcomes_observed": false,
+  "policy_loaded": false,
+  "preflight": {
+    "blockers": [],
+    "formal": true,
+    "free_disk_gib": 2111.5748138427734,
+    "output_root_absent": true,
+    "ready": true,
+    "schema": "proofalign.fixed-policy-prefix-shadow-v12-preflight.v1",
+    "selected_gpu": {
+      "driver_version": "570.133.07",
+      "index": 1,
+      "memory_total_mib": 49140,
+      "memory_used_mib": 27083,
+      "name": "NVIDIA RTX 6000 Ada Generation",
+      "uuid": "GPU-9630f0c1-163a-1dc7-564b-8242ac677a1e"
+    },
+    "worktree_status": []
+  },
+  "protocol_id": "proofalign-warmstart-policy-prefix-shadow-v12-qualification-20260729",
+  "protocol_sha256": "daac24f106307683b2dd35747abefc344a40d9f24c98cf815f098d3b8f47f9df",
+  "runtime_config": {
+    "config": {
+      "assets": "/home/ldx/lean-vla/external/LIBERO-Safety/libero/libero/assets",
+      "bddl_files": "/home/ldx/lean-vla/external/LIBERO-Safety/libero/libero/bddl_files",
+      "benchmark_root": "/home/ldx/lean-vla/external/LIBERO-Safety/libero/libero",
+      "datasets": "/home/ldx/lean-vla/external/LIBERO-Safety/libero/datasets",
+      "init_states": "/home/ldx/lean-vla/external/LIBERO-Safety/libero/libero/init_files"
+    },
+    "directory": "/home/ldx/lean-vla/results/proofalign_warmstart_policy_prefix_shadow_v12_qualification_20260729_fresh1/runtime/libero_config",
+    "sha256": "8d1cc08bf89c204f7d592bc6b87f4ffebeed91f7e870097b340a858c07741a3c"
+  },
+  "schema": "proofalign.fixed-policy-prefix-shadow-v12-run.v1",
+  "status": "complete"
+}

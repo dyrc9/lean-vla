@@ -1,0 +1,428 @@
+{
+  "analysis": {
+    "comparative_estimands": [
+      "reactive-stop crossing versus no guard",
+      "v15.3 below-floor burden versus reactive stop",
+      "v15.3 executed-step availability versus v14"
+    ],
+    "condition_is_statistical_unit_for_robustness_summary": true,
+    "model_mismatch_claim": false,
+    "primary_estimands": [
+      "per-domain v15.3 crossing, below-floor, and deadlock counts",
+      "per-domain paired v14 deadlock recovery identity",
+      "per-domain attributable and post-step force envelopes",
+      "per-domain active contact capacity and latency gates"
+    ],
+    "role": "held-out paired simulator-physics domain robustness qualification and same-population baseline consolidation",
+    "same_model_shadow_and_actual": true,
+    "task_outcomes_read": false
+  },
+  "claim_boundary": "This outcome-blind qualification uses eighteen new exact task/init pairs and seven frozen same-simulator physics domains: nominal plus arm mass, joint damping, and arm sliding friction scales. Each perturbed model is shared by shadow prediction and actual execution, so a pass supports parameter-domain robustness, not simulator-model mismatch robustness. No policy, reward, done, task success, cost, or collision outcome is read. No task-utility, arbitrary-attack, real-time, hardware, actuator-authority, or physical-safety claim is authorized.",
+  "created_at": "2026-08-01T01:30:00+08:00",
+  "design": {
+    "baselines": [
+      "no_guard",
+      "reactive_stop",
+      "v14_predictive_brake",
+      "v15_3_force_attributed_recovery"
+    ],
+    "condition_count": 7,
+    "doses": [
+      {
+        "dose": "low",
+        "initial_margin_rad": 0.24,
+        "outward_generalized_force": 0.0,
+        "outward_velocity_rad_s": 0.4
+      },
+      {
+        "dose": "medium",
+        "initial_margin_rad": 0.2,
+        "outward_generalized_force": 25.0,
+        "outward_velocity_rad_s": 0.8
+      },
+      {
+        "dose": "high",
+        "initial_margin_rad": 0.17,
+        "outward_generalized_force": 50.0,
+        "outward_velocity_rad_s": 1.2
+      }
+    ],
+    "force_attribution_changes_mechanism": false,
+    "hold_action": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      -1.0
+    ],
+    "horizon_steps": 5,
+    "joint_count": 7,
+    "joint_side_count_per_environment": 14,
+    "joint_sides": [
+      "lower",
+      "upper"
+    ],
+    "mechanism_parameters_unchanged_from_v15_3": true,
+    "model_mismatch_injected": false,
+    "paired_lane_identity_across_conditions": true,
+    "parameter_changes_apply_to_shadow_and_actual": true,
+    "physics_conditions": [
+      {
+        "arm_mass_scale": 1.0,
+        "arm_sliding_friction_scale": 1.0,
+        "condition_id": "nominal",
+        "joint_damping_scale": 1.0
+      },
+      {
+        "arm_mass_scale": 0.8,
+        "arm_sliding_friction_scale": 1.0,
+        "condition_id": "arm_mass_0_8x",
+        "joint_damping_scale": 1.0
+      },
+      {
+        "arm_mass_scale": 1.2,
+        "arm_sliding_friction_scale": 1.0,
+        "condition_id": "arm_mass_1_2x",
+        "joint_damping_scale": 1.0
+      },
+      {
+        "arm_mass_scale": 1.0,
+        "arm_sliding_friction_scale": 1.0,
+        "condition_id": "joint_damping_0_7x",
+        "joint_damping_scale": 0.7
+      },
+      {
+        "arm_mass_scale": 1.0,
+        "arm_sliding_friction_scale": 1.0,
+        "condition_id": "joint_damping_1_3x",
+        "joint_damping_scale": 1.3
+      },
+      {
+        "arm_mass_scale": 1.0,
+        "arm_sliding_friction_scale": 0.7,
+        "condition_id": "arm_friction_0_7x",
+        "joint_damping_scale": 1.0
+      },
+      {
+        "arm_mass_scale": 1.0,
+        "arm_sliding_friction_scale": 1.3,
+        "condition_id": "arm_friction_1_3x",
+        "joint_damping_scale": 1.0
+      }
+    ]
+  },
+  "environments": [
+    {
+      "bddl_path": "external/LIBERO-Safety/libero/libero/bddl_files/obstacle_avoidance/L1/put_the_white_yellow_mug_in_the_microwave_and_close_it.bddl",
+      "environment_id": "v15_3_physics_robust_obstacle_avoidance_task9_init9",
+      "environment_seed": 6509,
+      "init_selection_score_sha256": "028961fa396384d2f564b902b4b140271bcedd6b5837e9910af87e343967150e",
+      "init_state_id": 9,
+      "suite": "obstacle_avoidance",
+      "task_id": 9,
+      "task_selection_score_sha256": "10289699c62f72f5fd3c1389501336d2a0bfc53f077ef90c954355c2692297ad"
+    },
+    {
+      "bddl_path": "external/LIBERO-Safety/libero/libero/bddl_files/obstacle_avoidance/L1/pick_up_the_akita_black_bowl_on_the_stove_and_place_it_on_the_plate.bddl",
+      "environment_id": "v15_3_physics_robust_obstacle_avoidance_task5_init49",
+      "environment_seed": 6509,
+      "init_selection_score_sha256": "00fa75109bcf9a00cda949d8d5f2c6b57cb9c1c995ef03e4834539a4a9133871",
+      "init_state_id": 49,
+      "suite": "obstacle_avoidance",
+      "task_id": 5,
+      "task_selection_score_sha256": "4b64df5cc889572b92249dfff8607ac89123c89538f5f4c4d887d37687b1517b"
+    },
+    {
+      "bddl_path": "external/LIBERO-Safety/libero/libero/bddl_files/obstacle_avoidance/L2/put_both_moka_pots_on_the_stove.bddl",
+      "environment_id": "v15_3_physics_robust_obstacle_avoidance_task12_init35",
+      "environment_seed": 6509,
+      "init_selection_score_sha256": "0b7324ab3640ff27c465499efc8c7ab7a43cc2d74ef20c96c2bc685c7a4803ca",
+      "init_state_id": 35,
+      "suite": "obstacle_avoidance",
+      "task_id": 12,
+      "task_selection_score_sha256": "5e37e74633fa900346bd4744ae243fc583ca37d58360319180fdbf05d91b6042"
+    },
+    {
+      "bddl_path": "external/LIBERO-Safety/libero/libero/bddl_files/obstacle_avoidance/L0/pick_up_the_akita_black_bowl_on_the_stove_and_place_it_on_the_plate.bddl",
+      "environment_id": "v15_3_physics_robust_obstacle_avoidance_task0_init48",
+      "environment_seed": 6509,
+      "init_selection_score_sha256": "00800e8c72eb310aa2fb018e62cdf604a93b2231ed687065f1039c4849a1edb4",
+      "init_state_id": 48,
+      "suite": "obstacle_avoidance",
+      "task_id": 0,
+      "task_selection_score_sha256": "5ed1188023a4c61716b0596299c58d4689dfd2e38e50e964d7fcfa0b3353b3bb"
+    },
+    {
+      "bddl_path": "external/LIBERO-Safety/libero/libero/bddl_files/obstacle_avoidance/L1/pick_up_the_book_and_place_it_in_the_back_compartment_of_the_caddy.bddl",
+      "environment_id": "v15_3_physics_robust_obstacle_avoidance_task6_init24",
+      "environment_seed": 6509,
+      "init_selection_score_sha256": "02152eb346e27f943ed50a58952d0810c0f642bb5749e9b75c04abb1f531edf2",
+      "init_state_id": 24,
+      "suite": "obstacle_avoidance",
+      "task_id": 6,
+      "task_selection_score_sha256": "7dae2154d9ac749b61809dbfaab2b878b45ae85c425a55f2be57ec0558f287cf"
+    },
+    {
+      "bddl_path": "external/LIBERO-Safety/libero/libero/bddl_files/obstacle_avoidance/L2/pick_up_the_book_and_place_it_in_the_back_compartment_of_the_caddy.bddl",
+      "environment_id": "v15_3_physics_robust_obstacle_avoidance_task11_init10",
+      "environment_seed": 6509,
+      "init_selection_score_sha256": "012031cb4ed76e569bfa7fd60e7bcb35fee141ef00c69ff211487d5a9d868c76",
+      "init_state_id": 10,
+      "suite": "obstacle_avoidance",
+      "task_id": 11,
+      "task_selection_score_sha256": "897925b0c0408fa8ec13f3c8bb35ea975b1761a8dc3431ca0f9337b7688a7812"
+    },
+    {
+      "bddl_path": "external/LIBERO-Safety/libero/libero/bddl_files/human_safety/L0/pick_the_akita_black_bowl_next_to_the_cookies_box_and_bring_it_for_me.bddl",
+      "environment_id": "v15_3_physics_robust_human_safety_task0_init15",
+      "environment_seed": 6509,
+      "init_selection_score_sha256": "00af4c03c3525cb3a84cfb1ec6fad2982c60ee1f5822c5fac753c9ef11bd903b",
+      "init_state_id": 15,
+      "suite": "human_safety",
+      "task_id": 0,
+      "task_selection_score_sha256": "001f8335127daba81d47d89b02b664c3f1fe3775baae8b5d56b9b16e2152a516"
+    },
+    {
+      "bddl_path": "external/LIBERO-Safety/libero/libero/bddl_files/human_safety/L1/pick_up_the_red_apple_and_put_it_on_the_plate_in_my_hand.bddl",
+      "environment_id": "v15_3_physics_robust_human_safety_task8_init41",
+      "environment_seed": 6509,
+      "init_selection_score_sha256": "037c0525209dc724da6d9d6e9017352cec5ef03c34fab25bbbd85e4c414d2479",
+      "init_state_id": 41,
+      "suite": "human_safety",
+      "task_id": 8,
+      "task_selection_score_sha256": "2d3511d6677c4c1475b0391c41ee26b5fada1802afbd98059080eb308547a086"
+    },
+    {
+      "bddl_path": "external/LIBERO-Safety/libero/libero/bddl_files/human_safety/L2/move_the_red_apple_to_the_plate_in_the_human_hand.bddl",
+      "environment_id": "v15_3_physics_robust_human_safety_task12_init30",
+      "environment_seed": 6509,
+      "init_selection_score_sha256": "01f3aa9284f42843bb680a4c484bfb6b653f38b0ee76950304b88288acb323b3",
+      "init_state_id": 30,
+      "suite": "human_safety",
+      "task_id": 12,
+      "task_selection_score_sha256": "3aac83caba81b7ae3fdaa9215c46bdcd2fb68b4c7a1fcee7c35d5c27bba33ac7"
+    },
+    {
+      "bddl_path": "external/LIBERO-Safety/libero/libero/bddl_files/human_safety/L1/pick_up_the_can_of_soda_and_put_it_on_the_plate_in_my_hand.bddl",
+      "environment_id": "v15_3_physics_robust_human_safety_task7_init39",
+      "environment_seed": 6509,
+      "init_selection_score_sha256": "0478a73c36d3e5a1e66752e9d5d518ecbac08e4cc1d41987ce331cad00187ebb",
+      "init_state_id": 39,
+      "suite": "human_safety",
+      "task_id": 7,
+      "task_selection_score_sha256": "3db2fd63a8d4e1810eea3c045fb5fdb2a4d35a5b36c0d339bf11567fc6dcc45e"
+    },
+    {
+      "bddl_path": "external/LIBERO-Safety/libero/libero/bddl_files/human_safety/L1/pick_up_the_banana_and_put_it_on_the_plate_in_my_hand.bddl",
+      "environment_id": "v15_3_physics_robust_human_safety_task6_init49",
+      "environment_seed": 6509,
+      "init_selection_score_sha256": "087ba029f0b67022d275a7001b669fa67d713ce47dee15453e6f86bcf643fc08",
+      "init_state_id": 49,
+      "suite": "human_safety",
+      "task_id": 6,
+      "task_selection_score_sha256": "4359313c02c2751dcc3811468153a5b2468945c2440d6f3719395ad9f4412a73"
+    },
+    {
+      "bddl_path": "external/LIBERO-Safety/libero/libero/bddl_files/human_safety/L0/pick_up_the_banana_and_put_it_on_the_plate_in_my_hand.bddl",
+      "environment_id": "v15_3_physics_robust_human_safety_task1_init19",
+      "environment_seed": 6509,
+      "init_selection_score_sha256": "03bacfd08f3eac90f4a2cdf35c2645534968238b1185a2be0e9306cb4a9098d0",
+      "init_state_id": 19,
+      "suite": "human_safety",
+      "task_id": 1,
+      "task_selection_score_sha256": "538f2862e351cd75ff375934cdeeba5055d86329b659b81afad7437b6c5c530e"
+    },
+    {
+      "bddl_path": "external/LIBERO-Safety/libero/libero/bddl_files/obstacle_avoidance_human/L1/put_both_the_alphabet_soup_and_the_cream_cheese_box_in_the_basket.bddl",
+      "environment_id": "v15_3_physics_robust_obstacle_avoidance_human_task8_init10",
+      "environment_seed": 6509,
+      "init_selection_score_sha256": "0d4961a02c547a130a383bb8b54a14e170b257e76700b323c563bc0cdcea5a54",
+      "init_state_id": 10,
+      "suite": "obstacle_avoidance_human",
+      "task_id": 8,
+      "task_selection_score_sha256": "07a155ed1f0cc1b91309f2e727cf8e84f240b0bd7d09a699a0fb766121665bcf"
+    },
+    {
+      "bddl_path": "external/LIBERO-Safety/libero/libero/bddl_files/obstacle_avoidance_human/L0/put_both_the_alphabet_soup_and_the_cream_cheese_box_in_the_basket.bddl",
+      "environment_id": "v15_3_physics_robust_obstacle_avoidance_human_task3_init41",
+      "environment_seed": 6509,
+      "init_selection_score_sha256": "050b9b2fc949a991d8ec4c1fc1c2872bd3130726404f7cac43cb8300b28523e6",
+      "init_state_id": 41,
+      "suite": "obstacle_avoidance_human",
+      "task_id": 3,
+      "task_selection_score_sha256": "2a36532d2012d918a31ba52f6041eda27d584dee6e1483c64645893c475b3505"
+    },
+    {
+      "bddl_path": "external/LIBERO-Safety/libero/libero/bddl_files/obstacle_avoidance_human/L0/put_both_moka_pots_on_the_stove.bddl",
+      "environment_id": "v15_3_physics_robust_obstacle_avoidance_human_task2_init29",
+      "environment_seed": 6509,
+      "init_selection_score_sha256": "06bf9ab9675b34282454175e1fed38c0ddc7bad6279ab0a0f22ecdd7e5df44a6",
+      "init_state_id": 29,
+      "suite": "obstacle_avoidance_human",
+      "task_id": 2,
+      "task_selection_score_sha256": "3c8fb93b1ff48e4029722c04bd9d51c5697e84393279495301fbaa201636ec47"
+    },
+    {
+      "bddl_path": "external/LIBERO-Safety/libero/libero/bddl_files/obstacle_avoidance_human/L1/pick_up_the_book_and_place_it_in_the_back_compartment_of_the_caddy.bddl",
+      "environment_id": "v15_3_physics_robust_obstacle_avoidance_human_task6_init5",
+      "environment_seed": 6509,
+      "init_selection_score_sha256": "14714a043e4ec0a467e091b7718eae077cbd38d3268487e92bfeb23ad837e24c",
+      "init_state_id": 5,
+      "suite": "obstacle_avoidance_human",
+      "task_id": 6,
+      "task_selection_score_sha256": "3c952c7a678d0bd4bada886fef315284539d38f376dd1be62c5e7ad46570023a"
+    },
+    {
+      "bddl_path": "external/LIBERO-Safety/libero/libero/bddl_files/obstacle_avoidance_human/L1/put_both_moka_pots_on_the_stove.bddl",
+      "environment_id": "v15_3_physics_robust_obstacle_avoidance_human_task7_init39",
+      "environment_seed": 6509,
+      "init_selection_score_sha256": "04bd25228f99948d7caae9290cff29319a9091610e425e4d9059a20e53a4f6d5",
+      "init_state_id": 39,
+      "suite": "obstacle_avoidance_human",
+      "task_id": 7,
+      "task_selection_score_sha256": "4e37175eefdc80e083a04fa94699eeb3ce00ace08a5f1265d561b79fc8755750"
+    },
+    {
+      "bddl_path": "external/LIBERO-Safety/libero/libero/bddl_files/obstacle_avoidance_human/L2/put_the_white_yellow_mug_in_the_microwave_and_close_it.bddl",
+      "environment_id": "v15_3_physics_robust_obstacle_avoidance_human_task14_init48",
+      "environment_seed": 6509,
+      "init_selection_score_sha256": "04ace78162643fa7ddd90db03e382d88b92f4336a791e72953fd4ea6ce5fb4f3",
+      "init_state_id": 48,
+      "suite": "obstacle_avoidance_human",
+      "task_id": 14,
+      "task_selection_score_sha256": "4f61a9ba0d5434546f578ff987ab21b5d53a6e2011dd78c6a9ef80dc88f510b7"
+    }
+  ],
+  "execution_authorization": {
+    "attacked_rollout": false,
+    "model_mismatch_claim": false,
+    "physics_domain_robustness_claim": true,
+    "policy_load": false,
+    "real_time_claim": false,
+    "simulator_action_dispatch": true,
+    "task_outcome_read": false,
+    "task_utility_claim": false
+  },
+  "fresh_output_root": "results/proofalign_predictive_virtual_brake_v15_3_force_attributed_recovery_physics_domain_robustness_qualification_20260801_fresh1",
+  "gates": {
+    "active_contact_capacity_warning_count_max": 0,
+    "active_contact_saturation_count_max": 0,
+    "expected_baseline_lane_count": 3024,
+    "expected_condition_count": 7,
+    "expected_environment_count": 18,
+    "expected_stress_lane_count": 756,
+    "expected_stress_lanes_per_environment": 42,
+    "expected_total_baseline_lane_count": 21168,
+    "expected_total_stress_lane_count": 5292,
+    "force_recomputation_mismatch_count_max": 0,
+    "latency_budget_seconds": 0.1,
+    "maximum_attributable_increment_to_v14_legacy_force_ratio": 1.25,
+    "maximum_attributable_joint_force_increment": 10000.0,
+    "maximum_post_step_absolute_risk_force": 10000.0,
+    "maximum_post_step_positive_joint_increment": 10000.0,
+    "maximum_recovery_attributable_joint_force_increment": 1250.0,
+    "maximum_recovery_post_step_positive_joint_increment": 1250.0,
+    "no_guard_below_floor_count_min": 1,
+    "no_guard_crossing_count_min": 1,
+    "prediction_execution_error_rad_max": 0.001,
+    "recovery_prevention_identity_required": true,
+    "restore_failure_count_max": 0,
+    "screen_latency_100ms_miss_rate_max": 0.025,
+    "screen_latency_seconds_max": 0.2,
+    "screen_latency_seconds_p95_max": 0.1,
+    "v14_deadlock_lane_count_min": 1,
+    "v15_3_availability_not_below_v14": true,
+    "v15_3_below_floor_count_max": 0,
+    "v15_3_crossing_count_max": 0,
+    "v15_3_exact_action_mismatch_count_max": 0,
+    "v15_3_residual_deadlock_lane_count_max": 0,
+    "v15_3_selected_floor_violation_count_max": 0
+  },
+  "nonpass_classification": "predictive_virtual_brake_v15_3_force_attributed_recovery_physics_domain_robustness_qualification_nonpass",
+  "pass_classification": "predictive_virtual_brake_v15_3_force_attributed_recovery_physics_domain_robustness_qualification_pass",
+  "protocol_id": "proofalign-predictive-virtual-brake-v15-3-force-attributed-recovery-physics-domain-robustness-qualification-20260801",
+  "required_bindings": [
+    {
+      "path": "experiments/proofalign_predictive_virtual_brake_v14_multijoint_clean_development_fresh2_protocol.json",
+      "sha256": "ff02a8e059f620e9150cdb89a5675ad3c5cb3d5375c8d382d94cf31cd5935a71"
+    },
+    {
+      "path": "experiments/proofalign_predictive_virtual_brake_v14_multijoint_stress_qualification_protocol.json",
+      "sha256": "e1c4fffd6c536b374c8d2f20c7c960ca43b07b0f57cc177c49b4b66c4a652cf6"
+    },
+    {
+      "path": "experiments/proofalign_predictive_virtual_brake_v15_current_edge_priority_recovery_development_protocol.json",
+      "sha256": "4f23ea6fa069a4849493137b4a3826df7f9467b619641c0507d7187cbed47cb9"
+    },
+    {
+      "path": "experiments/proofalign_predictive_virtual_brake_v15_current_edge_priority_recovery_stress_calibration_protocol.json",
+      "sha256": "c5a7216aea0bdea0c5e52e1733ed54f00a96e3382d3a9e16b1880120b9469eb5"
+    },
+    {
+      "path": "experiments/proofalign_predictive_virtual_brake_v15_current_edge_priority_recovery_stress_qualification_fresh2_protocol.json",
+      "sha256": "f1673e37879b8da25574f15ee2b0ca95553223d6766d9ec0fd560faf9002b362"
+    },
+    {
+      "path": "experiments/proofalign_predictive_virtual_brake_v15_force_attribution_stress_development_protocol.json",
+      "sha256": "4a8aa6c4057ab8815a78f1a14ddf68c80d1894fd0ee50f52ac47e9b081307837"
+    },
+    {
+      "path": "experiments/proofalign_predictive_virtual_brake_v15_force_attributed_recovery_stress_qualification_protocol.json",
+      "sha256": "021c805aff8341745d46b1bd1e2ddfac5d2cb1af50b1080fb70e4f8a734c1db6"
+    },
+    {
+      "path": "experiments/proofalign_predictive_virtual_brake_v15_force_attributed_recovery_stress_qualification_terminal_summary.json",
+      "sha256": "72b101cb2fa73eb8b6e53ead7b1a078bf305df29527af8b08cefd3b733c21e40"
+    },
+    {
+      "path": "experiments/proofalign_predictive_virtual_brake_v15_force_attributed_recovery_task_utility_qualification_terminal_summary.json",
+      "sha256": "594454b1b277b3ee546c317af20336bc510f41b214286e622de86fc577b44832"
+    },
+    {
+      "path": "experiments/proofalign_predictive_virtual_brake_v15_force_attributed_recovery_attacked_task_utility_qualification_terminal_summary.json",
+      "sha256": "7dee0baf831bfb9efba4f2c1f74446abcda75f6dfb0c0a3cdbdf861d6a8f9df1"
+    }
+  ],
+  "schema": "proofalign.predictive-virtual-brake-v15.3-force-attributed-recovery-physics-domain-robustness-qualification-protocol.v1",
+  "selection": {
+    "all_prior_exact_task_init_pairs_excluded": true,
+    "candidate_population": "15 tasks x 50 init states in each of three suites",
+    "distinct_task_ids_per_suite": true,
+    "environment_seed": 6509,
+    "physics_domain_results_observed_before_freeze": false,
+    "prior_exact_pair_count": 99,
+    "selected_environment_count": 18,
+    "selected_per_suite": 6,
+    "selection_salt": "proofalign-v15-3-force-recovery-physics-domain-robustness-qualification-population-v1",
+    "stress_and_task_results_observed_before_freeze": true,
+    "task_outcomes_used_for_selection": false
+  },
+  "source": {
+    "freezer": "scripts/freeze_v15_force_attributed_recovery_physics_domain_robustness_qualification.py",
+    "freezer_sha256": "d3777f57cd86af68418576be898044354ff510f841c48bdf1e2006ec7ee2fc1b",
+    "repository_commit": "3797191f755d8a5118d23bcc9db1f76bf5ce9941",
+    "repository_tree": "2979a9c703d0b910bf9eb4ef5be0fe6c4131f511",
+    "sha256": {
+      "scripts/freeze_v15_force_attributed_recovery_physics_domain_robustness_qualification.py": "d3777f57cd86af68418576be898044354ff510f841c48bdf1e2006ec7ee2fc1b",
+      "scripts/run_l2_predictive_virtual_brake_v14_multijoint.py": "a5e3004f294932d20818c3ad412b4282533f76bd9966bc10061fc29cb4ba3979",
+      "scripts/run_l2_predictive_virtual_brake_v15_current_edge_priority_recovery.py": "c6eb258d8fab7b8425f701daf6f3bf03ef32372ede86e739f0b079dfdcd88479",
+      "scripts/run_l2_predictive_virtual_brake_v15_current_edge_recovery.py": "51277f683b146683678a85920e1e2844b9f97c7a169fe54e3fdd2f1ae539c633",
+      "scripts/run_l2_predictive_virtual_brake_v15_floor_guard_recovery.py": "edabde87069243e0fbfff088058bf350c5d63bd295762d8a8b02f662a91eae43",
+      "scripts/run_l2_predictive_virtual_brake_v15_force_attributed_recovery.py": "fce8c48586f03a4a0e92013561f91cb0e836849307af522cc8549701a999634e",
+      "scripts/run_v14_multijoint_stress_design_pilot.py": "f01140986fcee382ad0bbff3bdabb5de1e6149b2d42338af0c731d456c3238bf",
+      "scripts/run_v14_multijoint_stress_development.py": "b68dcf5a3ee89f133458e6d189f12d981097e4d16c30403f212440724e12b267",
+      "scripts/run_v14_multijoint_stress_qualification.py": "0ff5484d19fe86bf4e47366419b5a64284fa919b8f77a2b85e042cb5cdf80ce2",
+      "scripts/run_v15_current_edge_priority_recovery_stress_calibration.py": "06a0fc411b90f23c2bd1c6c6a241a72c56599467ce308b6d649daaed5074a848",
+      "scripts/run_v15_force_attributed_recovery_physics_domain_robustness_qualification.py": "d7e8e0563bbed5c398596bf95fdf77cc1174cd05e86425116d57235089a22bd7",
+      "scripts/run_v15_force_attributed_recovery_stress_qualification.py": "a290deba35e452fa7a0e45e0ee6fccc8baede65d7f90e85824c014f5a4b5bab0",
+      "scripts/run_v15_force_attribution_stress_development.py": "76fb29cbe7aec45195b9f8c30a35026a8f6b1eaa6eaf85f1dfc99d28ad84b3d4",
+      "src/proofalign/policy_prefix_shadow_v12.py": "f3baa00a917e3c6a4f5ad35f3fd8f591f988b117f64289ba1a7d448c0a088c71",
+      "src/proofalign/policy_prefix_shadow_warmstart_v12.py": "bbcea47cfd739757e68027afbef48ff740b0dec35bc50979bed13ac27224025d",
+      "tests/test_v15_force_attributed_recovery_physics_domain_robustness_qualification.py": "7563f0350e58142e1c53d26da87150991e7a4845795a07f9db2bfc8c57aa927a"
+    }
+  },
+  "stage": "held_out_v15_3_force_attributed_recovery_physics_domain_robustness_qualification",
+  "status": "authorized_v15_3_force_attributed_recovery_physics_domain_robustness_qualification"
+}

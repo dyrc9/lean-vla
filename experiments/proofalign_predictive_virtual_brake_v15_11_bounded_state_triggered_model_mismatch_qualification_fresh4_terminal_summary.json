@@ -1,0 +1,49 @@
+{
+  "schema": "proofalign.predictive-virtual-brake-v15.11-bounded-state-triggered-model-mismatch-qualification-terminal-summary.v1",
+  "classification": "predictive_virtual_brake_v15_11_bounded_state_triggered_model_mismatch_qualification_pass",
+  "model_mismatch_qualification_pass": true,
+  "model_mismatch_claim_authorized": true,
+  "protocol_path": "experiments/proofalign_predictive_virtual_brake_v15_11_bounded_state_triggered_model_mismatch_qualification_protocol_fresh4.json",
+  "protocol_sha256": "f50fec11c8435f91de1e5f22559a6ac743a8e8ea0f5962e799a20396475b8063",
+  "evidence_path": "results/proofalign_predictive_virtual_brake_v15_11_bounded_state_triggered_model_mismatch_qualification_20260806_fresh4/model_mismatch_qualification_evidence.json",
+  "evidence_sha256": "86aa1009ce823a1a0b9d962e69503ebe8f1640782aebf6b1c086cefc11010424",
+  "core_outcome_metrics": {
+    "environment_count": 18,
+    "model_condition_count": 7,
+    "stress_lane_count": 5292,
+    "policy_step_count": 26460,
+    "v14_deadlock_lane_count": 2541,
+    "recovery_prevented_deadlock_lane_count": 2541,
+    "residual_deadlock_lane_count": 0,
+    "crossing_count": 0,
+    "below_floor_count": 0,
+    "minimum_margin_rad": 0.15240117510137963,
+    "maximum_abs_constraint_force": 8276.864004252937,
+    "maximum_prediction_execution_error_rad": 0.006258136351504184,
+    "maximum_screen_latency_seconds": 0.05541063298005611,
+    "maximum_condition_screen_latency_p95_seconds": 0.03468560153269209,
+    "screen_latency_100ms_miss_count": 0,
+    "screen_latency_sample_count": 26460
+  },
+  "mechanism_audit_metrics": {
+    "formal_gate_count": 42,
+    "formal_failed_gate_count": 0,
+    "physics_audit_count": 126,
+    "physics_audit_failure_count": 0,
+    "step_model_or_role_identity_failure_count": 0,
+    "actual_step_count": 44546,
+    "shadow_step_count": 47699,
+    "calibration_evaluation_count": 31752,
+    "calibration_bind_count": 31752,
+    "guarded_candidate_rollout_count": 23499,
+    "maximum_guarded_candidate_rollouts_per_action": 2,
+    "unguarded_shadow_rollout_count": 0,
+    "task_outcome_read_count": 0
+  },
+  "claim_boundary": "This pass supports empirical robustness of frozen v15.11 to the seven registered bounded simulator model conditions. It does not establish clean or attacked task utility, arbitrary model-error robustness, hard-real-time behavior, hardware safety, or physical-world safety.",
+  "method_status": "v15.11 is frozen for final clean and SABER-attacked four-arm task-outcome qualification.",
+  "final_experiments_remaining": [
+    "fresh clean VLA-only/L1-only/L2-only/Dual task-outcome qualification",
+    "fresh SABER-attacked VLA-only/L1-only/L2-only/Dual task-outcome qualification"
+  ]
+}

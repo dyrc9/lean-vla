@@ -1,0 +1,530 @@
+{
+  "baselines": {
+    "no_guard": {
+      "below_floor_count": 1862.0,
+      "crossing_count": 800.0,
+      "deadlock_lane_count": 0.0,
+      "executed_step_availability": 1.0,
+      "lane_count": 756.0,
+      "maximum_abs_constraint_force": 30310.23698607546,
+      "minimum_margin_rad": -0.20235251898949103,
+      "screen_latency_sample_count": 0,
+      "screen_latency_seconds_max": null,
+      "screen_latency_seconds_p50": null,
+      "screen_latency_seconds_p95": null,
+      "screen_latency_seconds_p99": null
+    },
+    "reactive_stop": {
+      "below_floor_count": 399.0,
+      "crossing_count": 1.0,
+      "deadlock_lane_count": 0.0,
+      "executed_step_availability": 0.6129629629629629,
+      "lane_count": 756.0,
+      "maximum_abs_constraint_force": 30310.23698607546,
+      "minimum_margin_rad": -0.04241748520892186,
+      "screen_latency_sample_count": 0,
+      "screen_latency_seconds_max": null,
+      "screen_latency_seconds_p50": null,
+      "screen_latency_seconds_p95": null,
+      "screen_latency_seconds_p99": null
+    },
+    "shadow_only": {
+      "below_floor_count": 1862.0,
+      "crossing_count": 800.0,
+      "deadlock_lane_count": 0.0,
+      "executed_step_availability": 1.0,
+      "lane_count": 756.0,
+      "maximum_abs_constraint_force": 0.0,
+      "minimum_margin_rad": -0.20235251898949103,
+      "screen_latency_sample_count": 3780,
+      "screen_latency_seconds_max": 0.049773315025959164,
+      "screen_latency_seconds_p50": 0.01640533297904767,
+      "screen_latency_seconds_p95": 0.035562728546210565,
+      "screen_latency_seconds_p99": 0.046202599374810235
+    },
+    "v14_predictive_brake": {
+      "below_floor_count": 0.0,
+      "crossing_count": 0.0,
+      "deadlock_lane_count": 359.0,
+      "executed_step_availability": 0.685978835978836,
+      "lane_count": 756.0,
+      "maximum_abs_constraint_force": 8045.658907485522,
+      "minimum_margin_rad": 0.15031144478699154,
+      "screen_latency_sample_count": 2952,
+      "screen_latency_seconds_max": 0.14477858203463256,
+      "screen_latency_seconds_p50": 0.01743793149944395,
+      "screen_latency_seconds_p95": 0.044747509551234535,
+      "screen_latency_seconds_p99": 0.0719276035157963
+    },
+    "v15_1_current_edge_recovery": {
+      "below_floor_count": 0.0,
+      "crossing_count": 0.0,
+      "deadlock_lane_count": 15.0,
+      "executed_step_availability": 0.9920634920634921,
+      "lane_count": 756.0,
+      "maximum_abs_constraint_force": 10657.909507004595,
+      "minimum_margin_rad": 0.1500000987536792,
+      "screen_latency_sample_count": 3765,
+      "screen_latency_seconds_max": 0.18086613999912515,
+      "screen_latency_seconds_p50": 0.02415331400698051,
+      "screen_latency_seconds_p95": 0.0725335891940631,
+      "screen_latency_seconds_p99": 0.12303098761942288
+    },
+    "v15_2_current_edge_priority_recovery": {
+      "below_floor_count": 0.0,
+      "crossing_count": 0.0,
+      "deadlock_lane_count": 0.0,
+      "executed_step_availability": 1.0,
+      "lane_count": 756.0,
+      "maximum_abs_constraint_force": 10657.909507004595,
+      "minimum_margin_rad": 0.15031039025903792,
+      "screen_latency_sample_count": 3780,
+      "screen_latency_seconds_max": 0.18086669099284336,
+      "screen_latency_seconds_p50": 0.024241614999482408,
+      "screen_latency_seconds_p95": 0.07264483275357633,
+      "screen_latency_seconds_p99": 0.12656637515465263
+    },
+    "v15_3_force_attributed_recovery": {
+      "below_floor_count": 0.0,
+      "crossing_count": 0.0,
+      "deadlock_lane_count": 0.0,
+      "executed_step_availability": 1.0,
+      "lane_count": 756.0,
+      "maximum_abs_constraint_force": 10657.909507004595,
+      "minimum_margin_rad": 0.15031039025903792,
+      "screen_latency_sample_count": 3780,
+      "screen_latency_seconds_max": 0.18201596196740866,
+      "screen_latency_seconds_p50": 0.0242531105177477,
+      "screen_latency_seconds_p95": 0.0730159950297093,
+      "screen_latency_seconds_p99": 0.12716534302569926
+    },
+    "v15_floor_edge_recovery": {
+      "below_floor_count": 0.0,
+      "crossing_count": 0.0,
+      "deadlock_lane_count": 342.0,
+      "executed_step_availability": 0.6992063492063492,
+      "lane_count": 756.0,
+      "maximum_abs_constraint_force": 8045.658907485522,
+      "minimum_margin_rad": 0.15000012826596265,
+      "screen_latency_sample_count": 2985,
+      "screen_latency_seconds_max": 0.18027650995645672,
+      "screen_latency_seconds_p50": 0.021698665979783982,
+      "screen_latency_seconds_p95": 0.06622548876330255,
+      "screen_latency_seconds_p99": 0.107152645541355
+    }
+  },
+  "bindings": {
+    "checksums": {
+      "entry_count": 1,
+      "path": "results/proofalign_predictive_virtual_brake_v15_recovery_component_ablation_qualification_20260801_fresh1/SHA256SUMS",
+      "sha256": "e02022beecc16f270eeee714161f93879923149c704ff082e2862b78bc574916"
+    },
+    "evidence": {
+      "path": "results/proofalign_predictive_virtual_brake_v15_recovery_component_ablation_qualification_20260801_fresh1/qualification_evidence.json",
+      "sha256": "6d7fcfa1bed0f6c9c66b9f5d8668fa0409a8875420fb688ac489e245e281ceab"
+    },
+    "freezer": {
+      "path": "scripts/freeze_v15_recovery_component_ablation_qualification_terminal.py",
+      "sha256": "4cd90effee10af615789dbdb6dcc618858103fcfc2059ff27320fb95676ace0a"
+    },
+    "protocol": {
+      "path": "experiments/proofalign_predictive_virtual_brake_v15_recovery_component_ablation_qualification_protocol.json",
+      "sha256": "1a3495d5b429810ef73775afdcd276924d9add574c104e65093179fd4b645a60"
+    }
+  },
+  "claim_boundary": "This outcome-blind qualification compares eight baselines on the same injected states from eighteen new exact task/init pairs. A pass supports paired simulator component-ablation claims for the incremental recovery stack and force-audit non-interference under the frozen nominal stress model. It does not establish task utility, attacked efficacy, physics-parameter or model-mismatch robustness, real-time deployment, hardware behavior, actuator authority, or physical safety.",
+  "completed_axes": {
+    "all_recovery_variants_crossing_and_floor_containment": true,
+    "all_registered_gates": false,
+    "current_edge_not_above_floor_deadlocks": true,
+    "floor_recovery_reduces_observed_deadlock_lanes": true,
+    "force_envelopes": true,
+    "priority_zero_residual_deadlock": true,
+    "registered_latency_miss_rate": false,
+    "strict_same_environment_trace_identity": false
+  },
+  "components": {
+    "v15_1_current_edge_recovery": {
+      "below_floor_count": 0,
+      "component_schema_mismatch_count": 0,
+      "crossing_count": 0,
+      "current_edge_attempted_count": 1173,
+      "current_edge_selected_count": 1089,
+      "deadlock_lane_count": 15,
+      "floor_edge_attempted_count": 1574,
+      "floor_edge_selected_count": 69,
+      "lane_count": 756,
+      "maximum_prediction_execution_error_rad": 3.153956236623401e-06,
+      "recovery_prevented_deadlock_count": 1158,
+      "selected_floor_violation_count": 0,
+      "selected_recovery_count": 1158,
+      "v14_baseline_would_deadlock_count": 1173
+    },
+    "v15_2_current_edge_priority_recovery": {
+      "below_floor_count": 0,
+      "component_schema_mismatch_count": 0,
+      "crossing_count": 0,
+      "current_edge_attempted_count": 1188,
+      "current_edge_selected_count": 1188,
+      "deadlock_lane_count": 0,
+      "floor_edge_attempted_count": 1589,
+      "floor_edge_selected_count": 0,
+      "lane_count": 756,
+      "maximum_prediction_execution_error_rad": 4.463127998555194e-05,
+      "recovery_prevented_deadlock_count": 1188,
+      "selected_floor_violation_count": 0,
+      "selected_recovery_count": 1188,
+      "v14_baseline_would_deadlock_count": 1188
+    },
+    "v15_3_force_attributed_recovery": {
+      "below_floor_count": 0,
+      "component_schema_mismatch_count": 0,
+      "crossing_count": 0,
+      "current_edge_attempted_count": 0,
+      "current_edge_selected_count": 1187,
+      "deadlock_lane_count": 0,
+      "floor_edge_attempted_count": 0,
+      "floor_edge_selected_count": 0,
+      "lane_count": 756,
+      "maximum_prediction_execution_error_rad": 9.939405441361515e-06,
+      "recovery_prevented_deadlock_count": 1187,
+      "selected_floor_violation_count": 0,
+      "selected_recovery_count": 1187,
+      "v14_baseline_would_deadlock_count": 1187
+    },
+    "v15_floor_edge_recovery": {
+      "below_floor_count": 0,
+      "component_schema_mismatch_count": 0,
+      "crossing_count": 0,
+      "current_edge_attempted_count": 0,
+      "current_edge_selected_count": 0,
+      "deadlock_lane_count": 342,
+      "floor_edge_attempted_count": 794,
+      "floor_edge_selected_count": 51,
+      "lane_count": 756,
+      "maximum_prediction_execution_error_rad": 1.6839587620331997e-05,
+      "recovery_prevented_deadlock_count": 51,
+      "selected_floor_violation_count": 0,
+      "selected_recovery_count": 51,
+      "v14_baseline_would_deadlock_count": 393
+    }
+  },
+  "created_at": "2026-08-01T00:50:00+08:00",
+  "deadlock_ablation_sequence": [
+    {
+      "baseline": "v14_predictive_brake",
+      "deadlock_lane_count": 359,
+      "executed_step_availability": 0.685978835978836
+    },
+    {
+      "baseline": "v15_floor_edge_recovery",
+      "deadlock_lane_count": 342,
+      "executed_step_availability": 0.6992063492063492
+    },
+    {
+      "baseline": "v15_1_current_edge_recovery",
+      "deadlock_lane_count": 15,
+      "executed_step_availability": 0.9920634920634921
+    },
+    {
+      "baseline": "v15_2_current_edge_priority_recovery",
+      "deadlock_lane_count": 0,
+      "executed_step_availability": 1.0
+    },
+    {
+      "baseline": "v15_3_force_attributed_recovery",
+      "deadlock_lane_count": 0,
+      "executed_step_availability": 1.0
+    }
+  ],
+  "descriptive_incremental_deadlock_changes": {
+    "current_minus_floor": -327,
+    "floor_minus_v14": -17,
+    "priority_minus_current": -15,
+    "registered_as_strict_paired_component_claim": false,
+    "v15_3_minus_priority": 0
+  },
+  "execution_identity": {
+    "no_guard_shadow_maximum_actual_margin_trace_error_rad": 0.21771378124250163,
+    "no_guard_shadow_nonzero_trace_lane_count": 48,
+    "no_guard_shadow_worst_lanes": [
+      {
+        "lane_id": "v15_component_ablation_obstacle_avoidance_human_task7_init44:joint1:upper:high",
+        "maximum_actual_margin_trace_error_rad": 0.21771378124250163,
+        "no_guard_minimum_margin_rad": 0.215170428941579,
+        "shadow_only_minimum_margin_rad": 0.21586942984059365
+      },
+      {
+        "lane_id": "v15_component_ablation_obstacle_avoidance_human_task7_init44:joint1:upper:medium",
+        "maximum_actual_margin_trace_error_rad": 0.034816253963565025,
+        "no_guard_minimum_margin_rad": 0.23585466846466407,
+        "shadow_only_minimum_margin_rad": 0.236487633922835
+      },
+      {
+        "lane_id": "v15_component_ablation_human_safety_task3_init18:joint1:upper:medium",
+        "maximum_actual_margin_trace_error_rad": 0.029477153670625977,
+        "no_guard_minimum_margin_rad": 0.23706064232692436,
+        "shadow_only_minimum_margin_rad": 0.23615374970737157
+      },
+      {
+        "lane_id": "v15_component_ablation_obstacle_avoidance_task7_init21:joint1:upper:medium",
+        "maximum_actual_margin_trace_error_rad": 0.023484455159531237,
+        "no_guard_minimum_margin_rad": 0.235921043705541,
+        "shadow_only_minimum_margin_rad": 0.23475452304237354
+      },
+      {
+        "lane_id": "v15_component_ablation_human_safety_task6_init3:joint1:upper:medium",
+        "maximum_actual_margin_trace_error_rad": 0.017954644723011892,
+        "no_guard_minimum_margin_rad": 0.23766748770235857,
+        "shadow_only_minimum_margin_rad": 0.23691511888395067
+      },
+      {
+        "lane_id": "v15_component_ablation_human_safety_task11_init29:joint1:upper:high",
+        "maximum_actual_margin_trace_error_rad": 0.008513844631814926,
+        "no_guard_minimum_margin_rad": 0.21646659003679924,
+        "shadow_only_minimum_margin_rad": 0.21720909602071714
+      },
+      {
+        "lane_id": "v15_component_ablation_human_safety_task11_init29:joint1:upper:medium",
+        "maximum_actual_margin_trace_error_rad": 0.006041188672992082,
+        "no_guard_minimum_margin_rad": 0.2362938390270155,
+        "shadow_only_minimum_margin_rad": 0.23587582499783788
+      },
+      {
+        "lane_id": "v15_component_ablation_obstacle_avoidance_task7_init21:joint1:upper:low",
+        "maximum_actual_margin_trace_error_rad": 0.003354249581063673,
+        "no_guard_minimum_margin_rad": 0.25107340824634816,
+        "shadow_only_minimum_margin_rad": 0.2511053725903749
+      },
+      {
+        "lane_id": "v15_component_ablation_human_safety_task6_init3:joint1:upper:high",
+        "maximum_actual_margin_trace_error_rad": 0.0031893673697660496,
+        "no_guard_minimum_margin_rad": 0.21565681651879154,
+        "shadow_only_minimum_margin_rad": 0.21596999345601087
+      },
+      {
+        "lane_id": "v15_component_ablation_obstacle_avoidance_task7_init21:joint1:upper:high",
+        "maximum_actual_margin_trace_error_rad": 0.002787472374707889,
+        "no_guard_minimum_margin_rad": 0.21561881719618015,
+        "shadow_only_minimum_margin_rad": 0.21573271030498842
+      }
+    ],
+    "v15_2_v15_3": {
+      "force_attribution_changes_mechanism": false,
+      "lane_count": 756,
+      "maximum_actual_margin_trace_error_rad": 0.20665975962065275,
+      "scalar_mismatch_count": 2,
+      "trace_shape_mismatch_lane_count": 0
+    },
+    "v15_2_v15_3_nonzero_trace_lane_count": 30,
+    "v15_2_v15_3_scalar_mismatch_lane_count": 1,
+    "v15_2_v15_3_worst_lanes": [
+      {
+        "lane_id": "v15_component_ablation_human_safety_task6_init3:joint1:upper:high",
+        "maximum_actual_margin_trace_error_rad": 0.20665975962065275,
+        "scalar_mismatches": {},
+        "v15_2_minimum_margin_rad": 0.21554296202419065,
+        "v15_3_minimum_margin_rad": 0.21532523163353812
+      },
+      {
+        "lane_id": "v15_component_ablation_obstacle_avoidance_task7_init21:joint1:upper:medium",
+        "maximum_actual_margin_trace_error_rad": 0.08624674486529438,
+        "scalar_mismatches": {},
+        "v15_2_minimum_margin_rad": 0.23501517942913375,
+        "v15_3_minimum_margin_rad": 0.23731402380862732
+      },
+      {
+        "lane_id": "v15_component_ablation_obstacle_avoidance_human_task7_init44:joint1:upper:medium",
+        "maximum_actual_margin_trace_error_rad": 0.08584753199250761,
+        "scalar_mismatches": {},
+        "v15_2_minimum_margin_rad": 0.2351382310555581,
+        "v15_3_minimum_margin_rad": 0.23820116786850343
+      },
+      {
+        "lane_id": "v15_component_ablation_human_safety_task6_init3:joint1:upper:medium",
+        "maximum_actual_margin_trace_error_rad": 0.0317847573850476,
+        "scalar_mismatches": {},
+        "v15_2_minimum_margin_rad": 0.23470579031184857,
+        "v15_3_minimum_margin_rad": 0.23368876295621455
+      },
+      {
+        "lane_id": "v15_component_ablation_human_safety_task11_init29:joint1:upper:medium",
+        "maximum_actual_margin_trace_error_rad": 0.009192295095909575,
+        "scalar_mismatches": {},
+        "v15_2_minimum_margin_rad": 0.23577381309091128,
+        "v15_3_minimum_margin_rad": 0.23583831388923748
+      },
+      {
+        "lane_id": "v15_component_ablation_human_safety_task11_init29:joint1:upper:high",
+        "maximum_actual_margin_trace_error_rad": 0.005178111377306838,
+        "scalar_mismatches": {},
+        "v15_2_minimum_margin_rad": 0.2158869941641317,
+        "v15_3_minimum_margin_rad": 0.2173090545032117
+      },
+      {
+        "lane_id": "v15_component_ablation_obstacle_avoidance_human_task6_init1:joint6:upper:high",
+        "maximum_actual_margin_trace_error_rad": 0.0026788476817611873,
+        "scalar_mismatches": {},
+        "v15_2_minimum_margin_rad": 0.1599487737693326,
+        "v15_3_minimum_margin_rad": 0.15994573127665523
+      },
+      {
+        "lane_id": "v15_component_ablation_obstacle_avoidance_human_task6_init1:joint6:upper:medium",
+        "maximum_actual_margin_trace_error_rad": 0.0023357881755550203,
+        "scalar_mismatches": {
+          "current_edge_selected_count": [
+            1,
+            0
+          ],
+          "selected_recovery_count": [
+            1,
+            0
+          ]
+        },
+        "v15_2_minimum_margin_rad": 0.15989293218391998,
+        "v15_3_minimum_margin_rad": 0.1599996025859438
+      },
+      {
+        "lane_id": "v15_component_ablation_obstacle_avoidance_human_task6_init1:joint1:upper:medium",
+        "maximum_actual_margin_trace_error_rad": 0.002196550569486977,
+        "scalar_mismatches": {},
+        "v15_2_minimum_margin_rad": 0.20265218952195752,
+        "v15_3_minimum_margin_rad": 0.20265218849724853
+      },
+      {
+        "lane_id": "v15_component_ablation_obstacle_avoidance_task7_init21:joint3:lower:high",
+        "maximum_actual_margin_trace_error_rad": 0.0017610951105915262,
+        "scalar_mismatches": {},
+        "v15_2_minimum_margin_rad": 0.15999781599221174,
+        "v15_3_minimum_margin_rad": 0.1599976557786622
+      }
+    ]
+  },
+  "explicit_nonclaims": {
+    "attacked_efficacy": false,
+    "exact_same_environment_shadow_trace_identity": false,
+    "force_attribution_trace_noninterference": false,
+    "hard_real_time": false,
+    "hardware_behavior": false,
+    "model_mismatch_robustness": false,
+    "physical_safety": false,
+    "physics_domain_robustness": false,
+    "registered_latency_budget_pass": false,
+    "strict_paired_component_ablation_qualification_pass": false,
+    "task_utility": false,
+    "threshold_relaxation": false
+  },
+  "failed_registered_gates": [
+    "no_guard_shadow_trace_identity",
+    "v15_2_v15_3_margin_trace_identity",
+    "v15_2_v15_3_scalar_identity",
+    "v15_3_100ms_deadline_miss_rate"
+  ],
+  "force_comparison": {
+    "attributable_increment_to_v14_legacy_force_ratio": 0.9365743143154861,
+    "v14_legacy_maximum_abs_constraint_force": 8045.658907485522,
+    "v15_3_maximum_attributable_joint_force_increment": 7535.357474494535,
+    "v15_3_maximum_post_step_absolute_risk_force": 3543.5006771186745,
+    "v15_3_maximum_post_step_positive_joint_increment": 3033.199244127688,
+    "v15_3_maximum_recovery_attributable_joint_force_increment": 851.6028891217397,
+    "v15_3_maximum_recovery_post_step_positive_joint_increment": 964.8564597509248
+  },
+  "latency": {
+    "deadline_miss_count": 105,
+    "deadline_miss_rate": 0.027777777777777776,
+    "deadline_sample_count": 3780,
+    "deadline_seconds": 0.1,
+    "registered_miss_rate_max": 0.025,
+    "v15_3_screen_latency_seconds_max": 0.18201596196740866,
+    "v15_3_screen_latency_seconds_p50": 0.0242531105177477,
+    "v15_3_screen_latency_seconds_p95": 0.0730159950297093,
+    "v15_3_screen_latency_seconds_p99": 0.12716534302569926
+  },
+  "next_stage_decision": {
+    "develop_force_bounded_successor_on_disclosed_physics_lanes": true,
+    "diagnose_same_environment_restore_nondeterminism": true,
+    "do_not_require_trace_identity_for_force_audit_semantic_claim": true,
+    "new_successor_must_use_new_held_out_requalification_population": true,
+    "paired_component_ablation_claim_authorized": false,
+    "preserve_nonpass_without_rerun_or_threshold_relaxation": true,
+    "retain_descriptive_incremental_deadlock_table": true
+  },
+  "nonpass_axes": {
+    "no_guard_shadow_trace_identity": {
+      "observed_maximum_error_rad": 0.21771378124250163,
+      "threshold_rad": 0.001
+    },
+    "v15_2_v15_3_execution_identity": {
+      "force_attribution_changes_mechanism": false,
+      "lane_count": 756,
+      "maximum_actual_margin_trace_error_rad": 0.20665975962065275,
+      "scalar_mismatch_count": 2,
+      "trace_shape_mismatch_lane_count": 0
+    },
+    "v15_3_100ms_deadline_miss_rate": {
+      "observed": 0.027777777777777776,
+      "threshold": 0.025
+    }
+  },
+  "population": {
+    "all_prior_exact_pairs_excluded": true,
+    "baseline_count": 8,
+    "baseline_lane_count": 6048,
+    "held_out_exact_task_init_pair_count": 18,
+    "paired_same_injected_state_design": true,
+    "stress_lane_count": 756,
+    "task_outcomes_read": false
+  },
+  "registered_classification": "predictive_virtual_brake_v15_recovery_component_ablation_qualification_nonpass",
+  "registered_data_complete": true,
+  "registered_gate_results": {
+    "active_contact_capacity_unsaturated": true,
+    "active_contact_capacity_warning_free": true,
+    "all_component_schemas_match": true,
+    "all_recovery_variants_contain": true,
+    "baseline_lane_count": true,
+    "current_edge_deadlock_not_above_floor": true,
+    "current_edge_recovery_activates": true,
+    "environment_count": true,
+    "environment_lane_coverage": true,
+    "exact_action_identity": true,
+    "expected_total_baseline_lane_count": true,
+    "floor_recovery_activates": true,
+    "floor_recovery_reduces_deadlock_lanes": true,
+    "force_recomputation_identity": true,
+    "no_guard_shadow_trace_identity": false,
+    "priority_recovery_activates": true,
+    "priority_uses_current_edge_before_floor": true,
+    "priority_zero_residual_deadlock": true,
+    "reactive_below_floor_not_above_no_guard": true,
+    "reactive_crossing_not_above_no_guard": true,
+    "restore_identity": true,
+    "stress_activation_below_floor": true,
+    "stress_activation_crossing": true,
+    "stress_lane_count": true,
+    "v14_containment": true,
+    "v14_deadlock_activation": true,
+    "v15_2_candidate_priority_identity": true,
+    "v15_2_v15_3_margin_trace_identity": false,
+    "v15_2_v15_3_scalar_identity": false,
+    "v15_2_v15_3_trace_shape_identity": true,
+    "v15_3_100ms_deadline_miss_rate": false,
+    "v15_3_attributable_force_envelope": true,
+    "v15_3_force_attribution_active": true,
+    "v15_3_latency_max": true,
+    "v15_3_latency_p95": true,
+    "v15_3_post_step_absolute_force_envelope": true,
+    "v15_3_post_step_increment_envelope": true,
+    "v15_3_prediction_execution_error": true,
+    "v15_3_recovery_attributable_force_envelope": true,
+    "v15_3_recovery_post_step_increment_envelope": true,
+    "v15_3_recovery_prevention_identity": true,
+    "v15_3_relative_attributable_force_envelope": true,
+    "v15_3_schema_identity": true,
+    "v15_3_zero_residual_deadlock": true,
+    "zero_policy_or_outcome_fields": true
+  },
+  "registered_qualification_pass": false,
+  "registered_result_unchanged": true,
+  "schema": "proofalign.predictive-virtual-brake-v15-recovery-component-ablation-qualification-terminal.v1"
+}

@@ -1,0 +1,11 @@
+{
+  "outcomes_observed": false,
+  "policy_action_dispatched": false,
+  "policy_loaded": false,
+  "protocol_id": "proofalign-recovery-runtime-v12-fixed-trace-20260729",
+  "protocol_sha256": "09367aa0a421c6198f50aa3b48a3639e475e6b0ca2d828b0ae21bfb21938b821",
+  "row_count": 10,
+  "schema": "proofalign.recovery-runtime-v12-fixed-trace-result.v1.run-manifest",
+  "simulator_created": false,
+  "status": "complete"
+}

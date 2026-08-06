@@ -1,0 +1,46 @@
+{
+  "abort_classification": "v15_2_recovery_stress_qualification_fresh1_pre_evidence_analysis_abort",
+  "claim_boundary": "The frozen simulator matrix ran to the post-simulation analysis call, but analysis raised before any evidence directory or result artifact was created. This attempt authorizes no qualification, mechanism, task-utility, overhead, real-time, deployment, hardware, actuator-authority, or physical-safety claim. No qualification metric was observed from this attempt.",
+  "created_at": "2026-07-31T21:02:58+08:00",
+  "error": {
+    "exception_type": "KeyError",
+    "failing_analysis_key": "selected_floor_violation_count_max",
+    "failing_call": "calibration._analyze",
+    "reason": "The v15.2 qualification protocol registered the successor-native v15_2_selected_floor_violation_count_max key, while the reused calibration analysis layer also required its legacy selected_floor_violation_count_max compatibility alias.",
+    "simulator_matrix_reached_analysis": true
+  },
+  "fresh_output_root": {
+    "absent_after_abort": true,
+    "path": "results/proofalign_predictive_virtual_brake_v15_2_recovery_stress_qualification_20260731_fresh1"
+  },
+  "integrity": {
+    "evidence_artifact_created": false,
+    "qualification_metrics_observed": false,
+    "registered_population_changed": false,
+    "registered_thresholds_changed": false,
+    "result_reclassified": false
+  },
+  "protocol": {
+    "path": "experiments/proofalign_predictive_virtual_brake_v15_current_edge_priority_recovery_stress_qualification_protocol.json",
+    "sha256": "0a66460661df17c6d0aa00f2f523a14003ffeec63b72d05e1e87ea9031544e74"
+  },
+  "repair_scope_authorized": {
+    "analysis_compatibility_aliases_only": true,
+    "mechanism_parameter_change": false,
+    "population_change": false,
+    "random_seed_change": false,
+    "registered_gate_change": false,
+    "registered_threshold_change": false,
+    "retry_requires_fresh_output_root": true,
+    "versioned_successor_protocol_required": true
+  },
+  "repository": {
+    "commit": "2f8cad57a5cb7ce9507e96bd4f5deb2a1c236497",
+    "tree": "4c9f9920de4a0db75c7751be2f347295ec71d5c7"
+  },
+  "runner": {
+    "path": "scripts/run_v15_current_edge_priority_recovery_stress_qualification.py",
+    "sha256": "e5d043e62818d0d7fa5310395bba2a3299950b64bde21c67a41ba0f33fcdcfe0"
+  },
+  "schema": "proofalign.predictive-virtual-brake-v15.2-current-edge-priority-recovery-stress-qualification-abort.v1"
+}

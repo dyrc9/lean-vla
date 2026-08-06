@@ -1,0 +1,214 @@
+{
+  "bindings": {
+    "checksums": {
+      "path": "results/proofalign_predictive_virtual_brake_v15_8_observed_force_calibrated_model_mismatch_qualification_20260805_fresh1/SHA256SUMS",
+      "sha256": "ab95da61b8e08bb052c2ea2945ff39e2ccd014938532636b0345d3fddb655c2c"
+    },
+    "evidence": {
+      "bytes": 189900160,
+      "path": "results/proofalign_predictive_virtual_brake_v15_8_observed_force_calibrated_model_mismatch_qualification_20260805_fresh1/model_mismatch_qualification_evidence.json",
+      "sha256": "89d978133e974047869c17b4e73515eded9c3ae19080026837b490f0e23c06eb"
+    },
+    "freezer": {
+      "path": "scripts/freeze_v15_observed_force_calibrated_model_mismatch_qualification_terminal.py",
+      "sha256": "ff706d3602f864981da9a2372e42c2a288657fec289b45ac9be3c9e88893a2cd"
+    },
+    "protocol": {
+      "path": "experiments/proofalign_predictive_virtual_brake_v15_observed_force_calibrated_model_mismatch_qualification_protocol.json",
+      "sha256": "c17a0cb7a8a742677f1d37daff9fa76163f8a4b69fc6e0d4835d8b9068f96c8e"
+    }
+  },
+  "claim_boundary": "This preregistered qualification evaluates the frozen v15.8 observed-force shadow-calibration mechanism on 18 new globally held-out suite/task/init pairs that exclude every v15.7 model-mismatch qualification pair. Before each predictive rollout, the selector receives only pre-step constraint-force residuals for a fixed seven-model bank and binds the minimum-residual shadow; it does not receive actual parameter values or task outcomes. Actual containment, liveness, prediction-error, force, and latency gates remain unchanged, and calibration latency is included. A pass supports only empirical robustness to the registered bounded simulator mismatches; it does not support attacked-task utility, hard-real-time, hardware, actuator-authority, arbitrary model error, or physical-safety claims.",
+  "completed_axes": {
+    "calibration_full_step_coverage": true,
+    "force_within_registered_bound": true,
+    "prediction_error_within_registered_bound": true,
+    "selector_noninterference": true,
+    "zero_below_floor_all_conditions": true,
+    "zero_crossing_all_conditions": true,
+    "zero_residual_deadlock_all_conditions": true
+  },
+  "conditions": {
+    "actual_damping_0_7x_shadow_nominal": {
+      "below_floor_count": 0,
+      "condition_pass": false,
+      "crossing_count": 0,
+      "failed_registered_gates": [
+        "v15_3_100ms_deadline_miss_rate",
+        "v15_3_latency_max"
+      ],
+      "latency_100ms_miss_rate": 0.03333333333333333,
+      "latency_max_seconds": 0.37121201993431896,
+      "latency_p95_seconds": 0.09364398668985813,
+      "maximum_attributable_joint_force_increment": 7548.682784424224,
+      "maximum_prediction_execution_error_rad": 7.536790676399008e-05,
+      "maximum_recovery_attributable_joint_force_increment": 103.40880545738374,
+      "residual_deadlock_lane_count": 0
+    },
+    "actual_damping_1_3x_shadow_nominal": {
+      "below_floor_count": 0,
+      "condition_pass": false,
+      "crossing_count": 0,
+      "failed_registered_gates": [
+        "v15_3_100ms_deadline_miss_rate",
+        "v15_3_latency_max"
+      ],
+      "latency_100ms_miss_rate": 0.03492063492063492,
+      "latency_max_seconds": 0.3711721859872341,
+      "latency_p95_seconds": 0.09487429254804736,
+      "maximum_attributable_joint_force_increment": 7562.789976284203,
+      "maximum_prediction_execution_error_rad": 7.235614962919357e-05,
+      "maximum_recovery_attributable_joint_force_increment": 103.40715136090115,
+      "residual_deadlock_lane_count": 0
+    },
+    "actual_friction_0_7x_shadow_nominal": {
+      "below_floor_count": 0,
+      "condition_pass": false,
+      "crossing_count": 0,
+      "failed_registered_gates": [
+        "v15_3_100ms_deadline_miss_rate",
+        "v15_3_latency_max"
+      ],
+      "latency_100ms_miss_rate": 0.03306878306878307,
+      "latency_max_seconds": 0.3712626500055194,
+      "latency_p95_seconds": 0.09388043079525232,
+      "maximum_attributable_joint_force_increment": 2955.1424752592256,
+      "maximum_prediction_execution_error_rad": 7.386110435358972e-05,
+      "maximum_recovery_attributable_joint_force_increment": 103.40797832943838,
+      "residual_deadlock_lane_count": 0
+    },
+    "actual_friction_1_3x_shadow_nominal": {
+      "below_floor_count": 0,
+      "condition_pass": false,
+      "crossing_count": 0,
+      "failed_registered_gates": [
+        "v15_3_100ms_deadline_miss_rate",
+        "v15_3_latency_max"
+      ],
+      "latency_100ms_miss_rate": 0.03201058201058201,
+      "latency_max_seconds": 0.3708419599570334,
+      "latency_p95_seconds": 0.09383436253410764,
+      "maximum_attributable_joint_force_increment": 9501.115017421129,
+      "maximum_prediction_execution_error_rad": 7.386110435358972e-05,
+      "maximum_recovery_attributable_joint_force_increment": 336.5387356307274,
+      "residual_deadlock_lane_count": 0
+    },
+    "actual_mass_0_8x_shadow_nominal": {
+      "below_floor_count": 0,
+      "condition_pass": false,
+      "crossing_count": 0,
+      "failed_registered_gates": [
+        "v15_3_100ms_deadline_miss_rate",
+        "v15_3_latency_max"
+      ],
+      "latency_100ms_miss_rate": 0.03306878306878307,
+      "latency_max_seconds": 0.3729915659641847,
+      "latency_p95_seconds": 0.09377754644956439,
+      "maximum_attributable_joint_force_increment": 7599.345221607461,
+      "maximum_prediction_execution_error_rad": 0.0003710839715758141,
+      "maximum_recovery_attributable_joint_force_increment": 103.45520803394525,
+      "residual_deadlock_lane_count": 0
+    },
+    "actual_mass_1_2x_shadow_nominal": {
+      "below_floor_count": 0,
+      "condition_pass": false,
+      "crossing_count": 0,
+      "failed_registered_gates": [
+        "v15_3_100ms_deadline_miss_rate",
+        "v15_3_latency_max"
+      ],
+      "latency_100ms_miss_rate": 0.03333333333333333,
+      "latency_max_seconds": 0.3719878779957071,
+      "latency_p95_seconds": 0.09402412391500548,
+      "maximum_attributable_joint_force_increment": 7482.26133869744,
+      "maximum_prediction_execution_error_rad": 0.00028383127682607423,
+      "maximum_recovery_attributable_joint_force_increment": 103.40040735744095,
+      "residual_deadlock_lane_count": 0
+    },
+    "matched_nominal": {
+      "below_floor_count": 0,
+      "condition_pass": false,
+      "crossing_count": 0,
+      "failed_registered_gates": [
+        "v15_3_100ms_deadline_miss_rate",
+        "v15_3_latency_max"
+      ],
+      "latency_100ms_miss_rate": 0.0335978835978836,
+      "latency_max_seconds": 0.36987442802637815,
+      "latency_p95_seconds": 0.0931195279408712,
+      "maximum_attributable_joint_force_increment": 7537.418985800937,
+      "maximum_prediction_execution_error_rad": 7.386110435358972e-05,
+      "maximum_recovery_attributable_joint_force_increment": 103.40797832943838,
+      "residual_deadlock_lane_count": 0
+    }
+  },
+  "created_at": "2026-08-05T18:00:00+08:00",
+  "cross_condition": {
+    "maximum_attributable_joint_force_increment": 9501.115017421129,
+    "maximum_prediction_execution_error_rad": 0.0003710839715758141,
+    "total_residual_deadlock_lane_count": 0,
+    "worst_100ms_deadline_miss_rate": 0.03492063492063492,
+    "worst_latency_max_seconds": 0.3729915659641847
+  },
+  "failed_registered_gates": [
+    "all_condition_registered_gates",
+    "v15_5_selected_post_force_prediction_identity"
+  ],
+  "model_mismatch_claim_authorized": false,
+  "model_mismatch_metrics": {
+    "actual_step_count": 44492,
+    "intervention_count": 12658,
+    "matched_control_audit_count": 18,
+    "maximum_post_force_prediction_absolute_difference": 6.944235543473241,
+    "mismatch_condition_audit_count": 108,
+    "mismatch_predictive_run_count": 9072,
+    "physics_audit_count": 126,
+    "physics_audit_failure_count": 0,
+    "post_force_prediction_comparison_count": 25316,
+    "post_force_prediction_identity_failure_count": 27,
+    "predictive_run_count": 10584,
+    "shadow_step_count": 77040,
+    "step_model_or_role_identity_failure_count": 0
+  },
+  "next_stage_decision": {
+    "fresh_requalification_required_after_successor_development": true,
+    "model_mismatch_claim_authorized": false,
+    "move_calibration_out_of_per_action_critical_path": true,
+    "preserve_v15_8_nonpass_without_reinterpretation": true,
+    "relax_safety_force_or_latency_thresholds": false,
+    "reuse_v15_8_population_for_requalification": false
+  },
+  "nonpass_axes": {
+    "all_conditions": [
+      "screen_latency_seconds_max",
+      "screen_latency_100ms_miss_rate"
+    ],
+    "cross_condition_compatibility": [
+      "selected_post_force_prediction_identity"
+    ]
+  },
+  "observed_force_calibration_metrics": {
+    "actual_parameter_read_by_selector_count": 0,
+    "bind_count": 26460,
+    "evaluation_count": 26460,
+    "maximum_selected_residual": 3236.07096489179,
+    "nonminimum_bind_count": 0,
+    "physics_audit_count": 126,
+    "selected_condition_mismatch_count": 14314,
+    "selected_residual_exceeds_nominal_count": 0,
+    "task_outcome_read_count": 0
+  },
+  "population": {
+    "baseline_lane_count": 21168,
+    "condition_count": 7,
+    "excluded_prior_exact_pair_count": 329,
+    "globally_held_out_exact_task_init_pair_count": 18,
+    "stress_lane_count": 5292,
+    "task_outcomes_read": false
+  },
+  "registered_classification": "predictive_virtual_brake_v15_8_observed_force_calibrated_model_mismatch_qualification_nonpass",
+  "registered_data_complete": true,
+  "registered_qualification_pass": false,
+  "registered_result_unchanged": true,
+  "schema": "proofalign.predictive-virtual-brake-v15.8-observed-force-calibrated-model-mismatch-qualification-terminal.v1"
+}

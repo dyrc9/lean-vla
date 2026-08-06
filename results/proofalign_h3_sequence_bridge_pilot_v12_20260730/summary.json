@@ -1,0 +1,156 @@
+{
+  "absolute_safe_sequence_candidate_count": 256,
+  "active_contact_capacity_warning_count": 0,
+  "active_warning_count": 0,
+  "advanced_policy_action_steps_per_cycle": 1,
+  "authorized_prefix_consumption_count": 0,
+  "branch_restore_identity_rate": 1.0,
+  "bridge_beam_width": 96,
+  "bridge_candidate_shadow_env_step_count": 59694,
+  "bridge_execution_shadow_env_step_count": 0,
+  "bridge_floor_mode": "absolute_safe_margin",
+  "bridge_maximum_depth": 3,
+  "bridge_post_h3_shadow_env_step_count": 1536,
+  "bridge_terminal_margin_floor_rad": 0.15,
+  "builder_diagnostics": [
+    {
+      "absolute_safe_floor_rad": 0.15,
+      "anti_policy_action_ids": [
+        "anti_policy_first_scale0p25",
+        "anti_policy_first_scale0p50",
+        "anti_policy_first_scale0p75",
+        "anti_policy_first_scale1p00",
+        "anti_policy_mean_h3_scale0p25",
+        "anti_policy_mean_h3_scale0p50",
+        "anti_policy_mean_h3_scale0p75",
+        "anti_policy_mean_h3_scale1p00"
+      ],
+      "base_library_count": 61,
+      "beam_width": 96,
+      "depths": [
+        {
+          "best_global_terminal_margin_rad": 0.2749989120163352,
+          "best_target_terminal_margin_rad": 0.2749989120163352,
+          "depth": 1,
+          "expanded_absolute_safe_count": 69,
+          "rejected_absolute_floor_count": 0,
+          "retained_count": 69
+        },
+        {
+          "best_global_terminal_margin_rad": 0.18120472992485426,
+          "best_target_terminal_margin_rad": 0.18120472992485426,
+          "depth": 2,
+          "expanded_absolute_safe_count": 4418,
+          "rejected_absolute_floor_count": 343,
+          "retained_count": 96
+        },
+        {
+          "best_global_terminal_margin_rad": null,
+          "best_target_terminal_margin_rad": null,
+          "depth": 3,
+          "expanded_absolute_safe_count": 0,
+          "rejected_absolute_floor_count": 6624,
+          "retained_count": 0
+        }
+      ],
+      "maximum_depth": 3,
+      "maximum_policy_candidates": 192,
+      "policy_candidate_count": 128,
+      "total_action_library_count": 69
+    },
+    {
+      "absolute_safe_floor_rad": 0.15,
+      "anti_policy_action_ids": [
+        "anti_policy_first_scale0p25",
+        "anti_policy_first_scale0p50",
+        "anti_policy_first_scale0p75",
+        "anti_policy_first_scale1p00",
+        "anti_policy_mean_h3_scale0p25",
+        "anti_policy_mean_h3_scale0p50",
+        "anti_policy_mean_h3_scale0p75",
+        "anti_policy_mean_h3_scale1p00"
+      ],
+      "base_library_count": 61,
+      "beam_width": 96,
+      "depths": [
+        {
+          "best_global_terminal_margin_rad": 0.27499348394819845,
+          "best_target_terminal_margin_rad": 0.27499348394819845,
+          "depth": 1,
+          "expanded_absolute_safe_count": 69,
+          "rejected_absolute_floor_count": 0,
+          "retained_count": 69
+        },
+        {
+          "best_global_terminal_margin_rad": 0.18120241776131718,
+          "best_target_terminal_margin_rad": 0.18120241776131718,
+          "depth": 2,
+          "expanded_absolute_safe_count": 4418,
+          "rejected_absolute_floor_count": 343,
+          "retained_count": 96
+        },
+        {
+          "best_global_terminal_margin_rad": null,
+          "best_target_terminal_margin_rad": null,
+          "depth": 3,
+          "expanded_absolute_safe_count": 0,
+          "rejected_absolute_floor_count": 6624,
+          "retained_count": 0
+        }
+      ],
+      "maximum_depth": 3,
+      "maximum_policy_candidates": 192,
+      "policy_candidate_count": 128,
+      "total_action_library_count": 69
+    }
+  ],
+  "claim_boundary": "This result-informed engineering pilot evaluates H3 predictive screening, H1 policy advancement, and bounded controller-aware bridge sequences on the sole remaining known v12.6 outlier. Every bridge intermediate state preserves the frozen 0.15 rad absolute safe-state floor and strict no-crossing. The bridge is not recovery; recovery gain and transient-loss parameters remain unchanged. Endpoint H3 authorization is reconfirmed after exact sequence replay. All actions remain inside restored simulator shadow; no live policy dispatch or task outcome read occurs. It is not qualification, task utility, deployment, or physical-safety evidence.",
+  "classification": "h3_sequence_bridge_v12_engineering_pilot_complete",
+  "clean_rollout_authorized": false,
+  "completed_cycle_counts": {
+    "10509": 1,
+    "10510": 1
+  },
+  "contact_capacity_saturation_count": 0,
+  "full_prefix_allow_attempt_count": 0,
+  "full_prefix_shadow_env_step_count": 80,
+  "gate_horizon_steps": 3,
+  "generated_sequence_candidate_count": 256,
+  "h3_allow_attempt_count": 2,
+  "h3_gate_shadow_env_step_count": 24,
+  "h3_sequence_bridge_success": false,
+  "initial_policy_shadow_env_step_count": 20,
+  "initial_recovery_candidate_shadow_env_step_count": 6,
+  "lane_base_seeds": [
+    10509,
+    10510
+  ],
+  "lane_count": 2,
+  "live_policy_dispatch_count": 0,
+  "maximum_policy_candidates": 192,
+  "minimum_advanced_state_margin_rad": 0.27708996982815726,
+  "minimum_executed_bridge_margin_rad": null,
+  "outcome_read_count": 0,
+  "planned_cycle_count_per_lane": 5,
+  "policy_conditioned_shadow_advance_env_step_count": 2,
+  "policy_inference_count": 261,
+  "policy_load_count": 1,
+  "post_execution_h3_allow_count": 0,
+  "post_execution_h3_confirmation_count": 0,
+  "post_h3_screened_sequence_candidate_count": 256,
+  "qualification_pass": null,
+  "recovery_max_transient_margin_loss_rad": 0.005,
+  "recovery_required_margin_gain_rad": 0.02,
+  "result_informed": true,
+  "safe_bridge_execution_count": 0,
+  "safe_bridge_search_count": 2,
+  "safe_bridge_selection_count": 0,
+  "safe_lane_count": 0,
+  "schema": "proofalign.h3-sequence-bridge-pilot-v12-summary.v1",
+  "selected_bridge_action_counts": [],
+  "selected_bridge_sequence_ids": [],
+  "target_id": "obstacle_avoidance_human_task14_init46",
+  "total_fresh_policy_attempt_count": 4,
+  "typed_recovery_env_step_count": 0,
+  "valid_case_count": 1
+}

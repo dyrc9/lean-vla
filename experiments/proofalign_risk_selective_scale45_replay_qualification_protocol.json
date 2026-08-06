@@ -1,0 +1,62 @@
+{
+  "bound_scale45_evidence": {
+    "path": "results/proofalign_contact_phase_pick_up_scale45_cotenant_20260729_fresh1/pilot_evidence.json",
+    "sha256": "acffa947f74a59dfab785e0706aeb5638fa3ccbe65fda7fb6675535944eaa476"
+  },
+  "claim_boundary": "This outcome-conditioned read-only replay validates only the v9 physical/advisory partition and deterministic availability mechanisms on the complete retained v8 scale45 traces. It loads no policy, creates no simulator, dispatches no action, computes no counterfactual success rate, and makes no efficacy, attacked-defense, causal-safety, timing, deployment, or hardware claim.",
+  "created_at": "2026-07-29T15:30:00+08:00",
+  "execution_authorization": {
+    "action_dispatch": false,
+    "policy_load": false,
+    "read_bound_episode_artifacts": true,
+    "simulator_create": false,
+    "task_outcome_generation": false
+  },
+  "fresh_output_root": "results/proofalign_risk_selective_scale45_replay_qualification_20260729_fresh1",
+  "gates": {
+    "advisory_semantic_atom_count": 46,
+    "nominal_audit_count": 1142,
+    "physical_risk_atom_count": 6,
+    "predecessor_changed_block_count": 1036,
+    "predecessor_effect_reject_count": 17,
+    "predecessor_terminal_action_reject_count": 49,
+    "predecessor_unchanged_block_count": 106,
+    "selector_fallback_endpoint_count": 17,
+    "semantic_episode_count": 90,
+    "successor_effect_replan_count": 9,
+    "successor_nominal_eligible_count": 1136,
+    "successor_physical_reject_count": 6,
+    "successor_recovered_action_reject_count": 43,
+    "successor_retained_effect_reject_count": 8,
+    "successor_retained_physical_reject_count": 6
+  },
+  "method_delta": {
+    "advisory_replan": "task-semantic mismatch, missing expected progress, and selector unknown/finished endpoint",
+    "counterfactual_task_outcome_inference": false,
+    "hard_gate": "predicted physical risk, observed violations, and execution-integrity failures",
+    "policy_prompt": "trusted full task, unchanged from VLA arm",
+    "source_action_block": "returned unchanged when nominal physical-risk set is empty"
+  },
+  "parent_scale45_terminal": {
+    "classification": "contact_phase_pick_up_scale45_data_complete",
+    "path": "experiments/proofalign_contact_phase_pick_up_scale45_terminal_summary.json",
+    "sha256": "98f2895a9426e0a05e0bb0a0cccc9a98aeb144d69ba8fb40028c86c68c8fe3f1"
+  },
+  "protocol_id": "proofalign-risk-selective-scale45-replay-qualification-20260729",
+  "schema": "proofalign.risk-selective-scale45-replay-qualification-protocol.v1",
+  "source": {
+    "freezer": "scripts/freeze_risk_selective_scale45_replay_qualification.py",
+    "freezer_sha256": "ba72104efd3a2116bf2136c4a825b0068ce33dc1736f964fd7cc03153ff39753",
+    "repository_commit": "8d37003fb41835fb7c7b78118bebae9f2f391c9c",
+    "repository_tree": "1667c2c3a41d508f5b54bc7ea89ca11788f555f9",
+    "sha256": {
+      "scripts/freeze_risk_selective_scale45_replay_qualification.py": "ba72104efd3a2116bf2136c4a825b0068ce33dc1736f964fd7cc03153ff39753",
+      "scripts/run_l2_execution_attack_eval_v9.py": "8dba9d97c65e28381e68a233d11fd637b65b39adf323ca1e8444cbeb18cfc1f2",
+      "scripts/run_risk_selective_scale45_replay_qualification.py": "c4385e6964d272976558fd107aa59b2a198d646f9bd512486f189405ccd15a1c",
+      "src/proofalign/risk_selective_semantic.py": "ca73c803e1a37a131ebabe4388d72288045c6d3b4a55f80ff474389f5b82988d",
+      "tests/test_risk_selective_scale45_replay_qualification.py": "86ee96f0d731a281b5e39bae0bc9c1601fd5ac4c6924bf8aaa02cd4fa9f4dc04",
+      "tests/test_risk_selective_semantic.py": "c4c1ba22ae002aaad5b434c8676130528b71c2c362f1787a842b8f347303d849"
+    }
+  },
+  "status": "authorized_read_only_risk_partition_replay"
+}

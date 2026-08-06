@@ -1,0 +1,50 @@
+{
+  "schema": "proofalign.predictive-virtual-brake-v13-resource-failure.v1",
+  "classification": "predictive_virtual_brake_v13_fresh1_pre_outcome_resource_failure",
+  "recorded_at": "2026-07-31T11:27:00+08:00",
+  "protocol": {
+    "path": "experiments/proofalign_predictive_virtual_brake_v13_clean_protocol.json",
+    "protocol_id": "proofalign-predictive-virtual-brake-v13-clean-outcome-20260731",
+    "sha256": "5841d39a99f68d2167ca509f67cd65da9b966f1a4f8c2060ee9b8736c970d882",
+    "source_commit": "d4040588fdb2d7e3cbeaa5296899e48194b2e570"
+  },
+  "launch": {
+    "repository_commit": "f01f09de90a262e1330a432595c25726b37227a5",
+    "interpreter": "/home/ldx/lean-vla/.venv/bin/python",
+    "policy_gpu": 1,
+    "egl_gpu": 2,
+    "preflight_ready_before_launch": true
+  },
+  "failure": {
+    "type": "ModuleNotFoundError",
+    "message": "No module named 'jax'",
+    "stage": "configure_environment_import_jax",
+    "policy_loaded": false,
+    "environment_created": false,
+    "simulator_step_count": 0,
+    "policy_dispatch_count": 0,
+    "task_outcome_read_count": 0
+  },
+  "output_root": {
+    "path": "results/proofalign_predictive_virtual_brake_v13_clean_20260731_fresh1",
+    "preserved": true,
+    "file_count": 1,
+    "files": [
+      {
+        "path": "runtime/libero_config/config.yaml",
+        "sha256": "8d1cc08bf89c204f7d592bc6b87f4ffebeed91f7e870097b340a858c07741a3c",
+        "bytes": 408
+      }
+    ],
+    "run_manifest_created": false,
+    "episode_artifact_count": 0
+  },
+  "corrective_action": {
+    "original_protocol_mutated": false,
+    "fresh1_output_overwritten": false,
+    "required_interpreter": "external/openpi/.venv/bin/python",
+    "fresh2_protocol_required": true,
+    "workload_guard_threshold_and_analysis_changes_authorized": false
+  },
+  "claim_boundary": "This is a pre-outcome resource failure only. It contains no policy, simulator, task-success, reward, safety, utility, or efficacy evidence and cannot be counted as an experimental attempt."
+}

@@ -1,0 +1,67 @@
+{
+  "claim_boundary": "This fixed trace qualifies typed recovery authorization, single-use ordered 7D recovery receipts, substitution/replay rejection, old-policy revocation, fresh observation epoch, and fresh-policy state binding with an in-memory sink. It loads no policy, creates no simulator, reads no task outcome, and does not establish dynamics fidelity, arbitrary-state recovery, clean utility, attacked efficacy, deployment, or physical safety.",
+  "classification": "recovery_runtime_v12_fixed_trace_pass",
+  "execution_boundary": {
+    "outcome_read_count": 0,
+    "policy_action_dispatch_count": 0,
+    "policy_load_count": 0,
+    "recovery_sink_apply_count": 9,
+    "simulator_create_count": 0
+  },
+  "gate_conditions": {
+    "expected_classification": true,
+    "happy_receipt_identity": true,
+    "old_policy_authorization": true,
+    "outcome_read_count": true,
+    "policy_action_dispatch_count": true,
+    "policy_load_count": true,
+    "recovery_authorization_replay": true,
+    "runtime_exception_count": true,
+    "simulator_create_count": true,
+    "valid_case_count": true
+  },
+  "interpretation": {
+    "limit": "This used an in-memory recovery sink. It qualifies the transaction boundary only, not simulator dynamics, recovery coverage, task utility, attacked efficacy, deployment, or physical safety.",
+    "positive": "All ten frozen typed-runtime traces matched their expected classification, including exact ordered recovery receipts, replay/substitution rejection, old-policy revocation, fresh observation epoch, and fresh-policy state binding."
+  },
+  "lifecycle": {
+    "clean_rollout_authorized": false,
+    "multi_joint_simulator_preflight_authorized": true,
+    "next_step": "Freeze and run a 7-joint upper/lower no-outcome LIBERO simulator qualification through the typed runtime.",
+    "outcome_rollout_authorized": false,
+    "overwrite_allowed": false,
+    "predecessor_unchanged": true,
+    "terminal": true
+  },
+  "metrics": {
+    "expected_classification_rate": 1.0,
+    "happy_receipt_identity_rate": 1.0,
+    "old_policy_authorization_accept_count": 0,
+    "outcome_read_count": 0,
+    "policy_action_dispatch_count": 0,
+    "policy_load_count": 0,
+    "recovery_authorization_replay_accept_count": 0,
+    "recovery_sink_apply_count": 9,
+    "runtime_exception_count": 0,
+    "simulator_create_count": 0,
+    "valid_case_count": 10
+  },
+  "protocol_id": "proofalign-recovery-runtime-v12-fixed-trace-20260729",
+  "qualification_pass": true,
+  "schema": "proofalign.recovery-runtime-v12-fixed-trace-terminal.v1",
+  "source": {
+    "checksums_sha256": "5200db7f4657ffb0699dbb52c404cd04edbfa738b0a8d470907dc1cee84d1511",
+    "ledger_sha256": "f71f1c3ba2dc9031b3eb330c7aceb7c16498459e9e2fa517df5aef8836947ce8",
+    "manifest_sha256": "67cb3c176376d9e262f64bca38de506d4ff24738a0ae8a152a7994011cb26d0c",
+    "predecessor": {
+      "classification": "escape_recovery_v12_simulator_preflight_pass",
+      "path": "experiments/proofalign_escape_recovery_v12_simulator_preflight_terminal_summary.json",
+      "sha256": "8d2413296dd96875d082d4e34e61a840c34ec5ae187289ff5c740e59819897d0",
+      "unchanged": true
+    },
+    "protocol_path": "experiments/proofalign_recovery_runtime_v12_fixed_trace_protocol.json",
+    "protocol_sha256": "09367aa0a421c6198f50aa3b48a3639e475e6b0ca2d828b0ae21bfb21938b821",
+    "result_root": "results/proofalign_recovery_runtime_v12_fixed_trace_20260729_fresh1",
+    "result_sha256": "5ddb2a053d6fcfc8a44817374aa017d5c817e1a3685e82d2cd357120e1040d99"
+  }
+}

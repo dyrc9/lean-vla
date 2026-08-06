@@ -1,0 +1,1285 @@
+{
+  "bindings": {
+    "checksums": {
+      "entry_count": 1,
+      "path": "results/proofalign_predictive_virtual_brake_v15_3_force_attributed_recovery_physics_domain_robustness_qualification_20260801_fresh1/SHA256SUMS",
+      "sha256": "04800383fd34549453b7b5db60bd1ec37ad2100768fcb41d16195516b70b6128"
+    },
+    "evidence": {
+      "path": "results/proofalign_predictive_virtual_brake_v15_3_force_attributed_recovery_physics_domain_robustness_qualification_20260801_fresh1/qualification_evidence.json",
+      "sha256": "595c0afc4d4297752b80571b17076921ccbaa737c4442c74990ff8fba63f29de"
+    },
+    "freezer": {
+      "path": "scripts/freeze_v15_force_attributed_recovery_physics_domain_robustness_qualification_terminal.py",
+      "sha256": "e2e5fe12b7fd3f52f2879400c71706aa0b552902e99f0f7f34c5b971b993e1ba"
+    },
+    "protocol": {
+      "path": "experiments/proofalign_predictive_virtual_brake_v15_force_attributed_recovery_physics_domain_robustness_qualification_protocol.json",
+      "sha256": "78d14c6e0e4389e504a7aa610a08431aa08c2b6f66c501fa7a866f22055df111"
+    }
+  },
+  "claim_boundary": "This outcome-blind qualification uses eighteen new exact task/init pairs and seven frozen same-simulator physics domains: nominal plus arm mass, joint damping, and arm sliding friction scales. Each perturbed model is shared by shadow prediction and actual execution, so a pass supports parameter-domain robustness, not simulator-model mismatch robustness. No policy, reward, done, task success, cost, or collision outcome is read. No task-utility, arbitrary-attack, real-time, hardware, actuator-authority, or physical-safety claim is authorized.",
+  "completed_axes": {
+    "all_condition_active_warning_and_saturation_zero": true,
+    "all_condition_comparative_gates": true,
+    "all_condition_registered_gates": false,
+    "all_condition_v15_3_availability_one": true,
+    "all_condition_v15_3_joint_limit_proxy_containment": true
+  },
+  "conditions": {
+    "arm_friction_0_7x": {
+      "active_contact_capacity": {
+        "contact_capacity_warning_count": 0,
+        "contact_observation_count": 23005,
+        "contact_saturation_count": 0,
+        "maximum_ncon": 152,
+        "minimum_nconmax": 5000,
+        "warning_count": 0
+      },
+      "baselines": {
+        "no_guard": {
+          "below_floor_count": 1849.0,
+          "crossing_count": 792.0,
+          "deadlock_lane_count": 0.0,
+          "executed_step_availability": 1.0,
+          "lane_count": 756.0,
+          "maximum_abs_constraint_force": 921.2673227604911,
+          "minimum_margin_rad": -0.04396251397473616,
+          "screen_latency_sample_count": 0,
+          "screen_latency_seconds_max": null,
+          "screen_latency_seconds_p50": null,
+          "screen_latency_seconds_p95": null,
+          "screen_latency_seconds_p99": null
+        },
+        "reactive_stop": {
+          "below_floor_count": 398.0,
+          "crossing_count": 4.0,
+          "deadlock_lane_count": 0.0,
+          "executed_step_availability": 0.6158730158730159,
+          "lane_count": 756.0,
+          "maximum_abs_constraint_force": 926.8181630538152,
+          "minimum_margin_rad": -0.04098913708135887,
+          "screen_latency_sample_count": 0,
+          "screen_latency_seconds_max": null,
+          "screen_latency_seconds_p50": null,
+          "screen_latency_seconds_p95": null,
+          "screen_latency_seconds_p99": null
+        },
+        "v14_predictive_brake": {
+          "below_floor_count": 0.0,
+          "crossing_count": 0.0,
+          "deadlock_lane_count": 360.0,
+          "executed_step_availability": 0.6873015873015873,
+          "lane_count": 756.0,
+          "maximum_abs_constraint_force": 4689.6877586420105,
+          "minimum_margin_rad": 0.15023306055428254,
+          "screen_latency_sample_count": 2958,
+          "screen_latency_seconds_max": 0.11650329199619591,
+          "screen_latency_seconds_p50": 0.018652181985089555,
+          "screen_latency_seconds_p95": 0.045576007422641854,
+          "screen_latency_seconds_p99": 0.064239150827052
+        },
+        "v15_3_force_attributed_recovery": {
+          "below_floor_count": 0.0,
+          "crossing_count": 0.0,
+          "deadlock_lane_count": 0.0,
+          "executed_step_availability": 1.0,
+          "lane_count": 756.0,
+          "maximum_abs_constraint_force": 4689.68775864201,
+          "minimum_margin_rad": 0.15023200041927387,
+          "screen_latency_sample_count": 3780,
+          "screen_latency_seconds_max": 0.14706653996836394,
+          "screen_latency_seconds_p50": 0.026840993494261056,
+          "screen_latency_seconds_p95": 0.08285940325877164,
+          "screen_latency_seconds_p99": 0.08527343060297427
+        }
+      },
+      "comparative_gate_results": {
+        "reactive_crossing_not_above_no_guard": true,
+        "v15_3_availability_not_below_v14": true,
+        "v15_3_below_floor_not_above_reactive": true
+      },
+      "deadlock_prevention_identity": {
+        "internal_not_prevented_lane_ids": [],
+        "paired_identity": true,
+        "v14_deadlock_lane_count": 360,
+        "v14_only_lane_ids": [],
+        "v15_internal_only_lane_ids": [],
+        "v15_internal_would_deadlock_lane_count": 360,
+        "v15_recovery_prevented_deadlock_lane_count": 360
+      },
+      "failed_registered_gates": [
+        "v15_3_recovery_attributable_force_envelope"
+      ],
+      "force_comparison": {
+        "attributable_increment_to_v14_legacy_force_ratio": 0.9999786766187542,
+        "legacy_v15_3_total_force_diagnostic": 4689.68775864201,
+        "v14_legacy_maximum_abs_constraint_force": 4689.6877586420105,
+        "v15_3_maximum_attributable_joint_force_increment": 4689.587758642009,
+        "v15_3_maximum_post_step_absolute_risk_force": 0.1,
+        "v15_3_maximum_post_step_positive_joint_increment": 0.0,
+        "v15_3_maximum_recovery_attributable_joint_force_increment": 1777.6595190881712,
+        "v15_3_maximum_recovery_post_step_positive_joint_increment": 0.0
+      },
+      "latency_budget": {
+        "deadline_seconds": 0.1,
+        "miss_count": 21,
+        "miss_rate": 0.005555555555555556,
+        "sample_count": 3780
+      },
+      "physics_parameters": {
+        "arm_mass_scale": 1.0,
+        "arm_sliding_friction_scale": 0.7,
+        "condition_id": "arm_friction_0_7x",
+        "joint_damping_scale": 1.0
+      },
+      "recovery": {
+        "current_edge_selected_count": 1181,
+        "floor_edge_selected_count": 0,
+        "maximum_prediction_execution_error_rad": 3.6276599404416743e-06,
+        "recovery_prevented_deadlock_count": 1181,
+        "selected_floor_violation_count": 0,
+        "selected_recovery_count": 1181,
+        "v14_predictive_deadlock_lane_count": 360,
+        "v15_3_residual_deadlock_lane_count": 0
+      },
+      "registered_gate_results": {
+        "active_contact_capacity_unsaturated": true,
+        "active_contact_capacity_warning_free": true,
+        "baseline_lane_count": true,
+        "environment_count": true,
+        "environment_lane_coverage": true,
+        "exact_action_identity": true,
+        "expected_total_baseline_lane_count": true,
+        "force_recomputation_identity": true,
+        "restore_identity": true,
+        "stress_activation_below_floor": true,
+        "stress_activation_crossing": true,
+        "stress_lane_count": true,
+        "v14_deadlock_activation": true,
+        "v15_2_candidate_priority_identity": true,
+        "v15_3_100ms_deadline_miss_rate": true,
+        "v15_3_attributable_force_envelope": true,
+        "v15_3_availability_not_below_v14": true,
+        "v15_3_crossing_containment": true,
+        "v15_3_floor_containment": true,
+        "v15_3_force_attribution_active": true,
+        "v15_3_latency_max": true,
+        "v15_3_latency_p95": true,
+        "v15_3_post_step_absolute_force_envelope": true,
+        "v15_3_post_step_increment_envelope": true,
+        "v15_3_prediction_execution_error": true,
+        "v15_3_recovery_attributable_force_envelope": false,
+        "v15_3_recovery_post_step_increment_envelope": true,
+        "v15_3_recovery_prevention_identity": true,
+        "v15_3_relative_attributable_force_envelope": true,
+        "v15_3_schema_identity": true,
+        "v15_3_selected_recovery_floor_containment": true,
+        "v15_3_zero_residual_deadlock": true,
+        "zero_policy_or_outcome_fields": true
+      },
+      "worst_recovery_attributable_force": {
+        "dose": "low",
+        "guard_scope_absolute_risk_force": 1777.7595190881711,
+        "init_state_id": 5,
+        "joint_index": 6,
+        "lane_id": "v15_3_physics_robust_obstacle_avoidance_human_task6_init5:arm_friction_0_7x:joint6:lower:low",
+        "post_step_absolute_risk_force": 0.1,
+        "post_step_positive_joint_increment": 0.0,
+        "pre_step_absolute_risk_force": 0.1,
+        "runner_step_id": 1,
+        "side": "lower",
+        "suite": "obstacle_avoidance_human",
+        "task_id": 6,
+        "value": 1777.6595190881712
+      }
+    },
+    "arm_friction_1_3x": {
+      "active_contact_capacity": {
+        "contact_capacity_warning_count": 0,
+        "contact_observation_count": 23005,
+        "contact_saturation_count": 0,
+        "maximum_ncon": 152,
+        "minimum_nconmax": 5000,
+        "warning_count": 0
+      },
+      "baselines": {
+        "no_guard": {
+          "below_floor_count": 1849.0,
+          "crossing_count": 792.0,
+          "deadlock_lane_count": 0.0,
+          "executed_step_availability": 1.0,
+          "lane_count": 756.0,
+          "maximum_abs_constraint_force": 1000.0461171263541,
+          "minimum_margin_rad": -0.04396251397473616,
+          "screen_latency_sample_count": 0,
+          "screen_latency_seconds_max": null,
+          "screen_latency_seconds_p50": null,
+          "screen_latency_seconds_p95": null,
+          "screen_latency_seconds_p99": null
+        },
+        "reactive_stop": {
+          "below_floor_count": 398.0,
+          "crossing_count": 4.0,
+          "deadlock_lane_count": 0.0,
+          "executed_step_availability": 0.6158730158730159,
+          "lane_count": 756.0,
+          "maximum_abs_constraint_force": 1000.0466823358781,
+          "minimum_margin_rad": -0.04098913708135887,
+          "screen_latency_sample_count": 0,
+          "screen_latency_seconds_max": null,
+          "screen_latency_seconds_p50": null,
+          "screen_latency_seconds_p95": null,
+          "screen_latency_seconds_p99": null
+        },
+        "v14_predictive_brake": {
+          "below_floor_count": 0.0,
+          "crossing_count": 0.0,
+          "deadlock_lane_count": 360.0,
+          "executed_step_availability": 0.6873015873015873,
+          "lane_count": 756.0,
+          "maximum_abs_constraint_force": 4689.6877586420105,
+          "minimum_margin_rad": 0.15023306055428254,
+          "screen_latency_sample_count": 2958,
+          "screen_latency_seconds_max": 0.11593032197561115,
+          "screen_latency_seconds_p50": 0.01876262601581402,
+          "screen_latency_seconds_p95": 0.04504306663293392,
+          "screen_latency_seconds_p99": 0.06393150561721986
+        },
+        "v15_3_force_attributed_recovery": {
+          "below_floor_count": 0.0,
+          "crossing_count": 0.0,
+          "deadlock_lane_count": 0.0,
+          "executed_step_availability": 1.0,
+          "lane_count": 756.0,
+          "maximum_abs_constraint_force": 4689.68775864201,
+          "minimum_margin_rad": 0.15023200041927387,
+          "screen_latency_sample_count": 3780,
+          "screen_latency_seconds_max": 0.14580598403699696,
+          "screen_latency_seconds_p50": 0.02686659400933422,
+          "screen_latency_seconds_p95": 0.08301990799955092,
+          "screen_latency_seconds_p99": 0.08703979517682456
+        }
+      },
+      "comparative_gate_results": {
+        "reactive_crossing_not_above_no_guard": true,
+        "v15_3_availability_not_below_v14": true,
+        "v15_3_below_floor_not_above_reactive": true
+      },
+      "deadlock_prevention_identity": {
+        "internal_not_prevented_lane_ids": [],
+        "paired_identity": true,
+        "v14_deadlock_lane_count": 360,
+        "v14_only_lane_ids": [],
+        "v15_internal_only_lane_ids": [],
+        "v15_internal_would_deadlock_lane_count": 360,
+        "v15_recovery_prevented_deadlock_lane_count": 360
+      },
+      "failed_registered_gates": [
+        "v15_3_recovery_attributable_force_envelope"
+      ],
+      "force_comparison": {
+        "attributable_increment_to_v14_legacy_force_ratio": 0.9999786766187542,
+        "legacy_v15_3_total_force_diagnostic": 4689.68775864201,
+        "v14_legacy_maximum_abs_constraint_force": 4689.6877586420105,
+        "v15_3_maximum_attributable_joint_force_increment": 4689.587758642009,
+        "v15_3_maximum_post_step_absolute_risk_force": 0.1,
+        "v15_3_maximum_post_step_positive_joint_increment": 0.0,
+        "v15_3_maximum_recovery_attributable_joint_force_increment": 1777.6595190881712,
+        "v15_3_maximum_recovery_post_step_positive_joint_increment": 0.0
+      },
+      "latency_budget": {
+        "deadline_seconds": 0.1,
+        "miss_count": 21,
+        "miss_rate": 0.005555555555555556,
+        "sample_count": 3780
+      },
+      "physics_parameters": {
+        "arm_mass_scale": 1.0,
+        "arm_sliding_friction_scale": 1.3,
+        "condition_id": "arm_friction_1_3x",
+        "joint_damping_scale": 1.0
+      },
+      "recovery": {
+        "current_edge_selected_count": 1181,
+        "floor_edge_selected_count": 0,
+        "maximum_prediction_execution_error_rad": 3.6276599404416743e-06,
+        "recovery_prevented_deadlock_count": 1181,
+        "selected_floor_violation_count": 0,
+        "selected_recovery_count": 1181,
+        "v14_predictive_deadlock_lane_count": 360,
+        "v15_3_residual_deadlock_lane_count": 0
+      },
+      "registered_gate_results": {
+        "active_contact_capacity_unsaturated": true,
+        "active_contact_capacity_warning_free": true,
+        "baseline_lane_count": true,
+        "environment_count": true,
+        "environment_lane_coverage": true,
+        "exact_action_identity": true,
+        "expected_total_baseline_lane_count": true,
+        "force_recomputation_identity": true,
+        "restore_identity": true,
+        "stress_activation_below_floor": true,
+        "stress_activation_crossing": true,
+        "stress_lane_count": true,
+        "v14_deadlock_activation": true,
+        "v15_2_candidate_priority_identity": true,
+        "v15_3_100ms_deadline_miss_rate": true,
+        "v15_3_attributable_force_envelope": true,
+        "v15_3_availability_not_below_v14": true,
+        "v15_3_crossing_containment": true,
+        "v15_3_floor_containment": true,
+        "v15_3_force_attribution_active": true,
+        "v15_3_latency_max": true,
+        "v15_3_latency_p95": true,
+        "v15_3_post_step_absolute_force_envelope": true,
+        "v15_3_post_step_increment_envelope": true,
+        "v15_3_prediction_execution_error": true,
+        "v15_3_recovery_attributable_force_envelope": false,
+        "v15_3_recovery_post_step_increment_envelope": true,
+        "v15_3_recovery_prevention_identity": true,
+        "v15_3_relative_attributable_force_envelope": true,
+        "v15_3_schema_identity": true,
+        "v15_3_selected_recovery_floor_containment": true,
+        "v15_3_zero_residual_deadlock": true,
+        "zero_policy_or_outcome_fields": true
+      },
+      "worst_recovery_attributable_force": {
+        "dose": "low",
+        "guard_scope_absolute_risk_force": 1777.7595190881711,
+        "init_state_id": 5,
+        "joint_index": 6,
+        "lane_id": "v15_3_physics_robust_obstacle_avoidance_human_task6_init5:arm_friction_1_3x:joint6:lower:low",
+        "post_step_absolute_risk_force": 0.1,
+        "post_step_positive_joint_increment": 0.0,
+        "pre_step_absolute_risk_force": 0.1,
+        "runner_step_id": 1,
+        "side": "lower",
+        "suite": "obstacle_avoidance_human",
+        "task_id": 6,
+        "value": 1777.6595190881712
+      }
+    },
+    "arm_mass_0_8x": {
+      "active_contact_capacity": {
+        "contact_capacity_warning_count": 0,
+        "contact_observation_count": 22956,
+        "contact_saturation_count": 0,
+        "maximum_ncon": 152,
+        "minimum_nconmax": 5000,
+        "warning_count": 0
+      },
+      "baselines": {
+        "no_guard": {
+          "below_floor_count": 1852.0,
+          "crossing_count": 793.0,
+          "deadlock_lane_count": 0.0,
+          "executed_step_availability": 1.0,
+          "lane_count": 756.0,
+          "maximum_abs_constraint_force": 595.0227148527358,
+          "minimum_margin_rad": -0.04245529927684544,
+          "screen_latency_sample_count": 0,
+          "screen_latency_seconds_max": null,
+          "screen_latency_seconds_p50": null,
+          "screen_latency_seconds_p95": null,
+          "screen_latency_seconds_p99": null
+        },
+        "reactive_stop": {
+          "below_floor_count": 398.0,
+          "crossing_count": 2.0,
+          "deadlock_lane_count": 0.0,
+          "executed_step_availability": 0.6153439153439153,
+          "lane_count": 756.0,
+          "maximum_abs_constraint_force": 597.4270325125307,
+          "minimum_margin_rad": -0.037624022873300245,
+          "screen_latency_sample_count": 0,
+          "screen_latency_seconds_max": null,
+          "screen_latency_seconds_p50": null,
+          "screen_latency_seconds_p95": null,
+          "screen_latency_seconds_p99": null
+        },
+        "v14_predictive_brake": {
+          "below_floor_count": 0.0,
+          "crossing_count": 0.0,
+          "deadlock_lane_count": 361.0,
+          "executed_step_availability": 0.682010582010582,
+          "lane_count": 756.0,
+          "maximum_abs_constraint_force": 4655.9163590349,
+          "minimum_margin_rad": 0.15014591852934567,
+          "screen_latency_sample_count": 2939,
+          "screen_latency_seconds_max": 0.11583778000203893,
+          "screen_latency_seconds_p50": 0.01866545301163569,
+          "screen_latency_seconds_p95": 0.04470827101613395,
+          "screen_latency_seconds_p99": 0.0638277032587211
+        },
+        "v15_3_force_attributed_recovery": {
+          "below_floor_count": 0.0,
+          "crossing_count": 0.0,
+          "deadlock_lane_count": 0.0,
+          "executed_step_availability": 1.0,
+          "lane_count": 756.0,
+          "maximum_abs_constraint_force": 4926.208306880132,
+          "minimum_margin_rad": 0.15014543487026843,
+          "screen_latency_sample_count": 3780,
+          "screen_latency_seconds_max": 0.1458521099993959,
+          "screen_latency_seconds_p50": 0.0266489940113388,
+          "screen_latency_seconds_p95": 0.08258013818704057,
+          "screen_latency_seconds_p99": 0.08678761510527692
+        }
+      },
+      "comparative_gate_results": {
+        "reactive_crossing_not_above_no_guard": true,
+        "v15_3_availability_not_below_v14": true,
+        "v15_3_below_floor_not_above_reactive": true
+      },
+      "deadlock_prevention_identity": {
+        "internal_not_prevented_lane_ids": [],
+        "paired_identity": true,
+        "v14_deadlock_lane_count": 361,
+        "v14_only_lane_ids": [],
+        "v15_internal_only_lane_ids": [],
+        "v15_internal_would_deadlock_lane_count": 361,
+        "v15_recovery_prevented_deadlock_lane_count": 361
+      },
+      "failed_registered_gates": [],
+      "force_comparison": {
+        "attributable_increment_to_v14_legacy_force_ratio": 1.0580319591267826,
+        "legacy_v15_3_total_force_diagnostic": 4926.208306880132,
+        "v14_legacy_maximum_abs_constraint_force": 4655.9163590349,
+        "v15_3_maximum_attributable_joint_force_increment": 4926.108306880132,
+        "v15_3_maximum_post_step_absolute_risk_force": 0.1,
+        "v15_3_maximum_post_step_positive_joint_increment": 0.0,
+        "v15_3_maximum_recovery_attributable_joint_force_increment": 860.9079144187708,
+        "v15_3_maximum_recovery_post_step_positive_joint_increment": 0.0
+      },
+      "latency_budget": {
+        "deadline_seconds": 0.1,
+        "miss_count": 21,
+        "miss_rate": 0.005555555555555556,
+        "sample_count": 3780
+      },
+      "physics_parameters": {
+        "arm_mass_scale": 0.8,
+        "arm_sliding_friction_scale": 1.0,
+        "condition_id": "arm_mass_0_8x",
+        "joint_damping_scale": 1.0
+      },
+      "recovery": {
+        "current_edge_selected_count": 1201,
+        "floor_edge_selected_count": 0,
+        "maximum_prediction_execution_error_rad": 0.00017113115202516127,
+        "recovery_prevented_deadlock_count": 1201,
+        "selected_floor_violation_count": 0,
+        "selected_recovery_count": 1201,
+        "v14_predictive_deadlock_lane_count": 361,
+        "v15_3_residual_deadlock_lane_count": 0
+      },
+      "registered_gate_results": {
+        "active_contact_capacity_unsaturated": true,
+        "active_contact_capacity_warning_free": true,
+        "baseline_lane_count": true,
+        "environment_count": true,
+        "environment_lane_coverage": true,
+        "exact_action_identity": true,
+        "expected_total_baseline_lane_count": true,
+        "force_recomputation_identity": true,
+        "restore_identity": true,
+        "stress_activation_below_floor": true,
+        "stress_activation_crossing": true,
+        "stress_lane_count": true,
+        "v14_deadlock_activation": true,
+        "v15_2_candidate_priority_identity": true,
+        "v15_3_100ms_deadline_miss_rate": true,
+        "v15_3_attributable_force_envelope": true,
+        "v15_3_availability_not_below_v14": true,
+        "v15_3_crossing_containment": true,
+        "v15_3_floor_containment": true,
+        "v15_3_force_attribution_active": true,
+        "v15_3_latency_max": true,
+        "v15_3_latency_p95": true,
+        "v15_3_post_step_absolute_force_envelope": true,
+        "v15_3_post_step_increment_envelope": true,
+        "v15_3_prediction_execution_error": true,
+        "v15_3_recovery_attributable_force_envelope": true,
+        "v15_3_recovery_post_step_increment_envelope": true,
+        "v15_3_recovery_prevention_identity": true,
+        "v15_3_relative_attributable_force_envelope": true,
+        "v15_3_schema_identity": true,
+        "v15_3_selected_recovery_floor_containment": true,
+        "v15_3_zero_residual_deadlock": true,
+        "zero_policy_or_outcome_fields": true
+      },
+      "worst_recovery_attributable_force": {
+        "dose": "medium",
+        "guard_scope_absolute_risk_force": 861.0079144187708,
+        "init_state_id": 5,
+        "joint_index": 5,
+        "lane_id": "v15_3_physics_robust_obstacle_avoidance_human_task6_init5:arm_mass_0_8x:joint5:lower:medium",
+        "post_step_absolute_risk_force": 0.1,
+        "post_step_positive_joint_increment": 0.0,
+        "pre_step_absolute_risk_force": 0.1,
+        "runner_step_id": 1,
+        "side": "lower",
+        "suite": "obstacle_avoidance_human",
+        "task_id": 6,
+        "value": 860.9079144187708
+      }
+    },
+    "arm_mass_1_2x": {
+      "active_contact_capacity": {
+        "contact_capacity_warning_count": 0,
+        "contact_observation_count": 22931,
+        "contact_saturation_count": 0,
+        "maximum_ncon": 152,
+        "minimum_nconmax": 5000,
+        "warning_count": 0
+      },
+      "baselines": {
+        "no_guard": {
+          "below_floor_count": 1848.0,
+          "crossing_count": 794.0,
+          "deadlock_lane_count": 0.0,
+          "executed_step_availability": 1.0,
+          "lane_count": 756.0,
+          "maximum_abs_constraint_force": 862.8884262370624,
+          "minimum_margin_rad": -0.04077933145261303,
+          "screen_latency_sample_count": 0,
+          "screen_latency_seconds_max": null,
+          "screen_latency_seconds_p50": null,
+          "screen_latency_seconds_p95": null,
+          "screen_latency_seconds_p99": null
+        },
+        "reactive_stop": {
+          "below_floor_count": 397.0,
+          "crossing_count": 4.0,
+          "deadlock_lane_count": 0.0,
+          "executed_step_availability": 0.6161375661375661,
+          "lane_count": 756.0,
+          "maximum_abs_constraint_force": 670.7744215093937,
+          "minimum_margin_rad": -0.037534271852904144,
+          "screen_latency_sample_count": 0,
+          "screen_latency_seconds_max": null,
+          "screen_latency_seconds_p50": null,
+          "screen_latency_seconds_p95": null,
+          "screen_latency_seconds_p99": null
+        },
+        "v14_predictive_brake": {
+          "below_floor_count": 0.0,
+          "crossing_count": 0.0,
+          "deadlock_lane_count": 359.0,
+          "executed_step_availability": 0.6873015873015873,
+          "lane_count": 756.0,
+          "maximum_abs_constraint_force": 4720.876132602319,
+          "minimum_margin_rad": 0.150849262906118,
+          "screen_latency_sample_count": 2957,
+          "screen_latency_seconds_max": 0.11629963503219187,
+          "screen_latency_seconds_p50": 0.018586524005513638,
+          "screen_latency_seconds_p95": 0.04527909199241546,
+          "screen_latency_seconds_p99": 0.06324923618929462
+        },
+        "v15_3_force_attributed_recovery": {
+          "below_floor_count": 0.0,
+          "crossing_count": 0.0,
+          "deadlock_lane_count": 0.0,
+          "executed_step_availability": 1.0,
+          "lane_count": 756.0,
+          "maximum_abs_constraint_force": 4720.87613260232,
+          "minimum_margin_rad": 0.15084821818038607,
+          "screen_latency_sample_count": 3780,
+          "screen_latency_seconds_max": 0.14691273000789806,
+          "screen_latency_seconds_p50": 0.026589772489387542,
+          "screen_latency_seconds_p95": 0.08258445372339338,
+          "screen_latency_seconds_p99": 0.08582808649516668
+        }
+      },
+      "comparative_gate_results": {
+        "reactive_crossing_not_above_no_guard": true,
+        "v15_3_availability_not_below_v14": true,
+        "v15_3_below_floor_not_above_reactive": true
+      },
+      "deadlock_prevention_identity": {
+        "internal_not_prevented_lane_ids": [],
+        "paired_identity": true,
+        "v14_deadlock_lane_count": 359,
+        "v14_only_lane_ids": [],
+        "v15_internal_only_lane_ids": [],
+        "v15_internal_would_deadlock_lane_count": 359,
+        "v15_recovery_prevented_deadlock_lane_count": 359
+      },
+      "failed_registered_gates": [
+        "v15_3_recovery_attributable_force_envelope"
+      ],
+      "force_comparison": {
+        "attributable_increment_to_v14_legacy_force_ratio": 0.9999788174912473,
+        "legacy_v15_3_total_force_diagnostic": 4720.87613260232,
+        "v14_legacy_maximum_abs_constraint_force": 4720.876132602319,
+        "v15_3_maximum_attributable_joint_force_increment": 4720.776132602319,
+        "v15_3_maximum_post_step_absolute_risk_force": 0.1,
+        "v15_3_maximum_post_step_positive_joint_increment": 0.0,
+        "v15_3_maximum_recovery_attributable_joint_force_increment": 1706.498388040841,
+        "v15_3_maximum_recovery_post_step_positive_joint_increment": 0.0
+      },
+      "latency_budget": {
+        "deadline_seconds": 0.1,
+        "miss_count": 21,
+        "miss_rate": 0.005555555555555556,
+        "sample_count": 3780
+      },
+      "physics_parameters": {
+        "arm_mass_scale": 1.2,
+        "arm_sliding_friction_scale": 1.0,
+        "condition_id": "arm_mass_1_2x",
+        "joint_damping_scale": 1.0
+      },
+      "recovery": {
+        "current_edge_selected_count": 1146,
+        "floor_edge_selected_count": 0,
+        "maximum_prediction_execution_error_rad": 5.062982300518826e-06,
+        "recovery_prevented_deadlock_count": 1146,
+        "selected_floor_violation_count": 0,
+        "selected_recovery_count": 1146,
+        "v14_predictive_deadlock_lane_count": 359,
+        "v15_3_residual_deadlock_lane_count": 0
+      },
+      "registered_gate_results": {
+        "active_contact_capacity_unsaturated": true,
+        "active_contact_capacity_warning_free": true,
+        "baseline_lane_count": true,
+        "environment_count": true,
+        "environment_lane_coverage": true,
+        "exact_action_identity": true,
+        "expected_total_baseline_lane_count": true,
+        "force_recomputation_identity": true,
+        "restore_identity": true,
+        "stress_activation_below_floor": true,
+        "stress_activation_crossing": true,
+        "stress_lane_count": true,
+        "v14_deadlock_activation": true,
+        "v15_2_candidate_priority_identity": true,
+        "v15_3_100ms_deadline_miss_rate": true,
+        "v15_3_attributable_force_envelope": true,
+        "v15_3_availability_not_below_v14": true,
+        "v15_3_crossing_containment": true,
+        "v15_3_floor_containment": true,
+        "v15_3_force_attribution_active": true,
+        "v15_3_latency_max": true,
+        "v15_3_latency_p95": true,
+        "v15_3_post_step_absolute_force_envelope": true,
+        "v15_3_post_step_increment_envelope": true,
+        "v15_3_prediction_execution_error": true,
+        "v15_3_recovery_attributable_force_envelope": false,
+        "v15_3_recovery_post_step_increment_envelope": true,
+        "v15_3_recovery_prevention_identity": true,
+        "v15_3_relative_attributable_force_envelope": true,
+        "v15_3_schema_identity": true,
+        "v15_3_selected_recovery_floor_containment": true,
+        "v15_3_zero_residual_deadlock": true,
+        "zero_policy_or_outcome_fields": true
+      },
+      "worst_recovery_attributable_force": {
+        "dose": "low",
+        "guard_scope_absolute_risk_force": 1706.598388040841,
+        "init_state_id": 5,
+        "joint_index": 6,
+        "lane_id": "v15_3_physics_robust_obstacle_avoidance_human_task6_init5:arm_mass_1_2x:joint6:lower:low",
+        "post_step_absolute_risk_force": 0.1,
+        "post_step_positive_joint_increment": 0.0,
+        "pre_step_absolute_risk_force": 0.1,
+        "runner_step_id": 1,
+        "side": "lower",
+        "suite": "obstacle_avoidance_human",
+        "task_id": 6,
+        "value": 1706.498388040841
+      }
+    },
+    "joint_damping_0_7x": {
+      "active_contact_capacity": {
+        "contact_capacity_warning_count": 0,
+        "contact_observation_count": 23005,
+        "contact_saturation_count": 0,
+        "maximum_ncon": 152,
+        "minimum_nconmax": 5000,
+        "warning_count": 0
+      },
+      "baselines": {
+        "no_guard": {
+          "below_floor_count": 1849.0,
+          "crossing_count": 792.0,
+          "deadlock_lane_count": 0.0,
+          "executed_step_availability": 1.0,
+          "lane_count": 756.0,
+          "maximum_abs_constraint_force": 566.7903563593183,
+          "minimum_margin_rad": -0.04105295495552008,
+          "screen_latency_sample_count": 0,
+          "screen_latency_seconds_max": null,
+          "screen_latency_seconds_p50": null,
+          "screen_latency_seconds_p95": null,
+          "screen_latency_seconds_p99": null
+        },
+        "reactive_stop": {
+          "below_floor_count": 398.0,
+          "crossing_count": 4.0,
+          "deadlock_lane_count": 0.0,
+          "executed_step_availability": 0.6158730158730159,
+          "lane_count": 756.0,
+          "maximum_abs_constraint_force": 818.0345233834346,
+          "minimum_margin_rad": -0.042189237625338105,
+          "screen_latency_sample_count": 0,
+          "screen_latency_seconds_max": null,
+          "screen_latency_seconds_p50": null,
+          "screen_latency_seconds_p95": null,
+          "screen_latency_seconds_p99": null
+        },
+        "v14_predictive_brake": {
+          "below_floor_count": 0.0,
+          "crossing_count": 0.0,
+          "deadlock_lane_count": 360.0,
+          "executed_step_availability": 0.6873015873015873,
+          "lane_count": 756.0,
+          "maximum_abs_constraint_force": 4690.060037411994,
+          "minimum_margin_rad": 0.1502331817798752,
+          "screen_latency_sample_count": 2958,
+          "screen_latency_seconds_max": 0.11650338099570945,
+          "screen_latency_seconds_p50": 0.018690828001126647,
+          "screen_latency_seconds_p95": 0.044872503553051515,
+          "screen_latency_seconds_p99": 0.0637567473063245
+        },
+        "v15_3_force_attributed_recovery": {
+          "below_floor_count": 0.0,
+          "crossing_count": 0.0,
+          "deadlock_lane_count": 0.0,
+          "executed_step_availability": 1.0,
+          "lane_count": 756.0,
+          "maximum_abs_constraint_force": 4690.060037411994,
+          "minimum_margin_rad": 0.15023212175811662,
+          "screen_latency_sample_count": 3780,
+          "screen_latency_seconds_max": 0.1463553989888169,
+          "screen_latency_seconds_p50": 0.026707463985076174,
+          "screen_latency_seconds_p95": 0.08245563576638232,
+          "screen_latency_seconds_p99": 0.08660696022736375
+        }
+      },
+      "comparative_gate_results": {
+        "reactive_crossing_not_above_no_guard": true,
+        "v15_3_availability_not_below_v14": true,
+        "v15_3_below_floor_not_above_reactive": true
+      },
+      "deadlock_prevention_identity": {
+        "internal_not_prevented_lane_ids": [],
+        "paired_identity": true,
+        "v14_deadlock_lane_count": 360,
+        "v14_only_lane_ids": [],
+        "v15_internal_only_lane_ids": [],
+        "v15_internal_would_deadlock_lane_count": 360,
+        "v15_recovery_prevented_deadlock_lane_count": 360
+      },
+      "failed_registered_gates": [
+        "v15_3_recovery_attributable_force_envelope"
+      ],
+      "force_comparison": {
+        "attributable_increment_to_v14_legacy_force_ratio": 0.9999786783113217,
+        "legacy_v15_3_total_force_diagnostic": 4690.060037411994,
+        "v14_legacy_maximum_abs_constraint_force": 4690.060037411994,
+        "v15_3_maximum_attributable_joint_force_increment": 4689.960037411994,
+        "v15_3_maximum_post_step_absolute_risk_force": 0.1,
+        "v15_3_maximum_post_step_positive_joint_increment": 0.0,
+        "v15_3_maximum_recovery_attributable_joint_force_increment": 1777.871598806514,
+        "v15_3_maximum_recovery_post_step_positive_joint_increment": 0.0
+      },
+      "latency_budget": {
+        "deadline_seconds": 0.1,
+        "miss_count": 21,
+        "miss_rate": 0.005555555555555556,
+        "sample_count": 3780
+      },
+      "physics_parameters": {
+        "arm_mass_scale": 1.0,
+        "arm_sliding_friction_scale": 1.0,
+        "condition_id": "joint_damping_0_7x",
+        "joint_damping_scale": 0.7
+      },
+      "recovery": {
+        "current_edge_selected_count": 1181,
+        "floor_edge_selected_count": 0,
+        "maximum_prediction_execution_error_rad": 3.627615962731312e-06,
+        "recovery_prevented_deadlock_count": 1181,
+        "selected_floor_violation_count": 0,
+        "selected_recovery_count": 1181,
+        "v14_predictive_deadlock_lane_count": 360,
+        "v15_3_residual_deadlock_lane_count": 0
+      },
+      "registered_gate_results": {
+        "active_contact_capacity_unsaturated": true,
+        "active_contact_capacity_warning_free": true,
+        "baseline_lane_count": true,
+        "environment_count": true,
+        "environment_lane_coverage": true,
+        "exact_action_identity": true,
+        "expected_total_baseline_lane_count": true,
+        "force_recomputation_identity": true,
+        "restore_identity": true,
+        "stress_activation_below_floor": true,
+        "stress_activation_crossing": true,
+        "stress_lane_count": true,
+        "v14_deadlock_activation": true,
+        "v15_2_candidate_priority_identity": true,
+        "v15_3_100ms_deadline_miss_rate": true,
+        "v15_3_attributable_force_envelope": true,
+        "v15_3_availability_not_below_v14": true,
+        "v15_3_crossing_containment": true,
+        "v15_3_floor_containment": true,
+        "v15_3_force_attribution_active": true,
+        "v15_3_latency_max": true,
+        "v15_3_latency_p95": true,
+        "v15_3_post_step_absolute_force_envelope": true,
+        "v15_3_post_step_increment_envelope": true,
+        "v15_3_prediction_execution_error": true,
+        "v15_3_recovery_attributable_force_envelope": false,
+        "v15_3_recovery_post_step_increment_envelope": true,
+        "v15_3_recovery_prevention_identity": true,
+        "v15_3_relative_attributable_force_envelope": true,
+        "v15_3_schema_identity": true,
+        "v15_3_selected_recovery_floor_containment": true,
+        "v15_3_zero_residual_deadlock": true,
+        "zero_policy_or_outcome_fields": true
+      },
+      "worst_recovery_attributable_force": {
+        "dose": "low",
+        "guard_scope_absolute_risk_force": 1777.9715988065138,
+        "init_state_id": 5,
+        "joint_index": 6,
+        "lane_id": "v15_3_physics_robust_obstacle_avoidance_human_task6_init5:joint_damping_0_7x:joint6:lower:low",
+        "post_step_absolute_risk_force": 0.1,
+        "post_step_positive_joint_increment": 0.0,
+        "pre_step_absolute_risk_force": 0.1,
+        "runner_step_id": 1,
+        "side": "lower",
+        "suite": "obstacle_avoidance_human",
+        "task_id": 6,
+        "value": 1777.871598806514
+      }
+    },
+    "joint_damping_1_3x": {
+      "active_contact_capacity": {
+        "contact_capacity_warning_count": 0,
+        "contact_observation_count": 23005,
+        "contact_saturation_count": 0,
+        "maximum_ncon": 152,
+        "minimum_nconmax": 5000,
+        "warning_count": 0
+      },
+      "baselines": {
+        "no_guard": {
+          "below_floor_count": 1849.0,
+          "crossing_count": 792.0,
+          "deadlock_lane_count": 0.0,
+          "executed_step_availability": 1.0,
+          "lane_count": 756.0,
+          "maximum_abs_constraint_force": 566.7266472109684,
+          "minimum_margin_rad": -0.04429169184216297,
+          "screen_latency_sample_count": 0,
+          "screen_latency_seconds_max": null,
+          "screen_latency_seconds_p50": null,
+          "screen_latency_seconds_p95": null,
+          "screen_latency_seconds_p99": null
+        },
+        "reactive_stop": {
+          "below_floor_count": 398.0,
+          "crossing_count": 3.0,
+          "deadlock_lane_count": 0.0,
+          "executed_step_availability": 0.6158730158730159,
+          "lane_count": 756.0,
+          "maximum_abs_constraint_force": 570.9610240058331,
+          "minimum_margin_rad": -0.039784366629882495,
+          "screen_latency_sample_count": 0,
+          "screen_latency_seconds_max": null,
+          "screen_latency_seconds_p50": null,
+          "screen_latency_seconds_p95": null,
+          "screen_latency_seconds_p99": null
+        },
+        "v14_predictive_brake": {
+          "below_floor_count": 0.0,
+          "crossing_count": 0.0,
+          "deadlock_lane_count": 360.0,
+          "executed_step_availability": 0.6873015873015873,
+          "lane_count": 756.0,
+          "maximum_abs_constraint_force": 4689.315506735959,
+          "minimum_margin_rad": 0.15023294018599187,
+          "screen_latency_sample_count": 2958,
+          "screen_latency_seconds_max": 0.1164221370127052,
+          "screen_latency_seconds_p50": 0.018661885987967253,
+          "screen_latency_seconds_p95": 0.045015975317801354,
+          "screen_latency_seconds_p99": 0.06399201851396343
+        },
+        "v15_3_force_attributed_recovery": {
+          "below_floor_count": 0.0,
+          "crossing_count": 0.0,
+          "deadlock_lane_count": 0.0,
+          "executed_step_availability": 1.0,
+          "lane_count": 756.0,
+          "maximum_abs_constraint_force": 4689.315506735959,
+          "minimum_margin_rad": 0.15023187993801668,
+          "screen_latency_sample_count": 3780,
+          "screen_latency_seconds_max": 0.14626015402609482,
+          "screen_latency_seconds_p50": 0.02672114848974161,
+          "screen_latency_seconds_p95": 0.08256078443082515,
+          "screen_latency_seconds_p99": 0.08594440144195688
+        }
+      },
+      "comparative_gate_results": {
+        "reactive_crossing_not_above_no_guard": true,
+        "v15_3_availability_not_below_v14": true,
+        "v15_3_below_floor_not_above_reactive": true
+      },
+      "deadlock_prevention_identity": {
+        "internal_not_prevented_lane_ids": [],
+        "paired_identity": false,
+        "v14_deadlock_lane_count": 360,
+        "v14_only_lane_ids": [
+          "v15_3_physics_robust_obstacle_avoidance_human_task6_init5:joint_damping_1_3x:joint6:upper:medium"
+        ],
+        "v15_internal_only_lane_ids": [],
+        "v15_internal_would_deadlock_lane_count": 359,
+        "v15_recovery_prevented_deadlock_lane_count": 359
+      },
+      "failed_registered_gates": [
+        "v15_3_recovery_attributable_force_envelope",
+        "v15_3_recovery_prevention_identity"
+      ],
+      "force_comparison": {
+        "attributable_increment_to_v14_legacy_force_ratio": 0.9999786749260405,
+        "legacy_v15_3_total_force_diagnostic": 4689.315506735959,
+        "v14_legacy_maximum_abs_constraint_force": 4689.315506735959,
+        "v15_3_maximum_attributable_joint_force_increment": 4689.215506735959,
+        "v15_3_maximum_post_step_absolute_risk_force": 0.1,
+        "v15_3_maximum_post_step_positive_joint_increment": 0.0,
+        "v15_3_maximum_recovery_attributable_joint_force_increment": 1777.447171338038,
+        "v15_3_maximum_recovery_post_step_positive_joint_increment": 0.0
+      },
+      "latency_budget": {
+        "deadline_seconds": 0.1,
+        "miss_count": 21,
+        "miss_rate": 0.005555555555555556,
+        "sample_count": 3780
+      },
+      "physics_parameters": {
+        "arm_mass_scale": 1.0,
+        "arm_sliding_friction_scale": 1.0,
+        "condition_id": "joint_damping_1_3x",
+        "joint_damping_scale": 1.3
+      },
+      "recovery": {
+        "current_edge_selected_count": 1180,
+        "floor_edge_selected_count": 0,
+        "maximum_prediction_execution_error_rad": 3.627703936359694e-06,
+        "recovery_prevented_deadlock_count": 1180,
+        "selected_floor_violation_count": 0,
+        "selected_recovery_count": 1180,
+        "v14_predictive_deadlock_lane_count": 360,
+        "v15_3_residual_deadlock_lane_count": 0
+      },
+      "registered_gate_results": {
+        "active_contact_capacity_unsaturated": true,
+        "active_contact_capacity_warning_free": true,
+        "baseline_lane_count": true,
+        "environment_count": true,
+        "environment_lane_coverage": true,
+        "exact_action_identity": true,
+        "expected_total_baseline_lane_count": true,
+        "force_recomputation_identity": true,
+        "restore_identity": true,
+        "stress_activation_below_floor": true,
+        "stress_activation_crossing": true,
+        "stress_lane_count": true,
+        "v14_deadlock_activation": true,
+        "v15_2_candidate_priority_identity": true,
+        "v15_3_100ms_deadline_miss_rate": true,
+        "v15_3_attributable_force_envelope": true,
+        "v15_3_availability_not_below_v14": true,
+        "v15_3_crossing_containment": true,
+        "v15_3_floor_containment": true,
+        "v15_3_force_attribution_active": true,
+        "v15_3_latency_max": true,
+        "v15_3_latency_p95": true,
+        "v15_3_post_step_absolute_force_envelope": true,
+        "v15_3_post_step_increment_envelope": true,
+        "v15_3_prediction_execution_error": true,
+        "v15_3_recovery_attributable_force_envelope": false,
+        "v15_3_recovery_post_step_increment_envelope": true,
+        "v15_3_recovery_prevention_identity": false,
+        "v15_3_relative_attributable_force_envelope": true,
+        "v15_3_schema_identity": true,
+        "v15_3_selected_recovery_floor_containment": true,
+        "v15_3_zero_residual_deadlock": true,
+        "zero_policy_or_outcome_fields": true
+      },
+      "worst_recovery_attributable_force": {
+        "dose": "low",
+        "guard_scope_absolute_risk_force": 1777.547171338038,
+        "init_state_id": 5,
+        "joint_index": 6,
+        "lane_id": "v15_3_physics_robust_obstacle_avoidance_human_task6_init5:joint_damping_1_3x:joint6:lower:low",
+        "post_step_absolute_risk_force": 0.1,
+        "post_step_positive_joint_increment": 0.0,
+        "pre_step_absolute_risk_force": 0.1,
+        "runner_step_id": 1,
+        "side": "lower",
+        "suite": "obstacle_avoidance_human",
+        "task_id": 6,
+        "value": 1777.447171338038
+      }
+    },
+    "nominal": {
+      "active_contact_capacity": {
+        "contact_capacity_warning_count": 0,
+        "contact_observation_count": 23005,
+        "contact_saturation_count": 0,
+        "maximum_ncon": 152,
+        "minimum_nconmax": 5000,
+        "warning_count": 0
+      },
+      "baselines": {
+        "no_guard": {
+          "below_floor_count": 1849.0,
+          "crossing_count": 792.0,
+          "deadlock_lane_count": 0.0,
+          "executed_step_availability": 1.0,
+          "lane_count": 756.0,
+          "maximum_abs_constraint_force": 921.2673227604911,
+          "minimum_margin_rad": -0.04396251397473616,
+          "screen_latency_sample_count": 0,
+          "screen_latency_seconds_max": null,
+          "screen_latency_seconds_p50": null,
+          "screen_latency_seconds_p95": null,
+          "screen_latency_seconds_p99": null
+        },
+        "reactive_stop": {
+          "below_floor_count": 398.0,
+          "crossing_count": 4.0,
+          "deadlock_lane_count": 0.0,
+          "executed_step_availability": 0.6158730158730159,
+          "lane_count": 756.0,
+          "maximum_abs_constraint_force": 926.8181630538152,
+          "minimum_margin_rad": -0.04098913708135887,
+          "screen_latency_sample_count": 0,
+          "screen_latency_seconds_max": null,
+          "screen_latency_seconds_p50": null,
+          "screen_latency_seconds_p95": null,
+          "screen_latency_seconds_p99": null
+        },
+        "v14_predictive_brake": {
+          "below_floor_count": 0.0,
+          "crossing_count": 0.0,
+          "deadlock_lane_count": 360.0,
+          "executed_step_availability": 0.6873015873015873,
+          "lane_count": 756.0,
+          "maximum_abs_constraint_force": 4689.6877586420105,
+          "minimum_margin_rad": 0.15023306055428254,
+          "screen_latency_sample_count": 2958,
+          "screen_latency_seconds_max": 0.11543769197305664,
+          "screen_latency_seconds_p50": 0.018577692011604086,
+          "screen_latency_seconds_p95": 0.04474463747465052,
+          "screen_latency_seconds_p99": 0.06369974957080547
+        },
+        "v15_3_force_attributed_recovery": {
+          "below_floor_count": 0.0,
+          "crossing_count": 0.0,
+          "deadlock_lane_count": 0.0,
+          "executed_step_availability": 1.0,
+          "lane_count": 756.0,
+          "maximum_abs_constraint_force": 4689.68775864201,
+          "minimum_margin_rad": 0.15023200041927387,
+          "screen_latency_sample_count": 3780,
+          "screen_latency_seconds_max": 0.14520966401323676,
+          "screen_latency_seconds_p50": 0.026605800521792844,
+          "screen_latency_seconds_p95": 0.08201079748978372,
+          "screen_latency_seconds_p99": 0.0851648879161803
+        }
+      },
+      "comparative_gate_results": {
+        "reactive_crossing_not_above_no_guard": true,
+        "v15_3_availability_not_below_v14": true,
+        "v15_3_below_floor_not_above_reactive": true
+      },
+      "deadlock_prevention_identity": {
+        "internal_not_prevented_lane_ids": [],
+        "paired_identity": true,
+        "v14_deadlock_lane_count": 360,
+        "v14_only_lane_ids": [],
+        "v15_internal_only_lane_ids": [],
+        "v15_internal_would_deadlock_lane_count": 360,
+        "v15_recovery_prevented_deadlock_lane_count": 360
+      },
+      "failed_registered_gates": [
+        "v15_3_recovery_attributable_force_envelope"
+      ],
+      "force_comparison": {
+        "attributable_increment_to_v14_legacy_force_ratio": 0.9999786766187542,
+        "legacy_v15_3_total_force_diagnostic": 4689.68775864201,
+        "v14_legacy_maximum_abs_constraint_force": 4689.6877586420105,
+        "v15_3_maximum_attributable_joint_force_increment": 4689.587758642009,
+        "v15_3_maximum_post_step_absolute_risk_force": 0.1,
+        "v15_3_maximum_post_step_positive_joint_increment": 0.0,
+        "v15_3_maximum_recovery_attributable_joint_force_increment": 1777.6595190881712,
+        "v15_3_maximum_recovery_post_step_positive_joint_increment": 0.0
+      },
+      "latency_budget": {
+        "deadline_seconds": 0.1,
+        "miss_count": 21,
+        "miss_rate": 0.005555555555555556,
+        "sample_count": 3780
+      },
+      "physics_parameters": {
+        "arm_mass_scale": 1.0,
+        "arm_sliding_friction_scale": 1.0,
+        "condition_id": "nominal",
+        "joint_damping_scale": 1.0
+      },
+      "recovery": {
+        "current_edge_selected_count": 1181,
+        "floor_edge_selected_count": 0,
+        "maximum_prediction_execution_error_rad": 3.6276599404416743e-06,
+        "recovery_prevented_deadlock_count": 1181,
+        "selected_floor_violation_count": 0,
+        "selected_recovery_count": 1181,
+        "v14_predictive_deadlock_lane_count": 360,
+        "v15_3_residual_deadlock_lane_count": 0
+      },
+      "registered_gate_results": {
+        "active_contact_capacity_unsaturated": true,
+        "active_contact_capacity_warning_free": true,
+        "baseline_lane_count": true,
+        "environment_count": true,
+        "environment_lane_coverage": true,
+        "exact_action_identity": true,
+        "expected_total_baseline_lane_count": true,
+        "force_recomputation_identity": true,
+        "restore_identity": true,
+        "stress_activation_below_floor": true,
+        "stress_activation_crossing": true,
+        "stress_lane_count": true,
+        "v14_deadlock_activation": true,
+        "v15_2_candidate_priority_identity": true,
+        "v15_3_100ms_deadline_miss_rate": true,
+        "v15_3_attributable_force_envelope": true,
+        "v15_3_availability_not_below_v14": true,
+        "v15_3_crossing_containment": true,
+        "v15_3_floor_containment": true,
+        "v15_3_force_attribution_active": true,
+        "v15_3_latency_max": true,
+        "v15_3_latency_p95": true,
+        "v15_3_post_step_absolute_force_envelope": true,
+        "v15_3_post_step_increment_envelope": true,
+        "v15_3_prediction_execution_error": true,
+        "v15_3_recovery_attributable_force_envelope": false,
+        "v15_3_recovery_post_step_increment_envelope": true,
+        "v15_3_recovery_prevention_identity": true,
+        "v15_3_relative_attributable_force_envelope": true,
+        "v15_3_schema_identity": true,
+        "v15_3_selected_recovery_floor_containment": true,
+        "v15_3_zero_residual_deadlock": true,
+        "zero_policy_or_outcome_fields": true
+      },
+      "worst_recovery_attributable_force": {
+        "dose": "low",
+        "guard_scope_absolute_risk_force": 1777.7595190881711,
+        "init_state_id": 5,
+        "joint_index": 6,
+        "lane_id": "v15_3_physics_robust_obstacle_avoidance_human_task6_init5:nominal:joint6:lower:low",
+        "post_step_absolute_risk_force": 0.1,
+        "post_step_positive_joint_increment": 0.0,
+        "pre_step_absolute_risk_force": 0.1,
+        "runner_step_id": 1,
+        "side": "lower",
+        "suite": "obstacle_avoidance_human",
+        "task_id": 6,
+        "value": 1777.6595190881712
+      }
+    }
+  },
+  "created_at": "2026-08-01T00:20:00+08:00",
+  "cross_condition": {
+    "all_comparative_gates_passed": true,
+    "all_v15_3_crossing_floor_deadlock_containment": true,
+    "maximum_recovery_attributable_force": 1777.871598806514,
+    "maximum_recovery_attributable_force_condition": "joint_damping_0_7x",
+    "paired_lane_identity_across_conditions": true,
+    "physics_parameter_audit_failure_count": 0,
+    "recovery_attributable_force_nonpass_conditions": [
+      "arm_friction_0_7x",
+      "arm_friction_1_3x",
+      "arm_mass_1_2x",
+      "joint_damping_0_7x",
+      "joint_damping_1_3x",
+      "nominal"
+    ],
+    "recovery_attributable_force_pass_conditions": [
+      "arm_mass_0_8x"
+    ],
+    "recovery_attributable_force_threshold": 1250.0,
+    "total_100ms_deadline_miss_count": 147,
+    "total_100ms_deadline_miss_rate": 0.005555555555555556,
+    "total_latency_sample_count": 26460
+  },
+  "explicit_nonclaims": {
+    "actuator_authority": false,
+    "attacked_efficacy": false,
+    "full_physics_domain_robustness_qualification_pass": false,
+    "hard_real_time": false,
+    "hardware_behavior": false,
+    "model_mismatch_robustness": false,
+    "physical_safety": false,
+    "task_utility": false,
+    "threshold_relaxation": false
+  },
+  "failed_registered_gates": [
+    "all_condition_registered_gates"
+  ],
+  "next_stage_decision": {
+    "develop_force_bounded_successor_before_physics_requalification": true,
+    "diagnose_joint_damping_1_3x_identity_lane": true,
+    "model_mismatch_qualification_authorized": false,
+    "physics_domain_robustness_claim_authorized": false,
+    "preserve_nonpass_without_rerun_or_threshold_relaxation": true,
+    "proceed_to_new_component_ablation_population": true
+  },
+  "nonpass_axes": {
+    "recovery_attributable_force_envelope": [
+      "arm_friction_0_7x",
+      "arm_friction_1_3x",
+      "arm_mass_1_2x",
+      "joint_damping_0_7x",
+      "joint_damping_1_3x",
+      "nominal"
+    ],
+    "recovery_prevention_identity": [
+      "joint_damping_1_3x"
+    ]
+  },
+  "population": {
+    "all_prior_exact_pairs_excluded": true,
+    "baseline_count": 4,
+    "condition_count": 7,
+    "held_out_exact_task_init_pair_count": 18,
+    "stress_lane_count_per_condition": 756,
+    "task_outcomes_read": false,
+    "total_baseline_lane_count": 21168,
+    "total_stress_lane_count": 5292
+  },
+  "registered_classification": "predictive_virtual_brake_v15_3_force_attributed_recovery_physics_domain_robustness_qualification_nonpass",
+  "registered_data_complete": true,
+  "registered_gate_results": {
+    "all_condition_comparative_gates": true,
+    "all_condition_registered_gates": false,
+    "expected_condition_count": true,
+    "expected_total_baseline_lane_count": true,
+    "expected_total_stress_lane_count": true,
+    "paired_lane_identity_across_conditions": true,
+    "physics_audit_coverage": true,
+    "physics_parameter_identity": true
+  },
+  "registered_qualification_pass": false,
+  "registered_result_unchanged": true,
+  "schema": "proofalign.predictive-virtual-brake-v15.3-force-attributed-recovery-physics-domain-robustness-terminal.v1"
+}

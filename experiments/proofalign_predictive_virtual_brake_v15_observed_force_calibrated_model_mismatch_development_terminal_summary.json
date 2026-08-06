@@ -1,0 +1,58 @@
+{
+  "schema": "proofalign.predictive-virtual-brake-v15.8-observed-force-calibrated-model-mismatch-development-terminal.v1",
+  "created_at": "2026-08-05T16:00:00+08:00",
+  "classification": "outcome_disclosed_development_pass",
+  "development_pass": true,
+  "qualification_claim_authorized": false,
+  "model_mismatch_claim_authorized": false,
+  "task_utility_claim_authorized": false,
+  "registered_force_thresholds_unchanged": true,
+  "population": {
+    "outcome_disclosed_environment_count": 1,
+    "condition_count": 7,
+    "stress_lane_count": 294,
+    "policy_step_count": 1470,
+    "task_outcomes_read": false
+  },
+  "metrics": {
+    "residual_deadlock_lane_count": 0,
+    "crossing_count": 0,
+    "below_floor_count": 0,
+    "maximum_prediction_execution_error_rad": 0.0003710839715758141,
+    "maximum_abs_constraint_force": 8302.272320340242,
+    "maximum_screen_latency_seconds": 0.14869976206682622,
+    "screen_latency_seconds_p95": 0.08002318189246578,
+    "screen_latency_100ms_miss_rate": 0.012244897959183673,
+    "calibration_evaluation_count": 1470,
+    "calibration_bind_count": 1470,
+    "calibration_nonminimum_bind_count": 0,
+    "calibration_selected_residual_exceeds_nominal_count": 0
+  },
+  "bindings": {
+    "v15_7_model_mismatch_terminal": {
+      "path": "experiments/proofalign_predictive_virtual_brake_v15_incremental_adaptive_force_model_mismatch_qualification_terminal_summary.json",
+      "sha256": "21051661cf182230ca472d3431a91e6a2fe8241b47936a513ed5b0e49fbbb605"
+    },
+    "method": {
+      "path": "scripts/run_l2_predictive_virtual_brake_v15_observed_force_calibrated_recovery.py",
+      "sha256": "c20ed0a993b172ddcbfbef6db83b3861f0970d2d3147b0b49d378395eb4b2e1a"
+    },
+    "development_runner": {
+      "path": "scripts/run_v15_observed_force_calibrated_model_mismatch_development.py",
+      "sha256": "1ed3a31e1ab2dabc9accd702107fe623aee7cd5cc5de0b5016b5703239e9e651"
+    },
+    "evidence": {
+      "path": "results/proofalign_v15_8_observed_force_calibrated_model_mismatch_development_20260805/disclosed_development_evidence.json",
+      "sha256": "57057c8fcf7a03016805091d04d0ad283bf05eed52795aade68137b6caaf049e",
+      "bytes": 40501
+    }
+  },
+  "next_stage_decision": {
+    "freeze_v15_8_method": true,
+    "exclude_all_v15_7_model_mismatch_pairs_from_requalification": true,
+    "fresh_globally_held_out_requalification_required": true,
+    "relax_actual_safety_force_or_latency_thresholds": false,
+    "run_task_utility_before_requalification_pass": false
+  },
+  "claim_boundary": "This outcome-disclosed development result supports only freezing the v15.8 observed-force shadow-calibration mechanism for a fresh globally held-out model-mismatch qualification. It does not authorize a model-mismatch robustness, task-utility, attacked-task, hard-real-time, hardware, or physical-safety claim."
+}

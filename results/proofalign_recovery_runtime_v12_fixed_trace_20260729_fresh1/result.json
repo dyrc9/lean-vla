@@ -1,0 +1,46 @@
+{
+  "claim_boundary": "This fixed trace qualifies typed recovery authorization, single-use ordered 7D recovery receipts, substitution/replay rejection, old-policy revocation, fresh observation epoch, and fresh-policy state binding with an in-memory sink. It loads no policy, creates no simulator, reads no task outcome, and does not establish dynamics fidelity, arbitrary-state recovery, clean utility, attacked efficacy, deployment, or physical safety.",
+  "classification": "recovery_runtime_v12_fixed_trace_pass",
+  "execution_boundary": {
+    "outcome_read_count": 0,
+    "policy_action_dispatch_count": 0,
+    "policy_load_count": 0,
+    "recovery_sink_apply_count": 9,
+    "simulator_create_count": 0
+  },
+  "gate_conditions": {
+    "expected_classification": true,
+    "happy_receipt_identity": true,
+    "old_policy_authorization": true,
+    "outcome_read_count": true,
+    "policy_action_dispatch_count": true,
+    "policy_load_count": true,
+    "recovery_authorization_replay": true,
+    "runtime_exception_count": true,
+    "simulator_create_count": true,
+    "valid_case_count": true
+  },
+  "lifecycle": {
+    "clean_rollout_authorized": false,
+    "multi_joint_simulator_preflight_authorized": true,
+    "next_step": "Freeze and run a 7-joint upper/lower no-outcome LIBERO simulator qualification through the typed runtime.",
+    "outcome_rollout_authorized": false,
+    "terminal": true
+  },
+  "metrics": {
+    "expected_classification_rate": 1.0,
+    "happy_receipt_identity_rate": 1.0,
+    "old_policy_authorization_accept_count": 0,
+    "outcome_read_count": 0,
+    "policy_action_dispatch_count": 0,
+    "policy_load_count": 0,
+    "recovery_authorization_replay_accept_count": 0,
+    "recovery_sink_apply_count": 9,
+    "runtime_exception_count": 0,
+    "simulator_create_count": 0,
+    "valid_case_count": 10
+  },
+  "protocol_id": "proofalign-recovery-runtime-v12-fixed-trace-20260729",
+  "qualification_pass": true,
+  "schema": "proofalign.recovery-runtime-v12-fixed-trace-result.v1"
+}

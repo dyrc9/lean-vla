@@ -1,34 +1,41 @@
 # 文档导航
 
-主线阅读顺序：
+## 默认阅读
 
-1. [`method.md`](method.md)：两层定义、threat model、四臂和 Lean claim boundary；
-2. [`trusted_semantic_boundary.md`](trusted_semantic_boundary.md)：可信 `Z_t` 的 TCB、双视图和注入覆盖边界；
-3. [`semantic_subtask_hierarchy.md`](semantic_subtask_hierarchy.md)：零训练 `Z_t`、task graph、绑定和 probe；
-4. [`semantic_subtask_pilot.md`](semantic_subtask_pilot.md)：冻结 checkpoint 的首轮 GPU probe 与限制；
-5. [`action_block_assessment.md`](action_block_assessment.md)：`Z_t -> ActionBlock` 局部评估和资格化；
-6. [`experiments.md`](experiments.md)：M1/M2/fixed-trace/closed-loop gate；
-7. [`implementation_and_experiment_readiness.md`](implementation_and_experiment_readiness.md)：下一批代码接口、
-   测试、artifact 与实验停止条件；
-8. [`paper/paper_story.md`](paper/paper_story.md)：以双层对齐为主线的完整论文叙事；
-9. [`paper/related_work.md`](paper/related_work.md)：与 VLA hierarchy、world model、shielding、benchmark 和
-   formal methods 的逐层关系；
-10. [`experiment_reuse.md`](experiment_reuse.md)：P0b/R9 的逐项复用、迁移步骤与禁止边界；
-11. [`progress_and_plan.md`](progress_and_plan.md)：当前 blocker、历史复用和下一步；
-12. [`remote_execution.md`](remote_execution.md)：执行授权与远程运行规则。
+1. [`current_status_and_roadmap.md`](current_status_and_roadmap.md)：唯一项目进度入口；
+2. [`method.md`](method.md)：L1/L2方法、四臂设计和Lean claim boundary；
+3. [`paper/paper_story.md`](paper/paper_story.md)：论文完整叙事；
+4. [`paper/v15_14_final_four_arm_results.md`](paper/v15_14_final_four_arm_results.md)：最终clean与
+   SABER-attacked四臂主表；
+5. [`paper/final_results_figures.md`](paper/final_results_figures.md)：历史论文表格、图和冻结结果入口。
 
-论文组织：
+以后回答“项目进展如何”，默认只读取第1项，并按以下顺序汇报：
 
-- [`paper/paper_story.md`](paper/paper_story.md)
-- [`paper/progress_assessment.md`](paper/progress_assessment.md)
-- [`paper/confirmatory_preregistration.md`](paper/confirmatory_preregistration.md)
+```text
+复现了什么攻击、攻击成功率是多少
+  -> 原方法四臂实验结果
+  -> 新方法优化结果
+  -> 最终还缺哪些实验
+```
 
-审计原则：
+## 方法与实现参考
 
-- 旧 CTDA/PlanWitness/P0b/R9 文件不等于当前方法证据；
-- frozen legacy protocol 和现有 v3 runtime 可以保留 `intent_only` / `intent_action_enabled` 兼容值；
-  论文名称统一为 `Semantic-only` 和 `Intent–SemanticSubtask–ActionBlock`，semantic-bound successor
-  推荐使用新 v4 schema，不静默改变 v3 digest；
-- 顶层贡献始终是 Intent→ActionBlock 与 ActionBlock→Execution 双层对齐；`Z_t` 是 L1 机制，Lean 是
-  L2 的核心形式化方法组件；
-- 没有用户明确授权时，任何 protocol 都不授权新 outcome rollout。
+- [`trusted_semantic_boundary.md`](trusted_semantic_boundary.md)：可信输入和攻击边界；
+- [`semantic_subtask_hierarchy.md`](semantic_subtask_hierarchy.md)：L1 semantic hierarchy；
+- [`action_block_assessment.md`](action_block_assessment.md)：ActionBlock checker；
+- [`experiments.md`](experiments.md)：实验协议；
+- [`implementation_and_experiment_readiness.md`](implementation_and_experiment_readiness.md)：代码与执行准备；
+- [`remote_execution.md`](remote_execution.md)：远程执行和授权规则。
+
+## 历史归档：非默认读取
+
+- [`progress_and_plan.md`](progress_and_plan.md)：完整实验时间线；
+- [`failure_lessons.md`](failure_lessons.md)：失败原因和停止规则；
+- [`experiment_reuse.md`](experiment_reuse.md)：历史实验复用边界；
+- [`v11_terminal_checkpoint.md`](v11_terminal_checkpoint.md)：v11终局；
+- [`v12_simulator_integrated_recovery_checkpoint.md`](v12_simulator_integrated_recovery_checkpoint.md)：
+  v12.6–v12.38完整优化过程；
+- 其他 `v12_*_checkpoint.md`：v12中间机制证据。
+
+历史non-pass不会被删除或改判，但不再用于日常进度复述。只有在审计特定结论、解释方法来源或编写论文
+消融部分时才读取这些归档。

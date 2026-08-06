@@ -93,26 +93,36 @@
     }
   },
   "online_arm_status": {
+    "shared_source_chunk_component_gate": "implemented_no_dispatch",
+    "component_arm_switches_independent": true,
+    "component_p1_p2_p3_truth_table": "implemented_no_dispatch",
+    "live_switch_cli_contract": "implemented_all_four_arms",
     "vla_only": "implemented",
-    "dual_like_semantic_runtime": "implemented",
-    "semantic_only": "not_implemented",
-    "execution_only": "not_implemented",
+    "dual": "implemented",
+    "semantic_only": "implemented_mock_online",
+    "execution_only": "implemented_mock_online",
+    "live_independent_arm_switches": true,
+    "shared_source_live_gpu_gate": "not_run",
     "four_arm_confirmatory_ready": false
   },
   "implementation": {
     "attack_module": "src/proofalign/benchmark/execution_attack_relay.py",
+    "four_arm_identity_module": "src/proofalign/benchmark/l2_four_arm_identity.py",
+    "four_arm_identity_gate_runner": "scripts/run_l2_four_arm_identity_gate.py",
+    "four_arm_identity_gate_evidence": "experiments/proofalign_l2_four_arm_identity_gate_v1.json",
+    "online_arm_runtime": "src/proofalign/benchmark/l2_online_arm_runtime.py",
     "successor_runner": "scripts/run_l2_execution_attack_eval.py",
     "frozen_base_runner": "scripts/run_liberosafety_pi05_openpi_eval.py",
     "frozen_base_runner_modified": false,
     "tests": [
       "tests/test_execution_attack_relay.py",
+      "tests/test_l2_online_arm_runtime.py",
       "tests/test_semantic_online_runner.py"
     ]
   },
   "next_gates": [
-    "mock-online P1/P2/P3 regression",
     "12-episode non-primary execution-node smoke",
-    "independent online L1 and L2 arm switches",
+    "shared-source live four-arm GPU identity gate",
     "outcome-blind primary protocol freeze"
   ]
 }

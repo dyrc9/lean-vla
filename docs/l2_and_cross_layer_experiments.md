@@ -13,16 +13,16 @@
 | Ueda--Blevins coordinated perfectly-undetectable FDIA | **不支持** | 不得声称复现或反驳其 stealth theorem |
 | ROS captured-prefix replay | **v4 component semantics 已有，online capture/transport 尚缺** | 目前只能报告 component/fixed-trace 结果 |
 | feedback-linearized FDIA | **`interface_not_supported`** | 不进入 LIBERO efficacy |
-| 2×2 防御四臂 online rollout | **尚不可运行** | 当前 online runner 只有 VLA-only 与绑定 L1+L2 的 dual-like 路径 |
-| SABER × L2 完整 confirmatory | **未就绪** | 等 M2 和下面的 online-arm gate 通过后再冻结 |
+| 2×2 防御四臂 online rollout | **support45 clean 终局 nonpass** | 360/360 valid；Dual 0/90 strict success、88/90 deadlock；attacked 因 clean prerequisite 未过而停止 |
+| SABER × L2 confirmatory | **原 M2 50% gate 已 terminal nonpass** | 后续 40% continuation 只能作为 post-outcome exploratory evidence |
 
 这里最重要的修正是：当前 runner 能记录的是 `env.step` 的输入，不是低层 actuator 最终执行值。因此
 原计划中的 `A_applied` 改名为 `A_env_input`。没有 controller/actuator telemetry 时，不得把
 `env.step` input 称为硬件 actuation attestation。
 
-## 2. 不改变当前 M2
+## 2. 不改变 M2 原终局
 
-正在执行的顺序保持不变：
+已执行的 M2 顺序保持为冻结历史：
 
 ```text
 60-record outcome-blind attack producer
@@ -38,8 +38,10 @@ L2 代码和 non-outcome 测试不得：
 - 将 P0b/R9 历史 episode 混入新 primary denominator；
 - 把 mock/fixed-trace 结果报告成物理攻击防御 efficacy。
 
-M2 gate 未通过时，不启动跨层 confirmatory outcome；仍可完成接口、单测和明确标注的 engineering
-smoke。
+producer 与 victim 均已完成。M2 240/240 valid，39/86 transition=`45.35%`，原 50% gate terminal
+nonpass。观察终局后用户授权 40% continuation；它被单独冻结为 outcome-informed exploratory
+successor，只放行 clean four-arm Stage B。原 M2 artifact、gate 和 classification 均不得覆盖，
+后续结果不得称为跨层 confirmatory outcome。
 
 ## 3. 外部来源与使用方式
 
@@ -169,13 +171,36 @@ transaction 层无法检测；要解决必须加入受信的 controller/actuator
   - 锁定原文矩阵和接口约束。
 - `tests/test_semantic_online_runner.py`
   - 锁定 P1/P2/P3 和 VLA-only 实际 dispatch 行为。
+- `src/proofalign/benchmark/l2_four_arm_identity.py`
+  - 从同一个 `(H,7)` source action chunk 计算四臂 routing；
+  - 独立表达 L1 semantic alignment 与 L2 execution integrity 两个 treatment switch；
+  - 对 P1/P2/P3 只生成预期 dispatch/detection truth table，不创建 sink 或 simulator。
+- `scripts/run_l2_four_arm_identity_gate.py`
+  - 固化 12 个 no-outcome component cases × 4 arms；
+  - 检查 shared-source digest、四种 treatment pair、P1/P2/P3 routing 与 zero dispatch；
+  - 输出 `proofalign_l2_four_arm_identity_gate_v1.json`，但不授权 online rollout。
 - `experiments/proofalign_l2_interface_feasibility_v1.json`
   - 冻结当前支持/不支持矩阵和 claim gate。
+- `src/proofalign/benchmark/four_arm_v4.py`
+  - 冻结 120-unit schedule、append-only ledger、paired identity、保守 missing rule 与 terminal 统计；
+- `experiments/proofalign_four_arm_v4_successor_protocol.json`
+  - supersede legacy 四臂执行语义但不覆盖历史 artifact；这是三个 stage 均未授权的原
+    outcome-blind 设计；
+- `experiments/proofalign_four_arm_v4_exploratory40_successor.json`
+  - 绑定 M2 terminal nonpass 和结果后 40% 决策；只授权 clean Stage B；
+- `scripts/run_proofalign_four_arm_v4_clean.py`
+  - 执行/预检/终局验证 480 clean exploratory episodes，并 fail closed；
+- `scripts/monitor_and_launch_four_arm_v4_clean.py`
+  - 原 full-population runner 的 one-shot GPU launcher；完整预检并禁止重试失败 fresh root；
+- `experiments/proofalign_four_arm_v4_orchestration_dry_run.json`
+  - 证明每 stage 480 rows、每 arm 120、每 arm 每个 Latin position 30，且 fresh roots 未占用；
+- `experiments/proofalign_four_arm_v4_analysis_contract.json`
+  - 冻结 clean gate、base-pair cluster bootstrap、exact McNemar、Holm 和 attacked 对 clean baseline 的依赖。
 
 命令示例：
 
 ```bash
-python scripts/run_liberosafety_pi05_openpi_eval.py \
+python scripts/run_l2_execution_attack_eval.py \
   --semantic-runtime \
   --execution-attack-family ueda_blevins_scaling \
   --execution-attack-placement pre_boundary \
@@ -223,10 +248,11 @@ joint-space controller benchmark，再单独建立 reproduction protocol。
 - 固化 interface feasibility artifact；
 - 保持 M2 launcher、population 与 artifacts 不变。
 
-### Gate L2-1：执行节点 engineering smoke
+### Gate L2-1：次要执行节点 engineering smoke
 
-M2 结束后，在任何 confirmatory outcome 前固定一个非 primary task/init/seed，对三个 family 和三个
-placement 各跑一次，再加对应 nominal，共 12 个 engineering episodes。这里只检查：
+该 smoke 已不在 confirmatory 时间线内，也不是当前论文主线的前置任务。若主线 clean 完成后仍需要接口
+诊断，可另行固定一个非 primary task/init/seed，对三个 family 和三个 placement 各跑一次，再加对应
+nominal，共 12 个 engineering episodes。这里只检查：
 
 - runner 能启动且 attack audit 完整；
 - action 恒为 7D finite；
@@ -240,36 +266,71 @@ placement 各跑一次，再加对应 nominal，共 12 个 engineering episodes�
 
 ### Gate L2-2：补齐 online 四臂
 
-当前 `--semantic-runtime` 同时启用 semantic selection/checking 和 execution transaction，无法独立产生
-Semantic-only 与 Execution-only。必须先增加并测试：
+successor runner 已增加并测试：
 
 ```text
 --l1-semantic-alignment on/off
 --l2-execution-integrity on/off
 ```
 
-四臂还必须在相同 policy seed/base pair 下共享相同 source action chunk；否则不是干净的 2×2
-ablation。该 gate 未通过前，不能启动 1920-episode 计划。
+`Semantic-only` 保留真实 L1 ActionBlock 检查、关闭 L2 exact/effect enforcement；`Execution-only`
+使用独立的 raw-policy-prefix authorization，绑定 source chunk digest、policy observation digest、
+episode/proposal identity、freshness 和逐步 receipt，不伪造 semantic-known artifact。P1/P2/P3 的
+mock-online routing 已锁定。
 
-### Gate L2-3：冻结 primary
+当前 no-dispatch component gate 已完成：fixed trace 的四臂共享同一个 source chunk digest，四种开关
+组合唯一，且三个 source family 的 P1/P2/P3 routing truth table 已由单测锁定。live mock runner 的四条
+路径也已完成，并额外记录 initial raw observation、exact policy observation、prompt 和 source chunk
+digest。
 
-只有 M2、L2-1、L2-2 都通过后，才在不看 primary outcome 的前提下冻结：
+closed-loop 的正确 identity 不是“强制四臂 replay 同一个 chunk”。L1-on 的 trusted `T+Z_t` prompt
+本来就是 treatment，强制跨 L1 fan-out 会删除它对 policy 的中介作用。v4 successor 因此冻结：
 
-- family assignment；
-- attack placement；
-- episode population；
-- primary endpoint 和 cluster unit；
-- stopping rule；
-- resource budget。
+- 四臂共享 initial state、initial observation、environment seed 与 policy seed；
+- `VLA-only ↔ Execution-only`、`Semantic-only ↔ Dual` 两个 L2 pair 的首个 policy observation、
+  prompt 与 source chunk 必须分别相同；
+- treatment 介入后允许状态与后续 chunk 分叉；
+- 禁止 counterfactual action-chunk replay。
 
-建议 primary 先回答当前软件 boundary 最强且可归因的问题：
+GPU engineering smoke 仍可检查真实节点上的这些 digest，但不再要求跨 L1 chunk 相同，也不是主线
+confirmatory 的额外 efficacy gate。
 
-```text
-P1 pre-boundary tampering × {clean, SABER} × four defense arms
-```
+### Gate L2-3：原 v4 primary 已 outcome-blind 冻结
 
-P2/P3 作为 trust-boundary stress table 单独报告，不能把 P2 的 after-one-step detection 算成 prevention，
-也不能期待 P3 被 exact digest 单独解决。
+原 v4 successor 已在 M2 terminal outcome 与四臂 outcome 均未观察时冻结：
+
+- 60 base pairs × 2 seeds = 120 units；
+- fixed-trace、clean closed-loop、attacked closed-loop 各 4 arms；
+- clean gate、primary endpoints、base-pair cluster、100,000-resample bootstrap、exact McNemar、Holm；
+- fresh roots、480 episode/stage cap、no replacement、no partial-root resume；
+- missing/invalid 作为 failure + unsafe + deadlock + unknown 的保守规则。
+
+原冻结不等于授权。M2 terminal nonpass 后，结果后 40% exploratory successor 只授权 clean Stage B；
+M2 artifact 缺少逐 proposal trusted geometry，因此 Stage A 不补造。fresh1 又证明 15/60 affordance
+pairs 无法初始化已资格化 wrapper；原 full-population `unknown=0` clean gate 结构上不可通过。支持集
+45 pairs 的 M2 rate 为 44.78%；用户单独授权的 360-episode fresh2 现已 360/360 valid 终态完成，
+但 clean gate nonpass：VLA-only/Execution-only/Semantic-only/Dual strict success 分别为
+61/90、66/90、0/90、0/90，Dual deadlock 88/90。两个 semantic-enabled arms 各有 36/90
+`missing_destination_geometry` 与 54/90 `no_feasible_checked_action_block`；原 45-pair audit 因而只能
+称 wrapper-initialization support，不能称 closed-loop support。Stage C 的 clean prerequisite 未过，
+不授权、不执行，也不追加本协议 clean retry。
+
+support45 终局后的 post-outcome L1 repair 另行做了 zero-dispatch/no-outcome qualification，不属于
+原 v4 efficacy stage：exact simulator geometry 达到 45/45，但 K=4 availability 为 24/45=`53.33%`
+且 worst suite 7/15，未通过 90%/80% gates。K=1 到 K=4 的累计 coverage 均为 24/45，因此不能用
+“更多采样”解释为已恢复 clean utility；该 nonpass 不改变 Stage C 的停止状态。
+
+另行冻结的 Block-10 successor 用不重叠 init 和新 seed 将 K 固定为1，对同一个 source chunk
+匹配检查 H=2/5/10，availability 为 `0/45, 17/45, 36/45`。H=10 相对 H=5 有19个 gain、0个
+loss，但总80%与 worst-suite 73.33%仍未通过90%/80% gates；因此它只进入 block-size
+availability ablation，不恢复 clean/attacked execution authorization。
+
+H>10 不受当前 policy source interface 支持，因此没有拼接 stale-observation chunks。第三套
+H10×K4 no-outcome successor 的匹配 K=1/2/4 coverage 为 `35/45, 35/45, 36/45`，K=4
+仅净增1个初态；suite `13/15, 14/15, 9/15` 仍未过 gate。这关闭了“继续加随机 candidate 即可恢复
+clean utility”的解释，也不恢复 Stage C。
+P1/P2/P3 保留为次要 trust-boundary stress table：P2 的 after-one-step detection 不能算 prevention，P3
+也不能期待被 exact digest 单独解决。
 
 ## 10. 全链路设计
 
@@ -291,17 +352,11 @@ P2/P3 作为 trust-boundary stress table 单独报告，不能把 P2 的 after-o
 | Execution-only | off | on |
 | Dual | on | on |
 
-但 `480 × 4 attack cells = 1920` 只是 Gate L2-3 可选择的上限，不再写成已经可启动的默认计划。当前
-online runner 没有独立四臂，直接跑这个规模会把代码路径差异和 defense effect 混在一起。
-
-若最终冻结 60 base pairs × 2 seeds × 4 arms：
-
-- 三个 family 按 `base_pair_id` 的预注册 hash 均衡分配；
-- 同一 base pair 的两个 seed 使用同一 family；
-- 不允许 outcome-driven family replacement；
-- clean/SABER-only 可复用既有 confirmatory population，但不得混入历史 P0b/R9 denominator；
-- B-only/chained 必须使用同一 attack record；
-- L1 拒绝后链条终止，不为测试 L2 而绕过 L1。
+完整 4 attack-cell × 4 defense-arm 的 1920-episode 扩展不属于当前论文主线，也没有冻结或授权。原
+480 clean + 480 SABER-attacked 设计已被 full-population support failure 与 support45 clean nonpass
+截断；实际保留的是 360-episode support45 clean terminal evidence，attacked 为 0 episodes。
+Ueda/ROS/feedback FDIA 分别作为 operator-transfer、adapted replay 和 unsupported-interface 的次要证据。
+所有主线 unit 均禁止 outcome-driven replacement；L1 拒绝后链条终止，不为测试 L2 而绕过 L1。
 
 ## 11. 指标
 

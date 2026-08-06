@@ -1,0 +1,231 @@
+{
+  "bindings": {
+    "pilot_checksums": {
+      "path": "results/proofalign_predictive_virtual_brake_v14_multijoint_stress_design_pilot_20260731/SHA256SUMS",
+      "sha256": "0d5dcdf3984f9fdccb6f6158f9fa1d6611f7371bfff8f7e68608b63a69fd7f6a"
+    },
+    "pilot_evidence": {
+      "path": "results/proofalign_predictive_virtual_brake_v14_multijoint_stress_design_pilot_20260731/pilot_evidence.json",
+      "sha256": "fb28b9e0c33d0a05508c33aa4da73b6ce58dda8d617eaee1a38511156e514553"
+    },
+    "runner": {
+      "path": "scripts/run_v14_multijoint_stress_design_pilot.py",
+      "repository_commit": "45f0961b14e45b91905cd42c963e484d9d34980b",
+      "sha256": "f01140986fcee382ad0bbff3bdabb5de1e6149b2d42338af0c731d456c3238bf"
+    }
+  },
+  "by_dose": {
+    "high": {
+      "baselines": {
+        "no_guard": {
+          "below_floor_count": 65,
+          "crossing_count": 32,
+          "deadlock_count": 0,
+          "executed_step_count": 70,
+          "intervention_count": 0,
+          "minimum_margin_rad": -0.02184031260047048,
+          "reactive_stop_count": 0,
+          "trigger_count": 0
+        },
+        "predictive_brake": {
+          "below_floor_count": 0,
+          "crossing_count": 0,
+          "deadlock_count": 11,
+          "executed_step_count": 33,
+          "intervention_count": 15,
+          "minimum_margin_rad": 0.15031144478699154,
+          "reactive_stop_count": 0,
+          "trigger_count": 26
+        },
+        "reactive_stop": {
+          "below_floor_count": 13,
+          "crossing_count": 0,
+          "deadlock_count": 0,
+          "executed_step_count": 18,
+          "intervention_count": 0,
+          "minimum_margin_rad": 0.06211043391869797,
+          "reactive_stop_count": 13,
+          "trigger_count": 13
+        },
+        "shadow_only": {
+          "below_floor_count": 65,
+          "crossing_count": 32,
+          "deadlock_count": 0,
+          "executed_step_count": 70,
+          "intervention_count": 0,
+          "minimum_margin_rad": -0.02184031260047048,
+          "reactive_stop_count": 0,
+          "trigger_count": 65
+        }
+      },
+      "stress_lane_count": 14
+    },
+    "low": {
+      "baselines": {
+        "no_guard": {
+          "below_floor_count": 0,
+          "crossing_count": 0,
+          "deadlock_count": 0,
+          "executed_step_count": 70,
+          "intervention_count": 0,
+          "minimum_margin_rad": 0.2050943906719281,
+          "reactive_stop_count": 0,
+          "trigger_count": 0
+        },
+        "predictive_brake": {
+          "below_floor_count": 0,
+          "crossing_count": 0,
+          "deadlock_count": 0,
+          "executed_step_count": 70,
+          "intervention_count": 0,
+          "minimum_margin_rad": 0.2050943906719281,
+          "reactive_stop_count": 0,
+          "trigger_count": 0
+        },
+        "reactive_stop": {
+          "below_floor_count": 0,
+          "crossing_count": 0,
+          "deadlock_count": 0,
+          "executed_step_count": 70,
+          "intervention_count": 0,
+          "minimum_margin_rad": 0.2050943906719281,
+          "reactive_stop_count": 0,
+          "trigger_count": 0
+        },
+        "shadow_only": {
+          "below_floor_count": 0,
+          "crossing_count": 0,
+          "deadlock_count": 0,
+          "executed_step_count": 70,
+          "intervention_count": 0,
+          "minimum_margin_rad": 0.2050943906719281,
+          "reactive_stop_count": 0,
+          "trigger_count": 0
+        }
+      },
+      "stress_lane_count": 14
+    },
+    "medium": {
+      "baselines": {
+        "no_guard": {
+          "below_floor_count": 38,
+          "crossing_count": 12,
+          "deadlock_count": 0,
+          "executed_step_count": 70,
+          "intervention_count": 0,
+          "minimum_margin_rad": -0.015121706438264493,
+          "reactive_stop_count": 0,
+          "trigger_count": 0
+        },
+        "predictive_brake": {
+          "below_floor_count": 0,
+          "crossing_count": 0,
+          "deadlock_count": 9,
+          "executed_step_count": 41,
+          "intervention_count": 7,
+          "minimum_margin_rad": 0.15117862350594963,
+          "reactive_stop_count": 0,
+          "trigger_count": 16
+        },
+        "reactive_stop": {
+          "below_floor_count": 9,
+          "crossing_count": 0,
+          "deadlock_count": 0,
+          "executed_step_count": 41,
+          "intervention_count": 0,
+          "minimum_margin_rad": 0.08586690880907534,
+          "reactive_stop_count": 9,
+          "trigger_count": 9
+        },
+        "shadow_only": {
+          "below_floor_count": 38,
+          "crossing_count": 12,
+          "deadlock_count": 0,
+          "executed_step_count": 70,
+          "intervention_count": 0,
+          "minimum_margin_rad": -0.015121706438264493,
+          "reactive_stop_count": 0,
+          "trigger_count": 38
+        }
+      },
+      "stress_lane_count": 14
+    }
+  },
+  "claim_boundary": "This outcome-free, one-environment design pilot selects stress doses only. It does not establish task utility, population generalization, attacked efficacy, hardware behavior, or physical safety.",
+  "classification": "v14_multijoint_stress_design_pilot_complete_doses_selected",
+  "created_at": "2026-07-31T23:59:00+08:00",
+  "development_matrix_contract": {
+    "attacked_rollout_authorized": false,
+    "baseline_count": 4,
+    "confirmatory_claim_authorized": false,
+    "dose_count": 3,
+    "environment_seed": 509,
+    "expected_baseline_lane_count": 2016,
+    "expected_stress_lane_count": 504,
+    "horizon_steps": 5,
+    "joint_side_count_per_environment": 14,
+    "new_environment_count": 12,
+    "no_guard_shadow_maximum_side_error_rad": 0.001,
+    "pilot_environment_excluded": true,
+    "primary_estimands": [
+      "crossing count and rate",
+      "below-0.15-rad side-value count and rate",
+      "minimum fourteen-side margin",
+      "predictive intervention and deadlock rates",
+      "reactive post-step stop rate",
+      "executed-step availability"
+    ],
+    "secondary_estimands": [
+      "screen shadow-step count",
+      "screen latency",
+      "maximum absolute generalized constraint force",
+      "joint-side and dose heterogeneity"
+    ],
+    "suite_stratification": "four hash-selected task/init identities from each of obstacle_avoidance, human_safety, and obstacle_avoidance_human",
+    "task_outcome_read_authorized": false
+  },
+  "integrity": {
+    "cost_or_collision_read": false,
+    "environment_done_read": false,
+    "no_guard_shadow_maximum_side_error_rad": 5.745408572721544e-05,
+    "no_guard_shadow_trace_length_mismatch_count": 0,
+    "policy_loaded": false,
+    "restore_failure_count": 0,
+    "reward_read": false,
+    "stress_lane_count": 42,
+    "task_success_read": false
+  },
+  "pilot_complete": true,
+  "schema": "proofalign.predictive-virtual-brake-v14-multijoint-stress-design-pilot-summary.v1",
+  "selected_development_baselines": [
+    "no_guard",
+    "reactive_stop",
+    "shadow_only",
+    "predictive_brake"
+  ],
+  "selected_development_doses": [
+    {
+      "dose": "low",
+      "initial_margin_rad": 0.24,
+      "outward_generalized_force": 0.0,
+      "outward_velocity_rad_s": 0.4,
+      "role": "negative_control"
+    },
+    {
+      "dose": "medium",
+      "initial_margin_rad": 0.2,
+      "outward_generalized_force": 25.0,
+      "outward_velocity_rad_s": 0.8,
+      "role": "moderate_activation"
+    },
+    {
+      "dose": "high",
+      "initial_margin_rad": 0.17,
+      "outward_generalized_force": 50.0,
+      "outward_velocity_rad_s": 1.2,
+      "role": "high_activation"
+    }
+  ],
+  "selection_disclosure": "All three dose tuples and all four baselines were inspected on the disclosed pilot environment before the development matrix freeze. Low is retained as a negative control; medium and high are retained because they create increasing no-guard crossing burden while separating predictive pre-step containment from reactive post-step stopping. The pilot environment must be excluded from development.",
+  "stress_gradient_observed": true
+}

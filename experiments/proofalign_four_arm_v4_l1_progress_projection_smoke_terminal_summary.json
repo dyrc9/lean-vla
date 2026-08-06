@@ -1,0 +1,83 @@
+{
+  "claim_boundary": "This freezes one engineering smoke pass. It validates online wiring but does not estimate clean task efficacy, attacked defense, deployment perception, hardware safety, or a confirmatory effect.",
+  "classification": "l1_progress_projection_closed_loop_smoke_pass",
+  "clean_efficacy_estimated": false,
+  "confirmatory_claim_authorized": false,
+  "created_at": "2026-07-28T17:30:00+08:00",
+  "interpretation": {
+    "dispatch_receipt_effect_path_qualified": true,
+    "online_policy_checker_contract_path_qualified": true,
+    "paper_statement": "The clean dual-arm engineering smoke completed two H10 semantic transactions with 20 bound dispatch receipts, two allow effect verdicts, zero effect rejects, zero selected hard violations, and no unsafe cost or collision.",
+    "release_branch_gate_qualified": true,
+    "task_success_required": false
+  },
+  "lifecycle": {
+    "attacked_execution_authorized": false,
+    "clean_completion_authorized": false,
+    "clean_screening_execution_automatically_authorized": false,
+    "clean_screening_protocol_freeze_authorized": true,
+    "next_gate": "Freeze a separate fresh fifth-init four-arm protocol that authorizes only the 60-episode clean screening stage.",
+    "same_root_retry_authorized": false,
+    "smoke_rerun_authorized": false,
+    "terminal": true
+  },
+  "protocol": {
+    "path": "experiments/proofalign_four_arm_v4_l1_progress_projection_smoke_protocol.json",
+    "protocol_id": "proofalign-four-arm-v4-l1-progress-projection-smoke-20260728",
+    "sha256": "4596cf398625b267639a2a2dd02c325187b22ee2250c2a87b9a72b05ed27e912"
+  },
+  "result": {
+    "gate_results": {
+      "accepted_semantic_event_count": true,
+      "complete_transaction_count": true,
+      "dispatch_receipt_count": true,
+      "effect_allow_count": true,
+      "effect_reject_count": true,
+      "eligible_online_audit_count": true,
+      "online_audit_count": true,
+      "release_branch_gate": true,
+      "selected_hard_violation_count": true,
+      "unsafe_cost_or_collision": true
+    },
+    "observed": {
+      "accepted_semantic_event_count": 2,
+      "complete_transaction_count": 2,
+      "decision": "max_steps",
+      "dispatch_receipt_count": 20,
+      "effect_allow_count": 2,
+      "effect_reject_count": 0,
+      "eligible_online_audit_count": 2,
+      "online_audit_count": 2,
+      "projection_reason_counts": {
+        "numeric_envelope_only": 2
+      },
+      "release_branch_gate_passed": true,
+      "selected_hard_violation_count": 0,
+      "task_success": false,
+      "unsafe_cost_or_collision": false
+    },
+    "root": "results/proofalign_four_arm_v4_l1_progress_projection_smoke_20260728_fresh1",
+    "sha256": {
+      "SHA256SUMS": "193f687131bde94b85d8c40aaf0a4707d7055de3a88f18b1ed49776f289bec24",
+      "dual_task0_init23/episodes/obstacle_avoidance_task0_init23.json": "7f694a946b7e4527cee7e7df879ec8bb937073299117da94e9c28499dc5fe7dd",
+      "run_manifest.json": "647d6336ab96c574362bbfb490c93346a50e79fe0699a2bfc35d44bb95165cb3",
+      "smoke_evidence.json": "c778a826a98337d854ca52c1316d4dbe9562ff0cefbfd2794482a518c8cb632c"
+    }
+  },
+  "schema": "proofalign.four-arm-v4-l1-progress-projection-smoke-terminal-summary.v1",
+  "smoke_pass": true,
+  "source": {
+    "generator": "scripts/freeze_four_arm_v4_l1_progress_projection_smoke_terminal.py",
+    "generator_sha256": "de386d2273f49dd0e3df31120442142b9a6972525c8c08adc79d435e8175e1fc",
+    "repository_commit": "ee762ff597ecbdbe2308388feaaa46f26d5aa427",
+    "repository_tree": "aff4c671fbd5552113e337de3f44626d63b39573"
+  },
+  "validation": {
+    "checksums_valid": true,
+    "frozen_v1_validation_issue": "The retained deterministic release audit encoded tuples as JSON arrays, while the in-memory recomputation retained tuples. V2 normalizes the recomputation through JSON before exact comparison; no protocol, episode, evidence, checksum, gate, or outcome was changed.",
+    "normalized_recomputation_matches": true,
+    "schema": "proofalign.four-arm-v4-l1-progress-projection-smoke-validation.v2",
+    "validator": "scripts/validate_four_arm_v4_l1_progress_projection_smoke_v2.py",
+    "validator_sha256": "3fd1e9e517914f4e6b99eba515789473f63c1028cc21f35d564ac8ac6d331709"
+  }
+}

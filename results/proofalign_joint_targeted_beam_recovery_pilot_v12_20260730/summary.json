@@ -1,0 +1,104 @@
+{
+  "active_contact_capacity_warning_count": 0,
+  "active_warning_count": 0,
+  "best_generated_terminal_target_margin_rad": 0.2794439002302591,
+  "best_seed0_candidate": "joint1_upper_beam_r059_h3_negative_rx-positive_rx-negative_rx",
+  "best_seed0_minimum_shadow_margin_rad": -0.015433487416082858,
+  "branch_restore_identity_rate": 1.0,
+  "candidate_generation_shadow_env_step_count": 432,
+  "candidate_replay_shadow_env_step_count": 432,
+  "claim_boundary": "This result-informed engineering pilot uses simulator-shadow beam search to generate bounded primitive sequences targeted at the diagnosed joint-1 upper-margin failure on the sole remaining known v12.6 outlier. Every search node preserves the original transient and crossing gates, and every policy candidate passes the original recovery selector. Policy screens remain restored shadow branches; no typed live recovery or policy action is dispatched and no task outcome is read. It is not qualification, efficacy, deployment, or physical-safety evidence.",
+  "classification": "joint_targeted_beam_recovery_v12_engineering_pilot_complete",
+  "clean_rollout_authorized": false,
+  "contact_capacity_saturation_count": 0,
+  "generator_diagnostics": {
+    "best_terminal_target_margin_rad": 0.2794439002302591,
+    "depths": [
+      {
+        "best_terminal_global_margin_rad": 0.09876051985157264,
+        "best_terminal_target_margin_rad": 0.09876051985157264,
+        "depth": 1,
+        "expanded_transient_safe_count": 13,
+        "recovery_terminal_eligible_retained_count": 0,
+        "rejected_transient_count": 0,
+        "retained_count": 13
+      },
+      {
+        "best_terminal_global_margin_rad": 0.17782125981829267,
+        "best_terminal_target_margin_rad": 0.17782125981829267,
+        "depth": 2,
+        "expanded_transient_safe_count": 169,
+        "recovery_terminal_eligible_retained_count": 24,
+        "rejected_transient_count": 0,
+        "retained_count": 24
+      },
+      {
+        "best_terminal_global_margin_rad": 0.24486969417909332,
+        "best_terminal_target_margin_rad": 0.24486969417909332,
+        "depth": 3,
+        "expanded_transient_safe_count": 312,
+        "recovery_terminal_eligible_retained_count": 24,
+        "rejected_transient_count": 0,
+        "retained_count": 24
+      },
+      {
+        "best_terminal_global_margin_rad": 0.2794439002302591,
+        "best_terminal_target_margin_rad": 0.2794439002302591,
+        "depth": 4,
+        "expanded_transient_safe_count": 312,
+        "recovery_terminal_eligible_retained_count": 24,
+        "rejected_transient_count": 0,
+        "retained_count": 24
+      },
+      {
+        "best_terminal_global_margin_rad": 0.2784692629175478,
+        "best_terminal_target_margin_rad": 0.2784692629175478,
+        "depth": 5,
+        "expanded_transient_safe_count": 312,
+        "recovery_terminal_eligible_retained_count": 24,
+        "rejected_transient_count": 0,
+        "retained_count": 24
+      },
+      {
+        "best_terminal_global_margin_rad": 0.21275155726815442,
+        "best_terminal_target_margin_rad": 0.21275155726815442,
+        "depth": 6,
+        "expanded_transient_safe_count": 312,
+        "recovery_terminal_eligible_retained_count": 24,
+        "rejected_transient_count": 0,
+        "retained_count": 24
+      },
+      {
+        "best_terminal_global_margin_rad": null,
+        "best_terminal_target_margin_rad": null,
+        "depth": 7,
+        "expanded_transient_safe_count": 0,
+        "recovery_terminal_eligible_retained_count": 0,
+        "rejected_transient_count": 312,
+        "retained_count": 0
+      }
+    ],
+    "policy_candidate_count_after_cap": 96,
+    "recovery_terminal_node_count_before_cap": 120
+  },
+  "generator_search_shadow_env_step_count": 8151,
+  "joint_limit_crossing_candidate_count": 0,
+  "live_policy_dispatch_count": 0,
+  "outcome_read_count": 0,
+  "policy_inference_count": 97,
+  "policy_load_count": 1,
+  "policy_screened_candidate_count": 96,
+  "policy_shadow_env_step_count": 1940,
+  "qualification_pass": null,
+  "raw_candidate_count": 96,
+  "recovery_eligible_candidate_count": 96,
+  "schema": "proofalign.joint-targeted-beam-recovery-pilot-v12-summary.v1",
+  "selected_candidate_detail": null,
+  "selected_policy_aware_candidate": null,
+  "selection_succeeded": false,
+  "target_id": "obstacle_avoidance_human_task14_init46",
+  "target_joint_index": 1,
+  "target_joint_side": "upper",
+  "typed_recovery_env_step_count": 0,
+  "valid_case_count": 1
+}

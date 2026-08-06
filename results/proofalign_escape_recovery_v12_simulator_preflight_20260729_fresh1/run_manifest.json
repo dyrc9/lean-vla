@@ -1,0 +1,10 @@
+{
+  "outcomes_observed": false,
+  "policy_action_dispatched": false,
+  "policy_loaded": false,
+  "protocol_id": "proofalign-escape-recovery-v12-simulator-preflight-20260729",
+  "protocol_sha256": "b35396a3a458d3c178ff105facce98d6ee3b7cc819ea4ec835ff61990e706d13",
+  "row_count": 45,
+  "schema": "proofalign.escape-recovery-v12-simulator-preflight-summary.v1.run-manifest",
+  "status": "complete"
+}

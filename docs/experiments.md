@@ -243,10 +243,11 @@ applied-action conformance。
 ~~~text
 current frozen producer/M2 240 episodes
   -> M2 denominator/signal gate
-  -> source-matrix and P1/P2/P3 mock-online regression
+  -> source-matrix and P1/P2/P3 mock-online regression [done]
+  -> independent online L1/L2 arm switches [done in mock-online]
+  -> shared-source-chunk no-dispatch identity gate [done]
   -> 12-episode non-primary execution-node smoke
-  -> implement independent online L1/L2 arm switches
-  -> shared-source-chunk four-arm identity gate
+  -> shared-source live four-arm GPU identity gate
   -> freeze population/family/placement/endpoints/stopping rule
   -> affine-only and SABER × L2 primary
   -> adapted replay only after online capture/transport exists

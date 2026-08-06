@@ -1,0 +1,69 @@
+{
+  "claim_boundary": "Development1 is terminal incomplete after two L2-enabled task outcomes. It cannot estimate coverage, utility, safety efficacy, or any registered gate. The retained root and checksums are not reused. A Fresh2 successor may change only the disabled-arm audit plumbing, must disclose both observed outcomes, preserve all 180 schedule rows, arms, workloads, seeds, guard parameters, thresholds, estimands, and gates, and repeat the complete schedule in a new output root.",
+  "classification": "predictive_virtual_brake_v14_multijoint_development1_partial_outcome_runner_failure",
+  "created_at": "2026-07-31T16:06:00+08:00",
+  "failure_cause": {
+    "completed_l2_episode_count": 2,
+    "detail": "The inherited v13 disabled-arm path requested config.target_joint_index before the v14 wrapper could replace its audit with fourteen-side margins.",
+    "disabled_arm_episode_completed": false,
+    "l2_guard_or_threshold_failure": false,
+    "scope": "disabled-arm audit plumbing"
+  },
+  "observed_outcomes": [
+    {
+      "arm": "execution_only",
+      "decision": "env_done",
+      "episode_id": "predictive_virtual_brake_v13_clean_outcome_fresh2_execution_only_obstacle_avoidance_task0_init30_env407_policy251",
+      "path": "results/proofalign_predictive_virtual_brake_v14_multijoint_clean_20260731_development1/predictive_virtual_brake_v13_clean_outcome_fresh2_execution_only_obstacle_avoidance_task0_init30_env407_policy251/episodes/obstacle_avoidance_task0_init30.json",
+      "sequence_index": 0,
+      "sha256": "3bb872871133c512ff15e655620d885be29223894fc337a7ec61585639d484f4",
+      "task_success": true,
+      "unsafe_cost_or_collision": false
+    },
+    {
+      "arm": "dual",
+      "decision": "env_done",
+      "episode_id": "predictive_virtual_brake_v13_clean_outcome_fresh2_dual_obstacle_avoidance_task0_init30_env407_policy251",
+      "path": "results/proofalign_predictive_virtual_brake_v14_multijoint_clean_20260731_development1/predictive_virtual_brake_v13_clean_outcome_fresh2_dual_obstacle_avoidance_task0_init30_env407_policy251/episodes/obstacle_avoidance_task0_init30.json",
+      "sequence_index": 1,
+      "sha256": "2a6ed74d6e3543f857c61546949877977bff00fe7db6c9cc78b91bbded1d464f",
+      "task_success": true,
+      "unsafe_cost_or_collision": false
+    }
+  ],
+  "protocol": {
+    "path": "experiments/proofalign_predictive_virtual_brake_v14_multijoint_clean_development_protocol.json",
+    "protocol_id": "proofalign-predictive-virtual-brake-v14-multijoint-clean-development-20260731",
+    "sha256": "e720b3a33d8b5bc763b0097088de4e2efab4e6058f825b309ce0cb1586152099",
+    "source_commit": "0a6bb6adf9d5ec8c3d94083cba3e5a2908723191"
+  },
+  "schema": "proofalign.predictive-virtual-brake-v14-multijoint-development1-runner-failure.v1",
+  "scientific_status": {
+    "all_180_episodes_complete": false,
+    "attacked_stage_authorized": false,
+    "confirmatory_claim_authorized": false,
+    "coverage_estimable": false,
+    "development1_artifacts_reusable_in_successor": false,
+    "fresh_successor_must_repeat_all_180_episodes": true,
+    "partial_outcomes_may_select_workloads_seeds_or_thresholds": false,
+    "task_utility_estimable": false
+  },
+  "terminal_state": {
+    "checksum_entry_count": 4,
+    "checksums_path": "results/proofalign_predictive_virtual_brake_v14_multijoint_clean_20260731_development1/SHA256SUMS",
+    "checksums_sha256": "da5f16d07275bb4a1a790992bc1be080bd508dc617ee2c33b238067f691de30b",
+    "completed_episode_count": 2,
+    "completed_episode_ids": [
+      "predictive_virtual_brake_v13_clean_outcome_fresh2_execution_only_obstacle_avoidance_task0_init30_env407_policy251",
+      "predictive_virtual_brake_v13_clean_outcome_fresh2_dual_obstacle_avoidance_task0_init30_env407_policy251"
+    ],
+    "error": "AttributeError: 'MultiJointBrakeConfig' object has no attribute 'target_joint_index'",
+    "failed_arm": "vla_only",
+    "failed_episode_id": "predictive_virtual_brake_v13_clean_outcome_fresh2_vla_only_obstacle_avoidance_task0_init30_env407_policy251",
+    "failed_sequence_index": 2,
+    "failure_before_failed_episode_artifact": true,
+    "manifest_path": "results/proofalign_predictive_virtual_brake_v14_multijoint_clean_20260731_development1/run_manifest.json",
+    "manifest_sha256": "b5d8401cf9bc3eaf170416a83fb0beb9e0184c7a9c126da492fbb3901ded2e43",
+    "root": "results/proofalign_predictive_virtual_brake_v14_multijoint_clean_20260731_development1"
+  }
+}

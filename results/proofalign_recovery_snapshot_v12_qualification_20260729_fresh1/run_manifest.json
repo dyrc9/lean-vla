@@ -1,0 +1,10 @@
+{
+  "outcomes_observed": false,
+  "policy_action_dispatched": false,
+  "policy_loaded": false,
+  "protocol_id": "proofalign-recovery-snapshot-v12-qualification-20260729",
+  "protocol_sha256": "7d058b1ac09ebb30b0125c908d3ca6cd61eb18a909812b659723b50157b4834e",
+  "row_count": 210,
+  "schema": "proofalign.recovery-snapshot-v12-qualification-summary.v1.run-manifest",
+  "status": "complete"
+}

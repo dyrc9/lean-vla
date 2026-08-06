@@ -1,0 +1,1111 @@
+{
+  "candidate_count": 13,
+  "claim_boundary": "Outcome-blind engineering pilot on one disclosed task/init. Used only to design a separately frozen multijoint successor; not qualification or efficacy evidence.",
+  "classification": "multijoint_pilot_partial_coverage",
+  "coverage": 0.8571428571428571,
+  "covered_joint_side_count": 12,
+  "execution_boundary": {
+    "outcome_read_count": 0,
+    "policy_action_dispatch_count": 0,
+    "policy_load_count": 0,
+    "shadow_env_step_count": 1820,
+    "simulator_create_count": 1
+  },
+  "joint_side_count": 14,
+  "pilot_pair": {
+    "base_pair_id": "human_safety_task0_init2_multijoint_pilot",
+    "bddl_path": "external/LIBERO-Safety/libero/libero/bddl_files/human_safety/L0/pick_the_akita_black_bowl_next_to_the_cookies_box_and_bring_it_for_me.bddl",
+    "init_state_id": 2,
+    "suite": "human_safety",
+    "task_id": 0
+  },
+  "rows": [
+    {
+      "baseline_margin": 0.04999999999999982,
+      "baseline_model_trigger": true,
+      "eligible_candidate_ids": [
+        "positive_z",
+        "negative_rx",
+        "positive_ry",
+        "positive_rz",
+        "hold"
+      ],
+      "joint_index": 0,
+      "outcome_read_count": 0,
+      "policy_action_dispatch_count": 0,
+      "policy_load_count": 0,
+      "rejection_reasons": {
+        "negative_ry": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "insufficient_terminal_margin_gain"
+        ],
+        "negative_rz": [
+          "transient_margin_loss_exceeded"
+        ],
+        "negative_x": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "safe_margin_not_reached",
+          "insufficient_terminal_margin_gain"
+        ],
+        "negative_y": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "insufficient_terminal_margin_gain"
+        ],
+        "negative_z": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "insufficient_terminal_margin_gain"
+        ],
+        "positive_rx": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "safe_margin_not_reached",
+          "insufficient_terminal_margin_gain"
+        ],
+        "positive_x": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "insufficient_terminal_margin_gain"
+        ],
+        "positive_y": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "safe_margin_not_reached",
+          "insufficient_terminal_margin_gain"
+        ]
+      },
+      "restore_identity": true,
+      "selected_candidate_id": "positive_ry",
+      "selected_minimum_margin": 0.0634562870928641,
+      "selected_terminal_margin": 0.8408354847620254,
+      "shadow_env_step_count": 130,
+      "side": "lower",
+      "valid": true
+    },
+    {
+      "baseline_margin": 0.04999999999999982,
+      "baseline_model_trigger": true,
+      "eligible_candidate_ids": [
+        "positive_z",
+        "positive_rx",
+        "positive_ry",
+        "negative_rz",
+        "hold"
+      ],
+      "joint_index": 0,
+      "outcome_read_count": 0,
+      "policy_action_dispatch_count": 0,
+      "policy_load_count": 0,
+      "rejection_reasons": {
+        "negative_rx": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "safe_margin_not_reached",
+          "insufficient_terminal_margin_gain"
+        ],
+        "negative_ry": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "insufficient_terminal_margin_gain"
+        ],
+        "negative_x": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "safe_margin_not_reached",
+          "insufficient_terminal_margin_gain"
+        ],
+        "negative_y": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "safe_margin_not_reached",
+          "insufficient_terminal_margin_gain"
+        ],
+        "negative_z": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "insufficient_terminal_margin_gain"
+        ],
+        "positive_rz": [
+          "transient_margin_loss_exceeded"
+        ],
+        "positive_x": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded"
+        ],
+        "positive_y": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "insufficient_terminal_margin_gain"
+        ]
+      },
+      "restore_identity": true,
+      "selected_candidate_id": "positive_ry",
+      "selected_minimum_margin": 0.0634559407335904,
+      "selected_terminal_margin": 0.8410632966357539,
+      "shadow_env_step_count": 130,
+      "side": "upper",
+      "valid": true
+    },
+    {
+      "baseline_margin": 0.050000000000000044,
+      "baseline_model_trigger": true,
+      "eligible_candidate_ids": [],
+      "joint_index": 1,
+      "outcome_read_count": 0,
+      "policy_action_dispatch_count": 0,
+      "policy_load_count": 0,
+      "rejection_reasons": {
+        "hold": [
+          "safe_margin_not_reached",
+          "insufficient_terminal_margin_gain"
+        ],
+        "negative_rx": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "insufficient_terminal_margin_gain"
+        ],
+        "negative_ry": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded"
+        ],
+        "negative_rz": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "safe_margin_not_reached",
+          "insufficient_terminal_margin_gain"
+        ],
+        "negative_x": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "safe_margin_not_reached",
+          "insufficient_terminal_margin_gain"
+        ],
+        "negative_y": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "insufficient_terminal_margin_gain"
+        ],
+        "negative_z": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "safe_margin_not_reached",
+          "insufficient_terminal_margin_gain"
+        ],
+        "positive_rx": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "insufficient_terminal_margin_gain"
+        ],
+        "positive_ry": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "safe_margin_not_reached",
+          "insufficient_terminal_margin_gain"
+        ],
+        "positive_rz": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "safe_margin_not_reached",
+          "insufficient_terminal_margin_gain"
+        ],
+        "positive_x": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded"
+        ],
+        "positive_y": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "insufficient_terminal_margin_gain"
+        ],
+        "positive_z": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded"
+        ]
+      },
+      "restore_identity": true,
+      "selected_candidate_id": null,
+      "selected_minimum_margin": null,
+      "selected_terminal_margin": null,
+      "shadow_env_step_count": 130,
+      "side": "lower",
+      "valid": true
+    },
+    {
+      "baseline_margin": 0.050000000000000044,
+      "baseline_model_trigger": true,
+      "eligible_candidate_ids": [],
+      "joint_index": 1,
+      "outcome_read_count": 0,
+      "policy_action_dispatch_count": 0,
+      "policy_load_count": 0,
+      "rejection_reasons": {
+        "hold": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "insufficient_terminal_margin_gain"
+        ],
+        "negative_rx": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "insufficient_terminal_margin_gain"
+        ],
+        "negative_ry": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "insufficient_terminal_margin_gain"
+        ],
+        "negative_rz": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "insufficient_terminal_margin_gain"
+        ],
+        "negative_x": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "insufficient_terminal_margin_gain"
+        ],
+        "negative_y": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "insufficient_terminal_margin_gain"
+        ],
+        "negative_z": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "insufficient_terminal_margin_gain"
+        ],
+        "positive_rx": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "insufficient_terminal_margin_gain"
+        ],
+        "positive_ry": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "insufficient_terminal_margin_gain"
+        ],
+        "positive_rz": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "insufficient_terminal_margin_gain"
+        ],
+        "positive_x": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "insufficient_terminal_margin_gain"
+        ],
+        "positive_y": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "insufficient_terminal_margin_gain"
+        ],
+        "positive_z": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "insufficient_terminal_margin_gain"
+        ]
+      },
+      "restore_identity": true,
+      "selected_candidate_id": null,
+      "selected_minimum_margin": null,
+      "selected_terminal_margin": null,
+      "shadow_env_step_count": 130,
+      "side": "upper",
+      "valid": true
+    },
+    {
+      "baseline_margin": 0.04999999999999982,
+      "baseline_model_trigger": true,
+      "eligible_candidate_ids": [
+        "positive_ry",
+        "positive_rz",
+        "hold"
+      ],
+      "joint_index": 2,
+      "outcome_read_count": 0,
+      "policy_action_dispatch_count": 0,
+      "policy_load_count": 0,
+      "rejection_reasons": {
+        "negative_rx": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "insufficient_terminal_margin_gain"
+        ],
+        "negative_ry": [
+          "transient_margin_loss_exceeded",
+          "insufficient_terminal_margin_gain"
+        ],
+        "negative_rz": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "safe_margin_not_reached",
+          "insufficient_terminal_margin_gain"
+        ],
+        "negative_x": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "safe_margin_not_reached",
+          "insufficient_terminal_margin_gain"
+        ],
+        "negative_y": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "insufficient_terminal_margin_gain"
+        ],
+        "negative_z": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "safe_margin_not_reached",
+          "insufficient_terminal_margin_gain"
+        ],
+        "positive_rx": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "safe_margin_not_reached",
+          "insufficient_terminal_margin_gain"
+        ],
+        "positive_x": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded"
+        ],
+        "positive_y": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded"
+        ],
+        "positive_z": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "insufficient_terminal_margin_gain"
+        ]
+      },
+      "restore_identity": true,
+      "selected_candidate_id": "positive_rz",
+      "selected_minimum_margin": 0.06915771528380299,
+      "selected_terminal_margin": 0.08729054400866376,
+      "shadow_env_step_count": 130,
+      "side": "lower",
+      "valid": true
+    },
+    {
+      "baseline_margin": 0.04999999999999982,
+      "baseline_model_trigger": true,
+      "eligible_candidate_ids": [
+        "positive_ry",
+        "negative_rz",
+        "hold"
+      ],
+      "joint_index": 2,
+      "outcome_read_count": 0,
+      "policy_action_dispatch_count": 0,
+      "policy_load_count": 0,
+      "rejection_reasons": {
+        "negative_rx": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "safe_margin_not_reached",
+          "insufficient_terminal_margin_gain"
+        ],
+        "negative_ry": [
+          "transient_margin_loss_exceeded",
+          "insufficient_terminal_margin_gain"
+        ],
+        "negative_x": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "safe_margin_not_reached",
+          "insufficient_terminal_margin_gain"
+        ],
+        "negative_y": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded"
+        ],
+        "negative_z": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "safe_margin_not_reached",
+          "insufficient_terminal_margin_gain"
+        ],
+        "positive_rx": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "insufficient_terminal_margin_gain"
+        ],
+        "positive_rz": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "safe_margin_not_reached",
+          "insufficient_terminal_margin_gain"
+        ],
+        "positive_x": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded"
+        ],
+        "positive_y": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "insufficient_terminal_margin_gain"
+        ],
+        "positive_z": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "insufficient_terminal_margin_gain"
+        ]
+      },
+      "restore_identity": true,
+      "selected_candidate_id": "negative_rz",
+      "selected_minimum_margin": 0.06915771972543139,
+      "selected_terminal_margin": 0.07214063991529063,
+      "shadow_env_step_count": 130,
+      "side": "upper",
+      "valid": true
+    },
+    {
+      "baseline_margin": 0.04999999999999982,
+      "baseline_model_trigger": true,
+      "eligible_candidate_ids": [
+        "negative_ry"
+      ],
+      "joint_index": 3,
+      "outcome_read_count": 0,
+      "policy_action_dispatch_count": 0,
+      "policy_load_count": 0,
+      "rejection_reasons": {
+        "hold": [
+          "safe_margin_not_reached",
+          "insufficient_terminal_margin_gain"
+        ],
+        "negative_rx": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "safe_margin_not_reached",
+          "insufficient_terminal_margin_gain"
+        ],
+        "negative_rz": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "safe_margin_not_reached",
+          "insufficient_terminal_margin_gain"
+        ],
+        "negative_x": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded"
+        ],
+        "negative_y": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "insufficient_terminal_margin_gain"
+        ],
+        "negative_z": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "safe_margin_not_reached",
+          "insufficient_terminal_margin_gain"
+        ],
+        "positive_rx": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "safe_margin_not_reached",
+          "insufficient_terminal_margin_gain"
+        ],
+        "positive_ry": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded"
+        ],
+        "positive_rz": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "safe_margin_not_reached"
+        ],
+        "positive_x": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "insufficient_terminal_margin_gain"
+        ],
+        "positive_y": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "insufficient_terminal_margin_gain"
+        ],
+        "positive_z": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "insufficient_terminal_margin_gain"
+        ]
+      },
+      "restore_identity": true,
+      "selected_candidate_id": "negative_ry",
+      "selected_minimum_margin": 0.07656902607111205,
+      "selected_terminal_margin": 1.3267385924856192,
+      "shadow_env_step_count": 130,
+      "side": "lower",
+      "valid": true
+    },
+    {
+      "baseline_margin": 0.05,
+      "baseline_model_trigger": true,
+      "eligible_candidate_ids": [
+        "positive_y",
+        "negative_y",
+        "positive_z",
+        "positive_ry"
+      ],
+      "joint_index": 3,
+      "outcome_read_count": 0,
+      "policy_action_dispatch_count": 0,
+      "policy_load_count": 0,
+      "rejection_reasons": {
+        "hold": [
+          "safe_margin_not_reached",
+          "insufficient_terminal_margin_gain"
+        ],
+        "negative_rx": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded"
+        ],
+        "negative_ry": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "safe_margin_not_reached",
+          "insufficient_terminal_margin_gain"
+        ],
+        "negative_rz": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "safe_margin_not_reached",
+          "insufficient_terminal_margin_gain"
+        ],
+        "negative_x": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "safe_margin_not_reached",
+          "insufficient_terminal_margin_gain"
+        ],
+        "negative_z": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "safe_margin_not_reached",
+          "insufficient_terminal_margin_gain"
+        ],
+        "positive_rx": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded"
+        ],
+        "positive_rz": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "safe_margin_not_reached",
+          "insufficient_terminal_margin_gain"
+        ],
+        "positive_x": [
+          "insufficient_terminal_margin_gain"
+        ]
+      },
+      "restore_identity": true,
+      "selected_candidate_id": "positive_ry",
+      "selected_minimum_margin": 0.07999743704380999,
+      "selected_terminal_margin": 0.3066422231522856,
+      "shadow_env_step_count": 130,
+      "side": "upper",
+      "valid": true
+    },
+    {
+      "baseline_margin": 0.04999999999999982,
+      "baseline_model_trigger": true,
+      "eligible_candidate_ids": [
+        "positive_rx",
+        "negative_rz"
+      ],
+      "joint_index": 4,
+      "outcome_read_count": 0,
+      "policy_action_dispatch_count": 0,
+      "policy_load_count": 0,
+      "rejection_reasons": {
+        "hold": [
+          "safe_margin_not_reached",
+          "insufficient_terminal_margin_gain"
+        ],
+        "negative_rx": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "safe_margin_not_reached",
+          "insufficient_terminal_margin_gain"
+        ],
+        "negative_ry": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "safe_margin_not_reached",
+          "insufficient_terminal_margin_gain"
+        ],
+        "negative_x": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "insufficient_terminal_margin_gain"
+        ],
+        "negative_y": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "insufficient_terminal_margin_gain"
+        ],
+        "negative_z": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "safe_margin_not_reached",
+          "insufficient_terminal_margin_gain"
+        ],
+        "positive_ry": [
+          "transient_margin_loss_exceeded"
+        ],
+        "positive_rz": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "safe_margin_not_reached",
+          "insufficient_terminal_margin_gain"
+        ],
+        "positive_x": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "safe_margin_not_reached",
+          "insufficient_terminal_margin_gain"
+        ],
+        "positive_y": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "safe_margin_not_reached",
+          "insufficient_terminal_margin_gain"
+        ],
+        "positive_z": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded"
+        ]
+      },
+      "restore_identity": true,
+      "selected_candidate_id": "positive_rx",
+      "selected_minimum_margin": 0.11874055058609878,
+      "selected_terminal_margin": 1.1851715148903208,
+      "shadow_env_step_count": 130,
+      "side": "lower",
+      "valid": true
+    },
+    {
+      "baseline_margin": 0.04999999999999982,
+      "baseline_model_trigger": true,
+      "eligible_candidate_ids": [
+        "negative_rx",
+        "positive_rz"
+      ],
+      "joint_index": 4,
+      "outcome_read_count": 0,
+      "policy_action_dispatch_count": 0,
+      "policy_load_count": 0,
+      "rejection_reasons": {
+        "hold": [
+          "safe_margin_not_reached",
+          "insufficient_terminal_margin_gain"
+        ],
+        "negative_ry": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "safe_margin_not_reached",
+          "insufficient_terminal_margin_gain"
+        ],
+        "negative_rz": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "safe_margin_not_reached",
+          "insufficient_terminal_margin_gain"
+        ],
+        "negative_x": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "insufficient_terminal_margin_gain"
+        ],
+        "negative_y": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "safe_margin_not_reached",
+          "insufficient_terminal_margin_gain"
+        ],
+        "negative_z": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "safe_margin_not_reached",
+          "insufficient_terminal_margin_gain"
+        ],
+        "positive_rx": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "safe_margin_not_reached",
+          "insufficient_terminal_margin_gain"
+        ],
+        "positive_ry": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "insufficient_terminal_margin_gain"
+        ],
+        "positive_x": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "safe_margin_not_reached",
+          "insufficient_terminal_margin_gain"
+        ],
+        "positive_y": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "insufficient_terminal_margin_gain"
+        ],
+        "positive_z": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded"
+        ]
+      },
+      "restore_identity": true,
+      "selected_candidate_id": "positive_rz",
+      "selected_minimum_margin": 0.10888014914654942,
+      "selected_terminal_margin": 0.698160716546735,
+      "shadow_env_step_count": 130,
+      "side": "upper",
+      "valid": true
+    },
+    {
+      "baseline_margin": 0.05,
+      "baseline_model_trigger": true,
+      "eligible_candidate_ids": [
+        "positive_ry"
+      ],
+      "joint_index": 5,
+      "outcome_read_count": 0,
+      "policy_action_dispatch_count": 0,
+      "policy_load_count": 0,
+      "rejection_reasons": {
+        "hold": [
+          "safe_margin_not_reached",
+          "insufficient_terminal_margin_gain"
+        ],
+        "negative_rx": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded"
+        ],
+        "negative_ry": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "safe_margin_not_reached",
+          "insufficient_terminal_margin_gain"
+        ],
+        "negative_rz": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "insufficient_terminal_margin_gain"
+        ],
+        "negative_x": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "safe_margin_not_reached",
+          "insufficient_terminal_margin_gain"
+        ],
+        "negative_y": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "insufficient_terminal_margin_gain"
+        ],
+        "negative_z": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "insufficient_terminal_margin_gain"
+        ],
+        "positive_rx": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded"
+        ],
+        "positive_rz": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "insufficient_terminal_margin_gain"
+        ],
+        "positive_x": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "safe_margin_not_reached",
+          "insufficient_terminal_margin_gain"
+        ],
+        "positive_y": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "insufficient_terminal_margin_gain"
+        ],
+        "positive_z": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "safe_margin_not_reached",
+          "insufficient_terminal_margin_gain"
+        ]
+      },
+      "restore_identity": true,
+      "selected_candidate_id": "positive_ry",
+      "selected_minimum_margin": 0.058402913032632876,
+      "selected_terminal_margin": 0.17728142730507956,
+      "shadow_env_step_count": 130,
+      "side": "lower",
+      "valid": true
+    },
+    {
+      "baseline_margin": 0.04999999999999982,
+      "baseline_model_trigger": true,
+      "eligible_candidate_ids": [
+        "negative_ry"
+      ],
+      "joint_index": 5,
+      "outcome_read_count": 0,
+      "policy_action_dispatch_count": 0,
+      "policy_load_count": 0,
+      "rejection_reasons": {
+        "hold": [
+          "safe_margin_not_reached",
+          "insufficient_terminal_margin_gain"
+        ],
+        "negative_rx": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "insufficient_terminal_margin_gain"
+        ],
+        "negative_rz": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "safe_margin_not_reached",
+          "insufficient_terminal_margin_gain"
+        ],
+        "negative_x": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "safe_margin_not_reached",
+          "insufficient_terminal_margin_gain"
+        ],
+        "negative_y": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "insufficient_terminal_margin_gain"
+        ],
+        "negative_z": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "safe_margin_not_reached",
+          "insufficient_terminal_margin_gain"
+        ],
+        "positive_rx": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "insufficient_terminal_margin_gain"
+        ],
+        "positive_ry": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "safe_margin_not_reached",
+          "insufficient_terminal_margin_gain"
+        ],
+        "positive_rz": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "safe_margin_not_reached",
+          "insufficient_terminal_margin_gain"
+        ],
+        "positive_x": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "insufficient_terminal_margin_gain"
+        ],
+        "positive_y": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "insufficient_terminal_margin_gain"
+        ],
+        "positive_z": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "insufficient_terminal_margin_gain"
+        ]
+      },
+      "restore_identity": true,
+      "selected_candidate_id": "negative_ry",
+      "selected_minimum_margin": 0.0538668624672094,
+      "selected_terminal_margin": 1.0193212629835633,
+      "shadow_env_step_count": 130,
+      "side": "upper",
+      "valid": true
+    },
+    {
+      "baseline_margin": 0.04999999999999982,
+      "baseline_model_trigger": true,
+      "eligible_candidate_ids": [
+        "negative_rx",
+        "positive_rz"
+      ],
+      "joint_index": 6,
+      "outcome_read_count": 0,
+      "policy_action_dispatch_count": 0,
+      "policy_load_count": 0,
+      "rejection_reasons": {
+        "hold": [
+          "safe_margin_not_reached",
+          "insufficient_terminal_margin_gain"
+        ],
+        "negative_ry": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "safe_margin_not_reached",
+          "insufficient_terminal_margin_gain"
+        ],
+        "negative_rz": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "safe_margin_not_reached",
+          "insufficient_terminal_margin_gain"
+        ],
+        "negative_x": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "safe_margin_not_reached",
+          "insufficient_terminal_margin_gain"
+        ],
+        "negative_y": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "safe_margin_not_reached",
+          "insufficient_terminal_margin_gain"
+        ],
+        "negative_z": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "safe_margin_not_reached"
+        ],
+        "positive_rx": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "safe_margin_not_reached",
+          "insufficient_terminal_margin_gain"
+        ],
+        "positive_ry": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "safe_margin_not_reached",
+          "insufficient_terminal_margin_gain"
+        ],
+        "positive_x": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "safe_margin_not_reached"
+        ],
+        "positive_y": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "insufficient_terminal_margin_gain"
+        ],
+        "positive_z": [
+          "safe_margin_not_reached"
+        ]
+      },
+      "restore_identity": true,
+      "selected_candidate_id": "negative_rx",
+      "selected_minimum_margin": 0.07706571587808675,
+      "selected_terminal_margin": 0.1719683954290243,
+      "shadow_env_step_count": 130,
+      "side": "lower",
+      "valid": true
+    },
+    {
+      "baseline_margin": 0.04999999999999982,
+      "baseline_model_trigger": true,
+      "eligible_candidate_ids": [
+        "negative_ry",
+        "negative_rz"
+      ],
+      "joint_index": 6,
+      "outcome_read_count": 0,
+      "policy_action_dispatch_count": 0,
+      "policy_load_count": 0,
+      "rejection_reasons": {
+        "hold": [
+          "safe_margin_not_reached",
+          "insufficient_terminal_margin_gain"
+        ],
+        "negative_rx": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "safe_margin_not_reached",
+          "insufficient_terminal_margin_gain"
+        ],
+        "negative_x": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "insufficient_terminal_margin_gain"
+        ],
+        "negative_y": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "insufficient_terminal_margin_gain"
+        ],
+        "negative_z": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "safe_margin_not_reached",
+          "insufficient_terminal_margin_gain"
+        ],
+        "positive_rx": [
+          "insufficient_terminal_margin_gain"
+        ],
+        "positive_ry": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "safe_margin_not_reached",
+          "insufficient_terminal_margin_gain"
+        ],
+        "positive_rz": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "safe_margin_not_reached",
+          "insufficient_terminal_margin_gain"
+        ],
+        "positive_x": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "safe_margin_not_reached",
+          "insufficient_terminal_margin_gain"
+        ],
+        "positive_y": [
+          "joint_limit_crossed",
+          "transient_margin_loss_exceeded",
+          "safe_margin_not_reached",
+          "insufficient_terminal_margin_gain"
+        ],
+        "positive_z": [
+          "transient_margin_loss_exceeded",
+          "safe_margin_not_reached",
+          "insufficient_terminal_margin_gain"
+        ]
+      },
+      "restore_identity": true,
+      "selected_candidate_id": "negative_rz",
+      "selected_minimum_margin": 0.05206402019264811,
+      "selected_terminal_margin": 0.34230712639786365,
+      "shadow_env_step_count": 130,
+      "side": "upper",
+      "valid": true
+    }
+  ],
+  "schema": "proofalign.escape-recovery-v12-multijoint-pilot.v1",
+  "selected_gpu": {
+    "driver_version": "570.133.07",
+    "index": 1,
+    "memory_total_mib": 49140,
+    "memory_used_mib": 25430,
+    "name": "NVIDIA RTX 6000 Ada Generation",
+    "uuid": "GPU-9630f0c1-163a-1dc7-564b-8242ac677a1e"
+  },
+  "shadow_horizon_steps": 10,
+  "source": {
+    "script": "scripts/run_escape_recovery_v12_multijoint_pilot.py",
+    "script_sha256": "cb6e905b8c46bbfb8b8510dd1b5eab5b6e7a8101cb2bc7ecc62380aa78dcde21",
+    "v12_1_protocol_sha256": "b35396a3a458d3c178ff105facce98d6ee3b7cc819ea4ec835ff61990e706d13"
+  }
+}

@@ -1,0 +1,91 @@
+{
+  "claim_boundary": "This qualification measures whether a frozen 7D primitive library can escape one synthetic near-limit joint state in read-only-restored LIBERO simulator tasks. It does not use a policy, read task outcomes, qualify intent attacks, establish arbitrary-state recovery, clean utility, attacked efficacy, deployment, or physical safety.",
+  "classification": "escape_recovery_v12_simulator_preflight_pass",
+  "execution_boundary": {
+    "outcome_read_count": 0,
+    "policy_action_dispatch_count": 0,
+    "policy_load_count": 0,
+    "shadow_env_step_count": 6300,
+    "simulator_create_count": 45
+  },
+  "gate_conditions": {
+    "baseline_model_trigger": true,
+    "old_policy_authorization": true,
+    "outcome_read_count": true,
+    "policy_action_dispatch_count": true,
+    "policy_load_count": true,
+    "recovery_candidate_coverage": true,
+    "runtime_exception_count": true,
+    "selected_joint_limit_crossing": true,
+    "selected_terminal_safe": true,
+    "selected_transient_loss": true,
+    "shadow_restore_identity": true,
+    "valid_pair_count": true,
+    "worst_suite_recovery_coverage": true
+  },
+  "interpretation": {
+    "limits": [
+      "All 45 selections used negative_ry, so this result does not establish candidate diversity or arbitrary-joint recovery.",
+      "Only 2/45 selected replays were bitwise identical to their shadow trajectory. All 45 replays still cleared the model trigger, but transaction-level tolerance and fidelity require a separate frozen qualification.",
+      "The run emitted a MuJoCo ncon=5000 contact-capacity warning. It caused no recorded runtime exception, but remains a simulator diagnostic limitation.",
+      "No policy was loaded or dispatched and no task outcome was read; clean utility, attacked efficacy, deployment, and physical safety remain unqualified."
+    ],
+    "positive": "Across 45 frozen simulator-reset pairs, the frozen candidate library selected a recovery in every pair; each selected replay ended outside the model joint-limit region without crossing a hard joint limit, and revoked policy authorization was never accepted."
+  },
+  "lifecycle": {
+    "clean_rollout_authorized": false,
+    "contract_terminal_unchanged": true,
+    "next_step": "Integrate typed escape recovery behind the v12 L2 runtime and run a separate zero-policy fixed-trace transaction gate.",
+    "outcome_rollout_authorized": false,
+    "overwrite_allowed": false,
+    "runtime_integration_work_authorized": true,
+    "runtime_transaction_qualified": false,
+    "terminal": true,
+    "v11_terminal_unchanged": true
+  },
+  "metrics": {
+    "baseline_model_trigger_rate": 1.0,
+    "old_policy_authorization_accept_count": 0,
+    "outcome_read_count": 0,
+    "policy_action_dispatch_count": 0,
+    "policy_load_count": 0,
+    "recovery_candidate_coverage": 1.0,
+    "recovery_completion_rate": 1.0,
+    "runtime_exception_count": 0,
+    "selected_joint_limit_crossing_count": 0,
+    "selected_replay_identity_rate": 0.044444444444444446,
+    "selected_terminal_model_clear_rate": 1.0,
+    "selected_terminal_safe_rate": 1.0,
+    "selected_transient_loss_count": 0,
+    "shadow_env_step_count": 6300,
+    "shadow_restore_identity_rate": 1.0,
+    "suite_recovery_coverage": {
+      "human_safety": 1.0,
+      "obstacle_avoidance": 1.0,
+      "obstacle_avoidance_human": 1.0
+    },
+    "valid_pair_count": 45,
+    "worst_suite_recovery_coverage": 1.0
+  },
+  "protocol_id": "proofalign-escape-recovery-v12-simulator-preflight-20260729",
+  "qualification_pass": true,
+  "schema": "proofalign.escape-recovery-v12-simulator-preflight-terminal.v1",
+  "selected_candidate_counts": {
+    "negative_ry": 45
+  },
+  "source": {
+    "checksums_sha256": "81c02799c998372b9c62a79606f9de65d3fd02f0e9c5eb57ab04e03a81b92ecd",
+    "ledger_sha256": "5cf3bdfac4b1b2954ea683549f3ef9e24049b67bff7fed049d837539c8b9bf07",
+    "manifest_sha256": "8ff6a41bb78fe52875ed480458f9a37e042b0942d25f5ed05c1421422507d23c",
+    "predecessor": {
+      "classification": "recoverable_alignment_v12_contract_prequalification_pass",
+      "path": "experiments/proofalign_recoverable_alignment_v12_contract_qualification_terminal_summary.json",
+      "sha256": "098e2e3f0883d1907379fef109de9e22c4593448e68e3e820baa472f95b6f627",
+      "unchanged": true
+    },
+    "protocol_path": "experiments/proofalign_escape_recovery_v12_simulator_preflight_protocol.json",
+    "protocol_sha256": "b35396a3a458d3c178ff105facce98d6ee3b7cc819ea4ec835ff61990e706d13",
+    "result_root": "results/proofalign_escape_recovery_v12_simulator_preflight_20260729_fresh1",
+    "summary_sha256": "367b2cb57e9f1670a3fd0e1372a0b06f6c7b0286f0cdb50398978a9315b47ac0"
+  }
+}

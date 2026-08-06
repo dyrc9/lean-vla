@@ -1,0 +1,12 @@
+{
+  "outcomes_observed": false,
+  "policy_action_dispatched": false,
+  "policy_inference_performed": false,
+  "policy_loaded": false,
+  "protocol_id": "engineering-pilot",
+  "protocol_sha256": null,
+  "row_count": 12,
+  "schema": "proofalign.integrated-predictive-recovery-v12-fixed-trace-summary.v1.run-manifest",
+  "simulator_created": false,
+  "status": "complete"
+}

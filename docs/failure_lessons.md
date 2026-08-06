@@ -1,4 +1,8 @@
-# 失败教训与停止规则
+# 失败教训与停止规则（归档）
+
+本页只记录可复用的失败教训，不参与默认进度汇报。当前状态统一见
+[`current_status_and_roadmap.md`](current_status_and_roadmap.md)，完整逐版本时间线见
+[`progress_and_plan.md`](progress_and_plan.md)。
 
 ## 1. 不把不可观察变量当作实验接口
 
@@ -73,3 +77,30 @@ checker qualification。
 Lean 不是事后形式化装饰：exact dispatch、transaction binding 和 phase-gating theorem 是 L2 的核心方法
 贡献。但每次展示 Lean 结果时也必须同时声明 selector/assessor、Python refinement、sensor/observer 和
 现实物理不在证明范围内。扩大 claim 会损害本来可辩护的形式化贡献。
+
+## 14. 历史失败实验索引
+
+以下实验保留为归档证据，不在日常进度中逐项复述：
+
+- P0b/M2：攻击基础样本或预注册比例gate未通过；
+- support45与早期四臂：L1 coverage和deadlock导致clean gate失败；
+- L1 repair、H/K消融、v8–v10：定位checker availability和过度保守问题；
+- v11/v14：joint-limit containment有效，但task utility下降；
+- v12.1–v12.36：逐步排除state-safe但next-policy-unsafe、controller lag和不可制动状态；
+- v15.1–v15.6：逐步暴露recovery identity、force envelope、residual deadlock和latency问题；
+- v15.7 model mismatch：same-model qualification通过，但actual/shadow模型失配仍non-pass。
+- v15.8：observed-force model bank解决了失配下的deadlock、prediction error和force问题，但逐动作重复
+  simulator rollout使100ms latency miss rate超过注册门；不能把安全通过写成总体qualification通过；
+- v15.9/v15.10：把calibration移到动作前或滚动预绑定后，latency几乎不变，证明瓶颈是unguarded加多个
+  candidate rollouts，而不是七模型calibration；
+- v15.11第一次开发轮：将rollout限制为2次后延迟通过，但固定从0.16/0.18开始造成12条fail-closed
+  deadlock；最终使用state-offset首候选和current-edge ladder补选后，披露开发集才全门通过。
+- v15.11 fresh2：core安全、力和延迟指标全部通过，但candidate callsite被旧classifier识别成actual，导致
+  23571次前瞻缺少shadow-role证据；确认性分类必须保持non-pass。审计占位行也必须与真实screened candidate
+  分开计数，不能用“列表里存在”代替“实际评估过”。
+- v15.11 fresh3：model-role审计和全部核心结果通过，但新鲜样本没有触发ladder与force-rejection条件分支；
+  继承协议要求至少触发一次，故正式分类仍为non-pass。条件分支的activation coverage必须在冻结前说明是
+  必须触发还是只要求实现可审计，不能等看到新鲜样本后再决定。
+
+这些结果不删除、不重命名为pass，也不应遮盖当前主线：原方法已有完整四臂结果；v15.11新方法已通过
+fresh4 model-mismatch qualification，当前只缺最终clean与SABER-attacked四臂验证。

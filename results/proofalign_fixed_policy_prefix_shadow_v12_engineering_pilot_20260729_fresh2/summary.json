@@ -1,0 +1,58 @@
+{
+  "claim_boundary": "This three-prefix, six-case engineering pilot uses exact executed commands extracted without outcomes from frozen outcome-known traces. It selects the formal controller-shadow protocol and is not qualification or fresh-policy evidence.",
+  "classification": "fixed_policy_prefix_shadow_v12_engineering_pilot_complete",
+  "execution_boundary": {
+    "live_policy_dispatch_count": 0,
+    "outcome_read_count": 0,
+    "policy_inference_count": 0,
+    "policy_load_count": 0,
+    "policy_shadow_env_step_count": 120
+  },
+  "metrics": {
+    "blocked_prefix_authorization_count": 0,
+    "controller_restore_identity_rate": 1.0,
+    "environment_clock_restore_identity_rate": 1.0,
+    "exact_allow_identity_rate": 1.0,
+    "finite_source_prefix_rate": 1.0,
+    "full_simulator_restore_identity_rate": 1.0,
+    "full_simulator_restore_max_abs_error": 0.0,
+    "live_policy_dispatch_count": 0,
+    "nominal_allow_count": 3,
+    "nominal_allow_rate": 1.0,
+    "outcome_read_count": 0,
+    "policy_inference_count": 0,
+    "policy_load_count": 0,
+    "policy_shadow_env_step_count": 120,
+    "repeat_trajectory_max_abs_qpos_error_rad": 2.7755575615628914e-17,
+    "repeat_trajectory_within_tolerance_rate": 1.0,
+    "runtime_exception_count": 0,
+    "shadow_reference_risk_agreement_rate": 1.0,
+    "simulator_input_restore_identity_rate": 1.0,
+    "stabilization_env_step_count": 60,
+    "suite_nominal_allow": {
+      "human_safety": {
+        "allow_count": 1,
+        "allow_rate": 1.0,
+        "total_count": 1
+      },
+      "obstacle_avoidance": {
+        "allow_count": 1,
+        "allow_rate": 1.0,
+        "total_count": 1
+      },
+      "obstacle_avoidance_human": {
+        "allow_count": 1,
+        "allow_rate": 1.0,
+        "total_count": 1
+      }
+    },
+    "synthetic_current_trigger_rate": 1.0,
+    "synthetic_recovery_required_rate": 1.0,
+    "trusted_arm_restore_identity_rate": 1.0,
+    "valid_case_count": 6,
+    "worst_suite_nominal_allow_rate": 1.0
+  },
+  "qualification_pass": null,
+  "schema": "proofalign.fixed-policy-prefix-shadow-v12-qualification-summary.v1",
+  "valid_case_count": 6
+}

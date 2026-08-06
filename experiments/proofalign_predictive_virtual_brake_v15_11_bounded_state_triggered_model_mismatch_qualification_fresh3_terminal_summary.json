@@ -1,0 +1,33 @@
+{
+  "schema": "proofalign.predictive-virtual-brake-v15.11-bounded-state-triggered-model-mismatch-qualification-terminal-summary.v1",
+  "classification": "predictive_virtual_brake_v15_11_bounded_state_triggered_model_mismatch_qualification_nonpass",
+  "model_mismatch_qualification_pass": false,
+  "protocol_path": "experiments/proofalign_predictive_virtual_brake_v15_11_bounded_state_triggered_model_mismatch_qualification_protocol_fresh3.json",
+  "protocol_sha256": "10c913f2a6ffe5879f173d679d9c4e31627e2ef857e26fcccc1fda4896ea5dd4",
+  "evidence_path": "results/proofalign_predictive_virtual_brake_v15_11_bounded_state_triggered_model_mismatch_qualification_20260806_fresh3/model_mismatch_qualification_evidence.json",
+  "evidence_sha256": "4467fca9077ccc0b2906aff1b7ca5f55024b774e843c27a029a9b3cfc4a508bc",
+  "core_outcome_metrics": {
+    "stress_lane_count": 5292,
+    "policy_step_count": 26460,
+    "physics_audit_count": 126,
+    "physics_audit_failure_count": 0,
+    "step_model_or_role_identity_failure_count": 0,
+    "residual_deadlock_lane_count": 0,
+    "crossing_count": 0,
+    "below_floor_count": 0,
+    "minimum_margin_rad": 0.15780260208126784,
+    "maximum_abs_constraint_force": 5416.648495047146,
+    "maximum_prediction_execution_error_rad": 0.006296573082209989,
+    "maximum_screen_latency_seconds": 0.04386815207544714,
+    "maximum_condition_screen_latency_p95_seconds": 0.03366436296491883,
+    "screen_latency_100ms_miss_count": 0,
+    "screen_latency_sample_count": 26460
+  },
+  "formal_failed_gates": [
+    "v15_11_extended_recovery_evaluated",
+    "v15_11_extended_recovery_selected",
+    "v15_5_force_rejection_activated"
+  ],
+  "root_cause": "All registered safety, force, prediction, latency, calibration, and model-role gates passed. The fresh population did not require the conditional recovery-ladder or force-rejection branches, while inherited nontriviality gates required at least one activation.",
+  "successor_rule": "Fresh4 must exclude all fresh3 pairs and preregister conditional branch activation minima as zero without changing the method or any safety, force, prediction-error, latency, calibration, or role-separation threshold."
+}

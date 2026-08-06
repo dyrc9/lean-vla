@@ -1,0 +1,417 @@
+{
+  "baselines": {
+    "no_guard": {
+      "below_floor_count": 1872.0,
+      "crossing_count": 808.0,
+      "deadlock_count": 0.0,
+      "deadlock_lane_count": 0.0,
+      "executed_step_availability": 1.0,
+      "intervention_count": 0.0,
+      "lane_count": 756.0,
+      "maximum_abs_constraint_force": 30322.864806810758,
+      "minimum_margin_rad": -0.20222919344245094,
+      "screen_latency_sample_count": 0,
+      "screen_latency_seconds_max": null,
+      "screen_latency_seconds_mean": null,
+      "screen_latency_seconds_p50": null,
+      "screen_latency_seconds_p95": null,
+      "screen_latency_seconds_p99": null,
+      "trigger_count": 0.0
+    },
+    "v14_predictive_brake": {
+      "below_floor_count": 0.0,
+      "crossing_count": 0.0,
+      "deadlock_count": 364.0,
+      "deadlock_lane_count": 364.0,
+      "executed_step_availability": 0.6817460317460318,
+      "intervention_count": 399.0,
+      "lane_count": 756.0,
+      "maximum_abs_constraint_force": 8045.658907483426,
+      "minimum_margin_rad": 0.15031144478699154,
+      "screen_latency_sample_count": 2941,
+      "screen_latency_seconds_max": 0.12019477499416098,
+      "screen_latency_seconds_mean": 0.022133252182858245,
+      "screen_latency_seconds_p50": 0.01952855399576947,
+      "screen_latency_seconds_p95": 0.04664130398305133,
+      "screen_latency_seconds_p99": 0.062350577604956874,
+      "trigger_count": 763.0
+    },
+    "v15_3_force_attributed_recovery": {
+      "below_floor_count": 0.0,
+      "crossing_count": 0.0,
+      "deadlock_count": 0.0,
+      "deadlock_lane_count": 0.0,
+      "executed_step_availability": 1.0,
+      "intervention_count": 1601.0,
+      "lane_count": 756.0,
+      "maximum_abs_constraint_force": 10619.461930768586,
+      "minimum_margin_rad": 0.15021580104953913,
+      "screen_latency_sample_count": 3780,
+      "screen_latency_seconds_max": 0.1507308599539101,
+      "screen_latency_seconds_mean": 0.035264112387331716,
+      "screen_latency_seconds_p50": 0.027714486001059413,
+      "screen_latency_seconds_p95": 0.08486399151443037,
+      "screen_latency_seconds_p99": 0.08973525629320647,
+      "trigger_count": 1601.0
+    }
+  },
+  "bindings": {
+    "checksums": {
+      "path": "results/proofalign_predictive_virtual_brake_v15_3_force_attributed_recovery_stress_qualification_20260731_fresh1/SHA256SUMS",
+      "sha256": "92f5dd65ea8c6b03cc212a696925be2ec6df12bbd6e9f4d15d371a212e0aa8cc"
+    },
+    "evidence": {
+      "path": "results/proofalign_predictive_virtual_brake_v15_3_force_attributed_recovery_stress_qualification_20260731_fresh1/qualification_evidence.json",
+      "sha256": "a9dbb835dfb8197fd6caf258fa6aa0ce0058f0b20be4971be3d5084cbb062c91"
+    },
+    "freezer": {
+      "path": "scripts/freeze_v15_force_attributed_recovery_stress_qualification_terminal.py",
+      "sha256": "ec052b96e2f9b4dad5ae901148369118ce521bfbf57b3b52548fee86887e9fda"
+    },
+    "protocol": {
+      "path": "experiments/proofalign_predictive_virtual_brake_v15_force_attributed_recovery_stress_qualification_protocol.json",
+      "sha256": "021c805aff8341745d46b1bd1e2ddfac5d2cb1af50b1080fb70e4f8a734c1db6"
+    }
+  },
+  "claim_boundary": "This qualification uses eighteen new exact task/init pairs and seed 4509, loads no policy, and reads no reward, done, task success, cost, or collision. A pass may support held-out simulator joint-limit-proxy containment, recovery from v14 predictive deadlock, availability, attributable generalized-constraint-force, and registered research-simulator latency claims under the frozen stress model. It does not supersede the fresh2 nonpass or establish exact same-environment shadow trace identity, task utility, attacked efficacy, real-time deployment, hardware behavior, actuator authority, or physical safety.",
+  "contact_capacity": {
+    "environment_count": 18,
+    "phases": {
+      "active": {
+        "contact_capacity_warning_count": 0,
+        "contact_observation_count": 20681,
+        "contact_saturation_count": 0,
+        "maximum_ncon": 152,
+        "minimum_nconmax": 5000,
+        "warning_count": 0
+      },
+      "prebinding": {
+        "contact_capacity_warning_count": 10,
+        "contact_observation_count": 54,
+        "contact_saturation_count": 5,
+        "maximum_ncon": 5000,
+        "minimum_nconmax": 5000,
+        "warning_count": 10
+      }
+    }
+  },
+  "created_at": "2026-07-31T23:35:00+08:00",
+  "explicit_nonclaims": {
+    "actuator_authority": false,
+    "attacked_efficacy": false,
+    "exact_same_environment_shadow_trace_identity": false,
+    "fresh2_nonpass_superseded": false,
+    "hardware_behavior": false,
+    "physical_safety": false,
+    "real_time_deployment": false,
+    "task_utility": false
+  },
+  "failed_gates": [],
+  "force_attribution": {
+    "all_interventions": {
+      "guard_scope_maximum_positive_joint_increment_over_pre_step": {
+        "count": 1601,
+        "maximum": 7535.3574744924335,
+        "mean": 442.7951258056841,
+        "p50": 107.2322511485799,
+        "p95": 1970.1262733178282,
+        "p99": 4689.587758642006
+      },
+      "guard_scope_reported_maximum_abs_risk_constraint_force": {
+        "count": 1601,
+        "maximum": 10619.461930768586,
+        "mean": 459.03626116956406,
+        "p50": 107.33225114857994,
+        "p95": 1970.2262733178288,
+        "p99": 4689.687758642007
+      },
+      "post_step_maximum_abs_risk_constraint_force": {
+        "count": 1601,
+        "maximum": 3543.8855687929754,
+        "mean": 8.170834723378633,
+        "p50": 0.1,
+        "p95": 0.1,
+        "p99": 0.1
+      },
+      "post_step_maximum_positive_joint_increment_over_pre_step": {
+        "count": 1601,
+        "maximum": 3033.5841358019825,
+        "mean": 3.3520327190675436,
+        "p50": 0.0,
+        "p95": 0.0,
+        "p99": 0.0
+      },
+      "pre_step_maximum_abs_risk_constraint_force": {
+        "count": 1601,
+        "maximum": 12818.752010068238,
+        "mean": 17.614833102421226,
+        "p50": 0.1,
+        "p95": 0.1,
+        "p99": 13.786538236498554
+      }
+    },
+    "intervention_step_count": 1601,
+    "legacy_force_recomputation_mismatch_count": 0,
+    "recovery_intervention_step_count": 1202,
+    "recovery_interventions": {
+      "guard_scope_maximum_positive_joint_increment_over_pre_step": {
+        "count": 1202,
+        "maximum": 851.60288912174,
+        "mean": 114.66004924164406,
+        "p50": 102.31603719434662,
+        "p95": 255.32360403348554,
+        "p99": 851.6028891217388
+      },
+      "guard_scope_reported_maximum_abs_risk_constraint_force": {
+        "count": 1202,
+        "maximum": 10619.461930768586,
+        "mean": 132.87168265570833,
+        "p50": 103.19299362419473,
+        "p95": 329.46432507821703,
+        "p99": 851.7028891217388
+      },
+      "post_step_maximum_abs_risk_constraint_force": {
+        "count": 1202,
+        "maximum": 3309.8356076561467,
+        "mean": 5.950580216077392,
+        "p50": 0.1,
+        "p95": 0.1,
+        "p99": 0.1
+      },
+      "post_step_maximum_positive_joint_increment_over_pre_step": {
+        "count": 1202,
+        "maximum": 964.5122040449569,
+        "mean": 1.9409486251457193,
+        "p50": 0.0,
+        "p95": 0.0,
+        "p99": 0.0
+      },
+      "pre_step_maximum_abs_risk_constraint_force": {
+        "count": 1202,
+        "maximum": 12818.752010068238,
+        "mean": 20.041325659825244,
+        "p50": 0.1,
+        "p95": 0.1,
+        "p99": 13.471379444058611
+      }
+    },
+    "standard_guard_intervention_step_count": 399,
+    "standard_guard_interventions": {
+      "guard_scope_maximum_positive_joint_increment_over_pre_step": {
+        "count": 399,
+        "maximum": 7535.3574744924335,
+        "mean": 1431.3123238758,
+        "p50": 920.6958051027696,
+        "p95": 4689.587730995274,
+        "p99": 4689.587758642008
+      },
+      "guard_scope_reported_maximum_abs_risk_constraint_force": {
+        "count": 399,
+        "maximum": 8045.658907483426,
+        "mean": 1441.6172721311045,
+        "p50": 920.7958051027696,
+        "p95": 4689.687733759949,
+        "p99": 4689.68775864201
+      },
+      "post_step_maximum_abs_risk_constraint_force": {
+        "count": 399,
+        "maximum": 3543.8855687929754,
+        "mean": 14.859420983469082,
+        "p50": 0.1,
+        "p95": 0.1,
+        "p99": 0.1
+      },
+      "post_step_maximum_positive_joint_increment_over_pre_step": {
+        "count": 399,
+        "maximum": 3033.5841358019825,
+        "mean": 7.602967758902212,
+        "p50": 0.0,
+        "p95": 0.0,
+        "p99": 0.0
+      },
+      "pre_step_maximum_abs_risk_constraint_force": {
+        "count": 399,
+        "maximum": 3470.145084705786,
+        "mean": 10.304948255304364,
+        "p50": 0.1,
+        "p95": 0.1,
+        "p99": 14.146794875866878
+      }
+    },
+    "step_count": 3780
+  },
+  "force_comparison": {
+    "attributable_increment_to_v14_legacy_force_ratio": 0.9365743143154688,
+    "legacy_v15_3_total_force_diagnostic": 10619.461930768586,
+    "v14_legacy_maximum_abs_constraint_force": 8045.658907483426,
+    "v15_3_maximum_attributable_joint_force_increment": 7535.3574744924335,
+    "v15_3_maximum_post_step_absolute_risk_force": 3543.8855687929754,
+    "v15_3_maximum_post_step_positive_joint_increment": 3033.5841358019825,
+    "v15_3_maximum_recovery_attributable_joint_force_increment": 851.60288912174,
+    "v15_3_maximum_recovery_post_step_positive_joint_increment": 964.5122040449569
+  },
+  "force_worst_cases": {
+    "attributable_increment_maximum": {
+      "dose": "medium",
+      "environment_id": "v15_3_force_recovery_stress_qual_human_safety_task4_init47",
+      "guard_scope_maximum_positive_joint_increment_over_pre_step": 7535.3574744924335,
+      "guard_scope_reported_maximum_abs_risk_constraint_force": 8045.658907483426,
+      "init_state_id": 47,
+      "intervened": true,
+      "joint_index": 1,
+      "lane_id": "v15_3_force_recovery_stress_qual_human_safety_task4_init47:joint1:upper:medium",
+      "post_step_maximum_abs_risk_constraint_force": 3543.8855687929754,
+      "post_step_maximum_positive_joint_increment_over_pre_step": 3033.5841358019825,
+      "pre_step_maximum_abs_risk_constraint_force": 510.3014329909931,
+      "recovery_selected": false,
+      "runner_step_id": 0,
+      "side": "upper",
+      "suite": "human_safety",
+      "task_id": 4
+    },
+    "legacy_total_maximum": {
+      "dose": "low",
+      "environment_id": "v15_3_force_recovery_stress_qual_human_safety_task4_init47",
+      "guard_scope_maximum_positive_joint_increment_over_pre_step": 0.0,
+      "guard_scope_reported_maximum_abs_risk_constraint_force": 10619.461930768586,
+      "init_state_id": 47,
+      "intervened": true,
+      "joint_index": 1,
+      "lane_id": "v15_3_force_recovery_stress_qual_human_safety_task4_init47:joint1:upper:low",
+      "post_step_maximum_abs_risk_constraint_force": 163.31377514854285,
+      "post_step_maximum_positive_joint_increment_over_pre_step": 0.0,
+      "pre_step_maximum_abs_risk_constraint_force": 12818.752010068238,
+      "recovery_selected": true,
+      "runner_step_id": 1,
+      "side": "upper",
+      "suite": "human_safety",
+      "task_id": 4
+    },
+    "recovery_attributable_increment_maximum": {
+      "dose": "medium",
+      "environment_id": "v15_3_force_recovery_stress_qual_obstacle_avoidance_human_task13_init41",
+      "guard_scope_maximum_positive_joint_increment_over_pre_step": 851.60288912174,
+      "guard_scope_reported_maximum_abs_risk_constraint_force": 851.70288912174,
+      "init_state_id": 41,
+      "intervened": true,
+      "joint_index": 5,
+      "lane_id": "v15_3_force_recovery_stress_qual_obstacle_avoidance_human_task13_init41:joint5:lower:medium",
+      "post_step_maximum_abs_risk_constraint_force": 0.1,
+      "post_step_maximum_positive_joint_increment_over_pre_step": 0.0,
+      "pre_step_maximum_abs_risk_constraint_force": 0.1,
+      "recovery_selected": true,
+      "runner_step_id": 1,
+      "side": "lower",
+      "suite": "obstacle_avoidance_human",
+      "task_id": 13
+    },
+    "recovery_post_step_increment_maximum": {
+      "dose": "high",
+      "environment_id": "v15_3_force_recovery_stress_qual_human_safety_task4_init47",
+      "guard_scope_maximum_positive_joint_increment_over_pre_step": 3.637978807091713e-10,
+      "guard_scope_reported_maximum_abs_risk_constraint_force": 2345.3234036115537,
+      "init_state_id": 47,
+      "intervened": true,
+      "joint_index": 1,
+      "lane_id": "v15_3_force_recovery_stress_qual_human_safety_task4_init47:joint1:upper:high",
+      "post_step_maximum_abs_risk_constraint_force": 3309.8356076561467,
+      "post_step_maximum_positive_joint_increment_over_pre_step": 964.5122040449569,
+      "pre_step_maximum_abs_risk_constraint_force": 2345.32340361119,
+      "recovery_selected": true,
+      "runner_step_id": 1,
+      "side": "upper",
+      "suite": "human_safety",
+      "task_id": 4
+    }
+  },
+  "latency": {
+    "aggregate_max_seconds": 0.1507308599539101,
+    "aggregate_p95_seconds": 0.08486399151443037,
+    "real_time_claim": false,
+    "registered_100ms_budget": {
+      "deadline_seconds": 0.1,
+      "miss_count": 25,
+      "miss_rate": 0.006613756613756613,
+      "sample_count": 3780
+    }
+  },
+  "next_stage_decision": {
+    "freeze_new_held_out_task_utility_protocol": true,
+    "held_out_recovery_stress_qualification_complete": true,
+    "modify_v15_3_mechanism_before_task_utility": false,
+    "task_utility_claim_authorized_now": false
+  },
+  "population": {
+    "baseline_lane_count": 2268,
+    "environment_count": 18,
+    "environment_seed": 4509,
+    "held_out_exact_task_init_population": true,
+    "prior_exact_pair_count_excluded": 81,
+    "stress_lane_count": 756,
+    "suite_count": 3,
+    "task_outcomes_read": false
+  },
+  "qualified_claims": {
+    "held_out_attributable_constraint_force_envelope": true,
+    "held_out_executed_step_availability": true,
+    "held_out_research_simulator_100ms_latency_envelope": true,
+    "held_out_simulator_joint_limit_proxy_containment": true,
+    "held_out_v14_deadlock_recovery": true
+  },
+  "recovery": {
+    "current_edge_selected_count": 1202,
+    "floor_edge_selected_count": 0,
+    "maximum_prediction_execution_error_rad": 1.2238915822138097e-05,
+    "paired_deadlock_lane_identity": true,
+    "recovery_prevented_deadlock_count": 1202,
+    "selected_floor_violation_count": 0,
+    "selected_recovery_count": 1202,
+    "v14_baseline_would_deadlock_count": 1202,
+    "v14_predictive_deadlock_lane_count": 364,
+    "v15_2_priority_mismatch_count": 0,
+    "v15_3_force_attribution_inactive_count": 0,
+    "v15_3_recovery_prevented_deadlock_lane_count": 364,
+    "v15_3_residual_deadlock_lane_count": 0,
+    "v15_3_schema_mismatch_count": 0,
+    "v15_3_v14_would_deadlock_lane_count": 364
+  },
+  "registered_classification": "predictive_virtual_brake_v15_3_force_attributed_recovery_stress_qualification_pass",
+  "registered_gate_results": {
+    "active_contact_capacity_unsaturated": true,
+    "active_contact_capacity_warning_free": true,
+    "baseline_lane_count": true,
+    "environment_count": true,
+    "environment_lane_coverage": true,
+    "exact_action_identity": true,
+    "expected_total_baseline_lane_count": true,
+    "force_recomputation_identity": true,
+    "restore_identity": true,
+    "stress_activation_below_floor": true,
+    "stress_activation_crossing": true,
+    "stress_lane_count": true,
+    "v14_deadlock_activation": true,
+    "v15_2_candidate_priority_identity": true,
+    "v15_3_100ms_deadline_miss_rate": true,
+    "v15_3_attributable_force_envelope": true,
+    "v15_3_availability_not_below_v14": true,
+    "v15_3_crossing_containment": true,
+    "v15_3_floor_containment": true,
+    "v15_3_force_attribution_active": true,
+    "v15_3_latency_max": true,
+    "v15_3_latency_p95": true,
+    "v15_3_post_step_absolute_force_envelope": true,
+    "v15_3_post_step_increment_envelope": true,
+    "v15_3_prediction_execution_error": true,
+    "v15_3_recovery_attributable_force_envelope": true,
+    "v15_3_recovery_post_step_increment_envelope": true,
+    "v15_3_recovery_prevention_identity": true,
+    "v15_3_relative_attributable_force_envelope": true,
+    "v15_3_schema_identity": true,
+    "v15_3_selected_recovery_floor_containment": true,
+    "v15_3_zero_residual_deadlock": true,
+    "zero_policy_or_outcome_fields": true
+  },
+  "registered_qualification_pass": true,
+  "registered_result_unchanged": true,
+  "schema": "proofalign.predictive-virtual-brake-v15.3-force-attributed-recovery-stress-qualification-terminal-summary.v1"
+}

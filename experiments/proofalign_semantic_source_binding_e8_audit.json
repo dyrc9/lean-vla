@@ -3,7 +3,7 @@
   "audit_id": "proofalign-semantic-source-binding-e8-20260725",
   "audit_source": {
     "path": "scripts/generate_semantic_source_binding_e8.py",
-    "sha256": "27c7b766dd94d711ebf639b2b1de0be900a0c89aba3d76003bc7a2c9f76b2988"
+    "sha256": "c9b658473c7003e7af9d9e94227e2277f4c261662c02bb302f365fccf58d876d"
   },
   "claim_boundary": "This read-only audit binds the current semantic source scope, local evidence inventory, latest source-scope commit, and OpenPI checkout. A not-clean classification does not modify or commit the worktree. A clean classification would establish provenance only, not perception quality, efficacy, outcome, or safety.",
   "classification": "semantic_source_binding_clean",
@@ -14,7 +14,7 @@
       "exists": true,
       "git_status": "clean",
       "path": "Makefile",
-      "sha256": "f2fc7a35076b8059c208d64b77d1a48ce44b9a314e604ae06466e7fffb3acbb9",
+      "sha256": "b2a34cc75139b7c616dbc665f7850bf9e44e2c6c832350fb6a312629e896e2f2",
       "tracked": true
     },
     {
@@ -22,7 +22,7 @@
       "exists": true,
       "git_status": "clean",
       "path": "README.md",
-      "sha256": "560562d4d81817c1301b5b4bdc6dc9fb65ac49301fb9436262a0316dc912e241",
+      "sha256": "e7a162ebef8324aa83924fab239f423b6ade09f1545c5ed22349785a9fae439c",
       "tracked": true
     },
     {
@@ -38,7 +38,7 @@
       "exists": true,
       "git_status": "clean",
       "path": "docs/experiments.md",
-      "sha256": "eb30e4d4882b8d15bf9e593a7ed8b17a9f5a64c4a8d10ae2712ee6cbb17e418b",
+      "sha256": "6cfd0c1e3248e74a9fc301759fbe8d456570551254d23789db780c3a7069e069",
       "tracked": true
     },
     {
@@ -53,8 +53,24 @@
       "bound_to_head": true,
       "exists": true,
       "git_status": "clean",
+      "path": "docs/l2_and_cross_layer_experiments.md",
+      "sha256": "6fdebfeac2302edbf0de87b2627ec64f336c55a9544e4bef885044c534b2fd43",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
       "path": "docs/method.md",
-      "sha256": "fcfd9d9224bef60c6008ec173124a01466ad19420ed7b611ff4cdf94cfc5d40a",
+      "sha256": "76540c1e7e2ab4c7eb746ac4821bc59fc41dd3ebbe0a59d793c697fd175e92c7",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "docs/paper/paper_story.md",
+      "sha256": "c39c2786b87c33989d7bd4135a0fdfb8fa88a62b63ee16013cb1283997500aa7",
       "tracked": true
     },
     {
@@ -62,7 +78,7 @@
       "exists": true,
       "git_status": "clean",
       "path": "docs/progress_and_plan.md",
-      "sha256": "6d667edac11e17ab065fa0ddd927efb833503c8b58fb04ebf2b30dcd194ee430",
+      "sha256": "05835518ca26866d8ca2b3afcbacf1ffd46d9d2164989fa6a29fcc34ff9a4534",
       "tracked": true
     },
     {
@@ -118,7 +134,415 @@
       "exists": true,
       "git_status": "clean",
       "path": "scripts/check_all.sh",
-      "sha256": "cb691dd33d9c2bd8d12822d0e65a70c6961579d20d9e8d17e5298061b945d4e8",
+      "sha256": "b754fce5c68b38d1134ad07ecced5061c88213e7f51363c63a39936eb655e2bf",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/freeze_four_arm_v4_l1_repair_qualification.py",
+      "sha256": "3d184f3a831d5b0888a20ff7ede6cb088a9ab4d6e82a420f43fceeb8958ff50a",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/freeze_four_arm_v4_l1_repair_qualification_fresh2.py",
+      "sha256": "82092cd366a1a49feb9d459bc2dadf889cff5773aac980d82aec1be0d498a56c",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/freeze_four_arm_v4_l1_repair_qualification_fresh3.py",
+      "sha256": "4b5c8ddf7e1dd4d236768c0d9bc3a61f4c55de07c3d42b7f392ca885cb2bf26f",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/freeze_four_arm_v4_l1_repair_qualification_terminal.py",
+      "sha256": "e9a76ca7743adeab8bffc932769b3ba3b80c950a562d77135504966719573b59",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/freeze_four_arm_v4_l1_block10_qualification.py",
+      "sha256": "37213a537929f253a8099a609088817d35a4ae31c7e749a66ed6f8a1ef5ecdcb",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/freeze_four_arm_v4_l1_block10_terminal.py",
+      "sha256": "7ad720f2ed30d9ab0d5b3f32c49cdf77c6bd61ff477a7cf3bdb2af2111844dd5",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/freeze_four_arm_v4_l1_block10_k4_qualification.py",
+      "sha256": "e382a2c9edee09ba3b55d28f60cecf1cc9be5d8aedafacde64743436237fb28a",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/freeze_four_arm_v4_l1_block10_k4_terminal.py",
+      "sha256": "7274077b037824f906e89bf415f7ee32ea33b94dbb2e3a0aa235e6743913ec3a",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/freeze_four_arm_v4_l1_progress_projection_qualification.py",
+      "sha256": "849dacf52c900481f950ba88c1185845a982efa9fb01de436efce9383a0ac846",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/freeze_four_arm_v4_l1_progress_projection_terminal.py",
+      "sha256": "ccd600215fd339279b153963608675eeb70a6413c291e44b0a581ca59eddaddd",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/freeze_four_arm_v4_l1_progress_projection_smoke.py",
+      "sha256": "ebe514a405214dcff1425aaf22c8a3bdeb6bb92a2d9db2db758a5e4d2edf280c",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/freeze_horizon_consistent_pick_up_phase_transition_smoke.py",
+      "sha256": "0d43fb2f332a5e954ee561d8120e8b1133d8ec4067ed7940932576bd01e7e7a5",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/freeze_horizon_consistent_pick_up_phase_transition_smoke_terminal.py",
+      "sha256": "45bc5ef11e13477b3abaefc8d38813ff6f0b3646207f4ab4def1d39a43f8838e",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/freeze_horizon_consistent_pick_up_regression_smoke.py",
+      "sha256": "3bf7a2ea6efb52fe5c8295a398a4a1c03434b2438d6810d808fb676bb6f38b00",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/freeze_horizon_consistent_pick_up_regression_smoke_terminal.py",
+      "sha256": "5ca05f9b134c53bf209e0be328e76401100ef3459552b2454c895921b6a6697e",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/freeze_horizon_consistent_pick_up_fresh_dual_pilot.py",
+      "sha256": "7d88bd74a83b007e4e7d777bc46e736cd7684b24aa8f6318c4a4d1196c6b4715",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/freeze_horizon_consistent_pick_up_fresh_dual_pilot_terminal.py",
+      "sha256": "c3a717cea4256fa06b8a89ad6195407fe7a5185b4c4770cf7ec64821aa201ef0",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/freeze_horizon_consistent_release_h4_regression_smoke.py",
+      "sha256": "0e84b7786a9d9d60b5d6ab92278a0b36caf746c221bbbdb832db3c48a24253e8",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/freeze_horizon_consistent_release_h4_regression_smoke_terminal.py",
+      "sha256": "bdf43c417a0a1ada300cf75d5691d6df4c098f1eada38ffbf000669f1cd0b3d4",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/freeze_horizon_consistent_release_h4_regression_smoke_v2.py",
+      "sha256": "a1f0246aac7651e2ad62be995b02fa98656a17350d4ac32248800e6664671477",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/freeze_horizon_consistent_release_prefix_regression_smoke.py",
+      "sha256": "f44049767e4689c236230ffb6c1d368729641d550ab7207f9d78b294f54b8adc",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/freeze_horizon_consistent_release_prefix_regression_smoke_terminal.py",
+      "sha256": "0ec46c6f4e302a7a5b6ec8ab759830d559483a306fc312fc6fff5adf5023ca0a",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/freeze_horizon_consistent_release_qualification.py",
+      "sha256": "6064ccc777d20dfe91a59a94b11bad814949e3ead3279e4e25d046e646bed883",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/freeze_horizon_consistent_release_qualification_terminal.py",
+      "sha256": "f406696d53f836138202b91a3b50d1f28ae84a06718af8eeb2120ad3767bca47",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/freeze_horizon_consistent_release_qualification_v2.py",
+      "sha256": "495771661c025f8419f128f4456ef61e2b6c837875b4eb3c56a808fa51e032f2",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/freeze_horizon_consistent_release_regression_smoke.py",
+      "sha256": "d0a565c65b016175a9b3a69347f821a12abf6215c85495215a6f333272ef5571",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/freeze_horizon_consistent_release_regression_smoke_terminal.py",
+      "sha256": "9094e736a3ce4540f563366e29e944a7cb4c6391d763e4a5ec0e3adf9dfe8228",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/freeze_horizon_consistent_v7_four_arm_initial.py",
+      "sha256": "46912c2d9e681b9bc4c015cb0f81ce860b9b8dabbf691432dd638cc150f8858c",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/freeze_horizon_consistent_v7_four_arm_initial_terminal.py",
+      "sha256": "4afb235e2fa937fa3605ff30e23ad698c18e94d105f26747b8f6681c18be6a9e",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/freeze_contact_phase_pick_up_qualification.py",
+      "sha256": "33806ae88cbf6dafe1adc028204a6f60a89f49268b4638a75b1ed16ac4ad4bc3",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/freeze_contact_phase_pick_up_regression.py",
+      "sha256": "b4f25749ea1baab5f7f9d3792fc91153116939440f8332985dbe1c34904a98a0",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/freeze_contact_phase_pick_up_fresh_four_arm.py",
+      "sha256": "57bb65933c2b02835b1978edd747f6d409b8742aab76e49d9ce57d4d594c7371",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/freeze_contact_phase_pick_up_fresh_four_arm_terminal.py",
+      "sha256": "b7d89466267b3e76afc8f0f5516549cb4ab65195946d80f760c2a213f8bae572",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/freeze_contact_phase_pick_up_scale45_four_arm.py",
+      "sha256": "c7b5816cc0790d682e9d82d8214cfd5a8e795e225fe7f171526179b099bcec10",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/freeze_contact_phase_pick_up_scale45_cotenant.py",
+      "sha256": "b53d09fc9142d8809aa42483a155337505b33c91d05a9abf3c426f14bf97d77d",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/freeze_contact_phase_pick_up_scale45_terminal.py",
+      "sha256": "a2205737fd6ef310baf724d345f994d521f846960b3e407bf3c2fb8a1d66117c",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/freeze_risk_selective_scale45_replay_qualification.py",
+      "sha256": "ba72104efd3a2116bf2136c4a825b0068ce33dc1736f964fd7cc03153ff39753",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/freeze_risk_selective_fresh15_cotenant.py",
+      "sha256": "2755efb303b001f2f08f7f353e57d904f4f564e2f3d88360cc1569ddcdb5626a",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/freeze_physical_sufficiency_replay_qualification.py",
+      "sha256": "12202ace7a2baf514c00b302c339c5b95a65175a477060fcd7ef0fc6fdd92281",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/freeze_physical_sufficiency_fresh15_cotenant.py",
+      "sha256": "4e5a18c24351e636b7a41e4c66527223bcc2a5c86e3acecda96e27a99a02c57b",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/freeze_physical_sufficiency_fresh15_terminal.py",
+      "sha256": "96c2f955efd50962dfbb16cf888320a6abee079a1684b18cb0418ca00afda620",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/freeze_physical_sufficiency_attacked_fresh15.py",
+      "sha256": "2829246f73b0bcedde2d96f6a66ec72c79a1b663ae0d615498272a950877d22e",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/freeze_physical_sufficiency_attacked_fresh15_terminal.py",
+      "sha256": "a4c4fdcfebd67a9b1e40531a3863cb9de69cc30f76c047e40b6a39c25819b179",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/analyze_joint_limit_containment_v11_replay.py",
+      "sha256": "4f588c680579c3a799bcbd2748a52b0080f50df326a25bdcbe561271d5ca7f35",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/freeze_joint_limit_containment_v11_clean_fresh15.py",
+      "sha256": "43f23710aaf1fab9beca1cdc44b119b747cae6f3968f4b648fe5f08074666c70",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/freeze_joint_limit_containment_v11_attacked_fresh15.py",
+      "sha256": "61c286497d335942c6bf18d744358c9a8b5b507736d708be570a00944317c392",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/freeze_joint_limit_containment_v11_terminal.py",
+      "sha256": "250de2de18097c48a009e2019e526e6181b260a22e78e8693aefcb05a1b440cb",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/freeze_joint_limit_containment_v11_clean_scale45.py",
+      "sha256": "3dc108f6ed9e46a8d89f65072f05567251aa9bd325f444695ddefe7b793a8c86",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/freeze_joint_limit_containment_v11_attacked_scale45.py",
+      "sha256": "b1d9c88aaae29d20ab9fc1906618d6a7c956e55cc736f2428eebb09d8429b042",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/freeze_joint_limit_containment_v11_scale45_terminal.py",
+      "sha256": "0cc176c00a3f86cd6092108cc71084174643c436c68dbfc491107ab036609e20",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/monitor_and_launch_contact_phase_scale45.py",
+      "sha256": "c5318ea04835e0199ea67b93c3bccfdd7759b0b334630f94950e35ea9a3b30d2",
       "tracked": true
     },
     {
@@ -126,7 +550,7 @@
       "exists": true,
       "git_status": "clean",
       "path": "scripts/generate_semantic_source_binding_e8.py",
-      "sha256": "27c7b766dd94d711ebf639b2b1de0be900a0c89aba3d76003bc7a2c9f76b2988",
+      "sha256": "c9b658473c7003e7af9d9e94227e2277f4c261662c02bb302f365fccf58d876d",
       "tracked": true
     },
     {
@@ -183,6 +607,302 @@
       "git_status": "clean",
       "path": "scripts/run_liberosafety_pi05_openpi_eval.py",
       "sha256": "115a14c05e88e63964aab3c0fdcd9ed79c6ea973f22bf63d10b1a12e52dc4db9",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/run_l2_execution_attack_eval.py",
+      "sha256": "c448d00cc5561812d6a9911a38e1a9b615c0ce301589c4a5afc64ffb020a2309",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/run_l2_execution_attack_eval_v2.py",
+      "sha256": "cea2d528c5135948211bfd9f29febb584c603cf8f5d58a83eaa9ac3652496ad0",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/run_l2_execution_attack_eval_v3.py",
+      "sha256": "7d2c4af5e3f4b0322e6c73c824ea642f83b72677a976717f659551e45ca20df2",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/run_l2_execution_attack_eval_v4.py",
+      "sha256": "e5404595baca242bfa87a93e162416847291c1d4e0cbc2aadee1f4ccd3fb03fe",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/run_l2_execution_attack_eval_v5.py",
+      "sha256": "755dda72b9df446e4ffe63094fe01ab027a95852c355b6c5ac7565f51b6b9cf9",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/run_l2_execution_attack_eval_v6.py",
+      "sha256": "d38d4023829e3420127c027288a248e4bba0eeef2a776e91551da71bd1d0a88c",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/run_l2_execution_attack_eval_v7.py",
+      "sha256": "3f63cbbc02d1b974780db422eb88f13607d89313ebd9f61523c8d685483baf98",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/run_l2_execution_attack_eval_v8.py",
+      "sha256": "69369919c7aca7c4038d031a3cfbf57dd2519785f79107204cf7a021ddece12f",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/run_l2_execution_attack_eval_v9.py",
+      "sha256": "8dba9d97c65e28381e68a233d11fd637b65b39adf323ca1e8444cbeb18cfc1f2",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/run_l2_execution_attack_eval_v10.py",
+      "sha256": "c5e8687f5ced7ec18495d6759ccabed514bca9b841c9e5cb47919c33b24d601a",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/run_risk_selective_scale45_replay_qualification.py",
+      "sha256": "c4385e6964d272976558fd107aa59b2a198d646f9bd512486f189405ccd15a1c",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/run_risk_selective_clean_pilot.py",
+      "sha256": "4e60972031f63eac85c4ff44f43bb6f206efbac14d390d6b1525be79f7b42375",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/run_physical_sufficiency_replay_qualification.py",
+      "sha256": "9605d2c6c29fbbfdb0dff9e83c1edeb73d731ffd1908badac6f1a5e2b3e13331",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/run_physical_sufficiency_clean_pilot.py",
+      "sha256": "3c7a23ac4716b1ab5f87b8d7792491906a31e6b3e76664a2bd8df002c9897327",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/run_physical_sufficiency_attacked_pilot.py",
+      "sha256": "dd786a3f74743a6a4ceb8a2f76160a30516e9156116817eb9c6d0fb64cd23176",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/run_l2_joint_limit_containment_v11.py",
+      "sha256": "92ea262a16e1413f9863ea514efdb8d43bebb7a0770d0a6b0fc902617f3090c0",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/run_joint_limit_containment_v11_clean_pilot.py",
+      "sha256": "c9a9c05cc3db680f71c00d37f102d607df32b62f4b8b624d76f503acc2dab2df",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/run_joint_limit_containment_v11_attacked_pilot.py",
+      "sha256": "638570362bdb5cd742b22eeb14d25e6aac7905cfdb6eef3a5d6db47128e8eb96",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/run_joint_limit_containment_v11_clean_scale45.py",
+      "sha256": "fea392979da0bfd6aeb502d8725b7517b29aa756ff6abcd00c3adf90365df737",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/run_joint_limit_containment_v11_attacked_scale45.py",
+      "sha256": "3a78797befe9182a5454f05e4007e0003c1d5fa21d39d46930f91a8c5a67e80c",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/run_horizon_consistent_pick_up_fresh_dual_pilot.py",
+      "sha256": "eec47c25c801c3a4621ab25d370a3c47b316edc934f60a932ff9ed50b42aa3b1",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/run_horizon_consistent_pick_up_phase_transition_smoke.py",
+      "sha256": "c9131ce697e042fa2cc8873496460751e5285d9563601325fdd33306ca790a7b",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/run_horizon_consistent_pick_up_regression_smoke.py",
+      "sha256": "587df289f1a0abe435ea20550adc4c8fc5896e3e78e399649ec2dd6e3853c21f",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/run_horizon_consistent_release_h4_regression_smoke.py",
+      "sha256": "ffc292e51363169b35569f6b1e8778acb8da35cab73bb015618de37e770eedaf",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/run_horizon_consistent_release_prefix_regression_smoke.py",
+      "sha256": "80ea4972c8b427d7548cc194063352b5e9a9be57c619d4b62f2173babba0ca40",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/run_horizon_consistent_release_qualification.py",
+      "sha256": "d2ebaf90670eaabbd82bf6c4fc10a42dbcc4536015a05288d18b8cbabd1a1695",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/run_horizon_consistent_release_regression_smoke.py",
+      "sha256": "cbb09e8f4e6b2b098fe4762a628e09c13a8ddfa263b985d91e5bc5634edf8c45",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/run_horizon_consistent_v7_four_arm_initial.py",
+      "sha256": "32fd44f09e6a601da95d80755971fa3f9a5396add3fa29ed5b9866c5e9a5ca34",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/run_contact_phase_pick_up_qualification.py",
+      "sha256": "4169512b6043a7d82efd56cde614ed805ce166828aa5c243360b9e2e34a2d842",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/run_contact_phase_pick_up_clean_pilot.py",
+      "sha256": "622b9cb4649d97eb0cbfbe22584b9d1d57531e65664c347687dfbb992a963592",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/run_pick_up_prefix_progress_replay_qualification.py",
+      "sha256": "ed94988a2ce095aece7ff4e8337e91fbd387644e4db7e38c8a42355fcc0235f5",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/run_four_arm_v4_l1_repair_qualification.py",
+      "sha256": "419b92c6d05cba206fd2dc310554a7e985c1a775e853f57dece7fbedd56d77ec",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/run_four_arm_v4_l1_repair_qualification_v2.py",
+      "sha256": "de6d565bf9ac1d60a89948a40f016a9dbf26c176cfa3ee4666769311ad0939b7",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/run_four_arm_v4_l1_block10_qualification.py",
+      "sha256": "b51a1542910d592e3d3908ac0e7e3b61c66e7d80162538b2fdcf50c45ce62700",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/run_four_arm_v4_l1_block10_k4_qualification.py",
+      "sha256": "fbd8fb9984bfb6f650aedd531f10856620e20731901463af8f07c42e85ae5ff1",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/run_four_arm_v4_l1_progress_projection_qualification.py",
+      "sha256": "6d44f5cdc3cd168b2fd67d063ad93ee60c722f85e1df35061cfb289bfbe87a55",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "scripts/run_four_arm_v4_l1_progress_projection_smoke.py",
+      "sha256": "d41078f61da50b3d14d8f88d4b4180ea8ca1de1c90e7ce3442220645b70bbcb3",
       "tracked": true
     },
     {
@@ -317,6 +1037,78 @@
       "bound_to_head": true,
       "exists": true,
       "git_status": "clean",
+      "path": "src/proofalign/horizon_consistent_pick_up.py",
+      "sha256": "9b6a2faf32b81d1fed3c7ba04be945114453bc9ac665e3c6c2260e0a0196d485",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "src/proofalign/horizon_consistent_release.py",
+      "sha256": "27a9e98ab6807b1dd22f95927e8d88e86fe4c9311730a5e6e6ddd8387ccdd085",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "src/proofalign/horizon_consistent_release_h4.py",
+      "sha256": "f45076a2035f1940cce8beb416b1143cf063ac1e8853c182c18f845420cb7ff6",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "src/proofalign/horizon_consistent_release_prefix.py",
+      "sha256": "880e45ac6aa4e325c6c78e7a0aa45342ada751630c4d743ad8d1b66761177b9c",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "src/proofalign/contact_phase_pick_up.py",
+      "sha256": "d916fa7d94df5a8e54ef2d4cfe1b62b5e95a320acb23e3641a520fed86162aeb",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "src/proofalign/risk_selective_semantic.py",
+      "sha256": "ca73c803e1a37a131ebabe4388d72288045c6d3b4a55f80ff474389f5b82988d",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "src/proofalign/physical_sufficiency_semantic.py",
+      "sha256": "634340eed6bef812a204df629280f287c4f47849c00af55c059309ca6e49b6f9",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "src/proofalign/joint_limit_containment.py",
+      "sha256": "840d78b00854402e88eca623094a142eb50722f76817c3d6e23a70aced1b3e78",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "src/proofalign/semantic_action_selection.py",
+      "sha256": "2e35c9b5215005912b3288ae370baaa9633788ded4e05219e52304b90af70907",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
       "path": "src/proofalign/semantic_effect_observer.py",
       "sha256": "57a367cddf58e92500c01d55e51f35d3f678b22d4886ecb6fc2e1a625d0e20f9",
       "tracked": true
@@ -335,6 +1127,22 @@
       "git_status": "clean",
       "path": "src/proofalign/semantic_policy_wrapper.py",
       "sha256": "90004b15b6eebe28b177a7e3c73f97a22badbc7a3ce4415cc685c20d2100d047",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "src/proofalign/semantic_progress_projection.py",
+      "sha256": "9a047eb6c0b526c8e3c15f1652a2d42d00f95ce4974da3cd4bed127b6431d390",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "src/proofalign/semantic_trust.py",
+      "sha256": "ea73242423ad5a0c71645ae8b8c47e194bf5af043bc7255f57d9882cda6a658d",
       "tracked": true
     },
     {
@@ -381,8 +1189,328 @@
       "bound_to_head": true,
       "exists": true,
       "git_status": "clean",
+      "path": "tests/test_horizon_consistent_pick_up.py",
+      "sha256": "8d24009beabc7ad12e0532a0f8b5500f4c0caa58ff5b19e3842f0785378a4afc",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_horizon_consistent_pick_up_fresh_dual_pilot.py",
+      "sha256": "3744a34407ed541f33b4e45223b632903d157cfad3c43e08e408e91015b15c49",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_horizon_consistent_pick_up_smoke.py",
+      "sha256": "ff43657eca00962ed304b4db6fcc5691603988acc7988e2af2e1a26bf2561746",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_horizon_consistent_release.py",
+      "sha256": "1ff6a17bdafda80fb946e164a8c30a6ddacab3c97f9f815a01400b6642414a2a",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_horizon_consistent_release_h4.py",
+      "sha256": "9ab9088b9062ccba00a236d7501b8f1c45338027fa0387f5323c3c5580db82b1",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_horizon_consistent_release_prefix.py",
+      "sha256": "5523bbba54184426aacf84f9057ca188b494e75b59f1bfaa0e4569c1ee40ca16",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_horizon_consistent_v7_four_arm_initial.py",
+      "sha256": "192de80c1a6a7a5aa1ae831151331cb82c97e8668c2baa06ed8137613044156c",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_horizon_consistent_v7_four_arm_initial_terminal.py",
+      "sha256": "235d1953f0cde1ea02511bf6b66ddb2490d611455c5a029e843551bccb4f510d",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_contact_phase_pick_up.py",
+      "sha256": "b0b9a7c94d7aba4cff1756b306bc51a414005fc4f11c8abc9931630df499f5ab",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_contact_phase_pick_up_qualification.py",
+      "sha256": "53c30809561fc725774138ed0ab645c52227709de8833d151df3e18c5d75aca5",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_contact_phase_pick_up_regression.py",
+      "sha256": "53c1ccbc9b1a1f20a69e41c31555843434bf531b3604ee4f8f0eaeb0bbcf3ebf",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_contact_phase_pick_up_fresh_four_arm.py",
+      "sha256": "10de4ec50b753efab299f031ee1dd1715f9ea27906d0dac0d56a61c7980ef8b4",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_contact_phase_pick_up_fresh_four_arm_terminal.py",
+      "sha256": "f017015d5a4e17e7bd1330500d875eed191b5972c26b7c63759772d02bde280f",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_contact_phase_pick_up_scale45_four_arm.py",
+      "sha256": "22b2f26a6186bda6f6d02b1092694d40bb1dee804487f9c382d63376deab442f",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_contact_phase_pick_up_scale45_cotenant.py",
+      "sha256": "3ef0c4195bd417aac2c70a1a509123a5e4df7057f93b6816bb36fdcb1af457c3",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_contact_phase_pick_up_scale45_terminal.py",
+      "sha256": "8864a126af9a4100e5e2604a5a879488c961015b63be7608c40b2a29597dde2b",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_monitor_and_launch_contact_phase_scale45.py",
+      "sha256": "c4884e3491f79861e784771f1c975d78bca418a17ade384a512326dcd8fce34c",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_risk_selective_semantic.py",
+      "sha256": "c4c1ba22ae002aaad5b434c8676130528b71c2c362f1787a842b8f347303d849",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_risk_selective_scale45_replay_qualification.py",
+      "sha256": "86ee96f0d731a281b5e39bae0bc9c1601fd5ac4c6924bf8aaa02cd4fa9f4dc04",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_risk_selective_fresh15_cotenant.py",
+      "sha256": "78f8cfc75f13674f94abbfbb293b742e4085933511f02bf8e7d95d1203585fa4",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_physical_sufficiency_semantic.py",
+      "sha256": "35deb6d427ab92448ac38eb62596a2f3e9ef4a8da9b8ead5e3bb711a515004ee",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_physical_sufficiency_replay_qualification.py",
+      "sha256": "6cdf3383515b971c5080482abe96d70bff83ecf9a71f518f727c508dbbdcf7d1",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_physical_sufficiency_fresh15_cotenant.py",
+      "sha256": "927631d7bc6a77bd8abec865cd33445afd89ca97a18c74a7e6b0e46440458268",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_physical_sufficiency_fresh15_terminal.py",
+      "sha256": "3dc5461d77fe1f2398be7e193b25ed1e703c8c22ec637a8da476d8091107dc49",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_physical_sufficiency_attacked_fresh15.py",
+      "sha256": "f70d8fe5dfe2c35d05c99de74a2ef6fb563b5d610d28da739543ab6694707d39",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_physical_sufficiency_attacked_fresh15_terminal.py",
+      "sha256": "c175d0deec5df4fd013f454fac5de48821245ba8f1ed11afd2f7297d9f3b6f36",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_joint_limit_containment.py",
+      "sha256": "f78eb64c9a4b2b4a862cba989a791391960c476fd3e4713a132de9cc9f3087c1",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_joint_limit_containment_v11_replay.py",
+      "sha256": "5e9f7aa344333205b5b531cfc45c23405a619a8bc782b2b941d17269fe59b9a4",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_joint_limit_containment_v11_clean_fresh15.py",
+      "sha256": "358ce0cedfe5a5cbe346813cf235afe48154c3022de56315a120bda65ea3c5cd",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_joint_limit_containment_v11_attacked_fresh15.py",
+      "sha256": "5d694901367368b8cd41625647a07b377b82592879447e1c589d812dc9e5fc2f",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_joint_limit_containment_v11_terminal.py",
+      "sha256": "ba542f48645e2bccb65c28533ddc37bbeb77bba8fa93af6b7dd850b4cb790fb0",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_joint_limit_containment_v11_clean_scale45.py",
+      "sha256": "4fc978501cfc03a716d72c5ecd5bb2e0f234620a5b25999e2f68dbbc14afddea",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_joint_limit_containment_v11_attacked_scale45.py",
+      "sha256": "8878038ce7618968db0e6eeef9abed3c982dc065cd6c6134d2f4619ea49fc4b8",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_joint_limit_containment_v11_scale45_terminal.py",
+      "sha256": "1f0fc05163c87d22ecde9fe79f3392f655530d586a7d181c139412262853f334",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
       "path": "tests/test_local_checker_qualification_e3.py",
       "sha256": "23c209fd61acdd06d2ba844333a400af03f48ce5aad9b7595fdbed1f41d8c6d1",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_l1_repair_qualification.py",
+      "sha256": "2b3c0663123cefa12f725ea2859c46e4c6dcbe5877965f53342ea0be20664fcf",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_l1_repair_qualification_v2.py",
+      "sha256": "1b94e547f24d9136e597ec7982746fc094af466dfca17101ae9f2bb90f552811",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_l1_block10_qualification.py",
+      "sha256": "196e608f16ea4f5acae39ab1c5c9c8bb96fed72308a43ea2caedf59f43ec8905",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_l1_block10_k4_qualification.py",
+      "sha256": "1de1b1a5e4ff6f47c23fcdb2f38ac64c7da236372fa5e3abcf498e66929054f1",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_l1_progress_projection_qualification.py",
+      "sha256": "e80449bb9c7f2c97aee34f0585d47f71fa7754cb15ac5e9be2d15267c1058f0c",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_l1_progress_projection_smoke.py",
+      "sha256": "d770d06131929589518bbd1e97c196d504b441cc4239f28b2ef33fe1007c8220",
       "tracked": true
     },
     {
@@ -399,6 +1527,14 @@
       "git_status": "clean",
       "path": "tests/test_pi05_selector_qualification.py",
       "sha256": "6cac49052cb241b2b91b485a34e13d6da436e918ddf6d7d25a41393626b03c21",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_pick_up_prefix_progress_replay.py",
+      "sha256": "ee652f477ab618838b03734a2d7d3c15ce4f293d37a56c234a84b50352ccf1f5",
       "tracked": true
     },
     {
@@ -438,7 +1574,23 @@
       "exists": true,
       "git_status": "clean",
       "path": "tests/test_semantic_online_runner.py",
-      "sha256": "6e6bcba44dbf1ebf98424bda5bd9072afa7856f98ecbcf9231a29c590ed8fa43",
+      "sha256": "0fae08c3776aae685704b9fe5398142cfe8083a626b174fef2057b76ab790d49",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_semantic_online_runner_v2.py",
+      "sha256": "b4ba67e7dcec9433ae6f509b4c67d5934738e8e317a5090f76eeb28c1825c1d5",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_semantic_online_runner_v3.py",
+      "sha256": "72d3a84c73a76cda698e685e6772f1ff6118c889e55cd0065662829370dee079",
       "tracked": true
     },
     {
@@ -455,6 +1607,14 @@
       "git_status": "clean",
       "path": "tests/test_semantic_post_e5_readiness.py",
       "sha256": "0cb9e2ba1e915e3ae08dca19755a480d87983397daa11e7ebf7ada8e4a48d8da",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "tests/test_semantic_progress_projection.py",
+      "sha256": "6b1bd83de250eaef48dfc2225dec5dc3923181ad6659a4c7c7500bf647590dd4",
       "tracked": true
     },
     {
@@ -541,6 +1701,406 @@
       "bound_to_head": true,
       "exists": true,
       "git_status": "clean",
+      "path": "experiments/proofalign_four_arm_v4_l1_repair_qualification_protocol.json",
+      "sha256": "809697cc1c13585b14c0f57860ebf85b74b0d623d85ccb0f1be24c8255f2e4f1",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_four_arm_v4_l1_repair_qualification_fresh2_protocol.json",
+      "sha256": "5d553316deade059fb0331d8825c392ce40aa4f9cf328e34f2d250a4a90cba51",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_four_arm_v4_l1_repair_qualification_fresh3_protocol.json",
+      "sha256": "59047968be623897db017c672779087140ee4c4f35eda0a52c0860ddbdd25622",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_four_arm_v4_l1_repair_qualification_terminal_summary.json",
+      "sha256": "399892b24aba32f2c726350926650fd3055992c0405f3e083159191edb20ffa4",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_four_arm_v4_l1_block10_qualification_protocol.json",
+      "sha256": "91586bbd2fd59b527a345109e8777fdbb432bd046dd4f75c13d1db372dc45509",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_four_arm_v4_l1_block10_terminal_summary.json",
+      "sha256": "327a47c591b3e5927a6203cab814b2be5c0b7e8fb8106fd3eb7a1274a2dffc19",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_four_arm_v4_l1_block10_k4_qualification_protocol.json",
+      "sha256": "e65bd7387209cb7a3ba03e8380d9bca5f52e31d7f6be027149bfad1d7fdbcfc0",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_four_arm_v4_l1_block10_k4_terminal_summary.json",
+      "sha256": "a29696be69e43ced6a301428e3361b5fbaec7ed01a83bcfe6a4aaf73b4365f8d",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_four_arm_v4_l1_progress_projection_qualification_protocol.json",
+      "sha256": "d6da6b29c1b89523c9266ed1a39d6e866a0b568b67546a1654c3aa90a40590aa",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_four_arm_v4_l1_progress_projection_terminal_summary.json",
+      "sha256": "981452045ce37918b175a4ac6ce8c1d19bab75fc90fe3b6c1f33e6fce591e73e",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_four_arm_v4_l1_progress_projection_smoke_protocol.json",
+      "sha256": "4596cf398625b267639a2a2dd02c325187b22ee2250c2a87b9a72b05ed27e912",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_horizon_consistent_pick_up_phase_transition_smoke_protocol.json",
+      "sha256": "c8473a3adf1a28acff83b8d14d3c444583e1f59e4a738514e27851bdf385a375",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_horizon_consistent_pick_up_phase_transition_smoke_terminal_summary.json",
+      "sha256": "3bcf1d97454af5cf3faabb587ac513c84ea51999c7093db8423fcf23255ddd56",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_horizon_consistent_pick_up_regression_smoke_protocol.json",
+      "sha256": "d46dafe7a722d7a7db4dde68bedaec9b216b5ebc1511bb58610056767ced70b7",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_horizon_consistent_pick_up_regression_smoke_terminal_summary.json",
+      "sha256": "1309ceb394e2238701459d3b196c72c9f844de5b00dfb14f992d094675ec6813",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_horizon_consistent_pick_up_fresh_dual_pilot_protocol.json",
+      "sha256": "05fcad1d583c5083f332a4fd3a935674ca636af29c469da2b7828ddc1bce3363",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_horizon_consistent_pick_up_fresh_dual_pilot_terminal_summary.json",
+      "sha256": "094e60c1644e8f351479569aa9fcb08ce8400f429a77be4a92d9cff7c79be910",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_horizon_consistent_release_h4_regression_smoke_protocol.json",
+      "sha256": "86bb706c24e4dfb7584fa6d432dfadfdf1187f7cced7ec869e325542f363c1bb",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_horizon_consistent_release_h4_regression_smoke_terminal_summary.json",
+      "sha256": "c632cfa92f995bb36e1dc243c88a4e4465583488ef6b845e82ffab06a4e4fe4b",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_horizon_consistent_release_h4_regression_smoke_v2_protocol.json",
+      "sha256": "0bfb5bfeaeb57e67579c91f4f43c335a4f1c5e6d425346a8aae797d0e9d7d3ee",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_horizon_consistent_release_prefix_regression_smoke_protocol.json",
+      "sha256": "c0738ef5c6c6f6dcc6bb6e5d65cba552059012d13774534d8be776fadc77b475",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_horizon_consistent_release_prefix_regression_smoke_terminal_summary.json",
+      "sha256": "7692d958cc341d0a04208d149bcdc7c72d1f896322f8f4ec9f08da93517aff5d",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_horizon_consistent_release_qualification_protocol.json",
+      "sha256": "7a07d9b3b663f2f239a02ecd0d8e16d65578f9a8605cfbed6e0dde86ba8a22e2",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_horizon_consistent_release_qualification_terminal_summary.json",
+      "sha256": "cbce448f418f5c38d95c496e27f3431098e7fc764ac2d2f9b8d0bdd532e50382",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_horizon_consistent_release_qualification_v2_protocol.json",
+      "sha256": "9fcf8f0ef321d6302bfcc63642acf059e6858de7c855ebdbab118a633debd337",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_horizon_consistent_release_regression_smoke_protocol.json",
+      "sha256": "210bc0b57f7f1c6484c5f3f7acd0419c6c231bb396ce07fa7dcebea3c58f7036",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_horizon_consistent_release_regression_smoke_terminal_summary.json",
+      "sha256": "4e8b9c2b500af023cbafd690fe39de9dc509d120b73d31b661f6dd190ea4f37d",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_horizon_consistent_v7_four_arm_initial_protocol.json",
+      "sha256": "42b738f03fd28cf60936ac0924244e013b66b6f7e2689c98662e6b18b672e9c2",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_horizon_consistent_v7_four_arm_initial_terminal_summary.json",
+      "sha256": "1465249485bd33d2fd8be75862c85f30e5eb9e6408d427bfa52a178707ffbe9e",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_contact_phase_pick_up_qualification_protocol.json",
+      "sha256": "c216c2a52f8c19ef29ea23c71264abd0f98b2b53978dc0fbea53261e240dfbed",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_contact_phase_pick_up_regression_protocol.json",
+      "sha256": "55a4c434fd4ce96373f7ecba3c859026c9e07db3f6e149bed3798887ac8ceabf",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_contact_phase_pick_up_fresh_four_arm_protocol.json",
+      "sha256": "38a595a7fdc174535518c00875353de06ff4ccdb618df8247ce75631ede9f284",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_contact_phase_pick_up_fresh_four_arm_terminal_summary.json",
+      "sha256": "99bfd913eef3ddbaad9960319c706abe40a364f663ce2677c372fdb24c59d75d",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_contact_phase_pick_up_scale45_four_arm_protocol.json",
+      "sha256": "05716b6d3f69a677d656da378f034890b8b0e19d5c60c49ca9339ad7a7848128",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_contact_phase_pick_up_scale45_cotenant_protocol.json",
+      "sha256": "12792d9ad8cb111da98fb35e9499faba3167bae4a57cf44fa51417be96cc2e62",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_contact_phase_pick_up_scale45_terminal_summary.json",
+      "sha256": "98f2895a9426e0a05e0bb0a0cccc9a98aeb144d69ba8fb40028c86c68c8fe3f1",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_risk_selective_scale45_replay_qualification_protocol.json",
+      "sha256": "7e1f14fa6ce869d2c8c582b7fdfb1b0c4ae3c07fc1cf7218f2be971a2d4b2afa",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_risk_selective_fresh15_cotenant_protocol.json",
+      "sha256": "974229631d22751e759db218f6cc02484031d47688f0c00e38b35783e1ed9cd6",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_physical_sufficiency_replay_qualification_protocol.json",
+      "sha256": "34d88eaf0acfee7543839b80c8258eafaaadc1b4d050920ac0f34302d03aed86",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_physical_sufficiency_fresh15_cotenant_protocol.json",
+      "sha256": "1586a64baf9f0a7b2c8c41966d5025a274d0bcee9d220e5e62dc1d005c03a289",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_physical_sufficiency_fresh15_terminal_summary.json",
+      "sha256": "7733a1c6e62863e0d37b3399eab0e9a43fe40cede3aa7d5ba57afc7320791c06",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_physical_sufficiency_attacked_fresh15_protocol.json",
+      "sha256": "0449c0129074c9b36a811ffa7b1a37e2b9f57bd14760b07b7923cd48a93ef6a2",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_physical_sufficiency_attacked_fresh15_terminal_summary.json",
+      "sha256": "6671668240c142750a10e240633309aa8c634e1f617b0bff5bf0eca46e673774",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_joint_limit_containment_v11_replay_qualification.json",
+      "sha256": "c54f24ac828e8212d765fdf1f47175b4925a46dfbab5b27c3ce94e17ede28762",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_joint_limit_containment_v11_clean_fresh15_protocol.json",
+      "sha256": "5abde03d42aafd6240e27a5652f8cf813f0622f583268223e262b478af367782",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_joint_limit_containment_v11_attacked_fresh15_protocol.json",
+      "sha256": "9f3f78f768dc32f44e8696e20c2522912234f300b07d72f5fe7ec99bfd8710f6",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_joint_limit_containment_v11_terminal_summary.json",
+      "sha256": "35ab02ba1c31ca9b2e9cb820fb6a5fa7bda5a55460afeb50b15f673043c42d0d",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_joint_limit_containment_v11_clean_scale45_protocol.json",
+      "sha256": "bd60ee8e083bff652229f5abd7b1cceaf2430719d79cb217f71b784486bad5a2",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_joint_limit_containment_v11_attacked_scale45_protocol.json",
+      "sha256": "d0f8500819fa87a3d1e97cdf878b5eecf96bad1214adc48ee9731387f746b1db",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_joint_limit_containment_v11_scale45_terminal_summary.json",
+      "sha256": "3e07cb45c47ddfe4d7abbcd070b4c2e51bdc879878accff83f52b61a7e5753c1",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
       "path": "experiments/proofalign_pi05_action_conditioning_e2_protocol.json",
       "sha256": "079cf5566f49f44cd7ade70cf9cc5a96ef8d539bf5754ad01ad0d1e31e56be6e",
       "tracked": true
@@ -551,6 +2111,30 @@
       "git_status": "clean",
       "path": "experiments/proofalign_pi05_selector_e1_protocol.json",
       "sha256": "9ac6f615a8087b6710bee5c5dc5f542fc73383bf162c6e36ef1a475c9cd09ced",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_pick_up_prefix_progress_replay_protocol.json",
+      "sha256": "aca0df20ef7588c8a238cb6b5c0deba4b0d30c5c7a8d004297e88c225b5ae2ae",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_pick_up_prefix_progress_replay_v2_protocol.json",
+      "sha256": "50ab5e103660eab859682952dd70f47058e60a952db7bdb982e71184e78074fe",
+      "tracked": true
+    },
+    {
+      "bound_to_head": true,
+      "exists": true,
+      "git_status": "clean",
+      "path": "experiments/proofalign_pick_up_prefix_progress_replay_v3_protocol.json",
+      "sha256": "cc5fdadc5ddddcce94d3a9fd72ac8f9c3746e939b4120b3746ad67fc26377d0a",
       "tracked": true
     },
     {
@@ -606,7 +2190,7 @@
       "exists": true,
       "git_status": "clean",
       "path": "experiments/proofalign_semantic_v4_c5_readiness_packet_v1.json",
-      "sha256": "04f72878aedf56d0e9d50e959b0a8540dbcb98422f49a7fc15979f07c6716456",
+      "sha256": "8a15d140383a0533da5deb20bf8a855d5bfa23d69cba53272e3c59f7c7987402",
       "tracked": true
     },
     {
@@ -694,6 +2278,186 @@
       "ignored_by_git": true,
       "path": "results/proofalign_semantic_resource_smoke_e6_v2_20260727_fresh2/SHA256SUMS",
       "sha256": "9d0ac8a79299f1ee1ce70511c2393ecaaf370044952031b7ab3d1c177393a6a4"
+    },
+    {
+      "exists": true,
+      "ignored_by_git": true,
+      "path": "results/proofalign_four_arm_v4_l1_progress_projection_qualification_20260728_fresh1/summary.json",
+      "sha256": "c3f2b54198671b748c4880d55c21274d3af797dcdb18c243feba72de581c71d5"
+    },
+    {
+      "exists": true,
+      "ignored_by_git": true,
+      "path": "results/proofalign_four_arm_v4_l1_progress_projection_qualification_20260728_fresh1/SHA256SUMS",
+      "sha256": "5bc064b385369301f73c0c5c9ba1648c723405d0135849ad77ad31a1706906ac"
+    },
+    {
+      "exists": true,
+      "ignored_by_git": true,
+      "path": "results/proofalign_horizon_consistent_v7_four_arm_initial_20260728_fresh2/initial_evidence.json",
+      "sha256": "8cabd87764139ffd8813a8180d3ad99fa8ad61f7c0a3981879aead38f13dd486"
+    },
+    {
+      "exists": true,
+      "ignored_by_git": true,
+      "path": "results/proofalign_horizon_consistent_v7_four_arm_initial_20260728_fresh2/SHA256SUMS",
+      "sha256": "e540d5b32a1abd07dba6ccb364923dbd46cd113acfab55d9d46072685ffaf293"
+    },
+    {
+      "exists": true,
+      "ignored_by_git": true,
+      "path": "results/proofalign_contact_phase_pick_up_qualification_20260728_fresh1/qualification.json",
+      "sha256": "83f8715f98a062d2acff35a73c05d8af938d2218a024750e2c5a0e41134678f7"
+    },
+    {
+      "exists": true,
+      "ignored_by_git": true,
+      "path": "results/proofalign_contact_phase_pick_up_qualification_20260728_fresh1/SHA256SUMS",
+      "sha256": "1b8825cc39b89f86b13584e4313d7702f17e4f6bb6eea477ae03130a536da752"
+    },
+    {
+      "exists": true,
+      "ignored_by_git": true,
+      "path": "results/proofalign_contact_phase_pick_up_regression_20260728_fresh1/pilot_evidence.json",
+      "sha256": "3ae8c259fb5d85dc670864dc4c7b9472b791331c774e1c3e41800b92f74c295d"
+    },
+    {
+      "exists": true,
+      "ignored_by_git": true,
+      "path": "results/proofalign_contact_phase_pick_up_regression_20260728_fresh1/SHA256SUMS",
+      "sha256": "f26a77e9bf147f86ff5fe9907849dcf741dcad69b0e51133e0d625864af170ec"
+    },
+    {
+      "exists": true,
+      "ignored_by_git": true,
+      "path": "results/proofalign_contact_phase_pick_up_fresh_four_arm_20260728_fresh1/pilot_evidence.json",
+      "sha256": "de27da622a4fe5baf5389d6851557c965c4f783f0fd1a933d59f579aa63eb1dc"
+    },
+    {
+      "exists": true,
+      "ignored_by_git": true,
+      "path": "results/proofalign_contact_phase_pick_up_fresh_four_arm_20260728_fresh1/SHA256SUMS",
+      "sha256": "e829e40ccc4f263998253cae62a1de29039f3a6363ada0d2527e0694e105e400"
+    },
+    {
+      "exists": true,
+      "ignored_by_git": true,
+      "path": "results/proofalign_contact_phase_pick_up_scale45_cotenant_20260729_fresh1/pilot_evidence.json",
+      "sha256": "acffa947f74a59dfab785e0706aeb5638fa3ccbe65fda7fb6675535944eaa476"
+    },
+    {
+      "exists": true,
+      "ignored_by_git": true,
+      "path": "results/proofalign_contact_phase_pick_up_scale45_cotenant_20260729_fresh1/SHA256SUMS",
+      "sha256": "fc0913bec05308ddcc8447e7596621800a4c571676938f3c86ffeb61635a9553"
+    },
+    {
+      "exists": true,
+      "ignored_by_git": false,
+      "path": "results/proofalign_risk_selective_scale45_replay_qualification_20260729_fresh1/qualification.json",
+      "sha256": "70e001485a0c8f36670c1ae55e911be5b8bed6d3d7363067a054e2b23bf10882"
+    },
+    {
+      "exists": true,
+      "ignored_by_git": false,
+      "path": "results/proofalign_risk_selective_scale45_replay_qualification_20260729_fresh1/SHA256SUMS",
+      "sha256": "fb6a5ae03d4055b2f2e61ddd168e5ef1cde1df7ad29bfcd88a3434ed40697f98"
+    },
+    {
+      "exists": true,
+      "ignored_by_git": false,
+      "path": "results/proofalign_risk_selective_fresh15_cotenant_20260729_fresh1/pilot_evidence.json",
+      "sha256": "41b2be6473783c382dbb06aece0841b99e8a21b183e06611dd92ef5791655e19"
+    },
+    {
+      "exists": true,
+      "ignored_by_git": false,
+      "path": "results/proofalign_risk_selective_fresh15_cotenant_20260729_fresh1/SHA256SUMS",
+      "sha256": "cc7df85f4e916159595f69abe36e48513975ff05c14fb2939820498857b4cb45"
+    },
+    {
+      "exists": true,
+      "ignored_by_git": false,
+      "path": "results/proofalign_physical_sufficiency_replay_qualification_20260729_fresh1/qualification.json",
+      "sha256": "bcbf4b6f61754602421857578059481c6d909a4052eb31c8acf93e798f498d53"
+    },
+    {
+      "exists": true,
+      "ignored_by_git": false,
+      "path": "results/proofalign_physical_sufficiency_replay_qualification_20260729_fresh1/SHA256SUMS",
+      "sha256": "97343b459d503357f29c5e70b6c7dd7bbbe36c3fbc971c9543aca859391c29c5"
+    },
+    {
+      "exists": true,
+      "ignored_by_git": false,
+      "path": "results/proofalign_physical_sufficiency_fresh15_cotenant_20260729_fresh1/pilot_evidence.json",
+      "sha256": "03bbb051eada9d8a3c1625bd7e773a62a37755f1c9768184d027364a8f6c9470"
+    },
+    {
+      "exists": true,
+      "ignored_by_git": false,
+      "path": "results/proofalign_physical_sufficiency_fresh15_cotenant_20260729_fresh1/SHA256SUMS",
+      "sha256": "974f51e527dc60e8f8c4afc2291d0542c2a7ed5dae8cc170ef5d312625f51489"
+    },
+    {
+      "exists": true,
+      "ignored_by_git": false,
+      "path": "results/proofalign_physical_sufficiency_attacked_fresh15_20260729_fresh1/pilot_evidence.json",
+      "sha256": "d4bf51a96e5ad6523fe9022646e8f0e85373675b74babfdcba0464703db9c5ae"
+    },
+    {
+      "exists": true,
+      "ignored_by_git": false,
+      "path": "results/proofalign_physical_sufficiency_attacked_fresh15_20260729_fresh1/SHA256SUMS",
+      "sha256": "e642c83f3dadcae57122973a676a61005955d15adc896448396390a81b7a2745"
+    },
+    {
+      "exists": true,
+      "ignored_by_git": false,
+      "path": "results/proofalign_joint_limit_containment_v11_clean_fresh15_20260729_fresh1/pilot_evidence.json",
+      "sha256": "3c6b9df2441c0a60bc3edf6a2fa876379d4a3d9a632e98c1341732af2dac795b"
+    },
+    {
+      "exists": true,
+      "ignored_by_git": false,
+      "path": "results/proofalign_joint_limit_containment_v11_clean_fresh15_20260729_fresh1/SHA256SUMS",
+      "sha256": "28a2668fc946bc70578c9b190d85aca35fd12796bfc11ee873c00b174ebeba1f"
+    },
+    {
+      "exists": true,
+      "ignored_by_git": false,
+      "path": "results/proofalign_joint_limit_containment_v11_attacked_fresh15_20260729_fresh1/pilot_evidence.json",
+      "sha256": "e874f078c20b6f4eb36b4e1f68650f768ce41f65baeb67ec5bd30c104e71df45"
+    },
+    {
+      "exists": true,
+      "ignored_by_git": false,
+      "path": "results/proofalign_joint_limit_containment_v11_attacked_fresh15_20260729_fresh1/SHA256SUMS",
+      "sha256": "59690eb5b847f78bfdeb0ac034a157e8920cc3838a06532605623737490b042f"
+    },
+    {
+      "exists": true,
+      "ignored_by_git": false,
+      "path": "results/proofalign_joint_limit_containment_v11_clean_scale45_20260729_fresh1/pilot_evidence.json",
+      "sha256": "9d14768046a1c5e201b4a983e0f0340e94cc6f917f4f483b1beff81351e4b40d"
+    },
+    {
+      "exists": true,
+      "ignored_by_git": false,
+      "path": "results/proofalign_joint_limit_containment_v11_clean_scale45_20260729_fresh1/SHA256SUMS",
+      "sha256": "67c93d0f7d12617b7f9e858fd7bd5f43bc61bdf9274d072155b49fab3f827a36"
+    },
+    {
+      "exists": true,
+      "ignored_by_git": false,
+      "path": "results/proofalign_joint_limit_containment_v11_attacked_scale45_20260730_fresh1/pilot_evidence.json",
+      "sha256": "44e542a71729a8b0a23d0a6d9cf5abf659b8476c1bfb6f6847447a45b73156b4"
+    },
+    {
+      "exists": true,
+      "ignored_by_git": false,
+      "path": "results/proofalign_joint_limit_containment_v11_attacked_scale45_20260730_fresh1/SHA256SUMS",
+      "sha256": "6bca8c63eefd214ec5209cba07df49e459110c87b30496b388b4d7f9f8532a80"
     }
   ],
   "evidence_inventory_complete": true,
@@ -709,8 +2473,8 @@
   "policy_loaded": false,
   "repository_binding_semantics": "latest commit that changed the frozen semantic commit scope; later commits may contain only out-of-scope protocols or audit packets",
   "repository_fully_clean": true,
-  "repository_head_commit": "34d7afebb4351e40d057d3f8e3dd19dfa434894d",
-  "repository_head_tree": "74bb6ff3d5977d1a4ea6aaf24f33a1964eafe98a",
+  "repository_head_commit": "f2a0bcdc70cd01fc78bc5ce66cc2214145c4cd34",
+  "repository_head_tree": "7bd765c29c2cbf8ff2a445d2154052535652624e",
   "repository_status_row_count": 0,
   "schema": "proofalign.semantic-source-binding-e8-audit.v1",
   "simulator_created": false

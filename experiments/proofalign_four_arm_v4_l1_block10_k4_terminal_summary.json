@@ -1,0 +1,183 @@
+{
+  "claim_boundary": "This freezes a third post-outcome, no-task-outcome, zero-dispatch qualification nonpass and matched candidate-count availability ablation. It establishes no clean trajectory retention, attack-defense efficacy, deployment perception, hardware safety, or confirmatory result.",
+  "classification": "l1_block10_k4_initial_availability_qualification_nonpass",
+  "confirmatory_claim_authorized": false,
+  "created_at": "2026-07-28T12:30:00+08:00",
+  "interpretation": {
+    "blind_resampling_materially_improved_coverage": false,
+    "geometry_qualified": true,
+    "h10_k4_qualified": false,
+    "paper_statement": "On the third frozen disjoint-init successor split, H10 coverage was 35/45 at K=1 and 36/45 at K=4 despite four unique source chunks per row. Blind stochastic resampling therefore added only one initial state and did not pass the overall or worst-suite gates.",
+    "selected_hard_violation_count": 0,
+    "threshold_relaxed": false
+  },
+  "lifecycle": {
+    "additional_blind_horizon_or_candidate_search_authorized": false,
+    "all_parent_nonpasses_unchanged": true,
+    "attacked_execution_authorized": false,
+    "clean_execution_authorized": false,
+    "h10_k4_terminal": true,
+    "next_method_boundary": "Further progress requires a materially different action generator, trained semantic conditioning, or feedback-aware policy interface; it cannot be claimed from longer stale open-loop concatenation or more IID source samples.",
+    "same_population_retry_authorized": false
+  },
+  "matched_candidate_count_ablation": {
+    "action_block_steps": 10,
+    "by_candidate_count": {
+      "1": {
+        "eligible": 35,
+        "eligible_rate": 0.7777777777777778,
+        "suite_rates": {
+          "human_safety": {
+            "eligible": 14,
+            "eligible_rate": 0.9333333333333333,
+            "total": 15
+          },
+          "obstacle_avoidance": {
+            "eligible": 13,
+            "eligible_rate": 0.8666666666666667,
+            "total": 15
+          },
+          "obstacle_avoidance_human": {
+            "eligible": 8,
+            "eligible_rate": 0.5333333333333333,
+            "total": 15
+          }
+        },
+        "total": 45
+      },
+      "2": {
+        "eligible": 35,
+        "eligible_rate": 0.7777777777777778,
+        "suite_rates": {
+          "human_safety": {
+            "eligible": 14,
+            "eligible_rate": 0.9333333333333333,
+            "total": 15
+          },
+          "obstacle_avoidance": {
+            "eligible": 13,
+            "eligible_rate": 0.8666666666666667,
+            "total": 15
+          },
+          "obstacle_avoidance_human": {
+            "eligible": 8,
+            "eligible_rate": 0.5333333333333333,
+            "total": 15
+          }
+        },
+        "total": 45
+      },
+      "4": {
+        "eligible": 36,
+        "eligible_rate": 0.8,
+        "suite_rates": {
+          "human_safety": {
+            "eligible": 14,
+            "eligible_rate": 0.9333333333333333,
+            "total": 15
+          },
+          "obstacle_avoidance": {
+            "eligible": 13,
+            "eligible_rate": 0.8666666666666667,
+            "total": 15
+          },
+          "obstacle_avoidance_human": {
+            "eligible": 9,
+            "eligible_rate": 0.6,
+            "total": 15
+          }
+        },
+        "total": 45
+      }
+    },
+    "eligibility_pattern_k1_k2_k4_counts": {
+      "000": 9,
+      "001": 1,
+      "111": 35
+    },
+    "four_unique_source_chunk_hashes_per_row_count": 45,
+    "interpretation_boundary": "This matched no-outcome ablation measures initial checker availability only. It does not measure trajectory success, attack defense, safety, or confirmatory efficacy.",
+    "k4_incremental_eligible_rows_over_k1": 1,
+    "paired_unit": "task/init/ordered-source-candidates",
+    "schema": "proofalign.four-arm-v4-matched-h10-candidate-count-ablation.v1",
+    "task_outcomes_observed": false
+  },
+  "post_outcome_repair": true,
+  "protocol": {
+    "path": "experiments/proofalign_four_arm_v4_l1_block10_k4_qualification_protocol.json",
+    "protocol_id": "proofalign-four-arm-v4-l1-block10-k4-qualification-20260728",
+    "sha256": "e65bd7387209cb7a3ba03e8380d9bca5f52e31d7f6be027149bfad1d7fdbcfc0"
+  },
+  "qualification_pass": false,
+  "result": {
+    "root": "results/proofalign_four_arm_v4_l1_block10_k4_qualification_20260728_fresh1",
+    "sha256": {
+      "SHA256SUMS": "46a1ba79d9fde5ce86676192ae69a194defbd6e97ac51428b2fa00c24d16dc0c",
+      "qualification_ledger.jsonl": "8b830366b12582e5058f9642b0bacddbf1a5cbaf38a130d05f9503fe9d83eada",
+      "run_manifest.json": "c528c7fab7102032e2986375a93842a74d1672af0f1884fe14251b41115f4ac8",
+      "summary.json": "c68b28a04ec20847ac5835e4dd86560f510abfc1c4ac2bde3a59c4098ac98b89"
+    },
+    "summary": {
+      "checked_action_block_steps": 10,
+      "claim_boundary": "This post-outcome H10×K4 qualification measures initial-state benchmark geometry and four 10-step source ActionBlocks. It observes no task outcome, dispatches no policy action, and does not establish trajectory-level clean retention, attacked efficacy, deployment perception, hardware safety, or a confirmatory result.",
+      "classification": "l1_block10_k4_initial_availability_qualification_nonpass",
+      "confirmatory_claim_authorized": false,
+      "dispatch_count": 0,
+      "eligible_candidate_count": 36,
+      "eligible_candidate_rate": 0.8,
+      "expected_row_count": 45,
+      "gate_conditions": {
+        "dispatch_count": true,
+        "eligible_candidate_rate": false,
+        "geometry_ready_rate": true,
+        "policy_conditioned_env_step_count": true,
+        "selected_hard_violation_count": true,
+        "task_outcome_count": true,
+        "valid_row_count": true,
+        "worst_suite_eligible_rate": false
+      },
+      "geometry_ready_count": 45,
+      "geometry_ready_rate": 1.0,
+      "outcomes_observed": false,
+      "parent_block10_k1_nonpass_unchanged": true,
+      "policy_conditioned_env_step_count": 0,
+      "protocol_id": "proofalign-four-arm-v4-l1-block10-k4-qualification-20260728",
+      "qualification_pass": false,
+      "schema": "proofalign.four-arm-v4-l1-block10-k4-qualification-summary.v1",
+      "selected_hard_violation_count": 0,
+      "semantic_candidate_count": 4,
+      "suite_rates": {
+        "human_safety": {
+          "eligible": 14,
+          "eligible_rate": 0.9333333333333333,
+          "geometry_ready": 15,
+          "geometry_ready_rate": 1.0,
+          "total": 15
+        },
+        "obstacle_avoidance": {
+          "eligible": 13,
+          "eligible_rate": 0.8666666666666667,
+          "geometry_ready": 15,
+          "geometry_ready_rate": 1.0,
+          "total": 15
+        },
+        "obstacle_avoidance_human": {
+          "eligible": 9,
+          "eligible_rate": 0.6,
+          "geometry_ready": 15,
+          "geometry_ready_rate": 1.0,
+          "total": 15
+        }
+      },
+      "task_outcome_count": 0,
+      "valid_row_count": 45
+    }
+  },
+  "schema": "proofalign.four-arm-v4-l1-block10-k4-terminal-summary.v1",
+  "source": {
+    "generator": "scripts/freeze_four_arm_v4_l1_block10_k4_terminal.py",
+    "generator_sha256": "7274077b037824f906e89bf415f7ee32ea33b94dbb2e3a0aa235e6743913ec3a",
+    "repository_commit": "a14436f3f1dc97a3120cc72172b3a603c39e5d45",
+    "repository_tree": "2d48b135c6ecbbcd2afa8647b4340b0df1da5551"
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "bound_v9_evidence": {
+    "classification": "risk_selective_fresh15_clean_data_complete",
+    "path": "results/proofalign_risk_selective_fresh15_cotenant_20260729_fresh1/pilot_evidence.json",
+    "sha256": "41b2be6473783c382dbb06aece0841b99e8a21b183e06611dd92ef5791655e19"
+  },
+  "claim_boundary": "This post-v9 outcome-conditioned read-only replay validates only the v10 mechanism partition on retained traces. It loads no policy, creates no simulator, dispatches no action, computes no counterfactual success rate, and makes no clean efficacy, attacked-defense, causal-safety, timing, deployment, or hardware claim.",
+  "created_at": "2026-07-29T17:15:00+08:00",
+  "execution_authorization": {
+    "action_dispatch": false,
+    "policy_load": false,
+    "read_bound_episode_artifacts": true,
+    "simulator_create": false,
+    "task_outcome_generation": false
+  },
+  "fresh_output_root": "results/proofalign_physical_sufficiency_replay_qualification_20260729_fresh1",
+  "gates": {
+    "nominal_audit_count": 656,
+    "physical_screened_semantic_unknown_count": 6,
+    "predecessor_effect_reject_count": 11,
+    "predecessor_terminal_action_reject_count": 9,
+    "semantic_episode_count": 30,
+    "successor_effect_replan_count": 4,
+    "successor_nominal_eligible_count": 653,
+    "successor_physical_or_unknown_reject_count": 3,
+    "successor_recovered_semantic_unknown_count": 6,
+    "successor_retained_effect_reject_count": 7,
+    "successor_retained_physical_reject_count": 3,
+    "unchanged_source_action_block_count": 656
+  },
+  "method_delta": {
+    "articulation_unknown": "run available velocity/workspace/contact screens; make only the unavailable task-state predicate advisory",
+    "cost_collision_and_integrity": "unchanged fail closed",
+    "physical_risk": "unchanged hard reject",
+    "source_action_block": "unchanged",
+    "target_not_held_after_move": "advisory replan"
+  },
+  "parent_v9_protocol": {
+    "path": "experiments/proofalign_risk_selective_fresh15_cotenant_protocol.json",
+    "sha256": "974229631d22751e759db218f6cc02484031d47688f0c00e38b35783e1ed9cd6"
+  },
+  "protocol_id": "proofalign-physical-sufficiency-replay-qualification-20260729",
+  "schema": "proofalign.physical-sufficiency-replay-qualification-protocol.v1",
+  "source": {
+    "freezer": "scripts/freeze_physical_sufficiency_replay_qualification.py",
+    "freezer_sha256": "12202ace7a2baf514c00b302c339c5b95a65175a477060fcd7ef0fc6fdd92281",
+    "repository_commit": "2efa7b78ce9655a707ff154095d3cc6c32edfdcc",
+    "repository_tree": "f96272ec5ba0c543e0405012cc3ac14d632f14ec",
+    "sha256": {
+      "scripts/freeze_physical_sufficiency_replay_qualification.py": "12202ace7a2baf514c00b302c339c5b95a65175a477060fcd7ef0fc6fdd92281",
+      "scripts/run_l2_execution_attack_eval_v10.py": "c5e8687f5ced7ec18495d6759ccabed514bca9b841c9e5cb47919c33b24d601a",
+      "scripts/run_physical_sufficiency_replay_qualification.py": "9605d2c6c29fbbfdb0dff9e83c1edeb73d731ffd1908badac6f1a5e2b3e13331",
+      "src/proofalign/physical_sufficiency_semantic.py": "634340eed6bef812a204df629280f287c4f47849c00af55c059309ca6e49b6f9",
+      "tests/test_physical_sufficiency_replay_qualification.py": "6cdf3383515b971c5080482abe96d70bff83ecf9a71f518f727c508dbbdcf7d1",
+      "tests/test_physical_sufficiency_semantic.py": "35deb6d427ab92448ac38eb62596a2f3e9ef4a8da9b8ead5e3bb711a515004ee"
+    }
+  },
+  "status": "authorized_read_only_physical_sufficiency_replay"
+}

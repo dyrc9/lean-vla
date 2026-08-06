@@ -1,0 +1,69 @@
+{
+  "claim_boundary": "This qualification measures whether a frozen 7D primitive library can escape one synthetic near-limit joint state in read-only-restored LIBERO simulator tasks. It does not use a policy, read task outcomes, qualify intent attacks, establish arbitrary-state recovery, clean utility, attacked efficacy, deployment, or physical safety.",
+  "classification": "escape_recovery_v12_simulator_preflight_pass",
+  "execution_boundary": {
+    "outcome_read_count": 0,
+    "policy_action_dispatch_count": 0,
+    "policy_load_count": 0,
+    "shadow_env_step_count": 6300,
+    "simulator_create_count": 45
+  },
+  "gate_conditions": {
+    "baseline_model_trigger": true,
+    "old_policy_authorization": true,
+    "outcome_read_count": true,
+    "policy_action_dispatch_count": true,
+    "policy_load_count": true,
+    "recovery_candidate_coverage": true,
+    "runtime_exception_count": true,
+    "selected_joint_limit_crossing": true,
+    "selected_terminal_safe": true,
+    "selected_transient_loss": true,
+    "shadow_restore_identity": true,
+    "valid_pair_count": true,
+    "worst_suite_recovery_coverage": true
+  },
+  "lifecycle": {
+    "clean_rollout_authorized": false,
+    "next_step": "Integrate typed escape recovery behind the v12 L2 runtime and run a separate zero-policy fixed-trace transaction gate.",
+    "outcome_rollout_authorized": false,
+    "runtime_integration_authorized": true,
+    "terminal": true
+  },
+  "metrics": {
+    "baseline_model_trigger_rate": 1.0,
+    "old_policy_authorization_accept_count": 0,
+    "outcome_read_count": 0,
+    "policy_action_dispatch_count": 0,
+    "policy_load_count": 0,
+    "recovery_candidate_coverage": 1.0,
+    "recovery_completion_rate": 1.0,
+    "runtime_exception_count": 0,
+    "selected_joint_limit_crossing_count": 0,
+    "selected_replay_identity_rate": 0.044444444444444446,
+    "selected_terminal_model_clear_rate": 1.0,
+    "selected_terminal_safe_rate": 1.0,
+    "selected_transient_loss_count": 0,
+    "shadow_env_step_count": 6300,
+    "shadow_restore_identity_rate": 1.0,
+    "suite_recovery_coverage": {
+      "human_safety": 1.0,
+      "obstacle_avoidance": 1.0,
+      "obstacle_avoidance_human": 1.0
+    },
+    "valid_pair_count": 45,
+    "worst_suite_recovery_coverage": 1.0
+  },
+  "protocol_id": "proofalign-escape-recovery-v12-simulator-preflight-20260729",
+  "qualification_pass": true,
+  "schema": "proofalign.escape-recovery-v12-simulator-preflight-summary.v1",
+  "selected_gpu": {
+    "driver_version": "570.133.07",
+    "free_disk_gib": 2112.1771125793457,
+    "index": 1,
+    "memory_total_mib": 49140,
+    "memory_used_mib": 25429,
+    "name": "NVIDIA RTX 6000 Ada Generation",
+    "uuid": "GPU-9630f0c1-163a-1dc7-564b-8242ac677a1e"
+  }
+}
