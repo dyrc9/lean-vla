@@ -1,41 +1,28 @@
 # 文档导航
 
-## 默认阅读
+当前文档只围绕一个最终 ProofAlign 原型组织：
 
-1. [`current_status_and_roadmap.md`](current_status_and_roadmap.md)：唯一项目进度入口；
-2. [`method.md`](method.md)：L1/L2方法、四臂设计和Lean claim boundary；
-3. [`paper/paper_story.md`](paper/paper_story.md)：论文完整叙事；
-4. [`paper/v15_14_final_four_arm_results.md`](paper/v15_14_final_four_arm_results.md)：最终clean与
-   SABER-attacked四臂主表；
-5. [`paper/final_results_figures.md`](paper/final_results_figures.md)：历史论文表格、图和冻结结果入口。
+1. [`current_status_and_roadmap.md`](current_status_and_roadmap.md)：唯一当前状态与写作路线入口；
+2. [`paper/paper_narrative_zh.md`](paper/paper_narrative_zh.md)：中文论文叙事母稿；
+3. [`method.md`](method.md)：最终系统定义、L1/L2a/L2b 机制和 claim boundary；
+4. [`paper/final_four_arm_results.md`](paper/final_four_arm_results.md)：最终 clean/attacked 配对四臂结果；
+5. [`paper/actionblock_sampling_ablation.md`](paper/actionblock_sampling_ablation.md)：已冻结的 ActionBlock
+   长度 `H=2/5/10` 与候选采样数 `K=1/2/4` 消融；
+6. [`paper/related_work.md`](paper/related_work.md)：攻击、防御与 closest-work 定位；
+7. [`trusted_semantic_boundary.md`](trusted_semantic_boundary.md)：可信任务/观察与不可信 policy view 的边界；
+8. [`action_block_assessment.md`](action_block_assessment.md)：ActionBlock assessment 契约；
+9. [`semantic_subtask_hierarchy.md`](semantic_subtask_hierarchy.md)：结构化子任务与 task frontier。
 
-以后回答“项目进展如何”，默认只读取第1项，并按以下顺序汇报：
+默认叙事顺序为：
 
 ```text
-复现了什么攻击、攻击成功率是多少
-  -> 原方法四臂实验结果
-  -> 新方法优化结果
-  -> 最终还缺哪些实验
+SABER攻击成功复现
+  -> action-only VLA的authorization/realization gaps
+  -> 最终ProofAlign系统
+  -> 最终配对四臂证据
+  -> 论文初版
+  -> 由初稿缺口驱动的补充实验
 ```
 
-## 方法与实现参考
-
-- [`trusted_semantic_boundary.md`](trusted_semantic_boundary.md)：可信输入和攻击边界；
-- [`semantic_subtask_hierarchy.md`](semantic_subtask_hierarchy.md)：L1 semantic hierarchy；
-- [`action_block_assessment.md`](action_block_assessment.md)：ActionBlock checker；
-- [`experiments.md`](experiments.md)：实验协议；
-- [`implementation_and_experiment_readiness.md`](implementation_and_experiment_readiness.md)：代码与执行准备；
-- [`remote_execution.md`](remote_execution.md)：远程执行和授权规则。
-
-## 历史归档：非默认读取
-
-- [`progress_and_plan.md`](progress_and_plan.md)：完整实验时间线；
-- [`failure_lessons.md`](failure_lessons.md)：失败原因和停止规则；
-- [`experiment_reuse.md`](experiment_reuse.md)：历史实验复用边界；
-- [`v11_terminal_checkpoint.md`](v11_terminal_checkpoint.md)：v11终局；
-- [`v12_simulator_integrated_recovery_checkpoint.md`](v12_simulator_integrated_recovery_checkpoint.md)：
-  v12.6–v12.38完整优化过程；
-- 其他 `v12_*_checkpoint.md`：v12中间机制证据。
-
-历史non-pass不会被删除或改判，但不再用于日常进度复述。只有在审计特定结论、解释方法来源或编写论文
-消融部分时才读取这些归档。
+内部版本、优化过程、失败分析、旧协议和 checkpoint 统一保留在
+[`archive/`](archive/README.md)及冻结实验目录中，仅用于历史审计与复现，不进入默认论文故事。

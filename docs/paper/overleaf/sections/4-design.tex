@@ -1,0 +1,160 @@
+\section{Design}
+\label{sec:design}
+
+\subsection{Overview}
+
+Figure~\ref{fig:overview} summarizes the runtime path.  The policy and monitor never share authority: policy-facing bytes are evidence about what the VLA consumed, whereas $T$, $O_t^T$, and $Z_t$ determine the monitor context.  The output of one policy call is a single source \actionblock.  \system does not resample the policy, ask the policy to explain itself, or relabel $Z_t$ after seeing the action.
+
+The design follows four ordered invariants.  First, an action receives no
+covered-risk authorization without an assessment bound to a trusted context.
+Second, a dispatcher accepts no command without a fresh authorization bound to
+that exact action and state epoch.  Third, execution cannot advance the task
+phase until matching receipts and effects close the transaction.  Fourth, a
+near-boundary action is dispatched only under a guard configuration that
+passes the registered margin, restore, identity, and force gates.  Later
+layers preserve earlier identities rather than replacing their verdicts.
+
+The running example makes the layers non-interchangeable.  While the policy
+sees ``move to the farthest fixture,'' the trusted branch remains anchored to
+soda-to-plate and L1 assesses the exact returned block against that legal
+frontier.  L1 rejects a covered hard failure, but a task-progress mismatch can
+remain advisory.  If the block proceeds, L2a binds that same canonical block
+to one-use dispatch and receipt/effect evidence; a triggered L2b screen covers
+joint-side risk.  Thus, L2 can faithfully dispatch and contain a task-divergent
+block, while L1 alone establishes neither sink identity nor containment.  The
+composition protects three different edges---trusted context to proposal,
+proposal to dispatch evidence, and near-boundary dispatch to covered physical
+outcome.
+
+\begin{figure*}[t]
+\centering
+\resizebox{\textwidth}{!}{%
+\input{figures/system_overview}
+}
+\caption{\system separates trusted semantic authority from the potentially
+attacked policy branch.  The one-proposal transaction scope spans contract
+construction, the conditional L2b screen, fresh authorization,
+runtime-checked dispatch, and evidence closure.  The runtime carries the
+canonical source-\actionblock
+identity across these software artifacts; the guard/controller configuration
+is separately audited and is not part of the current Lean identity.}
+\label{fig:overview}
+\end{figure*}
+
+\subsection{C1: Trusted Semantic Context}
+
+The selector can emit one of a finite set of task-level skills: \texttt{pick\_up}, \texttt{move}, \texttt{place}, \texttt{release}, \texttt{open}, \texttt{close}, \texttt{actuate}, \texttt{finish}, or \texttt{unknown}.  A task-specific graph restricts which entities and transitions are legal.  For example, a mug-placement task cannot select \texttt{open(drawer)} even if an untrusted model would score it highly.
+
+In our final system, the authority path is
+\begin{equation}
+\mathsf{BDDL\ goal}\rightarrow\mathsf{task\ graph}
+\rightarrow\mathsf{frontier\ selector}\rightarrow Z_t.
+\end{equation}
+The compiler supports the six goal predicates present in the frozen study:
+\texttt{On}, \texttt{In}, \texttt{Open}, \texttt{Close}, \texttt{TurnOn}, and
+\texttt{TurnOff}.  Fixed templates expand each predicate into legal subtask
+transitions.  For example, \texttt{On(soda,plate)} expands to
+\texttt{pick\_up(soda)} $\rightarrow$ \texttt{move(soda,plate)} $\rightarrow$
+\texttt{place(soda,plate)} $\rightarrow$ \texttt{release(soda)}.  At each
+replanning boundary, a deterministic privileged-geometry finite-state machine
+chooses the current frontier using the trusted goal, gripper state, object
+state, and auditable distance relations.
+
+This construction avoids treating a VLA semantic score as authorization.  It
+also defines the scope precisely: the selector is a benchmark adapter for a
+small task language, not a learned planner or camera-only perception system.
+An incorrect but syntactically legal BDDL adapter remains a TCB failure.
+
+Each semantic artifact commits to the full context and a canonical selected subtask.  The L1 checker references the artifact digest.  It cannot rename the action's intent after observing $A_t$, and an observation-epoch change requires a new artifact and assessment.
+
+\subsection{C2: L1 Checker-Relative Assessment}
+
+The checker parses translation, rotation, and gripper commands over the full
+$10\times7$ chunk.  It does not run a complete dynamics rollout.  Starting
+from trusted end-effector position $\hat p_0$, it approximates the translational
+prefix by
+\begin{equation}
+\hat p_i=\hat p_{i-1}+0.05\,\Delta p_i,
+\qquad i\in\{1,\ldots,10\}.
+\end{equation}
+It combines this prefix with rotation/gripper commands, entity geometry,
+object/gripper relations, and the frozen task frontier.  The output is a finite
+set of motion, task-effect, precondition, and violation atoms plus a
+\texttt{known}/\texttt{unknown} status.
+
+Hard risks cover translation or rotation velocity limits, workspace exit,
+unexpected-contact neighborhoods, stale state, malformed commands, and
+unsupported unknown evidence.  When any hard risk is present, no dispatch
+authorization is created.  When no hard risk is present, L1 returns the
+unmodified source action.  The result means ``allowed relative to these rules
+and this state,'' not ``proved to implement the natural-language task.''  A
+downstream command rewrite must invalidate the assessment and obtain a new
+contract and authorization.
+
+Task-progress signals are treated differently.  For example, a block that does
+not reduce distance to the current target may still be a legitimate detour.
+Closing outside a target neighborhood, missing release/close progress, an
+expected task-effect miss, or unavailable articulation state therefore
+produces an advisory and mandatory next-block replan.  This asymmetry exposes
+proxy uncertainty instead of laundering it into a security theorem.  It is
+also a limitation: L1 closes the authorization gap only for its hard-risk
+vocabulary and provenance checks.
+
+\begin{table}[t]
+\centering
+\caption{L1 verdict semantics.  Advisory evidence cannot authorize a later
+block without a fresh observation and assessment.}
+\label{tab:l1-verdicts}
+\footnotesize
+\begin{tabularx}{\columnwidth}{l>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X}
+\toprule
+Class & Evidence & Runtime semantics \\
+\midrule
+Hard & Velocity/workspace bound, unexpected contact, stale/malformed object, unsupported unknown & Reject current block; reobserve \\
+Advisory & Task progress, release/close progress, expected-effect miss, unavailable articulation state & May dispatch current block; must replan next \\
+Allow & Bound evidence with no hard-risk atom & Dispatch exact $A_t$; normal replan \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{C3: L2a One-Use Execution Transaction}
+
+After L1, or directly in the L2-only arm, the consumer first compiles $C_t$.  It creates a fresh authorization only after a no-risk fast path or a triggered L2b screen qualifies.  L2b selects an execution configuration without changing the source-action bytes, consuming an authorization, or retroactively justifying one.  The dispatch boundary verifies the contract, nonce, proposal index, state epoch, action length, and canonical command identity before applying each step.  Receipts bind the authorization and the applied step.  The effect observer opens only after dispatch and closes at the registered observation boundary.  With L1 disabled, the L2-only schema binds the raw policy proposal, state, authorization, and receipts without claiming semantic alignment; it isolates execution identity and containment rather than trusted-task authorization.
+
+Unknown or missing integrity evidence blocks alignment.  Required task-progress evidence may request replanning rather than retroactively altering the command, whereas command/receipt substitution, stale/replayed state, workspace/wrong-contact evidence, and unrecognized unknown effects fail closed.  For arms with L2 enabled, task phase advances only when the transaction is aligned and task completion is observed.
+
+\begin{figure}[t]
+\centering
+\resizebox{\columnwidth}{!}{\input{figures/execution_transaction}}
+\caption{L2a transaction states.  A triggered L2b screen must qualify between
+contract construction and authorization; negative evidence cannot advance the
+phase, and a consumed authorization cannot be replayed.}
+\label{fig:l2a-transaction}
+\end{figure}
+
+\subsection{C4: L2b Bounded Guard Screening}
+
+On every step, the runtime computes the minimum across fourteen joint-side margins.  If the minimum is greater than $0.30$\,rad, the source action takes the fast path: no shadow simulator is invoked.  Otherwise, the runtime identifies the dangerous joint sides and constructs at most two temporary virtual-stop configurations.
+
+Every candidate starts from the same simulator snapshot and executes the same source action for a one-step shadow rollout.  Pre-dispatch eligibility requires exact snapshot restoration, fourteen predicted margins of at least $0.15$\,rad, source-action/guard/restore identity, and a MuJoCo generalized-constraint-force proxy no greater than 10,000.  The runtime selects the weakest eligible uniform guard.  Receipts, realized margins, and prediction error are recorded after dispatch and cannot retroactively qualify a candidate.  If none is eligible, the monitor records a fail-closed task failure without dispatch.
+
+The number ``two'' counts guard configurations, not policy candidates.  This keeps $K=1$ for the VLA and prevents a safety mechanism from being misreported as best-of-$K$ policy improvement.
+
+\subsection{End-to-End Decision Procedure}
+
+For every policy call, the monitor executes the following order.  It first
+captures $O_t^T$, advances the trusted FSM, and freezes $Z_t$ before invoking
+the policy.  It then receives exactly one $A_t$, constructs the L1 assessment,
+and stops if a hard verdict is present.  Otherwise it compiles $C_t$ and, near
+a registered joint-side trigger, screens at most two guard configurations from
+the same restored snapshot.  A qualifying execution receives a fresh one-use
+authorization bound to the episode nonce and current proposal;
+each low-level step must match the authorized command and state epoch before
+dispatch.  Finally, receipts and effects close the transaction.  A task phase
+can advance only after aligned completion; an advisory can only influence the
+next policy call.  This order prevents post-action relabeling of $Z_t$, replay
+of an old authorization, and use of future outcome as present-time evidence.
+
+\subsection{Failure Semantics}
+
+\system distinguishes four outcomes: \emph{hard reject} for covered physical or integrity failure; \emph{advisory replan} for task-progress uncertainty; \emph{fail-closed no-dispatch} when no safe guard qualifies; and \emph{aligned completion} when the transaction and task evidence both close.  The distinctions are retained in the trace rather than collapsed into task success.  This is necessary because a system can fail safely, succeed unsafely, or preserve utility while accumulating severe risk steps.

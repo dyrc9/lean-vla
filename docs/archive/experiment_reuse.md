@@ -30,7 +30,7 @@ P0b 与 R9 都能复用，但复用对象不同：
 ## 3. P0b 如何复用
 
 P0b 的冻结定义见
-[`saber_threat_replication_p0b_victim_protocol.json`](../experiments/saber_threat_replication_p0b_victim_protocol.json)。
+[`saber_threat_replication_p0b_victim_protocol.json`](../../experiments/saber_threat_replication_p0b_victim_protocol.json)。
 历史结论为：
 
 - 96/96 clean/attacked episodes 有效；
@@ -96,8 +96,8 @@ P0b trace 可以用于：
 
 R9 的冻结协议和 terminal audit 分别是：
 
-- [`saber_integrity_action_envelope_r9_protocol.json`](../experiments/saber_integrity_action_envelope_r9_protocol.json)
-- [`saber_integrity_action_envelope_terminal_summary.json`](../experiments/saber_integrity_action_envelope_terminal_summary.json)
+- [`saber_integrity_action_envelope_r9_protocol.json`](../../experiments/saber_integrity_action_envelope_r9_protocol.json)
+- [`saber_integrity_action_envelope_terminal_summary.json`](../../experiments/saber_integrity_action_envelope_terminal_summary.json)
 
 R9 已完成 48/48 attacked+defended episodes；terminal summary 绑定 53 个 checksum entries，分类为
 `exploratory_attacked_defended_complete_not_confirmatory`。
@@ -116,13 +116,13 @@ R9 已完成 48/48 attacked+defended episodes；terminal summary 绑定 53 个 c
 | contact/joint/force channels | 独立 observed/forbidden effect atoms |
 | strict success | utility endpoint，不是 alignment proof |
 
-当前 [`integrity_execution_adapter.py`](../src/proofalign/benchmark/integrity_execution_adapter.py)
+当前 [`integrity_execution_adapter.py`](../../src/proofalign/benchmark/integrity_execution_adapter.py)
 已将 execution-only 路径迁移到 ActionBlock/contract/receipt v3 runtime。
 
 ### 4.2 历史 trace 的精确迁移
 
 使用
-[`action_block_trace_adapter.py`](../src/proofalign/benchmark/action_block_trace_adapter.py)
+[`action_block_trace_adapter.py`](../../src/proofalign/benchmark/action_block_trace_adapter.py)
 时：
 
 1. 按 `policy_call_index` 分组；

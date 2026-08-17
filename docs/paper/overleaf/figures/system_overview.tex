@@ -1,0 +1,80 @@
+\begin{tikzpicture}[
+  font=\footnotesize,
+  node distance=4.5mm and 3.6mm,
+  flow/.style={-{Latex[length=1.8mm]},semithick},
+  evidenceflow/.style={-{Latex[length=1.8mm]},semithick,densely dashed},
+  trusted/.style={draw=blue!65!black,rounded corners=1.5pt,fill=blue!7,
+                  align=center,minimum height=9mm,text width=23mm,inner sep=2.2pt},
+  untrusted/.style={draw=red!70!black,rounded corners=1.5pt,fill=red!6,
+                    align=center,minimum height=9mm,text width=23mm,inner sep=2.2pt,
+                    dashed},
+  assess/.style={draw=orange!80!black,rounded corners=1.5pt,fill=orange!9,
+                 align=center,minimum height=13mm,text width=25mm,inner sep=2.2pt},
+  transaction/.style={draw=black!70,rounded corners=1.5pt,fill=gray!9,
+                      align=center,minimum height=13mm,text width=22mm,inner sep=2.2pt},
+  contain/.style={draw=green!50!black,rounded corners=1.5pt,fill=green!8,
+                  align=center,minimum height=13mm,text width=25mm,inner sep=2.2pt},
+  identity/.style={draw=black!65,rounded corners=1.5pt,fill=black!4,
+                   align=center,inner xsep=4pt,inner ysep=2.8pt}
+]
+
+% The two branches share data flow, but only the upper branch supplies
+% semantic authority to the monitor.
+\node[trusted] (task) {Authoritative task $T$\\trusted tap $O_t^T$};
+\node[trusted,right=of task] (selector) {\textbf{C1: trusted context}\\frozen graph + $Z_t$};
+\node[untrusted,below=5mm of task] (policyview) {Potentially attacked view\\$P_t^{pol},O_t^{pol},H_t^{pol}$};
+\node[untrusted,right=of policyview] (vla) {Frozen VLA policy\\source $A_t$ ($K=1$)};
+
+\node[assess,right=7mm of selector,yshift=-7mm] (l1) {
+  \textbf{C2: L1 assessment} $S_t$\\
+  trusted-context binding\\
+  hard reject / advisory};
+\node[transaction,right=6mm of l1] (contract) {
+  \textbf{Compile contract}\\
+  $C_t$ + state epoch};
+\node[contain,right=of contract] (l2b) {
+  \textbf{C4: L2b if triggered}\\
+  $\leq 2$ restored guards\\
+  margin + force gates};
+\node[transaction,right=of l2b] (dispatch) {
+  \textbf{Authorize + dispatch}\\
+  fresh one-use nonce\\
+  exact command};
+\node[transaction,right=of dispatch] (close) {
+  \textbf{Observe + close}\\
+  receipts $R_t$ + effects $E_t$\\
+  aligned phase advance};
+
+\draw[flow,blue!65!black] (task)--(selector);
+\draw[flow,red!70!black] (policyview)--(vla);
+\draw[flow,blue!65!black] (selector.east)-|(l1.north west);
+\draw[flow,red!70!black] (vla.east)-|(l1.south west);
+\draw[flow] (l1)--node[above]{bind}(contract);
+\draw[flow] (contract)--node[above]{screen}(l2b);
+\draw[flow] (l2b)--node[above]{qualify}(dispatch);
+\draw[flow] (dispatch)--node[above]{evidence}(close);
+
+\node[draw=blue!65!black,densely dotted,rounded corners=2pt,
+      fit=(task)(selector),inner sep=3pt,
+      label={[font=\scriptsize,text=blue!65!black]above:trusted authority branch}] {};
+\node[draw=red!70!black,dashed,rounded corners=2pt,
+      fit=(policyview)(vla),inner sep=3pt,
+      label={[font=\scriptsize,text=red!70!black]below:untrusted proposal branch}] {};
+
+% L2a is not a single pre-screen step: it is the transaction boundary that
+% binds contract construction, optional containment, dispatch, and closure.
+\node[draw=black!65,dashed,rounded corners=2pt,
+      fit=(contract)(l2b)(dispatch)(close),inner xsep=4pt,inner ysep=4pt,
+      label={[font=\scriptsize]above:\textbf{C3: L2a one-proposal execution transaction}}] {};
+
+\node[identity,below=6mm of l2b,text width=124mm,font=\scriptsize] (idband) {
+  \textbf{Runtime identity chain:} canonical $d(A_t)$ is recorded in $S_t$,
+  $C_t$, authorization, receipt-window, and $E_t$ artifacts; Python separately
+  checks each applied-step digest against the authorized step.};
+\draw[evidenceflow] (l1.south) -- (l1.south |- idband.north);
+\draw[evidenceflow] (contract.south) -- (contract.south |- idband.north);
+\draw[evidenceflow] (l2b.south) -- (l2b.south |- idband.north);
+\draw[evidenceflow] (dispatch.south) -- (dispatch.south |- idband.north);
+\draw[evidenceflow] (close.south) -- (close.south |- idband.north);
+
+\end{tikzpicture}

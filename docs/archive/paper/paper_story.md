@@ -1,9 +1,13 @@
-# Paper story
+# Paper story（历史审计材料）
+
+> 本页不再是当前论文主稿，也不应作为正文或主表来源。仅使用最终 ProofAlign 方法与优化后四臂结果的
+> 中文逻辑稿见 [`paper_narrative_zh.md`](../../paper/paper_narrative_zh.md)。本页保留旧版本分析，只用于复现审计、
+> 失败定位和审稿问答。
 
 > 2026-08-07终局更新：v15.14 clean与同pair SABER-attacked四臂均已完成并通过。Dual在attacked下为
 > `13/18` task success、`0/18` constraint-violation episodes；VLA-only为`11/18`和`4/18`。
 > 最终主表与claim boundary见
-> [`v15_14_final_four_arm_results.md`](v15_14_final_four_arm_results.md)。下文早期版本分析保留作审计。
+> [`v15_14_final_four_arm_results.md`](../../paper/v15_14_final_four_arm_results.md)。下文早期版本分析保留作审计。
 
 ## 1. 中心命题
 

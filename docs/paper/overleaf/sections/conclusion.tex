@@ -1,0 +1,23 @@
+\section{Conclusion}
+
+We presented \system, a cross-layer reference monitor for the point at which an
+action-only VLA's continuous output becomes an executable command.  Its central
+security object is the exact source \actionblock: an independently anchored,
+checker-relative verdict is bound to that block, then preserved through a
+one-use execution transaction, ordered receipts, effects, and state-triggered
+joint containment.  The VLA need not expose a plan and is neither retrained nor
+resampled.
+
+The attack study successfully reproduces SABER with a 39/86 (45.35\%) observed
+risk-transition ASR.  In the paired four-arm study, L1-only records 13/18
+attacked task success, both L2-on arms record 0/18 observed joint-limit
+violation episodes, and Dual combines the 13/18 and 0/18 sample outcomes.
+These outcomes expose the intended separation between task monitoring and
+covered physical containment in the frozen simulator setting; they do not
+establish population-level effects.
+
+Broader robot-safety claims require trusted perception, typed controller
+binding, more attacks and policies, hardware feedback, real-robot validation,
+and hard-real-time analysis.  \system instead closes a narrower, auditable
+chain: which action was assessed, which authorization permitted it, which
+command was applied, and which evidence allowed the execution phase to close.

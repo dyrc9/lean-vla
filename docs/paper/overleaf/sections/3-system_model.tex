@@ -1,0 +1,120 @@
+\section{Problem Definition and Threat Model}
+\label{sec:model}
+
+\subsection{Trust Split and Protected Object}
+
+Let $T$ denote an authoritative task artifact and $O_t^T$ an observation
+captured at a trusted tap before the attack transform.  The VLA receives a
+separate policy view $(P_t^{pol},O_t^{pol},H_t^{pol})$: prompt, observation,
+and policy history.  In a clean episode, $P_t^{pol}$ serializes $T$; in an
+attacked episode, SABER changes the policy-facing bytes after the split.  Both
+views are logged, but logging an attacked prompt does not make it authority.
+
+At state epoch $t$, the two branches compute
+\begin{equation}
+\begin{aligned}
+Z_t &= \mathsf{SelectFrozen}(T,O_t^T),\\
+A_t &= \pi(P_t^{pol},O_t^{pol},H_t^{pol}),\\
+S_t &= \mathsf{AssessLocal}(Z_t,O_t^T,A_t).
+\end{aligned}
+\end{equation}
+$Z_t$ is selected and frozen before the policy returns $A_t$.  It is an
+independent monitor anchor, not a recovered latent intent or a hidden prompt to
+the policy.  In a deployment, $T$ could be a signed job ticket,
+operator-approved task record, or protected workflow state.  If no independent
+task source exists, \system cannot create authority and its semantic claim does
+not apply.
+
+The protected object is the exact online block
+$A_t\in\mathbb{R}^{H\times d}$, represented by its ordered numeric values and
+shape in the runtime's canonical domain.  Assessment $S_t$ binds $A_t$ to
+$(Z_t,O_t^T)$.  The consumer then creates execution contract $C_t$, one-use
+authorization $\mathit{Auth}_t$, ordered receipts $R_t$, and effect evidence
+$E_t$.  Every object binds the episode nonce, proposal index, and state epoch;
+changes invalidate reuse.  This identity denotes a canonical command, not its
+raw memory representation or guaranteed physical trajectory.
+
+\subsection{Adversary and TCB}
+
+After the secure split, the adversary may modify the policy-facing instruction,
+digital/software visual input, or policy history to induce a task-divergent or
+risk-inducing proposal.  Across the consumer path, it may attempt command
+substitution, step reordering, stale authorization replay, cross-proposal
+receipt/effect splicing, or incomplete evidence.  Our empirical attack study
+instantiates instruction modification; the focused integrity suite instantiates
+the modeled transaction faults.  Visual and history attacks are in system
+scope but are not empirically evaluated.
+
+The TCB contains the authoritative task source, trusted observation tap,
+task-graph compiler and selector, local checker, contract compiler,
+nonce/digest ledger, single dispatch boundary, effect observer, and protected
+evidence storage.  The policy, policy-facing prompt/observation/history, and
+source \actionblock are untrusted.  This is a software reference-monitor model:
+we assume the TCB code and its cryptographic primitives execute as specified.
+
+\subsection{Security Goals}
+
+\textbf{G1---checker-relative authorization.}  A block may receive covered-risk
+authorization only if a qualified checker assessed that exact block against a
+legal $Z_t$ and the matching trusted observation epoch.  The implemented
+condition is
+
+\begin{align}
+\mathsf{L1}(T,O_t^T,Z_t,A_t,S_t) \triangleq {}&
+  \mathsf{TrustedProv}(T,O_t^T,Z_t) \nonumber\\
+&\land \mathsf{LegalFrontier}(T,O_t^T,Z_t) \nonumber\\
+&\land \mathsf{Bound}(S_t,Z_t,O_t^T,A_t) \nonumber\\
+&\land \mathsf{ScreenAvailable}(S_t) \nonumber\\
+&\land \neg\mathsf{HardRisk}(S_t) \nonumber\\
+&\land \mathsf{Qualified}(S_t.\mathit{assessor}).
+\end{align}
+
+This definition establishes provenance, frontier legality, assessment identity,
+and covered hard gates.  It does not establish that every admissible action
+advances $T$.  Task-progress and unavailable articulation evidence are
+advisory and force next-block replanning; velocity, workspace, unexpected
+contact, stale/malformed commands, and unsupported unknown evidence are hard
+gates.
+
+\textbf{G2---transaction alignment.}  A task phase may advance only if the
+authorization is fresh and bound to the proposal, the dispatched prefix is
+ordered and exact, and the post-dispatch evidence satisfies the contract:
+\begin{align}
+\mathsf{L2a} \triangleq {}&
+  \mathsf{FreshAndBound}(C_t,\mathit{Auth}_t,R_t) \nonumber\\
+&\land \mathsf{OrderedExactPrefix}(R_t,\mathit{Auth}_t) \nonumber\\
+&\land \mathsf{AfterDispatch}(E_t,R_t) \nonumber\\
+&\land \mathsf{Required}(C_t)\subseteq E_t \nonumber\\
+&\land \mathsf{Forbidden}(C_t)\cap E_t=\emptyset \nonumber\\
+&\land \neg\mathsf{ObsViolation}(E_t).
+\end{align}
+The contract binds the action, semantic-subtask, policy-prompt, assessment, and
+trusted-observation digests; state epoch; required/forbidden effects; and the
+observation window.  An authorization can be consumed once.  In Python,
+$\mathsf{OrderedExactPrefix}$ requires contiguous receipt indices and checks
+each applied-step digest against \texttt{authorization.action\_at(i)}.  The
+Lean model is deliberately coarser: it binds the authorization's whole final
+command digest to the action block, and proves that each bound receipt uses the
+same authorization and has equal applied and receipt-authorized digests.  It
+does not independently reconstruct the authorization's ordered per-step digest
+list.  An incomplete executed prefix, an unknown effect, or a receipt from
+another proposal cannot advance the phase.
+
+\textbf{G3---covered physical containment.}  When any of fourteen monitored
+joint-side margins enters the registered trigger region, dispatch requires a
+bounded screen whose selected configuration satisfies the margin, restoration,
+source-identity, and force gates.  The goal is covered joint-side containment,
+not exact trajectory reproduction or arbitrary collision avoidance.
+
+The distinction between source action and executable configuration is important.  A virtual guard leaves $A_t$ unchanged but changes how the controller maps its numeric values to motion.  The ideal executable identity is therefore at least $(A_t,\mathit{guard},\mathit{controller},\mathit{epoch})$.  The current runtime logs guard and controller-related evidence, but the Lean typed contract does not yet include guard/controller configuration as an independent digest.  We treat this as an explicit refinement gap rather than equating canonical command identity with an exact physical trajectory.
+
+\subsection{Non-Goals}
+
+We exclude physical optical attacks or root-level frame replacement before the
+trusted split, task-source or monitor compromise, forged actuator feedback
+inside the TCB, arbitrary dynamics error, hard-real-time guarantees, and
+real-robot safety.  The final selector uses privileged benchmark geometry and
+is not evidence of camera-only trusted perception.  Hashes, nonces, and Lean
+semantics do not supply a hardware root of trust.  If both branches share a
+compromised pre-split view, or the observer omits a relevant effect, a
+transaction may be internally aligned yet wrong about the physical world.

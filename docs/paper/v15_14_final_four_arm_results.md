@@ -1,4 +1,7 @@
-# v15.14最终clean与SABER-attacked四臂结果
+# 冻结实验记录：最终clean与SABER-attacked四臂结果
+
+> 本文件保留历史artifact标识、run-validity说明和checksums，仅用于复现审计。论文与默认项目叙事使用
+> [`final_four_arm_results.md`](final_four_arm_results.md)，并将系统统一称为 ProofAlign。
 
 状态：`final_paired_simulator_qualification_pass`。最后更新：2026-08-07。
 

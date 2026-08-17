@@ -1,0 +1,65 @@
+\section{Implementation and Formal Semantics}
+\label{sec:implementation}
+
+\subsection{Runtime Integration}
+
+We implement \system at the consumer/dispatch boundary of the OpenPI $\pi_{0.5}$ LIBERO-Safety runner.  The policy checkpoint, model weights, and action-generation procedure are unchanged.  A trusted-context module manages allowlists and semantic artifacts; a deterministic action-selection module checks frontier and digest consistency; and a runtime wrapper orders policy output, assessment, contract construction, optional guard screening, authorization, dispatch, receipts, and effects.
+
+In the evaluated runner, all policy-generated steps enter this wrapper before the sole \texttt{env.step} boundary.  Thus, complete mediation is conditional on the TCB containing every dispatch path and remaining intact; registered negative tests do not rule out an uninstrumented actuator path in another deployment.
+
+The runner records separate trusted- and policy-observation digests, exact policy-prompt bytes and digest, source and returned action digests, the local assessment, contract and authorization identifiers, step receipts, effect evidence, guard and restore events, joint-side margins, force, and latency.  An action-trace adapter groups actually consumed low-level commands by policy-call index.  It preserves the original policy-chunk digest but never reconstructs an unexecuted tail or uses future reward, success, collision, or observation as present-time evidence.
+
+Action identity is not a hash of raw array memory.  The runtime converts the
+flattened action to a finite tuple of Python floats; the proposal also binds its
+rank-two shape.  Schema-tagged payloads are key-sorted and encoded as
+whitespace-free UTF-8 JSON before SHA-256.  Thus, ``exact'' means equality in
+this canonical numeric domain, not equality of array dtype, endianness, or
+buffer layout, and not equality of the resulting physical trajectory.
+
+The no-risk path performs no shadow rollout.  The risk path evaluates at most two guard configurations from the same snapshot.  This bounded design makes the screening budget explicit and prevents an unbounded search from hiding in average latency.
+
+\subsection{Reproducibility Bindings}
+
+The frozen evaluation binds OpenPI commit \texttt{15a9616a0094},
+LIBERO-Safety commit \texttt{ef0f79b70fc5}, and SABER commit
+\texttt{22ad50642a2a}; the artifact manifest records the complete hashes.  The control frequency is
+20\,Hz, the policy replans every ten steps, and an episode is capped at 600
+steps after ten simulator warm-up steps.  Protocols bind the checkpoint
+metadata, environment and policy seeds, rotated arm schedule, source hashes,
+and expected output checksums.  The reproducibility record comprises the
+freezers, frozen JSON protocols, terminal evidence, negative integrity suite,
+Lean sources, and an executable claim-to-evidence audit.  Reported aggregates
+are re-derived from frozen traces rather than accepted as prose-transcribed
+constants; the audit additionally checks that the corresponding paper tokens
+match the recomputed values.
+
+The final runs assign policy inference and EGL simulation to distinct NVIDIA
+RTX 6000 Ada Generation GPUs (48\,GiB each; driver 570.133.07).  The policy
+receives the \texttt{agentview} and wrist-camera RGB streams, each resized to
+$224\!\times\!224$.  Screening latency is measured with a monotonic clock from
+the joint-margin read through bounded candidate construction, shadow steps,
+snapshot restoration, and candidate selection.  It excludes policy inference
+and the subsequently dispatched environment step; it is therefore a
+mechanism-specific measurement on this research platform, not end-to-end
+control-loop latency.
+
+\subsection{Component Qualification}
+
+The deterministic semantic selector is frozen before the main four-arm study.  On a 160-case qualification corpus, it exactly matches all 160 expected task-frontier outputs.  This result qualifies a privileged benchmark FSM; it does not measure visual perception or open-world generalization.  The analytic local checker and effect observer separately pass frozen finite-corpus gates that exercise supported atoms, malformed or stale objects, and fail-closed behavior.  We use these tests to catch implementation defects, not as a substitute for deployment-distribution safety statistics.
+
+\subsection{Lean Model}
+
+The Lean model defines the four-arm feature switches, \actionblock and assessment identities, execution contracts, authorizations, receipts, effects, and allowed phase transitions.  It proves finite transaction properties rather than physical safety.  The central theorem families establish that:
+\begin{itemize}
+  \item an authorization binds the same semantic identity and exact final command;
+  \item a consumed authorization is unavailable for replay;
+  \item every bound receipt uses the same authorization and its applied digest equals its receipt-authorized digest;
+  \item unknown effects or an incomplete executed prefix cannot satisfy execution alignment; and
+  \item phase advance in an execution-enabled arm requires alignment and contract completion.
+\end{itemize}
+
+These theorems make negative states explicit: the model does not permit an unknown effect, partial prefix, or mismatched receipt to become a completed transaction merely because the Python runner continued.  Separately, the Python runtime checks receipt order and binds every applied-step digest to \texttt{authorization.action\_at(i)}.  Appendix~\ref{app:lean} maps paper claims to theorem names.
+
+\subsection{Formal Boundary}
+
+Lean does not parse natural-language intent, choose $Z_t$, prove checker or observer correctness, validate the trusted sensor, or establish that the simulator matches a robot.  A complete refinement proof from the Python serializer and runtime observer to Lean is also future work.  In particular, the current model does not independently bind a receipt's authorized per-step digest to a typed ordered command list; that correspondence is enforced in Python.  The current \texttt{BlockExecutionContract} also does not type the virtual-guard/controller configuration as a separate digest.  We therefore use the phrase \emph{Lean-checked execution transaction semantics}, not \emph{formally verified robot safety}.
