@@ -190,6 +190,8 @@ class TemplateGeometryBridge:
         self.resolution_count = 0
         self.resolution_failures = 0
         self.selected_geom_counts: dict[str, int] = {}
+        self.entity_source_counts: dict[str, int] = {}
+        self.unresolved_entity_counts: dict[str, int] = {}
 
     def begin_episode(self) -> None:
         self.env = None
@@ -197,6 +199,8 @@ class TemplateGeometryBridge:
         self.resolution_count = 0
         self.resolution_failures = 0
         self.selected_geom_counts = {}
+        self.entity_source_counts = {}
+        self.unresolved_entity_counts = {}
 
     def compile(self, bddl_text: str) -> Any:
         digest = digest_text(bddl_text)
@@ -214,6 +218,73 @@ class TemplateGeometryBridge:
                 "more than one simulator was created in one episode"
             )
         self.env = env
+
+    def resolve_template_entities(self) -> tuple[EntityPosition, ...]:
+        """Resolve frozen target/region names from exact simulator sites/bodies."""
+
+        template = self.current_template
+        if template is None:
+            raise LLMTemplateRuntimeError("semantic template was not compiled")
+        if self.env is None:
+            raise LLMTemplateRuntimeError("semantic geometry has no simulator")
+        raw = _underlying_env(self.env)
+        sim = getattr(raw, "sim", None)
+        if sim is None:
+            raise LLMTemplateRuntimeError("trusted MuJoCo simulator is unavailable")
+        required = tuple(
+            sorted(
+                {
+                    str(value)
+                    for goal in template["template"]["goals"]
+                    for value in (goal.get("target"), goal.get("destination"))
+                    if value
+                }
+            )
+        )
+        resolved = []
+        for entity_id in required:
+            position = self._site_position(sim, entity_id)
+            source = "exact_sim_site"
+            if position is None:
+                position = self._body_position(raw, sim, entity_id)
+                source = "exact_sim_body"
+            if position is None:
+                self.unresolved_entity_counts[entity_id] = (
+                    self.unresolved_entity_counts.get(entity_id, 0) + 1
+                )
+                continue
+            key = f"{entity_id}:{source}"
+            self.entity_source_counts[key] = self.entity_source_counts.get(key, 0) + 1
+            resolved.append(EntityPosition(entity_id, position))
+        return tuple(resolved)
+
+    @staticmethod
+    def _site_position(sim: Any, entity_id: str) -> tuple[float, float, float] | None:
+        try:
+            site_id = sim.model.site_name2id(entity_id)
+            if site_id < 0:
+                return None
+            value = np.asarray(sim.data.get_site_xpos(entity_id), dtype=np.float64)
+        except Exception:
+            return None
+        if value.shape != (3,) or not np.isfinite(value).all():
+            return None
+        return tuple(float(item) for item in value)
+
+    @staticmethod
+    def _body_position(
+        raw: Any, sim: Any, entity_id: str
+    ) -> tuple[float, float, float] | None:
+        body_ids = getattr(raw, "obj_body_id", None)
+        if not isinstance(body_ids, Mapping) or entity_id not in body_ids:
+            return None
+        try:
+            value = np.asarray(sim.data.body_xpos[body_ids[entity_id]], dtype=np.float64)
+        except Exception:
+            return None
+        if value.shape != (3,) or not np.isfinite(value).all():
+            return None
+        return tuple(float(item) for item in value)
 
     def resolve_part_target(
         self, eef_position: tuple[float, float, float]
@@ -298,6 +369,8 @@ class TemplateGeometryBridge:
             "exact_simulator_part_resolution_count": self.resolution_count,
             "part_resolution_failure_count": self.resolution_failures,
             "selected_geom_counts": dict(sorted(self.selected_geom_counts.items())),
+            "exact_entity_source_counts": dict(sorted(self.entity_source_counts.items())),
+            "unresolved_entity_counts": dict(sorted(self.unresolved_entity_counts.items())),
         }
 
 
@@ -318,6 +391,8 @@ def _patched_observation_class(bridge: TemplateGeometryBridge) -> type:
             entities = {
                 item.entity_id: item for item in current.entity_positions
             }
+            for item in bridge.resolve_template_entities():
+                entities[item.entity_id] = item
             resolved = bridge.resolve_part_target(current.eef_position)
             if resolved is not None:
                 entities[resolved.entity_id] = resolved

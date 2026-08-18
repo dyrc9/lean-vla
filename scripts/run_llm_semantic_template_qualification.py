@@ -30,13 +30,13 @@ from scripts import saber_io  # noqa: E402
 from scripts.run_llm_template_semantic_v1 import TemplateGeometryBridge  # noqa: E402
 
 
-SCHEMA = "proofalign.llm-semantic-template-outcome-blind-qualification-protocol.v1"
-ROW_SCHEMA = "proofalign.llm-semantic-template-outcome-blind-qualification-row.v1"
-SUMMARY_SCHEMA = "proofalign.llm-semantic-template-outcome-blind-qualification-summary.v1"
-PROTOCOL_PATH = REPO_ROOT / "experiments/proofalign_llm_semantic_template_qualification_20260818.json"
+SCHEMA = "proofalign.llm-semantic-template-outcome-blind-qualification-protocol.v2"
+ROW_SCHEMA = "proofalign.llm-semantic-template-outcome-blind-qualification-row.v2"
+SUMMARY_SCHEMA = "proofalign.llm-semantic-template-outcome-blind-qualification-summary.v2"
+PROTOCOL_PATH = REPO_ROOT / "experiments/proofalign_llm_semantic_template_qualification_v2_20260818.json"
 CATALOG_PATH = REPO_ROOT / "experiments/proofalign_llm_semantic_template_catalog_20260818.json"
 POPULATION_PATH = REPO_ROOT / "experiments/proofalign_remote_full120_clean_protocol_20260818.json"
-OUTPUT_ROOT = REPO_ROOT / "results/proofalign_llm_semantic_template_qualification_20260818_fresh1"
+OUTPUT_ROOT = REPO_ROOT / "results/proofalign_llm_semantic_template_qualification_20260818_fresh2"
 SOURCE_PATHS = (
     "src/proofalign/semantic_local_checker.py",
     "src/proofalign/semantic_policy_wrapper.py",
@@ -69,7 +69,7 @@ def freeze() -> dict[str, Any]:
     commit = _git("rev-parse", "HEAD")
     protocol = {
         "schema": SCHEMA,
-        "protocol_id": "proofalign-full120-llm-template-outcome-blind-qualification-20260818",
+        "protocol_id": "proofalign-full120-llm-template-outcome-blind-qualification-v2-20260818",
         "created_at": _now(),
         "fresh_output_root": OUTPUT_ROOT.relative_to(REPO_ROOT).as_posix(),
         "execution_authorization": {
@@ -185,6 +185,8 @@ def _qualify_one(
             observation = base.get_observation(env)
         local = TrustedLocalObservation.from_libero_observation(observation, state_epoch=0)
         entities = {item.entity_id: item for item in local.entity_positions}
+        for item in bridge.resolve_template_entities():
+            entities[item.entity_id] = item
         part = bridge.resolve_part_target(local.eef_position)
         if part is not None:
             entities[part.entity_id] = part

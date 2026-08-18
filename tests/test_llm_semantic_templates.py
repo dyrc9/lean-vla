@@ -14,6 +14,7 @@ from proofalign.llm_semantic_templates import (
 )
 from scripts.run_llm_template_semantic_v1 import (
     LLMTemplateExecutablePrefixChecker,
+    TemplateGeometryBridge,
 )
 
 
@@ -135,3 +136,34 @@ def test_articulation_extension_rejects_motion_away_from_target() -> None:
     )
     assert result.known
     assert not result.semantic_compatible
+
+
+def test_exact_simulator_site_and_body_geometry_resolution() -> None:
+    class Model:
+        @staticmethod
+        def site_name2id(name: str) -> int:
+            if name != "microwave_1_heating_region":
+                raise KeyError(name)
+            return 0
+
+    class Data:
+        body_xpos = ((0.1, 0.2, 0.3),)
+
+        @staticmethod
+        def get_site_xpos(name: str) -> tuple[float, float, float]:
+            assert name == "microwave_1_heating_region"
+            return (0.4, 0.5, 0.6)
+
+    class Sim:
+        model = Model()
+        data = Data()
+
+    class Raw:
+        obj_body_id = {"microwave_1": 0}
+
+    assert TemplateGeometryBridge._site_position(
+        Sim(), "microwave_1_heating_region"
+    ) == (0.4, 0.5, 0.6)
+    assert TemplateGeometryBridge._body_position(
+        Raw(), Sim(), "microwave_1"
+    ) == (0.1, 0.2, 0.3)
