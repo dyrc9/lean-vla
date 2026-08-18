@@ -33,6 +33,7 @@ cited = tex.scan(/\\cite\{([^}]+)\}/)
   .map(&:strip)
   .uniq
 defined = bib.scan(/^@\w+\{([^,]+),/).flatten.uniq
+  .reject { |key| key == "IEEEexample:BSTcontrol" }
 
 missing_citations = cited - defined
 unused_citations = defined - cited

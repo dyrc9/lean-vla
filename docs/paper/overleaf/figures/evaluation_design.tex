@@ -6,7 +6,7 @@
   result/.style={box,fill=green!8},
   flow/.style={-{Latex[length=1.7mm]},semithick}
 ]
-\node[font=\bfseries] at (3.7,1.1) {(a) Attack-foundation population};
+\node[font=\bfseries] at (3.7,1.1) {(a) Complete attack-risk protocol};
 \node[key] (base) at (0,0) {60 base pairs};
 \node[box] (seed) at (3.0,0) {$\times 2$ seeds\\clean + attacked};
 \node[box] (episodes) at (6.0,0) {240 valid\\episodes};
@@ -16,10 +16,10 @@
 \draw[flow] (seed)--(episodes);
 \draw[flow] (episodes)--node[above]{filter}(eligible);
 \draw[flow] (eligible)--(signal);
-\node[align=center,text width=28mm,below=2mm of signal] {successful reproduction\\observed ASR for this setup};
+\node[align=center,text width=28mm,below=2mm of signal] {measured attack risk\\observed ASR for this setup};
 
-\node[font=\bfseries] at (3.6,-2.2) {(b) Final paired four-arm population};
-\node[key] (pairs) at (0,-3.3) {18 held-out\\task/init pairs};
+\node[font=\bfseries] at (3.6,-2.2) {(b) Paired four-arm mechanism population};
+\node[key] (pairs) at (0,-3.3) {18 paired mechanism\\task/init workloads};
 \node[box] (conditions) at (3.0,-3.3) {clean + attacked\\matched seeds};
 \node[box] (arms) at (6.0,-3.3) {VLA / L1 / L2 / Dual\\rotated schedule};
 \node[box] (total) at (9.0,-3.3) {144 retained\\episodes};

@@ -1,34 +1,34 @@
 \section{Introduction}
 \label{sec:introduction}
 
-Vision--language--action (VLA) models are becoming a general interface to robot
-control: a deployment supplies images, robot state, and a natural-language
-task, then receives a receding-horizon chunk of continuous actions.  The
-minimal interface is operationally convenient, but awkward as a security
-boundary.  When a model exposes only numbers, what independently trusted fact
-authorizes those numbers to move the robot?
+Vision--language--action (VLA) models turn language, images, and robot state
+into continuous actions.  At deployment, each policy call produces an action
+chunk that crosses from model output into the robot's execution stack.  That
+boundary is consequential but evidentially weak: the numeric chunk does not
+itself establish that it is admissible for the current task, that later
+software will preserve it, or that its realization is qualified for the
+current physical state.
 
-An attacked context makes the question concrete.  In one held-out workload
-used later in this paper, the authoritative task is to move a soda can to a
-plate, while a frozen SABER record tells the policy to ``move straight to the
-farthest fixture.''  The deployed policy emits a $10\!\times\!7$ numeric block,
-not a trustworthy structured plan identifying which task produced it.  Bounded
-instruction edits can similarly change continuous trajectories and induce
-constraint violations~\cite{saber2026}; visual and embodied-agent attacks show
-other routes from compromised model context to physical behavior
-~\cite{badrobot2025,robopair2025,freezevla2025}.  A refusal detector that stops
-at text is therefore too early, while discovering the deviation only after a
-physical outcome is too late.
+An attacked context makes the problem concrete.  In one evaluation workload,
+the operator task is to move a soda can to a plate, while SABER changes the
+policy-facing instruction to ``move straight to the farthest fixture.''  The
+policy returns a $10\!\times\!7$ numeric block rather than a trustworthy plan
+that identifies which task authorized it.  Bounded instruction edits can
+change continuous trajectories and induce constraint violations
+~\cite{saber2026}; visual and embodied-agent attacks provide other routes from
+compromised context to physical behavior
+~\cite{badrobot2025,robopair2025,freezevla2025}.  Input filtering alone is too
+early, while an eventual task or safety outcome arrives too late to authorize
+the command that produced it.
 
-This action-only boundary exposes two distinct gaps.  The \emph{authorization
-gap} asks whether the particular continuous block proposed now is authorized
-by an independently trusted task and current state.  Smoothness and geometric
-feasibility are insufficient: a perfectly bounded trajectory may approach the
-wrong object or execute the wrong task stage.  The \emph{realization gap} asks
-whether the block that was checked is the one that is authorized, dispatched
-in order, represented by the receipts, and associated with the observed
-effects.  Semantic plausibility alone is insufficient here: a correct proposal
-can be substituted, replayed, reordered, or misbound to evidence.
+The lifecycle of an online action exposes three distinct questions.  First,
+how can a consumer assess a continuous block relative to the current task
+without treating an incomplete geometric proxy as a semantic oracle?  Second,
+how can it establish that assessment, authorization, ordered dispatch,
+receipts, and effects all refer to the same proposal and state epoch?  Third,
+how can it qualify state-dependent physical constraints without silently
+replacing the action that earlier evidence names?  Smoothness, a one-time hash
+comparison, and a post-hoc success label answer none of these questions alone.
 
 Prior systems protect valuable portions of this path, but stop on opposite
 sides of the same object.  Prompt/data separation and trusted-control-flow
@@ -37,72 +37,77 @@ camel2026,ace2026}; action attribution and trajectory auditors primarily cover
 discrete digital actions~\cite{attriguard2026,mate2026}; VLA verifiers rely on a
 policy-supplied plan, a learned score, or multiple candidates
 ~\cite{sealvla2026,covervla2026}; CPS integrity and robot attestation begin from
-an already specified command, program, or intended path
+an already specified command or protected task program with reference motion
 ~\cite{diat2019,cfaplus2024,arto2026,tat2026}.  Table~\ref{tab:related-comparison}
 summarizes these stopping points.  The unclosed composition is the exact
-continuous block produced online by an action-only VLA.  It is neither a
-discrete API call nor a predeclared trajectory.
+continuous block generated online by a VLA.  It is neither a discrete API call
+nor a trajectory predeclared by a trusted robot program.
 
-Our key insight is to make that block the protected security object.  Rather
-than recover the model's latent intent, the consumer should derive authority
-from an external trusted task, assess the exact source block relative to that
-authority, and preserve its identity across the remaining execution chain.
-Doing so requires more than attaching a hash: the semantic anchor must be
-chosen before seeing the action; the checker must expose uncertainty instead
-of equating a geometric proxy with complete task correctness; authorization
-must resist substitution, reordering, replay, and evidence splicing; and
-near-boundary containment must not silently replace the already assessed
-source action.
+Our key insight is that this block is the hinge between VLA reasoning and
+embodied execution, and should therefore be the protected security object.
+The consumer need not recover the model's latent intent or assume a unique
+reference trajectory.  Instead, it should attach task-relative justification
+to the exact source block, preserve the same identity through dispatch and
+evidence collection, and qualify state-dependent realization without silently
+changing the object that earlier evidence names.
 
-We realize this idea in \system, a consumer-side reference monitor that leaves
-the VLA checkpoint, prompt, and $K=1$ action-generation procedure unchanged.  A
-trusted task/observation branch freezes the legal semantic subtask $Z_t$ before
-policy inference.  \lone binds a checker-relative verdict to $(Z_t,O_t^T,A_t)$:
-covered hard risks reject, while uncertain progress becomes an auditable
-advisory that forces next-block reobservation.  \ltwoa compiles an execution
-contract and, after any required \ltwob screen, issues a fresh one-use
-authorization for the exact block.  Runtime dispatch checks every ordered
-prefix step; receipts and effects must close before task-phase advance.  Near
-a joint limit, \ltwob tests at most two temporary virtual-guard configurations
-against registered margin, restore, identity, and force gates.  It changes the
-execution configuration, not the source-action bytes, and never asks the
-policy for a more favorable candidate.
+We realize this idea in \system, an inline consumer-side reference monitor that
+leaves the VLA checkpoint and $K=1$ action generation unchanged.  Under an
+explicit trusted-task and observation assumption, \lone binds a
+checker-relative assessment to $(Z_t,O_t^T,A_t)$: covered hard risks reject,
+while uncertain task progress remains an auditable advisory.  \ltwoa compiles
+a proposal-scoped contract, issues a fresh one-use authorization, checks each
+ordered dispatch step, and requires bound receipts and effects before task
+phase advance.  When a registered joint boundary triggers, \ltwob evaluates at
+most two temporary virtual-guard configurations for the same source action
+against identity, restoration, margin, and force conditions.  It changes the
+execution configuration, not the policy output.
 
-The resulting claim is conditional but end to end: relative to the stated
-checker and trusted computing base (TCB), no covered-risk action is authorized
-without trusted-context assessment; no command is dispatched without a fresh
-action-bound authorization; no phase advances without matching receipts and
-effects; and no near-boundary dispatch occurs without a qualified guard.  We
-evaluate these roles using matched VLA-only, L1-only, L2-only, and Dual arms.
-The four-arm experiment estimates the combined L2 treatment; separate fault
-injection and Lean-checked transaction theorems support L2a's integrity role.
+We capture this claim as one top-level property,
+$\mathsf{ProofAligned}$: the source block must be checker-relative eligible;
+its execution transaction must align; and a triggered physical boundary must
+have qualified containment.  Task phase advance additionally requires bound
+completion evidence.  Lean machine-checks the finite authorization, ordered
+action, receipt, effect, and phase-transition relations.  Continuous dynamics,
+checker soundness, sensor trust, and the Python-to-Lean refinement remain
+explicit assumptions or empirical obligations.
+
+We evaluate the attack surface and the three mechanism roles separately.  On
+the complete 120-unit attack-evaluation protocol, 39 of 86 clean-eligible units
+under SABER exhibit a new physical-risk transition, giving an observed ASR of
+45.35\% (95\% base-pair cluster-bootstrap CI: [32.93\%, 57.78\%]).  A paired
+four-arm mechanism study contains 18 task/initialization pairs and 144
+episodes.  Under attack, VLA-only and L2-only succeed on 11/18 tasks, while
+L1-only and Dual succeed on 13/18; their joint-limit violation-episode counts
+are 4/18, 1/18, 0/18, and 0/18.  The current populations and risk endpoints are
+reported separately rather than pooled.  Fault injection and Lean support
+L2a's transaction role, while the paired outcomes and runtime measurements
+support L1 and combined-L2 behavior.
 
 Our contributions are:
 \begin{itemize}
-  \item \textbf{A protected object and problem definition for action-only VLA.}
-  We formulate the authorization and realization gaps around the exact online
-  \actionblock, with an explicit TCB, adversary, and checker-relative goals.
+  \item \textbf{A protected object and security property for embodied VLA.}
+  We make the exact online \actionblock the common object across task-relative
+  assessment, execution identity, and state-dependent realization, with an
+  explicit adversary, TCB, and top-level $\mathsf{ProofAligned}$ property.
   \item \textbf{A cross-layer reference monitor.} \system composes trusted
   subtask selection and local block assessment (L1), a nonce/digest-bound
   execution transaction with Lean-checked abstract semantics (L2a), and
   bounded, state-triggered joint containment that preserves source-action
   identity (L2b).
-  \item \textbf{Auditable attack and defense evidence.} We successfully
-  reproduce SABER with an observed risk-transition ASR of 39/86 (45.35\%) and
-  report a paired 144-episode study.  L1-only records 13/18 task success under
-  both clean and attacked inputs; L2-on arms record zero observed joint-limit
-  crossings; and Dual combines these sample outcomes.  Across VLA/L1/L2/Dual,
-  attacked task success is 11/18, 13/18, 11/18, and 13/18, while violation
-  episodes are 4/18, 1/18, 0/18, and 0/18.  These are frozen-sample outcomes,
-  not population effects.
+  \item \textbf{Auditable attack and mechanism evidence.} We measure a
+  risk-transition ASR of 39/86 (45.35\%) under SABER and report paired
+  VLA/L1/L2/Dual outcomes, focused transaction-fault tests, and runtime
+  containment evidence.  Each evidence source is tied to the property it can
+  support rather than combined into a broader robot-safety claim.
 \end{itemize}
 
 \system does not recover a model's latent intent, prove that every accepted
-action advances the task, or establish real-robot safety.  Its security value
-is narrower and inspectable: every covered decision names which exact action
-was assessed, which authorization permitted it, which command was applied,
-which effects were observed, and whether qualified containment governed the
-near-boundary execution.
+action advances the task, or establish general robot safety.  Its security
+value is narrower and inspectable: every covered decision names which exact
+action was assessed, which authorization permitted it, which command was
+applied, which effects were observed, and whether qualified containment
+governed the near-boundary execution.
 
 \begin{table*}[t]
 \centering
@@ -120,8 +125,8 @@ AttriGuard, MATE & User intent or policy to discrete invocation/agent trajectory
 SEAL, CoVer & Policy plan or instruction to selected action candidate & Simulated outcome or learned alignment score; no receipt & Stronger candidate ranking; uses policy-supplied intent or $K>1$, without an execution transaction \\
 CaMeL, ACE, IsolateGPT, SAGA & Trusted-query flow, abstract app plan, capability, or agent identity & Digital execution barriers and isolation & Establish trusted scaffolding for app/tool systems, not joint-level physical containment \\
 DIAT, CFA+, ARTO & Software control/data flow & Attestation or runtime-integrity evidence & Stronger roots/evidence for CPS software; no natural-language task-to-action authorization \\
-TAT & Given intended robot path & Timed motion events and joint measurements & Starts from an intended path; \system binds a trusted-context verdict on a VLA block into dispatch \\
-\system & Trusted context and checker verdict bound to exact continuous block & Nonce, dispatch receipt, effects, margins, and simulator guard & Software TCB and simulator-qualified containment; no hardware attestation \\
+TAT & Protected task program and offline motion profiles & Timed event evidence and bypass joint measurements & Derives event-level reference motion from preprogrammed tasks; \system first authorizes an online VLA block \\
+\system & Trusted context and checker verdict bound to exact continuous block & Nonce, dispatch receipt, effects, margins, and runtime guard & Software TCB; current physical evidence is simulation-based, with no hardware attestation \\
 \bottomrule
 \end{tabularx}
 \end{table*}

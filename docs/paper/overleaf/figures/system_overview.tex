@@ -21,19 +21,19 @@
 % The two branches share data flow, but only the upper branch supplies
 % semantic authority to the monitor.
 \node[trusted] (task) {Authoritative task $T$\\trusted tap $O_t^T$};
-\node[trusted,right=of task] (selector) {\textbf{C1: trusted context}\\frozen graph + $Z_t$};
+\node[trusted,right=of task] (selector) {task model\\frozen graph + $Z_t$};
 \node[untrusted,below=5mm of task] (policyview) {Potentially attacked view\\$P_t^{pol},O_t^{pol},H_t^{pol}$};
 \node[untrusted,right=of policyview] (vla) {Frozen VLA policy\\source $A_t$ ($K=1$)};
 
 \node[assess,right=7mm of selector,yshift=-7mm] (l1) {
-  \textbf{C2: L1 assessment} $S_t$\\
+  \textbf{C1: L1 assessment} $S_t$\\
   trusted-context binding\\
   hard reject / advisory};
 \node[transaction,right=6mm of l1] (contract) {
   \textbf{Compile contract}\\
   $C_t$ + state epoch};
 \node[contain,right=of contract] (l2b) {
-  \textbf{C4: L2b if triggered}\\
+  \textbf{C3: L2b if triggered}\\
   $\leq 2$ restored guards\\
   margin + force gates};
 \node[transaction,right=of l2b] (dispatch) {
@@ -65,7 +65,7 @@
 % binds contract construction, optional containment, dispatch, and closure.
 \node[draw=black!65,dashed,rounded corners=2pt,
       fit=(contract)(l2b)(dispatch)(close),inner xsep=4pt,inner ysep=4pt,
-      label={[font=\scriptsize]above:\textbf{C3: L2a one-proposal execution transaction}}] {};
+      label={[font=\scriptsize]above:\textbf{C2: L2a one-proposal execution transaction}}] {};
 
 \node[identity,below=6mm of l2b,text width=124mm,font=\scriptsize] (idband) {
   \textbf{Runtime identity chain:} canonical $d(A_t)$ is recorded in $S_t$,

@@ -1,6 +1,9 @@
 \section{Related Work}
 \label{sec:related}
 
+We organize related work by where each system obtains authority and where its
+evidence chain stops.
+
 \subsection{VLA Attacks, Benchmarks, and Alignment}
 
 SABER uses bounded instruction edits to black-box stress-test VLA policies and measures task failure, trajectory length, and constraint violations~\cite{saber2026}.  FreezeVLA, BadRobot, and RoboPAIR demonstrate visual freezing and embodied-model jailbreak risks~\cite{freezevla2025,badrobot2025,robopair2025}.  A recent survey identifies multimodal attack surfaces, irreversible physical consequences, real-time constraints, and long-horizon error propagation as central VLA-security challenges~\cite{vlasafety2026}.
@@ -42,9 +45,9 @@ AttriGuard advances indirect-prompt-injection defense from input filtering to ac
 
 \subsection{CPS and Robot Execution Integrity}
 
-DIAT binds autonomous-system data to control-flow evidence; CFA+ combines prevention and runtime evidence; and ARTO integrates control-flow attestation with data-flow protection for real-time CPS~\cite{diat2019,cfaplus2024,arto2026}.  SCAPHY connects industrial-control program behavior to physical behavior~\cite{scaphy2023}.  TAT directly defines trajectory integrity for industrial robotic arms and combines timed motion events with joint measurements to attest conformity to an intended path~\cite{tat2026}.
+DIAT binds autonomous-system data to control-flow evidence; CFA+ combines prevention and runtime evidence; and ARTO integrates control-flow attestation with data-flow protection for real-time CPS~\cite{diat2019,cfaplus2024,arto2026}.  SCAPHY connects industrial-control program behavior to physical behavior~\cite{scaphy2023}.  TAT defines robot-arm trajectory integrity: it constructs event-level reference profiles from program analysis and offline executions, then compares actual motion using TEE-protected events and bypass joint measurements~\cite{tat2026}.
 
-Accordingly, we do not claim the first execution-integrity or robot-trajectory-attestation mechanism.  TAT begins with a given intended path.  \system studies the preceding VLA problem: when the model provides only a runtime numerical action chunk, which exact chunk carries a checker-relative trusted-task verdict into dispatch authorization, and how does that identity continue into execution?  The two abstractions are complementary: a future deployment could place hardware-backed trajectory attestation below \system's authorization transaction.  Our present software TCB, however, does not inherit the hardware root of trust or remote-attestation guarantee of those systems.
+We therefore do not claim the first execution-integrity or trajectory-attestation mechanism.  TAT begins with a protected preprogrammed task and offline profiles, then produces remote evidence after motion events.  \system instead authorizes a newly generated VLA block before dispatch and preserves its identity through execution.  The mechanisms are complementary: TAT-like attestation could sit below our transaction, but our software TCB does not inherit its hardware root, bypass encoder evidence, or remote-attestation guarantee.
 
 \subsection{Prediction, Shielding, and Formal Methods}
 

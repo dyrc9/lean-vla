@@ -1,6 +1,6 @@
 # NDSS 2027 simulated Round-1 review
 
-Last updated: 2026-08-07.  This is an internal submission audit, not part of
+Last updated: 2026-08-18.  This is an internal submission audit, not part of
 the anonymous paper or the Overleaf synchronization manifest.
 
 ## Overall assessment
@@ -23,7 +23,7 @@ Indicative Round-1 scores:
 | Novelty | 3/5 | Novelty is the protected object and cross-layer composition, not any individual checker, nonce, shield, or attestation primitive |
 | Technical correctness | 4/5 | Claims are conditional and evidence-bound; the Python-to-Lean and guard/controller refinement gap is disclosed |
 | Evaluation | 3/5 | Strong paired/frozen protocol and integrity suite, but one checkpoint, one benchmark, one non-adaptive attack family, and 18 final pairs |
-| Presentation | 4/5 | Abstract/introduction expose the two gaps; figures and tables make the runtime order and evidence boundary inspectable |
+| Presentation | 4/5 | Abstract/introduction expose the three obligations; figures and tables make the runtime order and evidence boundary inspectable |
 | Reproducibility | 3/5 | Final-study claims are executable and checksum-bound; an RQ1-complete public artifact still needs the missing immutable M2 roots |
 
 ## Likely reviewer objections and current answer
@@ -46,18 +46,18 @@ Evaluation now states the baseline/ablation logic explicitly.  VLA-only is the
 unchanged runtime baseline; L1-only and L2-only isolate mechanism roles; Dual
 tests composition.  SafeVLA changes training, SAFE learns rollout failure,
 and SEAL/CoVer require plan, candidate, or learned-score interfaces absent
-from the registered action-only, single-proposal victim.  The paper does not
+from the registered single-proposal $K=1$ interface.  The paper does not
 turn these interface differences into a leaderboard claim.
 
 ### 3. “The evaluation is too narrow.”
 
 This is the principal residual acceptance risk.  The final evidence covers
 one OpenPI pi0.5 checkpoint, LIBERO-Safety, one frozen SABER instruction attack
-family, and 18 held-out pairs.  The attack is not defense-aware.  The paper
+family, and 18 paired mechanism workloads.  The attack is not defense-aware.  The paper
 therefore claims simulator-qualified containment for this frozen setting and
-uses the larger 240-episode study only as a separate attack foundation.  More
+uses the complete 240-episode protocol as a separate attack-risk measurement.  More
 policies, attacks, seeds, trusted perception, and real robots are required to
-expand the claim, not to reproduce the present one.
+expand the claim beyond the present one.
 
 ### 4. “The trusted branch uses privileged geometry and is unrealistic.”
 
@@ -78,21 +78,23 @@ the four-arm result.
 ### 6. “The formal claims do not cover the implementation or robot.”
 
 Correct.  Lean checks finite authorization, receipt, effect, and phase
-relations.  For receipts it proves same-authorization binding and equality of
-the applied and receipt-authorized digests; Python separately checks the
-ordered indices and correspondence to `authorization.action_at(i)`.  Lean does
-not validate that per-step refinement, language, selector/checker correctness,
-sensing, simulator fidelity, or the current guard/controller configuration.
+relations.  It now types the ordered action-digest list and proves that each
+bound receipt's index resolves to its applied-step digest; Python additionally
+checks index contiguity against `authorization.action_at(i)`.  Lean does not
+validate Python canonical tuple/serializer refinement, language,
+selector/checker correctness, sensing, simulator fidelity, or the current
+guard/controller configuration.
 The paper consistently says “Lean-checked execution transaction semantics,”
 not “formally verified robot safety.”
 
-### 7. “The attack reproduction missed its preregistered gate.”
+### 7. “Why is the 45.35% attack-risk result reported separately?”
 
-The paper retains the non-pass: 39/86 clean-eligible units show a new risk
-transition (45.35%, cluster-bootstrap CI [32.93%, 57.78%]), below the 50%
-point-estimate gate.  This is evidence of an attack signal, not a passed
-confirmatory threshold.  The attack-foundation and final-study populations,
-denominators, and event definitions are never pooled.
+The complete protocol measures 39/86 clean-eligible units with a new risk
+transition (45.35%, cluster-bootstrap CI [32.93%, 57.78%]).  This is the
+observed attack-risk baseline under the stated protocol.  The paired mechanism
+study uses a different population and violation endpoint, so the two results
+are not pooled or subtracted.  A defense-effect claim aligned to 45.35% requires
+the planned 120-unit clean/attacked four-arm run.
 
 ### 8. “The utility noninferiority margin is too permissive.”
 

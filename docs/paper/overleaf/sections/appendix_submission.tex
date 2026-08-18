@@ -1,23 +1,17 @@
 \section{Supplementary Security and Reproducibility Details}
-
-\subsection{Lean Claim Map}
 \label{app:lean}
 
 \begingroup
 \scriptsize\sloppy
 Exact theorem names in \texttt{ProofAlign.SemanticIntegrityCore}:
 \nolinkurl{authorization_binds_semantic_identity},
-\nolinkurl{authorization_binds_exact_final_command};
+\nolinkurl{authorization_binds_exact_final_command},
+\nolinkurl{authorization_binds_ordered_actions};
 \nolinkurl{consumed_authorization_not_available};
 \nolinkurl{every_bound_receipt_uses_same_authorization},
-\nolinkurl{every_bound_receipt_applies_exact_action};
+\nolinkurl{every_bound_receipt_matches_authorized_step};
 \nolinkurl{unknown_effects_block_execution_alignment},
 \nolinkurl{incomplete_prefix_blocks_execution_alignment};
 \nolinkurl{execution_enabled_phase_advance_requires_alignment}, and
 \nolinkurl{phase_advance_requires_contract_completion}.
 \endgroup
-
-Despite its historical name,
-\nolinkurl{every_bound_receipt_applies_exact_action} proves only equality of a
-receipt's applied and authorized digests; Python-to-Lean refinement to the
-ordered step list is outside scope.

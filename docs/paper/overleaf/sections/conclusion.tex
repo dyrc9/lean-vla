@@ -1,15 +1,17 @@
 \section{Conclusion}
 
-We presented \system, a cross-layer reference monitor for the point at which an
-action-only VLA's continuous output becomes an executable command.  Its central
-security object is the exact source \actionblock: an independently anchored,
-checker-relative verdict is bound to that block, then preserved through a
-one-use execution transaction, ordered receipts, effects, and state-triggered
-joint containment.  The VLA need not expose a plan and is neither retrained nor
-resampled.
+We presented \system, a cross-layer reference monitor for the point at which a
+VLA's continuous output becomes an executable command.  Its central security
+object is the exact source \actionblock.  A checker-relative assessment is
+bound to that block, its identity is preserved through a one-use execution
+transaction, and a triggered physical boundary requires qualified containment
+without source-action replacement.  The composition is captured by the
+$\mathsf{ProofAligned}$ property, with Lean machine-checking its finite
+authorization, ordered-action, receipt, effect, and phase-transition relations.
 
-The attack study successfully reproduces SABER with a 39/86 (45.35\%) observed
-risk-transition ASR.  In the paired four-arm study, L1-only records 13/18
+The complete attack-evaluation protocol measures a 39/86 (45.35\%) observed
+risk-transition ASR under SABER.  In the paired four-arm mechanism study,
+L1-only records 13/18
 attacked task success, both L2-on arms record 0/18 observed joint-limit
 violation episodes, and Dual combines the 13/18 and 0/18 sample outcomes.
 These outcomes expose the intended separation between task monitoring and

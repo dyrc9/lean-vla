@@ -120,7 +120,7 @@ L2a 的69项 focused negative tests 另行注入 substitution、replay、receipt
 
 - Realization gap：
   - DIAT、CFA+、ARTO 保护 CPS control/data flow，但从已知程序和关键变量出发，不解决自然语言任务对 VLA proposal 的授权。[DIAT](https://www.ndss-symposium.org/ndss-paper/diat-data-integrity-attestation-for-resilient-collaboration-of-autonomous-systems/)、[ARTO](https://www.usenix.org/conference/usenixsecurity26/presentation/zhao-ruizhe)
-  - TAT 验证 actual motion 是否符合 intended path，但假设 intended path 已经给定；action-only VLA 恰恰缺少这个可信起点。[TAT](https://www.usenix.org/conference/usenixsecurity26/presentation/yao-chengtao)
+  - TAT 从受保护的预编程任务和受控离线运行构造 event-level reference profiles，并用 TEE-protected events 与旁路 joint measurements 验证 actual motion；action-only VLA 恰恰缺少对新生成在线 block 的这种可信 reference 起点。[TAT](https://www.usenix.org/conference/usenixsecurity26/presentation/yao-chengtao)
 
 由这些 stopping points，我们得到三个核心 insight：
 

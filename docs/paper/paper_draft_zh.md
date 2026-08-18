@@ -60,7 +60,7 @@ SafeVLA-Bench]；StruQ、SecAlign 与 CaMeL 研究 trusted/untrusted content 或
 CaMeL]；AttriGuard 和 MATE 将用户意图或策略归因到离散调用与 agent trajectory [AttriGuard, MATE]；ACE、
 IsolateGPT 和 SAGA 约束 LLM app 的计划、权限或隔离边界 [ACE, IsolateGPT, SAGA]；SEAL 与 CoVer 则根据
 policy-supplied plan 或 learned score 选择 VLA 动作候选 [SEAL, CoVer]。在 CPS 一侧，DIAT、CFA+、ARTO 和
-TAT 研究 control/data-flow 或给定机器人轨迹的完整性 [DIAT, CFA+, ARTO, TAT]。因此，本文不声称首次提出
+TAT 研究 control/data-flow，或从受保护任务程序及离线 reference profiles 出发审计机器人轨迹完整性 [DIAT, CFA+, ARTO, TAT]。因此，本文不声称首次提出
 intent-to-action alignment、trusted-plan/execution separation、action verification 或 trajectory integrity。
 我们的问题更窄：当 VLA 不暴露可信 structured plan、只在线给出连续 ActionBlock 时，consumer 如何以独立
 可信任务状态审计这个具体对象，并把同一身份延伸到软件执行事务和研究模拟器中的物理 containment？
@@ -141,7 +141,7 @@ compatibility，这正是 authorization gap。
 | Authorization | VLA action verification：SEAL、CoVer [SEAL, CoVer] | 将候选动作结果与 policy-supplied textual plan 对齐，或用 learned instruction–observation–action score 从多个候选中选择 | 依赖模型自报 plan、重写 instruction 或 `K>1` 候选；verifier 选择结束后，没有把同一 action identity 延伸到 dispatch、receipt 和 physical effects |
 | Authorization | agent action attribution/plan enforcement：AttriGuard、ACE、MATE [AttriGuard, ACE, MATE] | 判断离散 tool call 是否由 user intent 支持，约束 concrete app execution 符合 trusted abstract plan，或依据策略审计 agent trajectory | 提供更强 causal attribution 或 plan enforcement，但对象是离散调用、app plan 或数字轨迹，不是依赖机器人状态与控制器语义的连续动作块 |
 | Realization | operation/mission execution attestation：OAT、DIAT、ARI、CFA+、ARTO [OAT, DIAT, ARI, CFA+, ARTO] | 绑定 control flow、关键 data flow、fresh challenge 与 mission timing，抵抗软件路径劫持、data-only attacks 和旧 attestation replay | 对软件执行根、freshness 与 evidence 更强，但从已知程序和关键变量出发；不回答自然语言任务为何授权某个在线 VLA proposal，也没有定义 ActionBlock 的 proposal/epoch/step identity |
-| Realization | robot trajectory integrity：TAT [TAT] | 用 timed motion events 与 joint measurements 检查 actual motion 是否符合 intended path | 直接支撑“预期动作与实际运动可能分离”，但假设 intended path 已经给定且可信；action-only VLA 中最关键的问题恰是如何从可信任务得到可授权的在线动作对象 |
+| Realization | robot trajectory integrity：TAT [TAT] | 从 instrumented task program 和受控离线运行生成 TMEG/reference profiles，再以 TEE-protected events 与旁路 joint measurements 检查 actual motion | 直接支撑“参考运动与实际运动可能分离”，但从预编程任务和预建 profiles 出发；action-only VLA 中最关键的问题恰是如何从可信任务授权新生成的在线动作对象 |
 | 两者之外的物理风险 | prediction、clipping、CBF 与 continuous-space shields [VLMPC, SafetyChance, RealizableShields] | 预测候选动作后果，或约束动作与安全集合相容 | 物理 admissibility 不等于 trusted-task compatibility；guard/controller 还可能改变 command 到 trajectory 的映射，却不自动产生 authorization、receipt 或 effect identity |
 
 #### 从 execution attestation 到 ActionBlock transaction
@@ -277,6 +277,12 @@ intent。clean episode 中，\(P_t^{pol}\) 通常是 \(T\) 的正常 benchmark s
 中，冻结 SABER record 修改其 exact bytes。两者都会被记录用于 provenance，但记录本身不会赋予 semantic
 authority。
 
+为使 semantic authority 成为可检查的系统对象，task compiler 将 \(T\) 映射为
+\(\mathcal G_T=(V_T,E_T,\ell_T,\Phi_T)\)：\(V_T\) 是合法任务阶段，\(E_T\) 是允许的转换，
+\(\ell_T\) 将节点映射到 canonical skill/entity tuple，\(\Phi_T(O_t^T)\) 给出当前可信状态下启用的
+frontier。selector 只能从该 frontier 产生 \(Z_t\)，否则返回 `unknown`。该图约束语义合法性，不提供或
+暗示唯一 reference trajectory。
+
 ### 3.2 受保护对象与身份
 
 在状态 epoch `t`，记：
@@ -376,6 +382,18 @@ effects 来自绑定 dispatch 之后的 observation window；未知、不完整�
 **G4：covered physical containment。** 若 L2b trigger 激活且系统最终 dispatch，则所选 execution
 configuration 必须先通过 simulator 中注册的 joint-side margin、snapshot restore、source-action identity
 和 force gates。该目标是冻结模拟器中的 covered joint containment，不是任意碰撞或真实机器人安全证明。
+
+对最终 Dual 系统，将一次 proposal 的对象记为
+\(\chi_t=(T,O_t^T,Z_t,A_t,S_t,C_t,Auth_t,R_t,E_t,g_t)\)，统一性质为
+
+\[
+\mathsf{ProofAligned}(\chi_t)
+=\mathsf{L1}_t\land\mathsf{L2a}_t\land
+(\mathsf{Triggered}_t\Rightarrow\mathsf{L2b}_t).
+\]
+
+phase advance 还必须同时满足 task-completion atoms。Lean 只 mechanize 其中有限的 identity、authorization、
+receipt、evidence 和 phase-transition 子关系；selector/checker 的现实正确性与 L2b 物理条件仍是资格化义务。
 
 这四个目标不可互相替代。G1 可以评估一个随后被替换的 command；G2/G3 可以忠实执行 task-divergent
 command；G4 可以安全地约束错误任务。ProofAlign 的组合目标是在同一个 proposal scope 中同时保留这些证据。
@@ -539,22 +557,21 @@ evidence 和 phase transition 的有限关系。关键 machine-checked 性质包
 
 - `authorization_binds_semantic_identity`：authorization 绑定相同的语义 artifact identity；
 - `authorization_binds_exact_final_command`：authorization 绑定被评估后的 exact final command；
+- `authorization_binds_ordered_actions`：authorization 绑定 ActionBlock 的有序逐步 digest 列表；
 - `consumed_authorization_not_available`：已消费 authorization 不再可用；
 - `every_bound_receipt_uses_same_authorization`：所有绑定 receipt 使用同一 authorization；
-- `every_bound_receipt_applies_exact_action`：每个 receipt 应用对应的 exact action；
+- `every_bound_receipt_matches_authorized_step`：每个 receipt 的 index 解析为实际 applied-step digest；
 - `unknown_effects_block_execution_alignment`：unknown effects 阻止 execution alignment；
 - `incomplete_prefix_blocks_execution_alignment`：不完整执行前缀不能满足 alignment；
 - `execution_enabled_phase_advance_requires_alignment`：启用执行层时，phase advance 蕴含 alignment；
 - `phase_advance_requires_contract_completion`：phase advance 要求 contract completion。
 
 完整定义与定理位于 [`SemanticIntegrityCore.lean`](../../lean/ProofAlign/SemanticIntegrityCore.lean)。这些
-定理验证的是有限 transaction semantics。Python runtime 会逐步重建并检查 ordered exact prefix；Lean
-模型则更粗，只绑定整块 final-command digest，并证明 receipt 使用相同 authorization 且
-applied/authorized digests 相等。Lean 不独立重建 Python authorization 中的逐步 digest 列表，也不解析
-自然语言，不证明 `Z_t` 或 checker 对现实正确，不证明 simulator 等价于物理世界，更不自动证明 Python
-serializer/observer 精化到 Lean model。特别地，guard/controller configuration 尚未进入 Lean typed
-contract。因此本文使用“Lean-checked abstract execution-transaction semantics”，而不使用“formally
-verified robot safety”。
+定理验证的是有限 transaction semantics。Python runtime 与 Lean 都将 receipt 的 step index 绑定到授权的
+有序动作列表；Python 额外检查 index 连续性。Lean 不解析自然语言，不证明 `Z_t` 或 checker 对现实正确，
+不证明 simulator 等价于物理世界，也不自动证明 Python canonical tuple/serializer 和 observer 精化到
+Lean model。guard/controller configuration 也尚未进入 Lean typed contract。因此本文使用
+“Lean-checked abstract execution-transaction semantics”，而不使用“formally verified robot safety”。
 
 ## 6. 实现
 
@@ -757,10 +774,11 @@ leaderboard。
 OAT 将 operation 的 control flow、关键 data 和 fresh verifier challenge 组合为执行证据 [OAT]；DIAT、CFA+
 和 ARTO 将 autonomous/CPS software execution、data flow 与可信 evidence 结合 [DIAT, CFA+, ARTO]；ARI
 进一步要求 real-time mission 被正确且及时地执行 [ARI]；SCAPHY 关联工业控制程序与物理行为 [SCAPHY]；
-TAT 从给定 intended path 出发，以 timed motion
-events 和 joint measurements 审计工业机械臂轨迹 [TAT]。ProofAlign 不声称首次 trajectory integrity，也
-不具备这些 attestation 系统可能依赖的硬件 root of trust。它补充的是 intended path 尚未给定、VLA 只输出
-ActionBlock 时的 trusted-task monitor，并在软件 TCB 内维护一次性执行事务。
+TAT 从受保护的预编程任务出发，通过静态分析和受控离线运行建立 event-level reference profiles，再以
+TEE-protected timed events 和旁路 joint measurements 审计工业机械臂轨迹 [TAT]。ProofAlign 不声称首次
+trajectory integrity，也不具备这些 attestation 系统依赖的硬件 root of trust 和旁路 encoder evidence。它
+补充的是新生成的在线 VLA block 尚无可信 reference trajectory、VLA 只输出 ActionBlock 时的 trusted-task
+monitor，并在软件 TCB 内维护一次性执行事务。
 
 ### Action prediction、shielding 与 formal methods
 
@@ -808,23 +826,23 @@ violation episodes。结果支持冻结 simulator 范围内“任务效用与 co
 
 > 下列条目使用工作引用键，便于当前 Markdown 审阅；提交前统一导出 BibTeX，并核对作者、页码与 DOI。
 
-- **[SABER]** [SABER: A Stealthy Agentic Black-Box Attack Framework for Vision-Language-Action Models](https://arxiv.org/abs/2603.24935), arXiv, 2026.
+- **[SABER]** [SABER: A Stealthy Agentic Black-Box Attack Framework for Vision-Language-Action Models](https://arxiv.org/abs/2603.24935), IROS, 2026（当前可访问版本为 arXiv）。
 - **[LIBERO-Safety]** [LIBERO-Safety](https://arxiv.org/abs/2606.23686), ECCV, 2026.
 - **[SafeVLA-Bench]** [SafeVLA-Bench](https://arxiv.org/abs/2606.00773), arXiv, 2026.
 - **[ForesightSafety]** [ForesightSafety-VLA](https://arxiv.org/abs/2606.27079), arXiv, 2026.
 - **[VLASurvey]** [Vision-Language-Action Safety: Threats, Challenges, Evaluations, and Mechanisms](https://arxiv.org/abs/2604.23775), arXiv, 2026.
-- **[Pi0.5]** [π0.5: a Vision-Language-Action Model with Open-World Generalization](https://arxiv.org/abs/2504.16054), 2025.
-- **[RT-H]** [RT-H: Action Hierarchies Using Language](https://arxiv.org/abs/2403.01823), 2024.
+- **[Pi0.5]** [π0.5: a Vision-Language-Action Model with Open-World Generalization](https://arxiv.org/abs/2504.16054), CoRL Oral, 2025.
+- **[RT-H]** [RT-H: Action Hierarchies Using Language](https://www.roboticsproceedings.org/rss20/p049.html), RSS, 2024.
 - **[FreezeVLA]** [FreezeVLA](https://arxiv.org/abs/2509.19870), arXiv, 2025.
 - **[BadRobot]** [BadRobot](https://proceedings.iclr.cc/paper_files/paper/2025/hash/5b2fa23e4ef0f7ac6c4f01d7998e6237-Abstract-Conference.html), ICLR, 2025.
 - **[RoboPAIR]** [RoboPAIR](https://robopair.org/), ICRA, 2025.
-- **[SafeVLA]** [SafeVLA](https://safevla.github.io/), NeurIPS Spotlight, 2025.
-- **[SAFE]** [SAFE: Multitask Failure Detection for Vision-Language-Action Models](https://vla-safe.github.io/), NeurIPS, 2025.
+- **[SafeVLA]** [SafeVLA](https://proceedings.neurips.cc/paper_files/paper/2025/hash/e185c7be603426028c32ae1003a59d78-Abstract-Conference.html), NeurIPS, 2025.
+- **[SAFE]** [SAFE: Multitask Failure Detection for Vision-Language-Action Models](https://proceedings.neurips.cc/paper_files/paper/2025/hash/392d0d05e2f514063e6ce6f8b370834c-Abstract-Conference.html), NeurIPS, 2025.
 - **[StruQ]** [StruQ: Defending Against Prompt Injection with Structured Queries](https://www.usenix.org/conference/usenixsecurity25/presentation/chen-sizhe), USENIX Security, 2025.
 - **[SecAlign]** [SecAlign](https://arxiv.org/abs/2410.05451), ACM CCS, 2025.
 - **[CaMeL]** [Defeating Prompt Injections by Design](https://arxiv.org/abs/2503.18813), IEEE SaTML, 2026.
 - **[SEAL]** [Do What You Say: Steering Vision-Language-Action Models via Runtime Reasoning-Action Alignment Verification](https://arxiv.org/abs/2510.16281), ICRA, 2026.
-- **[CoVer]** [Scaling Verification Can Be More Effective than Scaling Policy Learning for Vision-Language-Action Alignment](https://arxiv.org/abs/2602.12281), ECCV, 2026.
+- **[CoVer]** [Scaling Verification Can Be More Effective than Scaling Policy Learning for Vision-Language-Action Alignment](https://arxiv.org/abs/2602.12281), arXiv；ScaleBot @ CVPR workshop, 2026.
 - **[WebAgent]** [When AI Meets the Web](https://arxiv.org/abs/2511.05797), IEEE S&P, 2026.
 - **[AgentPerms]** [Towards Automating Data Access Permissions in AI Agents](https://homes.cs.washington.edu/~franzi/pdf/wu-agentperms-sp26.pdf), IEEE S&P, 2026.
 - **[IsolateGPT]** [IsolateGPT](https://www.ndss-symposium.org/ndss-paper/isolategpt-an-execution-isolation-architecture-for-llm-based-agentic-systems/), NDSS, 2025.
@@ -848,7 +866,7 @@ violation episodes。结果支持冻结 simulator 范围内“任务效用与 co
 
 - 将本文转为目标会议 LaTeX 模板并补作者/匿名化信息；
 - 生成系统图、威胁模型图、四臂结果图和 latency/force 审计图；
-- 将工作引用键替换为正式 BibTeX，逐条核对2026 accepted/embargo paper 的最终元数据；
+- 继续逐条核对尚未进入正式 proceedings 的 2026 accepted/arXiv 工作；USENIX Security 2026 正式元数据已更新；
 - 从冻结 artifacts 自动生成主表和 appendix audit table，避免手工转录；
 - 在 appendix 给出 Lean theorem-to-claim mapping、negative integrity suite、完整 TCB 与失败分类；
 - 如新增模型、seed、attack family、真实机器人或 L2a/L2b sub-ablation，作为 claim expansion，和当前

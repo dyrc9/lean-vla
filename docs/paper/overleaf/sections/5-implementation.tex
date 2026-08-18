@@ -1,9 +1,9 @@
-\section{Implementation and Formal Semantics}
+\section{Implementation and Machine-Checked Verification}
 \label{sec:implementation}
 
-\subsection{Runtime Integration}
+\subsection{Runtime Evidence Production}
 
-We implement \system at the consumer/dispatch boundary of the OpenPI $\pi_{0.5}$ LIBERO-Safety runner.  The policy checkpoint, model weights, and action-generation procedure are unchanged.  A trusted-context module manages allowlists and semantic artifacts; a deterministic action-selection module checks frontier and digest consistency; and a runtime wrapper orders policy output, assessment, contract construction, optional guard screening, authorization, dispatch, receipts, and effects.
+We implement \system at the consumer/dispatch boundary of the OpenPI $\pi_{0.5}$ LIBERO-Safety runner.  The policy checkpoint, model weights, and action-generation procedure are unchanged.  The trusted-context and deterministic-selection modules implement the authority compiler/selector; the local checker emits the proposal assessment; the integrity runtime implements contract construction, the nonce/digest ledger, and one-use authorization; and the benchmark adapter integrates bounded guard screening, dispatch mediation, receipts, and the effect observer.  Together, a runtime wrapper orders policy output, assessment, contract construction, optional guard screening, authorization, dispatch, receipts, and effects as defined in Section~\ref{sec:design}.
 
 In the evaluated runner, all policy-generated steps enter this wrapper before the sole \texttt{env.step} boundary.  Thus, complete mediation is conditional on the TCB containing every dispatch path and remaining intact; registered negative tests do not rule out an uninstrumented actuator path in another deployment.
 
@@ -47,19 +47,47 @@ control-loop latency.
 
 The deterministic semantic selector is frozen before the main four-arm study.  On a 160-case qualification corpus, it exactly matches all 160 expected task-frontier outputs.  This result qualifies a privileged benchmark FSM; it does not measure visual perception or open-world generalization.  The analytic local checker and effect observer separately pass frozen finite-corpus gates that exercise supported atoms, malformed or stale objects, and fail-closed behavior.  We use these tests to catch implementation defects, not as a substitute for deployment-distribution safety statistics.
 
-\subsection{Lean Model}
+\subsection{Machine-Checked Transaction Model}
 
-The Lean model defines the four-arm feature switches, \actionblock and assessment identities, execution contracts, authorizations, receipts, effects, and allowed phase transitions.  It proves finite transaction properties rather than physical safety.  The central theorem families establish that:
+The Lean model gives executable meaning to the finite subrelation of
+$\mathsf{ProofAligned}$.  It defines the four-arm feature switches,
+\actionblock and assessment identities, execution contracts, authorizations,
+receipts, effects, and allowed phase transitions.  Its proof obligations track
+the runtime evidence chain:
 \begin{itemize}
-  \item an authorization binds the same semantic identity and exact final command;
-  \item a consumed authorization is unavailable for replay;
-  \item every bound receipt uses the same authorization and its applied digest equals its receipt-authorized digest;
-  \item unknown effects or an incomplete executed prefix cannot satisfy execution alignment; and
-  \item phase advance in an execution-enabled arm requires alignment and contract completion.
+  \item an authorization binds the semantic context, whole command, and
+  ordered per-step digest list, and is unavailable after consumption;
+  \item every bound receipt uses that authorization and resolves its index to
+  the applied-step digest; and
+  \item unknown effects or an incomplete prefix cannot establish alignment,
+  while phase advance requires alignment and contract completion.
 \end{itemize}
 
-These theorems make negative states explicit: the model does not permit an unknown effect, partial prefix, or mismatched receipt to become a completed transaction merely because the Python runner continued.  Separately, the Python runtime checks receipt order and binds every applied-step digest to \texttt{authorization.action\_at(i)}.  Appendix~\ref{app:lean} maps paper claims to theorem names.
+These theorems make negative states explicit: an unknown effect, partial prefix,
+or mismatched receipt cannot become a completed transaction merely because the
+runner continued.  Python additionally checks that receipt indices form a
+contiguous prefix; both models bind each applied-step digest to
+\texttt{authorization.action\_at(i)}.  Appendix~\ref{app:lean} lists the exact
+theorem names used by the artifact audit.
 
-\subsection{Formal Boundary}
+\subsection{Refinement and Physical Boundary}
 
-Lean does not parse natural-language intent, choose $Z_t$, prove checker or observer correctness, validate the trusted sensor, or establish that the simulator matches a robot.  A complete refinement proof from the Python serializer and runtime observer to Lean is also future work.  In particular, the current model does not independently bind a receipt's authorized per-step digest to a typed ordered command list; that correspondence is enforced in Python.  The current \texttt{BlockExecutionContract} also does not type the virtual-guard/controller configuration as a separate digest.  We therefore use the phrase \emph{Lean-checked execution transaction semantics}, not \emph{formally verified robot safety}.
+Lean does not parse natural-language intent, choose $Z_t$, prove checker or
+observer correctness, or validate a sensor or dynamics model.  The typed
+\texttt{orderedActionDigests} list captures per-step authorization, but a
+complete refinement proof from Python's canonical tuple/serializer and runtime
+observer to that model remains future work.  The current
+\texttt{BlockExecutionContract} also does not type the virtual-guard/controller
+configuration as a separate digest.  Thus, P1's checker soundness and P3's
+continuous constraints remain qualification obligations; Lean checks P2 and
+the discrete phase-transition implication in Eq.~\ref{eq:phase-advance}.
+
+We therefore use the phrase \emph{machine-checked execution-transaction
+semantics}, not \emph{formally verified robot safety}.  This separation is
+deliberate: formal evidence answers whether the finite artifacts compose as
+specified, while empirical evidence answers how the checker and containment
+mechanism behave on the evaluated platform.
+
+Accordingly, the evaluation uses paired outcomes for L1 and combined-L2
+behavior, fault injection and Lean for L2a, and runtime measurements for L2b;
+no one evidence source substitutes for the others.

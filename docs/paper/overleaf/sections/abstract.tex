@@ -1,35 +1,33 @@
 \begin{abstract}
-Vision--language--action (VLA) policies increasingly expose a minimal deployment
-interface: images, robot state, and a natural-language task enter the model; a
-chunk of continuous actions comes out.  This interface creates two security
-gaps.  First, a compromised prompt or observation can change the numerical
-trajectory without exposing a trustworthy plan that authorizes the change.
-Second, checking a proposed action does not establish that the same action is
-later dispatched, receipted, and realized.  Existing defenses typically stop
-before the continuous action boundary or begin from an already trusted
-command or trajectory.
+Vision--language--action (VLA) systems map language and multimodal observations
+to continuous robot actions.  At deployment, an online action chunk crosses
+from model output into the execution stack without inherent evidence that it
+is admissible for the current task, that later software preserves it, or that
+its realization is qualified for the current robot state.  Existing defenses
+typically stop at model input or candidate selection, or begin from an already
+trusted command, program, or reference trajectory.
 
-We present \system, a consumer-side reference monitor for this action-only
-boundary.  Its protected object is the exact source \actionblock proposed by
-the VLA.  A trusted task/observation branch freezes the currently legal
-semantic subtask before policy inference.  \lone binds a checker-relative
-assessment to that subtask, observation, and exact block.  \ltwoa carries the
-same identity through a fresh one-use authorization, ordered dispatch
-receipts, observed effects, and phase advance; Lean checks the abstract finite
-binding and phase semantics.  When joint state approaches a limit, \ltwob
-screens at most two temporary virtual-guard configurations against registered
-margin, restoration, identity, and force gates without changing or resampling
-the source action.
+We present \system, an inline consumer-side reference monitor that makes the
+exact source \actionblock the protected object.  Under an explicit trusted-task
+and observation assumption, \lone attaches a checker-relative assessment to
+the block.  \ltwoa carries its identity through a fresh one-use authorization,
+ordered dispatch, receipts, effects, and task-phase advance.  When a registered
+joint boundary triggers, \ltwob qualifies at most two temporary virtual-guard
+configurations without changing or resampling the source action.  We formalize
+the composition as $\mathsf{ProofAligned}$---checker-relative eligibility,
+transaction alignment, and conditional containment---and use Lean to
+machine-check its finite authorization, ordered-action, receipt, evidence, and
+phase-transition relations.
 
-We first successfully reproduce SABER's constraint-violation instruction
-attack: 39 of 86 clean-eligible units exhibit a new risk transition
-(45.35\%, 95\% base-pair cluster-bootstrap CI: [32.93\%, 57.78\%]).  We then
-run a paired four-arm study over 18 held-out task/initialization pairs and 144
-episodes.  Under attack, VLA-only and L2-only succeed on 11/18 tasks, whereas
-L1-only and Dual succeed on 13/18; their joint-limit violation-episode counts
-are 4/18, 1/18, 0/18, and 0/18.  Screening reaches 39.79\,ms maximum and
-18.30\,ms p95, with no 100\,ms miss.  These results support
-checker-relative, cross-layer execution integrity for the frozen attack family
-and simulator setting; they do not establish complete semantic correctness,
-hardware attestation, hard-real-time behavior, or general robot safety.
+Using SABER on a complete 120-unit attack-evaluation protocol, we measure 39 of
+86 clean-eligible units as new risk transitions (45.35\%, 95\% base-pair
+cluster-bootstrap CI: [32.93\%, 57.78\%]).  A separate paired four-arm study
+contains 18 task/initialization pairs and 144 episodes.  Under attack, VLA-only
+and L2-only succeed on 11/18 tasks, whereas L1-only and Dual succeed on 13/18;
+their joint-limit violation-episode counts are 4/18, 1/18, 0/18, and 0/18.
+Screening reaches 39.79\,ms maximum and 18.30\,ms p95, with no 100\,ms miss.
+The empirical studies run in LIBERO-Safety simulation; they support the stated
+checker-relative and transaction properties for the evaluated configuration,
+not complete semantic correctness, hardware attestation, hard-real-time
+behavior, or general robot safety.
 \end{abstract}

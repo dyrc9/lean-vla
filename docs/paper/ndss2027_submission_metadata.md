@@ -10,43 +10,40 @@ site opens.
 
 - Cycle: Fall
 - Type: Technical paper
-- Title: **ProofAlign: Trusted-Task Monitoring and Cross-Layer Execution Integrity for Action-Only Vision–Language–Action Systems**
+- Title: **ProofAlign: Cross-Layer Runtime Integrity for Embodied Vision–Language–Action Systems**
 
 ## Plain-text abstract
 
-Vision–language–action (VLA) controllers translate instructions and
-observations directly into continuous robot-action chunks. A compromised
-prompt or observation can therefore become physical behavior. Yet an
-action-only deployment exposes neither a trustworthy model-supplied plan nor
-evidence that a checked numerical action is the one later dispatched and
-observed. This leaves an authorization gap between a trusted task and a
-concrete action, and a realization gap between an authorized action and
-physical execution.
+Vision–language–action (VLA) systems map language and multimodal observations
+to continuous robot actions. At deployment, an online action chunk crosses
+from model output into the execution stack without inherent evidence that it
+is admissible for the current task, that later software preserves it, or that
+its realization is qualified for the current robot state. Existing defenses
+typically stop at model input or candidate selection, or begin from an already
+trusted command, program, or reference trajectory.
 
-We present ProofAlign, a consumer-side reference monitor that leaves the VLA
-unchanged. A trusted branch derives a structured subtask from an authoritative
-task and pre-attack observation; an untrusted policy branch proposes one
-continuous ActionBlock. L1 binds a local checker verdict to that exact block,
-rejects covered hard failures, and records uncertain task progress for
-next-block replanning. L2a carries the runtime identity through a one-use
-authorization, dispatch receipts, and effects; Lean checks abstract finite
-binding and phase relations. Near joint boundaries, L2b screens at most two
-temporary virtual-guard
-configurations under a common force envelope. This is checker-relative,
-simulator-qualified integrity—not latent-intent recovery or complete robot
-safety.
+We present ProofAlign, an inline consumer-side reference monitor that makes
+the exact source ActionBlock the protected object. Under an explicit
+trusted-task and observation assumption, L1 attaches a checker-relative
+assessment to the block. L2a carries its identity through a fresh one-use
+authorization, ordered dispatch, receipts, effects, and task-phase advance.
+When a registered joint boundary triggers, L2b qualifies at most two temporary
+virtual-guard configurations without changing or resampling the source
+action. We formalize the composition as ProofAligned—checker-relative
+eligibility, transaction alignment, and conditional containment—and use Lean
+to machine-check its finite authorization, ordered-action, receipt, evidence,
+and phase-transition relations.
 
-We first reproduce SABER’s constraint-violation instruction attack: 39 of 86
-clean-eligible units exhibit a new risk transition (45.35%, 95% base-pair
-cluster-bootstrap CI: [32.93%, 57.78%]), successfully reproducing its
-physical-risk effect in our victim/benchmark path. We then evaluate 18
-held-out pairs in a 144-episode, paired four-arm study. Under attack, VLA-only
+Using SABER on a complete 120-unit attack-evaluation protocol, we measure 39 of
+86 clean-eligible units as new risk transitions (45.35%, 95% base-pair
+cluster-bootstrap CI: [32.93%, 57.78%]). A separate 144-episode paired four-arm
+study contains 18 task/initialization pairs. Under attack, VLA-only
 and L2-only succeed on 11/18 tasks, while L1-only and Dual succeed on 13/18;
 their joint-limit violation-episode counts are 4/18, 1/18, 0/18, and 0/18,
 respectively. Maximum screening latency is 39.79 ms (18.30 ms p95), with no
-100 ms miss. The results support a cross-layer runtime-integrity mechanism for
-the frozen attack family and simulator setting, not hardware attestation,
-hard-real-time operation, or general robot safety.
+100 ms miss. The empirical studies run in LIBERO-Safety simulation; they do
+not establish hardware attestation, hard-real-time operation, or general robot
+safety.
 
 ## Recommended topics
 
@@ -67,11 +64,11 @@ monitor`, `execution integrity`, `trusted task`, `prompt injection`,
 
 ## Topic-fit statement
 
-ProofAlign is a systems-security paper about the authorization and realization
-boundary between an attacked machine-learning controller and physical robot
-execution. Its contribution is a consumer-side reference monitor with an
-explicit TCB, fail-closed transaction semantics, negative integrity tests, and
-simulator-qualified physical containment. Machine learning supplies the
+ProofAlign is a systems-security paper about the lifecycle of an online VLA
+ActionBlock as it crosses into embodied execution. Its contribution is a
+consumer-side reference monitor with an explicit TCB, a top-level
+ProofAligned property, fail-closed transaction semantics, negative integrity
+tests, and runtime physical containment. Machine learning supplies the
 untrusted action proposal; the contribution is not a new VLA architecture or
 training objective. The implementation, paired attack evaluation, and
 Lean-checked transaction model directly address practical AI-system and

@@ -5,7 +5,14 @@
 
 The paired study illustrates two empirical roles on the frozen sample.  L1-only records the same aggregate task-success count under clean and attacked inputs (13/18), but does not contain the full duration of residual joint-limit risk.  L2-on arms record zero observed joint-limit outcomes but do not show an independent task-success gain.  Dual combines these two sample outcomes without reducing L1's aggregate success count.  This mechanism-level interpretation is more precise than claiming that a single ``safety layer'' improves every metric.
 
-The evidence for L2 also has two sources.  SABER outcomes primarily test L2b's physical containment.  Focused substitution, replay, receipt/effect mismatch, and incomplete-prefix cases exercise Python's transaction checks; Lean separately establishes the coarser authorization, receipt, effect, and phase relations described in Section~\ref{sec:implementation}.  We do not treat those theorems as an end-to-end Python refinement proof.  The four-arm table cannot identify an independent causal effect for each L2 subcomponent because they are enabled together.
+The evidence for L2 also has two sources.  SABER outcomes primarily test L2b's
+physical containment.  Focused substitution, replay, receipt/effect mismatch,
+and incomplete-prefix cases exercise Python's transaction checks; Lean
+separately establishes the finite authorization, ordered-action, receipt,
+effect, and phase relations described in Section~\ref{sec:implementation}.  We
+do not treat those theorems as an end-to-end Python refinement proof.  The
+four-arm table cannot identify an independent causal effect for each L2
+subcomponent because they are enabled together.
 
 \subsection{Selector and Checker Failure}
 
@@ -31,7 +38,17 @@ and refinement evidence connecting its serialized runtime representation to the 
 
 \subsection{Scope and Statistical Limits}
 
-The current evidence covers one $\pi_{0.5}$ checkpoint, LIBERO-Safety, one frozen SABER instruction-attack family, and 18 final pairs.  The attack records were not adapted after observing \system.  Recent work shows that defenses evaluated only against static attacks can fail under a defense-aware adaptive attacker~\cite{adaptivesecond2026}; our observed containment is therefore not evidence of adaptive robustness.  The 240-episode attack reproduction and the paired four-arm study use different populations, denominators, and event definitions and cannot be pooled into a stronger statistical result.  In particular, the 144-episode final study is not a defended rerun over all 240 attack-foundation episodes.  The final sample illustrates the mechanism split but is too small for fine-grained task/suite subgroup conclusions.
+The current evidence covers one $\pi_{0.5}$ checkpoint, LIBERO-Safety, one
+frozen SABER instruction-attack family, and 18 paired mechanism workloads.  The
+attack records were not adapted after observing \system.  Recent work shows
+that defenses evaluated only against static attacks can fail under a
+defense-aware adaptive attacker~\cite{adaptivesecond2026}; our observed
+containment is therefore not evidence of adaptive robustness.  The 240-episode
+attack-risk measurement and the paired four-arm study use different
+populations, denominators, and event definitions and cannot be pooled into a
+stronger statistical result.  In particular, the 144-episode mechanism study
+is not yet a defended rerun over the complete 120-unit attack protocol.  It is
+too small for fine-grained task/suite subgroup conclusions.
 
 The most direct evidence gaps are a larger defended run, additional seeds or attack
 families, and an L2a/L2b sub-ablation.  Broader claim expansion would separately

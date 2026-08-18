@@ -3,16 +3,28 @@
 
 \subsection{Overview}
 
-Figure~\ref{fig:overview} summarizes the runtime path.  The policy and monitor never share authority: policy-facing bytes are evidence about what the VLA consumed, whereas $T$, $O_t^T$, and $Z_t$ determine the monitor context.  The output of one policy call is a single source \actionblock.  \system does not resample the policy, ask the policy to explain itself, or relabel $Z_t$ after seeing the action.
+\system is an inline consumer-side verifier, rather than a new policy or a
+remote robot attestation service.  It places one trusted authority path beside
+the untrusted proposal path and mediates their only route to the actuator
+interface.  Figure~\ref{fig:overview} separates three system stages.  During
+\emph{construction and qualification}, the monitor compiles $T$ into
+$\mathcal G_T$, registers checker/effect vocabularies, and qualifies their
+implementations; it does not generate a reference trajectory.  During
+\emph{online authorization}, it freezes $O_t^T$ and $Z_t$, receives one source
+\actionblock, assesses it, compiles a contract, and conditionally screens a
+guard.  During \emph{execution closure}, a fresh authorization gates the sole
+dispatch boundary and ordered receipts/effects determine whether the phase may
+advance.  Policy-facing bytes remain evidence of what the VLA consumed, not
+authority, and \system neither resamples the policy nor relabels $Z_t$ after
+seeing the action.
 
-The design follows four ordered invariants.  First, an action receives no
-covered-risk authorization without an assessment bound to a trusted context.
-Second, a dispatcher accepts no command without a fresh authorization bound to
-that exact action and state epoch.  Third, execution cannot advance the task
-phase until matching receipts and effects close the transaction.  Fourth, a
-near-boundary action is dispatched only under a guard configuration that
-passes the registered margin, restore, identity, and force gates.  Later
-layers preserve earlier identities rather than replacing their verdicts.
+Across these stages, the three obligations in
+$\mathsf{ProofAligned}$ remain explicit.  Eligibility requires a bound
+checker-relative assessment of the exact source block.  Transaction alignment
+requires fresh authorization, ordered exact dispatch, and matching receipts and
+effects before phase advance.  Triggered containment requires a guard that
+passes the registered identity, restoration, margin, and force conditions.
+Later stages preserve earlier identities rather than replacing their verdicts.
 
 The running example makes the layers non-interchangeable.  While the policy
 sees ``move to the farthest fixture,'' the trusted branch remains anchored to
@@ -41,7 +53,23 @@ is separately audited and is not part of the current Lean identity.}
 \label{fig:overview}
 \end{figure*}
 
-\subsection{C1: Trusted Semantic Context}
+\subsection{System Components and Evidence Flow}
+
+The authority compiler and selector emit a task graph and state-epoch-bound
+$Z_t$ without reading the policy-facing prompt.  The assessor binds $Z_t$, the
+matching observation, and exact source block into $S_t$.  The transaction
+engine compiles $C_t$, maintains nonces, and conditionally invokes L2b.  The
+sole actuator-facing boundary then checks each ordered row, emits receipts
+$R_t$, and opens the effect window for $E_t$ before phase advance.
+
+This placement matches the three evidence endpoints: a policy self-report
+cannot establish authority, a plausibility check cannot prove which command
+the actuator interface accepted, and a later outcome cannot retroactively
+authorize dispatch.  \system instead carries one proposal identity forward
+while adding evidence at the authority tap, dispatch boundary, and effect
+window; it does not compare the online block with a unique reference trajectory.
+
+\subsection{Task-Model Construction}
 
 The selector can emit one of a finite set of task-level skills: \texttt{pick\_up}, \texttt{move}, \texttt{place}, \texttt{release}, \texttt{open}, \texttt{close}, \texttt{actuate}, \texttt{finish}, or \texttt{unknown}.  A task-specific graph restricts which entities and transitions are legal.  For example, a mug-placement task cannot select \texttt{open(drawer)} even if an untrusted model would score it highly.
 
@@ -67,7 +95,7 @@ An incorrect but syntactically legal BDDL adapter remains a TCB failure.
 
 Each semantic artifact commits to the full context and a canonical selected subtask.  The L1 checker references the artifact digest.  It cannot rename the action's intent after observing $A_t$, and an observation-epoch change requires a new artifact and assessment.
 
-\subsection{C2: L1 Checker-Relative Assessment}
+\subsection{C1: L1 Checker-Relative Assessment}
 
 The checker parses translation, rotation, and gripper commands over the full
 $10\times7$ chunk.  It does not run a complete dynamics rollout.  Starting
@@ -117,7 +145,7 @@ Allow & Bound evidence with no hard-risk atom & Dispatch exact $A_t$; normal rep
 \end{tabularx}
 \end{table}
 
-\subsection{C3: L2a One-Use Execution Transaction}
+\subsection{C2: L2a One-Use Execution Transaction}
 
 After L1, or directly in the L2-only arm, the consumer first compiles $C_t$.  It creates a fresh authorization only after a no-risk fast path or a triggered L2b screen qualifies.  L2b selects an execution configuration without changing the source-action bytes, consuming an authorization, or retroactively justifying one.  The dispatch boundary verifies the contract, nonce, proposal index, state epoch, action length, and canonical command identity before applying each step.  Receipts bind the authorization and the applied step.  The effect observer opens only after dispatch and closes at the registered observation boundary.  With L1 disabled, the L2-only schema binds the raw policy proposal, state, authorization, and receipts without claiming semantic alignment; it isolates execution identity and containment rather than trusted-task authorization.
 
@@ -132,7 +160,7 @@ phase, and a consumed authorization cannot be replayed.}
 \label{fig:l2a-transaction}
 \end{figure}
 
-\subsection{C4: L2b Bounded Guard Screening}
+\subsection{C3: L2b Bounded Guard Screening}
 
 On every step, the runtime computes the minimum across fourteen joint-side margins.  If the minimum is greater than $0.30$\,rad, the source action takes the fast path: no shadow simulator is invoked.  Otherwise, the runtime identifies the dangerous joint sides and constructs at most two temporary virtual-stop configurations.
 
@@ -157,4 +185,4 @@ of an old authorization, and use of future outcome as present-time evidence.
 
 \subsection{Failure Semantics}
 
-\system distinguishes four outcomes: \emph{hard reject} for covered physical or integrity failure; \emph{advisory replan} for task-progress uncertainty; \emph{fail-closed no-dispatch} when no safe guard qualifies; and \emph{aligned completion} when the transaction and task evidence both close.  The distinctions are retained in the trace rather than collapsed into task success.  This is necessary because a system can fail safely, succeed unsafely, or preserve utility while accumulating severe risk steps.
+\system distinguishes four outcomes: \emph{hard reject} for covered physical or integrity failure; \emph{advisory replan} for task-progress uncertainty; \emph{fail-closed no-dispatch} when no safe guard qualifies; and \emph{aligned completion} when the transaction and task evidence both close.  The distinctions are retained in the trace rather than collapsed into task success, allowing the implementation to distinguish safe failure, unsafe success, and utility-preserving executions with severe risk steps.

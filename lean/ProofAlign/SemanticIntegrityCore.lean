@@ -101,6 +101,7 @@ structure ActionBlock where
   exactPolicyPromptDigest : String
   trustedObservationDigest : String
   commandDigest : String
+  orderedActionDigests : List String
   actionCount : Nat
 deriving Repr, DecidableEq
 
@@ -171,6 +172,7 @@ structure PrefixAuthorization where
   assessmentDigest : String
   executionContractDigest : String
   finalCommandDigest : String
+  orderedActionDigests : List String
   actionCount : Nat
   issuedAtNs : Nat
   validUntilNs : Nat
@@ -201,6 +203,8 @@ def authorizationBound
     ∧ authorization.executionContractDigest =
         contract.executionContractDigest
     ∧ authorization.finalCommandDigest = block.commandDigest
+    ∧ block.orderedActionDigests.length = block.actionCount
+    ∧ authorization.orderedActionDigests = block.orderedActionDigests
     ∧ authorization.actionCount = block.actionCount
     ∧ authorization.issuedAtNs ≤ nowNs
     ∧ nowNs ≤ authorization.validUntilNs
@@ -235,6 +239,29 @@ theorem authorization_binds_exact_final_command
   rcases bound with
     ⟨_, _, _, _, _, _, _, _, _, _, _, _, _, exactCommand, _⟩
   exact exactCommand
+
+theorem authorization_binds_ordered_actions
+    (block : ActionBlock)
+    (assessment : ActionAssessment)
+    (contract : BlockExecutionContract)
+    (authorization : PrefixAuthorization)
+    (nowNs : Nat)
+    (bound :
+      authorizationBound block assessment contract authorization nowNs) :
+    authorization.orderedActionDigests = block.orderedActionDigests
+      ∧ authorization.orderedActionDigests.length =
+          authorization.actionCount := by
+  rcases bound with
+    ⟨_, _, _, _, _, _, _, _, _, _, _, _, _, _, blockLength,
+      orderedActions, actionCount, _⟩
+  constructor
+  · exact orderedActions
+  · calc
+      authorization.orderedActionDigests.length =
+          block.orderedActionDigests.length :=
+        congrArg List.length orderedActions
+      _ = block.actionCount := blockLength
+      _ = authorization.actionCount := actionCount.symm
 
 structure DispatchLedger where
   consumedAuthorizationDigests : List String
@@ -284,6 +311,8 @@ def stepReceiptBound
     ∧ receipt.proposalIndex = block.proposalIndex
     ∧ receipt.actionCount = authorization.actionCount
     ∧ receipt.stepIndex < receipt.actionCount
+    ∧ authorization.orderedActionDigests[receipt.stepIndex]? =
+        some receipt.authorizedActionDigest
     ∧ receipt.appliedActionDigest = receipt.authorizedActionDigest
 
 structure PrefixExecutionEvidence where
@@ -383,7 +412,27 @@ theorem every_bound_receipt_applies_exact_action
     (receipt : StepDispatchReceipt)
     (member : receipt ∈ receipts) :
     receipt.appliedActionDigest = receipt.authorizedActionDigest := by
-  exact (window.1 receipt member).2.2.2.2.2.2.2.2
+  rcases window.1 receipt member with
+    ⟨_, _, _, _, _, _, _, _, _, appliedExact⟩
+  exact appliedExact
+
+theorem every_bound_receipt_matches_authorized_step
+    (block : ActionBlock)
+    (assessment : ActionAssessment)
+    (contract : BlockExecutionContract)
+    (authorization : PrefixAuthorization)
+    (receipts : List StepDispatchReceipt)
+    (evidence : PrefixExecutionEvidence)
+    (window :
+      receiptWindowBound block assessment contract authorization
+        receipts evidence)
+    (receipt : StepDispatchReceipt)
+    (member : receipt ∈ receipts) :
+    authorization.orderedActionDigests[receipt.stepIndex]? =
+      some receipt.appliedActionDigest := by
+  rcases window.1 receipt member with
+    ⟨_, _, _, _, _, _, _, _, authorizedStep, appliedExact⟩
+  simpa [appliedExact] using authorizedStep
 
 theorem unknown_effects_block_execution_alignment
     (block : ActionBlock)

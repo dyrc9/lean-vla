@@ -392,7 +392,7 @@ def main() -> None:
     for token in (
         "39/86=45.35\\%",
         "[32.93\\%,57.78\\%]",
-        "Successful SABER Reproduction",
+        "SABER Risk Measurement",
         "4/18 (22.22\\%)",
         "1/18 (5.56\\%)",
         "6438.1998<10000",
@@ -407,7 +407,7 @@ def main() -> None:
 
     for token in (
         "six each from LIBERO-Safety's",
-        "exact same original task instruction at a different initialization",
+        "same original task instruction at a different",
         "performs no best-of-$N$ selection",
     ):
         if token not in paper_text:
@@ -433,9 +433,10 @@ def main() -> None:
     theorem_names = (
         "authorization_binds_semantic_identity",
         "authorization_binds_exact_final_command",
+        "authorization_binds_ordered_actions",
         "consumed_authorization_not_available",
         "every_bound_receipt_uses_same_authorization",
-        "every_bound_receipt_applies_exact_action",
+        "every_bound_receipt_matches_authorized_step",
         "unknown_effects_block_execution_alignment",
         "incomplete_prefix_blocks_execution_alignment",
         "execution_enabled_phase_advance_requires_alignment",
@@ -455,7 +456,7 @@ def main() -> None:
     print("- attack-foundation prose matches the authoritative terminal status")
     print("- clean/attacked task, unsafe, transition, risk, integrity, and cost claims match frozen evidence")
     print("- final population, attack transplant, and platform claims match frozen protocols/manifests")
-    print("- all nine appendix theorem names match the Lean source exactly")
+    print("- all ten appendix theorem names match the Lean source exactly")
     print("- retained MuJoCo warning disclosure is present")
 
 

@@ -55,7 +55,7 @@ canonical command，更不能证明后续效果属于同一次 dispatch。
 现有工作分别保护了这条链的局部：trusted/untrusted input separation 保护模型入口 [StruQ, SecAlign,
 CaMeL]；VLA verifier 和 agent enforcement 约束候选动作、离散调用或执行计划 [SEAL, CoVer, AttriGuard,
 ACE]；operation/data/control-flow attestation 保护既定程序的动态执行 [OAT, DIAT, ARI, CFA+, ARTO]；robot
-trajectory attestation 检查给定 intended path 与 actual motion [TAT]；CBF、shielding 和 action prediction
+trajectory attestation 从受保护的预编程任务和离线 reference profiles 出发检查 actual motion [TAT]；CBF、shielding 和 action prediction
 约束物理可行性 [VLMPC, RealizableShields]。这些机制有效，但停在不同边界：它们没有共同回答“在线产生的
 连续 ActionBlock 为什么获得任务授权，以及之后是否仍是它被实际执行”。
 
@@ -108,8 +108,8 @@ learned score 选择 VLA candidate [SEAL, CoVer]。但 action-only 部署未必�
 
 Realization gap 的根源是检查对象与执行事实可能脱节。OAT、DIAT、ARI、CFA+ 和 ARTO 表明，执行完整性必须
 包含 dynamic control/data flow、freshness 与 timing，而不能只验证静态程序或做一次 hash [OAT, DIAT, ARI,
-CFA+, ARTO]。TAT 进一步表明 intended path 与 actual motion 是两个命题，需要 timed motion events 和 joint
-measurements [TAT]。然而，这些工作通常从已经给定的 program、mission 或 intended path 出发；它们不回答
+CFA+, ARTO]。TAT 进一步表明 task program 所定义的 reference motion 与 actual motion 是两个命题，需要 timed motion events 和 joint
+measurements [TAT]。然而，这些工作通常从已经选定的 program、mission 或离线 reference profiles 出发；它们不回答
 这个在线 VLA proposal 是否首先得到了可信任务授权。
 
 物理 safety mechanism 还覆盖另一条正交边。Prediction、clipping、CBF 和 continuous-space shields 可以限制
@@ -476,9 +476,10 @@ ranking；其差异是保持 (K=1)，用独立 trusted task branch 评估 exact 
 execution evidence。
 
 **执行与轨迹完整性。** OAT、DIAT、ARI、CFA+ 和 ARTO 对 operation、data/control flow、freshness 与 real-time
-mission 提供更强 attestation [OAT, DIAT, ARI, CFA+, ARTO]；TAT 从给定 intended path 审计 actual robot
+mission 提供更强 attestation [OAT, DIAT, ARI, CFA+, ARTO]；TAT 从受保护的预编程任务及受控离线运行所得
+reference profiles 出发，以 TEE-protected event evidence 和旁路 joint measurements 审计 actual robot
 trajectory [TAT]。ProofAlign 没有硬件 root of trust，也不声称首次提出 attestation。它补充的边界是：在
-intended path 尚未可信给定、VLA 只输出 ActionBlock 时，先建立 trusted-task authorization，再在软件 TCB
+在线 VLA block 尚无可信 reference trajectory、VLA 只输出 ActionBlock 时，先建立 trusted-task authorization，再在软件 TCB
 中维护 proposal-scoped transaction。
 
 **Prediction 与 shielding。** VLMPC、CBF 和 continuous-space shields 检查 action consequence 或保持安全集合
@@ -508,7 +509,7 @@ authorization，L2b 提供风险触发的 joint containment，L2a 将获准动�
 
 > 以下使用工作引用键；迁移到投稿 LaTeX 时统一替换为正式 BibTeX，并复核2026论文的最终元数据。
 
-- **[SABER]** [SABER: A Stealthy Agentic Black-Box Attack Framework for Vision-Language-Action Models](https://arxiv.org/abs/2603.24935), 2026.
+- **[SABER]** [SABER: A Stealthy Agentic Black-Box Attack Framework for Vision-Language-Action Models](https://arxiv.org/abs/2603.24935), IROS, 2026.
 - **[LIBERO-Safety]** [LIBERO-Safety](https://arxiv.org/abs/2606.23686), ECCV, 2026.
 - **[SafeVLA-Bench]** [SafeVLA-Bench](https://arxiv.org/abs/2606.00773), 2026.
 - **[VLASurvey]** [Vision-Language-Action Safety: Threats, Challenges, Evaluations, and Mechanisms](https://arxiv.org/abs/2604.23775), 2026.
@@ -522,7 +523,7 @@ authorization，L2b 提供风险触发的 joint containment，L2a 将获准动�
 - **[AttriGuard]** [AttriGuard](https://www.usenix.org/conference/usenixsecurity26/presentation/he-yu), USENIX Security, 2026.
 - **[MATE]** [MATE](https://www.usenix.org/conference/usenixsecurity26/presentation/jiang-changyue), USENIX Security, 2026.
 - **[SEAL]** [Do What You Say: Runtime Reasoning–Action Alignment Verification](https://arxiv.org/abs/2510.16281), ICRA, 2026.
-- **[CoVer]** [Scaling Verification Can Be More Effective than Scaling Policy Learning for VLA Alignment](https://arxiv.org/abs/2602.12281), ECCV, 2026.
+- **[CoVer]** [Scaling Verification Can Be More Effective than Scaling Policy Learning for VLA Alignment](https://arxiv.org/abs/2602.12281), arXiv；ScaleBot @ CVPR workshop, 2026.
 - **[OAT]** [OAT: Attesting Operation Integrity of Embedded Devices](https://www.longlu.org/publication/oat/), IEEE S&P, 2020.
 - **[DIAT]** [DIAT: Data Integrity Attestation for Resilient Collaboration of Autonomous Systems](https://www.ndss-symposium.org/ndss-paper/diat-data-integrity-attestation-for-resilient-collaboration-of-autonomous-systems/), NDSS, 2019.
 - **[ARI]** [ARI: Attestation of Real-time Mission Execution Integrity](https://www.usenix.org/conference/usenixsecurity23/presentation/wang-jinwen), USENIX Security, 2023.

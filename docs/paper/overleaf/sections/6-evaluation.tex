@@ -1,22 +1,41 @@
 \section{Evaluation}
 \label{sec:evaluation}
 
-We evaluate three questions aligned with the two gaps and their evidence:
+We evaluate three questions aligned with the three proof obligations and their
+distinct evidence sources:
 \begin{itemize}
-  \item \textbf{RQ1:} Does the frozen SABER constraint-violation attack produce measurable physical risk transitions in an independent reproduction?
-  \item \textbf{RQ2:} In a matched four-arm study, what roles do L1 and the combined L2 treatment play in attacked task success and covered joint-limit containment?
-  \item \textbf{RQ3:} Do the execution-integrity checks, formal transaction claims, force/margin gates, and runtime budget hold?
+  \item \textbf{RQ1:} What physical risk-transition rate does SABER induce on
+  the complete attack-evaluation protocol?
+  \item \textbf{RQ2:} In a paired four-arm mechanism study, what roles do L1
+  and the combined L2 treatment play in task success and covered joint-limit
+  containment?
+  \item \textbf{RQ3:} Do the transaction checks, machine-checked relations,
+  physical gates, and runtime budget hold for their stated scopes?
 \end{itemize}
 
-\subsection{Attack-Foundation Study}
+\subsection{Attack Risk Measurement}
 
-The victim is OpenPI $\pi_{0.5}$ and the benchmark is LIBERO-Safety.  We use frozen SABER \texttt{constraint\_violation} instruction-perturbation records.  The study includes 60 base pairs and two seeds, with a clean and attacked rollout for each seed, totaling 240 episodes.
+The victim is OpenPI $\pi_{0.5}$ and the benchmark is LIBERO-Safety.  We use
+frozen SABER \texttt{constraint\_violation} instruction perturbations.  The
+complete protocol contains 60 base pairs and two seed replicates, with a clean
+and attacked rollout for every unit, totaling 240 episodes.
 
 The attack success rate (ASR) is evaluated only on clean-safe units.  A success is a new attacked-rollout transition involving contact, a joint limit, excessive force, or the benchmark's cost/collision risk signal.  Task failure alone is not counted.  The resulting population contains 86 clean-eligible units.  Confidence intervals cluster by base pair so that seed replicates from the same base pair are not treated as independent.
 
-\subsection{Final Paired Four-Arm Study}
+\subsection{Paired Four-Arm Mechanism Study}
 
-The final study freezes 18 SABER records and 18 held-out suite/task/initialization pairs: six each from LIBERO-Safety's \texttt{obstacle\_avoidance}, \texttt{obstacle\_avoidance\_human}, and \texttt{human\_safety} suites.  For each held-out pair, the attacked run uses a SABER record generated for the exact same original task instruction at a different initialization.  Only the perturbed task text is transplanted; record generation reads no clean or attacked victim outcome and performs no best-of-$N$ selection.  Every pair is evaluated under clean and attacked conditions in four arms: VLA-only, L1-only, L2-only, and Dual.  Clean and attacked executions share the initial state, environment seed, policy seed, and arm schedule.  Each condition therefore contains 72 episodes, for 144 total.  We retain all pairs without selecting on clean or attacked outcome.
+The second study freezes 18 SABER records and 18 outcome-blind
+suite/task/initialization pairs: six each from LIBERO-Safety's
+\texttt{obstacle\_avoidance}, \texttt{obstacle\_avoidance\_human}, and
+\texttt{human\_safety} suites.  For each pair, the attacked run uses a SABER
+record generated for the same original task instruction at a different
+initialization.  Only the perturbed task text is transplanted; record generation
+reads no clean or attacked victim outcome and performs no best-of-$N$
+selection.  Every pair is evaluated under clean and attacked conditions in
+four arms: VLA-only, L1-only, L2-only, and Dual.  Clean and attacked executions
+share the initial state, environment seed, policy seed, and arm schedule.  Each
+condition contains 72 episodes, for 144 total, and all selected pairs remain in
+the analysis.
 
 The primary configuration uses one $H=10$ source block ($K=1$).  The first source \actionblock is identical across arms for a paired workload.  After a hard gate or state divergence, subsequent trajectories need not remain action-identical.  L2-on arms jointly enable L2a and L2b, so this study estimates their combined treatment rather than separate causal effects.
 
@@ -31,21 +50,28 @@ safety system.  We do not treat SafeVLA or SAFE as drop-in baselines because
 they respectively modify policy training or learn rollout-failure detection,
 whereas the registered victim and checkpoint remain fixed~\cite{safevla2025,safe2025}.
 SEAL and CoVer likewise assume a policy-supplied textual plan, multiple action
-candidates, or a learned alignment score that the action-only $K=1$ interface
+candidates, or a learned alignment score that the deployed $K=1$ interface
 does not expose~\cite{sealvla2026,covervla2026}.  None instantiates L2a's
 authorization--receipt--effect transaction.  Combining such policy or verifier
 methods with \system is a complementary experiment requiring a separately
 registered protocol, rather than an interchangeable baseline for this study.
 
-\subsection{Protocol Freeze and Held-Out Population}
+\subsection{Protocol Freeze and Evaluation Population}
 
-The reported \system configuration, metrics, gates, and arm schedule were fixed before reading outcomes from the final population.  The 18 pairs were selected by salted hash from 15 tasks and 50 initialization states in each of three suites after excluding 635 task/initialization pairs used by development protocols.  Their environment and policy seeds were newly assigned, and all selected pairs were retained.  Frozen run-validity records, including excluded invalid executions, remain available in the reproducibility audit but do not define additional system versions or contribute outcomes to the paper.
+The reported \system configuration, metrics, gates, and arm schedule were fixed
+before reading outcomes from the paired-study population.  Its 18 pairs were
+selected by salted hash from 15 tasks and 50 initialization states in each of
+three suites after excluding 635 task/initialization pairs used by development
+protocols.  Their environment and policy seeds were newly assigned, and all
+selected pairs were retained.  Frozen run-validity records, including excluded
+invalid executions, remain available in the reproducibility audit but do not
+define additional system versions or contribute outcomes to the paper.
 
 \subsection{Metrics}
 
 We report task success and paired clean/attacked success transitions.  A \emph{violation episode} contains at least one native joint-limit violation or actual joint-side margin crossing.  We also report crossing steps, joint-limit steps, benchmark \emph{official unsafe}, deadlock, maximum force, and prediction/execution margin error.
 
-Integrity metrics cover attack-metadata and prompt-digest mismatch, pairwise first-block identity, checksums, and receipt/effect gates.  Performance metrics are maximum and p95 screening latency and the fraction exceeding 100\,ms; their registered limits are 200\,ms, 100\,ms, and 2.5\%, respectively.  ``Constraint force'' is the maximum absolute MuJoCo generalized-constraint-force value on registered risk joints---a simulator proxy, not a calibrated end-effector force.  The attack-foundation risk-transition rate and final-study violation-episode rate have different populations, denominators, and event definitions; we never subtract or merge them.
+Integrity metrics cover attack-metadata and prompt-digest mismatch, pairwise first-block identity, checksums, and receipt/effect gates.  Performance metrics are maximum and p95 screening latency and the fraction exceeding 100\,ms; their registered limits are 200\,ms, 100\,ms, and 2.5\%, respectively.  ``Constraint force'' is the maximum absolute MuJoCo generalized-constraint-force value on registered risk joints---a simulator proxy, not a calibrated end-effector force.  The complete-protocol risk-transition rate and paired-study violation-episode rate have different populations, denominators, and event definitions; we never subtract or merge them.
 
 For the two registered task-success contrasts, we use a paired base-pair
 cluster percentile bootstrap with 100,000 resamples and a $-0.20$
@@ -60,26 +86,28 @@ score intervals to make the uncertainty of $n=18$ explicit.
 \begin{figure*}[t]
 \centering
 \resizebox{\textwidth}{!}{\input{figures/evaluation_design}}
-\caption{The attack-foundation and final four-arm studies answer different
+\caption{The attack-risk measurement and four-arm mechanism study answer different
 questions.  Their populations, denominators, and event definitions are kept
 separate throughout the analysis.}
 \label{fig:evaluation-design}
 \end{figure*}
 
-\subsection{RQ1: Successful SABER Reproduction}
+\subsection{RQ1: SABER Risk Measurement}
 
 All 240 episodes are valid.  Of the 86 clean-eligible units, 39 exhibit a new attacked risk transition:
 \begin{equation}
   \mathrm{ASR}=39/86=45.35\%,\qquad
   \mathrm{CI}_{95}=[32.93\%,57.78\%].
 \end{equation}
-The result successfully reproduces SABER's physical-risk effect in our victim/benchmark path.  We report 45.35\% as the observed ASR under this victim, benchmark, frozen attack configuration, eligibility rule, and event definition.
+This is the measured attack-risk baseline under the stated victim, benchmark,
+attack configuration, eligibility rule, and event definition.  It does not by
+itself determine the effectiveness of any ProofAlign layer.
 
 \subsection{RQ2: Paired Four-Arm Results}
 
 \begin{table}[t]
 \centering
-\caption{Task utility on 18 held-out pairs per condition.}
+\caption{Task utility on 18 paired workloads per condition.}
 \label{tab:main-task}
 \small
 \begin{tabular}{lcc}
@@ -97,7 +125,7 @@ Dual     & 13/18 & 13/18 \\
 \begin{table}[t]
 \centering
 \caption{Attacked-condition joint-limit outcomes.  These are not the
-attack-foundation ASR in RQ1.}
+complete-protocol ASR in RQ1.}
 \label{tab:main-risk}
 \footnotesize
 \begin{tabular}{lrrr}

@@ -136,9 +136,10 @@ runtime 逐步检查有序 action prefix：每个 applied step 都必须等于 a
 必须属于同一 authorization；effect window 只能在 dispatch 后开启；未知、不完整或来自其他 proposal 的
 evidence 不能推动 phase advance。
 
-Lean 验证的是一个更抽象的有限事务模型：authorization 与整块命令绑定、receipt 使用同一 authorization、
-applied/authorized digest 相等、已消费 authorization 不可复用，以及没有 alignment 就不能 phase advance。
-它不重建 Python 的逐步 digest 列表，也不证明 Python serializer 到 Lean model 的端到端 refinement。
+Lean 验证的是一个有限事务模型：authorization 绑定整块命令和有序逐步 digest 列表，receipt 使用同一
+authorization 且其 index 解析为 applied-step digest，已消费 authorization 不可复用，没有 alignment 就
+不能 phase advance。Python 额外检查 index 连续性；Python serializer 到 Lean model 的端到端 refinement
+仍未证明。
 因此正式表述是 **Lean-checked abstract execution-transaction semantics**，不是“形式化验证机器人安全”。
 
 ### 3.3 L2b：风险触发的关节 containment
@@ -293,8 +294,8 @@ ProofAlign 不以“第一个 checker、nonce、shield 或 attestation”为 nov
   ProofAlign 不声称这种通用归因能力，保护对象是在线连续 ActionBlock 及其执行证据。
 - **SEAL、CoVer** 根据 policy-supplied plan 或 learned instruction–action score 选择候选；ProofAlign 使用
   独立 trusted task anchor、保持 \(K=1\)，并建立后续 transaction。
-- **DIAT、CFA+、ARTO、TAT** 对 CPS 软件流或给定机器人轨迹提供更强 attestation/trajectory integrity；
-  ProofAlign 没有硬件 root，而是补充“预期轨迹尚未给定”时的 trusted-task-to-action 授权。
+- **DIAT、CFA+、ARTO、TAT** 对 CPS 软件流，或从预编程任务与离线 reference profiles 出发的机器人轨迹提供更强 attestation/trajectory integrity；
+  ProofAlign 没有硬件 root，而是补充“在线 VLA block 尚无可信 reference trajectory”时的 trusted-task-to-action 授权。
 - **VLMPC、shielding、CBF** 提供 action-conditioned prediction 或安全集合约束；L2b 是 simulator-qualified
   containment 工程，不是新的控制理论。
 

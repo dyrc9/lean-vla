@@ -1,8 +1,8 @@
 # 相关工作与论文定位
 
-文献核查截止：**2026-08-07**。会议归属优先以官方 proceedings/program 为准；尚未正式发表的工作明确标为
-arXiv。USENIX Security 2026 的 AttriGuard、MATE、ARTO 和 TAT 已列入官方 technical sessions，但截至核查日
-TAT 仍处于正文 embargo，因此这里只使用官方摘要可以支持的事实。
+文献核查截止：**2026-08-18**。会议归属优先以官方 proceedings/program 为准；尚未正式发表的工作明确标为
+arXiv。USENIX Security 2026 已于 8 月 12--14 日举行，AttriGuard、MATE、ARTO、TAT 和 Agentic AI SoK 的
+正式 proceedings PDF 均已公开；下文对 TAT 的定位已经按正式正文、而不是会议前摘要复核。
 
 ## 1. 结论先行：论文应主张跨层绑定，而不是单点首创
 
@@ -38,18 +38,18 @@ risk state -> guarded execution / joint-limit containment                [L2b]
 | Venue | 最新可核查批次 | 与本文最接近的工作 | 对叙事的约束 |
 |---|---|---|---|
 | IEEE S&P | [2026 accepted papers](https://www.ieee-security.org/TC/SP2026/accepted-papers.html) | Agent data permissions；When AI Meets the Web | 不能把数据授权或 trusted/untrusted content separation 当作首创 |
-| USENIX Security | [2026 technical sessions](https://www.usenix.org/conference/usenixsecurity26/technical-sessions) | AttriGuard；MATE；ARTO；TAT | 不能泛称首次 intent→action/policy attribution、execution integrity 或 trajectory integrity |
+| USENIX Security | [2026 technical sessions](https://www.usenix.org/conference/usenixsecurity26/technical-sessions) | AttriGuard；MATE；ARTO；TAT | 正式论文已公开；不能泛称首次 intent→action/policy attribution、execution integrity 或 trajectory integrity |
 | ACM CCS | 2025 proceedings/DOI | SecAlign | 不能把 prompt/data alignment 或模型级 prompt-injection defense 当作本文新意 |
 | NDSS | [2026 accepted papers](https://www.ndss-symposium.org/ndss2026/accepted-papers/) | ACE；SAGA；另参考 IsolateGPT 2025 | 不能声称首次分离 trusted planning 与 execution，或首次做 agent isolation/governance |
 
-截至 `2026-08-07`，CCS 2026 尚无可用正式 proceedings；USENIX Security 2026 的部分正文仍在会议前 embargo。
-因此文中对这些工作只使用官方页面已经公开的摘要，不从未公开正文推断实现细节。在本轮官方目录中未发现
+截至 `2026-08-18`，CCS 2026 尚无可用正式 proceedings；USENIX Security 2026 的相关正式正文已经公开。
+在本轮官方目录与已公开正文中未发现
 与 `trusted task -> exact continuous ActionBlock -> physical dispatch/effects` 完全同构的 VLA 系统；这是
 基于所核查目录的文献筛查结论，不是穷尽性“全球首个”证明。
 
 ## 2. VLA 与具身模型攻击：说明物理后果，但不提供运行时闭环
 
-[SABER](https://arxiv.org/abs/2603.24935)（arXiv 2026）使用 bounded instruction edits 对六类 VLA 做
+[SABER](https://arxiv.org/abs/2603.24935)（IROS 2026；当前可访问版本为 arXiv）使用 bounded instruction edits 对六类 VLA 做
 black-box attack，并以 task failure、动作长度和 constraint violation 衡量机器人行为后果。它是本文冻结
 攻击记录的直接来源，也支持“攻击是否改变最终执行”而不是“模型是否输出恶意解释”的问题设定。
 
@@ -78,8 +78,8 @@ safety architecture 列为开放问题；ProofAlign 是这个大方向中的一�
 physical-interaction 风险分开，并报告累计风险与暴露时间。这些工作直接支持本文同时报告 task success、
 violation episode、risk steps、deadlock 和 latency，而不是只给一个成功率。
 
-[SafeVLA](https://safevla.github.io/)（NeurIPS 2025 Spotlight）通过 constrained learning 改善 VLA 的训练时
-安全对齐；[SAFE](https://vla-safe.github.io/)（NeurIPS 2025）从 VLA hidden features 预测跨任务失败，并以
+[SafeVLA](https://proceedings.neurips.cc/paper_files/paper/2025/hash/e185c7be603426028c32ae1003a59d78-Abstract-Conference.html)（NeurIPS 2025）通过 constrained learning 改善 VLA 的训练时
+安全对齐；[SAFE](https://proceedings.neurips.cc/paper_files/paper/2025/hash/392d0d05e2f514063e6ce6f8b370834c-Abstract-Conference.html)（NeurIPS 2025）从 VLA hidden features 预测跨任务失败，并以
 conformal prediction 校准报警时间。它们分别代表 policy-level alignment 和 rollout-level failure detection。
 
 ProofAlign 与这一组工作的边界是：
@@ -96,8 +96,8 @@ ProofAlign 与这一组工作的边界是：
 [Diffusion Policy](https://arxiv.org/abs/2303.04137) 直接生成 receding-horizon 动作序列。这类最低共同接口
 不保证部署者能读取离散高层计划，所以依赖模型自报 plan 或 chain-of-thought 的 verifier 不是通用方案。
 
-[Pi0.5](https://arxiv.org/abs/2504.16054) 在论文系统中使用 high-level semantic prediction、object detection
-和 low-level action 等混合训练信号；[RT-H](https://arxiv.org/abs/2403.01823) 显式预测 language motion
+[Pi0.5](https://arxiv.org/abs/2504.16054)（CoRL 2025 Oral）在论文系统中使用 high-level semantic prediction、object detection
+和 low-level action 等混合训练信号；[RT-H](https://www.roboticsproceedings.org/rss20/p049.html)（RSS 2024）显式预测 language motion
 再条件化动作。它们证明 semantic/action hierarchy 可以提供结构与干预接口，但 policy 内部产生的 semantic
 output 仍与 policy 共享攻击面。
 
@@ -166,15 +166,19 @@ ActionBlock 建立授权，并继续绑定 simulator 中的 actuator command 和
   control-flow prevention 与可信 runtime evidence 结合；
 - [ARTO](https://www.usenix.org/conference/usenixsecurity26/technical-sessions)（USENIX Security 2026）面向
   real-time CPS 组合 control-flow attestation 与 data-flow protection；
-- [TAT](https://www.usenix.org/conference/usenixsecurity26/presentation/yao-chengtao)（USENIX Security 2026）
-  明确定义工业机械臂 trajectory integrity，并结合 timed motion events 与 joint measurements 审计真实运动。
+- [TAT](https://www.usenix.org/conference/usenixsecurity26/presentation/yao-chengtao)（USENIX Security 2026，
+  pp. 3439--3457）明确定义工业机械臂 trajectory integrity。它对受保护的任务程序做静态分析，并在受控
+  离线运行中生成 Timed Motion Event Graph 与事件级参考轨迹；运行时由 TEE 保护 event/control/data-flow
+  证据，并用旁路采集的原始电机编码器读数重建 actual trajectory。
 
 TAT 直接占据“机器人轨迹完整性”这一表述，因此 ProofAlign 不应声称首次提出 trajectory integrity 或首次把
-joint measurements 纳入 attestation。更准确的区分是：TAT 从给定 intended path 出发验证工业臂是否按路径
-运动；ProofAlign 研究的前置问题是，当自然语言条件下的 VLA 只给出数值 ActionBlock 时，哪个 exact block
-获得可信任务授权，以及授权后系统如何把同一 identity 延伸到执行与 effects。
+joint measurements 纳入 attestation。更准确的区分是：TAT 从预编程任务及其受控测试所得参考 profiles
+出发，验证工业臂的实际运动是否符合事件级时空语义；ProofAlign 研究的前置问题是，当自然语言条件下的 VLA
+在线生成数值 ActionBlock 时，哪个 exact block 获得可信任务授权，以及授权后系统如何把同一 identity
+延伸到执行与 effects。TAT 主要生成执行后的远程 attestation evidence，ProofAlign 则在执行前进行 dispatch
+mediation；两者是可组合的上下层，而不是互斥替代。
 
-ProofAlign 当前也不具备 TAT/DIAT/CFA+ 的硬件 root of trust 或远程 attestation 保证。其 digest、nonce、
+ProofAlign 当前也不具备 TAT/DIAT/CFA+ 的硬件 root of trust、旁路 encoder evidence 或远程 attestation 保证。其 digest、nonce、
 receipt 和 Lean semantics 是软件 TCB 内的 transaction-integrity mechanism；论文必须把这一点作为安全边界，
 不能用 `attestation` 一词暗示硬件支持。
 
@@ -231,7 +235,7 @@ compatibility 不等于 trusted-task compatibility。ProofAlign 的组合纪律�
 | IsolateGPT / SAGA / agent permissions | trusted scaffold | capability/data access | capability level | digital execution isolation | no | isolation/access control |
 | ACE | trusted abstract plan | abstract→concrete app plan | structured app-call level | digital plan/execution binding | no | static analysis + barriers |
 | DIAT / CFA+ / ARTO | trusted verifier/model | not natural-language task | software/data-flow level | attestation evidence | CPS-dependent | hardware/software attestation |
-| TAT | intended path given | path reference assumed | motion-event level | joint/event evidence | yes | trajectory attestation |
+| TAT | protected task program | offline event-level reference profiles | motion-event level | TEE-protected event evidence + bypass joint measurements | yes | trajectory attestation |
 | ProofAlign L1 | required | trusted-task monitor；progress advisory | exact block digest | feeds L2 | hard local-risk gates | statistical/system claim |
 | ProofAlign L2a | inherits L1 binding | no new semantic truth | exact authorized command | required | no standalone containment claim | Lean-checked finite semantics |
 | ProofAlign L2b | inherits L1 binding | no new semantic truth | source command retained | runtime guard/margin evidence | joint-margin/force envelope | simulator-qualified system claim |

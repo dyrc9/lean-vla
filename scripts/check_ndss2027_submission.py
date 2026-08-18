@@ -71,8 +71,8 @@ def require_tokens(label: str, text: str, tokens: tuple[str, ...]) -> None:
     require(not missing, f"{label} drifted or is incomplete: {missing}")
 
 
-def find_pdffonts() -> str:
-    executable = shutil.which("pdffonts")
+def find_poppler_tool(name: str) -> str:
+    executable = shutil.which(name)
     if executable is not None:
         return executable
 
@@ -84,13 +84,17 @@ def find_pdffonts() -> str:
     if pdfinfo is not None:
         dependency_root = Path(pdfinfo).resolve().parents[2]
         for relative in (
-            "native/poppler/poppler/bin/pdffonts",
-            "native/poppler/bin/pdffonts",
+            f"native/poppler/poppler/bin/{name}",
+            f"native/poppler/bin/{name}",
         ):
             candidate = dependency_root / relative
             if candidate.is_file():
                 return str(candidate)
-    raise AssertionError("PDF font audit: required executable not found: pdffonts")
+    raise AssertionError(f"PDF audit: required executable not found: {name}")
+
+
+def find_pdffonts() -> str:
+    return find_poppler_tool("pdffonts")
 
 
 def validate_source_structure() -> list[str]:
@@ -202,19 +206,19 @@ def validate_source_structure() -> list[str]:
             "39.79\\,ms",
             "18.30\\,ms p95",
             "no 100\\,ms miss",
-            "frozen attack family and simulator setting",
+            "complete 120-unit attack-evaluation protocol",
+            "empirical studies run in LIBERO-Safety simulation",
         ),
     )
     require_tokens(
         "introduction contribution summary",
         introduction,
         (
-            "paired 144-episode study",
-            "L1-only records 13/18 task success under both clean and attacked inputs",
-            "L2-on arms record zero observed joint-limit crossings",
-            "Dual combines these sample outcomes",
+            "\\mathsf{ProofAligned}",
+            "complete 120-unit attack-evaluation protocol",
+            "paired four-arm mechanism study",
             "does not recover a model's latent intent",
-            "establish real-robot safety",
+            "establish general robot safety",
         ),
     )
     require_tokens(
@@ -245,11 +249,12 @@ def validate_source_structure() -> list[str]:
         conclusion,
         (
             "39/86 (45.35\\%)",
-            "successfully reproduces SABER",
+            "complete attack-evaluation protocol",
             "13/18 attacked task success",
             "0/18 observed joint-limit violation episodes",
             "frozen simulator setting",
             "hard-real-time analysis",
+            "\\mathsf{ProofAligned}",
         ),
     )
 
@@ -262,11 +267,12 @@ def validate_source_structure() -> list[str]:
         "HotCRP metadata must retain the official Fall opening date and site",
     )
     metadata_tokens = (
-        "ProofAlign: Trusted-Task Monitoring and Cross-Layer Execution Integrity",
+        "ProofAlign: Cross-Layer Runtime Integrity for Embodied",
         "39 of 86",
         "45.35%",
         "[32.93%, 57.78%]",
-        "18 held-out pairs",
+        "complete 120-unit attack-evaluation protocol",
+        "18 task/initialization pairs",
         "144-episode",
         "11/18",
         "13/18",
@@ -292,8 +298,8 @@ def validate_pdf() -> None:
     require(PDF.is_file(), f"compiled PDF missing: {PDF}")
     info = run_checked("PDF metadata readable", ["pdfinfo", str(PDF)], cwd=PAPER_ROOT)
     require(
-        re.search(r"^Pages:\s+13$", info, re.M) is not None,
-        "PDF must remain 13 total pages",
+        re.search(r"^Pages:\s+14$", info, re.M) is not None,
+        "PDF must remain 14 total pages with technical content ending on page 13",
     )
     require(
         re.search(r"^Page size:\s+612 x 792 pts \(letter\)$", info, re.M) is not None,
@@ -302,6 +308,29 @@ def validate_pdf() -> None:
     for field in ("Author", "Title", "Subject", "Keywords"):
         match = re.search(rf"^{field}:\s*(.*)$", info, re.M)
         require(match is None or not match.group(1).strip(), f"PDF metadata leaks {field}")
+
+    page_13 = run_checked(
+        "PDF page 13 text readable",
+        [find_poppler_tool("pdftotext"), "-f", "13", "-l", "13", str(PDF), "-"],
+        cwd=PAPER_ROOT,
+    )
+    page_14 = run_checked(
+        "PDF page 14 text readable",
+        [find_poppler_tool("pdftotext"), "-f", "14", "-l", "14", str(PDF), "-"],
+        cwd=PAPER_ROOT,
+    )
+    require("CONCLUSION" in page_13.upper(), "Conclusion must begin by page 13")
+    require("APPENDIX" in page_14.upper(), "Appendix must remain on the excluded final page")
+    forbidden_final_page = (
+        "IX. CONCLUSION",
+        "VII. SECURITY ANALYSIS AND DISCUSSION",
+        "VIII. RELATED WORK",
+        "VI. EVALUATION",
+    )
+    require(
+        not any(token in page_14.upper() for token in forbidden_final_page),
+        "page 14 must contain only references and appendix material",
+    )
 
     require(LOG.is_file(), f"LaTeX log missing: {LOG}")
     log = LOG.read_text(encoding="utf-8", errors="replace")
@@ -336,8 +365,8 @@ def validate_pdf() -> None:
         "PDF must retain Times-compatible text and NewTX math fonts",
     )
     print(
-        "PASS  PDF is 13 total pages on US Letter with anonymous metadata, embedded/subset "
-        "fonts, and a clean log"
+        "PASS  PDF is 14 total pages on US Letter; technical content ends on page 13, "
+        "page 14 contains only references/appendix material, and metadata, fonts, and log pass"
     )
 
 

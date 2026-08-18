@@ -1,11 +1,12 @@
 # NDSS 2027 投稿就绪清单
 
-最后更新：2026-08-07。官方依据：
+最后更新：2026-08-18。官方依据：
 [NDSS 2027 Call for Papers](https://www.ndss-symposium.org/ndss2027/submissions/call-for-papers/)
 与 [NDSS 2027 Templates](https://www.ndss-symposium.org/ndss2027/submissions/templates/)。
 
-本清单只审计可投稿性，不改变冻结实验的 protocol、结果或历史分类。当前论文正文以前景结论“成功复现
-SABER，观测ASR为45.35%”组织；历史分类仅留在claim--evidence与冻结protocol审计中。
+本清单只审计可投稿性，不改变冻结实验的 protocol、结果或历史分类。当前论文把SABER作为完整攻击评测协议
+上的风险测量，报告观测ASR为45.35%；不再把“是否复现成功”作为正文故事。历史分类仅留在
+claim--evidence与冻结protocol审计中。
 
 ## 已满足或已落实
 
@@ -13,13 +14,14 @@ SABER，观测ASR为45.35%”组织；历史分类仅留在claim--evidence与冻
 - [x] 初审稿不包含作者姓名和单位；正文不使用第一人称指代既往作者工作。
 - [x] Ethics Considerations 紧接参考文献之前。
 - [x] 按实际辅助范围加入 Generative-AI Disclosure，明确产品、模型家族、访问时间，并覆盖全部论文小节与
-      Figs. 1--4 的 LaTeX/TikZ 图稿；若投稿界面届时提供更细的可见模型标签，再据实补充，不虚构未暴露的内部版本号。
+      Figs. 1--3 的 LaTeX/TikZ 图稿；若投稿界面届时提供更细的可见模型标签，再据实补充，不虚构未暴露的内部版本号。
 - [x] 论文主线明确落在系统安全：不把贡献写成纯 VLA/控制算法，不宣称硬件证明或真实机器人安全。
-- [x] SABER 攻击在正文中统一写为成功复现，报告 `39/86=45.35%` 及CI；历史分类在audit material中保留。
-- [x] 最终四臂数字与冻结证据一致，且不混用attack-reproduction与final-study口径；正文不出现内部版本号。
+- [x] SABER 攻击在正文中统一写为完整120-unit协议上的风险测量，报告 `39/86=45.35%` 及CI；历史
+      reproduction分类仅在audit material中保留。
+- [x] 当前18-pair四臂数字与冻结证据一致，且不与120-unit攻击风险口径混算；正文不出现内部版本号。
 - [x] 已用 NDSS 官方 `bare_conf_NDSS2027.tex` 要求的 `IEEEtran` 1.8b 接口、首页 block 和页码规则核对；
       本地已纳入与 Overleaf 全文相同的官方 IEEEtran 1.8b 类（仅行尾终止符规范化），不再依赖发行版隐式版本；
-      本地 Tectonic 生成 US Letter、双栏、完整 13 页 PDF，技术正文与 Conclusion 在第 12 页内结束；第 13 页
+      本地 Tectonic 生成 US Letter、双栏、完整 14 页 PDF，技术正文与 Conclusion 在第 13 页内结束；第 14 页
       仅含参考文献尾部和不计入正文限制的 Appendix，满足官方“技术正文最多 13 页，Ethics/References/Appendix
       不计”的要求。
 - [x] 正文嵌入 TeX Gyre Termes（Times-compatible）与 NewTX 数学字体；统一预检现在调用 Poppler 字体表，
@@ -50,20 +52,19 @@ SABER，观测ASR为45.35%”组织；历史分类仅留在claim--evidence与冻
       消融，Dual 是组合；SafeVLA、SAFE、SEAL 与 CoVer 因训练干预、所需 plan/candidate 接口或估计对象不同，
       不被误写为可直接替换的同协议数值基线，也不宣称全面优于所有 VLA safety system。
 - [x] `scripts/audit_ndss2027_paper_claims.py` 从冻结 trace 重算主表并核对完整性、开销与 warning，
-      同时逐项验证附录列出的 9 个 theorem 名称与 Lean 源码一致；当前通过。
+      同时逐项验证附录列出的 10 个 theorem 名称与 Lean 源码一致；当前通过。
 - [x] L2a 的 stale evidence、substitution、replay、cross-proposal、incomplete evidence 与 TCB-limit
       等负向完整性用例已完成聚焦回归（69/69 通过），并在正文中单独报告其证据边界。
 - [x] 动作身份主张已与实现对齐：正文明确 SHA-256 绑定的是 schema-tagged canonical numeric JSON
       与 proposal shape，而不是 NumPy dtype、endianness、内存字节或物理轨迹；L2-only 也明确不携带
       L1 trusted-task semantic authorization。
-- [x] receipt 主张已按现有证据收窄：Python runtime 检查连续 step index 及每步 digest 与
-      `authorization.action_at(i)` 的对应；Lean 只证明 whole-command authorization binding、同一
-      authorization 和 receipt 内 applied/authorized digest 相等，不把未完成的 ordered per-step-list
-      refinement 写成已证明。
+- [x] receipt 主张已与增强后的形式模型对齐：Python runtime 检查连续 step index 及每步 digest 与
+      `authorization.action_at(i)` 的对应；Lean 现在同时绑定 whole command、typed ordered digest list、
+      receipt index 与 applied-step digest。Python canonical tuple/serializer refinement 仍明确列为未证明。
 - [x] 摘要、系统图、结果图、Discussion 与 Conclusion 已统一这一证据层级：runtime gate 不再称为
       formal gate，四臂结果明确为 sample outcome 而非 population effect，Lean 只称为 abstract
       binding/phase semantics。
-- [x] 完成 novelty/orthogonality 审稿式精修：Introduction 现在把新颖性明确落在 action-only VLA 的
+- [x] 完成 novelty/orthogonality 审稿式精修：Introduction 现在把新颖性明确落在在线VLA source ActionBlock的
       protected object 与跨层 preservation chain，而非单个 checker/nonce/shield；Design 明确给出
       L1、L2a、L2b 不能互相替代的反例，并把 closest-work 表中的 L1 对象收窄为 trusted context 加
       checker verdict，而非无条件的 trusted-task authorization。
@@ -81,17 +82,22 @@ SABER，观测ASR为45.35%”组织；历史分类仅留在claim--evidence与冻
 - [x] Ethics 明确说明 \texttt{human\_safety} 是纯模拟场景，不涉及 human subjects、个人数据或未披露的
       真实系统漏洞，避免由 benchmark 命名产生伦理范围歧义。
 - [x] 源文件与 PDF 已扫描作者/机构/邮箱/本地路径；PDF metadata 不含 Author、Title 或身份字段。
-- [x] 最新 13 页版本已再次逐页渲染复核，无裁切、重叠、孤立标题、越界链接、未定义引用或
+- [x] 最新 14 页版本已再次逐页渲染复核，无裁切、重叠、孤立标题、越界链接、未定义引用或
       overfull box；Introduction/Design 增补后的后续分页和 Conclusion/Disclosure/Ethics 过渡均保持完整。
 - [x] 主结果表已将原先容易与分数斜杠混淆的 `C/A` 合并单元格拆成 Clean/Attacked 独立列，并把
       violation episode、crossing step、joint-limit step 明确归入 attacked joint-limit outcomes；数字未变。
 - [x] 本地 21 个同步文件已纳入 manifest；此前 20 个正文/图稿文件已逐一从 Overleaf 全选复制回读并与
       本地全文精确比较；模板类也已核对为相同正文（Overleaf 仅省略末尾换行）。修复了编辑器曾遗留的
       章节尾部和 `\end{document}` 后旧内容。本轮 reviewer-audit 修订后的正文/图稿精确回读已通过，
-      远端重新编译为 13 页，并确认 `Errors 0 / Warnings 0`。
+      当前本地重新编译为14页，其中技术正文与Conclusion结束于第13页；投稿预检与逐页视觉复核通过。
 
 ## 投稿前必须关闭
 
+- [ ] 按统一120-unit评测集补齐clean/attacked四臂，使各arm采用与45.35%相同的risk-transition定义；在结果
+      回来前，正文必须继续明确现有四臂是独立18-pair机制研究，不能把它写成已完成的全集防御实验。
+      运行与回填口径见 `docs/paper/full120_four_arm_result_integration.md`；现有冻结调度与分析契约只证明
+      历史schema和统计方法，不代表outcome已被观察。由于Lean形式化源已经增强，旧v4协议的source binding
+      当前会fail closed；正式执行前还必须签发绑定最终源码的新successor protocol，不能改写历史checksum。
 - [ ] 若提交时 Codex 界面暴露比“GPT-5 model family”更精确的模型标签，据实更新 disclosure；若未暴露，
       保留当前产品、模型家族与访问时间，不猜测内部构建版本。
 - [ ] 提交系统开放并获得 paper number 后，把首页 DOI 的 `24xxxx` 替换为实际 Fall-cycle 编号。
