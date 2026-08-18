@@ -5,6 +5,7 @@ import json
 import pytest
 
 from scripts import freeze_l1_task_conditioned_v3_development as freeze
+from scripts import freeze_l1_task_conditioned_v3_heldout as heldout
 
 
 def _analysis(message: str) -> dict:
@@ -75,3 +76,96 @@ def test_v3_freeze_does_not_authorize_from_incomplete_analysis(
     monkeypatch.setattr(freeze, "PARENT_ANALYSIS", path)
     with pytest.raises(freeze.FreezeV3Error, match="incomplete"):
         freeze._v2_diagnostic()
+
+
+def _heldout_fixture(tmp_path, monkeypatch: pytest.MonkeyPatch):
+    episode_path = tmp_path / "episode.json"
+    audit = {
+        "schema": "proofalign.task-conditioned-l1.v3.candidate-decision",
+        "source_policy_chunk_base_array_sha256": "a" * 64,
+        "recovery_library_digest": heldout.recovery_library_digest(),
+        "selected_kind": "nominal",
+        "nominal_command_changed": False,
+        "selection_reason": "transition_aligned_exact_shadow_allow",
+    }
+    episode_path.write_text(
+        json.dumps(
+            {
+                "observation_frame_audits": [
+                    {"online_progress_projection_v3": audit}
+                ]
+            }
+        ),
+        encoding="utf-8",
+    )
+    rows = []
+    for index in range(240):
+        l1 = index >= 120
+        rows.append(
+            {
+                "arm": "semantic_only" if l1 else "vla_only",
+                "terminal_exception": False,
+                "l1_audit_count": 1 if l1 else 0,
+                "l1_shadow_restore_identity_complete": l1,
+                "artifact_path": "episode.json",
+                "task_success": bool(index % 2),
+            }
+        )
+    analysis_path = tmp_path / "v3-analysis.json"
+    analysis_path.write_text(
+        json.dumps({"population": "development", "episode_rows": rows}),
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(heldout, "REPO_ROOT", tmp_path)
+    monkeypatch.setattr(heldout, "V3_DEV_ANALYSIS", analysis_path)
+    return analysis_path, episode_path, rows, audit
+
+
+def test_v3_heldout_authorization_is_outcome_blind_and_identity_bound(
+    tmp_path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    _heldout_fixture(tmp_path, monkeypatch)
+    result = heldout._qualification()
+    assert result["episode_count"] == 240
+    assert result["l1_episode_count"] == 120
+    assert result["qualified_restore_complete_episode_count"] == 120
+    assert result["outcome_gate_applied"] is False
+    assert result["task_success_or_risk_result_used_for_authorization"] is False
+
+
+def test_v3_heldout_authorization_rejects_terminal_or_unbound_recovery(
+    tmp_path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    analysis_path, episode_path, rows, audit = _heldout_fixture(
+        tmp_path, monkeypatch
+    )
+    rows[120]["terminal_exception"] = True
+    analysis_path.write_text(
+        json.dumps({"population": "development", "episode_rows": rows}),
+        encoding="utf-8",
+    )
+    with pytest.raises(
+        heldout.HeldoutV3FreezeError, match="terminal implementation"
+    ):
+        heldout._qualification()
+
+    rows[120]["terminal_exception"] = False
+    analysis_path.write_text(
+        json.dumps({"population": "development", "episode_rows": rows}),
+        encoding="utf-8",
+    )
+    audit["recovery_library_digest"] = "b" * 64
+    episode_path.write_text(
+        json.dumps(
+            {
+                "observation_frame_audits": [
+                    {"online_progress_projection_v3": audit}
+                ]
+            }
+        ),
+        encoding="utf-8",
+    )
+    with pytest.raises(
+        heldout.HeldoutV3FreezeError, match="library binding differs"
+    ):
+        heldout._qualification()
