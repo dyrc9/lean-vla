@@ -1,0 +1,17 @@
+{
+  "schema": "proofalign.l1-task-conditioned-startup-abort.v1",
+  "timestamp_timezone": "Asia/Shanghai",
+  "condition_processes": ["clean", "attacked"],
+  "interpreter": "/home/ldx/lean-vla/.venv/bin/python",
+  "error_type": "ModuleNotFoundError",
+  "error_message": "No module named 'jax'",
+  "failure_location": "pre-policy environment configuration import",
+  "policy_loaded": false,
+  "environment_created": false,
+  "episode_dispatch_count": 0,
+  "ledger_row_count": 0,
+  "outcome_observed": false,
+  "retry_classification": "launcher correction before any experimental attempt",
+  "replacement_interpreter": "/home/ldx/lean-vla/external/openpi/.venv/bin/python",
+  "method_or_protocol_changed": false
+}
