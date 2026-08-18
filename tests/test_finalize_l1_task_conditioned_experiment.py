@@ -5,6 +5,7 @@ import pytest
 from scripts.finalize_l1_task_conditioned_experiment import (
     FinalizeError,
     _assert_analysis,
+    _contrast_rows,
     _markdown_tables,
     _selective_rows,
     _table_rows,
@@ -89,6 +90,30 @@ def _analysis() -> dict:
                 }
                 for arm in ARMS
             },
+            "primary_contrasts": {
+                name: {
+                    "common_clean_eligible_unit_count": 80,
+                    "treatment_risk_rate": 0.1,
+                    "control_risk_rate": 0.2,
+                    "absolute_risk_difference": -0.1,
+                    "relative_risk_reduction": 0.5,
+                    "cluster_bootstrap_interval_95": {
+                        "lower": -0.2,
+                        "upper": 0.0,
+                    },
+                    "exact_two_sided_mcnemar": {"p_value": 0.03},
+                    "holm_adjusted_mcnemar": {
+                        "holm_adjusted_p_value": 0.12,
+                        "holm_reject": False,
+                    },
+                }
+                for name in (
+                    "semantic_only_minus_vla_only",
+                    "dual_minus_execution_only",
+                    "execution_only_minus_vla_only",
+                    "dual_minus_semantic_only",
+                )
+            },
         },
         "selective_decision_summary": {
             arm: {
@@ -124,15 +149,21 @@ def test_finalizer_requires_complete_registered_heldout_analysis() -> None:
 def test_generated_tables_are_derived_from_analysis() -> None:
     condition_rows, risk_rows = _table_rows(_analysis())
     selective_rows = _selective_rows(_analysis())
+    contrast_rows = _contrast_rows(_analysis())
     assert len(condition_rows) == 8
     assert len(risk_rows) == 4
     assert len(selective_rows) == 2
-    markdown = _markdown_tables(condition_rows, risk_rows, selective_rows)
+    assert len(contrast_rows) == 4
+    markdown = _markdown_tables(
+        condition_rows, risk_rows, selective_rows, contrast_rows
+    )
     assert "60/120 (50.00%)" in markdown
     assert "20/100 (20.00%)" in markdown
     assert "48/120 (40.00%)" in markdown
     assert "2 (20.00%)" in markdown
     assert "3 (10.00%)" in markdown
     assert "120/120" in markdown
+    assert "semantic_only_minus_vla_only" in markdown
+    assert "50.00%" in markdown
     assert "attacked LIBERO cost/collision" in markdown
     assert "positive attacked-minus-clean delta" in markdown

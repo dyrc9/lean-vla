@@ -161,10 +161,42 @@ def _selective_rows(analysis: Mapping[str, Any]) -> list[dict[str, Any]]:
     return rows
 
 
+def _contrast_rows(analysis: Mapping[str, Any]) -> list[dict[str, Any]]:
+    rows = []
+    contrasts = analysis["registered_risk_analysis"]["primary_contrasts"]
+    for name, source in contrasts.items():
+        treatment, control = name.split("_minus_", 1)
+        bootstrap = source.get("cluster_bootstrap_interval_95") or {}
+        mcnemar = source.get("exact_two_sided_mcnemar") or {}
+        holm = source.get("holm_adjusted_mcnemar") or {}
+        rows.append(
+            {
+                "contrast": name,
+                "treatment": treatment,
+                "control": control,
+                "common_clean_eligible_units": source[
+                    "common_clean_eligible_unit_count"
+                ],
+                "treatment_risk_rate": source.get("treatment_risk_rate"),
+                "control_risk_rate": source.get("control_risk_rate"),
+                "absolute_risk_difference": source.get("absolute_risk_difference"),
+                "relative_risk_reduction": source.get("relative_risk_reduction"),
+                "cluster_ci_lower": bootstrap.get("lower"),
+                "cluster_ci_upper": bootstrap.get("upper"),
+                "mcnemar_p_value": mcnemar.get("p_value"),
+                "holm_adjusted_p_value": holm.get("holm_adjusted_p_value"),
+                "holm_reject": holm.get("holm_reject"),
+                "not_estimable": bool(source.get("not_estimable")),
+            }
+        )
+    return rows
+
+
 def _markdown_tables(
     condition_rows: list[Mapping[str, Any]],
     risk_rows: list[Mapping[str, Any]],
     selective_rows: list[Mapping[str, Any]],
+    contrast_rows: list[Mapping[str, Any]],
 ) -> str:
     lines = [
         "# L1 task-conditioned successor: generated tables",
@@ -239,6 +271,52 @@ def _markdown_tables(
                 unsafe_allow=row["unsafe_first_action_allow_count"],
                 unsafe_rate=_percent(row["unsafe_first_action_allow_rate"]),
                 paired_unsafe=row["paired_transition_unsafe_allow_episodes"],
+            )
+        )
+    lines.extend(
+        [
+            "",
+            "## Paired four-channel risk contrasts",
+            "",
+            "| Contrast | Common eligible | Treatment risk | Control risk | Absolute difference | Relative reduction | 95% paired-cluster CI | McNemar p | Holm p | Holm reject |",
+            "|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
+        ]
+    )
+    for row in contrast_rows:
+        if row["not_estimable"]:
+            lines.append(
+                f"| {row['contrast']} | {row['common_clean_eligible_units']} | n/a | n/a | n/a | n/a | n/a | n/a | n/a | n/a |"
+            )
+            continue
+        lines.append(
+            "| {contrast} | {common_clean_eligible_units} | {treatment_rate} | "
+            "{control_rate} | {difference} | {relative} | [{ci_lower}, {ci_upper}] | "
+            "{mcnemar} | {holm} | {reject} |".format(
+                **row,
+                treatment_rate=_percent(row["treatment_risk_rate"]),
+                control_rate=_percent(row["control_risk_rate"]),
+                difference=(
+                    "n/a" if row["absolute_risk_difference"] is None
+                    else f"{float(row['absolute_risk_difference']):.4f}"
+                ),
+                relative=_percent(row["relative_risk_reduction"]),
+                ci_lower=(
+                    "n/a" if row["cluster_ci_lower"] is None
+                    else f"{float(row['cluster_ci_lower']):.4f}"
+                ),
+                ci_upper=(
+                    "n/a" if row["cluster_ci_upper"] is None
+                    else f"{float(row['cluster_ci_upper']):.4f}"
+                ),
+                mcnemar=(
+                    "n/a" if row["mcnemar_p_value"] is None
+                    else f"{float(row['mcnemar_p_value']):.6g}"
+                ),
+                holm=(
+                    "n/a" if row["holm_adjusted_p_value"] is None
+                    else f"{float(row['holm_adjusted_p_value']):.6g}"
+                ),
+                reject=str(row["holm_reject"]).lower(),
             )
         )
     lines.extend(
@@ -353,6 +431,7 @@ def finalize(
             raise FinalizeError(f"held-out protocol episode count differs: {condition}")
     condition_rows, risk_rows = _table_rows(analysis)
     selective_rows = _selective_rows(analysis)
+    contrast_rows = _contrast_rows(analysis)
     output_dir.mkdir(parents=True)
     condition_fields = list(condition_rows[0])
     risk_fields = list(risk_rows[0])
@@ -365,8 +444,14 @@ def finalize(
     (output_dir / "selective_decision_summary.csv").write_text(
         _csv(selective_rows, list(selective_rows[0])), encoding="utf-8"
     )
+    (output_dir / "risk_contrast_summary.csv").write_text(
+        _csv(contrast_rows, list(contrast_rows[0])), encoding="utf-8"
+    )
     (output_dir / "generated_tables.md").write_text(
-        _markdown_tables(condition_rows, risk_rows, selective_rows), encoding="utf-8"
+        _markdown_tables(
+            condition_rows, risk_rows, selective_rows, contrast_rows
+        ),
+        encoding="utf-8",
     )
     summary = {
         "schema": "proofalign.l1-task-conditioned-final-handoff.v1",

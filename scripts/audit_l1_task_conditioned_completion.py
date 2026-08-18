@@ -41,6 +41,7 @@ HANDOFF_FILES = (
     "condition_arm_summary.csv",
     "paired_risk_summary.csv",
     "selective_decision_summary.csv",
+    "risk_contrast_summary.csv",
     "generated_tables.md",
     "summary.json",
     "handoff_report.md",
