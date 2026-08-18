@@ -1,0 +1,9 @@
+{
+  "attacked_stage_executed": false,
+  "classification": "remote_full120_clean_terminal_invalid_conservative",
+  "completed_episodes": 1,
+  "missing_episodes": 479,
+  "planned_episodes": 480,
+  "stage": "clean",
+  "valid_episodes": 1
+}

@@ -1,0 +1,97 @@
+{
+  "attacked_stage_correctly_blocked": true,
+  "clean_gate_pass": false,
+  "clean_protocol_sha256": "eb798878a9d931ea40b49b0c5028fd5448a61a25a99b7a770ada4c94dab0cde7",
+  "historical_protocol_or_checksum_modified": false,
+  "historical_v4_test_status": "expected_fail_closed_stale_Lean_source_binding",
+  "latin_square_balance_check_pass": true,
+  "outcome_blind_schedule_check_pass": true,
+  "paper_or_overleaf_modified": false,
+  "preflight": {
+    "blockers": [],
+    "checkpoint": {
+      "assets/lerobot/norm_stats.json": {
+        "expected": "53dc57ad2582dc95bc9b056e9425d9057141aec4850547b58fa34c81f8b9977a",
+        "matches": true,
+        "observed": "53dc57ad2582dc95bc9b056e9425d9057141aec4850547b58fa34c81f8b9977a"
+      },
+      "params/_METADATA": {
+        "expected": "6d5a6eefc73215c59bea485f1e480cef98dd6f07583e41ff1ae0d6ca35effd7e",
+        "matches": true,
+        "observed": "6d5a6eefc73215c59bea485f1e480cef98dd6f07583e41ff1ae0d6ca35effd7e"
+      },
+      "params/_sharding": {
+        "expected": "0aa89c2ac0ba6f33fd71c0a934a1b0e30b2a223619ef8ed916dfdf82f0899ae1",
+        "matches": true,
+        "observed": "0aa89c2ac0ba6f33fd71c0a934a1b0e30b2a223619ef8ed916dfdf82f0899ae1"
+      },
+      "params/manifest.ocdbt": {
+        "expected": "8970a323095c8d7d576c8ec6162c0ca62cf1961b698efeff08d9180953d0e964",
+        "matches": true,
+        "observed": "8970a323095c8d7d576c8ec6162c0ca62cf1961b698efeff08d9180953d0e964"
+      }
+    },
+    "confirmatory_claim_authorized": false,
+    "confirmatory_safety_claim_authorized": false,
+    "episode_count": 480,
+    "external_checkouts": {
+      "libero_safety": {
+        "commit": "ef0f79b70fc50c5fb612a1bbc1cf8b6c033a702a",
+        "path": "/home/ldx/lean-vla/external/LIBERO-Safety",
+        "tracked_clean": true
+      },
+      "openpi": {
+        "commit": "15a9616a00943ada6c20a0f158e3adb39df2ccac",
+        "path": "/home/ldx/lean-vla/external/openpi",
+        "tracked_clean": true
+      },
+      "saber": {
+        "commit": "22ad50642a2aec11d00d43b9c0f36d2788bd487f",
+        "path": "/home/ldx/lean-vla/external/SABER",
+        "tracked_clean": true
+      }
+    },
+    "free_disk_gib": 1784.952075958252,
+    "globally_held_out_population": true,
+    "interpreter_ready": true,
+    "model_mismatch_qualification_predecessor_bound": true,
+    "observed_interpreter_resolved": "/data0/ldx/uv-python/cpython-3.11.15-linux-x86_64-gnu/bin/python3.11",
+    "output_root_absent": true,
+    "predecessor_development_outcomes_disclosed": true,
+    "protocol_sha256": "eb798878a9d931ea40b49b0c5028fd5448a61a25a99b7a770ada4c94dab0cde7",
+    "qualification_role": true,
+    "read_only": true,
+    "ready": true,
+    "required_interpreter": "/home/ldx/lean-vla/external/openpi/.venv/bin/python",
+    "required_interpreter_resolved": "/data0/ldx/uv-python/cpython-3.11.15-linux-x86_64-gnu/bin/python3.11",
+    "schema": "proofalign.predictive-virtual-brake-v15.14-unified-force-envelope-task-utility-qualification-preflight.v1",
+    "selected_gpu": {
+      "egl": {
+        "driver_version": "570.133.07",
+        "index": 0,
+        "memory_total_mib": 49140,
+        "memory_used_mib": 0,
+        "name": "NVIDIA RTX 6000 Ada Generation",
+        "uuid": "GPU-7ad5c3eb-adf0-f70a-e670-8438701a553e"
+      },
+      "policy": {
+        "driver_version": "570.133.07",
+        "index": 2,
+        "memory_total_mib": 49140,
+        "memory_used_mib": 0,
+        "name": "NVIDIA RTX 6000 Ada Generation",
+        "uuid": "GPU-177e688f-b5f1-1713-0c2e-29d927a058b3"
+      }
+    },
+    "selected_pair_task_outcomes_observed_before_freeze": false,
+    "stress_population_filtered_after_results": false,
+    "stress_proxy_results_observed_before_freeze": true,
+    "stress_qualification_predecessor_bound": true
+  },
+  "preflight_pass": true,
+  "raw_completed_artifact_check_pass": true,
+  "schema": "proofalign.remote-full120-terminal-checks.v1",
+  "stdout_stderr_retention_check_pass": false,
+  "successor_protocol_sha256": "fbdb4ecd03a85f75ff83bf62f0c97397604d2b2767b61d88906e70bae90b151b",
+  "terminal_conservative_missing_rule_check_pass": true
+}
