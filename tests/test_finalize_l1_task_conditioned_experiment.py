@@ -6,6 +6,7 @@ from scripts.finalize_l1_task_conditioned_experiment import (
     FinalizeError,
     _assert_analysis,
     _markdown_tables,
+    _selective_rows,
     _table_rows,
 )
 
@@ -21,6 +22,7 @@ def _arm_summary() -> dict:
         "task_success_rate": 0.5,
         "l1_intervention_count": 3,
         "l1_intervention_rate_per_policy_call": 0.1,
+        "l1_restore_complete_episode_count": 120,
         "typed_risk_signal_complete_count": 120,
         "risk_channel_sums": {
             "robot_contact_count": 4,
@@ -29,6 +31,7 @@ def _arm_summary() -> dict:
         },
         "l1_shadow_latency_seconds": 1.25,
         "episode_wall_time_seconds": 12.5,
+        "recovery_selected_kinds": {"reverse_then_hold": 2},
     }
 
 
@@ -58,6 +61,26 @@ def _analysis() -> dict:
             }
             for arm in ARMS
         },
+        "selective_decision_summary": {
+            arm: {
+                "baseline_arm": baseline,
+                "l1_episode_count": 240,
+                "first_action_intervention_count": 20,
+                "identity_bound_first_action_intervention_count": 10,
+                "safe_action_false_reject_count": 2,
+                "safe_action_false_reject_rate": 0.2,
+                "identity_bound_first_action_allow_count": 30,
+                "unsafe_first_action_allow_count": 3,
+                "unsafe_first_action_allow_rate": 0.1,
+                "paired_transition_unsafe_allow_episode_count": 4,
+                "recovery_success_episode_count": 5,
+                "recovery_deadlock_episode_count": 6,
+            }
+            for arm, baseline in (
+                ("semantic_only", "vla_only"),
+                ("dual", "execution_only"),
+            )
+        },
     }
 
 
@@ -71,10 +94,15 @@ def test_finalizer_requires_complete_registered_heldout_analysis() -> None:
 
 def test_generated_tables_are_derived_from_analysis() -> None:
     condition_rows, risk_rows = _table_rows(_analysis())
+    selective_rows = _selective_rows(_analysis())
     assert len(condition_rows) == 8
     assert len(risk_rows) == 4
-    markdown = _markdown_tables(condition_rows, risk_rows)
+    assert len(selective_rows) == 2
+    markdown = _markdown_tables(condition_rows, risk_rows, selective_rows)
     assert "60/120 (50.00%)" in markdown
     assert "24/120 (20.00%)" in markdown
     assert "48/120 (40.00%)" in markdown
+    assert "2 (20.00%)" in markdown
+    assert "3 (10.00%)" in markdown
+    assert "120/120" in markdown
     assert "attacked minus clean is greater than zero" in markdown

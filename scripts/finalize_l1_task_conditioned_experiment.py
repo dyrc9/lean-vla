@@ -86,12 +86,17 @@ def _table_rows(analysis: Mapping[str, Any]) -> tuple[list[dict[str, Any]], list
                     "task_success_rate": row["task_success_rate"],
                     "l1_interventions": row["l1_intervention_count"],
                     "l1_intervention_rate": row["l1_intervention_rate_per_policy_call"],
+                    "l1_restore_complete_episodes": row["l1_restore_complete_episode_count"],
                     "typed_signal_complete": row["typed_risk_signal_complete_count"],
                     "contact_sum": row["risk_channel_sums"]["robot_contact_count"],
                     "joint_limit_step_sum": row["risk_channel_sums"]["joint_limit_violation_steps"],
                     "excessive_force_step_sum": row["risk_channel_sums"]["excessive_force_steps"],
                     "shadow_latency_seconds": row["l1_shadow_latency_seconds"],
                     "wall_time_seconds": row["episode_wall_time_seconds"],
+                    "recovery_selected_kinds": json.dumps(
+                        row["recovery_selected_kinds"], sort_keys=True,
+                        separators=(",", ":")
+                    ),
                 }
             )
     risk_rows = []
@@ -114,8 +119,34 @@ def _table_rows(analysis: Mapping[str, Any]) -> tuple[list[dict[str, Any]], list
     return condition_rows, risk_rows
 
 
+def _selective_rows(analysis: Mapping[str, Any]) -> list[dict[str, Any]]:
+    rows = []
+    for arm in ("semantic_only", "dual"):
+        source = analysis["selective_decision_summary"][arm]
+        rows.append(
+            {
+                "arm": arm,
+                "baseline_arm": source["baseline_arm"],
+                "l1_episodes": source["l1_episode_count"],
+                "first_action_interventions": source["first_action_intervention_count"],
+                "identity_bound_interventions": source["identity_bound_first_action_intervention_count"],
+                "safe_action_false_reject_count": source["safe_action_false_reject_count"],
+                "safe_action_false_reject_rate": source["safe_action_false_reject_rate"],
+                "identity_bound_first_action_allows": source["identity_bound_first_action_allow_count"],
+                "unsafe_first_action_allow_count": source["unsafe_first_action_allow_count"],
+                "unsafe_first_action_allow_rate": source["unsafe_first_action_allow_rate"],
+                "paired_transition_unsafe_allow_episodes": source["paired_transition_unsafe_allow_episode_count"],
+                "recovery_success_episodes": source["recovery_success_episode_count"],
+                "recovery_deadlock_episodes": source["recovery_deadlock_episode_count"],
+            }
+        )
+    return rows
+
+
 def _markdown_tables(
-    condition_rows: list[Mapping[str, Any]], risk_rows: list[Mapping[str, Any]]
+    condition_rows: list[Mapping[str, Any]],
+    risk_rows: list[Mapping[str, Any]],
+    selective_rows: list[Mapping[str, Any]],
 ) -> str:
     lines = [
         "# L1 task-conditioned successor: generated tables",
@@ -160,6 +191,50 @@ def _markdown_tables(
                 contact=row["robot_contact_count_transition_count"],
                 joint=row["joint_limit_violation_steps_transition_count"],
                 force=row["excessive_force_steps_transition_count"],
+            )
+        )
+    lines.extend(
+        [
+            "",
+            "## Identity-bound selective decisions and recovery",
+            "",
+            "| L1 arm | Baseline | First interventions | Identity-bound | False reject | Unsafe first allow | Paired-transition unsafe allow | Recovery success | Recovery deadlock |",
+            "|---|---|---:|---:|---:|---:|---:|---:|---:|",
+        ]
+    )
+    for row in selective_rows:
+        lines.append(
+            "| {arm} | {baseline_arm} | {first_action_interventions} | "
+            "{identity_bound_interventions} | {false_reject} ({false_rate}) | "
+            "{unsafe_allow} ({unsafe_rate}) | {paired_unsafe} | "
+            "{recovery_success_episodes} | {recovery_deadlock_episodes} |".format(
+                **row,
+                false_reject=row["safe_action_false_reject_count"],
+                false_rate=_percent(row["safe_action_false_reject_rate"]),
+                unsafe_allow=row["unsafe_first_action_allow_count"],
+                unsafe_rate=_percent(row["unsafe_first_action_allow_rate"]),
+                paired_unsafe=row["paired_transition_unsafe_allow_episodes"],
+            )
+        )
+    lines.extend(
+        [
+            "",
+            "False reject and unsafe first allow are reported only when the first source ActionBlock digest exactly matches the L1-disabled arm in the same L2 stratum.",
+            "",
+            "## Shadow identity coverage and latency",
+            "",
+            "| Condition | Arm | Restore-complete episodes | L1 interventions | Shadow latency (s) | Episode wall time (s) |",
+            "|---|---|---:|---:|---:|---:|",
+        ]
+    )
+    for row in condition_rows:
+        lines.append(
+            "| {condition} | {arm} | {restore}/{episodes} | {l1_interventions} | "
+            "{shadow:.6f} | {wall:.6f} |".format(
+                **row,
+                restore=row["l1_restore_complete_episodes"],
+                shadow=float(row["shadow_latency_seconds"]),
+                wall=float(row["wall_time_seconds"]),
             )
         )
     lines.extend(
@@ -249,6 +324,7 @@ def finalize(
         if protocol.get("expected_episode_count") != 480:
             raise FinalizeError(f"held-out protocol episode count differs: {condition}")
     condition_rows, risk_rows = _table_rows(analysis)
+    selective_rows = _selective_rows(analysis)
     output_dir.mkdir(parents=True)
     condition_fields = list(condition_rows[0])
     risk_fields = list(risk_rows[0])
@@ -258,8 +334,11 @@ def finalize(
     (output_dir / "paired_risk_summary.csv").write_text(
         _csv(risk_rows, risk_fields), encoding="utf-8"
     )
+    (output_dir / "selective_decision_summary.csv").write_text(
+        _csv(selective_rows, list(selective_rows[0])), encoding="utf-8"
+    )
     (output_dir / "generated_tables.md").write_text(
-        _markdown_tables(condition_rows, risk_rows), encoding="utf-8"
+        _markdown_tables(condition_rows, risk_rows, selective_rows), encoding="utf-8"
     )
     summary = {
         "schema": "proofalign.l1-task-conditioned-final-handoff.v1",
