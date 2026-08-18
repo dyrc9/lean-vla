@@ -88,6 +88,7 @@ class SemanticGoal:
             "close",
             "turn_on",
             "turn_off",
+            "grasp_part",
         }:
             raise SemanticPolicyWrapperError(
                 f"unsupported semantic goal predicate: {self.predicate}"
@@ -97,6 +98,10 @@ class SemanticGoal:
         if self.predicate in {"on", "in"} and not self.destination:
             raise SemanticPolicyWrapperError(
                 "transport semantic goal requires a destination"
+            )
+        if self.predicate == "grasp_part" and not self.part:
+            raise SemanticPolicyWrapperError(
+                "grasp-part semantic goal requires a frozen part binding"
             )
 
     @property
@@ -113,6 +118,8 @@ class SemanticGoal:
             return (f"open({self.target})",)
         if self.predicate == "close":
             return (f"close({self.target})",)
+        if self.predicate == "grasp_part":
+            return (f"pick_up({self.target})",)
         return (
             f"actuate({self.target},{self.predicate})",
         )
