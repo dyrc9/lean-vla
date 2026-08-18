@@ -174,9 +174,10 @@ Task-state progress is stricter than local acceptance.  Let $q_t$ and
 $q_{t+1}$ be consecutive task phases.  The monitor enforces
 \begin{equation}
 \begin{aligned}
-\mathsf{Advance}(q_t,q_{t+1})\Rightarrow {}&
-\mathsf{ProofAligned}(\chi_t)\\
-&\land\mathsf{CompletionObserved}(q_t,q_{t+1},E_t).
+\mathsf{Advance}(q_t,q_{t+1})
+&\Rightarrow \mathsf{ProofAligned}(\chi_t)\\
+&\phantom{\Rightarrow{}}\land
+\mathsf{CompletionObserved}(q_t,q_{t+1},E_t).
 \end{aligned}
 \label{eq:phase-advance}
 \end{equation}
