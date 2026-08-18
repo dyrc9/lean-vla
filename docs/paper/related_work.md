@@ -1,178 +1,277 @@
-# 相关工作与定位
+# 相关工作与论文定位
 
-## 1. 组织原则：两层对齐对应两组不同文献
+文献核查截止：**2026-08-18**。会议归属优先以官方 proceedings/program 为准；尚未正式发表的工作明确标为
+arXiv。USENIX Security 2026 已于 8 月 12--14 日举行，AttriGuard、MATE、ARTO、TAT 和 Agentic AI SoK 的
+正式 proceedings PDF 均已公开；下文对 TAT 的定位已经按正式正文、而不是会议前摘要复核。
 
-ProofAlign 的顶层问题不是“如何让 VLA 产生一个 semantic plan”，而是两个连续但不可互相替代的断点：
+## 1. 结论先行：论文应主张跨层绑定，而不是单点首创
 
-```text
-trusted intent -> concrete ActionBlock                    [L1]
-authorized ActionBlock -> dispatch / observed effects    [L2]
-```
+ProofAlign 的相邻文献已经分别覆盖了以下问题：
 
-`SemanticSubtask Z_t` 是当前实现 L1 的结构化中间层。相关工作因此应按以下逻辑比较：
+- VLA jailbreak、指令扰动、视觉攻击和安全 benchmark 已经证明模型会产生有害或失效行为；
+- LLM/agent 安全文献已经研究 trusted/untrusted input separation、用户意图到 tool call 的归因、权限和
+  execution isolation；
+- robotics/CPS security 已经研究 control/data-flow attestation、工业控制物理行为关联和机器人 trajectory
+  integrity；
+- robot learning 已经研究 failure detection、safety alignment、shielding 和 action-conditioned prediction。
 
-1. VLA 攻击与安全 benchmark 说明为什么需要研究可信 intent 和实际轨迹之间的偏离；
-2. action-only VLA 与 language/action hierarchy 说明 L1 可以如何获得结构，但不自动提供可信性；
-3. action-conditioned prediction、failure monitoring 和 shielding 说明如何评估或修改动作，但不自动提供
-   trusted-intent binding；
-4. runtime verification 和 formal methods 说明如何约束执行事务，但不自动证明 learned semantics 或
-   物理世界。
+因此，论文不能把“首次检查意图”“首次做 action filter”“首次做执行完整性”或“首次做机器人轨迹审计”
+作为顶层新颖性。当前最窄、也最能被实验支持的定位是：
 
-论文的新颖性只能来自这些边界的组合和证据设计，不能来自把其中任一已有组件改名。
+> 面向不暴露可信高层计划的 action-only VLA，ProofAlign 在 consumer side 维护攻击面之外的可信任务/观察
+> 视图，对一个 **exact ActionBlock** 做 trusted-task monitoring 与 checker-relative authorization，再将
+> 获准对象绑定到一次性 authorization、实际 dispatch、receipt 和 observed physical effects；L1 与组合
+> L2 treatment 的作用由同一 task/init/seed 的四臂闭环实验比较。
 
-## 2. VLA 攻击与安全 benchmark：给出问题，不给出完整防御链
-
-[SABER](https://arxiv.org/abs/2603.24935) 研究黑盒 instruction perturbation，并以 task failure、动作长度
-和 constraint violation 等行为后果评估攻击；它直接支持本项目“攻击是否改变实际执行，而不是模型是否
-承认恶意计划”的问题设定。[FreezeVLA](https://arxiv.org/abs/2509.19870) 则说明视觉输入可以诱发
-action-freezing，进一步表明攻击面不只在文本通道。
-
-[LIBERO-Safety](https://arxiv.org/abs/2606.23686) 同时研究物理与语义安全，并报告语义错位和轨迹合成之间
-的 tension；[SafeVLA-Bench](https://arxiv.org/abs/2606.00773) 用 task-aware temporal specifications
-区分成功与 unsafe success；[ForesightSafety-VLA](https://arxiv.org/abs/2606.27079) 将 instruction、
-perception 和 physical-interaction 风险拆开诊断。这些 benchmark 共同说明：
-
-- task success 不能替代过程安全；
-- cost/collision 不能吞掉 contact、错误目标或 deadlock；
-- language、vision 和 scene variation 应分别报告。
-
-它们主要提供 attack/evaluation surface。ProofAlign 的不同目标是在线或 no-dispatch runtime integrity：
-在 trusted intent 保持不变时，对一个 exact ActionBlock 做预执行语义授权，并把授权对象继续绑定到
-dispatch receipt 和 effects。已有 benchmark outcome 可以作为 endpoint，但不能自动充当 L1 assessment
-或 L2 transaction witness。
-
-## 3. Action-only VLA 与显式层级：结构来源不等于可信来源
-
-[OpenVLA](https://arxiv.org/abs/2406.09246) 预测 tokenized actions 并解码为可执行连续动作；
-[Diffusion Policy](https://arxiv.org/abs/2303.04137) 直接生成动作序列并以 receding-horizon 方式执行。
-这类接口不承诺暴露离散高层计划，所以依赖模型自报 plan 的 verifier 不是通用方案。ProofAlign 把数值
-ActionBlock 作为最低共同接口，保留对 action-only checkpoint 的适用性。
-
-[π0.5](https://arxiv.org/abs/2504.16054) 的论文系统使用 high-level semantic prediction、object
-detection 和 low-level action 等混合训练信号；[RT-H](https://arxiv.org/abs/2403.01823) 显式预测
-language motion，再条件化动作。这两项工作说明 semantic/action hierarchy 可以改善策略结构和干预
-接口。
-
-ProofAlign 与它们的关系需要严格区分：
-
-- π0.5/RT-H 的 semantic output 属于 policy architecture；ProofAlign 的 `Z_t` 属于攻击面之外的
-  consumer-side trusted boundary；
-- 原生 semantic head 若可用，可以成为额外 proposal/cross-check，但不能仅因来自 policy 就自动可信；
-- 当前公开 `pi05_libero` 路径只返回数值动作，不能从论文能力推断本地 checkpoint 暴露 semantic API；
-- 当前 `Z_t` 在动作生成前作为显式输入并绑定 ActionBlock，但 action-conditioning 强度仍是经验问题，
-  不能由“prompt 被传入”推出“动作被可靠控制”。
-
-因此本文不主张首次提出 language hierarchy。它使用有限 task graph 和 zero-training selector，把层级
-转换成一个可审计的 L1 分解：
+这个定位有两个顶层 gap，其中 realization gap 再拆成两个证据来源不同的子机制：
 
 ```text
-TaskSubtask(T, O_t^T, Z_t)
-SubtaskAction(Z_t, O_t^T, A_t)
+trusted task / observation -> ActionBlock audit / relative authorization [L1]
+authorized ActionBlock -> dispatch / receipt / observed effects         [L2a]
+risk state -> guarded execution / joint-limit containment                [L2b]
 ```
 
-## 4. Action-conditioned prediction：支持 local checker，但不完成 L1
+论文的新意来自这条完整 identity chain 在 VLA 物理闭环中的组合，而不是其中任一组件单独存在。
 
-L1 的 `SubtaskAction` 部分与 action-conditioned prediction、model-based control 和 calibrated risk
-prediction 相邻：
+本轮安全四大筛查以官方 accepted/program/proceedings 为主，范围和最接近工作如下：
+
+| Venue | 最新可核查批次 | 与本文最接近的工作 | 对叙事的约束 |
+|---|---|---|---|
+| IEEE S&P | [2026 accepted papers](https://www.ieee-security.org/TC/SP2026/accepted-papers.html) | Agent data permissions；When AI Meets the Web | 不能把数据授权或 trusted/untrusted content separation 当作首创 |
+| USENIX Security | [2026 technical sessions](https://www.usenix.org/conference/usenixsecurity26/technical-sessions) | AttriGuard；MATE；ARTO；TAT | 正式论文已公开；不能泛称首次 intent→action/policy attribution、execution integrity 或 trajectory integrity |
+| ACM CCS | 2025 proceedings/DOI | SecAlign | 不能把 prompt/data alignment 或模型级 prompt-injection defense 当作本文新意 |
+| NDSS | [2026 accepted papers](https://www.ndss-symposium.org/ndss2026/accepted-papers/) | ACE；SAGA；另参考 IsolateGPT 2025 | 不能声称首次分离 trusted planning 与 execution，或首次做 agent isolation/governance |
+
+截至 `2026-08-18`，CCS 2026 尚无可用正式 proceedings；USENIX Security 2026 的相关正式正文已经公开。
+在本轮官方目录与已公开正文中未发现
+与 `trusted task -> exact continuous ActionBlock -> physical dispatch/effects` 完全同构的 VLA 系统；这是
+基于所核查目录的文献筛查结论，不是穷尽性“全球首个”证明。
+
+## 2. VLA 与具身模型攻击：说明物理后果，但不提供运行时闭环
+
+[SABER](https://arxiv.org/abs/2603.24935)（IROS 2026；当前可访问版本为 arXiv）使用 bounded instruction edits 对六类 VLA 做
+black-box attack，并以 task failure、动作长度和 constraint violation 衡量机器人行为后果。它是本文冻结
+攻击记录的直接来源，也支持“攻击是否改变最终执行”而不是“模型是否输出恶意解释”的问题设定。
+
+[FreezeVLA](https://arxiv.org/abs/2509.19870)（arXiv 2025）通过视觉输入诱发 action freezing；
+[BadRobot](https://proceedings.iclr.cc/paper_files/paper/2025/hash/5b2fa23e4ef0f7ac6c4f01d7998e6237-Abstract-Conference.html)
+（ICLR 2025）和 [RoboPAIR](https://robopair.org/)（ICRA 2025）展示 embodied LLM jailbreak 可以转化为
+物理世界中的有害动作。这些工作共同表明攻击面跨越 language、vision 和 interaction history，而且文本拒绝
+或无害 explanation 不能替代对实际命令的检查。
+
+这些攻击工作主要回答“怎样使模型偏离”和“偏离造成什么 outcome”。ProofAlign 不提出新的攻击算法；它将
+SABER 当作冻结外部攻击源，研究在 trusted task artifact 不变时，consumer 能否对攻击后的数值动作建立
+pre-dispatch authorization 和 post-dispatch evidence chain。
+
+## 3. VLA safety benchmark、训练时对齐与失败监控
+
+[Vision-Language-Action Safety: Threats, Challenges, Evaluations, and Mechanisms](https://arxiv.org/abs/2604.23775)
+（arXiv 2026 survey）将 VLA 风险整理为训练时/推理时攻击与训练时/运行时防御，并把不可逆物理后果、
+多模态攻击面、实时约束和长轨迹错误传播列为 VLA 区别于纯 LLM 安全的核心挑战。它也将 unified runtime
+safety architecture 列为开放问题；ProofAlign 是这个大方向中的一个窄实例，而不是覆盖该 survey 全部威胁。
+
+[LIBERO-Safety](https://arxiv.org/abs/2606.23686)（ECCV 2026）同时覆盖物理与语义安全，并指出更丰富的安全
+数据与 task success 之间仍存在 trajectory synthesis/semantic misalignment 瓶颈。
+[SafeVLA-Bench](https://arxiv.org/abs/2606.00773)（arXiv 2026）用 task-aware Signal Temporal Logic
+区分 success、succ-but-unsafe 和 violation severity；
+[ForesightSafety-VLA](https://arxiv.org/abs/2606.27079)（arXiv 2026）进一步把 instruction、perception 和
+physical-interaction 风险分开，并报告累计风险与暴露时间。这些工作直接支持本文同时报告 task success、
+violation episode、risk steps、deadlock 和 latency，而不是只给一个成功率。
+
+[SafeVLA](https://proceedings.neurips.cc/paper_files/paper/2025/hash/e185c7be603426028c32ae1003a59d78-Abstract-Conference.html)（NeurIPS 2025）通过 constrained learning 改善 VLA 的训练时
+安全对齐；[SAFE](https://proceedings.neurips.cc/paper_files/paper/2025/hash/392d0d05e2f514063e6ce6f8b370834c-Abstract-Conference.html)（NeurIPS 2025）从 VLA hidden features 预测跨任务失败，并以
+conformal prediction 校准报警时间。它们分别代表 policy-level alignment 和 rollout-level failure detection。
+
+ProofAlign 与这一组工作的边界是：
+
+- benchmark 给出 endpoint specification，但不会自动形成在线授权；
+- training-time alignment 改变或增强 policy，本项目保持 Pi0.5 参数不变；
+- failure detector 可以触发 stop/backtrack，但其分数本身不绑定 authoritative task、exact executable bytes
+  或 dispatch receipt；
+- ProofAlign 当前也不声称比这些方法具有更广的 attack coverage 或真实机器人泛化。
+
+## 4. Action-only VLA 与语义层级：结构不等于可信来源
+
+[OpenVLA](https://proceedings.mlr.press/v270/kim25c.html) 预测 tokenized actions 并解码为连续动作；
+[Diffusion Policy](https://arxiv.org/abs/2303.04137) 直接生成 receding-horizon 动作序列。这类最低共同接口
+不保证部署者能读取离散高层计划，所以依赖模型自报 plan 或 chain-of-thought 的 verifier 不是通用方案。
+
+[Pi0.5](https://arxiv.org/abs/2504.16054)（CoRL 2025 Oral）在论文系统中使用 high-level semantic prediction、object detection
+和 low-level action 等混合训练信号；[RT-H](https://www.roboticsproceedings.org/rss20/p049.html)（RSS 2024）显式预测 language motion
+再条件化动作。它们证明 semantic/action hierarchy 可以提供结构与干预接口，但 policy 内部产生的 semantic
+output 仍与 policy 共享攻击面。
+
+ProofAlign 因此不主张首次提出 language hierarchy。其 `SemanticSubtask Z_t` 来自 consumer-side、冻结且
+allowlisted 的有限 task graph/selector，只进入独立 monitor，不被当作 VLA latent intent 的观测值。当前公开
+`pi05_libero` 路径只返回数值动作；论文不能从 Pi0.5 论文中的训练信号反推本地 checkpoint 暴露可信 semantic
+API。
+
+## 5. 安全四大中的 LLM/agent security：最接近 L1 的数字世界邻居
+
+安全四大近年的工作正在从 input filtering 转向 trust separation、action attribution、permissions 和
+execution isolation：
+
+- [SoK: Attack and Defense Landscape of Agentic AI Systems](https://www.usenix.org/conference/usenixsecurity26/presentation/kim-juhee-agentic)
+  （USENIX Security 2026）系统整理 agent design、attack landscape 与 defense mechanism，说明本文应把
+  contribution 落在具体 system object 和 threat model，而不是把“agent security”本身当作新问题；
+- [Formalizing and Benchmarking Prompt Injection Attacks and Defenses](https://www.usenix.org/conference/usenixsecurity24/presentation/liu-yupei)
+  （USENIX Security 2024）系统化 prompt-injection threat/evaluation；
+- [StruQ](https://www.usenix.org/conference/usenixsecurity25/presentation/chen-sizhe)（USENIX Security 2025）
+  用 structured queries 分离 instruction 与 data channel；
+- [SecAlign](https://arxiv.org/abs/2410.05451)（ACM CCS 2025，DOI
+  `10.1145/3719027.3744836`）通过 preference optimization 让模型偏向执行 legitimate instruction；
+- [IsolateGPT](https://www.ndss-symposium.org/ndss-paper/isolategpt-an-execution-isolation-architecture-for-llm-based-agentic-systems/)
+  （NDSS 2025）为 LLM app 生态设计
+  execution isolation，限制不可信 app 间交互；
+- [ACE](https://www.ndss-symposium.org/ndss-paper/ace-a-security-architecture-for-llm-integrated-app-systems/)
+  （NDSS 2026）先用可信信息生成 abstract execution plan，再将其具体化为 app plan，并在执行期强制
+  data/capability barriers 与计划一致性；
+- [SAGA](https://www.ndss-symposium.org/ndss-paper/saga-a-security-architecture-for-governing-ai-agentic-systems/)
+  （NDSS 2026）进一步以身份、策略和 cryptographic access tokens 支持多 agent 的用户侧治理；
+- [Towards Automating Data Access Permissions in AI Agents](https://homes.cs.washington.edu/~franzi/pdf/wu-agentperms-sp26.pdf)
+  （IEEE S&P 2026）研究 agent 代表用户访问数据时的 permission decision；
+- [When AI Meets the Web](https://arxiv.org/abs/2511.05797)（IEEE S&P 2026）表明 chatbot plugin 会因
+  conversation-history integrity 缺失以及 trusted/untrusted web content 混合而放大 prompt injection；
+- [AttriGuard](https://www.usenix.org/conference/usenixsecurity26/presentation/he-yu)（USENIX Security 2026）
+  已把防御单位推进到 tool invocation，通过 counterfactual shadow replay 判断一个 action 是由 user intent
+  支持，还是由 untrusted observation 因果驱动。
+- [MATE](https://www.usenix.org/conference/usenixsecurity26/presentation/jiang-changyue)（USENIX Security 2026）
+  使用可编辑自然语言策略审计移动智能体的 task instruction 与 execution trajectory，说明本文不能把
+  policy-conditioned trajectory auditing 本身作为首创。
+
+AttriGuard 与 MATE 对论文定位尤其关键：ProofAlign 不能笼统声称“首次把 user intent/policy 与 action 或
+trajectory 对齐”。差异应写在 system object 和 evidence 上：AttriGuard 归因离散 tool call，MATE 学习审计
+移动智能体轨迹，而 ProofAlign 面向高频连续数值 ActionBlock，并把授权对象继续绑定到 actuator dispatch、
+receipt、joint-side margins 和 observed effects。反过来，ProofAlign 当前既没有 AttriGuard 的通用
+counterfactual causal attribution，也没有 MATE 的跨应用 learned policy auditor，不应暗示具备。
+
+同理，StruQ/SecAlign 的 prompt/data separation 支持 dual-view 思路，但它们主要保护模型输入/输出行为；
+IsolateGPT、SAGA 和 agent permissions 支持 least privilege、治理与 trusted scaffold，却不判断机器人动作
+是否推进指定 object/region，也不验证物理执行是否与授权 bytes 一致。ACE 更接近本文的两阶段结构，因此
+ProofAlign 也不能声称首次把 trusted planning 与 execution integrity 分离；区别在于 ACE 有显式 structured
+app plan 和离散 tool execution，而 action-only VLA 不暴露可信 plan。ProofAlign 由 consumer 为连续数值
+ActionBlock 建立授权，并继续绑定 simulator 中的 actuator command 和 physical effects。
+
+## 6. 安全四大中的 CPS/robot execution integrity：最接近 L2 的系统邻居
+
+机器人和 CPS 安全已经长期研究从软件执行到物理状态的完整性：
+
+- [An Experimental Security Analysis of an Industrial Robot Controller](https://www.ieee-security.org/TC/SP2017/papers/20.pdf)
+  （IEEE S&P 2017）系统展示工业机器人控制器的软件攻击面及物理后果；
+- [DIAT](https://www.ndss-symposium.org/ndss-paper/diat-data-integrity-attestation-for-resilient-collaboration-of-autonomous-systems/)
+  （NDSS 2019）把自主系统交换的数据与其生成/处理软件的 control-flow attestation 绑定；
+- [SCAPHY](https://www.ieee-security.org/TC/SP2023/program-papers.html)（IEEE S&P 2023）关联 SCADA 与 physical
+  behavior 来检测现代 ICS attack；
+- [CFA+](https://www.usenix.org/conference/usenixsecurity24/presentation/ammar)（USENIX Security 2024）将
+  control-flow prevention 与可信 runtime evidence 结合；
+- [ARTO](https://www.usenix.org/conference/usenixsecurity26/technical-sessions)（USENIX Security 2026）面向
+  real-time CPS 组合 control-flow attestation 与 data-flow protection；
+- [TAT](https://www.usenix.org/conference/usenixsecurity26/presentation/yao-chengtao)（USENIX Security 2026，
+  pp. 3439--3457）明确定义工业机械臂 trajectory integrity。它对受保护的任务程序做静态分析，并在受控
+  离线运行中生成 Timed Motion Event Graph 与事件级参考轨迹；运行时由 TEE 保护 event/control/data-flow
+  证据，并用旁路采集的原始电机编码器读数重建 actual trajectory。
+
+TAT 直接占据“机器人轨迹完整性”这一表述，因此 ProofAlign 不应声称首次提出 trajectory integrity 或首次把
+joint measurements 纳入 attestation。更准确的区分是：TAT 从预编程任务及其受控测试所得参考 profiles
+出发，验证工业臂的实际运动是否符合事件级时空语义；ProofAlign 研究的前置问题是，当自然语言条件下的 VLA
+在线生成数值 ActionBlock 时，哪个 exact block 获得可信任务授权，以及授权后系统如何把同一 identity
+延伸到执行与 effects。TAT 主要生成执行后的远程 attestation evidence，ProofAlign 则在执行前进行 dispatch
+mediation；两者是可组合的上下层，而不是互斥替代。
+
+ProofAlign 当前也不具备 TAT/DIAT/CFA+ 的硬件 root of trust、旁路 encoder evidence 或远程 attestation 保证。其 digest、nonce、
+receipt 和 Lean semantics 是软件 TCB 内的 transaction-integrity mechanism；论文必须把这一点作为安全边界，
+不能用 `attestation` 一词暗示硬件支持。
+
+## 7. Action-conditioned prediction、shielding 与 runtime assurance
+
+L1 的 local checker 与 action-conditioned prediction/model-based control 相邻：
 
 - [Unsupervised Learning for Physical Interaction through Video Prediction](https://arxiv.org/abs/1605.07157)
-  学习不同动作条件下的视觉未来；
-- [Deep Visual Foresight for Planning Robot Motion](https://research.google/pubs/deep-visual-foresight-for-planning-robot-motion/)
-  将 action-conditioned prediction 与 MPC 结合；
+  学习 action-conditioned visual futures；
+- [Deep Visual Foresight](https://research.google/pubs/deep-visual-foresight-for-planning-robot-motion/)
+  将视觉未来预测与 MPC 结合；
 - [VLMPC](https://www.roboticsproceedings.org/rss20/p106.pdf) 为候选动作预测未来帧并按视觉/语义成本选择；
-- [How safe am I given what I see?](https://proceedings.mlr.press/v242/mao24c.html) 研究图像控制系统的
-  calibrated safety-chance prediction；
+- [How safe am I given what I see?](https://proceedings.mlr.press/v242/mao24c.html) 研究视觉控制系统的校准
+  safety-chance prediction；
 - [Model-Based Runtime Monitoring with Interactive Imitation Learning](https://arxiv.org/abs/2310.17552)
-  结合未来预测、OOD 与 failure detection 做运行时监测。
+  结合未来预测、OOD 和 failure detection 做 runtime monitoring。
 
-这些工作支持 `Assess(O, A) -> predicted outcome/risk` 的技术可行性，但没有自动解决四个 ProofAlign
-特有条件：
+连续控制 safety filter/shield 的代表工作包括
+[A Learnable Safety Measure](https://proceedings.mlr.press/v100/heim20a.html)、
+[Measurement-Robust Control Barrier Functions](https://proceedings.mlr.press/v155/dean21a.html)、
+[Realizable Continuous-Space Shields](https://proceedings.mlr.press/v283/kim25c.html) 和
+[Adaptive Shielding with HJ Reachability](https://proceedings.mlr.press/v283/lu25a.html)。
 
-1. authoritative task/target 来自 trusted `T/O_t^T`，而非 attacked policy view；
-2. `Z_t` 必须属于当前合法 frontier，且在动作生成前冻结；
-3. attacked blocks 上报告 false-allow confidence bound，而不只 clean accuracy；
-4. assessment 必须绑定 exact executable prefix，并在任何 projection 后重新生成。
+这些工作支持 `Assess(O, A) -> predicted outcome/risk` 以及动作约束的技术可行性，但 safety-set
+compatibility 不等于 trusted-task compatibility。ProofAlign 的组合纪律是：authoritative task/target 必须
+来自 trusted branch；assessment 必须绑定 exact executable prefix；任何改变 command 的 intervention 都会使
+旧 assessment/authorization 失效，并要求重新检查和授权。task-progress mismatch 在当前实现中是 advisory，
+而 hard-risk atoms 才触发当前 block 的拒绝；这是 checker-relative system transaction rule，不是完整语义
+判定，也不是新的连续控制理论。
 
-因此 learned outcome predictor 是可选增强，不是第一版方法的必要前提。首版优先使用 task predicates、
-解析运动学/几何 checker 和保守 abstention；无论采用哪种 assessor，都必须单独资格化。
+## 8. Formal methods 与 proof-carrying control
 
-## 5. Shielding、safety filters 与 runtime assurance：解决约束，不自动解决意图
-
-已有工作常在状态–动作层判断或修正不安全动作：
-
-- [A Learnable Safety Measure](https://proceedings.mlr.press/v100/heim20a.html) 学习 state-action safety
-  measure；
-- [Realizable Continuous-Space Shields](https://proceedings.mlr.press/v283/kim25c.html) 在连续状态/动作
-  空间验证并最小修改 agent action；
-- [Adaptive Shielding with HJ Reachability](https://proceedings.mlr.press/v283/lu25a.html) 将模型
-  mismatch 纳入保守 shielding；
-- [Measurement-Robust Control Barrier Functions](https://proceedings.mlr.press/v155/dean21a.html)
-  显式处理 learned perception 的测量不确定性。
-
-ProofAlign 不声称发明 action filter。传统 shield 主要问动作是否留在安全集合内，而 L1 还要问一个
-几何上安全的动作是否仍在推进可信任务的正确 object/part/region。L2 则继续检查 shield 或其他
-intervention 之后的 exact command 是否真的被 dispatch，并产生了约定效果。
-
-只要 intervention 改变 ActionBlock，原 assessment、contract 和 authorization 就失效；修改后的 block
-必须重新检查和授权。这条 transaction discipline 是 ProofAlign 对现有 filter 的组合要求，而不是新的
-连续控制理论。
-
-## 6. 运行时失败预测、校准与 abstention：qualification 是方法的一部分
-
-OOD detection、selective prediction、conformal risk control 和 failure forecasting 可为 selector/local
-checker 提供 risk-coverage 与 abstention 工具。但一个高拒绝率分类器可能看起来 false-allow 很低，同时
-让机器人长期 deadlock。
-
-本文因此必须同时报告：
-
-- selector legal-frontier accuracy、stage stability、margin 和 OOD abstention；
-- local-checker attacked false allow、clean false reject 和 coverage；
-- suite/task/object/attack-family worst group；
-- p50/p95/p99 latency 和资源；
-- unknown、replan、deadlock、time-to-completion 与 task utility。
-
-所以“加一个 classifier”不是完整贡献。可信输入边界、冻结阈值、support definition、false-allow
-confidence bound 和 abstention 代价共同构成 L1 evidence。
-
-## 7. Formal methods 与 proof-carrying control：L2 证明的是事务，不是世界
-
-形式化规划、runtime verification、temporal-logic shields 和 proof-carrying control 在给定模型与规范中
-证明离散或连续性质。ProofAlign 借用其 fail-closed 和 binding discipline，但刻意缩小 Lean claim：
+形式化规划、runtime verification、temporal-logic shields 和 proof-carrying control 能在给定模型与规范中
+证明离散或连续性质。ProofAlign 借用 fail-closed 与 proof-carrying transaction 的思想，但 Lean claim 必须
+保持窄化：
 
 - Lean 不解析自然语言 intent，也不选择 `Z_t`；
-- Lean 不验证 selector、assessor、perception 或 observer 的现实正确性；
-- Lean 检查 ActionBlock、assessment、execution contract、authorization、exact command、receipt、
-  effect evidence 和 phase update 的有限关系；
-- Python serializer/runtime 到 Lean model 的对应仍需要独立 equivalence/refinement evidence；
-- 物理安全仍受 sensor trust、observer completeness、model mismatch 和 TCB 假设限制。
+- Lean 不证明 selector、checker、perception 或 observer 对现实正确；
+- Lean 检查 ActionBlock、assessment、contract、authorization、exact command、receipt、evidence 和
+  phase update 的有限关系；
+- Python runtime/serializer 到 Lean model 的 refinement 仍是未完成边界；
+- 物理结论仍受 sensor trust、observer completeness、simulator mismatch 和软件 TCB 假设限制。
 
-因此正确表述是 “Lean-specified/Lean-checked execution transaction semantics”，不是 “formally proven
-robot safety”。
+正确用语是 **Lean-checked execution transaction semantics**，而不是 “formally verified robot safety”。
 
-## 8. 横向比较
+## 9. 横向比较
 
-| Work family | Intent→Action semantics | Trusted dual view | Action modification | Receipt/effect binding | Formal transaction |
-|---|---:|---:|---:|---:|---:|
-| VLA hierarchy / RT-H / π0.5 | policy-internal | no | policy-dependent | no | no |
-| Action-conditioned predictor | predicted consequence | not inherent | candidate selection | no | no |
-| Shield / CBF / runtime assurance | safety-set compatibility | not inherent | yes | usually no | sometimes model-level |
-| VLA safety benchmark | post-hoc endpoint | evaluation-dependent | no | post-hoc trace | sometimes temporal specs |
-| ProofAlign L1 | trusted task/subtask/action relation | required | select/reject/project+recheck | feeds L2 | statistical/system claim |
-| ProofAlign L2 | no new semantic truth | inherits bindings | exact reauthorization | required | finite Lean semantics |
+| Work family | Trusted task 与 untrusted view 分离 | Intent/task→action | Exact command identity | Receipt/effect binding | Physical trajectory/constraint | Formal or attested mechanism |
+|---|---:|---:|---:|---:|---:|---:|
+| VLA attacks / benchmarks | evaluation-dependent | outcome only | no | post-hoc trace | measured | no |
+| VLA alignment / failure detection | not inherent | learned score/alignment | usually no | no | predicted/measured | statistical |
+| StruQ / SecAlign | prompt–data separation | legitimate instruction→response | no | no | no | model/system claim |
+| AttriGuard | control-attenuated dual view | user intent→tool call | tool-call level | no physical receipt | no | causal runtime test |
+| IsolateGPT / SAGA / agent permissions | trusted scaffold | capability/data access | capability level | digital execution isolation | no | isolation/access control |
+| ACE | trusted abstract plan | abstract→concrete app plan | structured app-call level | digital plan/execution binding | no | static analysis + barriers |
+| DIAT / CFA+ / ARTO | trusted verifier/model | not natural-language task | software/data-flow level | attestation evidence | CPS-dependent | hardware/software attestation |
+| TAT | protected task program | offline event-level reference profiles | motion-event level | TEE-protected event evidence + bypass joint measurements | yes | trajectory attestation |
+| ProofAlign L1 | required | trusted-task monitor；progress advisory | exact block digest | feeds L2 | hard local-risk gates | statistical/system claim |
+| ProofAlign L2a | inherits L1 binding | no new semantic truth | exact authorized command | required | no standalone containment claim | Lean-checked finite semantics |
+| ProofAlign L2b | inherits L1 binding | no new semantic truth | source command retained | runtime guard/margin evidence | joint-margin/force envelope | simulator-qualified system claim |
 
-这张表的目的不是声称所有先前工作都缺少某项能力，而是说明本文 estimand：L1 和 L2 必须在同一
-ActionBlock identity chain 上组合，并由四臂实验分别估计。
+表格不表示每篇工作都只有一个能力，而是说明 ProofAlign 的 estimand：两层必须共享同一 ActionBlock identity，
+并通过四臂设计分别估计 L1、L2 和组合效果。
 
-## 9. 最窄新颖性声明
+## 10. 论文中可用与不可用的新颖性表述
 
-当前可辩护的顶层新颖性仍然是双层对齐：
+可以使用：
 
-> 在不要求 VLA 暴露高层规划的条件下，针对 instruction/observation attack，将可信任务意图到具体
-> ActionBlock 的可资格化语义对齐，与 ActionBlock 到 observed execution/effects 的 Lean-specified
-> transaction integrity 分离并组合；当前 L1 用可信有限 `SemanticSubtask` 将完整意图对齐分解为
-> task–subtask 和 subtask–action 两个可审计关系，并在共享 candidate/trace 的四臂设计中识别两层的独立
-> 和联合贡献。
+> ProofAlign 是一个面向 action-only VLA 的跨层 reference monitor：它用攻击面之外的 trusted task/
+> observation 对 exact ActionBlock 做 checker-relative monitoring/authorization，并把获准对象延伸到
+> nonce-bound dispatch、receipt 和 observed physical effects；配对四臂实验比较 L1 的任务效用与组合 L2
+> treatment 的 joint-limit containment。
 
-只有当 selector/local-checker qualification、runtime identity、M2 denominator gate 和 closed-loop
-四臂结果完成后，才能把这句话从方法贡献提升为经验性有效性 claim。若这些 gate 未通过，论文仍只能报告
-组件语义、探索性攻击/Execution-only 信号和明确失败边界。
+不应使用：
+
+- “首次将用户意图与 agent action 对齐”（AttriGuard 等已覆盖相邻命题）；
+- “首次把可信计划与不可信执行分离”（ACE 已对 LLM app system 给出直接先例）；
+- “首次提出机器人 trajectory integrity”（TAT 已直接提出）；
+- “首次用形式化方法保证机器人安全”（本文 Lean claim 和物理 TCB 均不足）；
+- “首次用 shadow rollout/action filter 保证 VLA 安全”（prediction、MPC、shielding 文献均已有）；
+- “对任意 VLA 攻击有效”或“真实机器人安全”（当前仅有冻结 SABER 与 LIBERO-Safety simulator evidence）。
+
+## 11. 安全四大筛查对投稿叙事的直接影响
+
+截至核查日，在上述已检查的安全四大正式或 accepted papers 中，没有发现与本文完全同构的
+`trusted task -> exact continuous ActionBlock -> dispatch/receipt/effects` 双层 VLA 闭环；但相邻组件已经
+非常拥挤。投稿叙事因此应采用以下顺序：
+
+1. 先用 SABER 和最终 VLA outcome 说明 **prompt integrity failure 会变成 physical execution failure**；
+2. 再定义 authorization gap 与 realization gap，而不是泛称“VLA 不安全”；
+3. 将 AttriGuard/StruQ/ACE/IsolateGPT 放在 L1 的数字 agent 邻域，将 TAT/ARTO/DIAT 放在 L2 的 CPS 邻域；
+4. 把 novelty 放在跨层 identity chain、action-only applicability 和配对四臂机制归因；主表只识别 L1 与
+   `L2a+L2b` 整体，不能进一步声称 L2a/L2b 的独立因果效应；
+5. 用 `13/18` task success 与 `0/18` violation episodes 支撑冻结范围内的组合结果，不扩大为一般安全保证。
+
+这也是正式 Introduction、Related Work 和 Discussion 应共享的主线。

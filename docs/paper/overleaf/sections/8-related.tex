@@ -1,0 +1,56 @@
+\section{Related Work}
+\label{sec:related}
+
+We organize related work by where each system obtains authority and where its
+evidence chain stops.
+
+\subsection{VLA Attacks, Benchmarks, and Alignment}
+
+SABER uses bounded instruction edits to black-box stress-test VLA policies and measures task failure, trajectory length, and constraint violations~\cite{saber2026}.  FreezeVLA, BadRobot, and RoboPAIR demonstrate visual freezing and embodied-model jailbreak risks~\cite{freezevla2025,badrobot2025,robopair2025}.  A recent survey identifies multimodal attack surfaces, irreversible physical consequences, real-time constraints, and long-horizon error propagation as central VLA-security challenges~\cite{vlasafety2026}.
+
+LIBERO-Safety, SafeVLA-Bench, and ForesightSafety-VLA distinguish task success from physical or semantic safety and from duration/severity of exposure~\cite{liberosafety2026,safevlabench2026,foresightsafety2026}.  SafeVLA and SAFE represent policy-level safety alignment and calibrated rollout failure detection~\cite{safevla2025,safe2025}.  \system neither proposes a new attack nor trains a safer policy.  It treats attacked policy output as an untrusted runtime proposal and preserves identity across monitoring and execution.
+
+SEAL (``Do What You Say'') and CoVer are the closest VLA-specific runtime
+comparisons.  SEAL samples several action sequences, predicts their outcomes,
+and selects the one most consistent with a reasoning VLA's own textual plan;
+CoVer learns a contrastive instruction--observation--action verifier and scales
+over rephrased instructions and action candidates~\cite{sealvla2026,covervla2026}.
+Both address action alignment and can improve task performance.  \system asks a
+different security question: it fixes $K=1$, does not trust a policy-supplied
+plan as authority, and carries an independently anchored verdict on the source
+action into dispatch and effect evidence.  These approaches are complementary:
+a qualified learned verifier could strengthen L1, but any selected action would
+still require a fresh transaction.
+
+\subsection{Trusted Inputs and Agent Execution}
+
+An agent-security SoK systematizes the design, attack, and defense landscape for
+LLM agents~\cite{agenticsok2026}.  StruQ structurally separates instructions
+from data, while SecAlign trains a model to prefer legitimate
+instructions~\cite{struq2025,secalign2025}.  A 2026 S\&P study of third-party
+chatbot plugins further finds missing conversation-history integrity and
+trusted/untrusted web-content mixing in deployed systems~\cite{webplugins2026}.
+Attack-side results likewise show why mutable model context is not an
+authority: ToolHijacker poisons tool descriptions to redirect tool selection,
+ObliInjection optimizes contaminated segments under unknown multi-source
+ordering, and Les Dissonances hijacks control flow across
+tools~\cite{toolhijacker2026,obliinjection2026,lesdissonances2026}.  These
+systems target digital response or tool-selection pipelines rather than
+continuous robot execution, but motivate an independently protected task
+source and observation path.
+
+CaMeL extracts control and data flow from a trusted query and enforces capability policies around untrusted data; ACE similarly derives an abstract plan from trusted information, maps it to concrete application calls, and enforces data/capability barriers~\cite{camel2026,ace2026}.  IsolateGPT isolates LLM applications, SAGA provides identity and token-based agent governance, and recent work studies automated data-access permissions for agents~\cite{isolategpt2025,saga2026,agentpermissions2026}.  These systems establish important precedents for trusted scaffolding and plan/execution separation, but do not address a high-rate continuous robot-action interface.
+
+AttriGuard advances indirect-prompt-injection defense from input filtering to action-level causal attribution.  It uses control-attenuated counterfactual replay to decide whether a discrete tool call is supported by user intent or driven by untrusted observations~\cite{attriguard2026}.  MATE instead learns a policy-conditioned auditor over mobile-agent task instructions and execution trajectories~\cite{mate2026}.  These systems provide stronger general causal or learned policy attribution than \system's frozen local checker, but their protected objects remain digital invocations and agent trajectories.  \system's distinct object is an exact continuous \actionblock: a value generated online, without a trustworthy policy-supplied plan, and meaningful only together with robot state and controller semantics.  It extends a checker-relative verdict on that object to actuator dispatch, receipts, joint margins, and physical effects.
+
+\subsection{CPS and Robot Execution Integrity}
+
+DIAT binds autonomous-system data to control-flow evidence; CFA+ combines prevention and runtime evidence; and ARTO integrates control-flow attestation with data-flow protection for real-time CPS~\cite{diat2019,cfaplus2024,arto2026}.  SCAPHY connects industrial-control program behavior to physical behavior~\cite{scaphy2023}.  TAT defines robot-arm trajectory integrity: it constructs event-level reference profiles from program analysis and offline executions, then compares actual motion using TEE-protected events and bypass joint measurements~\cite{tat2026}.
+
+We therefore do not claim the first execution-integrity or trajectory-attestation mechanism.  TAT begins with a protected preprogrammed task and offline profiles, then produces remote evidence after motion events.  \system instead authorizes a newly generated VLA block before dispatch and preserves its identity through execution.  The mechanisms are complementary: TAT-like attestation could sit below our transaction, but our software TCB does not inherit its hardware root, bypass encoder evidence, or remote-attestation guarantee.
+
+\subsection{Prediction, Shielding, and Formal Methods}
+
+Action-conditioned prediction and visual model-predictive control estimate future outcomes of candidate actions~\cite{vlmpc2024,safetychance2024}.  Control-barrier functions and continuous-space shields enforce safety-set compatibility~\cite{measurementrobustcbf2021,realizableshields2025}.  These techniques motivate local action assessment and bounded guard selection.  Safety-set compatibility, however, is not trusted-task compatibility, and a modified command requires a new assessment and authorization.  Our L2b mechanism is an engineering containment layer, not a new continuous-control theory.
+
+Classic protection design calls for complete mediation and fail-safe defaults~\cite{saltzer1975}; execution-monitoring theory characterizes policies enforceable from observable prefixes~\cite{schneider2000}.  \system applies both to proposal, authorization, receipt, and effect events, but sees only TCB-exported evidence: bypasses and omitted physical effects remain outside enforcement, not covered by Lean.  Lean checks abstract finite binding and phase relations; Python refinement, selector/checker reality, trusted sensing, and dynamics still require qualification or assumptions.

@@ -1,0 +1,72 @@
+% ProofAlign anonymous NDSS 2027 submission source.
+\documentclass[conference]{IEEEtran}
+
+\usepackage{graphicx}
+\usepackage{cite}
+\usepackage{mathtools}
+% NDSS requires a Times-family face; load newtx after amsmath/mathtools so the
+% text and mathematics fonts remain portable across Tectonic and Overleaf.
+\usepackage{newtxtext,newtxmath}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{xspace}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{placeins}
+\usepackage{booktabs}
+\usepackage{tikz}
+\usepackage{url}
+\usepackage[hidelinks]{hyperref}
+\usetikzlibrary{positioning,arrows.meta,fit,shapes.geometric,patterns}
+\Urlmuskip=0mu plus 1mu
+
+\pagestyle{plain}
+\hyphenation{op-tical net-works semi-conduc-tor Action-Block}
+
+\begin{document}
+
+\title{ProofAlign: Cross-Layer Runtime Integrity for Embodied Vision--Language--Action Systems}
+
+% Double-blind submission.
+\author{}
+
+% Required NDSS 2027 first-page publication block.  Replace the placeholder
+% when the submission system assigns the Fall-cycle paper number.
+\IEEEoverridecommandlockouts
+\makeatletter\def\@IEEEpubidpullup{6.5\baselineskip}\makeatother
+\IEEEpubid{\parbox{\columnwidth}{
+  Network and Distributed System Security (NDSS) Symposium 2027\\
+  22--26 March 2027, Seoul, Republic of Korea\\
+  ISBN 978-1-970672-09-1\\
+  https://dx.doi.org/10.14722/ndss.2027.24xxxx\\
+  www.ndss-symposium.org
+}
+\hspace{\columnsep}\makebox[\columnwidth]{}}
+
+\maketitle
+
+\input{macro}
+\bstctlcite{IEEEexample:BSTcontrol}
+\input{sections/abstract}
+\IEEEpeerreviewmaketitle
+
+\input{sections/1-introduction}
+\input{sections/2-threat_surface}
+\input{sections/3-system_model}
+\input{sections/4-design}
+\input{sections/5-implementation}
+\input{sections/6-evaluation}
+\input{sections/7-discussion}
+\input{sections/8-related}
+\FloatBarrier
+\input{sections/conclusion}
+\input{sections/ai_disclosure}
+\input{sections/ethics}
+
+\bibliographystyle{IEEEtran}
+\bibliography{paper}
+
+\appendix
+\input{sections/appendix_submission}
+
+\end{document}

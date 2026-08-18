@@ -1,0 +1,33 @@
+\begin{abstract}
+Vision--language--action (VLA) systems map language and multimodal observations
+to continuous robot actions.  At deployment, an online action chunk crosses
+from model output into the execution stack without inherent evidence that it
+is admissible for the current task, that later software preserves it, or that
+its realization is qualified for the current robot state.  Existing defenses
+typically stop at model input or candidate selection, or begin from an already
+trusted command, program, or reference trajectory.
+
+We present \system, an inline consumer-side reference monitor that makes the
+exact source \actionblock the protected object.  Under an explicit trusted-task
+and observation assumption, \lone attaches a checker-relative assessment to
+the block.  \ltwoa carries its identity through a fresh one-use authorization,
+ordered dispatch, receipts, effects, and task-phase advance.  When a registered
+joint boundary triggers, \ltwob qualifies at most two temporary virtual-guard
+configurations without changing or resampling the source action.  We formalize
+the composition as $\mathsf{ProofAligned}$---checker-relative eligibility,
+transaction alignment, and conditional containment---and use Lean to
+machine-check its finite authorization, ordered-action, receipt, evidence, and
+phase-transition relations.
+
+Using SABER on a complete 120-unit attack-evaluation protocol, we measure 39 of
+86 clean-eligible units as new risk transitions (45.35\%, 95\% base-pair
+cluster-bootstrap CI: [32.93\%, 57.78\%]).  A separate paired four-arm study
+contains 18 task/initialization pairs and 144 episodes.  Under attack, VLA-only
+and L2-only succeed on 11/18 tasks, whereas L1-only and Dual succeed on 13/18;
+their joint-limit violation-episode counts are 4/18, 1/18, 0/18, and 0/18.
+Screening reaches 39.79\,ms maximum and 18.30\,ms p95, with no 100\,ms miss.
+The empirical studies run in LIBERO-Safety simulation; they support the stated
+checker-relative and transaction properties for the evaluated configuration,
+not complete semantic correctness, hardware attestation, hard-real-time
+behavior, or general robot safety.
+\end{abstract}

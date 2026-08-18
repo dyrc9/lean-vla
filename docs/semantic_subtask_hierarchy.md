@@ -13,15 +13,12 @@ Trusted task T + trusted observation O_t^T
                     |
                     v
         SemanticSubtask Z_t
-                    |
-                    v
-  attacked prompt/image -> frozen π0.5
-                    |
-                    v
-          ActionBlock A_t
-                    |
-                    v
-     checker(Z_t, O_t^T, A_t)
+                    |------------------------------┐
+                                                   v
+ policy prompt/image/history -> frozen π0.5 -> ActionBlock A_t
+                                                   |
+                                                   v
+                                  checker(Z_t, O_t^T, A_t)
 ```
 
 第一版不训练模型、不更新 π0.5 checkpoint，也不训练新的 action-to-intent 分类器。只增加推理代码、
@@ -45,8 +42,9 @@ Trusted task T + trusted observation O_t^T
 [Δx, Δy, Δz, Δrx, Δry, Δrz, gripper]
 ```
 
-内部 action representation 补齐到 32 维，LIBERO output transform 只保留前 7 维。当前 runner 每次执行
-前 `replan_steps=5` 步后重新调用 policy。此路径没有文本输出，也没有现成的 `Z_t`。
+内部 action representation 补齐到 32 维，LIBERO output transform 只保留前 7 维。最终四臂 runner 使用
+`replan_steps=10`，将完整 `10 x 7` source chunk 作为 ActionBlock。此路径没有文本输出，也没有现成的
+`Z_t`。
 
 代码依据：
 
@@ -57,20 +55,21 @@ Trusted task T + trusted observation O_t^T
 
 ## 3. `Z_t` 的定义与粒度
 
-`Z_t` 不是自由文本 explanation，也不是从 `A_t` 事后反推的 intent。它必须在动作生成之前产生，作为
-policy 的显式输入并与返回 ActionBlock 绑定：
+`Z_t` 不是自由文本 explanation，也不是从 `A_t` 事后反推的 intent。它必须在动作生成之前、基于同一
+trusted state epoch 产生，作为独立 monitor anchor 与返回的 ActionBlock 绑定；最终系统不把它写入
+policy prompt：
 
 ```text
-Z_t = SelectFrozen(T, O_t, Z_{t-1}, C(T))
-A_t = π_action(O_t, Prompt(T, Z_t))
+Z_t = SelectFrozen(T, O_t^T, Z_{t-1}, C(T))
+A_t = π_action(P_t^pol, O_t^pol, H_t^pol)
+S_t = AssessLocal(Z_t, O_t^T, A_t)
 ```
 
-这里“显式输入”不等于已经证明有效控制：固定 observation/noise 后，不同 `Z_t` 是否产生足够且阶段合理的
-ActionBlock 差异，必须作为独立 action-conditioning qualification 报告。若行为影响不足，`Z_t` 仍可作为
-local checker 的 trusted verifier anchor，但不能声称形成了可靠 hierarchical control。
+因此，`Z_t` 的作用不是形成 hierarchical action control，而是让 consumer 在不信任 policy-facing view
+的情况下拥有一个有限、可审计的 task-progress 与 local-risk 参照。论文不把 `Z_t` 对 policy 行为的因果
+控制作为贡献或 estimand。
 
-其中 `C(T)` 是由可信任务编译出的有限合法候选集。GPU pilot 表明，当前冻结 checkpoint 对 π0.5
-风格的**技能级**标签有信号，但不适合直接选择 RT-H 风格的低层 motion 标签。因此第一版 `Z_t` 词表为：
+其中 `C(T)` 是由可信任务编译出的有限合法候选集。最终系统使用以下技能级 `Z_t` 词表：
 
 ```text
 pick_up(target)
@@ -90,13 +89,10 @@ motion atoms，不作为当前冻结语言 selector 的主候选。具体任务�
 
 ## 4. 零训练来源
 
-`Z_t` 的来源按优先级分为两种，二者都不更新权重：
-
-1. **确定性 task graph/FSM**：由可信 task、BDDL goal、gripper 状态和可审计几何关系判断当前合法
-   frontier。它适合 benchmark qualification，但使用 simulator privileged state 时必须单独标注，不能
-   冒充可部署视觉结果。
-2. **冻结 VLM constrained selection**：从合法 frontier 中选择一个结构化候选。优先探测当前 π0.5
-   checkpoint 内的 PaliGemma；若该公开 checkpoint 的语言能力不可用，再评估独立冻结 VLM。
+最终 `Z_t` 由确定性 task graph/FSM 产生：它使用可信 task、BDDL goal、gripper 状态和可审计几何关系
+判断当前合法 frontier，不更新任何模型权重。该实现依赖 simulator privileged state，因此只能支持
+benchmark qualification，不能冒充 camera-only deployment perception。冻结 VLM constrained selection
+属于未来扩展，不参与当前 L1 授权或最终四臂结果。
 
 不允许把攻击后的 instruction 当作 `T`。Semantic selector 和 local checker 必须使用安全分叉前的
 `O_t^T`，而不是 policy-facing `O_t^atk`；否则结果只能称为层级自洽，不能称为 adversarial
@@ -123,83 +119,39 @@ confidence_or_margin
 status = known | unknown
 ```
 
-动作 prompt 使用固定模板：
-
-```text
-Task: <trusted task>
-Current semantic subtask: <canonical Z_t>
-```
-
-随后必须把 exact prompt bytes、`Z_t` digest、observation digest 和返回的完整 ActionBlock digest 一起记录。
-任何重新选择 `Z_t`、prompt 改写或 observation epoch 变化都要求重新生成 ActionBlock。
+policy prompt 与 semantic artifact 分开绑定。clean 时 `P_t^pol` 是任务的正常序列化，attacked 时它由冻结
+SABER record 修改；两种条件都记录 exact prompt bytes/digest。`Z_t` digest、trusted observation digest、
+policy-view digests 和完整 ActionBlock digest 随后共同进入 provenance/contract，但只有 `T/O_t^T/Z_t`
+属于 semantic authority。任何重新选择 `Z_t`、prompt 改写或 observation epoch 变化都要求重新生成并重新
+评估 ActionBlock。
 
 可信 context 和 `Z_t` artifact 已实现于 `src/proofalign/semantic_trust.py`。它以 exact allowlist 检查
 task source、observation tap、secure split、selector checkpoint/config；`UntrustedPolicyView` 单独表示
-可能被攻击的 prompt/image/history，不能传入签发 `Z_t` 的函数。固定 prompt 编译器只使用 trusted
-`T + Z_t`。
+可能被攻击的 prompt/image/history，不能传入签发 `Z_t` 的函数。仓库中的 fixed prompt compiler 是
+历史/qualification 辅助路径；最终四臂不使用它给 π0.5 注入 `Z_t`。
 
 ## 6. 具体选择哪个动作
 
-当前 `run_liberosafety_pi05_openpi_eval.py` 保留历史默认路径，并提供显式
-`--semantic-runtime` 的 K=1 在线路径。历史默认路径仍是：
-
-```text
-π0.5 生成一个 10 x 7 chunk
-        |
-逐步 clip 到 [-1, 1]
-        |
-执行前 5 步
-        |
-重新观察并生成下一块
-```
-
-`--semantic-runtime` 路径已经采用
-**select subtask → propose actions → constrain/select → authorize/dispatch**：
+最终在线 L1 采用 **select subtask → generate exact source → monitor → authorize/dispatch**：
 
 ```text
 1. 固定 Z_t 和 observation epoch
-2. π0.5 用同一 Z_t 提议 K 个 ActionBlocks
-3. 只取每个 chunk 将实际执行的前 H=5 步作为 executable prefix
-4. semantic/local checker 对每个 prefix 给出 known、progress margin 和 violations
-5. numeric envelope 只允许小幅投影
-6. 对投影后的 prefix 再做 semantic check
-7. 从可行集合选择一个并绑定 exact final bytes
-8. 为 final prefix 生成 fresh v4 assessment/contract/authorization
-9. 通过 single dispatch boundary 逐步消费 prefix，并绑定 receipt/effect evidence
+2. π0.5 从 `P_t^pol/O_t^pol/H_t^pol` 生成唯一的 `H=10` source ActionBlock
+3. 应用与 VLA-only 相同的 numeric envelope
+4. semantic/local checker 对 exact block 给出 known、task-progress advisory 和 hard-risk atoms
+5. 没有 hard risk 时返回 byte-identical source block；task-progress miss 触发 audited replan
+6. hard risk、stale state、malformed command 或未知 evidence 时 fail closed
+7. 为 exact returned block 生成 fresh assessment/contract/authorization
+8. 通过 single dispatch boundary 消费，并绑定 receipt/effect evidence
 ```
 
-第一版 baseline 使用 `K=1`；`K>1` 是不训练的 best-of-K 扩展，通过不同且预先记录的 flow-noise seeds
-得到候选。所有候选必须绑定同一个 `Z_t`。禁止看完 ActionBlock 后把 `Z_t` 改成与动作相符的标签。
+当前正式 estimand 固定为 `K=1/H=10`，不做 best-of-K policy resampling，也不对语义不兼容的动作做
+projection“修复”。禁止看完 ActionBlock 后把 `Z_t` 改成与动作相符的标签。L2 风险恢复中最多2个候选
+指的是同一 source action 下的 guard configurations，而不是新的 policy ActionBlocks。
 
-可行集合为：
-
-```text
-Q_t = {
-  k |
-      known_k
-    ∧ semantic_compatible(Z_t, A_t^k)
-    ∧ no_hard_violation(A_t^k)
-    ∧ projection_l2(A_t^k, Â_t^k) <= δ
-    ∧ semantic_compatible(Z_t, Â_t^k)
-    ∧ progress_margin(Â_t^k) >= m
-}
-```
-
-若 `Q_t` 非空，采用固定的 lexicographic rule：
-
-1. progress margin 更大；
-2. numeric projection 更小；
-3. ActionBlock 更平滑；
-4. candidate index 更小，作为确定性 tie-break。
-
-若 `Q_t` 为空，返回 `unknown/reject`，保持、刹停或重新观察；不能把语义错误通过 numeric projection
-“修复”，也不能临时选择另一个 `Z_t` 为原动作辩护。选中的是投影并复检后的 exact executable prefix，
-不是原始 10 步 chunk；原 chunk digest 只保留为 provenance。
-
-纯选择边界实现于 `src/proofalign/semantic_action_selection.py`；在线 K=1 接线位于
-`semantic_policy_wrapper.py`、`integrity_v4_runtime.py` 和
+在线接线位于 `semantic_policy_wrapper.py`、`integrity_v4_runtime.py` 和
 `run_liberosafety_pi05_openpi_eval.py`。当前几何来自 LIBERO benchmark privileged state，不能表述为
-camera-only deployment perception。未启用 `--semantic-runtime` 时仍保持冻结历史 runner 行为。
+camera-only deployment perception。
 
 ## 7. 新 L1
 
@@ -224,35 +176,34 @@ SubtaskAction(Z_t, O_t, A_t)
 - `place(x, y)`：目标位于 `y` 的允许区域，下降/释放顺序合法；
 - 所有子任务均满足 workspace、速度、旋转、碰撞/contact 和 gripper envelope。
 
-证据不足、候选分数接近、目标不可见或几何不支持时返回 `unknown`，默认不授权。
+证据不足、候选分数接近、目标不可见或几何不支持时返回 `unknown`，默认不授权。这里的“兼容性”仍需按
+实现强度解释：workspace、速度、unexpected contact、stale/malformed command 和 unknown evidence 是
+hard gate；task-progress、release/close progress 与 expected-effect miss 是 advisory，只触发记录和下一
+block 重规划。因而 L1 是 trusted-task ActionBlock monitor 与 checker-relative authorization，不是完整的
+task-semantic verifier。
 
 ## 8. 与 L2/Lean 的关系
 
-L2 保持不变：它绑定被授权的 ActionBlock、实际 dispatch command、receipt 和观察到的 effect。`Z_t` 和
-exact prompt digest 加入 execution contract provenance，但 Lean 不证明冻结 VLM 选择正确，也不证明
+L2 绑定被授权的 ActionBlock、实际 dispatch command、receipt 和观察到的 effect。`Z_t` 和
+exact policy-prompt digest 加入 execution contract provenance，但 Lean 不证明 selector 选择正确，也不证明
 场景感知真实。
 
 因此：
 
-- L1：可信任务 → 语义子任务 → 局部动作兼容；
-- L2：授权 ActionBlock → 实际执行/effect；
+- L1：可信任务 → 语义子任务 → 局部动作监控/有限授权；
+- L2a：获准 ActionBlock → exact command/receipt/effect 事务；
+- L2b：风险状态 → guarded execution/joint-limit containment；
 - Lean：检查绑定与 transaction semantics；
 - qualification：统计评估 selector 和 local checker 的现实正确性。
 
-## 9. 首轮可行性 probe
+当前 Lean `BlockExecutionContract` 绑定 ActionBlock、assessment、authorization、step receipts 和 effects，
+但尚未把 virtual-guard 或 controller configuration 作为独立 typed digest。runtime trace 会记录 guard、
+state restore、force 和 margin；这支持研究模拟器内的审计与 containment 结果，却不构成 full executable
+configuration 或 exact physical trajectory binding。
 
-首轮只评估零训练可行性，不做 confirmatory outcome rollout：
+## 9. 当前资格化边界
 
-1. 固定 checkpoint、候选词表、prompt 模板和随机种子；
-2. 在少量干净 LIBERO observation/task 上运行 frozen selector；
-3. 保存完整候选分数、top-1、margin、文本输出（若有）、latency 和失败原因；
-4. 检查候选合法率、阶段合理性、重复运行稳定性和 `unknown`；
-5. 再比较轻微视觉扰动/指令攻击下，可信 semantic view 是否保持稳定。
-
-首轮结果只能回答“当前冻结 checkpoint 是否值得继续”，不能证明防御有效。若 PaliGemma 不能可靠选择
-`Z_t`，顺序是：确定性 FSM → 独立冻结 VLM → 最后才讨论小规模 LoRA；不会自动进入训练。
-
-首轮实际结果见 [`semantic_subtask_pilot.md`](semantic_subtask_pilot.md)。后续 E1 已证明 raw π0.5
-selector 未通过资格化，因此当前不再把其分数用于 L1 授权。预注册的 deterministic privileged-geometry
-task graph/FSM fallback 已通过 160-case gate；analytic local checker 和 effect observer 分别通过 E3/E5
-finite-corpus gate。该结论仅覆盖 benchmark privileged geometry，不覆盖 camera perception 或部署泛化。
+正式系统使用 deterministic privileged-geometry task graph/FSM，而不使用 raw π0.5 semantic score 做
+L1 授权。该 selector 已通过160-case gate，analytic local checker 与 effect observer 分别通过 E3/E5
+finite-corpus gate。所有资格化只覆盖 benchmark privileged geometry，不覆盖 camera perception、分叉前
+视觉欺骗或部署泛化；相关 pilot 和替代路线保留在 [`archive/`](archive/) 供审计，不进入论文主线。

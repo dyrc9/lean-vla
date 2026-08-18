@@ -1,0 +1,106 @@
+\section{Background and Motivation}
+\label{sec:background}
+
+\subsection{The Embodied VLA Execution Boundary}
+
+An embodied VLA deployment has three logical roles.  An operator or scheduler
+supplies a task; a policy maps a task view and multimodal observations to a
+continuous action chunk; and a consumer translates that chunk into commands at
+an actuator-facing boundary.  The environment then evolves, new observations
+arrive, and the policy replans.  This is the ordinary execution path of a VLA
+system, independent of whether evaluation uses a simulator or a physical
+robot.
+
+Our implementation instantiates this path with OpenPI $\pi_{0.5}$~\cite{pi05}.
+The policy consumes base and wrist RGB, end-effector position and axis--angle
+orientation, gripper state, and a task prompt.  It returns a $10\times7$
+\actionblock whose rows contain 3-D translation, 3-D rotation, and gripper
+commands.  The consumer executes those rows before requesting the next block.
+The training system may use rich semantic supervision, and language action
+hierarchies can be useful control abstractions~\cite{pi05,rth2024}; the deployed
+consumer nevertheless receives the numeric block that will cross the control
+boundary.
+
+That block has no inherent evidence that it is admissible for the current task,
+that later software will preserve it, or that its realization is qualified for
+the current robot state.  A policy explanation shares the policy's input
+context, a prompt log establishes only what the model consumed, and a later
+task outcome arrives too late to authorize dispatch.  We therefore treat every
+source block as an untrusted proposal until the consumer discharges explicit
+proof obligations over it.
+
+\subsection{From Input Corruption to Physical Execution}
+
+Instruction, visual, and history attacks enter through different channels, but
+they affect the physical world only through commands accepted by the execution
+stack.  Their common convergence point is therefore the concrete online
+\actionblock.  After proposal, two further failures remain possible:
+transaction corruption can substitute, replay, reorder, or misbind the block;
+and state-dependent realization can make unchanged source values violate a
+covered physical boundary.  Monitoring only the model input, only the proposed
+action, or only the final outcome cannot cover this lifecycle.
+
+This observation supplies the organizing insight of \system: the
+\actionblock is the hinge between VLA reasoning and embodied execution.  The
+consumer should attach task-relative justification to that exact object before
+dispatch, preserve its identity through the execution transaction, and qualify
+its state-dependent realization without silently replacing it.
+
+\subsection{Where Existing Protection Stops}
+
+Two security literatures meet at the \actionblock but do not protect the same
+edge.  On the authorization side, structured prompting, alignment, and trusted
+agent-control-flow systems separate instructions from untrusted data or derive
+digital actions from a protected query~\cite{struq2025,secalign2025,camel2026,
+ace2026}.  VLA-specific systems score or select action candidates against a
+plan or learned instruction--action representation
+~\cite{sealvla2026,covervla2026}.  These approaches can strengthen an upstream
+checker, but they do not by themselves bind the chosen continuous command to
+actuator receipts and effects.
+
+On the realization side, CPS integrity systems attest software control/data
+flow.  TAT derives event-level reference motion from an instrumented task
+program and offline executions, then checks trusted event and joint evidence
+against those profiles~\cite{diat2019,cfaplus2024,arto2026,tat2026}.  Their
+integrity roots are stronger than ours, but they begin with a selected program
+and reference motion.  A VLA instead creates a new continuous command online,
+for which no unique trusted trajectory need exist.  The missing bridge is:
+task-relative assessment $\rightarrow$ exact online proposal $\rightarrow$
+actual execution evidence.
+
+\subsection{Three Design Challenges}
+
+The insight above produces three verification challenges.  \textbf{C1:
+semantic-to-continuous assessment.}  A task stage admits many valid
+trajectories.  Without a complete semantic oracle, the monitor must distinguish
+covered violations from uncertainty rather than equating a proxy with task
+correctness.  \textbf{C2: execution identity.}  An assessed block can still be
+substituted, replayed, reordered, partially executed, or paired with receipts
+and effects from another proposal.  Equality at one software boundary is
+insufficient.  \textbf{C3: state-dependent containment.}  The same block may be
+benign in one state and cross a joint boundary in another, yet rewriting its
+values would invalidate the assessment and authorization object.
+
+These are ordered obligations, not interchangeable filters.  L1 records a
+checker-relative assessment over the exact source block.  L2a preserves that
+identity through a one-use execution transaction.  L2b qualifies a covered
+near-boundary realization while retaining the source action.  The protected
+task state and observation tap on which L1 relies are stated explicitly as TCB
+assumptions in Section~\ref{sec:model}, not presented as a challenge that the
+monitor can manufacture.
+
+\begin{table}[t]
+\centering
+\caption{Challenges and the mechanism responsible for each security edge.}
+\label{tab:challenges}
+\footnotesize
+\begin{tabularx}{\columnwidth}{l>{\raggedright\arraybackslash}Xl}
+\toprule
+& Required invariant & Mechanism \\
+\midrule
+C1 & Verdict names the exact continuous source block and checker scope & L1 \\
+C2 & Authorization, ordered dispatch, receipts, and effects share identity & L2a \\
+C3 & Near-boundary execution qualifies without source-action replacement & L2b \\
+\bottomrule
+\end{tabularx}
+\end{table}

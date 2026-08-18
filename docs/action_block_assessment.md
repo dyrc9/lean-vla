@@ -6,7 +6,7 @@
 我们在其外部增加动作生成前的结构化 `Z_t`：
 
 ```text
-(trusted intent, trusted observation O_t^T)
+(trusted task context, trusted observation O_t^T)
                   |
                   v
        frozen semantic subtask Z_t
@@ -21,6 +21,11 @@
 因此本文件中的 assessor 主要负责 `Z_t -> ActionBlock` 的局部兼容性和禁止后果，不再承担“仅凭动作块
 恢复完整任务意图”的职责。`Z_t` 的来源、绑定和 qualification 见
 [`semantic_subtask_hierarchy.md`](semantic_subtask_hierarchy.md)。
+
+当前 checker 的结论是分级的：速度、工作区、unexpected contact、stale/malformed command 和 unknown
+evidence 进入 hard gate；task-progress、release/close progress 与 expected-effect miss 只产生 advisory，
+并要求下一 block audited replan。后者不是对当前 block 的普遍语义拒绝，因此论文只能把 L1 表述为
+trusted-task monitoring 与 checker-relative authorization，不能写成完整 semantic soundness。
 
 这里不能让 assessor 读取攻击后的外部 prompt，也不能默认复用被注入的 policy-facing image。否则 selector、
 policy 和 assessor 会共同接受同一注入，只得到“攻击视图内部自洽”。trusted observation tap、secure
@@ -77,7 +82,7 @@ legal semantic-subtask frontier
 
 冻结 learned predictor 和 shadow rollout 用于后续 qualification/困难样本审计；第一版不训练新模型。
 
-## 4. 推荐的第一版 LIBERO assessor
+## 4. 当前 LIBERO assessor
 
 对每个 7-DoF action chunk：
 
@@ -146,10 +151,10 @@ L1 的 learned prediction 真实性是统计 claim，不交给 Lean。Lean 只�
 
 ## 8. Semantic-subtask 接口
 
-当前公开 OpenPI 没有原生 semantic decode API，因此第一版 `Z_t` 是 consumer-side frozen selector 的
-输出。只有当 exact `Z_t` 在动作生成前写入 policy prompt 并绑定返回的 ActionBlock 时，才具备结构上的
-前置中间层身份；动作产生后的 explanation 不合格。是否产生有意义的行为因果效应，必须用固定
-observation/noise 的 action-conditioning probe 测量，不能从 prompt wiring 本身推出。
+当前公开 OpenPI 没有原生 semantic decode API，因此 `Z_t` 是 consumer-side frozen selector 的输出。
+它必须在动作生成前基于绑定的 trusted state epoch 产生，并与返回的 ActionBlock 一起进入 assessment，
+但最终 ProofAlign 不把 `Z_t` 写入 π0.5 prompt。它的身份是独立 monitor anchor，而不是 policy 的隐藏计划
+或 hierarchical-control 输入；动作产生后的 explanation 仍不合格。
 
 ## 9. 当前工程状态
 
@@ -157,4 +162,6 @@ observation/noise 的 action-conditioning probe 测量，不能从 prompt wiring
 输出 exact executed-prefix ActionBlocks，并保留原 policy chunk digest 作为 provenance。它明确不读取
 reward、success、cost、collision 或 future observation，也不重建未执行的 chunk tail。
 
-因此当前未完成项已缩小为 assessor 本身与资格化阈值，而不是 ActionBlock 抽取。
+最终方法使用已冻结的 analytic local checker；learned outcome predictor 仍只是可选扩展，不属于当前主张。
+当前工程边界因此是 exact ActionBlock extraction、consumer-side assessment、hard-risk gating 与
+task-progress advisory，不是端到端 learned semantics、完整任务语义拒绝或真实世界感知保证。

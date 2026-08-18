@@ -1,7 +1,7 @@
 # 失败教训与停止规则（归档）
 
 本页只记录可复用的失败教训，不参与默认进度汇报。当前状态统一见
-[`current_status_and_roadmap.md`](current_status_and_roadmap.md)，完整逐版本时间线见
+[`current_status_and_roadmap.md`](../current_status_and_roadmap.md)，完整逐版本时间线见
 [`progress_and_plan.md`](progress_and_plan.md)。
 
 ## 1. 不把不可观察变量当作实验接口

@@ -1,6 +1,10 @@
 # 最终实验图表与 Lean 边界
 
-本页图表由 [`../../scripts/plot_final_paper_results.py`](../../scripts/plot_final_paper_results.py)
+> 历史审计材料：本页包含优化前版本的冻结图表，不进入当前论文正文或主表。当前论文只使用最终
+> ProofAlign 四臂结果，叙事入口见 [`paper_narrative_zh.md`](../../paper/paper_narrative_zh.md)，最终数字见
+> [`v15_14_final_four_arm_results.md`](../../paper/v15_14_final_four_arm_results.md)。
+
+本页图表由 [`../../../scripts/plot_final_paper_results.py`](../../../scripts/plot_final_paper_results.py)
 直接读取冻结的 v11/v12 JSON 汇总生成；v13 终态表读取独立 checksum-bound terminal summary。
 v12 ledger 明确不读取 task outcome，因此不能从该实验推断 task success。
 
@@ -11,9 +15,9 @@ Lean 位于 L2 `ActionBlock -> Execution` 事务层，不参与 π0.5 推理、M
 
 当前 machine-checked 核心位于：
 
-- [`../../lean/ProofAlign/IntegrityCore.lean`](../../lean/ProofAlign/IntegrityCore.lean)：原始
+- [`../../../lean/ProofAlign/IntegrityCore.lean`](../../../lean/ProofAlign/IntegrityCore.lean)：原始
   ActionBlock、authorization、receipt、effect 与 phase-gating 语义；
-- [`../../lean/ProofAlign/SemanticIntegrityCore.lean`](../../lean/ProofAlign/SemanticIntegrityCore.lean)：
+- [`../../../lean/ProofAlign/SemanticIntegrityCore.lean`](../../../lean/ProofAlign/SemanticIntegrityCore.lean)：
   增加 semantic context/subtask/prompt identity、ordered receipt window 和 one-use authorization。
 
 Lean 检查的关键性质包括：
@@ -91,9 +95,9 @@ shadow继续38 steps并成功，两者official unsafe均为false。它是确定�
 不是aggregate safety superiority。
 
 终态来源：
-[`../../experiments/proofalign_predictive_virtual_brake_v13_attacked_terminal_summary.json`](../../experiments/proofalign_predictive_virtual_brake_v13_attacked_terminal_summary.json)。
+[`../../../experiments/proofalign_predictive_virtual_brake_v13_attacked_terminal_summary.json`](../../../experiments/proofalign_predictive_virtual_brake_v13_attacked_terminal_summary.json)。
 因果对照：
-[`../../experiments/proofalign_predictive_virtual_brake_v13_attacked_shadow_terminal_summary.json`](../../experiments/proofalign_predictive_virtual_brake_v13_attacked_shadow_terminal_summary.json)。
+[`../../../experiments/proofalign_predictive_virtual_brake_v13_attacked_shadow_terminal_summary.json`](../../../experiments/proofalign_predictive_virtual_brake_v13_attacked_shadow_terminal_summary.json)。
 
 ## 5. v14 全关节 clean development
 
@@ -111,7 +115,7 @@ recovery。逐侧校准的冻结`1e-9 rad`门也未过：非干预最大误差`0
 `4.24e-6 rad`，false-safe风险决策为0。
 
 终态来源：
-[`../../experiments/proofalign_predictive_virtual_brake_v14_multijoint_clean_terminal_summary.json`](../../experiments/proofalign_predictive_virtual_brake_v14_multijoint_clean_terminal_summary.json)。
+[`../../../experiments/proofalign_predictive_virtual_brake_v14_multijoint_clean_terminal_summary.json`](../../../experiments/proofalign_predictive_virtual_brake_v14_multijoint_clean_terminal_summary.json)。
 
 ## 6. v14 同 schedule shadow-only 因果消融
 
@@ -133,9 +137,9 @@ containment–availability因果解释，同时显示7个任务成功和17个dea
 确认性或物理安全结论。
 
 注册终态：
-[`../../experiments/proofalign_predictive_virtual_brake_v14_multijoint_shadow_only_causal_terminal_summary.json`](../../experiments/proofalign_predictive_virtual_brake_v14_multijoint_shadow_only_causal_terminal_summary.json)。
+[`../../../experiments/proofalign_predictive_virtual_brake_v14_multijoint_shadow_only_causal_terminal_summary.json`](../../../experiments/proofalign_predictive_virtual_brake_v14_multijoint_shadow_only_causal_terminal_summary.json)。
 分轴diagnostic：
-[`../../experiments/proofalign_predictive_virtual_brake_v14_multijoint_shadow_only_causal_terminal_diagnostic.json`](../../experiments/proofalign_predictive_virtual_brake_v14_multijoint_shadow_only_causal_terminal_diagnostic.json)。
+[`../../../experiments/proofalign_predictive_virtual_brake_v14_multijoint_shadow_only_causal_terminal_diagnostic.json`](../../../experiments/proofalign_predictive_virtual_brake_v14_multijoint_shadow_only_causal_terminal_diagnostic.json)。
 
 ## 7. v14 trigger-rich strong-baseline qualification
 
@@ -158,9 +162,9 @@ force发生crossing，唯一失败gate为`low_negative_control`。Predictive在�
 crossing，但不能结果后重标dose。完整性、核心mechanism和timing分轴全部通过不等于总体pass。
 
 development终态：
-[`../../experiments/proofalign_predictive_virtual_brake_v14_multijoint_stress_development_terminal_summary.json`](../../experiments/proofalign_predictive_virtual_brake_v14_multijoint_stress_development_terminal_summary.json)。
+[`../../../experiments/proofalign_predictive_virtual_brake_v14_multijoint_stress_development_terminal_summary.json`](../../../experiments/proofalign_predictive_virtual_brake_v14_multijoint_stress_development_terminal_summary.json)。
 held-out终态：
-[`../../experiments/proofalign_predictive_virtual_brake_v14_multijoint_stress_qualification_terminal_summary.json`](../../experiments/proofalign_predictive_virtual_brake_v14_multijoint_stress_qualification_terminal_summary.json)。
+[`../../../experiments/proofalign_predictive_virtual_brake_v14_multijoint_stress_qualification_terminal_summary.json`](../../../experiments/proofalign_predictive_virtual_brake_v14_multijoint_stress_qualification_terminal_summary.json)。
 
 ## 8. v14 held-out task-utility qualification
 
@@ -178,7 +182,7 @@ Execution−VLA任务成功差为`−33.33pp`，100,000次paired base-pair clust
 `0.000614 rad`通过冻结`0.005 rad`门，screen p95为`28.30ms`，但最大延迟`131.60ms`。
 
 终态来源：
-[`../../experiments/proofalign_predictive_virtual_brake_v14_multijoint_task_utility_qualification_terminal_summary.json`](../../experiments/proofalign_predictive_virtual_brake_v14_multijoint_task_utility_qualification_terminal_summary.json)。
+[`../../../experiments/proofalign_predictive_virtual_brake_v14_multijoint_task_utility_qualification_terminal_summary.json`](../../../experiments/proofalign_predictive_virtual_brake_v14_multijoint_task_utility_qualification_terminal_summary.json)。
 
 ## 9. v11 containment–utility tradeoff
 

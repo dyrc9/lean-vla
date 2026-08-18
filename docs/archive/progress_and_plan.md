@@ -2,10 +2,10 @@
 
 > 本文件保留完整实验时间线、失败successor和停止边界，仅用于论文审计与复现。
 > 它不再是当前项目进度入口。日常状态统一见
-> [`current_status_and_roadmap.md`](current_status_and_roadmap.md)，默认无需读取本文件其余内容。
+> [`current_status_and_roadmap.md`](../current_status_and_roadmap.md)，默认无需读取本文件其余内容。
 
 当前主线、可主张边界和下一步以
-[`current_status_and_roadmap.md`](current_status_and_roadmap.md) 为准。本页保留完整时间线和所有
+[`current_status_and_roadmap.md`](../current_status_and_roadmap.md) 为准。本页保留完整时间线和所有
 结果后 successor，不再作为快速状态入口。
 
 ## 最新 checkpoint：2026-07-31 v14 held-out task-outcome utility qualification
@@ -30,7 +30,7 @@ latency p95 `28.30ms`、p99 `36.12ms`、最大`131.60ms`，最大constraint forc
 数值。
 
 终态见
-[`../experiments/proofalign_predictive_virtual_brake_v14_multijoint_task_utility_qualification_terminal_summary.json`](../experiments/proofalign_predictive_virtual_brake_v14_multijoint_task_utility_qualification_terminal_summary.json)。
+[`../../experiments/proofalign_predictive_virtual_brake_v14_multijoint_task_utility_qualification_terminal_summary.json`](../../experiments/proofalign_predictive_virtual_brake_v14_multijoint_task_utility_qualification_terminal_summary.json)。
 它保留原non-pass并固定全部75条checksum entries。下一步只在outcome-disclosed development失败
 上设计recovery因子；方法与参数冻结后，必须使用新的task/init population和env-policy seeds做
 stress containment与task utility资格复验，不能在本轮18 pair上追逐门限。
@@ -47,7 +47,7 @@ constraint force约`4689.7`。
 development注册终态仍是non-pass：no-guard/shadow所有侧最大数值差`0.047551 rad`超过冻结
 `0.001 rad`。后验诊断没有放宽门，只确认35,280个配对侧值在crossing以及
 `0.15/0.16/0.22/0.30 rad`阈值上的分类分歧均为0。终态见
-[`../experiments/proofalign_predictive_virtual_brake_v14_multijoint_stress_development_terminal_summary.json`](../experiments/proofalign_predictive_virtual_brake_v14_multijoint_stress_development_terminal_summary.json)。
+[`../../experiments/proofalign_predictive_virtual_brake_v14_multijoint_stress_development_terminal_summary.json`](../../experiments/proofalign_predictive_virtual_brake_v14_multijoint_stress_development_terminal_summary.json)。
 
 随后在旧45个精确task/init pair之外，确定性选择三套任务各6个不同task id与新init，并将environment
 seed改为`1509`。held-out qualification完成18环境、`756` stress lanes和`3024` baseline lanes。
@@ -61,7 +61,7 @@ Shadow产生`818` crossing与`1884`低余量值，Predictive均为0；Reactive�
 joint-1-upper low lanes：原生constraint force约`30k`使no-guard在第二步crossing；Predictive
 在两条均提前deadlock并保持实际crossing为0。该意外结果不能事后把low重标为stress。终态将总体
 non-pass与完整的core axes分开记录，见
-[`../experiments/proofalign_predictive_virtual_brake_v14_multijoint_stress_qualification_terminal_summary.json`](../experiments/proofalign_predictive_virtual_brake_v14_multijoint_stress_qualification_terminal_summary.json)。
+[`../../experiments/proofalign_predictive_virtual_brake_v14_multijoint_stress_qualification_terminal_summary.json`](../../experiments/proofalign_predictive_virtual_brake_v14_multijoint_stress_qualification_terminal_summary.json)。
 
 独立task-outcome utility qualification已按上节完成并因10次deadlock保持non-pass。下一实验将
 deadlock recovery/backup controller作为独立因子；不得从本轮结果选择后续确认性任务或改写
@@ -93,9 +93,9 @@ deadlock代价。
 `0.004651 rad`，是门限的`2.326×`；唯一失败gate为calibration。后验diagnostic将该注册non-pass
 与完全通过的pre-divergence causal identity分轴记录，但明确不修订注册分类、不授权确认性结论。
 冻结文件为
-[`../experiments/proofalign_predictive_virtual_brake_v14_multijoint_shadow_only_causal_terminal_summary.json`](../experiments/proofalign_predictive_virtual_brake_v14_multijoint_shadow_only_causal_terminal_summary.json)
+[`../../experiments/proofalign_predictive_virtual_brake_v14_multijoint_shadow_only_causal_terminal_summary.json`](../../experiments/proofalign_predictive_virtual_brake_v14_multijoint_shadow_only_causal_terminal_summary.json)
 和
-[`../experiments/proofalign_predictive_virtual_brake_v14_multijoint_shadow_only_causal_terminal_diagnostic.json`](../experiments/proofalign_predictive_virtual_brake_v14_multijoint_shadow_only_causal_terminal_diagnostic.json)。
+[`../../experiments/proofalign_predictive_virtual_brake_v14_multijoint_shadow_only_causal_terminal_diagnostic.json`](../../experiments/proofalign_predictive_virtual_brake_v14_multijoint_shadow_only_causal_terminal_diagnostic.json)。
 
 下一步不再重跑同一outcome-disclosed schedule以追逐门限，而是冻结trigger-rich
 low/medium/high stress development，比较no-guard、reactive-stop、shadow-only与predictive
@@ -129,7 +129,7 @@ official unsafe仍为`1/1/2/2`，没有显示总体改善。
 不能结果后放宽原门。
 
 冻结终态见
-[`../experiments/proofalign_predictive_virtual_brake_v14_multijoint_clean_terminal_summary.json`](../experiments/proofalign_predictive_virtual_brake_v14_multijoint_clean_terminal_summary.json)。
+[`../../experiments/proofalign_predictive_virtual_brake_v14_multijoint_clean_terminal_summary.json`](../../experiments/proofalign_predictive_virtual_brake_v14_multijoint_clean_terminal_summary.json)。
 同schedule全关节shadow-only guard-off消融已按上节完成；下一步冻结trigger-rich
 no-guard/reactive/shadow/predictive压力测试，确认性复验必须使用新workloads/init/seeds。
 
@@ -176,11 +176,11 @@ joint-limit steps，最终env_done成功，且两条件official unsafe都为fals
 safety-proxy–liveness tradeoff：guard减少风险暴露，但没有safe recovery时会牺牲任务完成。
 
 终态可复算入口为
-[`../scripts/freeze_predictive_virtual_brake_v13_attacked_terminal.py`](../scripts/freeze_predictive_virtual_brake_v13_attacked_terminal.py)
+[`../../scripts/freeze_predictive_virtual_brake_v13_attacked_terminal.py`](../../scripts/freeze_predictive_virtual_brake_v13_attacked_terminal.py)
 和
-[`../experiments/proofalign_predictive_virtual_brake_v13_attacked_terminal_summary.json`](../experiments/proofalign_predictive_virtual_brake_v13_attacked_terminal_summary.json)。
+[`../../experiments/proofalign_predictive_virtual_brake_v13_attacked_terminal_summary.json`](../../experiments/proofalign_predictive_virtual_brake_v13_attacked_terminal_summary.json)。
 attacked因果对照见
-[`../experiments/proofalign_predictive_virtual_brake_v13_attacked_shadow_terminal_summary.json`](../experiments/proofalign_predictive_virtual_brake_v13_attacked_shadow_terminal_summary.json)。
+[`../../experiments/proofalign_predictive_virtual_brake_v13_attacked_shadow_terminal_summary.json`](../../experiments/proofalign_predictive_virtual_brake_v13_attacked_shadow_terminal_summary.json)。
 下一步实现全7关节/双侧margin audit与trigger-rich
 no-guard/reactive/shadow/predictive压力测试；development完成后必须另取未见workload/init/seeds做
 outcome-blind qualification。
@@ -935,7 +935,7 @@ wiring 本身推出。
 - hardened action prompt 只从 trusted `T + Z_t` 固定编译；
 - 当前只覆盖 secure split 后的数字/软件注入，不覆盖同时欺骗 trusted tap 的分叉前物理光学攻击。
 
-实现与边界见 [`trusted_semantic_boundary.md`](trusted_semantic_boundary.md)。
+实现与边界见 [`trusted_semantic_boundary.md`](../trusted_semantic_boundary.md)。
 
 2026-07-24 零训练 GPU pilot 的当前结论：
 
