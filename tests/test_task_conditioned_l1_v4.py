@@ -6,6 +6,10 @@ import numpy as np
 import pytest
 
 from proofalign.semantic_local_checker import LocalActionAssessment
+from proofalign.digests import digest_text
+from proofalign.semantic_local_checker import EntityPosition, TrustedLocalObservation
+from proofalign.semantic_policy_wrapper import TrustedSemanticPolicyWrapper
+from proofalign.semantic_trust import UntrustedPolicyView
 from proofalign.task_conditioned_l1 import L1Verdict
 from proofalign.task_conditioned_l1_v2 import TransitionShadowAssessment
 from proofalign.task_conditioned_l1_v4 import (
@@ -17,7 +21,10 @@ from proofalign.task_conditioned_l1_v4 import (
     no_dispatch_protocol_digest,
     reset_qualified_abort_state,
 )
-from scripts.run_l1_task_conditioned_successor_v4 import annotate_payload
+from scripts.run_l1_task_conditioned_successor_v4 import (
+    _patched_v4_checker_bindings,
+    annotate_payload,
+)
 
 
 class _Model:
@@ -205,3 +212,60 @@ def test_v4_sentinel_requires_exact_finite_shape_and_annotation_marks_abort() ->
     assert annotated["task_success"] is False
     assert annotated["strict_success_no_cost"] is False
     assert annotated["metadata"]["l1_qualified_no_dispatch_abort_count"] == 1
+
+
+def test_v4_real_semantic_wrapper_builds_no_contract_for_abort_sentinel() -> None:
+    from proofalign import task_conditioned_l1_v4 as module
+
+    bddl = """
+    (define (problem transport)
+      (:domain robosuite)
+      (:objects red_mug_1 - red_mug plate_1 - plate)
+      (:init (On red_mug_1 main_table_region))
+      (:goal (And (On red_mug_1 plate_1)))
+    )
+    """
+    observation = TrustedLocalObservation(
+        state_epoch=0,
+        eef_position=(0.0, 0.0, 0.25),
+        gripper_qpos=(0.04, -0.04),
+        entity_positions=(
+            EntityPosition("red_mug_1", (0.15, 0.0, 0.25)),
+            EntityPosition("plate_1", (0.40, 0.0, 0.25)),
+        ),
+    )
+    with _patched_v4_checker_bindings():
+        wrapper = TrustedSemanticPolicyWrapper(
+            episode_nonce="v4-abort-test",
+            trusted_task="put the red mug on the plate",
+            bddl_text=bddl,
+        )
+        preparation = wrapper.begin_policy_call(
+            proposal_index=0,
+            local_observation=observation,
+            trusted_observation_digest=digest_text("trusted-view"),
+            external_policy_prompt="put the red mug on the plate",
+            generated_at_ns=10,
+        )
+        assert preparation.request is not None
+        module._QUALIFIED_ABORT_ARMED = True
+        command = np.full((10, 7), ABORT_SENTINEL_VALUE)
+        decision = wrapper.complete_policy_call(
+            preparation.request,
+            policy_view=UntrustedPolicyView(
+                policy_prompt="put the red mug on the plate",
+                policy_observation_digest=digest_text("policy-view"),
+            ),
+            source_policy_chunk_digest=digest_text("abort-chunk"),
+            nominal_command=command.reshape(-1),
+            command_shape=command.shape,
+            proposed_at_ns=20,
+            assessed_at_ns=21,
+            contract_issued_at_ns=22,
+        )
+    assert decision.accepted is False
+    assert decision.executable_prefix is None
+    assert decision.execution_contract is None
+    assert decision.checked_candidate.semantic_compatible is False
+    assert "qualified_no_dispatch_abort" in decision.checked_candidate.hard_violation_atoms
+    reset_qualified_abort_state()
