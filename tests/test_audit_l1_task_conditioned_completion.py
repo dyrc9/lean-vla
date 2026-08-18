@@ -148,3 +148,76 @@ def test_completion_audit_rejects_a_changed_pair_result(
     path.write_text(json.dumps(value), encoding="utf-8")
     with pytest.raises(audit.CompletionAuditError, match="does not recompute"):
         audit._verify_analysis(path, protocols, roots)
+
+
+def test_completion_audit_recomputes_v4_no_dispatch_from_raw_artifact(
+    tmp_path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(audit, "REPO_ROOT", tmp_path)
+    artifact = tmp_path / "episode.json"
+    candidate = {
+        "schema": "proofalign.task-conditioned-l1.v4.candidate-decision",
+        "qualified_no_dispatch_abort": True,
+        "dispatch_intent": "none",
+        "selected_action_block_sha256": None,
+        "sentinel_is_authorizable": False,
+        "unqualified_fallback_dispatch_allowed": False,
+    }
+    artifact.write_text(
+        json.dumps(
+            {
+                "decision": "l1_qualified_no_dispatch_abort",
+                "metadata": {
+                    "l1_task_conditioned_successor_version": "4",
+                    "l1_unqualified_fallback_dispatch_allowed": False,
+                    "l1_qualified_no_dispatch_abort_count": 1,
+                },
+                "observation_frame_audits": [
+                    {
+                        "online_progress_projection_v3": candidate,
+                        "semantic_decision": {"accepted": False},
+                    }
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+    rows = [
+        {
+            "arm": "semantic_only",
+            "artifact_path": "episode.json",
+            "l1_audit_count": 1,
+            "l1_recovery_selected_kinds": {
+                "qualified_no_dispatch_abort": 1
+            },
+        }
+    ]
+    result = audit._verify_v4_no_dispatch(rows)
+    assert result["qualified_no_dispatch_abort_count"] == 1
+    assert result["qualified_no_dispatch_abort_dispatch_count"] == 0
+    assert result["raw_no_dispatch_recomputation"] is True
+
+    candidate["selected_action_block_sha256"] = "a" * 64
+    artifact.write_text(
+        json.dumps(
+            {
+                "decision": "l1_qualified_no_dispatch_abort",
+                "metadata": {
+                    "l1_task_conditioned_successor_version": "4",
+                    "l1_unqualified_fallback_dispatch_allowed": False,
+                    "l1_qualified_no_dispatch_abort_count": 1,
+                },
+                "observation_frame_audits": [
+                    {
+                        "online_progress_projection_v3": candidate,
+                        "semantic_decision": {"accepted": False},
+                    }
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+    with pytest.raises(
+        audit.CompletionAuditError, match="reached a dispatch path"
+    ):
+        audit._verify_v4_no_dispatch(rows)

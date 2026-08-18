@@ -141,6 +141,8 @@ def _verify_analysis(
     analysis_path: Path,
     protocol_paths: Mapping[str, Path],
     roots: Mapping[str, Path],
+    *,
+    require_v4_no_dispatch: bool = False,
 ) -> dict[str, Any]:
     analysis = load_json_object(analysis_path)
     definition = analysis.get("risk_transition_definition", {})
@@ -268,6 +270,17 @@ def _verify_analysis(
             or int(summary["transition_count"]) != registered_counts[arm]
         ):
             raise CompletionAuditError(f"registered arm risk differs: {arm}")
+    no_dispatch = (
+        _verify_v4_no_dispatch(rows)
+        if require_v4_no_dispatch
+        else {
+            "v4_l1_episode_count": 0,
+            "v4_audit_count": 0,
+            "qualified_no_dispatch_abort_count": 0,
+            "qualified_no_dispatch_abort_dispatch_count": 0,
+            "raw_no_dispatch_recomputation": False,
+        }
+    )
     return {
         "analysis_sha256": file_sha256(analysis_path),
         "episode_count": len(rows),
@@ -278,6 +291,81 @@ def _verify_analysis(
         "registered_clean_eligible_counts": dict(registered_eligible),
         "registered_risk_transition_counts": dict(registered_counts),
         "independent_pair_recomputation": True,
+        "v4_no_dispatch": no_dispatch,
+    }
+
+
+def _verify_v4_no_dispatch(rows: Any) -> dict[str, Any]:
+    l1_rows = [
+        row for row in rows if str(row.get("arm")) in {"semantic_only", "dual"}
+    ]
+    audit_count = 0
+    abort_count = 0
+    for row in l1_rows:
+        artifact_path = row.get("artifact_path")
+        if not isinstance(artifact_path, str):
+            raise CompletionAuditError("v4 analysis row lacks artifact path")
+        episode = load_json_object(REPO_ROOT / artifact_path)
+        metadata = episode.get("metadata")
+        if (
+            not isinstance(metadata, Mapping)
+            or metadata.get("l1_task_conditioned_successor_version") != "4"
+            or metadata.get("l1_unqualified_fallback_dispatch_allowed") is not False
+        ):
+            raise CompletionAuditError("v4 L1 metadata binding differs")
+        episode_audits = 0
+        episode_aborts = 0
+        for frame in episode.get("observation_frame_audits", ()):
+            if not isinstance(frame, Mapping):
+                continue
+            candidate = frame.get("online_progress_projection_v3")
+            if not isinstance(candidate, Mapping) or not str(
+                candidate.get("schema", "")
+            ).startswith("proofalign.task-conditioned-l1.v4"):
+                continue
+            episode_audits += 1
+            audit_count += 1
+            if candidate.get("unqualified_fallback_dispatch_allowed") is not False:
+                raise CompletionAuditError("v4 audit permits unqualified fallback")
+            if not candidate.get("qualified_no_dispatch_abort"):
+                continue
+            episode_aborts += 1
+            abort_count += 1
+            decision = frame.get("semantic_decision")
+            if (
+                candidate.get("dispatch_intent") != "none"
+                or candidate.get("selected_action_block_sha256") is not None
+                or candidate.get("sentinel_is_authorizable") is not False
+                or not isinstance(decision, Mapping)
+                or decision.get("accepted") is not False
+                or "semantic_transaction" in frame
+            ):
+                raise CompletionAuditError(
+                    "v4 qualified abort raw frame reached a dispatch path"
+                )
+        if int(row.get("l1_audit_count", -1)) != episode_audits:
+            raise CompletionAuditError("v4 raw and analyzed audit counts differ")
+        expected_aborts = int(
+            row.get("l1_recovery_selected_kinds", {}).get(
+                "qualified_no_dispatch_abort", 0
+            )
+        )
+        if expected_aborts != episode_aborts:
+            raise CompletionAuditError("v4 raw and analyzed abort counts differ")
+        if episode_aborts and (
+            episode.get("decision") != "l1_qualified_no_dispatch_abort"
+            or int(metadata.get("l1_qualified_no_dispatch_abort_count", -1))
+            != episode_aborts
+        ):
+            raise CompletionAuditError("v4 abort episode annotation differs")
+    if not l1_rows or audit_count == 0:
+        raise CompletionAuditError("v4 held-out L1 audit coverage is absent")
+    return {
+        "v4_l1_episode_count": len(l1_rows),
+        "v4_audit_count": audit_count,
+        "qualified_no_dispatch_abort_count": abort_count,
+        "qualified_no_dispatch_abort_dispatch_count": 0,
+        "raw_no_dispatch_recomputation": True,
     }
 
 
@@ -361,7 +449,15 @@ def audit(
         protocols[condition] = protocol
         roots[condition] = root
         collections[condition] = evidence
-    analysis_evidence = _verify_analysis(analysis_path, protocol_paths, roots)
+    require_v4_no_dispatch = str(
+        design.get("frozen_method", {}).get("version", "")
+    ) == "4"
+    analysis_evidence = _verify_analysis(
+        analysis_path,
+        protocol_paths,
+        roots,
+        require_v4_no_dispatch=require_v4_no_dispatch,
+    )
     handoff_evidence = _verify_handoff(handoff_root, analysis_path)
     preservation = _verify_preservation(preservation_base)
     if preservation["base_is_ancestor"] is not True:
@@ -385,6 +481,12 @@ def audit(
             "registered_45_35_percent_risk_definition_reused": True,
             "raw_ledgers_and_checksums_verified": True,
             "statistics_tables_and_handoff_verified": True,
+            "qualified_no_dispatch_raw_evidence_verified": (
+                require_v4_no_dispatch
+                and analysis_evidence["v4_no_dispatch"][
+                    "raw_no_dispatch_recomputation"
+                ]
+            ),
         },
     }
     output.parent.mkdir(parents=True, exist_ok=True)
