@@ -1,0 +1,54 @@
+{
+  "completed_at": "2026-08-18T10:28:55.146873+00:00",
+  "created_at": "2026-08-18T10:24:53.991934+00:00",
+  "env_step_count": 0,
+  "outcomes_observed": false,
+  "policy_loaded": false,
+  "protocol_sha256": "0a6533651a301f3d466779ab5071cb145260868fb63145a550d31a698ef92994",
+  "runtime_config": {
+    "config": {
+      "assets": "/home/ldx/lean-vla/external/LIBERO-Safety/libero/libero/assets",
+      "bddl_files": "/home/ldx/lean-vla/external/LIBERO-Safety/libero/libero/bddl_files",
+      "benchmark_root": "/home/ldx/lean-vla/external/LIBERO-Safety/libero/libero",
+      "datasets": "/home/ldx/lean-vla/external/LIBERO-Safety/libero/datasets",
+      "init_states": "/home/ldx/lean-vla/external/LIBERO-Safety/libero/libero/init_files"
+    },
+    "directory": "/home/ldx/lean-vla/results/proofalign_llm_semantic_template_qualification_20260818_fresh1/runtime/libero_config",
+    "sha256": "8d1cc08bf89c204f7d592bc6b87f4ffebeed91f7e870097b340a858c07741a3c"
+  },
+  "schema": "proofalign.llm-semantic-template-qualification-run.v1",
+  "status": "complete",
+  "summary": {
+    "attacked_prompt_read_count": 0,
+    "classification": "llm_semantic_template_qualification_nonpass",
+    "compiled_graph_count": 60,
+    "conditions": {
+      "all_goal_geometry_resolved": false,
+      "attacked_prompt_read_count": true,
+      "compiled_graph_count": true,
+      "env_step_count": true,
+      "part_resolution_failure_count": true,
+      "policy_inference_count": true,
+      "policy_load_count": true,
+      "task_outcome_read_count": true,
+      "valid_row_count": true
+    },
+    "env_step_count": 0,
+    "goal_predicate_counts": {
+      "close": 6,
+      "grasp_part": 15,
+      "in": 24,
+      "on": 33,
+      "turn_on": 6
+    },
+    "part_resolution_failure_count": 0,
+    "pass": false,
+    "policy_inference_count": 0,
+    "policy_load_count": 0,
+    "protocol_id": "proofalign-full120-llm-template-outcome-blind-qualification-20260818",
+    "row_count": 60,
+    "schema": "proofalign.llm-semantic-template-outcome-blind-qualification-summary.v1",
+    "task_outcome_read_count": 0,
+    "valid_row_count": 60
+  }
+}
