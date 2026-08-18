@@ -32,12 +32,15 @@ from scripts import run_v15_14_unified_force_envelope_attacked_task_utility_qual
 from scripts.run_llm_template_semantic_v1 import patched_llm_template_runtime  # noqa: E402
 
 
-PROTOCOL = REPO_ROOT / "experiments/proofalign_remote_full120_llm_resilient_completion_protocol_20260818.json"
+PROTOCOL = REPO_ROOT / "experiments/proofalign_remote_full120_llm_resilient_completion_v2_protocol_20260818.json"
 CLEAN_PROTOCOL = REPO_ROOT / "experiments/proofalign_remote_full120_llm_clean_protocol_20260818.json"
 ATTACKED_PROTOCOL = REPO_ROOT / "experiments/proofalign_remote_full120_llm_attacked_protocol_20260818.json"
 CATALOG = REPO_ROOT / "experiments/proofalign_llm_semantic_template_catalog_20260818.json"
 PARENT_CLEAN_ROOT = REPO_ROOT / "results/proofalign_remote_full120_llm_clean_20260818_fresh1"
 CLEAN_ROOT = REPO_ROOT / "results/proofalign_remote_full120_llm_clean_completion_20260818_fresh2"
+PARENT_COMPLETION_ROOT = CLEAN_ROOT
+CLEAN_ROOT = REPO_ROOT / "results/proofalign_remote_full120_llm_clean_completion_20260818_fresh3"
+PARENT_COMPLETION_LOG = REPO_ROOT / "results/proofalign_remote_full120_llm_clean_completion_execute_20260818.log"
 ATTACKED_ROOT = REPO_ROOT / "results/proofalign_remote_full120_llm_attacked_20260818_fresh1"
 SOURCE_PATHS = (
     "scripts/run_remote_full120_llm_resilient_completion.py",
@@ -77,10 +80,21 @@ def freeze() -> dict[str, Any]:
         raise CompletionError("bound parent stop state differs")
     clean = load_json_object(CLEAN_PROTOCOL)
     attacked = load_json_object(ATTACKED_PROTOCOL)
+    partial_manifest = load_json_object(PARENT_COMPLETION_ROOT / "run_manifest.json")
+    if (
+        partial_manifest.get("status") != "running"
+        or len(partial_manifest.get("completed_episode_ids", [])) != 47
+        or len(partial_manifest.get("terminal_exception_episode_ids", [])) != 1
+    ):
+        raise CompletionError("bound clean completion partial state differs")
+    orphan_spec = base_clean.build_specs(clean)[473]
+    orphan_artifact = _artifact_path(PARENT_COMPLETION_ROOT, orphan_spec)
+    if not orphan_artifact.is_file():
+        raise CompletionError("persisted postcheck-exception artifact is absent")
     commit = _git("rev-parse", "HEAD")
     payload = {
-        "schema": "proofalign.remote-full120-llm-resilient-completion-protocol.v1",
-        "protocol_id": "proofalign-remote-full120-llm-resilient-completion-20260818",
+        "schema": "proofalign.remote-full120-llm-resilient-completion-protocol.v2",
+        "protocol_id": "proofalign-remote-full120-llm-resilient-completion-v2-20260818",
         "created_at": _now(),
         "source": {
             "repository_commit": commit,
@@ -98,13 +112,29 @@ def freeze() -> dict[str, Any]:
             "terminal_error_episode_id": clean["schedule"][426]["episode_id"],
             "retry_authorized": False,
         },
+        "parent_clean_completion": {
+            "root": PARENT_COMPLETION_ROOT.relative_to(REPO_ROOT).as_posix(),
+            "manifest_sha256": file_sha256(PARENT_COMPLETION_ROOT / "run_manifest.json"),
+            "ledger_sha256": file_sha256(PARENT_COMPLETION_ROOT / "execution_ledger.jsonl"),
+            "checksums_sha256": file_sha256(PARENT_COMPLETION_ROOT / "SHA256SUMS"),
+            "verified_record_count": 47,
+            "covered_indices": list(range(426, 473)),
+            "persisted_postcheck_exception_index": 473,
+            "persisted_postcheck_exception_episode_id": orphan_spec.episode_id,
+            "persisted_artifact_path": orphan_artifact.relative_to(REPO_ROOT).as_posix(),
+            "persisted_artifact_sha256": file_sha256(orphan_artifact),
+            "execution_log_path": PARENT_COMPLETION_LOG.relative_to(REPO_ROOT).as_posix(),
+            "execution_log_sha256": file_sha256(PARENT_COMPLETION_LOG),
+            "postcheck_exception": "V15BoundedStateTriggeredTaskUtilityError: task-runtime bounded-core coverage differs",
+            "retry_authorized": False,
+        },
         "clean_completion": {
             "source_protocol": CLEAN_PROTOCOL.relative_to(REPO_ROOT).as_posix(),
             "source_protocol_sha256": file_sha256(CLEAN_PROTOCOL),
             "fresh_output_root": CLEAN_ROOT.relative_to(REPO_ROOT).as_posix(),
-            "terminal_error_record_only_indices": [426],
-            "execute_indices": list(range(427, 480)),
-            "expected_record_count": 54,
+            "terminal_error_record_only_indices": [],
+            "execute_indices": list(range(474, 480)),
+            "expected_record_count": 6,
         },
         "attacked_collection": {
             "source_protocol": ATTACKED_PROTOCOL.relative_to(REPO_ROOT).as_posix(),
@@ -130,7 +160,7 @@ def freeze() -> dict[str, Any]:
 
 
 def validate(protocol: Mapping[str, Any]) -> None:
-    if protocol.get("schema") != "proofalign.remote-full120-llm-resilient-completion-protocol.v1":
+    if protocol.get("schema") != "proofalign.remote-full120-llm-resilient-completion-protocol.v2":
         raise CompletionError("completion protocol schema differs")
     source = protocol["source"]
     if subprocess.run(
@@ -154,6 +184,19 @@ def validate(protocol: Mapping[str, Any]) -> None:
     ):
         raise CompletionError("parent clean stop artifacts differ")
     p0b.read_checksums(root)
+    partial = protocol["parent_clean_completion"]
+    partial_root = REPO_ROOT / partial["root"]
+    if (
+        file_sha256(partial_root / "run_manifest.json") != partial["manifest_sha256"]
+        or file_sha256(partial_root / "execution_ledger.jsonl") != partial["ledger_sha256"]
+        or file_sha256(partial_root / "SHA256SUMS") != partial["checksums_sha256"]
+        or file_sha256(REPO_ROOT / partial["persisted_artifact_path"])
+        != partial["persisted_artifact_sha256"]
+        or file_sha256(REPO_ROOT / partial["execution_log_path"])
+        != partial["execution_log_sha256"]
+    ):
+        raise CompletionError("parent clean completion artifacts differ")
+    p0b.read_checksums(partial_root)
 
 
 def _terminal_artifact(spec: Any, error: BaseException | str, *, condition: str, bridge: Any | None) -> dict[str, Any]:
@@ -262,12 +305,39 @@ def _collect_one(
             raise CompletionError("runner returned without an episode artifact")
         return artifact, {"terminal_exception": False, "wall_time_seconds": perf_counter() - started}
     except Exception as exc:
-        payload = _terminal_artifact(spec, exc, condition=condition, bridge=bridge)
-        artifact = _write_terminal(root, spec, payload)
+        artifact = _artifact_path(root, spec)
+        persisted_before_exception = artifact.is_file()
+        sidecar = None
+        if persisted_before_exception:
+            sidecar = artifact.parent.parent / "terminal_exception_sidecar.json"
+            sidecar.write_text(
+                canonical_text(
+                    {
+                        "schema": "proofalign.persisted-episode-postcheck-exception.v1",
+                        "episode_id": spec.episode_id,
+                        "artifact_path": artifact.relative_to(REPO_ROOT).as_posix(),
+                        "artifact_sha256": file_sha256(artifact),
+                        "exception_type": type(exc).__name__,
+                        "exception_message": str(exc),
+                        "traceback": traceback.format_exc(),
+                        "conservative_invalid": True,
+                        "retry_performed": False,
+                    }
+                ),
+                encoding="utf-8",
+            )
+        else:
+            payload = _terminal_artifact(spec, exc, condition=condition, bridge=bridge)
+            artifact = _write_terminal(root, spec, payload)
         return artifact, {
             "terminal_exception": True,
             "exception_type": type(exc).__name__,
             "exception_message": str(exc),
+            "artifact_persisted_before_exception": persisted_before_exception,
+            "exception_sidecar_path": (
+                sidecar.relative_to(REPO_ROOT).as_posix() if sidecar else None
+            ),
+            "exception_sidecar_sha256": file_sha256(sidecar) if sidecar else None,
             "wall_time_seconds": perf_counter() - started,
         }
 
