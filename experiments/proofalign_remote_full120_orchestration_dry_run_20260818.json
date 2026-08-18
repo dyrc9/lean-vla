@@ -1,0 +1,84 @@
+{
+  "actions_dispatched": false,
+  "attacked": {
+    "arm_counts": {
+      "dual": 120,
+      "execution_only": 120,
+      "semantic_only": 120,
+      "vla_only": 120
+    },
+    "arm_position_counts": {
+      "dual": [
+        30,
+        30,
+        30,
+        30
+      ],
+      "execution_only": [
+        30,
+        30,
+        30,
+        30
+      ],
+      "semantic_only": [
+        30,
+        30,
+        30,
+        30
+      ],
+      "vla_only": [
+        30,
+        30,
+        30,
+        30
+      ]
+    },
+    "episode_count": 480,
+    "root": "results/proofalign_remote_full120_attacked_20260818_fresh1",
+    "schedule_sha256": "807b7d16ba9cc3b536c373502c1d455a1100e78f85225d23ac347e3640b807d4",
+    "unit_count": 120
+  },
+  "clean": {
+    "arm_counts": {
+      "dual": 120,
+      "execution_only": 120,
+      "semantic_only": 120,
+      "vla_only": 120
+    },
+    "arm_position_counts": {
+      "dual": [
+        30,
+        30,
+        30,
+        30
+      ],
+      "execution_only": [
+        30,
+        30,
+        30,
+        30
+      ],
+      "semantic_only": [
+        30,
+        30,
+        30,
+        30
+      ],
+      "vla_only": [
+        30,
+        30,
+        30,
+        30
+      ]
+    },
+    "episode_count": 480,
+    "root": "results/proofalign_remote_full120_clean_20260818_fresh1",
+    "schedule_sha256": "46ec95fabec3e1854741a98c5e95b6a16858794a6509226843b9580e2c846b92",
+    "unit_count": 120
+  },
+  "complete": true,
+  "outcomes_observed": false,
+  "policy_loaded": false,
+  "protocol_id": "proofalign-remote-full120-outcome-blind-successor-20260818",
+  "schema": "proofalign.remote-full120-orchestration-dry-run.v1"
+}
