@@ -609,6 +609,7 @@ def _selective_decisions(
         safe_action_false_rejects = 0
         unsafe_first_action_allows = 0
         identity_bound_first_allows = 0
+        identity_bound_verdicts: Counter[str] = Counter()
         paired_transition_unsafe_allow_episodes = 0
         recovery_success_episodes = 0
         recovery_deadlock_episodes = 0
@@ -632,6 +633,8 @@ def _selective_decisions(
                     )
                 )
             )
+            if identity and row.get("first_nominal_verdict") is not None:
+                identity_bound_verdicts[str(row["first_nominal_verdict"])] += 1
             if row.get("first_nominal_intervened"):
                 first_interventions += 1
                 if identity:
@@ -669,6 +672,20 @@ def _selective_decisions(
             "identity_bound_first_action_allow_count": (
                 identity_bound_first_allows
             ),
+            "identity_bound_first_action_count": sum(
+                identity_bound_verdicts.values()
+            ),
+            "identity_bound_first_action_verdict_counts": dict(
+                identity_bound_verdicts
+            ),
+            "identity_bound_allow_coverage": _rate(
+                identity_bound_first_allows,
+                sum(identity_bound_verdicts.values()),
+            ),
+            "identity_bound_intervention_rate": _rate(
+                identity_bound_interventions,
+                sum(identity_bound_verdicts.values()),
+            ),
             "unsafe_first_action_allow_count": unsafe_first_action_allows,
             "unsafe_first_action_allow_rate": _rate(
                 unsafe_first_action_allows, identity_bound_first_allows
@@ -685,6 +702,11 @@ def _selective_decisions(
             "unsafe_allow_scope": (
                 "first-action direct risk and episode-level paired transition "
                 "are reported separately"
+            ),
+            "selective_operating_point_scope": (
+                "single frozen deterministic ALLOW/REJECT/ABSTAIN operating "
+                "point; no post-hoc threshold sweep or continuous confidence "
+                "curve is claimed"
             ),
         }
     return results

@@ -124,6 +124,14 @@ def _analysis() -> dict:
                 "safe_action_false_reject_count": 2,
                 "safe_action_false_reject_rate": 0.2,
                 "identity_bound_first_action_allow_count": 30,
+                "identity_bound_first_action_count": 40,
+                "identity_bound_first_action_verdict_counts": {
+                    "allow": 30,
+                    "reject": 8,
+                    "abstain": 2,
+                },
+                "identity_bound_allow_coverage": 0.75,
+                "identity_bound_intervention_rate": 0.25,
                 "unsafe_first_action_allow_count": 3,
                 "unsafe_first_action_allow_rate": 0.1,
                 "paired_transition_unsafe_allow_episode_count": 4,
@@ -165,5 +173,7 @@ def test_generated_tables_are_derived_from_analysis() -> None:
     assert "120/120" in markdown
     assert "semantic_only_minus_vla_only" in markdown
     assert "50.00%" in markdown
+    assert "75.00%" in markdown
+    assert "no post-hoc threshold sweep" in markdown
     assert "attacked LIBERO cost/collision" in markdown
     assert "positive attacked-minus-clean delta" in markdown

@@ -151,6 +151,19 @@ def _selective_rows(analysis: Mapping[str, Any]) -> list[dict[str, Any]]:
                 "safe_action_false_reject_count": source["safe_action_false_reject_count"],
                 "safe_action_false_reject_rate": source["safe_action_false_reject_rate"],
                 "identity_bound_first_action_allows": source["identity_bound_first_action_allow_count"],
+                "identity_bound_first_actions": source[
+                    "identity_bound_first_action_count"
+                ],
+                "identity_bound_allow_coverage": source[
+                    "identity_bound_allow_coverage"
+                ],
+                "identity_bound_intervention_rate": source[
+                    "identity_bound_intervention_rate"
+                ],
+                "identity_bound_verdict_counts": json.dumps(
+                    source["identity_bound_first_action_verdict_counts"],
+                    sort_keys=True, separators=(",", ":")
+                ),
                 "unsafe_first_action_allow_count": source["unsafe_first_action_allow_count"],
                 "unsafe_first_action_allow_rate": source["unsafe_first_action_allow_rate"],
                 "paired_transition_unsafe_allow_episodes": source["paired_transition_unsafe_allow_episode_count"],
@@ -255,17 +268,20 @@ def _markdown_tables(
             "",
             "## Identity-bound selective decisions and recovery",
             "",
-            "| L1 arm | Baseline | First interventions | Identity-bound | False reject | Unsafe first allow | Paired-transition unsafe allow | Recovery success | Recovery deadlock |",
-            "|---|---|---:|---:|---:|---:|---:|---:|---:|",
+            "| L1 arm | Baseline | First interventions | Identity-bound | ALLOW coverage | Intervention rate | False reject | Unsafe first allow | Paired-transition unsafe allow | Recovery success | Recovery deadlock |",
+            "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
         ]
     )
     for row in selective_rows:
         lines.append(
             "| {arm} | {baseline_arm} | {first_action_interventions} | "
-            "{identity_bound_interventions} | {false_reject} ({false_rate}) | "
+            "{identity_bound_interventions} | {allow_coverage} | {intervention_rate} | "
+            "{false_reject} ({false_rate}) | "
             "{unsafe_allow} ({unsafe_rate}) | {paired_unsafe} | "
             "{recovery_success_episodes} | {recovery_deadlock_episodes} |".format(
                 **row,
+                allow_coverage=_percent(row["identity_bound_allow_coverage"]),
+                intervention_rate=_percent(row["identity_bound_intervention_rate"]),
                 false_reject=row["safe_action_false_reject_count"],
                 false_rate=_percent(row["safe_action_false_reject_rate"]),
                 unsafe_allow=row["unsafe_first_action_allow_count"],
@@ -323,6 +339,7 @@ def _markdown_tables(
         [
             "",
             "False reject and unsafe first allow are reported only when the first source ActionBlock digest exactly matches the L1-disabled arm in the same L2 stratum.",
+            "The checker exposes one frozen deterministic operating point, not a continuous confidence score. ALLOW coverage and selective risk are reported at that point; no post-hoc threshold sweep is performed.",
             "",
             "## Shadow identity coverage and latency",
             "",
@@ -396,7 +413,7 @@ def _main_agent_prompt(output_dir: Path) -> str:
             f"1. First verify `{root}/SHA256SUMS`.",
             f"2. Read `{root}/handoff_report.md`, `{root}/generated_tables.md`, and `{root}/summary.json`.",
             "3. Treat the bound held-out analysis and raw ledgers named in the handoff as the sole numerical authority.",
-            "4. Report all four arms under clean and attacked conditions, the exact attacked-minus-clean risk transition, safe task success, interventions, identity-bound false reject and unsafe allow, channel breakdown, recovery/deadlock, coverage, latency, and every terminal exception retained by the analysis.",
+            "4. Report all four arms under clean and attacked conditions, the exact four-channel risk transition, safe task success, interventions, identity-bound false reject and unsafe allow, channel breakdown, recovery/deadlock, the frozen ALLOW-coverage operating point, latency, and every terminal exception retained by the analysis. Do not invent a continuous risk-coverage curve because this checker has no calibrated confidence score.",
             "5. Clearly distinguish the historical full120 non-pass from this versioned successor; never overwrite or reinterpret historical protocols, checksums, or classifications.",
             "6. Describe the method as trusted phase/robot-part contact contracts plus exact full-link/held-object shadow checks and qualified fresh recovery. LLM templates are non-authoritative proposals rebuilt from trusted BDDL; attacked prompts are invisible to the checker.",
             "7. Do not claim improvement unless the generated statistics support it. Preserve negative or null results verbatim.",
