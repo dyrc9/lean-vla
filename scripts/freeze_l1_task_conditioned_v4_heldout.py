@@ -156,6 +156,8 @@ def _qualification() -> dict[str, Any]:
     for row in l1_rows:
         episode = load_json_object(REPO_ROOT / row["artifact_path"])
         for frame in episode.get("observation_frame_audits", ()):
+            if not isinstance(frame, Mapping):
+                continue
             audit = frame.get("online_progress_projection_v3", {})
             if not str(audit.get("schema", "")).startswith(
                 "proofalign.task-conditioned-l1.v4"
@@ -171,19 +173,19 @@ def _qualification() -> dict[str, Any]:
                 raise HeldoutV4FreezeError("v4 selected an unqualified fallback")
             if audit.get("qualified_no_dispatch_abort"):
                 qualified_aborts += 1
+                decision = frame.get("semantic_decision")
+                metadata = episode.get("metadata")
                 if (
                     audit.get("dispatch_intent") != "none"
                     or audit.get("selected_action_block_sha256") is not None
                     or audit.get("sentinel_is_authorizable") is not False
-                    or frame.get("semantic_decision", {}).get("accepted") is not False
+                    or not isinstance(decision, Mapping)
+                    or decision.get("accepted") is not False
                     or "semantic_transaction" in frame
                     or episode.get("decision")
                     != "l1_qualified_no_dispatch_abort"
-                    or int(
-                        episode.get("metadata", {}).get(
-                            "l1_qualified_no_dispatch_abort_count", 0
-                        )
-                    )
+                    or not isinstance(metadata, Mapping)
+                    or int(metadata.get("l1_qualified_no_dispatch_abort_count", 0))
                     < 1
                 ):
                     raise HeldoutV4FreezeError(
