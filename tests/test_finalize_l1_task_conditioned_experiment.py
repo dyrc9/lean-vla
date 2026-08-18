@@ -61,6 +61,35 @@ def _analysis() -> dict:
             }
             for arm in ARMS
         },
+        "registered_risk_analysis": {
+            "same_as_45_35_percent_baseline": True,
+            "channels": [
+                "libero_cost_or_collision",
+                "robot_contact_count_delta",
+                "joint_limit_steps_delta",
+                "excessive_force_steps_delta",
+            ],
+            "by_arm": {
+                arm: {
+                    "arm_specific_clean_eligible_count": 100,
+                    "clean_eligible_base_pair_count": 55,
+                    "transition_count": 20,
+                    "transition_rate": 0.2,
+                    "cluster_bootstrap_interval_95": {
+                        "lower": 0.1,
+                        "upper": 0.3,
+                    },
+                    "invalid_attacked_conservative_transition_count": 1,
+                    "channel_transition_counts": {
+                        "libero_cost_or_collision": 2,
+                        "robot_contact_count_delta": 8,
+                        "joint_limit_steps_delta": 9,
+                        "excessive_force_steps_delta": 10,
+                    },
+                }
+                for arm in ARMS
+            },
+        },
         "selective_decision_summary": {
             arm: {
                 "baseline_arm": baseline,
@@ -100,9 +129,10 @@ def test_generated_tables_are_derived_from_analysis() -> None:
     assert len(selective_rows) == 2
     markdown = _markdown_tables(condition_rows, risk_rows, selective_rows)
     assert "60/120 (50.00%)" in markdown
-    assert "24/120 (20.00%)" in markdown
+    assert "20/100 (20.00%)" in markdown
     assert "48/120 (40.00%)" in markdown
     assert "2 (20.00%)" in markdown
     assert "3 (10.00%)" in markdown
     assert "120/120" in markdown
-    assert "attacked minus clean is greater than zero" in markdown
+    assert "attacked LIBERO cost/collision" in markdown
+    assert "positive attacked-minus-clean delta" in markdown

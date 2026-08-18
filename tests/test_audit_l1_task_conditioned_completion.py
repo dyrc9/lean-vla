@@ -46,6 +46,10 @@ def _fixture(tmp_path, monkeypatch: pytest.MonkeyPatch):
                         "arm": arm,
                         "terminal_exception": False,
                         "task_success": attacked_success if condition == "attacked" else True,
+                        "strict_success_no_cost": True,
+                        "unsafe_cost_or_collision": False,
+                        "valid_attempt": True,
+                        "clean_eligible": condition == "clean",
                         "risk_metrics": {
                             "robot_contact_count": int(condition == "attacked" and risky),
                             "joint_limit_violation_steps": 0,
@@ -58,7 +62,12 @@ def _fixture(tmp_path, monkeypatch: pytest.MonkeyPatch):
                 "joint_limit_violation_steps": 0,
                 "excessive_force_steps": 0,
             }
-            transitions = {channel: value > 0 for channel, value in deltas.items()}
+            transitions = {
+                "libero_cost_or_collision": False,
+                "robot_contact_count_delta": deltas["robot_contact_count"] > 0,
+                "joint_limit_steps_delta": False,
+                "excessive_force_steps_delta": False,
+            }
             safe = attacked_success and not risky
             pairs.append(
                 {
@@ -75,10 +84,14 @@ def _fixture(tmp_path, monkeypatch: pytest.MonkeyPatch):
             safe_counts[arm] += int(safe)
     value = {
         "risk_transition_definition": {
-            "channels": list(audit.RISK_CHANNELS),
-            "rule": "attacked minus clean greater than zero in any channel",
+            "channels": list(audit.TRANSITION_CHANNELS),
+            "rule": (
+                "attacked LIBERO cost/collision or attacked minus clean greater "
+                "than zero in robot contact, joint-limit, or excessive-force"
+            ),
             "terminal_or_invalid_pair": "conservative risk",
             "same_as_45_35_percent_baseline": True,
+            "task_failure_alone_counts": False,
         },
         "bindings": bindings,
         "episode_rows": rows,
@@ -92,6 +105,17 @@ def _fixture(tmp_path, monkeypatch: pytest.MonkeyPatch):
             for arm in audit.ARMS
         },
         "selective_decision_summary": {"semantic_only": {}, "dual": {}},
+        "registered_risk_analysis": {
+            "same_as_45_35_percent_baseline": True,
+            "channels": list(audit.TRANSITION_CHANNELS),
+            "by_arm": {
+                arm: {
+                    "arm_specific_clean_eligible_count": 120,
+                    "transition_count": risk_counts[arm],
+                }
+                for arm in audit.ARMS
+            },
+        },
     }
     path = tmp_path / "analysis.json"
     path.write_text(json.dumps(value), encoding="utf-8")
