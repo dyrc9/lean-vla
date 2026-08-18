@@ -49,7 +49,7 @@ CLEAN_PRIMARY_ROOT = REPO_ROOT / "results/proofalign_remote_full120_llm_clean_20
 CLEAN_PARTIAL_ROOT = REPO_ROOT / "results/proofalign_remote_full120_llm_clean_completion_20260818_fresh2"
 CLEAN_FINAL_ROOT = REPO_ROOT / "results/proofalign_remote_full120_llm_clean_completion_20260818_fresh3"
 ATTACKED_ROOT = REPO_ROOT / "results/proofalign_remote_full120_llm_attacked_20260818_fresh1"
-ANALYSIS_ROOT = REPO_ROOT / "results/proofalign_remote_full120_llm_analysis_20260818_fresh1"
+ANALYSIS_ROOT = REPO_ROOT / "results/proofalign_remote_full120_llm_analysis_20260818_fresh2"
 
 SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 
@@ -380,6 +380,23 @@ def finalize() -> dict[str, Any]:
     source_bindings = {
         "schema": "proofalign.remote-full120-llm-final-analysis-bindings.v1",
         "created_at": _now(),
+        "analysis_implementation": {
+            path.relative_to(REPO_ROOT).as_posix(): file_sha256(path)
+            for path in (
+                Path(__file__).resolve(),
+                REPO_ROOT / "scripts/analyze_remote_full120_experiment.py",
+                REPO_ROOT / "src/proofalign/benchmark/four_arm_v4.py",
+            )
+        },
+        "method_artifacts": {
+            path.relative_to(REPO_ROOT).as_posix(): file_sha256(path)
+            for path in (
+                REPO_ROOT / "lean/ProofAlign/SemanticIntegrityCore.lean",
+                REPO_ROOT / "experiments/proofalign_llm_semantic_template_catalog_20260818.json",
+                REPO_ROOT
+                / "results/proofalign_llm_semantic_template_qualification_20260818_fresh2/summary.json",
+            )
+        },
         "protocols": {
             path.relative_to(REPO_ROOT).as_posix(): file_sha256(path)
             for path in (UMBRELLA_PATH, CLEAN_PROTOCOL_PATH, ATTACKED_PROTOCOL_PATH, COMPLETION_PROTOCOL_PATH)

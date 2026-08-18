@@ -1,0 +1,75 @@
+{
+  "completed_at": "2026-08-18T12:40:34.582217+00:00",
+  "completed_episode_ids": [
+    "predictive_virtual_brake_v15_14_unified_force_envelope_task_utility_qualification_vla_only_obstacle_avoidance_human_task14_init12_env43_policy11",
+    "predictive_virtual_brake_v15_14_unified_force_envelope_task_utility_qualification_semantic_only_obstacle_avoidance_human_task14_init12_env43_policy11",
+    "predictive_virtual_brake_v15_14_unified_force_envelope_task_utility_qualification_execution_only_obstacle_avoidance_human_task14_init12_env59_policy17",
+    "predictive_virtual_brake_v15_14_unified_force_envelope_task_utility_qualification_dual_obstacle_avoidance_human_task14_init12_env59_policy17",
+    "predictive_virtual_brake_v15_14_unified_force_envelope_task_utility_qualification_vla_only_obstacle_avoidance_human_task14_init12_env59_policy17",
+    "predictive_virtual_brake_v15_14_unified_force_envelope_task_utility_qualification_semantic_only_obstacle_avoidance_human_task14_init12_env59_policy17"
+  ],
+  "condition": "clean",
+  "device_mapping": {
+    "cuda_visible_devices": "0,1,2",
+    "jax_cuda_visible_devices": "0",
+    "mapping": [
+      {
+        "cuda_physical_index": 0,
+        "cuda_visible_index": 0,
+        "egl_device_ordinal": 1
+      },
+      {
+        "cuda_physical_index": 1,
+        "cuda_visible_index": 1,
+        "egl_device_ordinal": 2
+      }
+    ],
+    "mapping_source": "EGL_NV_device_cuda",
+    "requested_egl_physical_index": 1,
+    "selected_egl_device_ordinal": 2
+  },
+  "protocol_sha256": "5a47c21c50e0e96f5ee6d25a2f997d97113485552e1005db2745c77d110f85d0",
+  "record_count": 6,
+  "retry_count": 0,
+  "runtime": {
+    "config": {
+      "assets": "/home/ldx/lean-vla/external/LIBERO-Safety/libero/libero/assets",
+      "bddl_files": "/home/ldx/lean-vla/external/LIBERO-Safety/libero/libero/bddl_files",
+      "benchmark_root": "/home/ldx/lean-vla/external/LIBERO-Safety/libero/libero",
+      "datasets": "/home/ldx/lean-vla/external/LIBERO-Safety/libero/datasets",
+      "init_states": "/home/ldx/lean-vla/external/LIBERO-Safety/libero/libero/init_files"
+    },
+    "directory": "/home/ldx/lean-vla/results/proofalign_remote_full120_llm_clean_completion_20260818_fresh3/runtime/libero_config",
+    "sha256": "8d1cc08bf89c204f7d592bc6b87f4ffebeed91f7e870097b340a858c07741a3c"
+  },
+  "scheduled_indices": [
+    474,
+    475,
+    476,
+    477,
+    478,
+    479
+  ],
+  "schema": "proofalign.remote-full120-resilient-collection-run.v1",
+  "selected_gpu": {
+    "egl": {
+      "driver_version": "570.133.07",
+      "index": 1,
+      "memory_total_mib": 49140,
+      "memory_used_mib": 0,
+      "name": "NVIDIA RTX 6000 Ada Generation",
+      "uuid": "GPU-9630f0c1-163a-1dc7-564b-8242ac677a1e"
+    },
+    "policy": {
+      "driver_version": "570.133.07",
+      "index": 0,
+      "memory_total_mib": 49140,
+      "memory_used_mib": 0,
+      "name": "NVIDIA RTX 6000 Ada Generation",
+      "uuid": "GPU-7ad5c3eb-adf0-f70a-e670-8438701a553e"
+    }
+  },
+  "source_protocol_sha256": "9ca57a52c2e37fd6ff8a156dd2798e7c756e6ec0b2dfb193013b6cd53791e0f7",
+  "status": "complete",
+  "terminal_exception_episode_ids": []
+}

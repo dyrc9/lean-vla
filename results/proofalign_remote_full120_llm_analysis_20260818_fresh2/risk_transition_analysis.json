@@ -1,0 +1,116 @@
+{
+  "by_arm": {
+    "dual": {
+      "arm_specific_clean_eligible_count": 78,
+      "cluster_bootstrap_interval_95": {
+        "cluster_count": 44,
+        "estimate": 0.5512820512820513,
+        "lower": 0.4166666666666667,
+        "method": "two-sided-percentile-base-pair-cluster-bootstrap",
+        "resamples": 100000,
+        "seed": 2026072707,
+        "unit_count": 78,
+        "upper": 0.6829268292682927
+      },
+      "fixed_cohort_current_arm_clean_eligible_count": 72,
+      "fixed_cohort_transition_count": 42,
+      "fixed_cohort_transition_rate_among_current_arm_clean_eligible": 0.5833333333333334,
+      "fixed_original_vla_cohort_member_count": 86,
+      "transition_count": 43,
+      "transition_rate": 0.5512820512820513
+    },
+    "execution_only": {
+      "arm_specific_clean_eligible_count": 86,
+      "cluster_bootstrap_interval_95": {
+        "cluster_count": 48,
+        "estimate": 0.5,
+        "lower": 0.38823529411764707,
+        "method": "two-sided-percentile-base-pair-cluster-bootstrap",
+        "resamples": 100000,
+        "seed": 2026072706,
+        "unit_count": 86,
+        "upper": 0.6091954022988506
+      },
+      "fixed_cohort_current_arm_clean_eligible_count": 79,
+      "fixed_cohort_transition_count": 42,
+      "fixed_cohort_transition_rate_among_current_arm_clean_eligible": 0.5316455696202531,
+      "fixed_original_vla_cohort_member_count": 86,
+      "transition_count": 43,
+      "transition_rate": 0.5
+    },
+    "semantic_only": {
+      "arm_specific_clean_eligible_count": 78,
+      "cluster_bootstrap_interval_95": {
+        "cluster_count": 44,
+        "estimate": 0.5384615384615384,
+        "lower": 0.4050632911392405,
+        "method": "two-sided-percentile-base-pair-cluster-bootstrap",
+        "resamples": 100000,
+        "seed": 2026072705,
+        "unit_count": 78,
+        "upper": 0.6707317073170732
+      },
+      "fixed_cohort_current_arm_clean_eligible_count": 72,
+      "fixed_cohort_transition_count": 41,
+      "fixed_cohort_transition_rate_among_current_arm_clean_eligible": 0.5694444444444444,
+      "fixed_original_vla_cohort_member_count": 86,
+      "transition_count": 42,
+      "transition_rate": 0.5384615384615384
+    },
+    "vla_only": {
+      "arm_specific_clean_eligible_count": 85,
+      "cluster_bootstrap_interval_95": {
+        "cluster_count": 47,
+        "estimate": 0.5294117647058824,
+        "lower": 0.4230769230769231,
+        "method": "two-sided-percentile-base-pair-cluster-bootstrap",
+        "resamples": 100000,
+        "seed": 2026072704,
+        "unit_count": 85,
+        "upper": 0.6341463414634146
+      },
+      "fixed_cohort_current_arm_clean_eligible_count": 79,
+      "fixed_cohort_transition_count": 43,
+      "fixed_cohort_transition_rate_among_current_arm_clean_eligible": 0.5443037974683544,
+      "fixed_original_vla_cohort_member_count": 86,
+      "transition_count": 45,
+      "transition_rate": 0.5294117647058824
+    }
+  },
+  "definition": "same four-channel risk transition used for the historical 45.35% baseline; task failure alone is not a transition",
+  "historical_vla_baseline": {
+    "classification_preserved": "confirmatory_attack_foundation_nonpass",
+    "eligible": 86,
+    "rate": 0.45348837209302323,
+    "transitions": 39
+  },
+  "paired_exact_mcnemar_risk_transitions": {
+    "dual_vs_vla_only": {
+      "control": "vla_only",
+      "control_only": 8,
+      "discordant": 21,
+      "method": "exact_two_sided_mcnemar",
+      "p_value": 0.38331031799316406,
+      "treatment": "dual",
+      "treatment_only": 13
+    },
+    "execution_only_vs_vla_only": {
+      "control": "vla_only",
+      "control_only": 3,
+      "discordant": 4,
+      "method": "exact_two_sided_mcnemar",
+      "p_value": 0.625,
+      "treatment": "execution_only",
+      "treatment_only": 1
+    },
+    "semantic_only_vs_vla_only": {
+      "control": "vla_only",
+      "control_only": 8,
+      "discordant": 20,
+      "method": "exact_two_sided_mcnemar",
+      "p_value": 0.5034446716308594,
+      "treatment": "semantic_only",
+      "treatment_only": 12
+    }
+  }
+}
