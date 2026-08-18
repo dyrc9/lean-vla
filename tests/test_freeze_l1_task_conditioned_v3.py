@@ -23,7 +23,25 @@ def _analysis(message: str) -> dict:
         "terminal_exception_message": message,
     }
     return {
+        "schema": "proofalign.l1-task-conditioned-analysis.v2",
         "population": "development",
+        "risk_transition_definition": {
+            "channels": [
+                "libero_cost_or_collision",
+                "robot_contact_count_delta",
+                "joint_limit_steps_delta",
+                "excessive_force_steps_delta",
+            ],
+            "same_as_45_35_percent_baseline": True,
+        },
+        "registered_risk_analysis": {
+            "historical_baseline": {
+                "unit_count": 120,
+                "eligible": 86,
+                "transitions": 39,
+                "four_channel_rows_verified": 86,
+            }
+        },
         "episode_rows": rows,
     }
 
@@ -44,6 +62,7 @@ def test_v3_freeze_accepts_only_complete_v2_recovery_coverage_failure(
     assert diagnostic["complete_episode_count"] == 240
     assert diagnostic["terminal_recovery_coverage_failure_count"] == 1
     assert diagnostic["task_success_or_risk_result_used"] is False
+    assert diagnostic["registered_four_channel_analysis_verified"] is True
 
 
 @pytest.mark.parametrize(
@@ -112,13 +131,35 @@ def _heldout_fixture(tmp_path, monkeypatch: pytest.MonkeyPatch):
             }
         )
     analysis_path = tmp_path / "v3-analysis.json"
-    analysis_path.write_text(
-        json.dumps({"population": "development", "episode_rows": rows}),
-        encoding="utf-8",
-    )
+    analysis_path.write_text(json.dumps(_heldout_analysis(rows)), encoding="utf-8")
     monkeypatch.setattr(heldout, "REPO_ROOT", tmp_path)
     monkeypatch.setattr(heldout, "V3_DEV_ANALYSIS", analysis_path)
     return analysis_path, episode_path, rows, audit
+
+
+def _heldout_analysis(rows: list[dict]) -> dict:
+    return {
+        "schema": "proofalign.l1-task-conditioned-analysis.v2",
+        "population": "development",
+        "risk_transition_definition": {
+            "channels": [
+                "libero_cost_or_collision",
+                "robot_contact_count_delta",
+                "joint_limit_steps_delta",
+                "excessive_force_steps_delta",
+            ],
+            "same_as_45_35_percent_baseline": True,
+        },
+        "registered_risk_analysis": {
+            "historical_baseline": {
+                "unit_count": 120,
+                "eligible": 86,
+                "transitions": 39,
+                "four_channel_rows_verified": 86,
+            }
+        },
+        "episode_rows": rows,
+    }
 
 
 def test_v3_heldout_authorization_is_outcome_blind_and_identity_bound(
@@ -129,6 +170,7 @@ def test_v3_heldout_authorization_is_outcome_blind_and_identity_bound(
     assert result["episode_count"] == 240
     assert result["l1_episode_count"] == 120
     assert result["qualified_restore_complete_episode_count"] == 120
+    assert result["registered_four_channel_analysis_verified"] is True
     assert result["outcome_gate_applied"] is False
     assert result["task_success_or_risk_result_used_for_authorization"] is False
 
@@ -140,20 +182,14 @@ def test_v3_heldout_authorization_rejects_terminal_or_unbound_recovery(
         tmp_path, monkeypatch
     )
     rows[120]["terminal_exception"] = True
-    analysis_path.write_text(
-        json.dumps({"population": "development", "episode_rows": rows}),
-        encoding="utf-8",
-    )
+    analysis_path.write_text(json.dumps(_heldout_analysis(rows)), encoding="utf-8")
     with pytest.raises(
         heldout.HeldoutV3FreezeError, match="terminal implementation"
     ):
         heldout._qualification()
 
     rows[120]["terminal_exception"] = False
-    analysis_path.write_text(
-        json.dumps({"population": "development", "episode_rows": rows}),
-        encoding="utf-8",
-    )
+    analysis_path.write_text(json.dumps(_heldout_analysis(rows)), encoding="utf-8")
     audit["recovery_library_digest"] = "b" * 64
     episode_path.write_text(
         json.dumps(

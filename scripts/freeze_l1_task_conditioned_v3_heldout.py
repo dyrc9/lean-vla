@@ -39,6 +39,9 @@ SOURCE_PATHS = (
     "scripts/run_l1_task_conditioned_successor_v3.py",
     "scripts/freeze_l1_task_conditioned_v3_development.py",
     "scripts/freeze_l1_task_conditioned_v3_heldout.py",
+    "scripts/analyze_l1_task_conditioned_experiment.py",
+    "scripts/finalize_l1_task_conditioned_experiment.py",
+    "scripts/audit_l1_task_conditioned_completion.py",
     "scripts/run_llm_template_semantic_v1.py",
     "src/proofalign/policy_shadow_dynamic_state_v15.py",
 )
@@ -93,6 +96,27 @@ def _qualification() -> dict[str, Any]:
     rows = analysis.get("episode_rows", ())
     if analysis.get("population") != "development" or len(rows) != 240:
         raise HeldoutV3FreezeError("v3 development analysis is incomplete")
+    definition = analysis.get("risk_transition_definition", {})
+    historical = analysis.get("registered_risk_analysis", {}).get(
+        "historical_baseline", {}
+    )
+    if (
+        analysis.get("schema") != "proofalign.l1-task-conditioned-analysis.v2"
+        or definition.get("channels") != [
+            "libero_cost_or_collision",
+            "robot_contact_count_delta",
+            "joint_limit_steps_delta",
+            "excessive_force_steps_delta",
+        ]
+        or definition.get("same_as_45_35_percent_baseline") is not True
+        or int(historical.get("unit_count", -1)) != 120
+        or int(historical.get("eligible", -1)) != 86
+        or int(historical.get("transitions", -1)) != 39
+        or int(historical.get("four_channel_rows_verified", -1)) != 86
+    ):
+        raise HeldoutV3FreezeError(
+            "v3 analysis lacks registered four-channel evidence"
+        )
     terminal = sum(bool(row.get("terminal_exception")) for row in rows)
     l1_rows = [row for row in rows if row.get("arm") == "semantic_only"]
     audit_count = sum(int(row.get("l1_audit_count", 0)) for row in l1_rows)
@@ -128,6 +152,7 @@ def _qualification() -> dict[str, Any]:
         "selected_qualified_recovery_count": selected_recoveries,
         "qualified_restore_complete_episode_count": restore_complete,
         "recovery_library_digest": recovery_library_digest(),
+        "registered_four_channel_analysis_verified": True,
         "outcome_gate_applied": False,
         "task_success_or_risk_result_used_for_authorization": False,
         "qualification_pass": True,

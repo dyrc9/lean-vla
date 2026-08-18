@@ -37,6 +37,7 @@ SOURCE_PATHS = (
     "scripts/run_l1_task_conditioned_experiment_v3.py",
     "scripts/run_l1_task_conditioned_successor_v3.py",
     "scripts/freeze_l1_task_conditioned_v3_development.py",
+    "scripts/analyze_l1_task_conditioned_experiment.py",
     "scripts/run_llm_template_semantic_v1.py",
     "src/proofalign/policy_shadow_dynamic_state_v15.py",
 )
@@ -97,6 +98,25 @@ def _v2_diagnostic() -> dict[str, Any]:
     rows = analysis.get("episode_rows", ())
     if analysis.get("population") != "development" or len(rows) != 240:
         raise FreezeV3Error("v2 development analysis is incomplete")
+    definition = analysis.get("risk_transition_definition", {})
+    historical = analysis.get("registered_risk_analysis", {}).get(
+        "historical_baseline", {}
+    )
+    if (
+        analysis.get("schema") != "proofalign.l1-task-conditioned-analysis.v2"
+        or definition.get("channels") != [
+            "libero_cost_or_collision",
+            "robot_contact_count_delta",
+            "joint_limit_steps_delta",
+            "excessive_force_steps_delta",
+        ]
+        or definition.get("same_as_45_35_percent_baseline") is not True
+        or int(historical.get("unit_count", -1)) != 120
+        or int(historical.get("eligible", -1)) != 86
+        or int(historical.get("transitions", -1)) != 39
+        or int(historical.get("four_channel_rows_verified", -1)) != 86
+    ):
+        raise FreezeV3Error("v2 analysis lacks registered four-channel evidence")
     terminal = [row for row in rows if row.get("terminal_exception")]
     if not terminal:
         raise FreezeV3Error("v2 has no bounded-recovery coverage failure to repair")
@@ -115,6 +135,7 @@ def _v2_diagnostic() -> dict[str, Any]:
         "terminal_recovery_coverage_failure_count": len(terminal),
         "repair_scope": "fixed bounded retreat coverage only",
         "task_success_or_risk_result_used": False,
+        "registered_four_channel_analysis_verified": True,
     }
 
 
