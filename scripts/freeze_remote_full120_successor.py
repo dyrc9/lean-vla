@@ -6,7 +6,6 @@ from __future__ import annotations
 import argparse
 from collections import Counter
 from copy import deepcopy
-from datetime import datetime, timezone
 from hashlib import sha256
 from pathlib import Path
 import subprocess
@@ -32,6 +31,7 @@ from scripts.run_joint_limit_containment_v11_attacked_scale45 import (  # noqa: 
 
 
 DATE = "20260818"
+CREATED_AT = "2026-08-18T12:00:00+08:00"
 UMBRELLA_PATH = REPO_ROOT / "experiments/proofalign_remote_full120_successor_protocol_20260818.json"
 CLEAN_PATH = REPO_ROOT / "experiments/proofalign_remote_full120_clean_protocol_20260818.json"
 ATTACKED_PATH = REPO_ROOT / "experiments/proofalign_remote_full120_attacked_protocol_20260818.json"
@@ -182,7 +182,7 @@ def build(source_commit: str) -> tuple[dict[str, Any], ...]:
     umbrella.update({
         "protocol_id": "proofalign-remote-full120-outcome-blind-successor-20260818",
         "protocol_status": "remote_full120_outcome_blind_execution_authorized",
-        "created_at": datetime.now(timezone.utc).isoformat(),
+        "created_at": CREATED_AT,
         "outcomes_observed": False,
         "paper_role": "final frozen full-population clean and SABER-attacked four-arm evaluation",
         "source": source,
