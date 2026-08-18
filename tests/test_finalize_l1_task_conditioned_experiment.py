@@ -32,7 +32,10 @@ def _arm_summary() -> dict:
         },
         "l1_shadow_latency_seconds": 1.25,
         "episode_wall_time_seconds": 12.5,
-        "recovery_selected_kinds": {"reverse_then_hold": 2},
+        "recovery_selected_kinds": {
+            "reverse_then_hold": 2,
+            "qualified_no_dispatch_abort": 1,
+        },
     }
 
 
@@ -169,6 +172,7 @@ def test_generated_tables_are_derived_from_analysis() -> None:
         condition_rows, risk_rows, selective_rows, contrast_rows
     )
     assert "60/120 (50.00%)" in markdown
+    assert "Qualified no-dispatch aborts" in markdown
     assert "20/100 (20.00%)" in markdown
     assert "48/120 (40.00%)" in markdown
     assert "2 (20.00%)" in markdown

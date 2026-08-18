@@ -94,6 +94,9 @@ def _table_rows(analysis: Mapping[str, Any]) -> tuple[list[dict[str, Any]], list
                     "task_success_count": row["task_success_count"],
                     "task_success_rate": row["task_success_rate"],
                     "l1_interventions": row["l1_intervention_count"],
+                    "qualified_no_dispatch_aborts": row[
+                        "recovery_selected_kinds"
+                    ].get("qualified_no_dispatch_abort", 0),
                     "l1_intervention_rate": row["l1_intervention_rate_per_policy_call"],
                     "l1_restore_complete_episodes": row["l1_restore_complete_episode_count"],
                     "typed_signal_complete": row["typed_risk_signal_complete_count"],
@@ -225,13 +228,14 @@ def _markdown_tables(
         "",
         "## Clean and attacked outcomes",
         "",
-        "| Condition | Arm | Episodes | Terminal | Task success | L1 interventions | Typed signal coverage |",
-        "|---|---|---:|---:|---:|---:|---:|",
+        "| Condition | Arm | Episodes | Terminal | Task success | L1 interventions | Qualified no-dispatch aborts | Typed signal coverage |",
+        "|---|---|---:|---:|---:|---:|---:|---:|",
     ]
     for row in condition_rows:
         lines.append(
             "| {condition} | {arm} | {episodes} | {terminal_exceptions} | "
             "{success}/{episodes} ({success_rate}) | {interventions} | "
+            "{qualified_no_dispatch_aborts} | "
             "{coverage}/{episodes} |".format(
                 **row,
                 success=row["task_success_count"],
@@ -386,6 +390,14 @@ def _handoff(
 ) -> str:
     bindings = analysis["bindings"]
     terminal = sum(bool(row["terminal_exception"]) for row in analysis["episode_rows"])
+    qualified_aborts = sum(
+        int(
+            row.get("l1_recovery_selected_kinds", {}).get(
+                "qualified_no_dispatch_abort", 0
+            )
+        )
+        for row in analysis["episode_rows"]
+    )
     fixed = analysis["registered_risk_analysis"]["fixed_original_86_cohort"]
     return "\n".join(
         [
@@ -400,6 +412,7 @@ def _handoff(
             f"- Episode count: `{len(analysis['episode_rows'])}`",
             f"- Clean/attacked pairs: `{len(analysis['paired_rows'])}`",
             f"- Terminal exceptions retained conservatively: `{terminal}`",
+            f"- Qualified no-dispatch aborts: `{qualified_aborts}` (zero rejected ActionBlock dispatches by construction and qualification).",
             f"- Generated artifact root: `{_relative(output_dir)}`",
             "- Risk rule: unchanged from the 45.35% SABER baseline.",
             f"- Historical fixed-86 cohort overlap: `{fixed['current_heldout_overlap_count']}`; fixed-cohort estimate available: `{fixed['estimable']}`.",
@@ -423,9 +436,9 @@ def _main_agent_prompt(output_dir: Path) -> str:
             f"1. First verify `{root}/SHA256SUMS`.",
             f"2. Read `{root}/handoff_report.md`, `{root}/generated_tables.md`, and `{root}/summary.json`.",
             "3. Treat the bound held-out analysis and raw ledgers named in the handoff as the sole numerical authority.",
-            "4. Report all four arms under clean and attacked conditions, the exact four-channel risk transition, safe task success, interventions, identity-bound false reject and unsafe allow, channel breakdown, recovery/deadlock, the frozen ALLOW-coverage operating point, latency, and every terminal exception retained by the analysis. Do not invent a continuous risk-coverage curve because this checker has no calibrated confidence score.",
+            "4. Report all four arms under clean and attacked conditions, the exact four-channel risk transition, safe task success, interventions, qualified no-dispatch aborts, identity-bound false reject and unsafe allow, channel breakdown, recovery/deadlock, the frozen ALLOW-coverage operating point, latency, and every terminal exception retained by the analysis. Do not invent a continuous risk-coverage curve because this checker has no calibrated confidence score.",
             "5. Clearly distinguish the historical full120 non-pass from this versioned successor; never overwrite or reinterpret historical protocols, checksums, or classifications.",
-            "6. Describe the method as trusted phase/robot-part contact contracts plus exact full-link/held-object shadow checks and qualified fresh recovery. LLM templates are non-authoritative proposals rebuilt from trusted BDDL; attacked prompts are invisible to the checker.",
+            "6. Describe the method as trusted phase/robot-part contact contracts plus exact full-link/held-object shadow checks, qualified fresh recovery, and a qualified no-dispatch deadlock when no exact-shadow ALLOW recovery exists. Never describe the abort sentinel as an executed action: the semantic checker rejects it before authorization and the dispatch boundary independently blocks it. LLM templates are non-authoritative proposals rebuilt from trusted BDDL; attacked prompts are invisible to the checker.",
             "7. Do not claim improvement unless the generated statistics support it. Preserve negative or null results verbatim.",
             "8. If the handoff reports zero overlap with the historical fixed 86-unit cohort, state that the fixed-cohort contrast is not estimable; do not substitute the new held-out cohort for it.",
             "9. Make paper edits only in the paper-writing workflow; the experiment branch intentionally contains evidence and handoff artifacts, not manuscript changes.",
