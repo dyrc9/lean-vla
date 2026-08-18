@@ -108,6 +108,13 @@ def _fixture(tmp_path, monkeypatch: pytest.MonkeyPatch):
         "registered_risk_analysis": {
             "same_as_45_35_percent_baseline": True,
             "channels": list(audit.TRANSITION_CHANNELS),
+            "historical_baseline": {
+                "unit_count": 120,
+                "eligible": 86,
+                "transitions": 39,
+                "four_channel_rows_verified": 86,
+                "task_failure_alone_counts_as_transition": False,
+            },
             "by_arm": {
                 arm: {
                     "arm_specific_clean_eligible_count": 120,

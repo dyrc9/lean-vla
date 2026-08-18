@@ -226,6 +226,15 @@ def _verify_analysis(
         or tuple(registered.get("channels", ())) != TRANSITION_CHANNELS
     ):
         raise CompletionAuditError("registered four-channel analysis differs")
+    historical = registered.get("historical_baseline", {})
+    if (
+        int(historical.get("unit_count", -1)) != 120
+        or int(historical.get("eligible", -1)) != 86
+        or int(historical.get("transitions", -1)) != 39
+        or int(historical.get("four_channel_rows_verified", -1)) != 86
+        or historical.get("task_failure_alone_counts_as_transition") is not False
+    ):
+        raise CompletionAuditError("historical 45.35% evidence binding differs")
     registered_counts = Counter()
     registered_eligible = Counter()
     for arm in ARMS:

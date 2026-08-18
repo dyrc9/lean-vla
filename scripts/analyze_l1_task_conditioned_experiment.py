@@ -376,6 +376,45 @@ def _cluster_bootstrap_rate(
     }
 
 
+def _historical_baseline_evidence() -> dict[str, Any]:
+    historical = load_json_object(M2_SUMMARY)
+    units = historical.get("units", ())
+    eligible = [row for row in units if row.get("clean_eligible")]
+    transitions = [row for row in eligible if row.get("transition_observed")]
+    for row in eligible:
+        channels = row.get("transition", {}).get("channels", {})
+        if set(channels) != set(TRANSITION_CHANNELS):
+            raise AnalysisError(
+                "historical 45.35% row does not use the registered four channels"
+            )
+        if bool(row.get("transition_observed")) != any(
+            bool(value) for value in channels.values()
+        ):
+            raise AnalysisError("historical transition row does not recompute")
+    observed_rate = len(transitions) / len(eligible) if eligible else None
+    if (
+        len(units) != 120
+        or len(eligible) != 86
+        or len(transitions) != 39
+        or not math.isclose(float(observed_rate), 39 / 86, rel_tol=0.0, abs_tol=1e-15)
+        or int(historical.get("clean_eligible_unit_count", -1)) != 86
+        or int(historical.get("transition_unit_count", -1)) != 39
+        or historical.get("task_failure_alone_counts_as_transition") is not False
+    ):
+        raise AnalysisError("historical 45.35% baseline does not recompute")
+    return {
+        "eligible": len(eligible),
+        "transitions": len(transitions),
+        "rate": observed_rate,
+        "unit_count": len(units),
+        "four_channel_rows_verified": len(eligible),
+        "task_failure_alone_counts_as_transition": False,
+        "classification_preserved": historical["classification"],
+        "summary_path": M2_SUMMARY.relative_to(REPO_ROOT).as_posix(),
+        "summary_sha256": file_sha256(M2_SUMMARY),
+    }
+
+
 def _registered_risk_analysis(
     rows: list[Mapping[str, Any]],
 ) -> dict[str, Any]:
@@ -506,6 +545,7 @@ def _registered_risk_analysis(
             row["holm_adjusted_mcnemar"] = adjusted_by_name[name]
 
     historical = load_json_object(M2_SUMMARY)
+    historical_evidence = _historical_baseline_evidence()
     fixed_ids = {
         str(row["unit_id"]) for row in historical["units"]
         if row["clean_eligible"]
@@ -524,14 +564,7 @@ def _registered_risk_analysis(
             "cost/collision and complete typed/raw-action coverage"
         ),
         "same_as_45_35_percent_baseline": True,
-        "historical_baseline": {
-            "eligible": 86,
-            "transitions": 39,
-            "rate": 39 / 86,
-            "classification_preserved": historical["classification"],
-            "summary_path": M2_SUMMARY.relative_to(REPO_ROOT).as_posix(),
-            "summary_sha256": file_sha256(M2_SUMMARY),
-        },
+        "historical_baseline": historical_evidence,
         "by_arm": by_arm,
         "primary_contrasts": contrast_rows,
         "holm_family_wise_alpha": 0.05,

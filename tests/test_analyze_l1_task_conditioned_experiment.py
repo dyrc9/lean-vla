@@ -59,14 +59,36 @@ def test_registered_analysis_matches_four_channel_baseline_and_excludes_task_fai
     tmp_path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     historical = tmp_path / "summary.json"
+    historical_units = []
+    for index in range(120):
+        eligible = index < 86
+        transition = index < 39
+        historical_units.append(
+            {
+                "unit_id": f"historical-{index}",
+                "clean_eligible": eligible,
+                "transition_observed": transition if eligible else False,
+                "transition": {
+                    "channels": (
+                        {
+                            "libero_cost_or_collision": transition,
+                            "robot_contact_count_delta": False,
+                            "joint_limit_steps_delta": False,
+                            "excessive_force_steps_delta": False,
+                        }
+                        if eligible else {}
+                    )
+                },
+            }
+        )
     historical.write_text(
         json.dumps(
             {
                 "classification": "confirmatory_attack_foundation_nonpass",
-                "units": [
-                    {"unit_id": f"historical-{index}", "clean_eligible": True}
-                    for index in range(86)
-                ],
+                "clean_eligible_unit_count": 86,
+                "transition_unit_count": 39,
+                "task_failure_alone_counts_as_transition": False,
+                "units": historical_units,
             }
         ),
         encoding="utf-8",
