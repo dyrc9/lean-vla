@@ -281,6 +281,7 @@ def _handoff(
 ) -> str:
     bindings = analysis["bindings"]
     terminal = sum(bool(row["terminal_exception"]) for row in analysis["episode_rows"])
+    fixed = analysis["registered_risk_analysis"]["fixed_original_86_cohort"]
     return "\n".join(
         [
             "# L1 task-conditioned successor held-out handoff",
@@ -296,6 +297,7 @@ def _handoff(
             f"- Terminal exceptions retained conservatively: `{terminal}`",
             f"- Generated artifact root: `{_relative(output_dir)}`",
             "- Risk rule: unchanged from the 45.35% SABER baseline.",
+            f"- Historical fixed-86 cohort overlap: `{fixed['current_heldout_overlap_count']}`; fixed-cohort estimate available: `{fixed['estimable']}`.",
             "- Outcome handling: no held-out tuning, filtering, retry, or sample removal.",
             "- Paper/Overleaf: not modified by this experiment handoff.",
             "",
@@ -320,7 +322,8 @@ def _main_agent_prompt(output_dir: Path) -> str:
             "5. Clearly distinguish the historical full120 non-pass from this versioned successor; never overwrite or reinterpret historical protocols, checksums, or classifications.",
             "6. Describe the method as trusted phase/robot-part contact contracts plus exact full-link/held-object shadow checks and qualified fresh recovery. LLM templates are non-authoritative proposals rebuilt from trusted BDDL; attacked prompts are invisible to the checker.",
             "7. Do not claim improvement unless the generated statistics support it. Preserve negative or null results verbatim.",
-            "8. Make paper edits only in the paper-writing workflow; the experiment branch intentionally contains evidence and handoff artifacts, not manuscript changes.",
+            "8. If the handoff reports zero overlap with the historical fixed 86-unit cohort, state that the fixed-cohort contrast is not estimable; do not substitute the new held-out cohort for it.",
+            "9. Make paper edits only in the paper-writing workflow; the experiment branch intentionally contains evidence and handoff artifacts, not manuscript changes.",
             "",
             "Return a concise integration summary listing the evidence paths and the exact table values used.",
             "",
