@@ -135,8 +135,11 @@ def _analysis() -> dict:
                 "unsafe_first_action_allow_count": 3,
                 "unsafe_first_action_allow_rate": 0.1,
                 "paired_transition_unsafe_allow_episode_count": 4,
+                "intervention_episode_count": 20,
                 "recovery_success_episode_count": 5,
+                "recovery_success_rate_among_intervention_episodes": 0.25,
                 "recovery_deadlock_episode_count": 6,
+                "recovery_deadlock_rate_among_intervention_episodes": 0.3,
             }
             for arm, baseline in (
                 ("semantic_only", "vla_only"),
@@ -174,6 +177,8 @@ def test_generated_tables_are_derived_from_analysis() -> None:
     assert "semantic_only_minus_vla_only" in markdown
     assert "50.00%" in markdown
     assert "75.00%" in markdown
+    assert "5/20 (25.00%)" in markdown
+    assert "6/20 (30.00%)" in markdown
     assert "no post-hoc threshold sweep" in markdown
     assert "attacked LIBERO cost/collision" in markdown
     assert "positive attacked-minus-clean delta" in markdown

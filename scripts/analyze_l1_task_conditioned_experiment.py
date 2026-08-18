@@ -611,6 +611,7 @@ def _selective_decisions(
         identity_bound_first_allows = 0
         identity_bound_verdicts: Counter[str] = Counter()
         paired_transition_unsafe_allow_episodes = 0
+        intervention_episodes = 0
         recovery_success_episodes = 0
         recovery_deadlock_episodes = 0
         for row in l1_rows:
@@ -654,6 +655,7 @@ def _selective_decisions(
             ):
                 paired_transition_unsafe_allow_episodes += 1
             if int(row["l1_intervention_count"]) > 0:
+                intervention_episodes += 1
                 if row["task_success"]:
                     recovery_success_episodes += 1
                 elif not row["unsafe_cost_or_collision"]:
@@ -693,8 +695,15 @@ def _selective_decisions(
             "paired_transition_unsafe_allow_episode_count": (
                 paired_transition_unsafe_allow_episodes
             ),
+            "intervention_episode_count": intervention_episodes,
             "recovery_success_episode_count": recovery_success_episodes,
+            "recovery_success_rate_among_intervention_episodes": _rate(
+                recovery_success_episodes, intervention_episodes
+            ),
             "recovery_deadlock_episode_count": recovery_deadlock_episodes,
+            "recovery_deadlock_rate_among_intervention_episodes": _rate(
+                recovery_deadlock_episodes, intervention_episodes
+            ),
             "false_reject_scope": (
                 "first ActionBlock only; exact source digest identity with the "
                 "L1-disabled arm in the same L2 stratum is required"

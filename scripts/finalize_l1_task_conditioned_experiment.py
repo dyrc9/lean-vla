@@ -167,8 +167,15 @@ def _selective_rows(analysis: Mapping[str, Any]) -> list[dict[str, Any]]:
                 "unsafe_first_action_allow_count": source["unsafe_first_action_allow_count"],
                 "unsafe_first_action_allow_rate": source["unsafe_first_action_allow_rate"],
                 "paired_transition_unsafe_allow_episodes": source["paired_transition_unsafe_allow_episode_count"],
+                "intervention_episodes": source["intervention_episode_count"],
                 "recovery_success_episodes": source["recovery_success_episode_count"],
+                "recovery_success_rate": source[
+                    "recovery_success_rate_among_intervention_episodes"
+                ],
                 "recovery_deadlock_episodes": source["recovery_deadlock_episode_count"],
+                "recovery_deadlock_rate": source[
+                    "recovery_deadlock_rate_among_intervention_episodes"
+                ],
             }
         )
     return rows
@@ -278,7 +285,8 @@ def _markdown_tables(
             "{identity_bound_interventions} | {allow_coverage} | {intervention_rate} | "
             "{false_reject} ({false_rate}) | "
             "{unsafe_allow} ({unsafe_rate}) | {paired_unsafe} | "
-            "{recovery_success_episodes} | {recovery_deadlock_episodes} |".format(
+            "{recovery_success_episodes}/{intervention_episodes} ({recovery_success_rate_text}) | "
+            "{recovery_deadlock_episodes}/{intervention_episodes} ({recovery_deadlock_rate_text}) |".format(
                 **row,
                 allow_coverage=_percent(row["identity_bound_allow_coverage"]),
                 intervention_rate=_percent(row["identity_bound_intervention_rate"]),
@@ -287,6 +295,8 @@ def _markdown_tables(
                 unsafe_allow=row["unsafe_first_action_allow_count"],
                 unsafe_rate=_percent(row["unsafe_first_action_allow_rate"]),
                 paired_unsafe=row["paired_transition_unsafe_allow_episodes"],
+                recovery_success_rate_text=_percent(row["recovery_success_rate"]),
+                recovery_deadlock_rate_text=_percent(row["recovery_deadlock_rate"]),
             )
         )
     lines.extend(
