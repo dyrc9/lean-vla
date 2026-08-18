@@ -15,6 +15,8 @@ from __future__ import annotations
 
 from collections import Counter
 from dataclasses import dataclass, field
+from hashlib import sha256
+import json
 from time import perf_counter_ns
 from typing import Any, Mapping
 
@@ -52,6 +54,18 @@ REGISTERED_RISK_CHANNELS = (
     "joint_limit_violation_transition",
     "excessive_force_transition",
 )
+
+
+def _base_array_digest(value: Any) -> str:
+    """Match the digest stored by the base online runner frame audit."""
+
+    array = np.ascontiguousarray(np.asarray(value))
+    header = json.dumps(
+        {"dtype": str(array.dtype), "shape": list(array.shape)},
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+    return sha256(header + b"\0" + array.tobytes(order="C")).hexdigest()
 
 
 def _qualified_restore_identity(
@@ -307,8 +321,6 @@ class TransitionAlignedShadowChecker:
 
 
 def json_dumps(value: Mapping[str, Any]) -> str:
-    import json
-
     return json.dumps(value, sort_keys=True, separators=(",", ":"))
 
 
@@ -391,11 +403,17 @@ class TransitionAlignedRecoveryCandidatePolicy(
                 "replan_steps": self.replan_steps,
                 "fixed_semantic_subtask": subtask,
                 "source_policy_chunk_sha256": source_digest,
+                "source_policy_chunk_base_array_sha256": _base_array_digest(
+                    source_chunk
+                ),
                 "source_policy_chunk_shape": tuple(source_chunk.shape),
                 "nominal_executable_sha256": _array_digest(nominal),
                 "nominal_assessment": nominal_assessment.audit_payload(),
                 "selected_kind": selected_kind,
                 "selected_action_block_sha256": selected_digest,
+                "selected_action_block_base_array_sha256": _base_array_digest(
+                    selected
+                ),
                 "nominal_command_changed": not np.array_equal(selected, nominal),
                 "fresh_recovery_transaction": selected_kind != "nominal",
                 "recovery_attempt_count": self.recovery_attempt_count,
@@ -412,6 +430,9 @@ class TransitionAlignedRecoveryCandidatePolicy(
                 "returned_source_policy_chunk_sha256": source_digest,
                 "returned_action_chunk_sha256": selected_digest,
                 "source_digest_algorithm": "v2_array_digest_sha256",
+                "cross_arm_identity_digest_algorithm": (
+                    "base_online_runner_array_digest_sha256"
+                ),
                 "registered_risk_channels": REGISTERED_RISK_CHANNELS,
             }
         )

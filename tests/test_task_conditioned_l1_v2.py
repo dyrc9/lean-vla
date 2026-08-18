@@ -9,10 +9,12 @@ from proofalign.task_conditioned_l1 import L1Verdict, TaskConditionedL1Error
 from proofalign.task_conditioned_l1_v2 import (
     TransitionAlignedRecoveryCandidatePolicy,
     TransitionShadowAssessment,
+    _base_array_digest,
     _qualified_restore_identity,
     _transition_contact_atom,
 )
 from scripts.run_l2_execution_attack_eval_v2 import _array_digest
+from scripts.run_liberosafety_pi05_openpi_eval import array_digest
 
 
 class _Model:
@@ -78,6 +80,11 @@ def test_v2_restore_uses_qualified_boundary_not_full_state_diagnostic() -> None:
     assert _qualified_restore_identity(
         _restore(controller_state_identity=False)
     ) is False
+
+
+def test_v2_cross_arm_digest_matches_base_runner() -> None:
+    value = np.arange(70, dtype=np.float64).reshape(10, 7)
+    assert _base_array_digest(value) == array_digest(value)
 
 
 def test_held_object_contact_only_activates_while_grasped() -> None:
@@ -166,6 +173,9 @@ def test_v2_uses_shared_source_digest_and_qualified_recovery(monkeypatch) -> Non
     result = policy.infer({})
     audit = policy.audits[-1]
     assert audit["source_policy_chunk_sha256"] == _array_digest(nominal)
+    assert audit["source_policy_chunk_base_array_sha256"] == (
+        _base_array_digest(nominal)
+    )
     assert audit["source_digest_algorithm"] == "v2_array_digest_sha256"
     assert audit["selected_kind"] == "reverse_then_hold"
     assert not np.array_equal(result["actions"], nominal)
