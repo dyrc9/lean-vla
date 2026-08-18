@@ -1,0 +1,61 @@
+{
+  "catalog": {
+    "attacked_prompt_visible": false,
+    "path": "experiments/proofalign_llm_semantic_template_catalog_20260818.json",
+    "runtime_llm_calls": 0,
+    "sha256": "ca27aba705cba5f84f8404e96354918ea11f4bf3a27b2906ce8f8559e35b1a21",
+    "template_count": 60
+  },
+  "created_at": "2026-08-18T10:29:56.417312+00:00",
+  "environment_seed": 43,
+  "execution_authorization": {
+    "attacked_prompt_read": false,
+    "env_step": false,
+    "environment_initialization": true,
+    "policy_inference": false,
+    "policy_load": false,
+    "task_outcome_read": false
+  },
+  "fresh_output_root": "results/proofalign_llm_semantic_template_qualification_20260818_fresh2",
+  "gates": {
+    "all_goal_geometry_resolved": true,
+    "compiled_graph_count": 60,
+    "env_step_count": 0,
+    "part_resolution_failure_count": 0,
+    "policy_inference_count": 0,
+    "policy_load_count": 0,
+    "task_outcome_read_count": 0,
+    "valid_row_count": 60
+  },
+  "population": {
+    "evaluation_unit_count_after_replication": 120,
+    "outcome_based_selection": false,
+    "path": "experiments/proofalign_remote_full120_clean_protocol_20260818.json",
+    "sha256": "eb798878a9d931ea40b49b0c5028fd5448a61a25a99b7a770ada4c94dab0cde7",
+    "workload_count": 60
+  },
+  "protocol_id": "proofalign-full120-llm-template-outcome-blind-qualification-v2-20260818",
+  "schema": "proofalign.llm-semantic-template-outcome-blind-qualification-protocol.v2",
+  "source": {
+    "repository_commit": "391d74af82127e5572b5ad3cceaaceead75a5458",
+    "repository_tree": "427f58da2f3780c9804f024a4d470bf2b56730bc",
+    "sha256": {
+      "scripts/run_llm_semantic_template_qualification.py": "c2ab1c06e6976800b98316b3ee665eb693cdea60101074af5d817488e56a2eba",
+      "scripts/run_llm_template_semantic_v1.py": "ab1c70b77c86fd7c8963a81f548ee6ad61fe6902e8be3fddf7b2c0b731c09719",
+      "src/proofalign/llm_semantic_templates.py": "d2c0608945b5bf27f3997d11d861c2fe6783acbabc664dcd43c21da9efe38342",
+      "src/proofalign/semantic_local_checker.py": "142750008de7bef8a8738d77e11b1032002c0d1bc0519fc6d4bd2c307dcaa5f3",
+      "src/proofalign/semantic_policy_wrapper.py": "e34ecaa62184f0dbec05e49244fd45e18559cd556a130ccae1ec9f9de0b53de5"
+    }
+  },
+  "victim": {
+    "checkpoint": "/data0/ldx/libero_safety_models/pi05_libero_safety",
+    "checkpoint_sha256": {
+      "assets/lerobot/norm_stats.json": "53dc57ad2582dc95bc9b056e9425d9057141aec4850547b58fa34c81f8b9977a",
+      "params/_METADATA": "6d5a6eefc73215c59bea485f1e480cef98dd6f07583e41ff1ae0d6ca35effd7e",
+      "params/_sharding": "0aa89c2ac0ba6f33fd71c0a934a1b0e30b2a223619ef8ed916dfdf82f0899ae1",
+      "params/manifest.ocdbt": "8970a323095c8d7d576c8ec6162c0ca62cf1961b698efeff08d9180953d0e964"
+    },
+    "config": "pi05_libero",
+    "policy": "OpenPI pi0.5"
+  }
+}
