@@ -11,6 +11,7 @@ checker, source action, and ALLOW criterion are unchanged.
 from __future__ import annotations
 
 from collections import Counter
+from itertools import product
 import json
 from typing import Any
 
@@ -45,21 +46,14 @@ def _unit(value: tuple[float, float, float]) -> np.ndarray:
     return vector / norm
 
 
-_FIXED_RETREAT_DIRECTIONS = (
-    ("x_neg", _unit((-1.0, 0.0, 0.0))),
-    ("x_pos", _unit((1.0, 0.0, 0.0))),
-    ("y_neg", _unit((0.0, -1.0, 0.0))),
-    ("y_pos", _unit((0.0, 1.0, 0.0))),
-    ("z_neg", _unit((0.0, 0.0, -1.0))),
-    ("z_pos", _unit((0.0, 0.0, 1.0))),
-    ("xneg_yneg_zpos", _unit((-1.0, -1.0, 1.0))),
-    ("xneg_ypos_zpos", _unit((-1.0, 1.0, 1.0))),
-    ("xpos_yneg_zpos", _unit((1.0, -1.0, 1.0))),
-    ("xpos_ypos_zpos", _unit((1.0, 1.0, 1.0))),
-    ("xneg_yneg_zneg", _unit((-1.0, -1.0, -1.0))),
-    ("xneg_ypos_zneg", _unit((-1.0, 1.0, -1.0))),
-    ("xpos_yneg_zneg", _unit((1.0, -1.0, -1.0))),
-    ("xpos_ypos_zneg", _unit((1.0, 1.0, -1.0))),
+_DIRECTION_LABEL = {-1: "neg", 0: "zero", 1: "pos"}
+_FIXED_RETREAT_DIRECTIONS = tuple(
+    (
+        "x{}_y{}_z{}".format(*(_DIRECTION_LABEL[value] for value in values)),
+        _unit(tuple(float(value) for value in values)),
+    )
+    for values in product((-1, 0, 1), repeat=3)
+    if values != (0, 0, 0)
 )
 
 

@@ -69,7 +69,7 @@ def test_bounded_retreat_library_is_fixed_unique_and_low_amplitude() -> None:
     second = bounded_retreat_candidates(_nominal())
     assert [name for name, _ in first] == [name for name, _ in second]
     assert [block.tobytes() for _, block in first] == [block.tobytes() for _, block in second]
-    assert len(first) == 31
+    assert len(first) == 55
     assert len({block.tobytes() for _, block in first}) == len(first)
     assert all(float(np.max(np.abs(block[:, :3]))) <= 0.25 for _, block in first)
     assert all(np.array_equal(block[:, 6], np.full(10, -1.0)) for _, block in first)
@@ -116,7 +116,7 @@ def test_v3_selects_only_an_exact_shadow_allow(monkeypatch: pytest.MonkeyPatch) 
     result = policy.infer({})
     audit = policy.audits[-1]
     assert audit["selected_kind"] == "source_reverse_4_then_hold"
-    assert audit["recovery_library_size"] == 31
+    assert audit["recovery_library_size"] == 55
     assert audit["unqualified_fallback_dispatch_allowed"] is False
     assert not np.array_equal(result["actions"], nominal)
 
@@ -124,6 +124,6 @@ def test_v3_selects_only_an_exact_shadow_allow(monkeypatch: pytest.MonkeyPatch) 
 def test_v3_still_fails_closed_if_entire_library_rejects(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    policy, _ = _policy(monkeypatch, [L1Verdict.REJECT] * 32)
+    policy, _ = _policy(monkeypatch, [L1Verdict.REJECT] * 56)
     with pytest.raises(TaskConditionedL1Error, match="no qualified bounded-retreat"):
         policy.infer({})
