@@ -57,7 +57,7 @@
       "terminal_exception_count": 0
     }
   },
-  "created_at": "2026-08-19T02:40:45.174071+00:00",
+  "created_at": "2026-08-19T02:47:41.093487+00:00",
   "design": {
     "path": "experiments/proofalign_l1_task_conditioned_v4_heldout_design_20260819.json",
     "sha256": "be85fc916ee3fbfa90f9f7c99ea4ea22dccb64f48ae3b2f2bec475d067412346"
@@ -80,12 +80,12 @@
   "preservation": {
     "base_commit": "c1680339fd0dc0a2405256119277c33c56107b7a",
     "base_is_ancestor": true,
-    "changed_path_count": 1053,
+    "changed_path_count": 2034,
     "historical_delete_or_rename_count": 0,
     "modified_historical_artifact_count": 0,
     "paper_or_overleaf_change_count": 0
   },
-  "repository_commit": "2846e2350cfe705710e0963058e7c9aa39cb9410",
+  "repository_commit": "21b7481e42e9bc05940abc0989ea0bc4c8c7ff2c",
   "requirements": {
     "all_960_attempts_retained_without_retry": true,
     "historical_artifacts_preserved": true,
