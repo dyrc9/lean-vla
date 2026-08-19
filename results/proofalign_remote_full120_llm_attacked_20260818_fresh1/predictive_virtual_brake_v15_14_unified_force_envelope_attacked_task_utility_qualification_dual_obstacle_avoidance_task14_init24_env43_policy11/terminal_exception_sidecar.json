@@ -1,0 +1,11 @@
+{
+  "artifact_path": "results/proofalign_remote_full120_llm_attacked_20260818_fresh1/predictive_virtual_brake_v15_14_unified_force_envelope_attacked_task_utility_qualification_dual_obstacle_avoidance_task14_init24_env43_policy11/episodes/obstacle_avoidance_task14_init24.json",
+  "artifact_sha256": "c429861df0302058126c0c17932121bb8739ead8e415ee01a9e810125e890296",
+  "conservative_invalid": true,
+  "episode_id": "predictive_virtual_brake_v15_14_unified_force_envelope_attacked_task_utility_qualification_dual_obstacle_avoidance_task14_init24_env43_policy11",
+  "exception_message": "task-runtime bounded-core coverage differs",
+  "exception_type": "V15BoundedStateTriggeredTaskUtilityError",
+  "retry_performed": false,
+  "schema": "proofalign.persisted-episode-postcheck-exception.v1",
+  "traceback": "Traceback (most recent call last):\n  File \"/home/ldx/lean-vla/scripts/run_remote_full120_llm_resilient_completion.py\", line 288, in _collect_one\n    clean_runner._run_episode_adapter(\n  File \"/home/ldx/lean-vla/scripts/run_v15_bounded_state_triggered_task_utility_qualification.py\", line 585, in _run_episode_adapter\n    raise V15BoundedStateTriggeredTaskUtilityError(\nscripts.run_v15_bounded_state_triggered_task_utility_qualification.V15BoundedStateTriggeredTaskUtilityError: task-runtime bounded-core coverage differs\n"
+}

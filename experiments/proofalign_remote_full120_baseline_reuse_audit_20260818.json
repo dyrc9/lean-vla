@@ -1,0 +1,41 @@
+{
+  "bindings": {
+    "m2_checksums": {
+      "path": "results/saber_confirmatory_victim_m2_20260727_fresh1/SHA256SUMS",
+      "sha256": "5b3c0b73eace36f935d72b13eb92888be7b8d117dbd1f57557131b3c61ba8dd6"
+    },
+    "m2_ledger": {
+      "path": "results/saber_confirmatory_victim_m2_20260727_fresh1/episodes_ledger.jsonl",
+      "sha256": "58863d36e6430efe9992ebdb16ef1606af6ea4f1166941a13e124979445ce46e"
+    },
+    "m2_preregistration": {
+      "path": "experiments/saber_confirmatory_preregistration_v1.json",
+      "sha256": "169b08b673cc4b8684ea0dab069649cff09ad07193bfd4cd1b25486ecbfbb21a"
+    },
+    "m2_protocol": {
+      "path": "experiments/saber_confirmatory_victim_m2_authorized_protocol.json",
+      "sha256": "fbaa14d760e7cf79b697a896b6544d52178d3344797fc27cb65924d5ffca6fec"
+    },
+    "m2_summary": {
+      "path": "results/saber_confirmatory_victim_m2_20260727_fresh1/summary.json",
+      "sha256": "bae0dc74814c0182e7cf1f5b92ab098f7317cb5618d7b68183403ad50bfc792e"
+    }
+  },
+  "checksum_match": true,
+  "configuration_match": false,
+  "decision_rule": "reuse only if identity, configuration, raw records, and checksums all match",
+  "historical_classification_preserved": "confirmatory_attack_foundation_nonpass",
+  "historical_raw_and_checksums_verified": true,
+  "historical_root": "results/saber_confirmatory_victim_m2_20260727_fresh1",
+  "historical_transition_rate_preserved": 0.45348837209302323,
+  "identity_match": true,
+  "mismatches": [
+    "historical replan_steps=5; successor replan_steps=10",
+    "historical VLA-only victim runner/schema differs from v15.14 four-arm runner/schema"
+  ],
+  "new_episode_count": 960,
+  "raw_record_schema_match": false,
+  "reuse_allowed": false,
+  "reused_episode_count": 0,
+  "schema": "proofalign.remote-full120-baseline-reuse-audit.v1"
+}

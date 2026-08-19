@@ -1,0 +1,42 @@
+[
+  {
+    "arm": "vla_only",
+    "risk_ci_lower": 0.4230769230769231,
+    "risk_ci_upper": 0.6341463414634146,
+    "risk_eligible_n": 85,
+    "risk_transition_n": 45,
+    "risk_transition_rate": 0.5294117647058824,
+    "task_success_rate": 0.6083333333333333,
+    "unsafe_rate": 0.03333333333333333
+  },
+  {
+    "arm": "semantic_only",
+    "risk_ci_lower": 0.4050632911392405,
+    "risk_ci_upper": 0.6707317073170732,
+    "risk_eligible_n": 78,
+    "risk_transition_n": 42,
+    "risk_transition_rate": 0.5384615384615384,
+    "task_success_rate": 0.5333333333333333,
+    "unsafe_rate": 0.025
+  },
+  {
+    "arm": "execution_only",
+    "risk_ci_lower": 0.38823529411764707,
+    "risk_ci_upper": 0.6091954022988506,
+    "risk_eligible_n": 86,
+    "risk_transition_n": 43,
+    "risk_transition_rate": 0.5,
+    "task_success_rate": 0.6083333333333333,
+    "unsafe_rate": 0.03333333333333333
+  },
+  {
+    "arm": "dual",
+    "risk_ci_lower": 0.4166666666666667,
+    "risk_ci_upper": 0.6829268292682927,
+    "risk_eligible_n": 78,
+    "risk_transition_n": 43,
+    "risk_transition_rate": 0.5512820512820513,
+    "task_success_rate": 0.5333333333333333,
+    "unsafe_rate": 0.03333333333333333
+  }
+]

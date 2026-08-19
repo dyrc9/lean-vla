@@ -1,0 +1,51 @@
+{
+  "analysis_implementation": {
+    "scripts/analyze_remote_full120_experiment.py": "9b8b863729b4efb1ad14ee9c6c97f93c8af306364b33aa2ff334082d00b78505",
+    "scripts/analyze_remote_full120_llm_experiment.py": "5f569f0ae38b0c0952c5134c2fc373779f5ab1c20e21ed0d5cf7e65962a9ae28",
+    "src/proofalign/benchmark/four_arm_v4.py": "13673ce509d3fbcdcf1c080dda85e0477317433746a48d437213c6b89f0c307e"
+  },
+  "analysis_rules": {
+    "exception_retry_count": 0,
+    "invalid_is_conservative_failure_and_unsafe": true,
+    "result_conditioned_sample_filtering": false,
+    "result_conditioned_threshold_change": false,
+    "risk_transition_definition_changed_from_45_35_percent_baseline": false
+  },
+  "created_at": "2026-08-18T15:45:38.942516+00:00",
+  "episode_attempts": {
+    "attacked": 480,
+    "clean": 480,
+    "reused": 0,
+    "total": 960
+  },
+  "method_artifacts": {
+    "experiments/proofalign_llm_semantic_template_catalog_20260818.json": "ca27aba705cba5f84f8404e96354918ea11f4bf3a27b2906ce8f8559e35b1a21",
+    "lean/ProofAlign/SemanticIntegrityCore.lean": "6f947aa9404b9a3ac6cf422a72bcc6a6d17f99d608fd448c646d7fbbaefc2508",
+    "results/proofalign_llm_semantic_template_qualification_20260818_fresh2/summary.json": "58016429dde43876f48419dc071098b16c00598e437e26547e4735e4a7a5620f"
+  },
+  "protocols": {
+    "experiments/proofalign_remote_full120_llm_attacked_protocol_20260818.json": "53ef6d982b6307533eefd106f04e1b114464a05f9d964581e7b9285544b2bd6d",
+    "experiments/proofalign_remote_full120_llm_clean_protocol_20260818.json": "9ca57a52c2e37fd6ff8a156dd2798e7c756e6ec0b2dfb193013b6cd53791e0f7",
+    "experiments/proofalign_remote_full120_llm_resilient_completion_v2_protocol_20260818.json": "5a47c21c50e0e96f5ee6d25a2f997d97113485552e1005db2745c77d110f85d0",
+    "experiments/proofalign_remote_full120_llm_successor_protocol_20260818.json": "5664572c59d644d3157e4337247b394dbf97433d7d3b10cfdbbf0a72783ef628"
+  },
+  "raw_roots": {
+    "results/proofalign_remote_full120_llm_attacked_20260818_fresh1": {
+      "manifest_sha256": "9c8c727959ffc8d1758a8cb12529c1090761644b563cef0ab2e8bccde6098224",
+      "sha256sums_sha256": "d609fb20198faaaec72fc859f64a29ba1663f9dbd9a2256b711de995cf2219b7"
+    },
+    "results/proofalign_remote_full120_llm_clean_20260818_fresh1": {
+      "manifest_sha256": "c8c4e753df32e8f14027933a93dce5c1eac1718ec448d8869d83f64969725e4c",
+      "sha256sums_sha256": "0ee6e3c0c0e53e48b472cc0b2e4f54d52edc6d49c16b7af59be933177d630ed7"
+    },
+    "results/proofalign_remote_full120_llm_clean_completion_20260818_fresh2": {
+      "manifest_sha256": "b12fe94f67ed557d2ebe9b884bf6e9fb4e7c39e9875adea6833212880a12c068",
+      "sha256sums_sha256": "67a7772faa0efaceab0c53f73c33e0d651275ce66b8b68186f444fffe8afc58f"
+    },
+    "results/proofalign_remote_full120_llm_clean_completion_20260818_fresh3": {
+      "manifest_sha256": "b36cdf15545fd2c1feb499bda28f0084ee1173594dcc5a2328b1916fecd210e3",
+      "sha256sums_sha256": "c698dabed63f005d6526fe5af31cf141f187a8345e5301de1f9b0c66597a4977"
+    }
+  },
+  "schema": "proofalign.remote-full120-llm-final-analysis-bindings.v1"
+}

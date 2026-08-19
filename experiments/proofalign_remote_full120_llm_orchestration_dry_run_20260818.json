@@ -1,0 +1,34 @@
+{
+  "actions_dispatched": false,
+  "attacked": {
+    "arm_counts": {
+      "dual": 120,
+      "execution_only": 120,
+      "semantic_only": 120,
+      "vla_only": 120
+    },
+    "episode_count": 480,
+    "root": "results/proofalign_remote_full120_llm_attacked_20260818_fresh1",
+    "sequence_contiguous": true,
+    "unit_count": 120
+  },
+  "clean": {
+    "arm_counts": {
+      "dual": 120,
+      "execution_only": 120,
+      "semantic_only": 120,
+      "vla_only": 120
+    },
+    "episode_count": 480,
+    "root": "results/proofalign_remote_full120_llm_clean_20260818_fresh1",
+    "sequence_contiguous": true,
+    "unit_count": 120
+  },
+  "complete": true,
+  "outcomes_observed": false,
+  "policy_loaded": false,
+  "protocol_id": "proofalign-remote-full120-llm-template-successor-20260818",
+  "same_120_units_and_four_arms": true,
+  "schema": "proofalign.remote-full120-llm-template-orchestration-dry-run.v1",
+  "total_new_episode_count": 960
+}

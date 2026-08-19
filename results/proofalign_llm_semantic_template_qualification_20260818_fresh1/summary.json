@@ -1,0 +1,33 @@
+{
+  "attacked_prompt_read_count": 0,
+  "classification": "llm_semantic_template_qualification_nonpass",
+  "compiled_graph_count": 60,
+  "conditions": {
+    "all_goal_geometry_resolved": false,
+    "attacked_prompt_read_count": true,
+    "compiled_graph_count": true,
+    "env_step_count": true,
+    "part_resolution_failure_count": true,
+    "policy_inference_count": true,
+    "policy_load_count": true,
+    "task_outcome_read_count": true,
+    "valid_row_count": true
+  },
+  "env_step_count": 0,
+  "goal_predicate_counts": {
+    "close": 6,
+    "grasp_part": 15,
+    "in": 24,
+    "on": 33,
+    "turn_on": 6
+  },
+  "part_resolution_failure_count": 0,
+  "pass": false,
+  "policy_inference_count": 0,
+  "policy_load_count": 0,
+  "protocol_id": "proofalign-full120-llm-template-outcome-blind-qualification-20260818",
+  "row_count": 60,
+  "schema": "proofalign.llm-semantic-template-outcome-blind-qualification-summary.v1",
+  "task_outcome_read_count": 0,
+  "valid_row_count": 60
+}
