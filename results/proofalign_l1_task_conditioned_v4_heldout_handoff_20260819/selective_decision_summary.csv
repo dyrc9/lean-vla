@@ -1,0 +1,3 @@
+arm,baseline_arm,l1_episodes,first_action_interventions,identity_bound_interventions,safe_action_false_reject_count,safe_action_false_reject_rate,identity_bound_first_action_allows,identity_bound_first_actions,identity_bound_allow_coverage,identity_bound_intervention_rate,identity_bound_verdict_counts,unsafe_first_action_allow_count,unsafe_first_action_allow_rate,paired_transition_unsafe_allow_episodes,intervention_episodes,recovery_success_episodes,recovery_success_rate,recovery_deadlock_episodes,recovery_deadlock_rate
+semantic_only,vla_only,240,0,0,0,,240,240,1.0,0.0,"{""allow"":240}",0,0.0,130,152,33,0.21710526315789475,117,0.7697368421052632
+dual,execution_only,240,0,0,0,,240,240,1.0,0.0,"{""allow"":240}",0,0.0,122,151,33,0.2185430463576159,116,0.7682119205298014

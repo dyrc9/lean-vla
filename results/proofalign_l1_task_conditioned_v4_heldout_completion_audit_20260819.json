@@ -1,0 +1,102 @@
+{
+  "analysis": {
+    "analysis_sha256": "febff26f4689fb179f6b08487cb705518be50f975f93b7d759f272da3c1f2f40",
+    "episode_count": 960,
+    "independent_pair_recomputation": true,
+    "pair_count": 480,
+    "registered_clean_eligible_counts": {
+      "dual": 55,
+      "execution_only": 83,
+      "semantic_only": 56,
+      "vla_only": 85
+    },
+    "registered_risk_transition_counts": {
+      "dual": 28,
+      "execution_only": 44,
+      "semantic_only": 31,
+      "vla_only": 49
+    },
+    "risk_counts": {
+      "dual": 61,
+      "execution_only": 72,
+      "semantic_only": 65,
+      "vla_only": 78
+    },
+    "safe_task_success_counts": {
+      "dual": 23,
+      "execution_only": 37,
+      "semantic_only": 21,
+      "vla_only": 35
+    },
+    "terminal_exception_count": 0,
+    "v4_no_dispatch": {
+      "qualified_no_dispatch_abort_count": 60,
+      "qualified_no_dispatch_abort_dispatch_count": 0,
+      "raw_no_dispatch_recomputation": true,
+      "v4_audit_count": 17444,
+      "v4_l1_episode_count": 480
+    }
+  },
+  "collections": {
+    "attacked": {
+      "checksum_entry_count": 483,
+      "checksums_sha256": "9af8b195d3248992c294e06b3b1957a8391925d06208fcd35aa2fe85ef55dbb9",
+      "ledger_sha256": "413d31b84a6ba3cab1ea4d8a1516aad507da78e6b6dccf11cf7542d52f287915",
+      "manifest_sha256": "79c3f8f9c5dc2ef80afff934fff721d42a22fff8a242ab0750e57298bea88251",
+      "protocol_sha256": "1ef28d4d68dc3eccf9872cc7eccb8304d2c086ada93777e464b391d14c25f49b",
+      "schedule_sha256": "7fdc03c0ecfa203fb8abe0e8af674b7f9760540f838e38ad770d753eb77922f1",
+      "terminal_exception_count": 0
+    },
+    "clean": {
+      "checksum_entry_count": 483,
+      "checksums_sha256": "651e508d0a11022949d1d70292deddfb1dbbc8eee2ef05255b5e81c4beca7224",
+      "ledger_sha256": "c0c2eb37098f9f3a8a53de14fb495f4068d93ea92dad48395a2a1e6156acb2db",
+      "manifest_sha256": "efe392723f2ae743880c6e1493b9829fb63003df61d0492e5bb1c415f550fc51",
+      "protocol_sha256": "3747c23b0d6c64d1b587e431f770ba1052d509bf519160ab4ff92aca1792ce02",
+      "schedule_sha256": "5fa411f131db217365fbdcd25a4e47cb889be4fd44b6ed77deef6de2701fef39",
+      "terminal_exception_count": 0
+    }
+  },
+  "created_at": "2026-08-19T02:40:45.174071+00:00",
+  "design": {
+    "path": "experiments/proofalign_l1_task_conditioned_v4_heldout_design_20260819.json",
+    "sha256": "be85fc916ee3fbfa90f9f7c99ea4ea22dccb64f48ae3b2f2bec475d067412346"
+  },
+  "handoff": {
+    "checksum_entry_count": 8,
+    "checksums_sha256": "5028d35e9af1239a132e10a6ca9e56dac398fecc480a3187673d1f67a9effca7",
+    "required_files": [
+      "condition_arm_summary.csv",
+      "paired_risk_summary.csv",
+      "selective_decision_summary.csv",
+      "risk_contrast_summary.csv",
+      "generated_tables.md",
+      "summary.json",
+      "handoff_report.md",
+      "main_agent_prompt.md"
+    ],
+    "root": "results/proofalign_l1_task_conditioned_v4_heldout_handoff_20260819"
+  },
+  "preservation": {
+    "base_commit": "c1680339fd0dc0a2405256119277c33c56107b7a",
+    "base_is_ancestor": true,
+    "changed_path_count": 1053,
+    "historical_delete_or_rename_count": 0,
+    "modified_historical_artifact_count": 0,
+    "paper_or_overleaf_change_count": 0
+  },
+  "repository_commit": "2846e2350cfe705710e0963058e7c9aa39cb9410",
+  "requirements": {
+    "all_960_attempts_retained_without_retry": true,
+    "historical_artifacts_preserved": true,
+    "outcome_blind_qualification": true,
+    "paper_and_overleaf_unchanged": true,
+    "qualified_no_dispatch_raw_evidence_verified": true,
+    "raw_ledgers_and_checksums_verified": true,
+    "registered_45_35_percent_risk_definition_reused": true,
+    "statistics_tables_and_handoff_verified": true,
+    "untouched_heldout_full120_four_arm_two_condition": true
+  },
+  "schema": "proofalign.l1-task-conditioned-completion-audit.v1",
+  "status": "pass"
+}
