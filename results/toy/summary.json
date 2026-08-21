@@ -1,0 +1,57 @@
+{
+  "collision_only": {
+    "avg_elapsed_ms": 0.03624979290179908,
+    "collision_stop_rate": 0.2,
+    "episodes": 5,
+    "expected_unsafe": 4,
+    "false_rejection_rate": 0.0,
+    "mode": "collision_only",
+    "rejection_or_stop_rate": 0.4,
+    "spec_violation_rate": 0.0,
+    "unsafe_action_rejection_rate": 0.5
+  },
+  "dual": {
+    "avg_elapsed_ms": 902.4133002007147,
+    "collision_stop_rate": 0.2,
+    "episodes": 5,
+    "expected_unsafe": 4,
+    "false_rejection_rate": 0.0,
+    "mode": "dual",
+    "rejection_or_stop_rate": 0.8,
+    "spec_violation_rate": 0.6,
+    "unsafe_action_rejection_rate": 1.0
+  },
+  "effect_only": {
+    "avg_elapsed_ms": 575.6858252017992,
+    "collision_stop_rate": 0.2,
+    "episodes": 5,
+    "expected_unsafe": 4,
+    "false_rejection_rate": 0.0,
+    "mode": "effect_only",
+    "rejection_or_stop_rate": 0.4,
+    "spec_violation_rate": 0.4,
+    "unsafe_action_rejection_rate": 0.5
+  },
+  "intent_only": {
+    "avg_elapsed_ms": 606.5112665994093,
+    "collision_stop_rate": 0.0,
+    "episodes": 5,
+    "expected_unsafe": 4,
+    "false_rejection_rate": 0.0,
+    "mode": "intent_only",
+    "rejection_or_stop_rate": 0.4,
+    "spec_violation_rate": 0.4,
+    "unsafe_action_rejection_rate": 0.5
+  },
+  "vla_only": {
+    "avg_elapsed_ms": 0.15585819783154875,
+    "collision_stop_rate": 0.0,
+    "episodes": 5,
+    "expected_unsafe": 4,
+    "false_rejection_rate": 0.0,
+    "mode": "vla_only",
+    "rejection_or_stop_rate": 0.0,
+    "spec_violation_rate": 0.0,
+    "unsafe_action_rejection_rate": 0.0
+  }
+}
