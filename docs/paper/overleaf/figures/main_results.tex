@@ -1,30 +1,30 @@
-\begin{tikzpicture}[x=0.80cm,y=0.17cm,font=\scriptsize]
+\begin{tikzpicture}[x=0.80cm,y=0.030cm,font=\scriptsize]
   \draw[->] (0.25,0) -- (8.15,0);
-  \draw[->] (0.45,0) -- (0.45,20.3);
-  \foreach \y in {0,6,12,18} {
+  \draw[->] (0.45,0) -- (0.45,132);
+  \foreach \y in {0,40,80,120} {
     \draw[gray!35] (0.45,\y) -- (8.05,\y);
     \node[anchor=east] at (0.38,\y) {\y};
   }
-  \node[rotate=90,anchor=south] at (-0.15,9) {episodes / task successes (out of 18)};
+  \node[rotate=90,anchor=south] at (-0.15,60) {outcome count (denominators labeled)};
 
-  \foreach \x/\name in {1.4/VLA,3.4/L1,5.4/L2,7.4/Dual} {
+  \foreach \x/\name in {1.4/{\vlaonly},3.4/{\loneonly},5.4/{\ltwoonly},7.4/{\dual}} {
     \node[anchor=north] at (\x,0) {\name};
   }
 
-  % Clean success, attacked success, attacked violation episodes.
-  \foreach \x/\c/\a/\v in {1.4/13/11/4,3.4/13/13/1,5.4/13/11/0,7.4/13/13/0} {
+  % Clean success, attacked success, and attacked risk-transition count.
+  \foreach \x/\c/\a/\r/\rlab in {1.4/85/73/45/{45 of 85},3.4/78/64/42/{42 of 78},5.4/86/73/43/{43 of 86},7.4/78/64/43/{43 of 78}} {
     \filldraw[fill=gray!18] (\x-0.54,0) rectangle (\x-0.22,\c);
     \filldraw[fill=gray!72] (\x-0.16,0) rectangle (\x+0.16,\a);
-    \filldraw[pattern=north east lines,pattern color=black] (\x+0.22,0) rectangle (\x+0.54,\v);
-    \node[anchor=south] at (\x-0.38,\c+0.25) {\c};
-    \node[anchor=south] at (\x,\a+0.25) {\a};
-    \node[anchor=south] at (\x+0.38,\v+0.25) {\v};
+    \filldraw[pattern=north east lines,pattern color=black] (\x+0.22,0) rectangle (\x+0.54,\r);
+    \node[anchor=south] at (\x-0.38,\c+2) {\c/120};
+    \node[anchor=south] at (\x,\a+2) {\a/120};
+    \node[anchor=south] at (\x+0.38,\r+2) {\rlab};
   }
 
-  \filldraw[fill=gray!18] (0.7,19.15) rectangle (0.95,19.85);
-  \node[anchor=west] at (1.02,19.5) {clean success};
-  \filldraw[fill=gray!72] (3.15,19.15) rectangle (3.4,19.85);
-  \node[anchor=west] at (3.47,19.5) {attacked success};
-  \filldraw[pattern=north east lines,pattern color=black] (5.95,19.15) rectangle (6.2,19.85);
-  \node[anchor=west] at (6.27,19.5) {attacked violation};
+  \filldraw[fill=gray!18] (0.7,124) rectangle (0.95,129);
+  \node[anchor=west] at (1.02,126.5) {clean success};
+  \filldraw[fill=gray!72] (3.15,124) rectangle (3.4,129);
+  \node[anchor=west] at (3.47,126.5) {attacked success};
+  \filldraw[pattern=north east lines,pattern color=black] (5.95,124) rectangle (6.2,129);
+  \node[anchor=west] at (6.27,126.5) {arm-specific risk transitions};
 \end{tikzpicture}

@@ -49,7 +49,7 @@ risk state -> guarded execution / joint-limit containment                [L2b]
 
 ## 2. VLA 与具身模型攻击：说明物理后果，但不提供运行时闭环
 
-[SABER](https://arxiv.org/abs/2603.24935)（IROS 2026；当前可访问版本为 arXiv）使用 bounded instruction edits 对六类 VLA 做
+[SABER](https://arxiv.org/abs/2603.24935)（作者主页称已被 IROS 2026 接收；当前参考文献仍按 arXiv 官方元数据著录）使用 bounded instruction edits 对六类 VLA 做
 black-box attack，并以 task failure、动作长度和 constraint violation 衡量机器人行为后果。它是本文冻结
 攻击记录的直接来源，也支持“攻击是否改变最终执行”而不是“模型是否输出恶意解释”的问题设定。
 
@@ -70,7 +70,7 @@ pre-dispatch authorization 和 post-dispatch evidence chain。
 多模态攻击面、实时约束和长轨迹错误传播列为 VLA 区别于纯 LLM 安全的核心挑战。它也将 unified runtime
 safety architecture 列为开放问题；ProofAlign 是这个大方向中的一个窄实例，而不是覆盖该 survey 全部威胁。
 
-[LIBERO-Safety](https://arxiv.org/abs/2606.23686)（ECCV 2026）同时覆盖物理与语义安全，并指出更丰富的安全
+[LIBERO-Safety](https://arxiv.org/abs/2606.23686)（已被 ECCV 2026 接收；当前可访问版本为 arXiv）同时覆盖物理与语义安全，并指出更丰富的安全
 数据与 task success 之间仍存在 trajectory synthesis/semantic misalignment 瓶颈。
 [SafeVLA-Bench](https://arxiv.org/abs/2606.00773)（arXiv 2026）用 task-aware Signal Temporal Logic
 区分 success、succ-but-unsafe 和 violation severity；

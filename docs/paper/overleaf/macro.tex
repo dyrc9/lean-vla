@@ -1,6 +1,125 @@
 \newcommand{\system}{\textsc{ProofAlign}\xspace}
+\newcommand{\vla}{VLA\xspace}
 \newcommand{\actionblock}{\textsc{ActionBlock}\xspace}
+\newcommand{\taskassessment}{\textsc{Task Assessment}\xspace}
+\newcommand{\transactionbinding}{\textsc{Transaction Binding}\xspace}
+\newcommand{\guardscreening}{\textsc{Guard Screening}\xspace}
+% Stable labels retained for formal definitions and evaluation-arm names.
 \newcommand{\lone}{\textsc{L1}\xspace}
+\newcommand{\ltwo}{\textsc{L2}\xspace}
 \newcommand{\ltwoa}{\textsc{L2a}\xspace}
 \newcommand{\ltwob}{\textsc{L2b}\xspace}
 \newcommand{\dual}{\textsc{Dual}\xspace}
+\newcommand{\ltwoenabled}{\textsc{L2-enabled}\xspace}
+\newcommand{\vlaonly}{\textsc{VLA-only}\xspace}
+\newcommand{\loneonly}{\textsc{L1-only}\xspace}
+\newcommand{\ltwoonly}{\textsc{L2-only}\xspace}
+\newcommand{\intentaction}{\textsc{Intent}\ensuremath{\rightarrow}\textsc{ActionBlock}\xspace}
+\newcommand{\actionexecution}{\textsc{ActionBlock}\ensuremath{\rightarrow}\textsc{Execution}\xspace}
+\newcommand{\proofaligned}{\ensuremath{\mathsf{ProofAligned}}\xspace}
+\newcommand{\pacovered}{\textcolor{paGreen!80!black}{\ensuremath{\checkmark}}}
+\newcommand{\panotcovered}{\textcolor{paGray!65}{\ensuremath{\times}}}
+
+% Colorblind-safe semantic palette shared by the conceptual and architecture
+% diagrams (Okabe--Ito blue/vermillion/green with neutral gray).
+\definecolor{paBlue}{HTML}{0072B2}
+\definecolor{paOrange}{HTML}{D55E00}
+\definecolor{paGreen}{HTML}{009E73}
+\definecolor{paPurple}{HTML}{CC79A7}
+\definecolor{paGray}{HTML}{4D4D4D}
+
+% Small line icons for the paper diagrams.  They are deliberately geometric
+% and monochrome so they remain legible after two-column scaling and in print.
+\tikzset{
+  pics/paTask/.style={code={
+    \draw[paGray,line width=.45pt,rounded corners=.3pt]
+      (-.28,-.34) rectangle (.28,.31);
+    \draw[paGray,line width=.45pt,rounded corners=.3pt]
+      (-.12,.38) rectangle (.12,.25);
+    \draw[paGray,line width=.4pt] (-.16,.12)--(.16,.12)
+      (-.16,-.03)--(.16,-.03) (-.16,-.18)--(.09,-.18);
+  }},
+  pics/paAttack/.style={code={
+    \draw[paOrange!90!black,line width=.55pt,rounded corners=.4pt]
+      (0,.38)--(-.36,-.29)--(.36,-.29)--cycle;
+    \draw[paOrange!90!black,line width=.55pt] (0,.14)--(0,-.08);
+    \fill[paOrange!90!black] (0,-.19) circle (.025);
+  }},
+  pics/paModel/.style={code={
+    \foreach \y in {-.24,0,.24} \filldraw[fill=white,draw=paGray,line width=.4pt]
+      (-.30,\y) circle (.055);
+    \foreach \y in {-.16,.16} \filldraw[fill=white,draw=paGray,line width=.4pt]
+      (0,\y) circle (.055);
+    \foreach \y in {-.24,0,.24} \filldraw[fill=white,draw=paGray,line width=.4pt]
+      (.30,\y) circle (.055);
+    \foreach \a in {-.24,0,.24} {
+      \foreach \b in {-.16,.16} {
+        \draw[paGray!80,line width=.28pt] (-.245,\a)--(-.055,\b);
+        \draw[paGray!80,line width=.28pt] (.055,\b)--(.245,\a);
+      }
+    }
+  }},
+  pics/paAction/.style={code={
+    \draw[paGray,line width=.45pt,rounded corners=.3pt]
+      (-.34,-.28) rectangle (.34,.28);
+    \foreach \x in {-.17,0,.17} \draw[paGray!80,line width=.3pt]
+      (\x,-.28)--(\x,.28);
+    \foreach \y in {-.093,.093} \draw[paGray!80,line width=.3pt]
+      (-.34,\y)--(.34,\y);
+    \fill[paBlue] (-.255,.18) circle (.025);
+    \fill[paOrange] (.085,-.18) circle (.025);
+  }},
+  pics/paDispatch/.style={code={
+    \draw[paGray,line width=.55pt] (-.10,-.34)--(-.10,.34)
+      (.10,-.34)--(.10,.34);
+    \draw[paBlue!85!black,-{Latex[length=1.2mm]},line width=.55pt]
+      (-.38,0)--(.38,0);
+  }},
+  pics/paRobot/.style={code={
+    \draw[paGray,line width=.6pt] (-.34,-.30)--(.12,-.30);
+    \draw[paGray,line width=.6pt] (-.22,-.30)--(-.16,-.05)--(.05,.11)--(.24,.30);
+    \foreach \p in {(-.16,-.05),(.05,.11)}
+      \filldraw[fill=white,draw=paGray,line width=.45pt] \p circle (.06);
+    \draw[paGray,line width=.5pt] (.20,.33)--(.31,.27)
+      (.24,.30)--(.32,.38);
+  }},
+  pics/paEvidence/.style={code={
+    \draw[paGray,line width=.45pt,rounded corners=.3pt]
+      (-.27,-.34) rectangle (.27,.34);
+    \draw[paGray!75,line width=.35pt] (-.15,.16)--(.15,.16)
+      (-.15,.02)--(.08,.02);
+    \draw[paGreen!75!black,line width=.65pt]
+      (-.15,-.14)--(-.04,-.25)--(.18,-.02);
+  }},
+  pics/paShield/.style={code={
+    \draw[paBlue!85!black,line width=.55pt,rounded corners=.5pt]
+      (0,.36)--(-.30,.24)--(-.25,-.13)--(0,-.36)--(.25,-.13)--(.30,.24)--cycle;
+    \draw[paGreen!75!black,line width=.6pt]
+      (-.13,0)--(-.03,-.11)--(.16,.12);
+  }},
+  pics/paLedger/.style={code={
+    \draw[paGray,line width=.45pt] (-.30,.22) arc[start angle=180,end angle=360,
+      x radius=.30,y radius=.10];
+    \draw[paGray,line width=.45pt] (-.30,.22)--(-.30,-.22)
+      (.30,.22)--(.30,-.22);
+    \draw[paGray,line width=.45pt] (-.30,-.22) arc[start angle=180,end angle=360,
+      x radius=.30,y radius=.10];
+    \draw[paGray!75,line width=.3pt] (-.30,0) arc[start angle=180,end angle=360,
+      x radius=.30,y radius=.10];
+  }},
+  pics/paEye/.style={code={
+    \draw[paGray,line width=.5pt]
+      (-.36,0).. controls (-.16,.27) and (.16,.27) ..(.36,0)
+      .. controls (.16,-.27) and (-.16,-.27) ..cycle;
+    \filldraw[fill=paBlue!15,draw=paBlue!85!black,line width=.4pt]
+      (0,0) circle (.10);
+    \fill[paBlue!85!black] (0,0) circle (.035);
+  }},
+  pics/paSelect/.style={code={
+    \draw[paBlue!85!black,line width=.5pt,-{Latex[length=.9mm]}]
+      (-.34,0)--(-.08,0)--(.24,.25);
+    \draw[paBlue!85!black,line width=.5pt,-{Latex[length=.9mm]}]
+      (-.08,0)--(.24,-.25);
+    \fill[paBlue!85!black] (-.08,0) circle (.035);
+  }}
+}

@@ -4,8 +4,8 @@
 \usepackage{graphicx}
 \usepackage{cite}
 \usepackage{mathtools}
-% NDSS requires a Times-family face; load newtx after amsmath/mathtools so the
-% text and mathematics fonts remain portable across Tectonic and Overleaf.
+% NDSS requires a Times-family face; load newtx after mathtools so text and
+% mathematics remain portable across Tectonic and Overleaf.
 \usepackage{newtxtext,newtxmath}
 \usepackage{textcomp}
 \usepackage{xcolor}
@@ -15,10 +15,9 @@
 \usepackage{placeins}
 \usepackage{booktabs}
 \usepackage{tikz}
-\usepackage{url}
+\usepackage[hyphens]{url}
 \usepackage[hidelinks]{hyperref}
-\usetikzlibrary{positioning,arrows.meta,fit,shapes.geometric,patterns}
-\Urlmuskip=0mu plus 1mu
+\usetikzlibrary{positioning,arrows.meta,fit,shapes.geometric,patterns,backgrounds}
 
 \pagestyle{plain}
 \hyphenation{op-tical net-works semi-conduc-tor Action-Block}
@@ -46,7 +45,6 @@
 \maketitle
 
 \input{macro}
-\bstctlcite{IEEEexample:BSTcontrol}
 \input{sections/abstract}
 \IEEEpeerreviewmaketitle
 
@@ -65,8 +63,5 @@
 
 \bibliographystyle{IEEEtran}
 \bibliography{paper}
-
-\appendix
-\input{sections/appendix_submission}
 
 \end{document}

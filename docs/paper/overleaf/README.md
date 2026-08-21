@@ -8,7 +8,7 @@
 | 本地 | Overleaf | 作用 |
 |---|---|---|
 | `paper_ndss.tex` | `paper_ndss.tex` | IEEEtran 主入口与章节顺序 |
-| `IEEEtran.cls` | `IEEEtran.cls` | NDSS starter 所要求的 IEEEtran 1.8b 模板类 |
+| `IEEEtran.cls` | `IEEEtran.cls` | NDSS 官方模板要求的 IEEEtran V1.8b 类 |
 | `macro.tex` | `macro.tex` | 论文宏 |
 | `paper.bib` | `paper.bib` | 唯一参考文献库 |
 | `sections/*.tex` | `sections/*.tex` | 分章节正文、结论与附录 |
@@ -17,7 +17,7 @@
 投稿格式、匿名性和证据审计统一记录在 `ndss2027_readiness.md`；未关闭的项目不能在 Overleaf 预览无
 错误后被误判为“已可投稿”。
 
-本地与 Overleaf 都固定使用同一份 IEEEtran 1.8b 模板类；不要静默回退到 TeX 发行版自带的同名类，
+本地与 Overleaf 都固定使用 NDSS 官方模板要求的同一份 IEEEtran V1.8b 类；不要静默切换到其他同名类，
 以免首页 publication block、边距或分页在两端发生漂移。
 旧的 `paper_ccs.tex` 不属于当前 ProofAlign 主线，也不作为本地同步目标。Overleaf History 是远端恢复机制，
 Git 是本地版本历史。

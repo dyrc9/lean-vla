@@ -9,21 +9,22 @@
   reject/.style={-{Latex[length=1.6mm]},semithick,dashed}
 ]
 \node[state] (proposal) {Frozen proposal\\$(Z_t,O_t^T,A_t,\mathit{epoch})$};
-\node[state,below=of proposal] (assessed) {Contract compiled\\canonical action digest};
-\node[state,below=of assessed] (authorized) {Authorized\\fresh, one-use nonce};
-\node[state,below=of authorized] (dispatched) {Dispatched\\runtime-bound step receipt};
-\node[success,below=of dispatched] (closed) {Aligned completion\\receipts + effects close};
+\node[state,below=of proposal] (assessed) {Assessed\\contract names source block};
+\node[state,below=of assessed] (authorized) {Permitted\\fresh and one-use};
+\node[state,below=of authorized] (dispatched) {Dispatched\\next source row recorded};
+\node[success,below=of dispatched] (closed) {Aligned completion\\receipts and effects close};
 
-\node[fail,right=11mm of assessed] (rejected) {Reject / no dispatch\\stale, malformed, substituted};
-\node[fail,right=11mm of dispatched] (pending) {Pending / no phase advance\\replay, prefix, effect mismatch};
+\node[fail,right=11mm of assessed] (rejected) {Reject with no dispatch\\stale, malformed, substituted};
+\node[fail,right=11mm of dispatched] (pending) {Pending with no phase advance\\replay, prefix, effect mismatch};
 
-\draw[flow] (proposal)--node[right]{assess + bind}(assessed);
-\draw[flow] (assessed)--node[right]{screen if triggered}(authorized);
-\draw[flow] (authorized)--node[right]{consume once}(dispatched);
+\draw[flow] (proposal)--node[right]{assess and bind}(assessed);
+\draw[flow] (assessed)--node[right]{permit same block}(authorized);
+\draw[flow] (authorized)--node[right]{consume; screen step}(dispatched);
 \draw[flow] (dispatched)--node[right]{observe window}(closed);
 \draw[reject] (proposal.east)-|node[pos=.25,above]{bad binding}(rejected.north);
-\draw[reject] (assessed.east)--node[above]{invalid / hard risk}(rejected.west);
-\draw[reject] (authorized.east)-|node[pos=.28,above]{replay/substitute}(pending.north);
+\draw[reject] (assessed.east)--node[above=1pt,align=center,font=\tiny,
+  fill=white,inner sep=.3pt]{invalid or\\hard risk}(rejected.west);
+\draw[reject] (authorized.east)-|node[pos=.28,above]{replay or substitute}(pending.north);
 \draw[reject] (dispatched.east)--(pending.west);
 
 \node[below=3.5mm of closed,align=center,text width=39mm] {

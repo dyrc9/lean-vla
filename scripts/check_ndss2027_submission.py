@@ -106,11 +106,10 @@ def validate_source_structure() -> list[str]:
         "\\input{sections/ai_disclosure}",
         "\\input{sections/ethics}",
         "\\bibliographystyle{IEEEtran}",
-        "\\appendix",
     )
     positions = [main.find(token) for token in ordered]
     require(all(position >= 0 for position in positions), "required paper sections missing")
-    require(positions == sorted(positions), "conclusion/disclosure/ethics/references/appendix order drifted")
+    require(positions == sorted(positions), "conclusion/disclosure/ethics/references order drifted")
 
     manifest = (PAPER_ROOT / "sync_manifest.txt").read_text(encoding="utf-8")
     tex_sources = []
@@ -133,57 +132,62 @@ def validate_source_structure() -> list[str]:
         "Generative-AI disclosure must cover diagram preparation",
     )
     require(
-        "reviewed the generated text and diagrams" in disclosure,
+        "reviewed the generated material" in disclosure,
         "Generative-AI disclosure must retain author-review responsibility",
     )
     require(
-        "all manuscript sections" in disclosure and "Figs.~1--3" in disclosure,
+        "all manuscript sections" in disclosure
+        and "Figs.~2--3" in disclosure
+        and "raster artwork for Figs.~1 and~4" in disclosure,
         "Generative-AI disclosure must identify the generated prose/figure scope",
     )
     design = re.sub(r"\s+", " ", DESIGN.read_text(encoding="utf-8"))
     implementation = re.sub(
         r"\s+", " ", IMPLEMENTATION.read_text(encoding="utf-8")
     )
-    require(
-        "first compiles $C_t$" in design
-        and "triggered L2b screen qualifies" in design
-        and design.index("first compiles $C_t$")
-        < design.index("triggered L2b screen qualifies")
-        < design.index("The dispatch boundary verifies"),
-        "design must preserve contract -> optional screen -> authorization order",
+    require_tokens(
+        "two-stage design structure",
+        design,
+        (
+            "two alignment stages and three components",
+            "L1 Intent-to-ActionBlock Assessment",
+            "L2 ActionBlock-to-Execution Alignment",
+            "L2a Transaction Binding",
+            "L2b State-Conditioned Guard Screening",
+            "Its contract states which evidence must be observed",
+            "Triggered guard screening occurs before the corresponding dispatch",
+            "Receipts and effects then close the transaction",
+        ),
     )
-    runtime_order = (
-        "policy output",
-        "assessment",
-        "contract construction",
-        "optional guard screening",
-        "authorization",
-        "dispatch",
-        "receipts",
-        "effects",
-    )
-    runtime_clause = implementation[
-        implementation.index("a runtime wrapper orders") :
-    ]
-    runtime_positions = [runtime_clause.index(token) for token in runtime_order]
-    require(
-        runtime_positions == sorted(runtime_positions),
-        "implementation module order drifted from the integrated transaction",
+    require_tokens(
+        "implementation component structure",
+        implementation,
+        (
+            "The \\lone component derives a task graph",
+            "The \\ltwoa component holds the current proposal",
+            "The \\ltwob component snapshots simulator and controller state",
+            "before real dispatch",
+            "source-action identity is encoded as schema-tagged",
+            "whitespace-free UTF-8 JSON over finite Python-float values",
+            "array dtype or endianness",
+        ),
     )
     require(
-        "complete mediation is conditional on the TCB" in implementation
-        and "uninstrumented actuator path" in implementation,
-        "reference-monitor prose must retain the deployment bypass boundary",
+        "sole environment-step interface" in implementation
+        and "complete mediation assumes" in implementation,
+        "reference-monitor prose must retain the complete-mediation assumption",
     )
     require(
         "fresh nonce" not in design
-        and "fresh one-use authorization bound to the episode nonce" in design,
-        "design must distinguish the episode nonce from each fresh authorization",
+        and "A fresh permission names the proposal" in design
+        and "can open exactly one transaction" in design,
+        "design must retain a fresh, one-use proposal permission",
     )
     ethics = re.sub(r"\s+", " ", ETHICS.read_text(encoding="utf-8"))
     require(
-        "no human subjects, personal data, or undisclosed real-system vulnerability"
-        in ethics,
+        "The study is simulator-only" in ethics
+        and "every attack, benchmark agent, and contact" in ethics
+        and "is synthetic" in ethics,
         "ethics statement must disambiguate the simulated human_safety suite",
     )
 
@@ -197,65 +201,109 @@ def validate_source_structure() -> list[str]:
         "abstract evidence summary",
         abstract,
         (
-            "39 of 86",
-            "45.35\\%",
-            "[32.93\\%, 57.78\\%]",
-            "11/18 tasks",
-            "13/18",
-            "4/18, 1/18, 0/18, and 0/18",
-            "39.79\\,ms",
-            "18.30\\,ms p95",
-            "no 100\\,ms miss",
-            "complete 120-unit attack-evaluation protocol",
-            "empirical studies run in LIBERO-Safety simulation",
+            "intent--action authorization gap",
+            "action--execution realization gap",
+            "establishes a scoped alignment chain across the two gaps",
+            "Among 86 clean-eligible units",
+            "observed ASR of 45.35\\%",
+            "A separate paired four-arm study provides no evidence of a broad risk reduction",
+            "none of its 237 valid attacked \\ltwoenabled traces contains a joint-limit step",
+            "The claims remain checker-relative",
+            "registered joint boundary, frozen attack family, checkpoint, and simulator",
         ),
     )
     require_tokens(
         "introduction contribution summary",
         introduction,
         (
-            "\\mathsf{ProofAligned}",
-            "complete 120-unit attack-evaluation protocol",
-            "paired four-arm mechanism study",
-            "does not recover a model's latent intent",
-            "establish general robot safety",
+            "In the motivating SABER case",
+            "This missing composition exposes two alignment gaps",
+            "\\lone aligns trusted task intent with the exact source \\actionblock",
+            "\\ltwo aligns the admitted source block with execution",
+            "The attack reproduction yields an observed ASR of 45.35\\%",
+            "common 75-unit cohort has broad risk-transition rates",
+            "Under attack, \\dual task success is 53.33\\%, compared with 60.83\\% for \\vlaonly",
+            "237 valid attacked \\ltwoenabled traces",
+            "A two-stage cross-layer reference monitor",
+            "An attack reproduction and paired system characterization",
         ),
     )
     require_tokens(
         "evaluation primary results",
         evaluation,
         (
-            "39/86=45.35\\%",
-            "4/18 (22.22\\%)",
-            "1/18 (5.56\\%)",
-            "6438.1998<10000",
-            "39.79\\,ms",
-            "18.30\\,ms",
-            "100\\,ms miss rate is zero",
-            "preregistered Bonferroni correction",
-            "permits at most a 20-percentage-point task-success loss",
-            "not a deployment-derived utility threshold",
-            "MuJoCo generalized-constraint-force value",
-            "not a calibrated end-effector force",
-            "checks execution/restore consistency",
-            "not prediction under dynamics mismatch",
-            "VLA-only is the unchanged runtime baseline",
-            "not a claim of outperforming every VLA safety system",
-            "authorization--receipt--effect transaction",
+            "The complete population contains 60 task/initialization base pairs",
+            "Two independently seeded executions of every pair yield 120 seed-specific evaluation units",
+            "$120\\times2\\times4=960$ attempts",
+            "\\vlaonly is the unchanged runtime baseline",
+            "\\loneonly and \\ltwoonly are stage ablations",
+            "\\dual is the final composed \\system prototype",
+            "Each condition contains 98.96\\% valid traces (475/480)",
+            "The four-arm results are therefore nonconfirmatory",
+            "A clean trace is eligible if it is valid, achieves strict task success",
+            "Clean contact, joint-limit, and force counts need not be zero",
+            "Task failure alone is excluded",
+            "\\label{tab:task-success}",
+            "\\label{tab:risk-transition}",
+            "70.83\\% (85/120) & 60.83\\% (73/120)",
+            "65.00\\% (78/120) & 53.33\\% (64/120)",
+            "52.94\\% (45/85) & 50.67\\% (38/75)",
+            "53.85\\% (42/78) & 56.00\\% (42/75)",
+            "50.00\\% (43/86) & 48.00\\% (36/75)",
+            "55.13\\% (43/78) & 57.33\\% (43/75)",
+            "10.92\\% of clean traces (13/119)",
+            "14.29\\% of attacked traces (17/119)",
+            "4.76\\% (5/105)",
+            "form 237 \\ltwoenabled traces",
+            "trace-level incidence of 0.00\\% (0/237)",
+            "record 4,960 and 2,452 joint-limit steps",
+            "All 69 focused transaction and runner cases reach their expected state (100\\%)",
+            "performs 78,434 screens",
+            "0.41\\% of screens exceed 100\\,ms (323/78,434)",
+            "maximum is 458.99\\,ms",
+            "maximum-at-most-200\\,ms criterion therefore fails",
+            "229.5709",
+            "$2.41\\times10^{-5}$\\,rad",
+            "force proxy differs from the predispatch shadow-force candidate gate",
+            "1.05\\% of valid \\ltwoenabled episodes (5/474)",
+            "0.0034\\% of performed screens (5/146,397)",
         ),
+    )
+    require(
+        evaluation.count("\\begin{table}[t]") == 2,
+        "evaluation must retain exactly two core result tables",
     )
     require_tokens(
         "conclusion claim summary",
         conclusion,
         (
-            "39/86 (45.35\\%)",
-            "complete attack-evaluation protocol",
-            "13/18 attacked task success",
-            "0/18 observed joint-limit violation episodes",
-            "frozen simulator setting",
-            "hard-real-time analysis",
-            "\\mathsf{ProofAligned}",
+            "cross-layer reference monitor for two alignment stages",
+            "45.35\\% attack-induced risk-transition rate among 86 clean-eligible units (39/86)",
+            "120-unit four-arm study",
+            "960 episode attempts",
+            "98.96\\% valid traces in each condition (475/480)",
+            "system comparisons remain nonconfirmatory",
+            "common 75-unit cohort",
+            "Under attack, task success is 60.83\\% for \\vlaonly and 53.33\\% for \\dual",
+            "237 valid attacked \\ltwoenabled traces",
+            "record 4,960 and 2,452 such steps",
+            "does not establish a broad robot-safety improvement",
         ),
+    )
+
+    forbidden_active_tokens = (
+        "13/18",
+        "0/18",
+        "cluster-bootstrap CI",
+        "95\\% CI",
+        "tab:main-results",
+        "<<<<<<<",
+        ">>>>>>>",
+    )
+    forbidden_hits = [token for token in forbidden_active_tokens if token in joined]
+    require(
+        not forbidden_hits,
+        f"active paper source contains forbidden legacy tokens: {forbidden_hits}",
     )
 
     require(SUBMISSION_METADATA.is_file(), "HotCRP copy/paste metadata sheet is missing")
@@ -268,18 +316,17 @@ def validate_source_structure() -> list[str]:
     )
     metadata_tokens = (
         "ProofAlign: Cross-Layer Runtime Integrity for Embodied",
-        "39 of 86",
-        "45.35%",
-        "[32.93%, 57.78%]",
-        "complete 120-unit attack-evaluation protocol",
-        "18 task/initialization pairs",
-        "144-episode",
-        "11/18",
-        "13/18",
-        "4/18, 1/18, 0/18, and 0/18",
-        "39.79 ms",
-        "18.30 ms p95",
-        "100 ms miss",
+        "intent–action authorization gap",
+        "action–execution realization gap",
+        "Among 86 clean-eligible units",
+        "observed ASR is 45.35%",
+        "960 episode attempts",
+        "98.96% valid traces (475/480)",
+        "comparisons remain nonconfirmatory",
+        "50.67%, 56.00%, 48.00%, and 57.33%",
+        "Dual task success is 53.33%, compared with 60.83% for VLA-only",
+        "237 valid attacked L2-enabled traces",
+        "0.00% contain a joint-limit step",
         "LaTeX/TikZ diagrams",
     )
     missing_metadata = [
@@ -298,8 +345,8 @@ def validate_pdf() -> None:
     require(PDF.is_file(), f"compiled PDF missing: {PDF}")
     info = run_checked("PDF metadata readable", ["pdfinfo", str(PDF)], cwd=PAPER_ROOT)
     require(
-        re.search(r"^Pages:\s+14$", info, re.M) is not None,
-        "PDF must remain 14 total pages with technical content ending on page 13",
+        re.search(r"^Pages:\s+15$", info, re.M) is not None,
+        "PDF must remain 15 total pages with technical content ending on page 13",
     )
     require(
         re.search(r"^Page size:\s+612 x 792 pts \(letter\)$", info, re.M) is not None,
@@ -309,27 +356,36 @@ def validate_pdf() -> None:
         match = re.search(rf"^{field}:\s*(.*)$", info, re.M)
         require(match is None or not match.group(1).strip(), f"PDF metadata leaks {field}")
 
-    page_13 = run_checked(
-        "PDF page 13 text readable",
-        [find_poppler_tool("pdftotext"), "-f", "13", "-l", "13", str(PDF), "-"],
+    technical_tail = run_checked(
+        "PDF pages 12--13 text readable",
+        [find_poppler_tool("pdftotext"), "-f", "12", "-l", "13", str(PDF), "-"],
         cwd=PAPER_ROOT,
     )
-    page_14 = run_checked(
-        "PDF page 14 text readable",
-        [find_poppler_tool("pdftotext"), "-f", "14", "-l", "14", str(PDF), "-"],
+    excluded_pages = run_checked(
+        "PDF excluded pages 14--15 text readable",
+        [find_poppler_tool("pdftotext"), "-f", "14", "-l", "15", str(PDF), "-"],
         cwd=PAPER_ROOT,
     )
-    require("CONCLUSION" in page_13.upper(), "Conclusion must begin by page 13")
-    require("APPENDIX" in page_14.upper(), "Appendix must remain on the excluded final page")
-    forbidden_final_page = (
+    require("CONCLUSION" in technical_tail.upper(), "Conclusion must begin by page 13")
+    require(
+        all(
+            token in technical_tail.upper()
+            for token in ("GENERATIVE-AI DISCLOSURE", "ETHICS CONSIDERATIONS", "REFERENCES")
+        ),
+        "pages 12--13 must contain the conclusion followed by disclosure, ethics, and references",
+    )
+    forbidden_excluded_pages = (
         "IX. CONCLUSION",
         "VII. SECURITY ANALYSIS AND DISCUSSION",
         "VIII. RELATED WORK",
         "VI. EVALUATION",
     )
     require(
-        not any(token in page_14.upper() for token in forbidden_final_page),
-        "page 14 must contain only references and appendix material",
+        not any(
+            token in excluded_pages.upper()
+            for token in forbidden_excluded_pages
+        ),
+        "pages 14--15 must contain only references",
     )
 
     require(LOG.is_file(), f"LaTeX log missing: {LOG}")
@@ -365,8 +421,9 @@ def validate_pdf() -> None:
         "PDF must retain Times-compatible text and NewTX math fonts",
     )
     print(
-        "PASS  PDF is 14 total pages on US Letter; technical content ends on page 13, "
-        "page 14 contains only references/appendix material, and metadata, fonts, and log pass"
+        "PASS  PDF is 15 total pages on US Letter; technical content ends on page 13, "
+        "pages 14--15 contain only references, "
+        "and metadata, fonts, and log pass"
     )
 
 
@@ -386,7 +443,7 @@ def main() -> int:
 
     try:
         run_checked(
-            "LaTeX source tree and 38 citations",
+            "LaTeX source tree and resolved citations",
             ["ruby", "scripts/check_source.rb"],
             cwd=PAPER_ROOT,
         )

@@ -1,61 +1,95 @@
 \section{Security Analysis and Discussion}
 \label{sec:discussion}
 
-\subsection{What the Results Establish}
+\subsection{What the Evidence Shows}
 
-The paired study illustrates two empirical roles on the frozen sample.  L1-only records the same aggregate task-success count under clean and attacked inputs (13/18), but does not contain the full duration of residual joint-limit risk.  L2-on arms record zero observed joint-limit outcomes but do not show an independent task-success gain.  Dual combines these two sample outcomes without reducing L1's aggregate success count.  This mechanism-level interpretation is more precise than claiming that a single ``safety layer'' improves every metric.
+The two studies answer different questions.  The independent attack
+reproduction shows that a bounded SABER instruction perturbation can propagate
+through an unprotected \vla to the registered physical-risk endpoint.  Its
+observed ASR is 45.35\% among 86 clean-eligible units (39/86).  The four-arm
+study then characterizes the final \system prototype and its stage ablations at
+the consumer boundary.  It shows predispatch rejection for the covered C1 findings, the
+expected response to the exercised C2 transaction faults, and 0.00\%
+trace-level joint-limit incidence across 237 valid attacked \ltwoenabled traces.
 
-The evidence for L2 also has two sources.  SABER outcomes primarily test L2b's
-physical containment.  Focused substitution, replay, receipt/effect mismatch,
-and incomplete-prefix cases exercise Python's transaction checks; Lean
-separately establishes the finite authorization, ordered-action, receipt,
-effect, and phase relations described in Section~\ref{sec:implementation}.  We
-do not treat those theorems as an end-to-end Python refinement proof.  The
-four-arm table cannot identify an independent causal effect for each L2
-subcomponent because they are enabled together.
+The system-level result does not show a broad safety improvement.  On the common
+75-unit cohort, the broad risk-transition rates are 50.67\%, 56.00\%, 48.00\%,
+and 57.33\%, and no monitored arm provides evidence of a reduction relative to
+\vlaonly.  Under attack, \dual task success is 53.33\%, compared with 60.83\%
+for \vlaonly.  Moreover, each condition is 98.96\% valid against a registered
+100\% requirement, so the four-arm results cannot support a confirmatory
+overall-effect claim.  The
+paper therefore treats the C1, C2, and joint-side observations as bounded
+property evidence, not as proof that \system makes the robot generally safer.
 
-\subsection{Selector and Checker Failure}
+\subsection{Why Local Properties Do Not Imply End-to-End Safety}
 
-A syntactically valid but incorrect $Z_t$ can cause semantic false allow.  A local checker can also miss an action incompatible with the current subtask.  Conversely, excessive \texttt{unknown} decisions can cause fail-closed utility loss.  Our finite-corpus qualification establishes expected behavior on a frozen privileged-geometry corpus; it does not guarantee distribution-shift robustness.
+The evaluation illustrates why the three components must be interpreted
+separately.  \lone and \ltwo protect different alignment stages; \ltwoa and
+\ltwob supply distinct evidence within the second stage.  \taskassessment
+enforces a declared checker vocabulary against an
+independently anchored task state.  It can stop a covered hard finding before
+dispatch, but an incomplete checker can reject useful actions or miss hazards
+outside its predicates.  The observed task-completion loss is therefore not an
+incidental reporting detail; it is the availability cost of the current checker
+boundary.
 
-Task-progress advisory handling is a central limitation.  Because the current checker does not universally reject progress mismatches, L1 should be understood as a trusted-task monitor with checker-relative assessment.  Strengthening it requires a qualified action-conditioned outcome model or a more complete trusted state abstraction, followed by preregistered false-allow and clean-reject gates.
+\transactionbinding answers a different question.  It determines whether
+execution evidence still refers to the proposal that received permission.  It prevents a covered
+substitution or replay from being mistaken for aligned execution, but a faithfully
+executed authorized action can still be physically undesirable.  It also cannot
+detect a trusted sink that changes both the action and the evidence it reports.
 
-\subsection{Common-View Failure}
+\guardscreening targets one registered joint-side condition.  Its zero
+joint-limit observation in valid attacked \ltwoenabled traces is consistent with that
+local goal, while the broader endpoint still includes contact, force,
+cost/collision, and other pathways not eliminated by the joint guard.  Changing
+the guard/controller configuration can also alter task progress even though the
+policy-emitted source action remains fixed.  Consequently, source-action
+integrity, local constraint enforcement, task success, and broad physical risk
+are related but non-equivalent properties.
 
-The trusted branch is useful only when its observation path is genuinely independent of the attacked policy view.  A pre-split physical perturbation, root-level frame injection, or compromised task adapter can make both branches agree on a false scene.  Addressing this class requires trusted capture, sensor redundancy, or hardware-backed evidence; hashing a compromised image does not make it true.
+\subsection{Dependence on the TCB and Registered Models}
 
-\subsection{Observer and Contract Failure}
+The authorization claim depends on a task and observation path that is
+independent of the attacked policy view.  The evaluated prototype realizes this
+path with privileged simulator task state and geometry.  A deployable camera-only
+or sensor-based trusted path would need its own integrity and accuracy evidence;
+errors before the trusted split are outside the current guarantee.
 
-L2a enforces the atoms present in its contract.  If a security-relevant physical effect is absent, or if actuator feedback is forged inside the TCB, the transaction can be internally aligned yet externally misleading.  Receipt freshness also depends on the single-dispatch boundary remaining complete.  The negative integrity suite tests the modeled substitutions; it cannot prove that no unmodeled dispatch path exists.
+The execution claim assumes complete mediation, protected monitor state, and
+truthful receipts and actuator feedback.  Contract binding ranges only over the
+effects the contract declares, so omitted hazards remain uncovered.  Likewise,
+the checker-relative claim depends on the registered predicates.  Unknown
+inputs trigger configured fail-closed handling; no general semantic judgment
+follows.
 
-\subsection{Simulator and Controller Gap}
+The guard evidence uses the LIBERO/robosuite dynamics
+~\cite{robosuite2020} and the same simulator model for shadow screening and
+post-restore execution.  It qualifies snapshot restoration and the registered
+joint-margin and force measurements in that environment.  It does not establish
+model fidelity, robustness to real sensor noise, or physical-robot safety.  The
+Lean model is narrower still: it checks selected abstract authorization,
+ordered-action, evidence, and phase relations, not the prototype-to-model
+refinement or continuous dynamics.
 
-L2b depends on LIBERO/robosuite dynamics, virtual stops, snapshot restore, and the benchmark force proxy.  Compliance, friction, saturation, and latency on a physical robot can change the result.  Moreover, a virtual guard changes the controller-to-motion map while preserving the source action.  The runtime audits this configuration, but the Lean contract does not yet type-bind it.  A stronger cross-layer claim requires an executable identity such as
-\begin{equation}
-(A_t,\mathit{guard\_config},\mathit{controller\_config},\mathit{state\_epoch})
-\end{equation}
-and refinement evidence connecting its serialized runtime representation to the formal model.
+\subsection{Statistical and Empirical Limitations}
 
-\subsection{Scope and Statistical Limits}
+The four-arm study produced 1.04\% invalid rows in each condition (5/480)
+against a registered zero-invalid requirement.  Task counts retain all 120 units with
+invalid runs counted as failures, but the broad-risk comparison uses 75 units
+that are eligible and valid in every arm.  That common cohort enables a matched
+comparison with a shared denominator; it is not a full-population causal
+estimate.  The zero joint-limit result similarly covers only the 237 valid
+attacked \ltwoenabled traces and cannot be extended to invalid runs.
 
-The current evidence covers one $\pi_{0.5}$ checkpoint, LIBERO-Safety, one
-frozen SABER instruction-attack family, and 18 paired mechanism workloads.  The
-attack records were not adapted after observing \system.  Recent work shows
-that defenses evaluated only against static attacks can fail under a
-defense-aware adaptive attacker~\cite{adaptivesecond2026}; our observed
-containment is therefore not evidence of adaptive robustness.  The 240-episode
-attack-risk measurement and the paired four-arm study use different
-populations, denominators, and event definitions and cannot be pooled into a
-stronger statistical result.  In particular, the 144-episode mechanism study
-is not yet a defended rerun over the complete 120-unit attack protocol.  It is
-too small for fine-grained task/suite subgroup conclusions.
-
-The most direct evidence gaps are a larger defended run, additional seeds or attack
-families, and an L2a/L2b sub-ablation.  Broader claim expansion would separately
-require other checkpoints, trusted visual perception, controller-configuration
-binding, and real-robot experiments.  None is evidence for the current result
-until it is separately registered and executed.
-
-\subsection{Ethics and Responsible Use}
-
-All experiments are simulator-only.  We report the observed attack ASR, retained risk steps, and all final sample outcomes; the system is neither a certified machinery safeguard nor a recommendation for unsupervised deployment.
+The empirical scope contains one $\pi_{0.5}$ checkpoint, one simulator
+benchmark, and one frozen SABER instruction-attack family.  Defense-aware
+adaptive attacks are not evaluated, although recent work shows their importance
+~\cite{adaptivesecond2026}.  Other visual or post-inference channels belong to
+the threat model but are represented here only by focused transaction cases, not
+full end-to-end attack campaigns.  Finally, the 458.99\,ms maximum screening
+latency violates the registered 200\,ms bound, so the prototype has no
+hard-real-time guarantee.  Broader attack families, trusted perception, more
+complete physical predicates, and real-robot evaluation are necessary before
+claiming wider protection.

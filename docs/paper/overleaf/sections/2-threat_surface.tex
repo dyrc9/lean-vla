@@ -1,106 +1,156 @@
 \section{Background and Motivation}
 \label{sec:background}
 
-\subsection{The Embodied VLA Execution Boundary}
+\subsection{The Action-Only Execution Boundary}
 
-An embodied VLA deployment has three logical roles.  An operator or scheduler
-supplies a task; a policy maps a task view and multimodal observations to a
-continuous action chunk; and a consumer translates that chunk into commands at
-an actuator-facing boundary.  The environment then evolves, new observations
-arrive, and the policy replans.  This is the ordinary execution path of a VLA
-system, independent of whether evaluation uses a simulator or a physical
-robot.
+An embodied \vla deployment has three logical roles.  An operator or scheduler
+supplies a task, a policy maps its task view and multimodal observations to a
+continuous \actionblock, and a consumer sends the block to an actuator-facing
+controller.  After the block is consumed, the environment supplies a new
+observation and the policy replans.  The policy therefore exports neither a
+trusted task proof nor a predeclared reference trajectory; it exports an ordered
+numeric proposal~\cite{pi05}.
 
-Our implementation instantiates this path with OpenPI $\pi_{0.5}$~\cite{pi05}.
-The policy consumes base and wrist RGB, end-effector position and axis--angle
-orientation, gripper state, and a task prompt.  It returns a $10\times7$
-\actionblock whose rows contain 3-D translation, 3-D rotation, and gripper
-commands.  The consumer executes those rows before requesting the next block.
-The training system may use rich semantic supervision, and language action
-hierarchies can be useful control abstractions~\cite{pi05,rth2024}; the deployed
-consumer nevertheless receives the numeric block that will cross the control
-boundary.
+For policy call $t$, write the source block as
+\begin{equation}
+A_t=(a_{t,0},\ldots,a_{t,H-1})\in\mathbb{R}^{H\times d}.
+\label{eq:action-block-background}
+\end{equation}
+The consumer must decide whether this block is admissible, ensure that its rows
+reach the controller in the intended order, and interpret the effects observed
+after execution.  These are different questions: a task-relative assessment
+does not itself establish execution integrity, and faithful dispatch does not
+itself establish a physical safety property.
 
-That block has no inherent evidence that it is admissible for the current task,
-that later software will preserve it, or that its realization is qualified for
-the current robot state.  A policy explanation shares the policy's input
-context, a prompt log establishes only what the model consumed, and a later
-task outcome arrives too late to authorize dispatch.  We therefore treat every
-source block as an untrusted proposal until the consumer discharges explicit
-proof obligations over it.
+\subsection{How Attacks Reach the Same Object}
 
-\subsection{From Input Corruption to Physical Execution}
+SABER perturbs policy-facing instructions, FreezeVLA perturbs visual input, and
+embodied-agent jailbreaks manipulate language or multimodal context
+~\cite{saber2026,freezevla2025,badrobot2025,robopair2025}.  Although these attacks
+enter through different modalities, their physical influence is mediated by the
+online block produced at the action-only interface.  They instantiate the
+\intentaction surface; RQ1 exercises the SABER instruction channel.
 
-Instruction, visual, and history attacks enter through different channels, but
-they affect the physical world only through commands accepted by the execution
-stack.  Their common convergence point is therefore the concrete online
-\actionblock.  After proposal, two further failures remain possible:
-transaction corruption can substitute, replay, reorder, or misbind the block;
-and state-dependent realization can make unchanged source values violate a
-covered physical boundary.  Monitoring only the model input, only the proposed
-action, or only the final outcome cannot cover this lifecycle.
+After inference, a software
+adversary can target the same lifecycle by substituting the source block,
+reordering or omitting steps, replaying an earlier permission, or attaching
+receipts and effects from a different proposal
+~\cite{diat2019,cfaplus2024,arto2026,tat2026}.  These faults target the
+\actionexecution transaction path enforced by \ltwoa.
 
-This observation supplies the organizing insight of \system: the
-\actionblock is the hinge between VLA reasoning and embodied execution.  The
-consumer should attach task-relative justification to that exact object before
-dispatch, preserve its identity through the execution transaction, and qualify
-its state-dependent realization without silently replacing it.
+The meaning of an accepted source action also depends on state and execution
+configuration.  The same controller input can realize differently as joint
+margins, contacts, or controller constraints change
+~\cite{vlmpc2024,safetychance2024,measurementrobustcbf2021,
+realizableshields2025}.  This state-dependent realization risk is the registered
+target of \ltwob and need not arise from a separate attacker action.  The
+security question spans the path from task authority, through the generated
+block, to ordered execution and state-conditioned physical realization.
 
-\subsection{Where Existing Protection Stops}
+\subsection{Where Existing Protection Boundaries Stop}
 
-Two security literatures meet at the \actionblock but do not protect the same
-edge.  On the authorization side, structured prompting, alignment, and trusted
-agent-control-flow systems separate instructions from untrusted data or derive
-digital actions from a protected query~\cite{struq2025,secalign2025,camel2026,
-ace2026}.  VLA-specific systems score or select action candidates against a
-plan or learned instruction--action representation
-~\cite{sealvla2026,covervla2026}.  These approaches can strengthen an upstream
-checker, but they do not by themselves bind the chosen continuous command to
-actuator receipts and effects.
+Upstream defenses establish trusted inputs, protected digital control flow, or
+an assessment over one or more policy candidates
+~\cite{struq2025,secalign2025,camel2026,ace2026,sealvla2026,covervla2026}.
+Their evidence ends before the full actuator transaction.  Execution-side
+systems establish integrity for protected programs, control flow, or reference
+motion~\cite{diat2019,cfaplus2024,arto2026,scaphy2023,tat2026}; their authority
+begins from an already specified program or trajectory.  Prediction and
+shielding qualify possible consequences or a local safety set, but do not by
+themselves connect that decision to an independently anchored task assessment of
+the newly generated block.
 
-On the realization side, CPS integrity systems attest software control/data
-flow.  TAT derives event-level reference motion from an instrumented task
-program and offline executions, then checks trusted event and joint evidence
-against those profiles~\cite{diat2019,cfaplus2024,arto2026,tat2026}.  Their
-integrity roots are stronger than ours, but they begin with a selected program
-and reference motion.  A VLA instead creates a new continuous command online,
-for which no unique trusted trajectory need exist.  The missing bridge is:
-task-relative assessment $\rightarrow$ exact online proposal $\rightarrow$
-actual execution evidence.
+Table~\ref{tab:capability-comparison} summarizes these stopping points using
+the six capabilities that define the protected lifecycle in this paper.
+
+\begin{table*}[t]
+\centering
+\caption{Capability coverage across adjacent defenses at the action-only
+boundary.  For a family row, a check means that at least one cited member states
+a mechanism matching the column; a cross marks a capability outside the row's
+stated endpoint.  The symbols do not rank overall system strength.}
+\label{tab:capability-comparison}
+\footnotesize
+\setlength{\tabcolsep}{3.4pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}X*{6}{>{\centering\arraybackslash}p{0.096\textwidth}}}
+\toprule
+Work family & \shortstack{Trusted/\\untrusted\\authority split}
+  & \shortstack{Task--action\\assessment}
+  & \shortstack{Exact action\\identity}
+  & \shortstack{Receipt/effect\\binding}
+  & \shortstack{Physical\\qualification}
+  & \shortstack{Formal/\\attested\\semantics} \\
+\midrule
+StruQ, SecAlign~\cite{struq2025,secalign2025}
+  & \pacovered & \panotcovered & \panotcovered & \panotcovered & \panotcovered & \panotcovered \\
+AttriGuard~\cite{attriguard2026}
+  & \pacovered & \pacovered & \pacovered & \panotcovered & \panotcovered & \panotcovered \\
+CaMeL, ACE~\cite{camel2026,ace2026}
+  & \pacovered & \pacovered & \pacovered & \panotcovered & \panotcovered & \pacovered \\
+SEAL, CoVer~\cite{sealvla2026,covervla2026}
+  & \panotcovered & \pacovered & \panotcovered & \panotcovered & \panotcovered & \panotcovered \\
+DIAT, CFA+, ARTO, SCAPHY~\cite{diat2019,cfaplus2024,arto2026,scaphy2023}
+  & \pacovered & \panotcovered & \panotcovered & \pacovered & \pacovered & \pacovered \\
+TAT~\cite{tat2026}
+  & \pacovered & \panotcovered & \panotcovered & \pacovered & \pacovered & \pacovered \\
+Prediction and shielding~\cite{vlmpc2024,safetychance2024,measurementrobustcbf2021,realizableshields2025}
+  & \panotcovered & \pacovered & \panotcovered & \panotcovered & \pacovered & \pacovered \\
+\textbf{\system}
+  & \pacovered & \pacovered & \pacovered & \pacovered & \pacovered & \pacovered \\
+\bottomrule
+\end{tabularx}
+\end{table*}
+
+The missing composition is therefore a proposal-scoped lifecycle with two
+stages.  The first links authoritative task state to assessment of the source
+block.  The second links an admitted block to ordered dispatch, receipts, and
+effects, with an additional qualification obligation when robot state approaches
+the registered boundary.  Section~\ref{sec:related} gives the detailed
+comparison.  These stopping points yield the design requirements below.
 
 \subsection{Three Design Challenges}
 
-The insight above produces three verification challenges.  \textbf{C1:
-semantic-to-continuous assessment.}  A task stage admits many valid
-trajectories.  Without a complete semantic oracle, the monitor must distinguish
-covered violations from uncertainty rather than equating a proxy with task
-correctness.  \textbf{C2: execution identity.}  An assessed block can still be
-substituted, replayed, reordered, partially executed, or paired with receipts
-and effects from another proposal.  Equality at one software boundary is
-insufficient.  \textbf{C3: state-dependent containment.}  The same block may be
-benign in one state and cross a joint boundary in another, yet rewriting its
-values would invalidate the assessment and authorization object.
+\textbf{C1. Bind semantic authority to a continuous proposal.}
+A task phase can admit many valid continuous trajectories, so a monitor cannot
+simply compare the policy output with one reference motion.  It needs an
+independently anchored description of the current legal subtask and a checker
+whose verdict states exactly which properties it covers.  Covered hard risks
+must block execution, while uncertain task progress must not be presented as a
+complete semantic guarantee.
 
-These are ordered obligations, not interchangeable filters.  L1 records a
-checker-relative assessment over the exact source block.  L2a preserves that
-identity through a one-use execution transaction.  L2b qualifies a covered
-near-boundary realization while retaining the source action.  The protected
-task state and observation tap on which L1 relies are stated explicitly as TCB
-assumptions in Section~\ref{sec:model}, not presented as a challenge that the
-monitor can manufacture.
+\textbf{C2. Preserve proposal identity through execution.}
+An assessment is useful only if later permission, dispatch, receipts, effects,
+and task-phase advance refer to the same proposal and observation epoch.  The
+consumer must reject substitution, replay, reordering, partial evidence, and
+cross-proposal splicing while ensuring that failed evidence cannot be mistaken
+for successful completion.
+
+\textbf{C3. Qualify state-dependent realization without changing the source
+action.}
+Near a physical boundary, the controller configuration may need to change how a
+source action is realized.  The design must keep the policy-produced row fixed,
+make the selected guard/controller configuration explicit, and qualify that
+combination before dispatch.  ``Same action'' therefore means the same policy
+output at the protected controller boundary, not an assertion that every
+controller configuration produces an identical physical trajectory.
 
 \begin{table}[t]
 \centering
-\caption{Challenges and the mechanism responsible for each security edge.}
+\caption{The two alignment stages and their three component obligations.}
 \label{tab:challenges}
 \footnotesize
 \begin{tabularx}{\columnwidth}{l>{\raggedright\arraybackslash}Xl}
 \toprule
-& Required invariant & Mechanism \\
+Component & Required invariant & Stage \\
 \midrule
-C1 & Verdict names the exact continuous source block and checker scope & L1 \\
-C2 & Authorization, ordered dispatch, receipts, and effects share identity & L2a \\
-C3 & Near-boundary execution qualifies without source-action replacement & L2b \\
+\lone (C1) & Verdict names the source block and checker scope & I \\
+\ltwoa (C2) & Permission, dispatch, receipts, and effects share one proposal & II \\
+\ltwob (C3) & Qualification names the fixed source action and configuration & II \\
 \bottomrule
 \end{tabularx}
 \end{table}
+
+The next section turns these challenges into an adversary model, trusted
+assumptions, and lifecycle security objective.  Section~\ref{sec:design} then
+presents the three corresponding components within the two stages.
