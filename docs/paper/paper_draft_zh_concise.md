@@ -509,8 +509,8 @@ authorization，L2b 提供风险触发的 joint containment，L2a 将获准动�
 
 > 以下使用工作引用键；迁移到投稿 LaTeX 时统一替换为正式 BibTeX，并复核2026论文的最终元数据。
 
-- **[SABER]** [SABER: A Stealthy Agentic Black-Box Attack Framework for Vision-Language-Action Models](https://arxiv.org/abs/2603.24935), IROS, 2026.
-- **[LIBERO-Safety]** [LIBERO-Safety](https://arxiv.org/abs/2606.23686), ECCV, 2026.
+- **[SABER]** [SABER: A Stealthy Agentic Black-Box Attack Framework for Vision-Language-Action Models](https://arxiv.org/abs/2603.24935), arXiv, 2026（作者主页称已被 IROS 2026 接收；当前仍按 arXiv 官方元数据著录）。
+- **[LIBERO-Safety]** [LIBERO-Safety](https://arxiv.org/abs/2606.23686), arXiv, 2026（已被 ECCV 2026 接收）。
 - **[SafeVLA-Bench]** [SafeVLA-Bench](https://arxiv.org/abs/2606.00773), 2026.
 - **[VLASurvey]** [Vision-Language-Action Safety: Threats, Challenges, Evaluations, and Mechanisms](https://arxiv.org/abs/2604.23775), 2026.
 - **[FreezeVLA]** [FreezeVLA](https://arxiv.org/abs/2509.19870), 2025.
@@ -523,7 +523,7 @@ authorization，L2b 提供风险触发的 joint containment，L2a 将获准动�
 - **[AttriGuard]** [AttriGuard](https://www.usenix.org/conference/usenixsecurity26/presentation/he-yu), USENIX Security, 2026.
 - **[MATE]** [MATE](https://www.usenix.org/conference/usenixsecurity26/presentation/jiang-changyue), USENIX Security, 2026.
 - **[SEAL]** [Do What You Say: Runtime Reasoning–Action Alignment Verification](https://arxiv.org/abs/2510.16281), ICRA, 2026.
-- **[CoVer]** [Scaling Verification Can Be More Effective than Scaling Policy Learning for VLA Alignment](https://arxiv.org/abs/2602.12281), arXiv；ScaleBot @ CVPR workshop, 2026.
+- **[CoVer]** [Scaling Verification Can Be More Effective than Scaling Policy Learning for VLA Alignment](https://arxiv.org/abs/2602.12281), arXiv, 2026（另有 ScaleBot @ CVPR 2026 workshop 的官方 OpenReview 记录）。
 - **[OAT]** [OAT: Attesting Operation Integrity of Embedded Devices](https://www.longlu.org/publication/oat/), IEEE S&P, 2020.
 - **[DIAT]** [DIAT: Data Integrity Attestation for Resilient Collaboration of Autonomous Systems](https://www.ndss-symposium.org/ndss-paper/diat-data-integrity-attestation-for-resilient-collaboration-of-autonomous-systems/), NDSS, 2019.
 - **[ARI]** [ARI: Attestation of Real-time Mission Execution Integrity](https://www.usenix.org/conference/usenixsecurity23/presentation/wang-jinwen), USENIX Security, 2023.

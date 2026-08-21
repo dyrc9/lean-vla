@@ -2,9 +2,11 @@ paper_ndss.tex
 IEEEtran.cls
 macro.tex
 paper.bib
-figures/system_overview.tex
+figures/motivation_boundary_raster_v2_square.png
+figures/system_overview_raster_v1.png
 figures/execution_transaction.tex
 figures/evaluation_design.tex
+figures/evaluation_design_raster_v3.png
 figures/main_results.tex
 sections/abstract.tex
 sections/1-introduction.tex
@@ -18,4 +20,3 @@ sections/8-related.tex
 sections/conclusion.tex
 sections/ai_disclosure.tex
 sections/ethics.tex
-sections/appendix_submission.tex

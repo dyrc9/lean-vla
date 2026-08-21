@@ -1,80 +1,197 @@
 \begin{tikzpicture}[
-  font=\footnotesize,
-  node distance=4.5mm and 3.6mm,
-  flow/.style={-{Latex[length=1.8mm]},semithick},
-  evidenceflow/.style={-{Latex[length=1.8mm]},semithick,densely dashed},
-  trusted/.style={draw=blue!65!black,rounded corners=1.5pt,fill=blue!7,
-                  align=center,minimum height=9mm,text width=23mm,inner sep=2.2pt},
-  untrusted/.style={draw=red!70!black,rounded corners=1.5pt,fill=red!6,
-                    align=center,minimum height=9mm,text width=23mm,inner sep=2.2pt,
-                    dashed},
-  assess/.style={draw=orange!80!black,rounded corners=1.5pt,fill=orange!9,
-                 align=center,minimum height=13mm,text width=25mm,inner sep=2.2pt},
-  transaction/.style={draw=black!70,rounded corners=1.5pt,fill=gray!9,
-                      align=center,minimum height=13mm,text width=22mm,inner sep=2.2pt},
-  contain/.style={draw=green!50!black,rounded corners=1.5pt,fill=green!8,
-                  align=center,minimum height=13mm,text width=25mm,inner sep=2.2pt},
-  identity/.style={draw=black!65,rounded corners=1.5pt,fill=black!4,
-                   align=center,inner xsep=4pt,inner ysep=2.8pt}
+  font=\scriptsize,
+  flow/.style={-{Stealth[length=1.8mm,width=1.35mm]},line width=.62pt,
+               draw=black!78,line cap=round,shorten <=1pt,shorten >=1pt},
+  attackflow/.style={-{Stealth[length=1.9mm,width=1.45mm]},line width=.72pt,
+                     draw=paOrange!94!black,line cap=round,
+                     dash pattern=on 2.4pt off 1.6pt,
+                     shorten <=1pt,shorten >=1pt},
+  trustflow/.style={-{Stealth[length=1.8mm,width=1.35mm]},line width=.68pt,
+                    draw=paBlue!88!black,line cap=round,
+                    shorten <=1pt,shorten >=1pt},
+  evidenceflow/.style={-{Stealth[length=1.7mm,width=1.25mm]},line width=.6pt,
+                       draw=paGray,dash pattern=on 2.2pt off 1.5pt,
+                       line cap=round,shorten <=1pt,shorten >=1pt},
+  untrusted/.style={draw=paOrange!90!black,rounded corners=3pt,
+                    fill=paOrange!5,align=center,minimum height=10mm,
+                    text width=23mm,inner sep=2pt,dashed},
+  source/.style={draw=black,rounded corners=3pt,fill=white,align=center,
+                 minimum height=10mm,text width=24mm,inner sep=2pt,
+                 line width=.8pt},
+  trustedchip/.style={draw=paBlue!85!black,rounded corners=3pt,fill=paBlue!7,
+                      align=center,minimum height=7mm,text width=19mm,
+                      inner sep=1.5pt},
+  selector/.style={draw=paBlue!85!black,rounded corners=3pt,fill=paBlue!7,
+                   align=center,minimum height=12mm,text width=23mm,inner sep=2pt},
+  c1/.style={draw=paPurple!85!black,rounded corners=3pt,fill=paPurple!8,
+             align=center,minimum height=13mm,text width=25mm,inner sep=2pt},
+  c2/.style={draw=paGray,rounded corners=3pt,fill=black!3,
+             align=center,minimum height=13mm,text width=24mm,inner sep=2pt},
+  c3/.style={draw=paGreen!75!black,rounded corners=3pt,fill=paGreen!8,
+             align=center,minimum height=13mm,text width=24mm,inner sep=2pt},
+  dispatch/.style={draw=paBlue!85!black,rounded corners=3pt,fill=paBlue!6,
+                   align=center,minimum height=13mm,text width=26mm,inner sep=2pt},
+  external/.style={draw=paGray,rounded corners=3pt,fill=white,align=center,
+                   minimum height=13mm,text width=20mm,inner sep=2pt},
+  attackpill/.style={draw=paOrange!94!black,rounded corners=4pt,
+                     fill=paOrange!7,align=center,minimum height=7.5mm,
+                     font=\scriptsize\bfseries,inner sep=1.7pt},
+  badge/.style={circle,draw=paGray,fill=white,minimum size=5.0mm,
+                inner sep=0pt,line width=.45pt},
+  edgelabel/.style={font=\tiny,fill=white,rounded corners=1pt,
+                    inner sep=1pt,text=black!78},
+  attacklabel/.style={font=\tiny,fill=white,rounded corners=1pt,
+                      inner sep=1pt,text=paOrange!94!black},
+  fastpill/.style={font=\tiny,draw=black!35,fill=white,
+                   rounded corners=2pt,inner xsep=2pt,inner ysep=1pt,
+                   text=black!78}
 ]
 
-% The two branches share data flow, but only the upper branch supplies
-% semantic authority to the monitor.
-\node[trusted] (task) {Authoritative task $T$\\trusted tap $O_t^T$};
-\node[trusted,right=of task] (selector) {task model\\frozen graph + $Z_t$};
-\node[untrusted,below=5mm of task] (policyview) {Potentially attacked view\\$P_t^{pol},O_t^{pol},H_t^{pol}$};
-\node[untrusted,right=of policyview] (vla) {Frozen VLA policy\\source $A_t$ ($K=1$)};
+% ---------------------------------------------------------------------------
+% Threat-model plane: the policy branch remains outside the software TCB.
+% ---------------------------------------------------------------------------
+\node[attackpill,text width=28mm] (contextattack) at (.8,3.62)
+  {Context attacker};
+\node[badge,draw=paOrange!94!black] (contextattackicon)
+  at ([xshift=1.5mm,yshift=.7mm]contextattack.north west) {};
+\pic[scale=.55] at (contextattackicon) {paAttack};
 
-\node[assess,right=7mm of selector,yshift=-7mm] (l1) {
-  \textbf{C1: L1 assessment} $S_t$\\
-  trusted-context binding\\
-  hard reject / advisory};
-\node[transaction,right=6mm of l1] (contract) {
-  \textbf{Compile contract}\\
-  $C_t$ + state epoch};
-\node[contain,right=of contract] (l2b) {
-  \textbf{C3: L2b if triggered}\\
-  $\leq 2$ restored guards\\
-  margin + force gates};
-\node[transaction,right=of l2b] (dispatch) {
-  \textbf{Authorize + dispatch}\\
-  fresh one-use nonce\\
-  exact command};
-\node[transaction,right=of dispatch] (close) {
-  \textbf{Observe + close}\\
-  receipts $R_t$ + effects $E_t$\\
-  aligned phase advance};
+\node[untrusted] (policyview) at (.8,2.15)
+  {Policy inputs\\prompt $\bullet$ vision and state $\bullet$ history};
+\node[untrusted] (vla) at (3.35,2.15)
+  {Frozen \vla\\one proposal ($K=1$)};
+\node[source] (action) at (5.95,2.15)
+  {\textbf{Source \actionblock}\\canonical $A_t$};
 
-\draw[flow,blue!65!black] (task)--(selector);
-\draw[flow,red!70!black] (policyview)--(vla);
-\draw[flow,blue!65!black] (selector.east)-|(l1.north west);
-\draw[flow,red!70!black] (vla.east)-|(l1.south west);
-\draw[flow] (l1)--node[above]{bind}(contract);
-\draw[flow] (contract)--node[above]{screen}(l2b);
-\draw[flow] (l2b)--node[above]{qualify}(dispatch);
-\draw[flow] (dispatch)--node[above]{evidence}(close);
+\node[badge,draw=paOrange!90!black] (policyicon)
+  at ([xshift=1.7mm,yshift=.8mm]policyview.north west) {};
+\pic[scale=.60] at (policyicon) {paEye};
+\node[badge,draw=paOrange!90!black] (vlaicon)
+  at ([xshift=1.7mm,yshift=.8mm]vla.north west) {};
+\pic[scale=.60] at (vlaicon) {paModel};
+\node[badge,draw=black] (actionicon)
+  at ([xshift=1.7mm,yshift=.8mm]action.north west) {};
+\pic[scale=.60] at (actionicon) {paAction};
 
-\node[draw=blue!65!black,densely dotted,rounded corners=2pt,
-      fit=(task)(selector),inner sep=3pt,
-      label={[font=\scriptsize,text=blue!65!black]above:trusted authority branch}] {};
-\node[draw=red!70!black,dashed,rounded corners=2pt,
-      fit=(policyview)(vla),inner sep=3pt,
-      label={[font=\scriptsize,text=red!70!black]below:untrusted proposal branch}] {};
+\draw[attackflow] (contextattack.south)--(policyview.north);
+\draw[flow] (policyview)--(vla);
+\draw[flow] (vla)--(action);
 
-% L2a is not a single pre-screen step: it is the transaction boundary that
-% binds contract construction, optional containment, dispatch, and closure.
-\node[draw=black!65,dashed,rounded corners=2pt,
-      fit=(contract)(l2b)(dispatch)(close),inner xsep=4pt,inner ysep=4pt,
-      label={[font=\scriptsize]above:\textbf{C2: L2a one-proposal execution transaction}}] {};
+% The execution attacker from Fig. 1 names the two protected targets.
+\node[attackpill,text width=29mm] (stackattack) at (10.75,3.62)
+  {Execution attacker};
+\node[badge,draw=paOrange!94!black] (stackattackicon)
+  at ([xshift=1.5mm,yshift=.7mm]stackattack.north west) {};
+\pic[scale=.55] at (stackattackicon) {paAttack};
 
-\node[identity,below=6mm of l2b,text width=124mm,font=\scriptsize] (idband) {
-  \textbf{Runtime identity chain:} canonical $d(A_t)$ is recorded in $S_t$,
-  $C_t$, authorization, receipt-window, and $E_t$ artifacts; Python separately
-  checks each applied-step digest against the authorized step.};
-\draw[evidenceflow] (l1.south) -- (l1.south |- idband.north);
-\draw[evidenceflow] (contract.south) -- (contract.south |- idband.north);
-\draw[evidenceflow] (l2b.south) -- (l2b.south |- idband.north);
-\draw[evidenceflow] (dispatch.south) -- (dispatch.south |- idband.north);
-\draw[evidenceflow] (close.south) -- (close.south |- idband.north);
+% ---------------------------------------------------------------------------
+% Trusted online path: authority, assessment, transaction, containment, gate.
+% ---------------------------------------------------------------------------
+\node[trustedchip] (task) at (.55,.32) {Task $T$};
+\node[trustedchip] (obs) at (.55,-.38) {Obs. tap $O_t^T$};
+\node[font=\tiny\bfseries,text=paBlue!88!black] at (.55,.93)
+  {TRUSTED INPUTS};
+\node[badge,draw=paBlue!85!black] (taskicon) at (task.west) {};
+\pic[scale=.52] at (taskicon) {paTask};
+\node[badge,draw=paBlue!85!black] (obsicon) at (obs.west) {};
+\pic[scale=.52] at (obsicon) {paEye};
+
+\coordinate (trustedmerge) at (1.78,0);
+\node[selector] (select) at (3.35,0)
+  {Task graph $\mathcal G_T$\\frozen selector $Z_t$};
+\node[c1] (l1) at (5.95,0)
+  {\textbf{C1 \lone assess}\\bind $A_t$ to $(Z_t,O_t^T)$\\verdict $S_t$\\reject $\mid$ advise $\mid$ allow};
+\node[c2] (contract) at (8.65,0)
+  {\textbf{C2 \ltwoa bind}\\$C_t$, epoch, nonce\\one-use $Auth_t$};
+\node[c3] (l2b) at (11.30,0)
+  {\textbf{C3 \ltwob screen}\\joint trigger gives $\leq2$ guards\\qualify $g_t$\\restore; margin; force};
+\node[dispatch] (dispatchnode) at (14.10,0)
+  {\textbf{C2 dispatch boundary}\\fresh auth and exact $A_t$\\ordered prefix $\rightarrow$ command};
+\node[external] (plant) at (17.05,0)
+  {Robot and\\environment};
+
+\node[badge,draw=paBlue!85!black] (selecticon)
+  at ([xshift=1mm,yshift=1mm]select.north west) {};
+\pic[scale=.52] at (selecticon) {paSelect};
+\node[badge,draw=paPurple!85!black] (l1icon)
+  at ([xshift=1mm,yshift=1mm]l1.north west) {};
+\pic[scale=.52] at (l1icon) {paShield};
+\node[badge] (contracticon)
+  at ([xshift=1mm,yshift=1mm]contract.north west) {};
+\pic[scale=.52] at (contracticon) {paLedger};
+\node[badge,draw=paGreen!75!black] (guardicon)
+  at ([xshift=1mm,yshift=1mm]l2b.north west) {};
+\pic[scale=.52] at (guardicon) {paShield};
+\node[badge,draw=paBlue!85!black] (dispatchicon)
+  at ([xshift=1mm,yshift=1mm]dispatchnode.north west) {};
+\pic[scale=.52] at (dispatchicon) {paDispatch};
+\node[badge] (planticon)
+  at ([xshift=1mm,yshift=1mm]plant.north west) {};
+\pic[scale=.52] at (planticon) {paRobot};
+
+\draw[trustflow] (task.east)--(trustedmerge);
+\draw[trustflow] (obs.east)--(trustedmerge);
+\draw[trustflow] (trustedmerge)--(select.west);
+\draw[trustflow] (select)--(l1);
+\draw[flow] (action.south)--(l1.north);
+\draw[flow] (l1)--(contract);
+\draw[flow] (contract)--(l2b);
+\draw[flow] (l2b)--(dispatchnode);
+\draw[flow] (dispatchnode)--(plant);
+
+% No-trigger blocks still require the same authorization and dispatch gate.
+% A dedicated pill keeps the condition clear of the line.
+\node[fastpill] (fastlabel) at (11.55,1.08)
+  {no trigger $\rightarrow$ skip C3};
+\draw[draw=black!78,line width=.62pt,line cap=round]
+  (contract.north)--(contract.north|-fastlabel.west)--(fastlabel.west);
+\draw[flow] (fastlabel.east)--(dispatchnode.north|-fastlabel.east)
+  --(dispatchnode.north);
+
+% Attack arrows terminate at the exact objects protected by C1 and C2.
+\draw[attackflow] (stackattack.south west)
+  to[out=-125,in=75] (action.north);
+\draw[attackflow] (stackattack.south east)
+  to[out=-55,in=85] (dispatchnode.north);
+\node[attacklabel] at (7.15,2.76) {tamper or replay};
+\node[attacklabel] at (13.02,2.07) {bypass or reorder};
+
+% ---------------------------------------------------------------------------
+% Evidence closure: receipts and effects bind back to the same proposal.
+% ---------------------------------------------------------------------------
+\node[c2,text width=27mm] (observer) at (14.10,-2.15)
+  {\textbf{C2 receipt and effect observer}\\ordered $R_t$ and effect window $E_t$};
+\node[c2,text width=36mm] (store) at (9.60,-2.15)
+  {\textbf{Protected evidence and phase gate}\\proposal $\rightarrow$ auth $\rightarrow$ receipt $\rightarrow$ effect\\advance only after aligned closure};
+\node[badge] (observericon)
+  at ([xshift=1mm,yshift=1mm]observer.north west) {};
+\pic[scale=.52] at (observericon) {paEye};
+\node[badge,draw=paBlue!85!black] (storeicon)
+  at ([xshift=1mm,yshift=1mm]store.north west) {};
+\pic[scale=.52] at (storeicon) {paEvidence};
+
+\draw[evidenceflow] (plant.south)|-(observer.east);
+\draw[evidenceflow] (observer)--(store);
+
+% Trust and transaction regions are behind all labels and icons.
+\begin{pgfonlayer}{background}
+  \node[draw=paBlue!85!black,densely dotted,fill=paBlue!1,
+        rounded corners=4pt,
+        fit=(task)(obs)(select)(l1)(contract)(l2b)(dispatchnode)
+            (observer)(store)(fastlabel),
+        inner xsep=3.5mm,inner ysep=3.2mm] (tcb) {};
+  \node[draw=paGray,dashed,fill=black!1,rounded corners=4pt,
+        fit=(contract)(l2b)(dispatchnode)(observer)(store)(fastlabel),
+        inner xsep=2.4mm,inner ysep=2.5mm] (txn) {};
+\end{pgfonlayer}
+
+\node[anchor=south west,font=\scriptsize\bfseries,text=paBlue!85!black,
+      fill=white,rounded corners=1pt,inner sep=1.2pt]
+  at ([xshift=1mm,yshift=1mm]tcb.south west)
+  {\system software TCB};
+\node[anchor=south east,font=\tiny\bfseries,text=paGray,
+      fill=white,rounded corners=1pt,inner sep=1.1pt]
+  at ([xshift=-1mm,yshift=1mm]txn.south east)
+  {C2 \ltwoa one-proposal transaction};
 
 \end{tikzpicture}

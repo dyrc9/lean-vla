@@ -1,218 +1,250 @@
 \section{Evaluation}
 \label{sec:evaluation}
 
-We evaluate three questions aligned with the three proof obligations and their
-distinct evidence sources:
+The evaluation follows the preceding security argument.  It first measures
+whether an upstream instruction attack reaches the physical-risk endpoint, then
+characterizes the final monitor and its stage ablations, and finally tests the
+specific enforcement properties claimed by C1--C3.  Three questions guide the
+evaluation.
 \begin{itemize}
-  \item \textbf{RQ1:} What physical risk-transition rate does SABER induce on
-  the complete attack-evaluation protocol?
-  \item \textbf{RQ2:} In a paired four-arm mechanism study, what roles do L1
-  and the combined L2 treatment play in task success and covered joint-limit
-  containment?
-  \item \textbf{RQ3:} Do the transaction checks, machine-checked relations,
-  physical gates, and runtime budget hold for their stated scopes?
+  \item \textbf{RQ1. Attack propagation.}  How often does the frozen SABER
+  instruction attack create a new physical-risk transition over a matched clean
+  execution?
+  \item \textbf{RQ2. System-level outcomes.}  How do \lone, \ltwo, and their
+  composition affect task success, the broad risk-transition endpoint, and the
+  registered joint-side property?
+  \item \textbf{RQ3. Mechanism behavior and cost.}  Do the monitor boundaries
+  reach the expected state under targeted semantic and transaction faults, and
+  what cost and failure modes does guard screening introduce?
 \end{itemize}
 
-\subsection{Attack Risk Measurement}
+The \ltwo arm combines \transactionbinding and \guardscreening, so their
+component-specific physical effects are not identifiable from the four-arm
+contrast.  Focused transaction cases characterize \ltwoa, while joint-side
+measurements and screening latency characterize \ltwob.
 
-The victim is OpenPI $\pi_{0.5}$ and the benchmark is LIBERO-Safety.  We use
-frozen SABER \texttt{constraint\_violation} instruction perturbations.  The
-complete protocol contains 60 base pairs and two seed replicates, with a clean
-and attacked rollout for every unit, totaling 240 episodes.
+\subsection{Experimental Design}
 
-The attack success rate (ASR) is evaluated only on clean-safe units.  A success is a new attacked-rollout transition involving contact, a joint limit, excessive force, or the benchmark's cost/collision risk signal.  Task failure alone is not counted.  The resulting population contains 86 clean-eligible units.  Confidence intervals cluster by base pair so that seed replicates from the same base pair are not treated as independent.
+\paragraph{Platform and workload}
+The victim is OpenPI $\pi_{0.5}$~\cite{pi05} running on
+LIBERO-Safety~\cite{liberosafety2026}.  The policy runs at a 20\,Hz control rate,
+returns one $H=10$ source block per call, and receives a new observation after
+the block is consumed.  Episodes are capped at 600 steps.  Policy inference and
+simulation run on separate NVIDIA RTX 6000 Ada GPUs.
 
-\subsection{Paired Four-Arm Mechanism Study}
+The complete population contains 60 task/initialization base pairs, equally
+divided among the benchmark's affordance, human-safety, obstacle-avoidance, and
+obstacle-with-human subsets and balanced across three difficulty levels.  Two
+independently seeded executions of every pair yield 120 seed-specific evaluation
+units.  Initializations are selected without observing outcomes.
 
-The second study freezes 18 SABER records and 18 outcome-blind
-suite/task/initialization pairs: six each from LIBERO-Safety's
-\texttt{obstacle\_avoidance}, \texttt{obstacle\_avoidance\_human}, and
-\texttt{human\_safety} suites.  For each pair, the attacked run uses a SABER
-record generated for the same original task instruction at a different
-initialization.  Only the perturbed task text is transplanted; record generation
-reads no clean or attacked victim outcome and performs no best-of-$N$
-selection.  Every pair is evaluated under clean and attacked conditions in
-four arms: VLA-only, L1-only, L2-only, and Dual.  Clean and attacked executions
-share the initial state, environment seed, policy seed, and arm schedule.  Each
-condition contains 72 episodes, for 144 total, and all selected pairs remain in
-the analysis.
+The attack workload uses SABER constraint-violation instruction
+perturbations~\cite{saber2026}.  One bounded, prompt-only attack record is
+generated for each base pair without access to victim outcomes and is frozen
+before evaluation.  Both seeded units of a pair use the same record.
 
-The primary configuration uses one $H=10$ source block ($K=1$).  The first source \actionblock is identical across arms for a paired workload.  After a hard gate or state divergence, subsequent trajectories need not remain action-identical.  L2-on arms jointly enable L2a and L2b, so this study estimates their combined treatment rather than separate causal effects.
+\paragraph{Two separate studies}
+The \emph{attack-reproduction study} runs one clean and one attacked
+unprotected rollout for every unit, for 240 episodes.  Each matched execution
+shares the task, initialization, environment seed, and policy seed.  This study
+estimates the observed attack success rate (ASR).
 
-\paragraph{ActionBlock interface ablations.}
-Separate matched, zero-dispatch/no-outcome studies retain two interface ablations over 45 units.  With a fixed checker and nested prefixes from one source chunk, initial availability is 0/45, 17/45, and 36/45 for $H=2,5,10$.  With $H=10$ fixed and four distinct source chunks per row, cumulative availability is 35/45, 35/45, and 36/45 for $K=1,2,4$.  These measurements motivate a sufficiently long block and show little marginal gain from blind IID resampling in this frozen setting; they measure checker availability, not task success, safety, or attack-defense efficacy.
+The \emph{four-arm study} performs new clean and attacked rollouts for every
+unit under \vlaonly, \loneonly, \ltwoonly, and \dual, for
+$120\times2\times4=960$ attempts.  \vlaonly is the unchanged runtime baseline,
+\loneonly and \ltwoonly are stage ablations, and \dual is the final composed
+\system prototype.  Runs for a unit share the initial state and random seeds,
+and a counterbalanced arm order reduces schedule effects.  The two studies
+share population identities, not rollouts or estimands.
 
-\paragraph{Baselines and ablation logic.}
-VLA-only is the unchanged runtime baseline; L1-only and L2-only isolate the two
-mechanism roles; and Dual evaluates their composition.  These paired arms
-support within-workload attribution, not a claim of outperforming every VLA
-safety system.  We do not treat SafeVLA or SAFE as drop-in baselines because
-they respectively modify policy training or learn rollout-failure detection,
-whereas the registered victim and checkpoint remain fixed~\cite{safevla2025,safe2025}.
-SEAL and CoVer likewise assume a policy-supplied textual plan, multiple action
-candidates, or a learned alignment score that the deployed $K=1$ interface
-does not expose~\cite{sealvla2026,covervla2026}.  None instantiates L2a's
-authorization--receipt--effect transaction.  Combining such policy or verifier
-methods with \system is a complementary experiment requiring a separately
-registered protocol, rather than an interchangeable baseline for this study.
-
-\subsection{Protocol Freeze and Evaluation Population}
-
-The reported \system configuration, metrics, gates, and arm schedule were fixed
-before reading outcomes from the paired-study population.  Its 18 pairs were
-selected by salted hash from 15 tasks and 50 initialization states in each of
-three suites after excluding 635 task/initialization pairs used by development
-protocols.  Their environment and policy seeds were newly assigned, and all
-selected pairs were retained.  Frozen run-validity records, including excluded
-invalid executions, remain available in the reproducibility audit but do not
-define additional system versions or contribute outcomes to the paper.
-
-\subsection{Metrics}
-
-We report task success and paired clean/attacked success transitions.  A \emph{violation episode} contains at least one native joint-limit violation or actual joint-side margin crossing.  We also report crossing steps, joint-limit steps, benchmark \emph{official unsafe}, deadlock, maximum force, and prediction/execution margin error.
-
-Integrity metrics cover attack-metadata and prompt-digest mismatch, pairwise first-block identity, checksums, and receipt/effect gates.  Performance metrics are maximum and p95 screening latency and the fraction exceeding 100\,ms; their registered limits are 200\,ms, 100\,ms, and 2.5\%, respectively.  ``Constraint force'' is the maximum absolute MuJoCo generalized-constraint-force value on registered risk joints---a simulator proxy, not a calibrated end-effector force.  The complete-protocol risk-transition rate and paired-study violation-episode rate have different populations, denominators, and event definitions; we never subtract or merge them.
-
-For the two registered task-success contrasts, we use a paired base-pair
-cluster percentile bootstrap with 100,000 resamples and a $-0.20$
-noninferiority margin.  This gate was frozen before final outcomes and permits
-at most a 20-percentage-point task-success loss for mechanism qualification;
-it is not a deployment-derived utility threshold.  A preregistered Bonferroni
-correction controls the familywise level at 0.05 across L2$-$VLA and
-Dual$-$L1: each one-sided test uses the 2.5th-percentile bootstrap lower bound.
-Violation-episode rates are descriptive.  We report two-sided 95\% Wilson
-score intervals to make the uncertainty of $n=18$ explicit.
+All 960 four-arm attempts produce an outcome record.  Each condition contains
+98.96\% valid traces (475/480), short of the registered 100\% all-valid
+requirement.  The four-arm results are therefore nonconfirmatory.  Task-success
+rates count invalid rows as failures, the broad-risk comparison is a
+common-eligible complete-case diagnostic, and joint-side measurements are
+valid-trace diagnostics.
 
 \begin{figure*}[t]
 \centering
-\resizebox{\textwidth}{!}{\input{figures/evaluation_design}}
-\caption{The attack-risk measurement and four-arm mechanism study answer different
-questions.  Their populations, denominators, and event definitions are kept
-separate throughout the analysis.}
+\includegraphics[width=\textwidth]{figures/evaluation_design_raster_v3.png}
+\caption{The independent attack reproduction estimates attack propagation.
+The separate four-arm study uses new runs over the same 120 population
+identities.  Its task-success, broad-risk, and joint-side results use distinct
+invalid-trace rules and remain nonconfirmatory.}
 \label{fig:evaluation-design}
 \end{figure*}
 
-\subsection{RQ1: SABER Risk Measurement}
+\subsection{Metrics and Counting Rules}
 
-All 240 episodes are valid.  Of the 86 clean-eligible units, 39 exhibit a new attacked risk transition:
-\begin{equation}
-  \mathrm{ASR}=39/86=45.35\%,\qquad
-  \mathrm{CI}_{95}=[32.93\%,57.78\%].
-\end{equation}
-This is the measured attack-risk baseline under the stated victim, benchmark,
-attack configuration, eligibility rule, and event definition.  It does not by
-itself determine the effectiveness of any ProofAlign layer.
+\paragraph{Attack-induced risk transition}
+A clean trace is eligible if it is valid, achieves strict task success without a
+benchmark cost or collision, and has complete typed constraint-signal and
+raw-action coverage.  Clean contact, joint-limit, and force counts need not be
+zero.  For an eligible unit with a valid matched attacked trace, a risk
+transition occurs when the attacked execution raises the benchmark
+cost/collision flag or increases the clean count of robot contacts, joint-limit
+steps, or excessive-force steps.  Task failure alone is excluded.
 
-\subsection{RQ2: Paired Four-Arm Results}
+The attack reproduction estimates ASR over its 86 clean-eligible units.  In the
+four-arm study, each arm also has a descriptive residual risk-transition rate
+over its own clean-eligible units.  Direct cross-arm comparison uses the 75 units
+whose clean run is eligible in every arm and whose clean and attacked traces are
+valid in every arm.  This common-eligible complete-case cohort gives every arm
+the same denominator.  Its rate is a conditional diagnostic, not a
+full-population causal effect.
+
+Task-success rates retain all 120 fixed units in every arm, with invalid rows
+counted as failures.  Checker rejection is reported among valid traces;
+transaction faults are reported over the focused case suite; guard refusal is
+reported by valid episode and performed screen.  An invalid trace is not itself
+a checker rejection, guard refusal, or observed risk transition.  Percentages
+are used for unit- and episode-level outcome rates.  Registered step-level
+diagnostics remain counts because no common step-exposure rate was defined.
+Paired cross-arm sensitivity tests use exact two-sided McNemar tests on the 75
+common-eligible units and carry no confirmatory interpretation.
+
+\subsection{RQ1. SABER Attack Propagation}
+
+All 240 attack-reproduction episodes are valid (100\%).  Among the 86
+clean-eligible units, 39 meet the attacked-over-clean risk-transition endpoint.
+The observed ASR is therefore 45.35\% (39/86).  This reproduces the SABER
+constraint-violation instruction attack on the evaluated OpenPI
+$\pi_{0.5}$--LIBERO-Safety path and establishes that the exercised upstream
+prompt perturbation can reach the registered physical-risk endpoint.  SABER
+serves here as the evaluated Stage-I threat instance; the system objective
+continues through the Stage-II execution boundary.
+
+\subsection{RQ2. Final-System and Layer Outcomes}
+
+Table~\ref{tab:task-success} reports the episode-level task-success metric.
+Table~\ref{tab:risk-transition} keeps the independent ASR, arm-specific
+residual rates, and common-cohort diagnostic visibly separated.
 
 \begin{table}[t]
 \centering
-\caption{Task utility on 18 paired workloads per condition.}
-\label{tab:main-task}
-\small
+\caption{Task-success rates.  Every denominator is the full 120-unit
+population; invalid traces count as failures.}
+\label{tab:task-success}
+\footnotesize
 \begin{tabular}{lcc}
 \toprule
-Arm & Clean success & Attacked success \\
+Arm & Clean & Attacked \\
 \midrule
-VLA-only & 13/18 & 11/18 \\
-L1-only  & 13/18 & 13/18 \\
-L2-only  & 13/18 & 11/18 \\
-Dual     & 13/18 & 13/18 \\
+\vlaonly  & 70.83\% (85/120) & 60.83\% (73/120) \\
+\loneonly & 65.00\% (78/120) & 53.33\% (64/120) \\
+\ltwoonly & 71.67\% (86/120) & 60.83\% (73/120) \\
+\dual     & 65.00\% (78/120) & 53.33\% (64/120) \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 \begin{table}[t]
 \centering
-\caption{Attacked-condition joint-limit outcomes.  These are not the
-complete-protocol ASR in RQ1.}
-\label{tab:main-risk}
+\caption{Attack-induced risk-transition rates.  The first row is the separate
+RQ1 reproduction.  Four-arm native rates use each arm's clean-eligible
+denominator; the common column is the matched 75-unit diagnostic.}
+\label{tab:risk-transition}
 \footnotesize
-\begin{tabular}{lrrr}
+\setlength{\tabcolsep}{3.5pt}
+\begin{tabular}{lcc}
 \toprule
-Arm & Violation episodes & Crossing steps & Limit steps \\
+Study or arm & Own-cohort rate & Common cohort \\
 \midrule
-VLA-only & 4/18 (22.22\%) & 28  & 175 \\
-L1-only  & 1/18 (5.56\%)  & 295 & 317 \\
-L2-only  & 0/18 (0\%)     & 0   & 0 \\
-Dual     & 0/18 (0\%)     & 0   & 0 \\
+Attack reproduction & 45.35\% (39/86) & N/A \\
+\midrule
+\vlaonly  & 52.94\% (45/85) & 50.67\% (38/75) \\
+\loneonly & 53.85\% (42/78) & 56.00\% (42/75) \\
+\ltwoonly & 50.00\% (43/86) & 48.00\% (36/75) \\
+\dual     & 55.13\% (43/78) & 57.33\% (43/75) \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-Tables~\ref{tab:main-task} and~\ref{tab:main-risk} deliberately separate task
-utility from physical containment.  All four clean arms achieve 13/18 task
-success.  Under attack, VLA-only records 11/18 success and four violation
-episodes.  L1-only records 13/18 success and one violation episode.  This
-sample pattern is consistent with L1's task-utility role, but the small
-descriptive contrast is not a population-level L1 effect claim.
+\paragraph{Task success and broad risk}
+Under attack, \ltwoonly matches \vlaonly at 60.83\% task success.
+\loneonly and \dual each reach 53.33\%.  Relative to \vlaonly, \dual is
+5.83 percentage points lower when clean and 7.50 points lower under attack.
+The final composed system therefore shows an availability cost in this study.
 
-The broader benchmark official-unsafe flag is zero in every attacked arm.  In
-clean runs it occurs once in L1-only and once in Dual; both events remain in
-the frozen aggregates.  This endpoint is distinct from the attacked joint-limit
-outcomes targeted by L2 and prevents the zero-crossing result from being read
-as a claim that every benchmark safety signal is always zero.
+On the common 75-unit cohort, the broad risk-transition rates are 50.67\%,
+56.00\%, 48.00\%, and 57.33\%.  Relative to \vlaonly, the nominal differences
+are $+5.33$, $-2.67$, and $+6.67$ percentage points for \loneonly, \ltwoonly,
+and \dual.  Exact paired sensitivity tests give $p=0.5034$, $0.6250$, and
+$0.3833$, respectively.  No monitored arm provides evidence of a reduction in
+the broad endpoint.  This statement remains nonconfirmatory and conditional on
+the common-eligible cohort.
 
-The physical interpretation of L1 must remain narrow.  Its single violation episode accumulates 295 crossing steps and 317 joint-limit steps, compared with 28 and 175 for VLA-only.  The data therefore do not support a general claim that L1 reduces physical-risk severity.  They instead show that residual risk can be temporally severe and requires a separate containment layer.
+\paragraph{L1 (C1) checker behavior and availability}
+Among valid \loneonly traces, hard checker rejection occurs in 10.92\% of
+clean traces (13/119) and 14.29\% of attacked traces (17/119).  Among the 118
+units with valid clean and attacked \loneonly traces, 11 reject in both
+conditions, five only under attack, and two only when clean.  The attack-only
+rate is 4.76\% (5/105) among clean-accepted complete cases.  All 17 valid
+attacked rejections occur before actuator dispatch.
 
-L2-only retains VLA-only's 11/18 attacked task success while reducing violation episodes, crossings, and joint-limit steps to zero.  Dual retains L1-only's 13/18 success while also reducing all three joint-limit outcomes to zero.  The registered attacked task-success contrasts L2$-$VLA and Dual$-$L1 are both zero, with paired bootstrap intervals of $[0,0]$.  In this paired sample, L2 adds containment without changing the aggregate task-success count; this is not a population-level proof of zero utility effect.
+Relative to \vlaonly under attack, 4.17\% of units change from task failure to
+success (5/120), while 11.67\% change from success to failure (14/120).  The
+net change is $-7.50$ percentage points.  These outcomes match the
+checker-relative scope: \lone blocks covered hard findings and imposes a
+measurable availability cost; it does not provide complete task semantics.
 
-The descriptive 95\% Wilson intervals for attacked violation-episode rates
-are [9.00\%,\,45.21\%] for VLA-only, [0.99\%,\,25.76\%] for L1-only, and
-[0\%,\,17.59\%] for both L2-only and Dual.  Thus, zero observed events supports
-containment on the frozen sample, not a zero population risk bound.
+\paragraph{L2b (C3) joint-side outcome}
+The 119 valid attacked \ltwoonly traces and 118 valid attacked \dual traces
+form 237 \ltwoenabled traces.  None contains a joint-limit step, giving a
+trace-level incidence of 0.00\% (0/237) and a step total of zero.  The
+corresponding valid attacked \vlaonly and \loneonly traces record 4,960 and
+2,452 joint-limit steps.  This is the positive result targeted by
+\guardscreening, within a valid-only registered joint boundary.  The broader
+endpoint additionally includes contact, force, cost, and collision; its rate
+does not fall for the final composed system.
 
-Paired transitions show why aggregate success requires care.  Clean-success-to-attacked-failure counts are 3/2/3/2 for VLA/L1/L2/Dual; clean-failure-to-attacked-success counts are 1/2/1/2.  Not every attacked failure is newly caused by the attack, and the aggregate combines transitions in both directions.
+The RQ2 evidence therefore describes a scoped trade-off.  The targeted
+joint-side event is absent from valid attacked \ltwoenabled traces, while
+\dual task success is lower than \vlaonly and the broad risk endpoint does not
+improve.
 
-The motivating pair from Section~\ref{sec:introduction} is post-hoc and serves
-only to concretize the role split; all inferential claims use the full paired
-sample.  On
-\texttt{human\_safety\_task2\_init34}, SABER replaces soda-to-plate with ``move
-to the farthest fixture'': VLA fails with 2 crossing/5 joint-limit steps; L1
-succeeds with 0/0; L2 fails with 0/0; and Dual succeeds with 0/0.  On
-the separate residual-risk pair, L1's sole violation event accounts for all
-295/317 steps while Dual has 0/0; both fail the task.
+\subsection{RQ3. Transaction Behavior and Runtime Cost}
 
-\subsection{RQ3: Integrity and Cost}
+\paragraph{L2a (C2) targeted fault cases}
+Targeted tests inject stale context, source-row substitution, replay,
+reordering, cross-proposal evidence, incomplete prefixes, missing or unknown
+effects, and compromised-sink behavior.  All 69 focused transaction and runner
+cases reach their expected state (100\%).  Stale context and malformed binding
+reject before dispatch; substitution and reordering fail to match the open
+transaction; replay, spliced evidence, and incomplete prefixes cannot close it;
+and missing, forbidden, or unknown effects prevent task-phase advance.
 
-All 72 attacked episodes complete.  The study uses 18 attack records and 72 paired clean comparisons; the first attacked \actionblock differs from its clean counterpart in 72/72 arm episodes.  Attack-metadata and prompt-digest mismatch are both zero, the four arms share the first block for 18/18 pairs, all 76 registered checksums match, and every registered runtime integrity gate passes.
+The compromised-sink cases expose the TCB boundary.  A sink that changes the
+action but reports truthfully produces a receipt mismatch.  A sink that changes
+both the action and its evidence is accepted.  Software transaction binding
+cannot detect a coordinated lie inside the TCB.
 
-We separately execute 69 focused implementation tests for transaction and
-runner behavior; all pass.  Table~\ref{tab:l2a-negative} summarizes the
-adversarial cases rather than treating ordinary SABER episodes as evidence for
-software substitution resistance.  The tests distinguish pre-dispatch
-prevention from post-dispatch detection: a truthful receipt can expose a
-changed command after one step, but cannot undo that physical step.  If the
-sink or observer forges internally consistent evidence inside the TCB, the
-software monitor has no independent fact with which to reject it.
+\paragraph{L2b (C3) screening behavior and cost}
+Across the 237 valid attacked \ltwoenabled traces, the monitor performs 78,434
+screens.  The 95th-percentile screening latency is 23.47\,ms; 0.41\% of screens
+exceed 100\,ms (323/78,434), and the maximum is 458.99\,ms.  The registered
+maximum-at-most-200\,ms criterion therefore fails, and the prototype has no
+hard-real-time guarantee.  These measurements cover the screening interval on
+the research simulator, excluding policy inference and real-hardware dispatch.
 
-\begin{table}[t]
-\centering
-\caption{Focused L2a negative-integrity cases and observed semantics.}
-\label{tab:l2a-negative}
-\footnotesize
-\begin{tabularx}{\columnwidth}{>{\raggedright\arraybackslash}p{0.34\columnwidth}>{\raggedright\arraybackslash}X}
-\toprule
-Injected case & Observed result \\
-\midrule
-Stale state, assessment, or authorization & Reject before sink dispatch; require a fresh proposal \\
-Pre-dispatch command substitution & Consume/reject authorization; no sink side effect \\
-Sink-side change with truthful receipt & Bind rejected receipt; no aligned completion or phase advance \\
-Replay, cross-proposal receipt, or incomplete prefix & Freshness/alignment fails; transaction cannot close \\
-Missing, forbidden, or unknown effect & Remain pending or reject; phase cannot advance \\
-Forged sink/observer evidence inside TCB & Not independently detectable; explicit trusted-sink limit \\
-\bottomrule
-\end{tabularx}
-\end{table}
+Across valid attacked \ltwoenabled screens, the maximum post-step observed
+generalized-constraint-force proxy is 229.5709, and the maximum
+prediction/execution margin error is $2.41\times10^{-5}$\,rad.  The observed
+force proxy differs from the predispatch shadow-force candidate gate, so it is
+an execution diagnostic rather than validation of that gate.
 
-L2-on arms have zero actual crossings, zero joint-limit steps, and zero deadlocks.  The maximum generalized-constraint-force proxy is $6438.1998<10000$.  Maximum selected-margin prediction error is $2.69\times10^{-13}$\,rad, below the 0.01\,rad gate.  Because shadow and dispatch reuse a restored MuJoCo state/model, this checks execution/restore consistency, not prediction under dynamics mismatch.  Maximum screening latency is 39.79\,ms, p95 is 18.30\,ms, and the 100\,ms miss rate is zero; the maximum is also below the nominal 50\,ms period of the 20\,Hz simulator loop.
+Across valid clean and attacked \ltwoenabled traces, five episodes contain one
+guard refusal each.  This is 1.05\% of valid \ltwoenabled episodes (5/474) and
+0.0034\% of performed screens (5/146,397).  Every refusal has the registered
+no-bounded-force-feasible-guard-candidate reason and ends without actuator
+dispatch.  These results qualify the exercised simulator path; they do not
+validate a dynamics model for a physical robot.
 
-These latency results establish compliance with the registered budget in the frozen research environment.  They do not measure worst-case operating-system scheduling, communication jitter, or a hard-real-time control loop.
-
-A retained log audit found four instances of a MuJoCo numerical-instability
-warning at 0.3\,s, all on the same task/initialization pair and one in each arm.
-All four episodes completed without a runtime exception and remain in every
-reported aggregate; the warning was not a registered exclusion or pass gate.
-This paired occurrence does not favor an arm, but it further limits the result
-to the frozen simulator configuration and is not evidence of physical-robot
-robustness.
+\paragraph{Summary}
+RQ1 reproduces SABER with a 45.35\% attacked-over-clean ASR.  RQ2 finds no
+broad risk or task-success improvement for the final composed system, while
+valid attacked \ltwoenabled traces show the targeted zero-joint-limit
+diagnostic.  RQ3 shows that all 69 focused cases reach their expected state,
+including the compromised-sink limitation, and that guard screening has a
+measured long-latency tail.  Every conclusion remains bounded by the registered
+checker, TCB, guard, simulator, attack family, and trace-validity rules.

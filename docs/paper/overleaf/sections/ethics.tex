@@ -1,2 +1,9 @@
 \section*{Ethics Considerations}
-All attacks and all agents or contacts in \texttt{human\_safety} are simulated; the study involves no human subjects, personal data, or undisclosed real-system vulnerability, and no physical robot.  We retain the observed attack ASR, severe residual L1 risk steps, and frozen audit records.  The prototype is a research reference monitor, not a certified machinery safeguard.
+The study is simulator-only: every attack, benchmark agent, and contact in
+\texttt{human\_safety} is synthetic.  Its data consist of benchmark task
+instances, simulator traces, and system logs.  The attack target is the
+OpenPI $\pi_{0.5}$ model evaluated on the LIBERO-Safety
+benchmark~\cite{pi05,liberosafety2026}.  The paper retains every
+fixed evaluation unit, explicit error record, residual risk transition, and
+frozen audit record.  The prototype's intended use is supervised research on
+action-boundary monitoring.

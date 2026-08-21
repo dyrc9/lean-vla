@@ -1,6 +1,6 @@
 # 当前状态与路线图
 
-最后更新：2026-08-09。
+最后更新：2026-08-21。
 
 本页是项目进度的唯一默认入口。ProofAlign 在论文叙事中只有一个最终系统，不展开内部版本或优化过程。
 
@@ -8,8 +8,8 @@
 SABER攻击成功复现
   -> 最终ProofAlign设计与实现
   -> 最终clean/attacked配对四臂证据
-  -> 完成论文初版
-  -> 根据初稿缺口定向补实验
+  -> 冻结论文、证据与复现入口
+  -> 项目结题（仅保留可复现性维护）
 ```
 
 ## 1. SABER攻击已成功复现
@@ -52,44 +52,49 @@ binding/phase semantics，不证明真实机器人安全、Python refinement 或
 
 ## 3. 最终配对四臂结果
 
-最终实验包含18个 held-out suite/task/init pairs。每个pair在clean与SABER-attacked条件下运行
-VLA-only、L1-only、L2-only和Dual，共144个episodes；clean/attacked共享初态、environment seed、policy
-seed和arm schedule。
+最终实验覆盖完整的60个base pairs乘2组seeds，共120个固定evaluation units。每个unit在clean与
+SABER-attacked条件下运行VLA-only、L1-only、L2-only和Dual，共960次episode attempts；clean/attacked共享
+初态、environment seed、policy seed和arm schedule。`960/960` artifacts均存在，clean与attacked各有
+`475/480` valid rows。预注册要求每个条件`480/480`全部有效，因此终态为
+`four_arm_terminal_invalid_conservative`，不能作为确认性总体效果。
 
-| Arm | Clean task success | Attacked task success | Attacked violation episodes | Crossing steps | Joint-limit steps |
+| Arm | Valid clean/attacked | Clean task success | Attacked task success | Attacked risk transitions | Valid attacked joint-limit steps |
 |---|---:|---:|---:|---:|---:|
-| VLA-only | 13/18 | 11/18 | 4/18（22.22%） | 28 | 175 |
-| L1-only | 13/18 | 13/18 | 1/18（5.56%） | 295 | 317 |
-| L2-only | 13/18 | 11/18 | 0/18 | 0 | 0 |
-| Dual | 13/18 | 13/18 | 0/18 | 0 | 0 |
+| VLA-only | 119/119 | 85/120 | 73/120 | 45/85（52.94%） | 4,960 |
+| L1-only | 119/119 | 78/120 | 64/120 | 42/78（53.85%） | 2,452 |
+| L2-only | 119/119 | 86/120 | 73/120 | 43/86（50.00%） | 0 |
+| Dual | 118/118 | 78/120 | 64/120 | 43/78（55.13%） | 0 |
 
 主结论：
 
-- L1 在该冻结样本中承担任务效用角色，但不提供完整的 joint-limit containment；
-- L2-on 两臂把观察到的 violation episodes、crossing steps 和 joint-limit steps 降到0；
-- L2-only 的 attacked task success 仍为 `11/18`，说明 containment 不会自动恢复任务效用；
-- Dual 同时得到 `13/18` attacked task success 和 `0/18` observed violation episodes，并保持clean总体成功数；
-- 上述结果是一个checkpoint、一个benchmark、一个冻结攻击族和18个pairs上的sample outcomes，不外推为任意
-  攻击、总体零风险、真实机器人安全或硬实时保证。
+- 全量四臂的broader contact/joint/force/cost-collision endpoint没有相对VLA-only下降；exact paired McNemar
+  的最小`p=0.3833`；
+- 为避免各arm的clean eligibility改变分母，正文横向比较使用四臂clean均eligible且clean/attacked均valid的
+  75-unit共同队列：VLA/L1/L2/Dual的risk transitions分别为`38/75`、`42/75`、`36/75`、`43/75`。该队列
+  是complete-case diagnostic，不是全population因果estimand；表中的`45/85`、`42/78`、`43/86`、`43/78`
+  是各arm单独的clean-eligible描述，二者不得混用；
+- 237个valid attacked L2-on rows的joint-limit steps为0，而VLA-only和L1-only分别为4,960和2,452；这是
+  registered joint-side property的valid-only diagnostic，不是总体零风险保证；
+- clean/attacked task success在全部120个units上的计数如表所示，L1/Dual没有显示任务效用改善；
+- 由于每个条件各有5个invalid rows，预注册all-valid dependency失败，任何arm-level效果只能保守、
+  非确认性地解释；
+- 结果范围仍限定为一个checkpoint、LIBERO-Safety、一个冻结SABER攻击族和模拟器，不外推为任意攻击、
+  真实机器人安全或硬实时保证。
 
-两组攻击数字使用不同population、denominator和event definition：攻击复现报告clean-eligible unit上的
-`39/86` risk-transition ASR；最终四臂报告18个episode中的violation episodes。二者不得直接相减或合并。
+攻击复现的`39/86`、四臂共同队列的`38/75`和四臂arm-specific rates虽然使用同一组120个population
+identities，但属于不同运行或不同estimand；四臂VLA-only结果不得替换、回填或与`39/86`合并。
 
-完整证据见 [`paper/final_four_arm_results.md`](paper/final_four_arm_results.md)。
+完整证据见 [`paper/full120_four_arm_result_integration.md`](paper/full120_four_arm_result_integration.md)。
 
-## 4. 当前重心：先完成论文初版
+## 4. 项目结题与维护边界
 
-当前不再围绕内部版本或方法优化组织工作。下一里程碑是完成一份从问题到证据闭合的论文初版：
+项目于2026-08-21结题。论文源、claim--evidence 映射、最终实验结果、校验脚本和审计材料按当前状态冻结。
+默认不再进行方法优化、新的 benchmark 扩展或补充实验；更多seeds、其他攻击族、camera-only trusted
+perception、L2a/L2b更细消融、真实机器人和更强执行证明仅作为未执行的未来方向。
 
-1. 固定 Introduction 中的 action-only protected object、authorization gap 和 realization gap；
-2. 完成 Background/Related Work 对攻击通道、既有防御停止位置和本文边界的分层；
-3. 固定 Problem Definition、Threat Model、TCB、security goals 与 out-of-scope；
-4. 用一个最终 ProofAlign 系统描述 L1、L2a、L2b，不出现内部版本演进；
-5. 将现有攻击复现和最终四臂结果写入 Evaluation，并保持不同统计口径分离。
-
-论文初版完成后，再根据审稿视角暴露的证据缺口选择补充实验。候选方向包括更多seeds、其他攻击族、
-camera-only trusted perception、L2a/L2b更细消融、真实机器人和更强执行证明；在初稿完成前不将这些扩展
-预设为当前必须完成的主实验。
+后续维护只允许：修复可复现性问题、恢复缺失但已有校验和的历史artifact、处理外部提交系统分配的paper
+number或准确模型标签，以及修正文档中的明确错误。任何新实验、结果重分类或 claim 扩张都需要先由用户明确
+重启项目。
 
 ## 可复现性说明
 

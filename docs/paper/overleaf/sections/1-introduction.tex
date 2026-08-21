@@ -1,132 +1,145 @@
 \section{Introduction}
 \label{sec:introduction}
 
-Vision--language--action (VLA) models turn language, images, and robot state
-into continuous actions.  At deployment, each policy call produces an action
-chunk that crosses from model output into the robot's execution stack.  That
-boundary is consequential but evidentially weak: the numeric chunk does not
-itself establish that it is admissible for the current task, that later
-software will preserve it, or that its realization is qualified for the
-current physical state.
+Vision--language--action (\vla) models are moving robot control from fixed task
+programs toward policies that translate language and multimodal observations
+directly into continuous actions~\cite{pi05,rth2024}.  In the action-only
+interface studied here,
+each policy call returns an ordered \actionblock to a consumer, which dispatches
+the block and then replans from a new observation.  This block is the first
+concrete object that leaves the learned policy and becomes eligible for physical
+execution; it is therefore a natural security boundary
+(Figure~\ref{fig:motivation}).
 
-An attacked context makes the problem concrete.  In one evaluation workload,
-the operator task is to move a soda can to a plate, while SABER changes the
-policy-facing instruction to ``move straight to the farthest fixture.''  The
-policy returns a $10\!\times\!7$ numeric block rather than a trustworthy plan
-that identifies which task authorized it.  Bounded instruction edits can
-change continuous trajectories and induce constraint violations
-~\cite{saber2026}; visual and embodied-agent attacks provide other routes from
-compromised context to physical behavior
-~\cite{badrobot2025,robopair2025,freezevla2025}.  Input filtering alone is too
-early, while an eventual task or safety outcome arrives too late to authorize
-the command that produced it.
-
-The lifecycle of an online action exposes three distinct questions.  First,
-how can a consumer assess a continuous block relative to the current task
-without treating an incomplete geometric proxy as a semantic oracle?  Second,
-how can it establish that assessment, authorization, ordered dispatch,
-receipts, and effects all refer to the same proposal and state epoch?  Third,
-how can it qualify state-dependent physical constraints without silently
-replacing the action that earlier evidence names?  Smoothness, a one-time hash
-comparison, and a post-hoc success label answer none of these questions alone.
-
-Prior systems protect valuable portions of this path, but stop on opposite
-sides of the same object.  Prompt/data separation and trusted-control-flow
-systems protect authority before model output~\cite{struq2025,secalign2025,
-camel2026,ace2026}; action attribution and trajectory auditors primarily cover
-discrete digital actions~\cite{attriguard2026,mate2026}; VLA verifiers rely on a
-policy-supplied plan, a learned score, or multiple candidates
-~\cite{sealvla2026,covervla2026}; CPS integrity and robot attestation begin from
-an already specified command or protected task program with reference motion
-~\cite{diat2019,cfaplus2024,arto2026,tat2026}.  Table~\ref{tab:related-comparison}
-summarizes these stopping points.  The unclosed composition is the exact
-continuous block generated online by a VLA.  It is neither a discrete API call
-nor a trajectory predeclared by a trusted robot program.
-
-Our key insight is that this block is the hinge between VLA reasoning and
-embodied execution, and should therefore be the protected security object.
-The consumer need not recover the model's latent intent or assume a unique
-reference trajectory.  Instead, it should attach task-relative justification
-to the exact source block, preserve the same identity through dispatch and
-evidence collection, and qualify state-dependent realization without silently
-changing the object that earlier evidence names.
-
-We realize this idea in \system, an inline consumer-side reference monitor that
-leaves the VLA checkpoint and $K=1$ action generation unchanged.  Under an
-explicit trusted-task and observation assumption, \lone binds a
-checker-relative assessment to $(Z_t,O_t^T,A_t)$: covered hard risks reject,
-while uncertain task progress remains an auditable advisory.  \ltwoa compiles
-a proposal-scoped contract, issues a fresh one-use authorization, checks each
-ordered dispatch step, and requires bound receipts and effects before task
-phase advance.  When a registered joint boundary triggers, \ltwob evaluates at
-most two temporary virtual-guard configurations for the same source action
-against identity, restoration, margin, and force conditions.  It changes the
-execution configuration, not the policy output.
-
-We capture this claim as one top-level property,
-$\mathsf{ProofAligned}$: the source block must be checker-relative eligible;
-its execution transaction must align; and a triggered physical boundary must
-have qualified containment.  Task phase advance additionally requires bound
-completion evidence.  Lean machine-checks the finite authorization, ordered
-action, receipt, effect, and phase-transition relations.  Continuous dynamics,
-checker soundness, sensor trust, and the Python-to-Lean refinement remain
-explicit assumptions or empirical obligations.
-
-We evaluate the attack surface and the three mechanism roles separately.  On
-the complete 120-unit attack-evaluation protocol, 39 of 86 clean-eligible units
-under SABER exhibit a new physical-risk transition, giving an observed ASR of
-45.35\% (95\% base-pair cluster-bootstrap CI: [32.93\%, 57.78\%]).  A paired
-four-arm mechanism study contains 18 task/initialization pairs and 144
-episodes.  Under attack, VLA-only and L2-only succeed on 11/18 tasks, while
-L1-only and Dual succeed on 13/18; their joint-limit violation-episode counts
-are 4/18, 1/18, 0/18, and 0/18.  The current populations and risk endpoints are
-reported separately rather than pooled.  Fault injection and Lean support
-L2a's transaction role, while the paired outcomes and runtime measurements
-support L1 and combined-L2 behavior.
-
-Our contributions are:
-\begin{itemize}
-  \item \textbf{A protected object and security property for embodied VLA.}
-  We make the exact online \actionblock the common object across task-relative
-  assessment, execution identity, and state-dependent realization, with an
-  explicit adversary, TCB, and top-level $\mathsf{ProofAligned}$ property.
-  \item \textbf{A cross-layer reference monitor.} \system composes trusted
-  subtask selection and local block assessment (L1), a nonce/digest-bound
-  execution transaction with Lean-checked abstract semantics (L2a), and
-  bounded, state-triggered joint containment that preserves source-action
-  identity (L2b).
-  \item \textbf{Auditable attack and mechanism evidence.} We measure a
-  risk-transition ASR of 39/86 (45.35\%) under SABER and report paired
-  VLA/L1/L2/Dual outcomes, focused transaction-fault tests, and runtime
-  containment evidence.  Each evidence source is tied to the property it can
-  support rather than combined into a broader robot-safety claim.
-\end{itemize}
-
-\system does not recover a model's latent intent, prove that every accepted
-action advances the task, or establish general robot safety.  Its security
-value is narrower and inspectable: every covered decision names which exact
-action was assessed, which authorization permitted it, which command was
-applied, which effects were observed, and whether qualified containment
-governed the near-boundary execution.
-
-\begin{table*}[t]
+\begin{figure}[!t]
 \centering
-\caption{Closest security-system abstractions.  The distinction is the
-protected object and evidence boundary, not a claim that each component is
-individually unprecedented.}
-\label{tab:related-comparison}
-\footnotesize
-\begin{tabularx}{\textwidth}{l>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X}
-\toprule
-Work family & Authorized or verified object & Execution/physical evidence & Boundary relative to \system \\
-\midrule
-StruQ, SecAlign & Legitimate instruction to model response & No actuator or physical receipt & Protect prompt/data interpretation rather than a continuous command transaction \\
-AttriGuard, MATE & User intent or policy to discrete invocation/agent trajectory & Counterfactual replay or learned trajectory audit; no physical dispatch & Stronger causal/policy attribution, but no continuous robot-action realization chain \\
-SEAL, CoVer & Policy plan or instruction to selected action candidate & Simulated outcome or learned alignment score; no receipt & Stronger candidate ranking; uses policy-supplied intent or $K>1$, without an execution transaction \\
-CaMeL, ACE, IsolateGPT, SAGA & Trusted-query flow, abstract app plan, capability, or agent identity & Digital execution barriers and isolation & Establish trusted scaffolding for app/tool systems, not joint-level physical containment \\
-DIAT, CFA+, ARTO & Software control/data flow & Attestation or runtime-integrity evidence & Stronger roots/evidence for CPS software; no natural-language task-to-action authorization \\
-TAT & Protected task program and offline motion profiles & Timed event evidence and bypass joint measurements & Derives event-level reference motion from preprogrammed tasks; \system first authorizes an online VLA block \\
-\system & Trusted context and checker verdict bound to exact continuous block & Nonce, dispatch receipt, effects, margins, and runtime guard & Software TCB; current physical evidence is simulation-based, with no hardware attestation \\
-\bottomrule
-\end{tabularx}
-\end{table*}
+\includegraphics[width=.98\columnwidth]{figures/motivation_boundary_raster_v2_square.png}
+\caption{Deployment and protection overview.  Attacks may corrupt policy inputs
+or tamper with post-inference execution.  \system mediates the point at which a
+newly generated continuous \actionblock becomes executable.}
+\label{fig:motivation}
+\end{figure}
+
+That boundary is exposed from both sides.  Instruction perturbations, visual
+perturbations, and embodied-agent jailbreaks can change the action produced by a
+\vla~\cite{saber2026,freezevla2025,badrobot2025,robopair2025}.  In the motivating
+SABER case, the authoritative task is to move a soda can to a plate, while the
+policy is induced to act on ``move to the farthest fixture.''  The consumer sees
+only the resulting numeric block, not a trustworthy account of which task
+authorized it.  After inference, compromised software can additionally replace
+the proposal, replay an earlier permission, reorder steps, or splice evidence
+from different proposals~\cite{diat2019,cfaplus2024,arto2026,tat2026}.  An input
+attack and an execution attack thus meet at the same actuator-facing object.
+
+Existing defenses protect important parts of this path.  Structured-input and
+trusted-agent architectures protect instruction/data separation or derive
+digital control flow from a trusted query~\cite{struq2025,secalign2025,
+camel2026,ace2026}.  Action attribution and trajectory auditing explain tool
+calls or mobile-agent behavior~\cite{attriguard2026,mate2026}.  \vla verifiers
+assess plan--action consistency or learned alignment over action candidates
+~\cite{sealvla2026,covervla2026}.  CPS integrity and robot-attestation systems
+bind protected programs, reference motion, or control flow to execution
+evidence~\cite{diat2019,cfaplus2024,arto2026,tat2026}; prediction and shielding
+qualify candidate consequences or continuous safety sets
+~\cite{vlmpc2024,safetychance2024,measurementrobustcbf2021,
+realizableshields2025}.
+
+These defenses stop at different points around the online \actionblock.  Input
+and agent defenses do not establish that the block later accepted by the robot
+is the one justified by trusted task state.  Candidate verifiers may rank or
+score a policy proposal, but do not preserve that verdict through ordered
+dispatch and observed effects.  Execution-integrity systems begin from a
+protected program or previously specified motion, while shields qualify a
+physical constraint without connecting the decision back to task-relative
+authority.  The surveyed defense families therefore protect different segments
+of the path.  Their stated mechanisms do not jointly bind independently anchored
+task authority to the exact newly generated block, its ordered dispatch, and
+registered execution evidence.
+
+This missing composition exposes two alignment gaps.  The \emph{intent--action
+authorization gap} lies between trusted task intent and the exact \actionblock
+generated from an attackable policy view.  The \emph{action--execution
+realization gap} lies between an admitted block and its ordered dispatch,
+evidence, and state-dependent physical realization.  C1 belongs to the first
+stage.  C2 and C3 are the transaction-integrity and guarded-realization
+obligations within the second stage.
+
+The core question is how an action-only consumer can establish
+checker-relative task authorization for an exact source block and preserve that
+authorization through qualified execution without modifying the \vla.
+
+The key insight is to treat the exact online \actionblock as the stable identity
+anchor across the entire lifecycle.  Evidence attaches to this observable
+object, avoiding assumptions about the model's latent intent or a unique
+reference trajectory.  A scoped task-relative assessment names the source
+block, the same proposal persists through dispatch and effect evidence, and any
+state-dependent execution configuration is recorded separately.  Physical
+qualification therefore cannot silently change the object named by earlier
+evidence.
+
+Turning this insight into a runtime monitor raises three challenges.  \textbf{C1
+concerns semantic assessment.}  A task phase may admit many valid trajectories,
+so the monitor must distinguish covered hard risks from uncertain task progress
+without presenting a local checker as a complete semantic oracle.  \textbf{C2
+concerns execution identity.}  Assessment, permission, ordered dispatch,
+receipts, and effects must remain attached to one proposal and one state epoch
+under replay and reordering attempts.  \textbf{C3 concerns state-dependent
+realization.}  Near a physical boundary, the monitor must qualify an execution
+configuration while keeping the policy's source action fixed and making failure
+explicit.
+
+\system realizes this two-stage design as an inline consumer-side reference
+monitor~\cite{saltzer1975,schneider2000}.  \lone aligns trusted task intent with
+the exact source \actionblock through checker-relative \taskassessment (C1).
+Covered hard risks reject before dispatch; task-progress uncertainty remains
+advisory.  \ltwo aligns the admitted source block with execution.  Its
+\transactionbinding component (\ltwoa) binds the proposal to a one-use ordered
+transaction and requires matching receipts and effects (C2).
+\guardscreening (\ltwob) qualifies the same source action under a registered
+joint-boundary trigger before dispatch (C3).  Together, the two stages implement
+the \proofaligned lifecycle property while leaving the \vla checkpoint,
+policy-facing prompt, and single-source-block generation unchanged.
+
+The threat and the final system are evaluated in two deliberately separate
+studies.  The attack-reproduction study pairs clean and SABER-attacked rollouts
+for 120 seed-specific units and measures whether an attack creates a new
+physical-risk transition.  The system study reruns the same population under
+clean and attacked conditions for 960 attempts.  Its four paired arms are
+\vlaonly, \loneonly, \ltwoonly, and \dual.  This design separates the reproduced
+ASR from the four-arm mechanism comparison and reports task success independently
+from physical-risk outcomes.
+
+The attack reproduction yields an observed ASR of 45.35\% among 86
+clean-eligible units (39/86).  In the separate four-arm study, the common
+75-unit cohort has broad risk-transition rates of 50.67\%, 56.00\%, 48.00\%,
+and 57.33\%; the paired sensitivity tests provide no evidence of a broad
+reduction.  Each condition has 98.96\% valid traces (475/480), leaving the
+registered all-valid dependency unmet and the comparisons nonconfirmatory.
+Under attack, \dual task success is 53.33\%, compared with 60.83\% for
+\vlaonly.  The narrower registered joint-side result covers the 237 valid
+attacked \ltwoenabled traces.  None contains a joint-limit step (0.00\%), while
+valid attacked \vlaonly and \loneonly traces contain 4,960 and 2,452 such
+steps.  This supports the targeted guard property within its validity boundary;
+it is not a general robot-safety claim.
+
+All claims are checker-relative and TCB-relative.  The empirical scope is one
+$\pi_{0.5}$ checkpoint, LIBERO-Safety simulation, and one frozen SABER
+instruction-attack family.
+
+This work makes three contributions.
+\begin{itemize}
+  \item \textbf{A protected object and lifecycle security property.}  This work
+  identifies the exact online \actionblock as the common object across
+  task-relative assessment, execution identity, and state-conditioned
+  realization, and defines the adversary, TCB, evidence endpoints, and
+  \proofaligned property.
+  \item \textbf{A two-stage cross-layer reference monitor.}  \system composes
+  \lone intent--action assessment with \ltwo action--execution transaction and
+  guard enforcement while keeping source-action identity fixed.  Lean checks
+  selected abstract transaction and phase relations.
+  \item \textbf{An attack reproduction and paired system characterization.}
+  The evaluation quantifies the reproduced SABER attack, compares the final
+  system and its two stage ablations, and reports broad risk, task success,
+  targeted joint-side behavior, invalid traces, and runtime cost without merging
+  their distinct estimands.
+\end{itemize}

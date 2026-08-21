@@ -8,25 +8,26 @@
 ]
 \node[font=\bfseries] at (3.7,1.1) {(a) Complete attack-risk protocol};
 \node[key] (base) at (0,0) {60 base pairs};
-\node[box] (seed) at (3.0,0) {$\times 2$ seeds\\clean + attacked};
+\node[box] (seed) at (3.0,0) {$\times 2$ seeds\\clean and attacked};
 \node[box] (episodes) at (6.0,0) {240 valid\\episodes};
-\node[box] (eligible) at (9.0,0) {86 clean-safe\\eligible units};
-\node[result] (signal) at (12.2,0) {39 risk transitions\\45.35\%};
+\node[box] (eligible) at (9.0,0) {86 clean-eligible\\units};
+\node[result] (signal) at (12.2,0) {39 meet the registered\\risk-transition endpoint};
 \draw[flow] (base)--(seed);
 \draw[flow] (seed)--(episodes);
 \draw[flow] (episodes)--node[above]{filter}(eligible);
 \draw[flow] (eligible)--(signal);
-\node[align=center,text width=28mm,below=2mm of signal] {measured attack risk\\observed ASR for this setup};
+\node[align=center,text width=28mm,below=2mm of signal] {observed attacked-over-clean\\transition rate};
 
-\node[font=\bfseries] at (3.6,-2.2) {(b) Paired four-arm mechanism population};
-\node[key] (pairs) at (0,-3.3) {18 paired mechanism\\task/init workloads};
-\node[box] (conditions) at (3.0,-3.3) {clean + attacked\\matched seeds};
-\node[box] (arms) at (6.0,-3.3) {VLA / L1 / L2 / Dual\\rotated schedule};
-\node[box] (total) at (9.0,-3.3) {144 retained\\episodes};
-\node[result] (outcomes) at (12.2,-3.3) {task success +\\violation / integrity / cost};
+\node[font=\bfseries] at (3.6,-2.2) {(b) Complete-population four-arm experiment};
+\node[key] (pairs) at (0,-3.3) {60 base pairs\\$\times 2$ seeds};
+\node[box] (conditions) at (3.0,-3.3) {120 fixed units\\clean and attacked};
+\node[box] (arms) at (6.0,-3.3) {\vlaonly, \loneonly, \ltwoonly, \dual\\rotated schedule};
+\node[box] (total) at (9.0,-3.3) {960 attempts\\475/480 valid per condition\\all-valid requirement unmet};
+\node[result] (outcomes) at (12.2,-3.3) {task: all 120\\broad risk: common 75\\joint: valid attacked traces};
 \draw[flow] (pairs)--(conditions);
 \draw[flow] (conditions)--(arms);
 \draw[flow] (arms)--(total);
 \draw[flow] (total)--(outcomes);
-\node[align=center,text width=31mm,below=2mm of outcomes] {different population and event definition; never pooled with (a)};
+\node[align=center,text width=33mm,below=2mm of outcomes] {same 120 units; new runs\\conservative, nonconfirmatory diagnostics};
+
 \end{tikzpicture}

@@ -1,25 +1,27 @@
 \section{Conclusion}
 
-We presented \system, a cross-layer reference monitor for the point at which a
-VLA's continuous output becomes an executable command.  Its central security
-object is the exact source \actionblock.  A checker-relative assessment is
-bound to that block, its identity is preserved through a one-use execution
-transaction, and a triggered physical boundary requires qualified containment
-without source-action replacement.  The composition is captured by the
-$\mathsf{ProofAligned}$ property, with Lean machine-checking its finite
-authorization, ordered-action, receipt, effect, and phase-transition relations.
+\system is a cross-layer reference monitor for two alignment stages at the
+action-only \vla boundary.  \lone binds trusted task intent to the exact online
+\actionblock through a checker-relative assessment.  \ltwo then binds the
+authorized block to execution: \ltwoa preserves proposal identity through a
+one-use ordered transaction and its evidence, while \ltwob qualifies the same
+source action at the registered joint boundary.  The
+\proofaligned property composes these obligations, and Lean checks
+selected abstract transaction and phase relations.
 
-The complete attack-evaluation protocol measures a 39/86 (45.35\%) observed
-risk-transition ASR under SABER.  In the paired four-arm mechanism study,
-L1-only records 13/18
-attacked task success, both L2-on arms record 0/18 observed joint-limit
-violation episodes, and Dual combines the 13/18 and 0/18 sample outcomes.
-These outcomes expose the intended separation between task monitoring and
-covered physical containment in the frozen simulator setting; they do not
-establish population-level effects.
+The independent SABER reproduction measures a 45.35\% attack-induced
+risk-transition rate among 86 clean-eligible units (39/86).  The separate
+120-unit four-arm study produces 960 episode attempts, with 98.96\% valid traces
+in each condition (475/480).  Its registered all-valid requirement is unmet, so
+the system comparisons remain nonconfirmatory.  On the common 75-unit cohort,
+the risk-transition rates for \vlaonly, \loneonly, \ltwoonly, and \dual are
+50.67\%, 56.00\%, 48.00\%, and 57.33\%; no paired contrast provides evidence of
+a broad reduction.  Under attack, task success is 60.83\% for \vlaonly and
+53.33\% for \dual.  The targeted joint-side observation is narrower: 0.00\%
+of the 237 valid attacked \ltwoenabled traces contain a joint-limit step (0/237), while
+the valid attacked \vlaonly and \loneonly traces record 4,960 and 2,452 such
+steps.
 
-Broader robot-safety claims require trusted perception, typed controller
-binding, more attacks and policies, hardware feedback, real-robot validation,
-and hard-real-time analysis.  \system instead closes a narrower, auditable
-chain: which action was assessed, which authorization permitted it, which
-command was applied, and which evidence allowed the execution phase to close.
+The evidence is checker-relative, simulator-bound, and limited to the stated
+TCB, attack family, and valid traces.  It does not establish a broad
+robot-safety improvement or hard-real-time guarantee.

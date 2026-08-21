@@ -15,6 +15,7 @@ checkpoint。归档只改变文档位置，不删除或改判任何冻结实验�
 - `l2_and_cross_layer_experiments.md`：旧 L2/跨层实验计划；
 - `semantic_subtask_pilot.md`：早期 semantic pilot；
 - `remote_execution.md`：远程执行手册；
+- `project_closeout_audit_20260821.md`：结题版本的验证结果、历史审计非通过项和本地清理边界；
 - `v11_*`、`v12_*`：历史 checkpoint 与优化过程。
 
 ## 论文历史材料

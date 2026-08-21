@@ -826,8 +826,8 @@ violation episodes。结果支持冻结 simulator 范围内“任务效用与 co
 
 > 下列条目使用工作引用键，便于当前 Markdown 审阅；提交前统一导出 BibTeX，并核对作者、页码与 DOI。
 
-- **[SABER]** [SABER: A Stealthy Agentic Black-Box Attack Framework for Vision-Language-Action Models](https://arxiv.org/abs/2603.24935), IROS, 2026（当前可访问版本为 arXiv）。
-- **[LIBERO-Safety]** [LIBERO-Safety](https://arxiv.org/abs/2606.23686), ECCV, 2026.
+- **[SABER]** [SABER: A Stealthy Agentic Black-Box Attack Framework for Vision-Language-Action Models](https://arxiv.org/abs/2603.24935), arXiv, 2026（作者主页称已被 IROS 2026 接收；当前仍按 arXiv 官方元数据著录）。
+- **[LIBERO-Safety]** [LIBERO-Safety](https://arxiv.org/abs/2606.23686), arXiv, 2026（已被 ECCV 2026 接收）。
 - **[SafeVLA-Bench]** [SafeVLA-Bench](https://arxiv.org/abs/2606.00773), arXiv, 2026.
 - **[ForesightSafety]** [ForesightSafety-VLA](https://arxiv.org/abs/2606.27079), arXiv, 2026.
 - **[VLASurvey]** [Vision-Language-Action Safety: Threats, Challenges, Evaluations, and Mechanisms](https://arxiv.org/abs/2604.23775), arXiv, 2026.
@@ -842,7 +842,7 @@ violation episodes。结果支持冻结 simulator 范围内“任务效用与 co
 - **[SecAlign]** [SecAlign](https://arxiv.org/abs/2410.05451), ACM CCS, 2025.
 - **[CaMeL]** [Defeating Prompt Injections by Design](https://arxiv.org/abs/2503.18813), IEEE SaTML, 2026.
 - **[SEAL]** [Do What You Say: Steering Vision-Language-Action Models via Runtime Reasoning-Action Alignment Verification](https://arxiv.org/abs/2510.16281), ICRA, 2026.
-- **[CoVer]** [Scaling Verification Can Be More Effective than Scaling Policy Learning for Vision-Language-Action Alignment](https://arxiv.org/abs/2602.12281), arXiv；ScaleBot @ CVPR workshop, 2026.
+- **[CoVer]** [Scaling Verification Can Be More Effective than Scaling Policy Learning for Vision-Language-Action Alignment](https://arxiv.org/abs/2602.12281), arXiv, 2026（另有 ScaleBot @ CVPR 2026 workshop 的官方 OpenReview 记录）。
 - **[WebAgent]** [When AI Meets the Web](https://arxiv.org/abs/2511.05797), IEEE S&P, 2026.
 - **[AgentPerms]** [Towards Automating Data Access Permissions in AI Agents](https://homes.cs.washington.edu/~franzi/pdf/wu-agentperms-sp26.pdf), IEEE S&P, 2026.
 - **[IsolateGPT]** [IsolateGPT](https://www.ndss-symposium.org/ndss-paper/isolategpt-an-execution-isolation-architecture-for-llm-based-agentic-systems/), NDSS, 2025.
